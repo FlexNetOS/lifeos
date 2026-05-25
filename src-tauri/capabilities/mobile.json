@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Mobile permission set for LifeOS — iOS / Android. Drops shell:* (any compromised webview content could otherwise spawn processes) and core:menu:* (no menu surface exists on mobile). FS scope stays — same vault model as desktop. The mobile readiness audit at `.claude/plan/tauri-mobile-readiness.md` is the source for this split.",
+  "windows": ["main"],
+  "platforms": ["android", "iOS"],
+  "permissions": [
+    "core:default",
+    "core:event:default",
+    "core:webview:default",
+    "core:window:default",
+    "fs:default"
+  ]
+}

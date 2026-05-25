@@ -1,0 +1,40 @@
+[package]
+name = "lifeos"
+version = "0.1.0"
+description = "LifeOS — the AI agent that runs your home and life."
+authors = ["LifeOS"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "lifeos_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Portable LifeOS core — types, auth, MCP clients. Stage 1b moves the pure
+# structs (VaultEntry / AppVersion / TelemetrySnapshot / AiProvider) here so the
+# Tauri shell stops being the canonical home for cross-platform data shapes.
+lifeos-core = { path = "../crates/lifeos-core", features = ["plugin-host", "storage"] }
+tauri = { version = "2", features = [] }
+tauri-plugin-fs = "2"
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# AI provider routing — async HTTP via rustls (no openssl-sys C build), and a thin
+# keyring read that gracefully no-ops on hosts without secret-service running.
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "rustls-native-certs", "json"] }
+keyring = "3"
+# Telemetry widget — sysinfo gives us cross-platform CPU / memory / network /
+# uptime without pulling per-OS crates. `default-features = false` strips the
+# component / disks / users probes we don't render.
+sysinfo = { version = "0.39", default-features = false, features = ["system", "network"] }
+# Local account login — Argon2id password hashing is provided by `lifeos-core`
+# (Stage 1c). The shell only needs the JSON storage helpers + Tauri command
+# wrappers in src-tauri/src/auth.rs.
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

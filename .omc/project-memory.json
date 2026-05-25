@@ -1,0 +1,517 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1779663425786,
+  "projectRoot": "/home/drdave/repos/ubuntu-lifeos",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "vue",
+        "version": "3.4.27",
+        "category": "frontend"
+      },
+      {
+        "name": "vite",
+        "version": "5.2.10",
+        "category": "build"
+      },
+      {
+        "name": "vitest",
+        "version": "1.6.0",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "bun run build 2>&1 | tail -20",
+    "testCommand": "/home/drdave/.claude/bin/codeagent-wrapper --backend codex - \"/home/drdave/repos/ubuntu-lifeos\" <<'EOF'\nYou are reviewing an OpenSpec proposal for a Vue 3 + Tauri 2 desktop app (LifeOS).\nThe proposal is at openspec/changes/design-md-format-adoption/proposal.md (197 lines, read it).\n\nThe change adopts the `@google/design.md` format spec (a YAML+markdown spec for describing\ndesign systems to AI agents) and locks the existing 0-violation axe baseline via ~30\ncomponent-level vitest-axe specs.\n\nSource context:\n- Upstream spec: ~/_work/repos/google-labs-code-design.md/docs/spec.md and README.md\n- Existing tokens: colors_and_type.css (60+ CSS variables)\n- Existing prose: design-system-reference/README.md (12.8K)\n- Existing test suite: 194 specs in tests/ (Vitest + happy-dom + @vue/test-utils)\n- Hard constraints: no openssl-sys in cargo graph; ESP32/no_std isolation; .ts/.js sibling parity; OpenPencil compatibility; lifeos.cyan/purple/green identity preserved\n\nReview the proposal as a senior implementation engineer. Surface ONLY:\n1. Specific risks I missed (not generic \"consider X\" advice)\n2. Concrete ambiguities that would create implementation forks (e.g. \"spec says X, but how do we handle Y edge case?\")\n3. PBT-style invariants for the new capabilities (e.g. \"DESIGN.md lint output is deterministic for a given input file\")\n4. Tasks that should be added or split that the proposal misses\n5. Anything that, if missed, would break the existing 194-test suite, the cargo workspace, or the Tauri shell\n\nFormat as JSON:\n{\n  \"missed_risks\": [{\"risk\": \"...\", \"severity\": \"high|med|low\", \"mitigation\": \"...\"}],\n  \"open_ambiguities\": [{\"ambiguity\": \"...\", \"needed_decision\": \"...\"}],\n  \"pbt_invariants\": [{\"capability\": \"...\", \"property\": \"...\", \"falsification\": \"...\"}],\n  \"missing_tasks\": [\"specific concrete task\"],\n  \"regression_risks\": [\"specific way existing tests/build could break\"]\n}\n\nKeep total response under 2000 tokens. Be specific, not generic.\nEOF",
+    "lintCommand": null,
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "vite",
+      "build": "vue-tsc --noEmit && vite build",
+      "preview": "vite preview",
+      "test": "vitest run",
+      "test:watch": "vitest",
+      "test:coverage": "vitest run --coverage",
+      "tauri": "tauri",
+      "tauri:dev": "tauri dev",
+      "tauri:build": "tauri build"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "public",
+      "src",
+      "tests"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "design-system-reference": {
+      "path": "design-system-reference",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1779663425776,
+      "keyFiles": [
+        "README.md",
+        "SKILL.md",
+        "sot.md"
+      ]
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 9,
+      "lastAccessed": 1779663425776,
+      "keyFiles": [
+        "index.html",
+        "lifeos-app-icon.png",
+        "lifeos-companion.svg",
+        "lifeos-icon-triad.png",
+        "lifeos-mark-256.png"
+      ]
+    },
+    "fonts": {
+      "path": "fonts",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1779663425783,
+      "keyFiles": [
+        "Rigelstar.ttf"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 8,
+      "lastAccessed": 1779663425784,
+      "keyFiles": [
+        "lifeos-app-icon.png",
+        "lifeos-companion.svg",
+        "lifeos-icon-triad.png",
+        "lifeos-mark-256.png",
+        "lifeos-mark.png"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 3,
+      "lastAccessed": 1779663425785,
+      "keyFiles": [
+        "App.vue",
+        "main.ts",
+        "shims-vue.d.ts"
+      ]
+    },
+    "src-tauri": {
+      "path": "src-tauri",
+      "purpose": null,
+      "fileCount": 5,
+      "lastAccessed": 1779663425785,
+      "keyFiles": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "build.rs",
+        "tauri.conf.json"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 25,
+      "lastAccessed": 1779663425785,
+      "keyFiles": [
+        "Badge.spec.js",
+        "CalendarView.spec.js",
+        "CommandPalette.spec.js",
+        "ContactsView.spec.js",
+        "Dashboard.spec.js"
+      ]
+    },
+    "dist/assets": {
+      "path": "dist/assets",
+      "purpose": "Static assets",
+      "fileCount": 8,
+      "lastAccessed": 1779663425785,
+      "keyFiles": [
+        "Rigelstar-B2-V78BQ.ttf",
+        "index-BCavsbeh.js",
+        "index-BIuUeJOD.css"
+      ]
+    },
+    "src/components": {
+      "path": "src/components",
+      "purpose": "UI components",
+      "fileCount": 23,
+      "lastAccessed": 1779663425785,
+      "keyFiles": [
+        "AIAvatar.vue",
+        "AIChat.vue",
+        "Badge.vue"
+      ]
+    },
+    "src/data": {
+      "path": "src/data",
+      "purpose": "Data files",
+      "fileCount": 1,
+      "lastAccessed": 1779663425785,
+      "keyFiles": [
+        "types.ts"
+      ]
+    },
+    "src/lib": {
+      "path": "src/lib",
+      "purpose": "Library code",
+      "fileCount": 8,
+      "lastAccessed": 1779663425785,
+      "keyFiles": [
+        "icons.js",
+        "icons.ts",
+        "nav.js"
+      ]
+    },
+    "src-tauri/src": {
+      "path": "src-tauri/src",
+      "purpose": "Source code",
+      "fileCount": 2,
+      "lastAccessed": 1779663425786,
+      "keyFiles": [
+        "lib.rs",
+        "main.rs"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src-tauri/src/lib.rs",
+      "accessCount": 28,
+      "lastAccessed": 1779704603593,
+      "type": "file"
+    },
+    {
+      "path": "TODO.md",
+      "accessCount": 20,
+      "lastAccessed": 1779704826050,
+      "type": "file"
+    },
+    {
+      "path": "src-tauri/Cargo.toml",
+      "accessCount": 14,
+      "lastAccessed": 1779704149962,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "accessCount": 14,
+      "lastAccessed": 1779708711049,
+      "type": "file"
+    },
+    {
+      "path": ".claude/plan/cross-platform-foundation.md",
+      "accessCount": 12,
+      "lastAccessed": 1779696529931,
+      "type": "file"
+    },
+    {
+      "path": "vite.config.ts",
+      "accessCount": 8,
+      "lastAccessed": 1779686867668,
+      "type": "file"
+    },
+    {
+      "path": "src-tauri/src/auth.rs",
+      "accessCount": 8,
+      "lastAccessed": 1779704565685,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 8,
+      "lastAccessed": 1779710508678,
+      "type": "file"
+    },
+    {
+      "path": "src/components/SettingsView.vue",
+      "accessCount": 7,
+      "lastAccessed": 1779691980175,
+      "type": "file"
+    },
+    {
+      "path": "tests/SettingsView.spec.js",
+      "accessCount": 7,
+      "lastAccessed": 1779692020828,
+      "type": "file"
+    },
+    {
+      "path": "vitest.config.ts",
+      "accessCount": 7,
+      "lastAccessed": 1779710502051,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 6,
+      "lastAccessed": 1779704780785,
+      "type": "file"
+    },
+    {
+      "path": "src-tauri/tauri.conf.json",
+      "accessCount": 5,
+      "lastAccessed": 1779696431858,
+      "type": "file"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "accessCount": 5,
+      "lastAccessed": 1779704819489,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/icons.ts",
+      "accessCount": 5,
+      "lastAccessed": 1779710507671,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/icons.js",
+      "accessCount": 4,
+      "lastAccessed": 1779686086780,
+      "type": "file"
+    },
+    {
+      "path": "tsconfig.json",
+      "accessCount": 4,
+      "lastAccessed": 1779686120402,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 4,
+      "lastAccessed": 1779696950030,
+      "type": "file"
+    },
+    {
+      "path": "src/stores/lifeos.ts",
+      "accessCount": 4,
+      "lastAccessed": 1779697462897,
+      "type": "file"
+    },
+    {
+      "path": "src/main.ts",
+      "accessCount": 3,
+      "lastAccessed": 1779691143991,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/persistence.ts",
+      "accessCount": 3,
+      "lastAccessed": 1779696497340,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/persistence.js",
+      "accessCount": 3,
+      "lastAccessed": 1779696497873,
+      "type": "file"
+    },
+    {
+      "path": "src/stores/lifeos.js",
+      "accessCount": 3,
+      "lastAccessed": 1779697476367,
+      "type": "file"
+    },
+    {
+      "path": ".claude/settings.json",
+      "accessCount": 3,
+      "lastAccessed": 1779697642918,
+      "type": "file"
+    },
+    {
+      "path": "src-tauri/capabilities/default.json",
+      "accessCount": 3,
+      "lastAccessed": 1779698900802,
+      "type": "file"
+    },
+    {
+      "path": "tests/setup.js",
+      "accessCount": 3,
+      "lastAccessed": 1779710414227,
+      "type": "file"
+    },
+    {
+      "path": "tests/__mocks__/lucide-vue-next.js",
+      "accessCount": 2,
+      "lastAccessed": 1779685950404,
+      "type": "file"
+    },
+    {
+      "path": "src/components/OpenPencilEditor.vue",
+      "accessCount": 2,
+      "lastAccessed": 1779686080530,
+      "type": "file"
+    },
+    {
+      "path": "src/shims-vue.d.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779686144569,
+      "type": "file"
+    },
+    {
+      "path": "src/router/index.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779691164268,
+      "type": "file"
+    },
+    {
+      "path": "src/App.vue",
+      "accessCount": 2,
+      "lastAccessed": 1779691630923,
+      "type": "file"
+    },
+    {
+      "path": "HANDOFF.md",
+      "accessCount": 2,
+      "lastAccessed": 1779699867414,
+      "type": "file"
+    },
+    {
+      "path": ".claude/plan/google-design-incorporation.md",
+      "accessCount": 2,
+      "lastAccessed": 1779708698766,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Icon.vue",
+      "accessCount": 2,
+      "lastAccessed": 1779710501729,
+      "type": "file"
+    },
+    {
+      "path": "SESSIONS.md",
+      "accessCount": 1,
+      "lastAccessed": 1779667348682,
+      "type": "file"
+    },
+    {
+      "path": ".claude/hooks/session-log.mjs",
+      "accessCount": 1,
+      "lastAccessed": 1779667387345,
+      "type": "file"
+    },
+    {
+      "path": ".claude/hooks/README.md",
+      "accessCount": 1,
+      "lastAccessed": 1779667394992,
+      "type": "file"
+    },
+    {
+      "path": "Claude-vite-bundle/Bundle the whole repo.md",
+      "accessCount": 1,
+      "lastAccessed": 1779685313080,
+      "type": "file"
+    },
+    {
+      "path": "tests/Icon.spec.js",
+      "accessCount": 1,
+      "lastAccessed": 1779685950444,
+      "type": "file"
+    },
+    {
+      "path": "tests/Sidebar.spec.js",
+      "accessCount": 1,
+      "lastAccessed": 1779691166405,
+      "type": "file"
+    },
+    {
+      "path": "src/stores/auth.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779691571759,
+      "type": "file"
+    },
+    {
+      "path": "src/views/Login.vue",
+      "accessCount": 1,
+      "lastAccessed": 1779691617253,
+      "type": "file"
+    },
+    {
+      "path": "tests/auth-store.spec.js",
+      "accessCount": 1,
+      "lastAccessed": 1779691645509,
+      "type": "file"
+    },
+    {
+      "path": "tests/Login.spec.js",
+      "accessCount": 1,
+      "lastAccessed": 1779691663330,
+      "type": "file"
+    },
+    {
+      "path": "tests/App-auth-gate.spec.js",
+      "accessCount": 1,
+      "lastAccessed": 1779691672642,
+      "type": "file"
+    },
+    {
+      "path": ".claude/plan/loop-closure.md",
+      "accessCount": 1,
+      "lastAccessed": 1779696106553,
+      "type": "file"
+    },
+    {
+      "path": "src-tauri/src/main.rs",
+      "accessCount": 1,
+      "lastAccessed": 1779696279103,
+      "type": "file"
+    },
+    {
+      "path": "src-tauri/capabilities/AGENTS.md",
+      "accessCount": 1,
+      "lastAccessed": 1779696453081,
+      "type": "file"
+    },
+    {
+      "path": ".claude/plan/exo-integration.md",
+      "accessCount": 1,
+      "lastAccessed": 1779696539170,
+      "type": "file"
+    },
+    {
+      "path": ".claude/plan/tauri-mobile-readiness.md",
+      "accessCount": 1,
+      "lastAccessed": 1779696688660,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

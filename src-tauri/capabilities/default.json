@@ -1,0 +1,17 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Desktop permission set for LifeOS — core, shell open, native menu, and FS access scoped to the user vault via tauri.conf.json. iOS/Android use mobile.json (no shell, no menu).",
+  "windows": ["main"],
+  "platforms": ["linux", "macOS", "windows"],
+  "permissions": [
+    "core:default",
+    "core:event:default",
+    "core:webview:default",
+    "core:window:default",
+    "core:menu:default",
+    "shell:default",
+    "shell:allow-open",
+    "fs:default"
+  ]
+}

@@ -1,0 +1,32 @@
+## Handoff: team-exec Wave 2 → Wave 3
+- **Decided**: All four serial steps of TODO 1a–1d landed. The repo is now a Cargo workspace at root with `src-tauri/` and `crates/lifeos-core/` as members; `firmware/esp32/` is excluded (its own resolver). `lifeos-core` exposes `types`, `auth`, and `mcp` (cognitum + ruvector scaffolds) — 14 unit tests across the three modules. The Tauri shell imports types and auth helpers from `lifeos_core::*`; `src-tauri/Cargo.toml` no longer declares `argon2` (transitive through lifeos-core).
+- **Live Cognitum endpoint info from user (2026-05-25 mid-Wave 2)**:
+  - **MCP endpoint**: `http://169.254.42.1/mcp` (HTTP, browser-addressable). Not stdio. **This supersedes the foundation doc's stdio-style examples.**
+  - **40 tools live** (10 cogs, 4 framework). Naming is dot-notation:
+    - `seed.coherence.profile` — current coherence profile
+    - `seed.cogs.list` — installed cogs with running state + PID (mirrors `GET /api/v1/apps`)
+    - `seed.cogs.available` — browse cloud cog registry (mirrors `GET /api/v1/apps/available`)
+    - `seed.cogs.install` — install a cog (mirrors `POST /api/v1/apps/install`)
+    - `seed.cogs.start` / `seed.cogs.stop` — lifecycle (mirrors `POST /api/v1/apps/{id}/{start,stop}`)
+    - `seed.cogs.logs` — recent stdout/stderr (mirrors `GET /api/v1/apps/{id}/logs`)
+    - `seed.sensor.snapshot` — most recent sensor frame (mirrors `GET /api/v1/sensor/stream`)
+    - `seed.cogs.config_get` / `seed.cogs.config_set` — cog config (mirrors `GET`/`PUT /api/v1/apps/{id}/config`)
+    - `seed.cogs.uninstall` — `DELETE /api/v1/apps/{id}`
+    - `seed.cogs.console` — exec allowed command (mirrors `POST /api/v1/apps/{id}/console`)
+  - **Every MCP tool mirrors a REST endpoint** — so the simplest cross-platform client is `reqwest`-on-REST, not a JSON-RPC marshaller. The MCP-over-HTTP path stays available for agents-driving-LifeOS scenarios.
+  - **Tool-name mismatch with foundation doc**: the TODO/foundation doc cited `seed_device_status` / `seed_sensor_list` / `seed_thermal_state` / `seed_cognitive_status` / `seed_memory_query`. Those don't appear in the live 40-tool list. The closest live equivalents are `seed.sensor.snapshot`, `seed.coherence.profile`, `seed.cogs.list`. **Wave 3 Cognitum agent targets the actual visible tool names** and documents the rename in its module-level comment.
+  - The screenshot also calls out ESP32 firmware v0.6.3 for ESP32-S3 (`cognitum-esp32s3-v0.6.3.bin`) — out of scope for this run but worth noting that the user's Cognitum target chip is ESP32-S3, not the ESP32-C6 we scaffolded for LifeOS. Wave 1 ESP32 firmware skeleton stays on C6 (RISC-V stable Rust) as decided; the ESP32-S3 ref is informational.
+- **Rejected**: Adding `lifeos-daemon` to the workspace members in Wave 2 (deferred — created+wired by Wave 3 C3). The `Workspace`/`Section`/`Item`/`AiMessage` names from TODO 1b had no Rust footprint to move; deferred until a future `data.js → src/data/*.ts → lifeos-core::domain` port. Stdio-MCP transport for Cognitum (the live endpoint is HTTP).
+- **Risks**: Wave 3 agents must NOT race on shared files. Territory plan to avoid races:
+  - **Combined MCP agent (C1+C2 merged)**: edits `crates/lifeos-core/src/mcp/{cognitum.rs,ruvector.rs}` + `crates/lifeos-core/Cargo.toml`. Single agent owns both client files to avoid Cargo.toml races. Uses `reqwest` (already a workspace dep via src-tauri) with `rustls-tls`. **Must NOT pull `openssl-sys`.** Endpoint defaults: `LIFEOS_COGNITUM_URL` env → `http://169.254.42.1/mcp`; `LIFEOS_RUVECTOR_URL` env → unverified, leave blank with placeholder.
+  - **C3 lifeos-daemon**: creates `crates/lifeos-daemon/` and uncomments the line in root `Cargo.toml` members. Owns root Cargo.toml during its run.
+  - **C4 mlua spike**: edits `crates/lifeos-core/Cargo.toml` (adds `mlua` under a `plugin-host` feature) and creates `crates/lifeos-core/src/plugin/mod.rs` + a Tauri command in `src-tauri/src/lib.rs`. Owns `lifeos-core/Cargo.toml` and `src-tauri/src/lib.rs` during its run.
+  - **Sequence**: combined-MCP-agent runs first (owns lifeos-core/Cargo.toml). Then C3 + C4 run in parallel (C3 owns root Cargo.toml; C4 owns lifeos-core/Cargo.toml + src-tauri/src/lib.rs — disjoint).
+- **Files** (Wave 2 actually touched):
+  - Created: `/Cargo.toml` (workspace root), `/Cargo.lock` (moved from `src-tauri/`), `crates/lifeos-core/{Cargo.toml,src/lib.rs,src/types.rs,src/auth.rs,src/mcp/mod.rs,src/mcp/cognitum.rs,src/mcp/ruvector.rs}`, `.omc/handoffs/team-plan.md`, `.omc/handoffs/team-exec-wave2.md`.
+  - Modified: `src-tauri/Cargo.toml` (added lifeos-core path dep, removed argon2), `src-tauri/src/lib.rs` (imports moved types, replaced SUPPORTED_PROVIDERS with AiProvider enum), `src-tauri/src/auth.rs` (slimmed to storage + 5 Tauri command wrappers; pub use AuthState from lifeos-core), `src/stores/lifeos.ts` + `src/stores/lifeos.js` (comment-only update to point at new AiProvider location).
+- **Remaining for Wave 3**:
+  - Combined MCP agent: HTTP+REST read-only client methods for Cognitum (`seed.cogs.list`, `seed.sensor.snapshot`, `seed.coherence.profile`, `seed.cogs.logs` GET-style only) using `reqwest` (rustls). Typed response structs (start permissive — `serde_json::Value` plus typed views for the 2-3 most useful fields per call). In-memory fake `Transport` trait for unit tests. `#[ignore]`-d smoke test gated on `LIFEOS_COGNITUM_URL`. RuVector path mirrors the shape with placeholder URL and `vector_db_stats` / `gnn_cache_stats` REST paths flagged "unverified — confirm before implementing."
+  - C3 lifeos-daemon: bin crate cross-compiles to `aarch64-unknown-linux-gnu` from this host. Imports `lifeos_core::types`. Sensor → MQTT bridge sketched (placeholder body OK; the bin must compile against `aarch64-unknown-linux-gnu` target without installing a Pi sysroot — pure-Rust deps only, e.g. `rumqttc` with rustls).
+  - C4 mlua: feature-flagged Lua/Luau scripting inside `lifeos-core`. `mlua = "{version}", features = ["luau", "async", "send", "vendored"]`. Sandbox `io`, `os`, `package` before any script runs. Tauri command `plugin_run(script: String) -> Result<String, String>` for the spike.
+  - Final Wave 4 (lead): Tauri capabilities split + `#[cfg(desktop)]` gate on the menu setup block in `src-tauri/src/lib.rs` (mobile audit flagged this as the one compile blocker), CHANGELOG entry, TODO.md update marks, full verify.

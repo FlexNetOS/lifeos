@@ -1,0 +1,18 @@
+[build]
+target = "riscv32imac-unknown-none-elf"
+
+# build-std is required: the riscv32imac-unknown-none-elf tier-2 target does
+# not ship a pre-built core/alloc. Cargo must compile them from source.
+[unstable]
+build-std = ["core", "alloc"]
+
+[target.'cfg(target_arch = "riscv32")']
+# espflash runner: uncomment when espflash is installed on the host.
+# runner = "espflash flash --monitor"
+rustflags = [
+    "-C", "link-arg=-Tlinkall.x",
+    "-C", "force-frame-pointers",
+]
+
+[env]
+ESP_LOG = "info"

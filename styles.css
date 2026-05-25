@@ -1,0 +1,76 @@
+/* LifeOS — top-level styles
+   Imports the design tokens and the LifeOS component CSS (ported from the
+   React canon, kept identical so visuals match the design system 1:1).
+   Vue-specific overrides (router transitions, skip-link, etc.) live below. */
+
+@import url("./colors_and_type.css");
+@import url("./lifeos_app.css");
+
+/* Vue-specific: vue-router enter/leave transitions on the main canvas */
+.canvas-fade-enter-active,
+.canvas-fade-leave-active { transition: opacity .18s ease, transform .18s ease; }
+.canvas-fade-enter-from,
+.canvas-fade-leave-to     { opacity: 0; transform: translateY(4px); }
+
+/* Accessibility: skip link is invisible until focused */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-1);
+  color: var(--text-strong);
+  border: 1px solid var(--lifeos-cyan);
+  border-radius: var(--radius-md);
+  font: 500 13px/1.4 var(--font-sans);
+  z-index: 9999;
+  transition: top .2s ease;
+}
+.skip-link:focus {
+  top: var(--space-3);
+  outline: 2px solid var(--lifeos-cyan);
+  outline-offset: 2px;
+}
+
+/* Accessibility: keyboard-focus rings (mouse clicks don't trigger).
+   Uses the design system's --ring-focus token so the brand color is consistent. */
+:focus-visible {
+  outline: 2px solid var(--lifeos-cyan);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+button:focus-visible,
+[role="button"]:focus-visible,
+[role="option"]:focus-visible {
+  outline: 2px solid var(--lifeos-cyan);
+  outline-offset: 2px;
+}
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--lifeos-cyan);
+  outline-offset: 1px;
+}
+
+/* Screen-reader-only utility. Removes the element from visual layout while keeping it
+   in the accessibility tree for aria-live announcements, off-screen labels, etc. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Respect users who request reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

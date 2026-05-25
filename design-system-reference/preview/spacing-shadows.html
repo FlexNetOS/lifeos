@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Shadows & glow</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--font-sans);padding:24px 20px;box-sizing:border-box;}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;align-items:center;justify-items:center;}
+  .col{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .box{width:84px;height:64px;background:var(--bg-2);border:1px solid var(--bg-4);border-radius:12px;}
+  .s-sm{box-shadow:var(--shadow-sm);}
+  .s-md{box-shadow:var(--shadow-md);}
+  .s-lg{box-shadow:var(--shadow-lg);}
+  .g-cyan{box-shadow:var(--shadow-glow-cyan);border-color:rgba(0,212,255,.4);}
+  .g-purple{box-shadow:var(--shadow-glow-purple);border-color:rgba(155,123,255,.4);}
+  .lbl{font-family:var(--font-mono);font-size:10px;color:var(--fg-3);text-align:center;line-height:1.4;}
+</style></head>
+<body>
+<div class="grid">
+  <div class="col"><div class="box s-sm"></div><div class="lbl">shadow-sm</div></div>
+  <div class="col"><div class="box s-md"></div><div class="lbl">shadow-md</div></div>
+  <div class="col"><div class="box s-lg"></div><div class="lbl">shadow-lg</div></div>
+  <div class="col"><div class="box g-cyan"></div><div class="lbl">glow-cyan</div></div>
+  <div class="col"><div class="box g-purple"></div><div class="lbl">glow-purple</div></div>
+</div>
+</body></html>

@@ -1,0 +1,34 @@
+# lifeos-daemon — headless LifeOS node for Pi Zero 2 W / Pi 3 (64-bit Linux).
+#
+# Wave-3 scaffold. The daemon's eventual job is to bridge the Cognitum-Seed
+# sensor surface (via `lifeos_core::mcp::cognitum::CognitumClient`) to MQTT
+# so a Raspberry Pi without a GUI can stand in as a sensor publisher. For
+# this stage the bin is a placeholder that prints a banner — see `src/main.rs`
+# and `README.md` for the Wave 4+ roadmap.
+#
+# Dependency posture: pure-Rust only. No `openssl-sys`. We pull `lifeos-core`
+# with `default-features = false` so the daemon scaffold doesn't drag
+# `reqwest` (and its rustls transport) into the cross-compile path until a
+# future stage opts back into `mcp-http`. This keeps `cargo check --target
+# aarch64-unknown-linux-gnu` resolving against a minimal dependency graph.
+
+[package]
+name = "lifeos-daemon"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77"
+description = "Headless LifeOS sensor-bridge daemon (Pi Zero 2 W / Pi 3, aarch64-unknown-linux-gnu)."
+license = "MIT OR Apache-2.0"
+
+[[bin]]
+name = "lifeos-daemon"
+path = "src/main.rs"
+
+[dependencies]
+# Workspace sibling. `default-features = false` strips the `mcp-http` feature
+# (and the `reqwest` dep behind it) — the scaffold's `main()` only needs the
+# `VERSION` constant + the `CognitumClient` type signatures, both available
+# without the HTTP transport. A future wave that wires real sensor reads will
+# either flip `default-features` back on or add a `mcp-http` feature here that
+# forwards to `lifeos-core/mcp-http`.
+lifeos-core = { path = "../lifeos-core", default-features = false }

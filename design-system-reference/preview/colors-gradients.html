@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Gradients</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--font-sans);}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:20px;height:170px;box-sizing:border-box;}
+  .sw{border-radius:14px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;border:1px solid var(--bg-4);}
+  .a{background:var(--gradient-spiral);}
+  .b{background:var(--gradient-spiral-soft),var(--bg-1);}
+  .c{background:var(--gradient-radial-glow),var(--bg-1);}
+  .name{font-weight:600;font-size:13px;color:#0a0a0a;}
+  .b .name,.c .name{color:var(--fg-1);}
+  .role{font-size:11px;color:#0a0a0a;opacity:.7;font-family:var(--font-mono);}
+  .b .role,.c .role{color:var(--fg-3);}
+</style></head>
+<body>
+<div class="grid">
+  <div class="sw a">
+    <div class="name">spiral · 135°</div>
+    <div class="role">cyan → purple → green</div>
+  </div>
+  <div class="sw b">
+    <div class="name">spiral · soft</div>
+    <div class="role">18% opacity wash</div>
+  </div>
+  <div class="sw c">
+    <div class="name">radial glow</div>
+    <div class="role">top-anchored halo</div>
+  </div>
+</div>
+</body></html>

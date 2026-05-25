@@ -1,0 +1,80 @@
+# lifeos-core — portable Rust core for LifeOS.
+#
+# Stage 1a: empty crate that exists so the workspace topology is in place. Domain
+# types (1b), Argon2 auth helpers (1c), and MCP client stubs (1d) land here in
+# subsequent stages. Kept dependency-free for now so `cargo check -p lifeos-core`
+# is instant and surfaces only the workspace plumbing, not transitive resolution.
+
+[package]
+name = "lifeos-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77"
+description = "Portable Rust core for LifeOS — types, auth, MCP clients, sync protocols."
+license = "MIT OR Apache-2.0"
+
+[lib]
+name = "lifeos_core"
+path = "src/lib.rs"
+
+[dependencies]
+# Stage 1b: derive Serialize/Deserialize on portable types so the Tauri shell
+# can still return them through `#[tauri::command]` without re-defining shapes.
+serde = { version = "1", features = ["derive"] }
+# Stage 1c: Argon2id password hashing for the local account record. Identical
+# feature set to what `src-tauri/Cargo.toml` previously declared — `std` and
+# `password-hash` pull SaltString::generate + the PHC verifier; the argon2
+# crate re-exports rand_core::OsRng so no separate rand crate is needed.
+argon2 = { version = "0.5", default-features = false, features = ["std", "alloc", "password-hash"] }
+# Stage 1d (Wave 3): MCP read clients now parse real JSON payloads from
+# Cognitum-Seed + RuVector, so serde_json graduates from dev-dependency to a
+# production dep. The typed response wrappers all expose a `.raw()` accessor
+# that hands back the underlying `serde_json::Value` for callers that want
+# fields we haven't typed yet.
+serde_json = "1"
+# Stage 1d (Wave 3): HTTP transport for the MCP REST mirror surfaces. Blocking
+# client so both the daemon and the Tauri shell can call from worker threads
+# without dragging tokio into `lifeos-core`. Rustls feature set mirrors
+# `src-tauri/Cargo.toml` (no openssl-sys, no native-tls). Behind the `mcp-http`
+# feature flag (default-on) so a future no_std slice of the crate can drop the
+# transport and keep just the typed wrappers + `Transport` trait.
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "rustls-tls-native-roots", "blocking", "json"], optional = true }
+# Wave 3 (TODO 1d / C4): Luau plugin host spike. `luau` picks Roblox's
+# sandboxed Lua dialect (the foundation doc recommends it whenever third-party
+# scripts are in scope); `vendored` builds the Luau C VM from source so the
+# crate compiles cleanly on every host without a system Lua install; `send`
+# flips the VM to `Send` so the Tauri command thread can briefly own it.
+# `async` is intentionally NOT enabled — the spike's Tauri command runs
+# synchronously, and pulling futures-util through here for no reason would
+# slow the default-features `cargo check` even though the dep is optional.
+mlua = { version = "0.11", default-features = false, features = ["luau", "send", "vendored"], optional = true }
+# Wave 4 (storage): async SQLite via sqlx. rustls feature set matches reqwest —
+# no openssl-sys in the graph. Optional behind the `storage` feature so
+# no_std / ESP32 consumers keep a clean dependency tree.
+sqlx = { version = "0.8", default-features = false, features = ["sqlite", "tls-rustls", "macros", "migrate", "runtime-tokio", "chrono"], optional = true }
+# tokio listed explicitly so storage code can call tokio::* without relying on
+# sqlx's transitive re-export. The Tauri shell owns the actual runtime; we only
+# need the feature tag here so async storage functions compile.
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "macros"], optional = true }
+# Timestamp formatting for migration archive filenames and DB timestamps.
+# Optional, pulled in by the `storage` feature only.
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"], optional = true }
+
+[features]
+# Default keeps the HTTP transport on — daemon + Tauri shell both need it.
+# Downstream consumers that only want the typed wrappers / `Transport` trait
+# (e.g. a future WASM target) can opt out with `default-features = false`.
+default = ["mcp-http", "storage"]
+mcp-http = ["dep:reqwest"]
+# Wave 3 (TODO 1d / C4): opt-in Luau scripting. Off by default so the standard
+# workspace build doesn't pay the vendored Luau C compile cost; the Tauri
+# shell enables it explicitly in `src-tauri/Cargo.toml`.
+plugin-host = ["dep:mlua"]
+# Wave 4: SQLite-backed local storage. Default-on for desktop + daemon; ESP32
+# consumers turn it off with `default-features = false`.
+storage = ["dep:sqlx", "dep:tokio", "dep:chrono"]
+
+[dev-dependencies]
+# storage tests run against sqlx with tokio runtime
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tempfile = "3"

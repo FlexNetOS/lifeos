@@ -1,0 +1,26 @@
+# LifeOS Cargo workspace
+#
+# Members:
+#  - src-tauri/        — Tauri 2 desktop shell (binary + lifeos_lib staticlib/cdylib/rlib)
+#  - crates/lifeos-core — portable Rust core (types, auth, MCP clients, sync protocols)
+#
+# Excluded:
+#  - firmware/esp32/   — ESP32-C6 no_std firmware. Different target, different resolver,
+#                        own rust-toolchain.toml. Lives as a standalone sibling project,
+#                        not a workspace member.
+#
+# The workspace exists to share the future `lifeos-daemon` bin crate and `lifeos-core`
+# across the desktop shell + headless Pi daemon without duplicating dependencies. The
+# Tauri shell continues to be invoked via `cargo tauri dev` / `cargo tauri build` from
+# the `src-tauri/` directory; cargo resolves up to this manifest as the workspace root.
+
+[workspace]
+resolver = "2"
+members = [
+    "src-tauri",
+    "crates/lifeos-core",
+    "crates/lifeos-daemon",
+]
+exclude = [
+    "firmware/esp32",
+]

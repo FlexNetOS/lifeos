@@ -1,0 +1,58 @@
+[package]
+name    = "lifeos-esp32"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# This is a STANDALONE Cargo project — intentionally NOT a member of the
+# ubuntu-lifeos workspace (which doesn't exist yet as TODO 1a). Mixing
+# no_std firmware and std workspace members complicates resolver behavior.
+# Keep this crate self-contained until the workspace is established and
+# a deliberate decision is made about how to handle the no_std boundary.
+
+[dependencies]
+# Core HAL for Espressif devices (no_std, stable Rust).
+# esp-hal 1.1.1 requires rustc >= 1.88.0; this host runs 1.95.0 — OK.
+# `unstable` is required because esp-rtos internally enables `requires-unstable`
+# on esp-hal. The build script enforces that if `requires-unstable` is set,
+# `unstable` must also be set by the end-user crate. This is an intentional
+# gate — esp-hal is signalling "you are using internal APIs; opt in explicitly."
+esp-hal = { version = "1.1.1", features = ["esp32c6", "unstable"] }
+
+# Embassy RTOS integration layer for esp-hal 1.x.
+# esp-rtos replaces the older esp-hal-embassy package in the 1.x family.
+esp-rtos = { version = "0.3.0", features = ["embassy", "esp32c6"] }
+
+# Bootloader descriptor macro — required for esp_app_desc!() in main.rs.
+esp-bootloader-esp-idf = { version = "0.5.0", features = ["esp32c6"] }
+
+# Panic handler + backtrace over UART/JTAG.
+esp-backtrace = { version = "0.19.0", features = [
+    "esp32c6",
+    "panic-handler",
+    "println",
+] }
+
+# print!/println! for bare-metal (UART or JTAG-Serial, auto-selected).
+esp-println = { version = "0.17.0", features = ["esp32c6", "log-04"] }
+
+# Embassy async executor (pinned to match esp-rtos 0.3.0's internal dep).
+embassy-executor = "0.10.0"
+
+# Async timers — pulled transitively by esp-rtos/embassy, listed explicitly
+# so the version is visible and pinned.
+embassy-time = "0.5.0"
+
+# NOTE: esp-hal-embassy 0.9.1 is the older 0.x-era companion crate.
+# The 1.x family uses esp-rtos instead. Do NOT add esp-hal-embassy here.
+
+[profile.dev]
+# Optimize for size even in dev to keep firmware under flash limits.
+opt-level = "s"
+
+[profile.release]
+debug            = true   # Keep symbols for post-mortem debug via probe-rs.
+debug-assertions = true
+lto              = "fat"
+codegen-units    = 1
+opt-level        = "s"

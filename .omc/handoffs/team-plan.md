@@ -1,0 +1,23 @@
+## Handoff: team-plan → team-exec
+- **Decided**: Execute TODO.md scope = foundation refactor + read-only MCP + safe sweep, in 4 waves:
+  - Wave 1 (parallel, independent): Tauri mobile readiness doc, Exo desktop fleet plan doc, account-keyed sync sketch doc, ESP32-C6 firmware skeleton at `firmware/esp32/`.
+  - Wave 2 (serial, lead executes): 1a Cargo workspace member, 1b pure types move, 1c auth move, 1d MCP module stubs. All inside `src-tauri/Cargo.toml` and `src-tauri/src/lib.rs` — must be serial because every step rewrites the same files.
+  - Wave 3 (parallel after Wave 2): Cognitum read-only MCP client, RuVector read-only MCP client, `lifeos-daemon` bin crate, mlua plugin host spike (feature-flagged).
+  - Wave 4 (lead executes): Tauri capabilities split per platform (default desktop / mobile clean), CHANGELOG entry, TODO.md updates, full verify (cargo check workspace, bun test, bun run build).
+- **Rejected**:
+  - Google design.md task (blocked on source URL per its own plan doc).
+  - Carry-over items (OpenPencil persistence, dynamic Lucide, data.js port, auto-updater, onboarding tour, system tray, mobile breakpoints) — explicitly punted in TODO.md as "none blocking production ready".
+  - Spawning Claude Code worker teammates for Wave 2 — the Cargo workspace chain rewrites the same files; parallel workers race. Lead executes serially.
+  - openssl-sys (per CLAUDE.md; we keep rustls).
+  - Installing global Rust targets/toolchains as a precondition — Wave 1 ESP32 agent will install only the riscv32imac target (additive, safe) and document the rest.
+- **Risks**:
+  - Auth-tests-on-tauri-AppHandle: existing `auth.rs` tests use plain functions that don't depend on Tauri runtime, so they migrate cleanly into `lifeos-core::auth` after we lift the `app: &tauri::AppHandle` parameters out of the pure-logic helpers. The Tauri commands stay as thin `#[tauri::command]` wrappers in the shell.
+  - `crates/` directory does not exist yet — needs to be created at repo root.
+  - `firmware/` directory does not exist — same.
+  - `keyring` requires platform secret service at runtime; lifeos-daemon on Pi headless will not have GNOME keyring — design must keep keyring optional/fallback (already true in current `lookup_key`).
+  - The `1.77` minimum rust-version in Cargo.toml is satisfied (host has 1.95.0); workspace members inherit this.
+- **Files**:
+  - `TODO.md`, `CLAUDE.md`, `AGENTS.md`, `.claude/plan/cross-platform-foundation.md`, `.claude/plan/google-design-incorporation.md`, `.claude/plan/loop-closure.md`, `HANDOFF.md`, `CHANGELOG.md`
+  - `src-tauri/Cargo.toml`, `src-tauri/src/lib.rs`, `src-tauri/src/auth.rs`, `src-tauri/src/main.rs`, `src-tauri/capabilities/default.json`, `src-tauri/tauri.conf.json`
+  - `src/lib/persistence.ts`, `src/lib/persistence.js`
+- **Remaining for team-exec**: Execute the 4 waves above. Each wave gates on its own acceptance check before the next begins.

@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Badges & status</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
+<style>
+  html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--font-sans);padding:20px;box-sizing:border-box;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .row + .row{margin-top:14px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.02em;line-height:1.4;}
+  .b-cyan{background:rgba(0,212,255,.14);color:var(--lifeos-cyan);border:1px solid rgba(0,212,255,.3);}
+  .b-purple{background:rgba(155,123,255,.14);color:var(--lifeos-purple);border:1px solid rgba(155,123,255,.3);}
+  .b-green{background:rgba(0,230,118,.14);color:var(--lifeos-green);border:1px solid rgba(0,230,118,.3);}
+  .b-warn{background:rgba(255,176,32,.14);color:var(--status-warn);border:1px solid rgba(255,176,32,.3);}
+  .b-err{background:rgba(255,77,106,.14);color:var(--status-err);border:1px solid rgba(255,77,106,.3);}
+  .b-neutral{background:var(--bg-2);color:var(--fg-2);border:1px solid var(--bg-4);}
+  .count{min-width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;border-radius:999px;font-size:10px;font-weight:700;color:#fff;}
+  .c-cyan{background:var(--lifeos-cyan);color:#0a0a0a;}
+  .c-red{background:var(--status-err);}
+  .c-green{background:var(--lifeos-green);color:#0a0a0a;}
+  .dot{width:8px;height:8px;border-radius:999px;display:inline-block;}
+  .pulse{animation:p 1.5s infinite;}
+  @keyframes p{0%,100%{box-shadow:0 0 0 0 currentColor}50%{box-shadow:0 0 0 6px transparent}}
+  .lbl{font-family:var(--font-mono);font-size:10px;color:var(--fg-4);width:80px;}
+  svg{width:11px;height:11px;}
+</style></head>
+<body>
+<div class="row"><span class="lbl">tag</span>
+  <span class="badge b-cyan"><i data-lucide="sparkles"></i>AI</span>
+  <span class="badge b-purple">Memory</span>
+  <span class="badge b-green"><i data-lucide="check"></i>Live</span>
+  <span class="badge b-warn"><i data-lucide="alert-triangle"></i>Warn</span>
+  <span class="badge b-err">Error</span>
+  <span class="badge b-neutral">Draft</span>
+</div>
+<div class="row"><span class="lbl">count</span>
+  <span class="count c-cyan">3</span>
+  <span class="count c-red">12</span>
+  <span class="count c-green">99+</span>
+  <span style="color:var(--lifeos-green)" class="dot pulse"></span> <span style="font-size:12px;color:var(--fg-2)">online</span>
+  <span style="background:var(--status-warn)" class="dot"></span> <span style="font-size:12px;color:var(--fg-2)">away</span>
+  <span style="background:var(--fg-5)" class="dot"></span> <span style="font-size:12px;color:var(--fg-2)">offline</span>
+</div>
+<script>lucide.createIcons();</script>
+</body></html>

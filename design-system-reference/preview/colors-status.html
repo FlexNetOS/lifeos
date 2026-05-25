@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Status colors</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--font-sans);}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px;height:170px;box-sizing:border-box;}
+  .sw{background:var(--bg-2);border:1px solid var(--bg-4);border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;}
+  .dot{width:14px;height:14px;border-radius:999px;}
+  .ok{background:var(--status-ok);box-shadow:0 0 12px var(--status-ok);}
+  .warn{background:var(--status-warn);}
+  .err{background:var(--status-err);}
+  .info{background:var(--status-info);box-shadow:0 0 12px var(--status-info);}
+  .name{font-weight:600;font-size:13px;margin-top:8px;}
+  .role{font-size:11px;color:var(--fg-3);}
+  .hex{font-family:var(--font-mono);font-size:11px;color:var(--fg-2);}
+</style></head>
+<body>
+<div class="grid">
+  <div class="sw"><div class="dot ok"></div><div><div class="name">OK · live</div><div class="role">success state</div></div><div class="hex">#00E676</div></div>
+  <div class="sw"><div class="dot warn"></div><div><div class="name">Warn</div><div class="role">needs attention</div></div><div class="hex">#FFB020</div></div>
+  <div class="sw"><div class="dot err"></div><div><div class="name">Error</div><div class="role">alert · destructive</div></div><div class="hex">#FF4D6A</div></div>
+  <div class="sw"><div class="dot info"></div><div><div class="name">Info</div><div class="role">notice · primary</div></div><div class="hex">#00D4FF</div></div>
+</div>
+</body></html>

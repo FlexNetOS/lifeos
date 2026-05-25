@@ -1,0 +1,50 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Iconography</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
+<style>
+  html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--font-sans);padding:18px;box-sizing:border-box;}
+  .grid{display:grid;grid-template-columns:repeat(9,1fr);gap:10px;}
+  .col{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--fg-1);}
+  .col .tile{
+    width:44px;height:44px;border-radius:10px;
+    background:var(--bg-2);
+    border:1px solid var(--lifeos-cyan);
+    box-shadow:0 0 0 1px rgba(0,212,255,.15), 0 0 12px rgba(0,212,255,.25);
+    display:grid;place-items:center;
+    color:var(--lifeos-cyan);
+  }
+  .col svg{width:20px;height:20px;}
+  .lbl{font-family:var(--font-mono);font-size:9px;color:var(--fg-4);letter-spacing:.02em;}
+  .note{margin-top:14px;font-size:11px;color:var(--fg-3);display:flex;gap:14px;}
+  .note kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--bg-4);padding:2px 6px;border-radius:4px;color:var(--fg-2);font-size:10px;}
+</style></head>
+<body>
+<div class="grid">
+  <div class="col"><div class="tile"><i data-lucide="search"></i></div><span class="lbl">search</span></div>
+  <div class="col"><div class="tile"><i data-lucide="message-square"></i></div><span class="lbl">chat</span></div>
+  <div class="col"><div class="tile"><i data-lucide="bot"></i></div><span class="lbl">bot</span></div>
+  <div class="col"><div class="tile"><i data-lucide="sparkles"></i></div><span class="lbl">ai</span></div>
+  <div class="col"><div class="tile"><i data-lucide="brain"></i></div><span class="lbl">brain</span></div>
+  <div class="col"><div class="tile"><i data-lucide="home"></i></div><span class="lbl">home</span></div>
+  <div class="col"><div class="tile"><i data-lucide="briefcase"></i></div><span class="lbl">work</span></div>
+  <div class="col"><div class="tile"><i data-lucide="heart"></i></div><span class="lbl">family</span></div>
+  <div class="col"><div class="tile"><i data-lucide="wallet"></i></div><span class="lbl">wallet</span></div>
+
+  <div class="col"><div class="tile"><i data-lucide="shield"></i></div><span class="lbl">security</span></div>
+  <div class="col"><div class="tile"><i data-lucide="bell"></i></div><span class="lbl">notify</span></div>
+  <div class="col"><div class="tile"><i data-lucide="user"></i></div><span class="lbl">user</span></div>
+  <div class="col"><div class="tile"><i data-lucide="calendar"></i></div><span class="lbl">calendar</span></div>
+  <div class="col"><div class="tile"><i data-lucide="list-todo"></i></div><span class="lbl">to-do</span></div>
+  <div class="col"><div class="tile"><i data-lucide="settings"></i></div><span class="lbl">settings</span></div>
+  <div class="col"><div class="tile"><i data-lucide="lamp"></i></div><span class="lbl">automation</span></div>
+  <div class="col"><div class="tile"><i data-lucide="play-circle"></i></div><span class="lbl">media</span></div>
+  <div class="col"><div class="tile"><i data-lucide="zap"></i></div><span class="lbl">energy</span></div>
+</div>
+<div class="note">
+  <span><kbd>Lucide 0.475</kbd> stroke 1.5 · 20px default</span>
+  <span><kbd>@carbon/icons-react</kbd> used in source code</span>
+</div>
+<script>lucide.createIcons();</script>
+</body></html>

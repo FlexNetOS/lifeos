@@ -1,0 +1,100 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  body{background:#0a0a0a;color:#fff;font-family:sans-serif;padding:40px;display:flex;gap:40px;align-items:center;flex-wrap:wrap;}
+  .box{background:#000;border:1px solid #2a2a2a;border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .label{font-size:11px;color:#9ba1a6;font-family:monospace;}
+</style></head>
+<body>
+
+<!-- Variant A: triangle frame with 3 nodes + curved hooks -->
+<div class="box">
+  <svg width="160" height="160" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="ga" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00D4FF"/>
+        <stop offset="50%" stop-color="#9B7BFF"/>
+        <stop offset="100%" stop-color="#00E676"/>
+      </linearGradient>
+    </defs>
+    <g stroke="url(#ga)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <!-- 3 sides of triangle with curve toward outside, each rotated -->
+      <g>
+        <path d="M 0,-32 C 22,-30 36,-10 32,18" />
+        <path d="M 32,18 q -2,-8 6,-12" />
+        <circle cx="0" cy="-32" r="5" fill="url(#ga)" stroke="none"/>
+      </g>
+      <g transform="rotate(120)">
+        <path d="M 0,-32 C 22,-30 36,-10 32,18" />
+        <path d="M 32,18 q -2,-8 6,-12" />
+        <circle cx="0" cy="-32" r="5" fill="url(#ga)" stroke="none"/>
+      </g>
+      <g transform="rotate(240)">
+        <path d="M 0,-32 C 22,-30 36,-10 32,18" />
+        <path d="M 32,18 q -2,-8 6,-12" />
+        <circle cx="0" cy="-32" r="5" fill="url(#ga)" stroke="none"/>
+      </g>
+    </g>
+  </svg>
+  <div class="label">variant A</div>
+</div>
+
+<!-- Variant B: smoother, no hook, denser stroke -->
+<div class="box">
+  <svg width="160" height="160" viewBox="-50 -50 100 100">
+    <defs>
+      <linearGradient id="gb" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00D4FF"/>
+        <stop offset="50%" stop-color="#9B7BFF"/>
+        <stop offset="100%" stop-color="#00E676"/>
+      </linearGradient>
+    </defs>
+    <g stroke="url(#gb)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <g>
+        <path d="M 4,-30 C 28,-22 38,0 28,22 L 28,22 C 24,16 18,14 12,16"/>
+        <circle cx="0" cy="-32" r="5" fill="url(#gb)" stroke="none"/>
+      </g>
+      <g transform="rotate(120)">
+        <path d="M 4,-30 C 28,-22 38,0 28,22 L 28,22 C 24,16 18,14 12,16"/>
+        <circle cx="0" cy="-32" r="5" fill="url(#gb)" stroke="none"/>
+      </g>
+      <g transform="rotate(240)">
+        <path d="M 4,-30 C 28,-22 38,0 28,22 L 28,22 C 24,16 18,14 12,16"/>
+        <circle cx="0" cy="-32" r="5" fill="url(#gb)" stroke="none"/>
+      </g>
+    </g>
+  </svg>
+  <div class="label">variant B</div>
+</div>
+
+<!-- Variant C: solid arc segments with arrow hook -->
+<div class="box">
+  <svg width="160" height="160" viewBox="-50 -50 100 100">
+    <defs>
+      <linearGradient id="gc" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00D4FF"/>
+        <stop offset="50%" stop-color="#9B7BFF"/>
+        <stop offset="100%" stop-color="#00E676"/>
+      </linearGradient>
+    </defs>
+    <g stroke="url(#gc)" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <!-- 3 swooshes -->
+      <g>
+        <!-- a curve from above the top node sweeping down-right to lower-right node, with hook at start -->
+        <path d="M -8,-26 Q -2,-34 4,-30 C 26,-24 36,-2 30,18"/>
+        <circle cx="0" cy="-32" r="4.5" fill="url(#gc)" stroke="none"/>
+      </g>
+      <g transform="rotate(120)">
+        <path d="M -8,-26 Q -2,-34 4,-30 C 26,-24 36,-2 30,18"/>
+        <circle cx="0" cy="-32" r="4.5" fill="url(#gc)" stroke="none"/>
+      </g>
+      <g transform="rotate(240)">
+        <path d="M -8,-26 Q -2,-34 4,-30 C 26,-24 36,-2 30,18"/>
+        <circle cx="0" cy="-32" r="4.5" fill="url(#gc)" stroke="none"/>
+      </g>
+    </g>
+  </svg>
+  <div class="label">variant C</div>
+</div>
+
+</body></html>

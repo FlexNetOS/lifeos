@@ -1,0 +1,13 @@
+# Crate-local cargo config. Only kicks in when `cargo` is invoked with a
+# manifest path inside this crate (or from this directory) AND the build is
+# targeting `aarch64-unknown-linux-gnu`. Host builds are untouched.
+#
+# Pins the linker for the Pi Zero 2 W / Pi 3 (64-bit Linux) cross target to
+# the Debian/Ubuntu cross-gcc that ships in the `gcc-aarch64-linux-gnu` apt
+# package. `cargo check --target aarch64-unknown-linux-gnu` doesn't actually
+# link, so this stanza is dormant for the Wave-3 acceptance — it exists so
+# `cargo build --target aarch64-unknown-linux-gnu` works the first time
+# someone reaches for it (assuming the apt package is installed).
+
+[target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"

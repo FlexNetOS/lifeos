@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Cards</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
+<style>
+  html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--font-sans);padding:18px;box-sizing:border-box;}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .card{background:var(--bg-2);border:1px solid var(--bg-4);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;}
+  .card .ico{width:32px;height:32px;border-radius:8px;background:var(--bg-3);display:flex;align-items:center;justify-content:center;color:var(--fg-1);}
+  .card .ico svg{width:16px;height:16px;}
+  .card .title{font-size:13px;font-weight:600;}
+  .card .stat{font-family:var(--font-display);font-size:32px;letter-spacing:.04em;line-height:1;}
+  .card .meta{font-size:11px;color:var(--fg-3);display:flex;align-items:center;gap:4px;}
+  .delta{color:var(--lifeos-green);font-family:var(--font-mono);font-size:11px;}
+  .card.glow{background:linear-gradient(180deg,rgba(0,212,255,.06),transparent 60%),var(--bg-2);border-color:rgba(0,212,255,.3);}
+  .card.glow .ico{background:rgba(0,212,255,.14);color:var(--lifeos-cyan);}
+  .card.purple{background:linear-gradient(180deg,rgba(155,123,255,.06),transparent 60%),var(--bg-2);border-color:var(--lifeos-purple);box-shadow:0 0 0 1px rgba(155,123,255,.25), 0 0 18px rgba(155,123,255,.25);}
+  .card.purple .ico{background:rgba(155,123,255,.14);color:var(--lifeos-purple);}
+  .card.green{background:linear-gradient(180deg,rgba(0,230,118,.06),transparent 60%),var(--bg-2);border-color:var(--lifeos-green);box-shadow:0 0 0 1px rgba(0,230,118,.25), 0 0 18px rgba(0,230,118,.25);}
+  .card.green .ico{background:rgba(0,230,118,.14);color:var(--lifeos-green);}
+</style></head>
+<body>
+<div class="grid">
+  <div class="card glow">
+    <div class="ico"><i data-lucide="briefcase"></i></div>
+    <div class="title">Work</div>
+    <div class="stat">87<span style="font-size:18px;opacity:.5">%</span></div>
+    <div class="meta"><span class="delta">↑ 4.2%</span> productivity today</div>
+  </div>
+  <div class="card purple">
+    <div class="ico"><i data-lucide="brain"></i></div>
+    <div class="title">AI runs</div>
+    <div class="stat">18</div>
+    <div class="meta">automations overnight</div>
+  </div>
+  <div class="card green">
+    <div class="ico"><i data-lucide="home"></i></div>
+    <div class="title">Home</div>
+    <div class="stat">72<span style="font-size:18px;opacity:.5">°F</span></div>
+    <div class="meta">18 devices online</div>
+  </div>
+</div>
+<script>lucide.createIcons();</script>
+</body></html>

@@ -10,7 +10,7 @@
 
 LifeOS already has a strong, opinionated design system: tokens in `colors_and_type.css` (60+ CSS variables across 8 token families) and long-form rationale in `design-system-reference/README.md`. What it does not have is an **agent-readable canonical file** that AI coding agents can consume without re-deriving the system from prose every session. Multiple agents (Claude Code, Codex, Gemini, plus future tooling) work in this repo daily; each one currently re-builds a mental model from `README.md` + `colors_and_type.css`, and they disagree about the system in subtle ways (radius scale naming, which colors are "brand" vs "status", what the typography levels actually are).
 
-Google Labs' [`design.md` format spec](https://github.com/google-labs-code/design.md) (alpha, MIT-licensed) is **exactly the file format we are missing**: YAML front matter holds the normative tokens, an 8-section markdown body holds the rationale, and a CLI (`@google/design.md`) lints the file against 8 structural + accessibility rules — including `contrast-ratio` (WCAG AA 4.5:1, token-level). Crucially, it is a *format*, not a UI library, not Material Design, not a CSS framework. Adopting it costs us no visual identity change. It costs us one new file (`DESIGN.md`), one devDependency, and one new lint script.
+Google Labs' [`design.md` format spec](https://github.com/google-labs-code/design.md) (alpha, Apache-2.0 licensed) is **exactly the file format we are missing**: YAML front matter holds the normative tokens, an 8-section markdown body holds the rationale, and a CLI (`@google/design.md`) lints the file against 8 structural + accessibility rules — including `contrast-ratio` (WCAG AA 4.5:1, token-level). Crucially, it is a *format*, not a UI library, not Material Design, not a CSS framework. Adopting it costs us no visual identity change. It costs us one new file (`DESIGN.md`), one devDependency, and one new lint script.
 
 The second half of this change closes a long-standing gate gap. The loop-closure documented "0 axe violations across 9 surfaces" — but `grep -rn axe` across the repo returns zero matches. That 0-violation baseline was achieved with a manual dev-tools sweep and is not regression-protected. Component-level automated axe via `vitest-axe` (chosen scope, ~30 specs) turns the existing baseline into an enforced contract: any future change that introduces an a11y regression on a covered surface will turn a test red instead of slipping past until the next manual sweep.
 
@@ -23,7 +23,7 @@ Together the two halves are coherent: DESIGN.md gives agents (and humans) a mach
 - Create `DESIGN.md` at the repo root. YAML front matter contains the normative tokens. Markdown body uses the canonical 8-section order (Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts).
 - Add `@google/design.md` as a devDependency (CLI + linter library only, never imported by the runtime). Pin to the exact version published on npm at adoption time — the format is at `version: alpha` and may evolve.
 - Add `bun run design:lint` (`@google/design.md lint DESIGN.md`) — gates on 0 errors. Wired into `bun run check` (precommit) and CI.
-- Add `bun run design:diff` (`@google/design.md diff DESIGN.md@HEAD~1 DESIGN.md@HEAD`) — detects token-level regressions in PRs; advisory locally, hard gate in CI.
+- Add `bun run design:diff` — detects token-level regressions vs. the previous-release snapshot at `design-system-reference/exports/DESIGN.previous.md`. **The upstream CLI takes file paths, not git rev syntax** (codex finding: `DESIGN.md@HEAD~1` would be passed as a literal filename and fail); a small Node wrapper at `scripts/design-diff.mjs` shells `git show HEAD~1:DESIGN.md` into a tempfile, then calls the CLI. Advisory locally, hard gate in CI; falls back to no-op if no previous version exists.
 - Add `bun run design:export:dtcg` (DTCG `tokens.json`) and `bun run design:export:tailwind` (Tailwind v4 `@theme` CSS) — output artifacts checked in under `design-system-reference/exports/` for cross-tool consumption (Figma, Tailwind users, downstream apps).
 - `design-system-reference/README.md` stays as the long-form brand guide. Add a short header pointer: *"Normative tokens live in `DESIGN.md` at the repo root. This document covers identity, voice, asset attribution, and component patterns that don't fit the token schema."* No content is moved or duplicated — the README keeps its identity prose; DESIGN.md keeps the numbers.
 
@@ -35,7 +35,8 @@ Together the two halves are coherent: DESIGN.md gives agents (and humans) a mach
   - Every interactive overlay open + closed: CommandPalette, KeyboardHelp, NotificationsDrawer, ToastContainer (4 components × 2 states = 8).
   - Every stateful component variant: Button (idle / hover / disabled / focus-visible), Sidebar (expanded / collapsed), AIAvatar (hidden / visible / chat-open), TelemetryWidget (loading / loaded / error) — ~10 additional.
 - Each spec renders the component in happy-dom (existing test env), waits for any async, runs `axe.run()`, asserts 0 violations against `wcag2a, wcag2aa, wcag21aa`.
-- Add `bun run test:a11y` script that filters to `tests/a11y/`. CI runs both `bun run test` (existing) and `bun run test:a11y` as separate jobs so a single a11y regression doesn't drown the unit-test signal.
+- **Pseudo-class limitation (codex finding):** happy-dom does not fully compute `:hover` / `:focus-visible` / `:active`, so axe's `color-contrast` rule against pseudo-state styles is unreliable in this environment. Coverage is for **structural a11y** (roles, names, labels, landmarks, contrast on rendered-default state). Hover/focus contrast claims, if needed, would require a follow-up Playwright lane — explicitly out of scope here.
+- Add `bun run test:a11y` script that filters to `tests/a11y/`. **Update `vitest.config.ts` `include` to exclude `tests/a11y/**` so `bun run test` stays at 194 specs unchanged** (codex finding: default include `tests/**/*.spec.{js,ts}` would pull a11y specs into the main run by default).
 
 ### Part C — CI / commit-hook wiring
 
@@ -137,7 +138,7 @@ When all 8 gate sections pass, the proposal is considered "100% complete, 100% h
 - `design-system-reference/exports/theme.css` (NEW, generated, checked in) — Tailwind v4 `@theme` block.
 - `package.json` — devDeps: `@google/design.md`, `vitest-axe`, `axe-core`. New scripts: `design:lint`, `design:diff`, `design:export:dtcg`, `design:export:tailwind`, `test:a11y`, `check`.
 - `vitest.config.ts` — add `setupFiles: ['./tests/setup.ts']` if not already present.
-- `tests/setup.ts` (NEW or augmented) — `expect.extend({ toHaveNoViolations })`, `axe-core` global config (rules: `wcag2a, wcag2aa, wcag21aa`).
+- `tests/setup.js` (AUGMENTED in place, NOT replaced — currently 14.4K of `LIFEOS_DATA` fixture data that 27 existing specs depend on) — add `expect.extend({ toHaveNoViolations })` at top of file; keep all existing `beforeAll` fixture population unchanged.
 - `tests/a11y/*.spec.ts` (NEW, ~30 files) — see Part B scope above. Each spec is ~20–30 lines.
 
 ### Dependencies

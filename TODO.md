@@ -25,14 +25,26 @@ Verdict: Vue 3 + Tauri 2 is the right *shell* for the workstation but not the *f
 
 **See full plan + verified primary-source facts**: [`.claude/plan/cross-platform-foundation.md`](.claude/plan/cross-platform-foundation.md)
 
-## Next session: incorporate Google's `design.md`
+## Closed: incorporate Google's `design.md` (2026-05-25, CHANGELOG 0.1.7)
 
-- [ ] **Clone + study `google-labs-code/design.md`** for design-system overlap and divergences vs the LifeOS Design System.
-- [ ] **Audit**: identify patterns, tokens, motion rules, components, or UX principles worth porting into LifeOS.
-- [ ] **Plan**: decide which to adopt verbatim, which to adapt, which to skip (preserve LifeOS's calm dark-first identity).
-- [ ] **Implement** the agreed subset in a Phase-style pass with axe + tests gating each change.
+- [x] **Clone + study `google-labs-code/design.md`** — cloned to `~/_work/repos/google-labs-code-design.md/`. Determined it is a **format spec** (YAML+markdown for agent-readable design systems), not a UI library; no Material 3 adoption needed.
+- [x] **Audit** — produced `openspec/changes/archive/2026-05-25-design-md-format-adoption/proposal.md` (22.7K) categorising every spec feature into Adopt/Adapt/Skip with constraint sets.
+- [x] **Plan** — `openspec/changes/archive/2026-05-25-design-md-format-adoption/design.md` (34.5K) with 10 numbered decisions, 9 PBT properties, 14-row risk matrix. `tasks.md` with 88 checkbox tasks across 10 sections.
+- [x] **Implement** — `DESIGN.md` at repo root + `@google/design.md@0.1.1` (Apache-2.0) + `vitest-axe` lane (32 specs) + `scripts/design-diff.mjs` regression gate + DTCG and Tailwind exports. All gates green.
 
-**See full plan**: [`.claude/plan/google-design-incorporation.md`](.claude/plan/google-design-incorporation.md)
+### Follow-ups queued
+
+- [ ] **OpenPencilEditor a11y spec** — Plan §7.A.11 listed it; implementation skipped it. Adding a working spec requires synthesizing a valid `sub` prop + AI chat store state (the component reads `lifeos.activeSub` and renders nothing without it). Codex review 2026-05-25 surfaced this coverage gap.
+- [x] **Router-mock fidelity for `components.spec.ts` + `overlays.spec.ts`** — resolved: both a11y files now use real `createRouter({ history: createMemoryHistory() })` plugins, matching `views.spec.ts` and eliminating Vue Router Symbol injection warnings from `bun run test:a11y`.
+- [x] **`@google/design.md` post-archive path references** — resolved: docs now point at `openspec/changes/archive/2026-05-25-design-md-format-adoption/` instead of the pre-archive path.
+- [ ] **Auto-generate `DESIGN.md` ↔ `colors_and_type.css`** — current sync is manual; lint catches broken `{token.path}` references but not CSS-side `--lifeos-cyan: #...` drift. A small build-time check (regex parse over CSS variables, JSON-equal against DESIGN.md YAML) would close this.
+- [ ] **GitHub Actions workflow for `bun run check`** — repo has no `.github/workflows/` today. Add one pipeline that runs the umbrella gate on PRs.
+- [ ] **Browser-backed Playwright axe lane** — happy-dom cannot reliably compute `:hover` / `:focus-visible` pseudo-classes. A Playwright lane against `bun run dev` could lock pseudo-state contrast (Button hover, focus rings) — not blocking today.
+- [ ] **`@google/design.md` post-alpha migration** — pin is `0.1.1` exact. When upstream leaves alpha, re-validate the token shape and update the pin. Track at https://github.com/google-labs-code/design.md/releases.
+- [ ] **CSS-tailwind export** — `@google/design.md@0.1.1` documents `css-tailwind` (Tailwind v4 `@theme` block) but only implements `tailwind` (v3 JSON). Switch when upstream ships the v4 format.
+- [x] **DESIGN.md `badge-count` contrast fix** — resolved: `badge-count.textColor` changed to `{colors.on-brand}` (#0A0A0A on #FF4D6A ≈ 6:1, passes WCAG AA). Design lint: 0 warnings.
+
+**Reference**: [`.claude/plan/google-design-incorporation.md`](.claude/plan/google-design-incorporation.md), `openspec/changes/archive/2026-05-25-design-md-format-adoption/`.
 
 ## Dev environment — codex multi-model backend (2026-05-25)
 

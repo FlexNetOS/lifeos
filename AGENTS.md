@@ -138,6 +138,12 @@ cargo check --workspace                                    # full workspace must
 cargo check -p lifeos-core --no-default-features          # ESP32/no_std isolation must hold
 cargo test -p lifeos-core --features storage              # storage round-trip + property tests
 cargo tree -p lifeos-core --features storage | grep openssl-sys   # must be empty
+
+# DESIGN.md + a11y gates (added in design-md-format-adoption)
+bun run design:lint       # @google/design.md lint — must exit 0 (0 errors)
+bun run test:a11y         # vitest-axe component-level a11y — must be 0 violations
+bun run design:export     # regenerate DTCG tokens + tailwind theme; deterministic (md5 stable)
+bun run check             # umbrella: vue-tsc + test + test:a11y + design:lint
 ```
 
 ## OpenPencil flow

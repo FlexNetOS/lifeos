@@ -2,6 +2,47 @@
 
 All notable changes to LifeOS (ubuntu-lifeos). Dates ISO. Each stage closed with green gates (tests + build + axe).
 
+## [0.1.7] — 2026-05-25 · design-md-format-adoption
+
+`/ccg:spec-impl` run implementing the `design-md-format-adoption` OPSX change. Adopts Google Labs' [`@google/design.md@0.1.1`](https://github.com/google-labs-code/design.md) (Apache-2.0) — a YAML+markdown format spec for describing design systems to AI agents — and locks the previously-manual 0-axe-violation baseline into automated `vitest-axe` specs.
+
+### New capabilities
+
+- **`design-system-contract`** — `DESIGN.md` at repo root with normative YAML front matter (17 colors, 11 typography levels, 7 radii, 9 spacing tokens, 32 components) plus 8-section markdown body (Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts). Lint clean: 0 errors, 0 warnings.
+- **`design-system-lint`** — `bun run design:lint` (`design.md lint DESIGN.md`). 8 rules: broken-ref (error), missing-primary, contrast-ratio (WCAG AA), orphaned-tokens, token-summary, missing-sections, missing-typography, section-order. CI gate at `bun run check`.
+- **`design-token-exports`** — `bun run design:export` generates `design-system-reference/exports/tokens.json` (DTCG) and `tailwind.theme.json` (Tailwind v3 `theme.extend`). Byte-deterministic across runs. Checked in.
+- **`design-system-regression-gate`** — `bun run design:diff` via `scripts/design-diff.mjs` wrapper: snapshots `HEAD~1:DESIGN.md` and fails CI on protected token-level regressions (colors/typography/rounded/spacing removed or modified) unless allowlisted in `scripts/design-diff.allow`.
+- **`a11y-regression-suite`** — `tests/a11y/{components,overlays,views}.spec.ts` (3 files, 32 specs) running under a separate `vitest.a11y.config.ts`. Covers Sidebar (×2), AIAvatar (×3), TelemetryWidget (×3), Badge (×2), Icon (×2), MenuRow (×2), CommandPalette/KeyboardHelp/NotificationsDrawer (×2 each), ToastContainer (×2), Dashboard, LightsView, CalendarView, FilesView, HealthView, IoTView, ContactsView (workspace + aggregator), SettingsView, N8nFlowView. Axe rules: `wcag2a, wcag2aa, wcag21aa`. 0 violations enforced.
+- **`bun run check`** — umbrella pre-flight: `vue-tsc --noEmit` + `bun run test` + `bun run test:a11y` + `bun run design:lint`.
+
+### Dependencies
+
+- New `devDependencies` (production bundle 0-impact): `@google/design.md@0.1.1` (exact pin — alpha schema), `vitest-axe@^0.1.0`, `axe-core@^4.11.4`. No runtime deps added.
+- Apache-2.0 license attribution for `@google/design.md`.
+
+### Verification gates (all green)
+
+| Gate | Result |
+|---|---|
+| `bun run test` | **217 / 217** across 27 files |
+| `bun run test:a11y` | **32 / 32** axe assertions, 0 violations |
+| `bun run design:lint` | exit 0, 0 errors, 0 warnings |
+| `bun run build` | clean, 199.5 kB / gzip 59.9 kB main + 103.4 kB / gzip 38.9 kB lucide |
+| `cargo check --workspace` | green |
+| `cargo check -p lifeos-core --no-default-features` | green (ESP32 isolation) |
+| `cargo tree -p lifeos-core --features storage \| grep openssl-sys` | empty |
+| `bun run design:export` × 2 | byte-identical (md5 stable for both artifacts) |
+
+### Explicitly NOT in this release
+
+- Auto-generation of `DESIGN.md` ↔ `colors_and_type.css` (manual sync for now; lint catches broken references; CSS-side parity check deferred to a follow-up).
+- Playwright lane for browser-rendered pseudo-state contrast (happy-dom cannot reliably compute `:hover` / `:focus-visible` — documented limitation, not blocked).
+- GitHub Actions workflow wiring (`bun run check` is local-only until repo gets a `.github/workflows/`).
+- `@google/design.md` post-alpha migration — will trigger a follow-up change when upstream leaves alpha.
+- The `css-tailwind` export format (Tailwind v4 `@theme` block) — documented upstream but not yet implemented in `@google/design.md@0.1.1`; we ship the JSON v3 config only.
+
+---
+
 ## [0.1.6] — 2026-05-25 · database-storage-foundation
 
 `/ccg:spec-impl` run implementing the `database-storage-foundation` OPSX change. Adds SQLite persistence to `lifeos-core` behind the `storage` Cargo feature, migrates the JSON account store to a proper `accounts` table, and lands empty mirror schemas for MempPalace and RuVector.

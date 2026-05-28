@@ -34,7 +34,7 @@ Verdict: Vue 3 + Tauri 2 is the right *shell* for the workstation but not the *f
 
 ### Follow-ups queued
 
-- [ ] **OpenPencilEditor a11y spec** — Plan §7.A.11 listed it; implementation skipped it. Adding a working spec requires synthesizing a valid `sub` prop + AI chat store state (the component reads `lifeos.activeSub` and renders nothing without it). Codex review 2026-05-25 surfaced this coverage gap.
+- [x] **OpenPencilEditor a11y spec** — resolved: the dedicated-view a11y suite now synthesizes a valid OpenPencil files-mode `sub` prop and covers the editor surface. Inspector controls have explicit accessible names so the new axe gate stays green.
 - [x] **Router-mock fidelity for `components.spec.ts` + `overlays.spec.ts`** — resolved: both a11y files now use real `createRouter({ history: createMemoryHistory() })` plugins, matching `views.spec.ts` and eliminating Vue Router Symbol injection warnings from `bun run test:a11y`.
 - [x] **`@google/design.md` post-archive path references** — resolved: docs now point at `openspec/changes/archive/2026-05-25-design-md-format-adoption/` instead of the pre-archive path.
 - [ ] **Auto-generate `DESIGN.md` ↔ `colors_and_type.css`** — current sync is manual; lint catches broken `{token.path}` references but not CSS-side `--lifeos-cyan: #...` drift. A small build-time check (regex parse over CSS variables, JSON-equal against DESIGN.md YAML) would close this.

@@ -20,7 +20,7 @@ import IoTView from "@/components/IoTView.vue";
 import ContactsView from "@/components/ContactsView.vue";
 import SettingsView from "@/components/SettingsView.vue";
 import N8nFlowView from "@/components/N8nFlowView.vue";
-// OpenPencilEditor a11y spec deferred — see TODO.md follow-up.
+import OpenPencilEditor from "@/components/OpenPencilEditor.vue";
 
 // Real router via createMemoryHistory — codex review surfaced that the prior
 // `provide: { router: stub }` did not satisfy Vue Router's Symbol injection
@@ -45,6 +45,18 @@ beforeEach(() => {
 
 const axeOptions = {
   runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] },
+};
+
+const openPencilSub = {
+  sectionTitle: "Files",
+  item: {
+    icon: "file-code",
+    label: "App.vue",
+    meta: "Vue shell",
+    path: "src/App.vue",
+    view: "open-pencil",
+    pane: "files",
+  },
 };
 
 // — Dashboard ————————————————————————————————————————————————
@@ -163,8 +175,12 @@ describe("N8nFlowView", () => {
 });
 
 // — OpenPencilEditor ————————————————————————————————————————————
-// Plan §7.A.11 listed this as one of the 11 dedicated-view a11y targets but
-// the initial implementation skipped it. Codex review (2026-05-25) flagged
-// the gap. Adding the spec here requires synthesizing a valid `sub` prop +
-// store wiring (the component reads `sub.value?.item` plus AI chat state).
-// Deferred to a follow-up — see TODO.md.
+describe("OpenPencilEditor", () => {
+  it("has no a11y violations in files mode", async () => {
+    const w = mount(OpenPencilEditor, {
+      ...globalOpts(),
+      props: { sub: openPencilSub },
+    });
+    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+  });
+});

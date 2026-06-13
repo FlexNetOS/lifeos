@@ -237,7 +237,9 @@ mod tests {
         assert_eq!(row.computed_at, 1000);
 
         // Upsert overwrites.
-        upsert_gnn(pool, "key1", b"new_payload", 2000).await.unwrap();
+        upsert_gnn(pool, "key1", b"new_payload", 2000)
+            .await
+            .unwrap();
         let row = get_gnn(pool, "key1").await.unwrap().unwrap();
         assert_eq!(row.payload, b"new_payload");
 

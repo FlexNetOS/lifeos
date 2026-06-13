@@ -89,9 +89,7 @@ pub async fn update_password(
 /// Delete all accounts. Returns the number of rows removed.
 /// Called by `auth_reset_vault` to wipe the local credential store.
 pub async fn delete_all(pool: &SqlitePool) -> Result<u64, StorageError> {
-    let result = sqlx::query("DELETE FROM accounts")
-        .execute(pool)
-        .await?;
+    let result = sqlx::query("DELETE FROM accounts").execute(pool).await?;
     Ok(result.rows_affected())
 }
 
@@ -233,7 +231,9 @@ mod tests {
         let s = setup().await;
         let pool = s.pool();
 
-        let row = insert(pool, "alex@lifeos.ai", "Alex", "hash1").await.unwrap();
+        let row = insert(pool, "alex@lifeos.ai", "Alex", "hash1")
+            .await
+            .unwrap();
         assert_eq!(row.email, "alex@lifeos.ai");
         assert_eq!(row.display_name, "Alex");
         assert!(row.updated_at >= row.created_at);
@@ -250,7 +250,9 @@ mod tests {
         assert_eq!(updated.password_hash, "newhash");
 
         // duplicate email returns DuplicateEmail
-        let err = insert(pool, "alex@lifeos.ai", "Alex2", "hash2").await.unwrap_err();
+        let err = insert(pool, "alex@lifeos.ai", "Alex2", "hash2")
+            .await
+            .unwrap_err();
         assert!(matches!(err, StorageError::DuplicateEmail));
     }
 
@@ -280,7 +282,9 @@ mod tests {
             .unwrap()
             .map(|e| e.unwrap().file_name().to_string_lossy().to_string())
             .collect();
-        assert!(entries.iter().any(|n| n.starts_with("account.json.migrated-")));
+        assert!(entries
+            .iter()
+            .any(|n| n.starts_with("account.json.migrated-")));
         assert!(!dir.path().join("account.json").exists());
 
         // Second call → AlreadyMigrated

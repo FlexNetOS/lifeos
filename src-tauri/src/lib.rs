@@ -8,8 +8,8 @@ mod auth;
 // Portable types live in lifeos-core (Stage 1b). The Tauri shell re-uses them
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
-use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 use lifeos_core::storage::{DbHealth, MigrateReport, Storage};
+use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
 // against `tauri::menu`, and a top-level `use` would break them.
@@ -90,8 +90,7 @@ fn ui_state_write(app: tauri::AppHandle, state: String) -> Result<(), String> {
 // keyring-less environments. The user-facing error message stays calm regardless of
 // the underlying failure mode — never leak transport details to the UI.
 
-const AI_ERROR_MSG: &str =
-    "LifeOS couldn't reach the AI provider right now — try again.";
+const AI_ERROR_MSG: &str = "LifeOS couldn't reach the AI provider right now — try again.";
 
 fn ai_file(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
     let dir = app
@@ -162,7 +161,10 @@ async fn call_claude(prompt: &str) -> Result<String, String> {
     let json: serde_json::Value = resp.json().await.map_err(|_| AI_ERROR_MSG.to_string())?;
     json.get("content")
         .and_then(|c| c.as_array())
-        .and_then(|arr| arr.iter().find_map(|p| p.get("text").and_then(|t| t.as_str())))
+        .and_then(|arr| {
+            arr.iter()
+                .find_map(|p| p.get("text").and_then(|t| t.as_str()))
+        })
         .map(|s| s.to_string())
         .ok_or_else(|| AI_ERROR_MSG.into())
 }
@@ -277,7 +279,7 @@ fn app_version() -> AppVersion {
 // near-free (single `refresh_cpu_usage` against the already-warm state).
 
 use std::sync::Mutex;
-use sysinfo::{MINIMUM_CPU_UPDATE_INTERVAL, Networks, System};
+use sysinfo::{Networks, System, MINIMUM_CPU_UPDATE_INTERVAL};
 
 pub struct TelemetryState {
     sys: Mutex<System>,
@@ -462,13 +464,8 @@ pub fn run() {
                 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 
                 let handle = app.handle();
-                let settings_item = MenuItem::with_id(
-                    handle,
-                    "settings",
-                    "Settings…",
-                    true,
-                    Some("CmdOrCtrl+,"),
-                )?;
+                let settings_item =
+                    MenuItem::with_id(handle, "settings", "Settings…", true, Some("CmdOrCtrl+,"))?;
                 let quit_item = PredefinedMenuItem::quit(handle, None)?;
                 let close_item = PredefinedMenuItem::close_window(handle, None)?;
 

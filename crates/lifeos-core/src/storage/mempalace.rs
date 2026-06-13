@@ -184,11 +184,17 @@ mod tests {
         let pool = s.pool();
 
         // Two nodes required before an edge can be inserted.
-        upsert_node(pool, "n1", "concept", Some("Node 1"), "{}", 0).await.unwrap();
-        upsert_node(pool, "n2", "concept", Some("Node 2"), "{}", 0).await.unwrap();
+        upsert_node(pool, "n1", "concept", Some("Node 1"), "{}", 0)
+            .await
+            .unwrap();
+        upsert_node(pool, "n2", "concept", Some("Node 2"), "{}", 0)
+            .await
+            .unwrap();
 
         // Valid edge.
-        upsert_edge(pool, "n1", "n2", "related", "{}", 0).await.unwrap();
+        upsert_edge(pool, "n1", "n2", "related", "{}", 0)
+            .await
+            .unwrap();
         let e = get_edge(pool, "n1", "n2", "related").await.unwrap();
         assert!(e.is_some());
 

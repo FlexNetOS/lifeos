@@ -3,6 +3,7 @@ import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import Dashboard from "@/components/Dashboard.vue";
 import { useLifeos } from "@/stores/lifeos.js";
+import { useAuth } from "@/stores/auth";
 
 describe("Dashboard.vue", () => {
   let pinia;
@@ -13,6 +14,16 @@ describe("Dashboard.vue", () => {
     expect(w.find(".canvas-greeting").text()).toBe("Good afternoon.");
     expect(w.findAll(".stat-card").length).toBe(1);
     expect(w.findAll(".team-card").length).toBe(1);
+  });
+
+  it("personalizes the greeting from the signed-in account", async () => {
+    const auth = useAuth();
+    auth._resetFakeBackend();
+    await auth.signup({ email: "drdave@local.lifeos", displayName: "DrDave", password: "longenough" });
+
+    const w = mount(Dashboard, { global: { plugins: [pinia] } });
+
+    expect(w.find(".canvas-greeting").text()).toBe("Good afternoon, DrDave.");
   });
 
   it("clicking an agent team card jumps to AI workspace + opens the flow", async () => {

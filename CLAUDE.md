@@ -110,6 +110,21 @@ Added in `database-storage-foundation`. Owned entirely by `lifeos-core` + the Ta
 - **Module layout**: `crates/lifeos-core/src/storage/{mod, error, accounts, mempalace, ruvector}.rs`; migrations at `crates/lifeos-core/migrations/000N_*.sql`.
 - **ESP32 isolation test**: `cargo tree -p lifeos-core --features storage | grep openssl-sys` must be empty.
 
+### DESIGN.md is the agent-readable token source
+
+Added in `design-md-format-adoption`. Three files form the design-system contract:
+
+- **`DESIGN.md`** (repo root) — normative agent-readable spec following Google Labs' `@google/design.md@0.1.1` format. YAML front matter holds tokens (colors / typography / rounded / spacing / components); markdown body has 8 canonical sections. Lint with `bun run design:lint` (must exit 0, 0 errors).
+- **`colors_and_type.css`** — runtime CSS variable consumer. Every opaque `#hex` in this file must mirror a token in `DESIGN.md`'s `colors:` map.
+- **`design-system-reference/README.md`** — long-form brand prose, voice, asset attribution.
+
+Drift gates:
+- `bun run design:lint` enforces `broken-ref` (errors on unresolved `{token.path}` references) and `contrast-ratio` (warns on WCAG AA fails).
+- `bun run design:diff` (via `scripts/design-diff.mjs`) compares HEAD~1 against HEAD and fails on token-level regressions in `colors / typography / rounded / spacing` unless allowlisted in `scripts/design-diff.allow`.
+- Component-level a11y suite at `tests/a11y/*.spec.ts` runs via `bun run test:a11y` against the 9 dedicated views + 4 overlays + 6 component variants — 32 axe assertions, 0 violations enforced.
+
+Exports regenerate from `DESIGN.md`: `bun run design:export` writes `design-system-reference/exports/tokens.json` (DTCG) and `tailwind.theme.json` (Tailwind v3 `theme.extend`). Both byte-deterministic — checked in.
+
 ### Vite build splits vendor chunks deliberately
 
 `vite.config.ts` `manualChunks` separates `lucide`, `vue-router`, `pinia`, `vue`, and a residual `vendor`. Lucide alone is ~600 KB — keep it in its own chunk so the main app chunk stays small and vendor chunks cache across releases. Don't collapse this back into a single chunk.

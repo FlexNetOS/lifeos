@@ -14,7 +14,9 @@
 //! perspective.
 
 use lifeos_core::{
-    auth::{self, AccountRecord, AuthStatus, ERR_ACCOUNT_EXISTS, ERR_BAD_CREDENTIALS, ERR_NO_ACCOUNT},
+    auth::{
+        self, AccountRecord, AuthStatus, ERR_ACCOUNT_EXISTS, ERR_BAD_CREDENTIALS, ERR_NO_ACCOUNT,
+    },
     storage::{accounts, Storage},
 };
 
@@ -57,9 +59,14 @@ pub async fn auth_signup(
     }
     // Reuse the existing validation + hashing orchestrator.
     let validated = AccountRecord::new_signup(&email, &display_name, &password)?;
-    let row = accounts::insert(pool, &validated.email, &validated.display_name, &validated.password_hash)
-        .await
-        .map_err(|e| e.to_string())?;
+    let row = accounts::insert(
+        pool,
+        &validated.email,
+        &validated.display_name,
+        &validated.password_hash,
+    )
+    .await
+    .map_err(|e| e.to_string())?;
     state.login(&row_to_record(&row))?;
     Ok(AuthStatus {
         has_account: true,

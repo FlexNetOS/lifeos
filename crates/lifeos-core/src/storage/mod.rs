@@ -79,10 +79,9 @@ impl Storage {
             .await
             .map_err(|e| StorageError::Sqlx(sqlx::Error::Protocol(e.to_string())))?;
 
-        let (applied,): (i64,) =
-            sqlx::query_as("SELECT COUNT(*) FROM _sqlx_migrations")
-                .fetch_one(&self.pool)
-                .await?;
+        let (applied,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM _sqlx_migrations")
+            .fetch_one(&self.pool)
+            .await?;
 
         let total = sqlx::migrate!("./migrations").migrations.len() as u32;
 
@@ -104,7 +103,11 @@ impl Storage {
         let applied = rows.len() as u32;
         let last_migration_version = rows.last().map(|(v,)| *v).unwrap_or(0);
         let embedded_count = sqlx::migrate!("./migrations").migrations.len() as u32;
-        let status = if applied >= embedded_count { "ok" } else { "degraded" };
+        let status = if applied >= embedded_count {
+            "ok"
+        } else {
+            "degraded"
+        };
 
         Ok(DbHealth {
             status,

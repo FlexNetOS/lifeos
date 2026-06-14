@@ -4,17 +4,25 @@
 
 import { ref, computed } from "vue";
 import { useLifeos } from "@/stores/lifeos.js";
+import { useAuth } from "@/stores/auth";
 import { useToasts } from "@/stores/toasts.js";
 import { useNav } from "@/lib/nav.js";
 import Icon from "./Icon.vue";
 import TelemetryWidget from "./TelemetryWidget.vue";
 
 const lifeos = useLifeos();
+const auth = useAuth();
 const toasts = useToasts();
 const nav = useNav();
 const d = (window).LIFEOS_DATA?.dashboardCanvas;
 const TONE = (window).TONE || {};
 const teams = computed(() => lifeos.teams);
+const todayLabel = computed(() =>
+  new Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "long" }).format(new Date()));
+const greeting = computed(() => {
+  const name = auth.account?.displayName?.trim();
+  return name ? `Good afternoon, ${name}.` : d.greeting;
+});
 const aiAgentTeamItems = computed(() =>
   (window).LIFEOS_DATA?.workspaces?.ai?.sections?.find((s) => s.title === "Agent Teams")?.items || []);
 
@@ -71,8 +79,8 @@ const comingSoon = (label) => {
   <div v-else class="canvas">
     <header class="canvas-head">
       <div>
-        <div class="canvas-eyebrow">Tuesday · 19 May</div>
-        <h1 class="canvas-greeting">{{ d.greeting }}</h1>
+        <div class="canvas-eyebrow">{{ todayLabel }}</div>
+        <h1 class="canvas-greeting">{{ greeting }}</h1>
         <p class="canvas-sub">{{ d.sub }}</p>
       </div>
       <div class="canvas-actions">

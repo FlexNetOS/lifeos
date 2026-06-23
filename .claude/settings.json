@@ -4,9 +4,19 @@
       {
         "hooks": [
           {
-            "type": "command",
             "command": "echo \"[ubuntu-lifeos] Mandate: Boil the Ocean (Garry Tan) — completeness on the asked-for scope is the target. Style: Karpathy guidelines — think before coding, simplicity first, surgical changes, goal-driven execution. Authority: ./CLAUDE.md + ./AGENTS.md (top-of-file). Full Karpathy spec: andrej-karpathy-skills:karpathy-guidelines.\"",
-            "timeout": 2000
+            "timeout": 2000,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "sh -lc 'root=\"$(git rev-parse --show-toplevel)\"; exec rusty-idd next --base \"$root\"'",
+            "statusMessage": "Rusty IDD front door: computing the next step",
+            "timeout": 180,
+            "type": "command"
           }
         ]
       }
@@ -15,9 +25,9 @@
       {
         "hooks": [
           {
-            "type": "command",
             "command": "node /home/drdave/repos/ubuntu-lifeos/.claude/hooks/session-log.mjs",
-            "timeout": 3000
+            "timeout": 3000,
+            "type": "command"
           }
         ]
       }

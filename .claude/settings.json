@@ -4,7 +4,7 @@
       {
         "hooks": [
           {
-            "command": "echo \"[ubuntu-lifeos] Mandate: Boil the Ocean (Garry Tan) — completeness on the asked-for scope is the target. Style: Karpathy guidelines — think before coding, simplicity first, surgical changes, goal-driven execution. Authority: ./CLAUDE.md + ./AGENTS.md (top-of-file). Full Karpathy spec: andrej-karpathy-skills:karpathy-guidelines.\"",
+            "command": "echo \"[ubuntu-lifeos] Mandate: Boil the Ocean (Garry Tan) \u2014 completeness on the asked-for scope is the target. Style: Karpathy guidelines \u2014 think before coding, simplicity first, surgical changes, goal-driven execution. Authority: ./CLAUDE.md + ./AGENTS.md (top-of-file). Full Karpathy spec: andrej-karpathy-skills:karpathy-guidelines.\"",
             "timeout": 2000,
             "type": "command"
           }
@@ -19,6 +19,14 @@
             "type": "command"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.handoff/hooks/loop-entry.sh\""
+          }
+        ]
       }
     ],
     "Stop": [
@@ -28,6 +36,16 @@
             "command": "node /home/drdave/repos/ubuntu-lifeos/.claude/hooks/session-log.mjs",
             "timeout": 3000,
             "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.handoff/hooks/session-end.sh\""
           }
         ]
       }

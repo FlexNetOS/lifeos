@@ -1,5 +1,11 @@
 # LifeOS Design System
 
+> **Normative tokens live in [`DESIGN.md`](../DESIGN.md) at the repo root** — colors,
+> typography, radii, spacing, and component-level values in machine-readable YAML front matter.
+> This document covers identity, voice, asset attribution, and component patterns
+> that don't fit the token schema. Both sources must stay in sync:
+> `bun run design:lint` catches broken token references.
+
 > **Mission:** LifeOS is the AI agent that runs your home and your life.
 > Work, personal, home automation — one operating system, one assistant.
 

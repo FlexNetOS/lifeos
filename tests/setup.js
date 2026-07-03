@@ -29,6 +29,12 @@ const FIXTURE = {
           items: [
             { icon: "users-2", label: "Day Captain", flowId: "day", view: "n8n-flow", meta: "3 agents", status: "online" },
           ] },
+        { title: "Files",
+          items: [
+            { icon: "file-code", label: "App.vue", meta: "Vue shell", path: "src/App.vue", view: "open-pencil", pane: "files" },
+            { icon: "file-text", label: "README.md", meta: "Project docs", path: "README.md", view: "open-pencil", pane: "files" },
+            { icon: "file-json", label: "package.json", meta: "Scripts", path: "package.json", view: "open-pencil", pane: "files" },
+          ] },
       ],
     },
     work: { title: "Work", sections: [{ title: "Today", items: [{ icon: "video", label: "Standup" }] }] },

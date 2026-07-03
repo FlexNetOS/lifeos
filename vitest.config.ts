@@ -16,7 +16,7 @@ export default defineConfig({
     environment: "happy-dom",
     globals: true,
     setupFiles: ["./tests/setup.js"],
-    include: ["tests/**/*.spec.{js,ts}"],
+    include: ["tests/*.spec.{js,ts}"],
     coverage: {
       reporter: ["text", "html"],
       include: ["src/**/*.{vue,js,ts}"],

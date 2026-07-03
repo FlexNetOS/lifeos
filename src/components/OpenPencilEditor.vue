@@ -338,7 +338,7 @@ const paneTitle = computed(() => ({
           <button v-for="layer in layers" :key="layer.id"
                   :class="['op-layer', { selected: layer.selected }]"
                   :style="{ paddingLeft: (10 + layer.depth * 12) + 'px' }"
-                  :aria-selected="layer.selected">
+                  :aria-pressed="layer.selected">
             <Icon :name="TYPE_GLYPH[layer.type] || 'square'" :size="11" />
             <span class="op-layer-name">{{ layer.name }}</span>
             <Icon v-if="layer.type === 'instance'" name="link" :size="9" class="op-layer-instance" />
@@ -627,13 +627,13 @@ claude mcp add --scope user open-pencil -- openpencil-mcp
                   </span>
                   <span class="op-files-lang">{{ langLabel }}</span>
                   <div class="op-files-view-switch" role="tablist" aria-label="View">
-                    <button :class="{ active: filesView === 'editor'  }" @click="filesView = 'editor'"  title="Editor only">
+                    <button role="tab" :aria-selected="filesView === 'editor'" :class="{ active: filesView === 'editor'  }" @click="filesView = 'editor'"  title="Editor only">
                       <Icon name="code" :size="11" /> Editor
                     </button>
-                    <button :class="{ active: filesView === 'split'   }" @click="filesView = 'split'"   title="Editor + Preview">
+                    <button role="tab" :aria-selected="filesView === 'split'" :class="{ active: filesView === 'split'   }" @click="filesView = 'split'"   title="Editor + Preview">
                       <Icon name="columns-2" :size="11" /> Split
                     </button>
-                    <button :class="{ active: filesView === 'preview' }" @click="filesView = 'preview'" title="Preview only">
+                    <button role="tab" :aria-selected="filesView === 'preview'" :class="{ active: filesView === 'preview' }" @click="filesView = 'preview'" title="Preview only">
                       <Icon name="eye" :size="11" /> Preview
                     </button>
                   </div>
@@ -680,31 +680,31 @@ claude mcp add --scope user open-pencil -- openpencil-mcp
         <div class="op-insp">
           <div class="op-insp-section">
             <div class="op-insp-label">Selection</div>
-            <input class="op-insp-name" v-model="inspector.name" />
+            <input class="op-insp-name" v-model="inspector.name" aria-label="Selected layer name" />
           </div>
           <div class="op-insp-section">
             <div class="op-insp-label">Position & size</div>
             <div class="op-insp-grid">
-              <span>X</span><input :value="inspector.x" />
-              <span>Y</span><input :value="inspector.y" />
-              <span>W</span><input :value="inspector.width" />
-              <span>H</span><input :value="inspector.height" />
+              <span>X</span><input :value="inspector.x" aria-label="X position" />
+              <span>Y</span><input :value="inspector.y" aria-label="Y position" />
+              <span>W</span><input :value="inspector.width" aria-label="Width" />
+              <span>H</span><input :value="inspector.height" aria-label="Height" />
             </div>
           </div>
           <div class="op-insp-section">
             <div class="op-insp-label">Auto layout</div>
             <div class="op-insp-grid">
-              <span>Dir</span><input :value="inspector.autoLayout" />
-              <span>Gap</span><input :value="inspector.gap" />
-              <span>Pad</span><input :value="inspector.padding" />
-              <span>Rad</span><input :value="inspector.cornerRadius" />
+              <span>Dir</span><input :value="inspector.autoLayout" aria-label="Auto layout direction" />
+              <span>Gap</span><input :value="inspector.gap" aria-label="Auto layout gap" />
+              <span>Pad</span><input :value="inspector.padding" aria-label="Auto layout padding" />
+              <span>Rad</span><input :value="inspector.cornerRadius" aria-label="Corner radius" />
             </div>
           </div>
           <div class="op-insp-section">
             <div class="op-insp-label">Fill</div>
-            <div class="op-insp-color"><span class="op-swatch" :style="{ background: inspector.fill }" /><input :value="inspector.fill" /></div>
+            <div class="op-insp-color"><span class="op-swatch" :style="{ background: inspector.fill }" /><input :value="inspector.fill" aria-label="Fill color" /></div>
             <div class="op-insp-label">Stroke</div>
-            <div class="op-insp-color"><span class="op-swatch" :style="{ background: inspector.stroke }" /><input :value="inspector.stroke" /></div>
+            <div class="op-insp-color"><span class="op-swatch" :style="{ background: inspector.stroke }" /><input :value="inspector.stroke" aria-label="Stroke color" /></div>
           </div>
         </div>
       </aside>

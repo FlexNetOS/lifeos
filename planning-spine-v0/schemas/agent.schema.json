@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/agent.schema.json",
+  "title": "Agent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "kind",
+    "role_ids",
+    "capability_ids",
+    "authority_scope",
+    "boundary_rules",
+    "status"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "kind": { "type": "string", "enum": ["system", "human", "ai"] },
+    "role_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "capability_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "authority_scope": { "type": "string" },
+    "boundary_rules": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "status": { "type": "string", "enum": ["available", "busy", "disabled"] }
+  }
+}

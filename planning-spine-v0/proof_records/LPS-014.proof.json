@@ -1,0 +1,136 @@
+{
+  "task_id": "LPS-014",
+  "title": "Build JSON execution packets",
+  "status": "pass",
+  "observed_at": "2026-07-03T19:39:08Z",
+  "local_path": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+  "scope": {
+    "allowed_paths": [
+      "scripts/**",
+      "generated/**",
+      "proof_records/LPS-014.proof.json"
+    ],
+    "blocked_paths": [
+      "unbounded repo roots",
+      "secrets/**"
+    ]
+  },
+  "files_changed": [
+    "scripts/build-execution-packets.py",
+    "generated/execution_manifest.json",
+    "generated/execution_packets/LPS-012.json",
+    "generated/execution_packets/LPS-013.json",
+    "generated/execution_packets/LPS-014.json",
+    "generated/execution_packets/LPS-015.json",
+    "generated/execution_packets/LPS-016.json",
+    "generated/execution_packets/LPS-017.json",
+    "generated/execution_packets/LPS-018.json",
+    "proof_records/LPS-014.proof.json"
+  ],
+  "artifacts": {
+    "packet_builder_script": {
+      "path": "scripts/build-execution-packets.py",
+      "sha256": "a240a74b1f58632acd7de50e7c934067434317959ac0e7d8823ab1470d6398e8"
+    },
+    "execution_manifest": {
+      "path": "generated/execution_manifest.json",
+      "schema_version": "lifeos-planning-spine.execution-manifest.v0",
+      "packet_schema_version": "lifeos-planning-spine.execution-packet.v0",
+      "packet_count": 7,
+      "task_ids": [
+        "LPS-012",
+        "LPS-013",
+        "LPS-014",
+        "LPS-015",
+        "LPS-016",
+        "LPS-017",
+        "LPS-018"
+      ],
+      "sha256": "c5ade8a82744ca4b673ab163b74faaf1cd2b2a203d29c46067b6e91ac68ce8ce"
+    },
+    "execution_packets": [
+      {
+        "task_id": "LPS-012",
+        "path": "generated/execution_packets/LPS-012.json",
+        "sha256": "b7183386c55061dd1d02c587d2a8067ae2f5bbe7f4d2e38340e0baf3a3a321dd"
+      },
+      {
+        "task_id": "LPS-013",
+        "path": "generated/execution_packets/LPS-013.json",
+        "sha256": "f73947847439b0a77656ea6a87ef167220f909df93602dcb1c5ee8037e466e08"
+      },
+      {
+        "task_id": "LPS-014",
+        "path": "generated/execution_packets/LPS-014.json",
+        "sha256": "147ad0bb79b4188bed0a8d0e5088690238322da406a379075d65d4df8522d228"
+      },
+      {
+        "task_id": "LPS-015",
+        "path": "generated/execution_packets/LPS-015.json",
+        "sha256": "86fb95baef496576ab21f53ba8fc47d5f1af290120bf936ce9774715cf0e5466"
+      },
+      {
+        "task_id": "LPS-016",
+        "path": "generated/execution_packets/LPS-016.json",
+        "sha256": "e35752c75c1f7e4fb1f8423d8e5a6991ad0d895bf19f205655f8ef42d4c6cc7f"
+      },
+      {
+        "task_id": "LPS-017",
+        "path": "generated/execution_packets/LPS-017.json",
+        "sha256": "72ad207764490b999ce7fb0e041d6eb5f8dda0baea847d9e1c624932bf624379"
+      },
+      {
+        "task_id": "LPS-018",
+        "path": "generated/execution_packets/LPS-018.json",
+        "sha256": "c8e8ee8c76f4b7ed1266d3e0c90c622c7672530d2fc7ca27496ef38d5fddfa10"
+      }
+    ]
+  },
+  "verification_commands": [
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/build-execution-packets.py generated/task_graph.normalized.json --packet-dir generated/execution_packets --manifest generated/execution_manifest.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "build-execution-packets: wrote 7 packet(s) to generated/execution_packets and manifest generated/execution_manifest.json"
+    },
+    {
+      "command": "for f in generated/execution_packets/*.json; do jq -e 'has(\"packet_schema_version\") and has(\"generated_at\") and has(\"source_graph_uri\") and has(\"task_id\") and has(\"paths\") and has(\"cell\") and has(\"verification_gate\") and has(\"rollback_plan\") and has(\"proof_uri\") and ((has(\"goal\") or has(\"next_action\") or has(\"source_columns\")) | not)' \"$f\" >/dev/null || exit 1; done",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "packet field/prose checks passed for 7 files"
+    },
+    {
+      "command": "jq empty generated/execution_manifest.json generated/execution_packets/*.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "checks": [
+    {
+      "name": "ready_tasks_packaged",
+      "result": "pass",
+      "detail": "Execution manifest includes one packet for each normalized ready task: LPS-012 through LPS-018."
+    },
+    {
+      "name": "required_packet_fields_present",
+      "result": "pass",
+      "detail": "Every packet includes task_id, paths, cell, verification_gate, rollback_plan, proof_uri, source_graph_uri, generated_at, and packet_schema_version."
+    },
+    {
+      "name": "doc_prose_excluded",
+      "result": "pass",
+      "detail": "Packets omit goal, next_action, and source_columns."
+    },
+    {
+      "name": "manifest_checksums_present",
+      "result": "pass",
+      "detail": "Manifest records a sha256 for every generated packet."
+    }
+  ],
+  "drift_or_blockers": [
+    "Ready task packets include LPS-012 and LPS-013 because the live normalized graph still marks those sheet rows Ready even though local proof records now exist.",
+    "LPS-014 preserves the MVP boundary and does not expand into Hermes, Odysseus, full company hierarchy, or standalone Mirofish."
+  ],
+  "recommended_next_task_id": "LPS-015"
+}

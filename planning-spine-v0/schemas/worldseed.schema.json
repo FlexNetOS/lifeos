@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/worldseed.schema.json",
+  "title": "WorldSeed",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "intent_id",
+    "task_id",
+    "environment_snapshot",
+    "assumptions",
+    "hypotheses",
+    "constraints",
+    "simulator_version",
+    "generated_at"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "intent_id": { "type": "string" },
+    "task_id": { "type": "string" },
+    "environment_snapshot": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "assumptions": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "hypotheses": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "simulator_version": { "type": "string" },
+    "generated_at": { "type": "string" }
+  }
+}

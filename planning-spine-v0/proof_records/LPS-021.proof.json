@@ -1,0 +1,97 @@
+{
+  "task_id": "LPS-021",
+  "status": "pass",
+  "observed_at": "2026-07-03T18:46:59Z",
+  "scope_guard": {
+    "repo_root": "/home/flexnetos/FlexNetOS/src/lifeos",
+    "package_root": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+    "allowed_write_paths": [
+      "planning-spine-v0/**",
+      "scripts/**"
+    ],
+    "out_of_scope_mutations_performed": false
+  },
+  "summary": {
+    "problem": "planning-spine-v0 only proved that individual example files satisfied their schemas; it did not provide a machine-readable connected MVP bundle or verify cross-object referential integrity across the end-to-end path.",
+    "repair": "Added a package-local MVP bundle manifest over the canonical v0 examples, updated the decision example so the decision resolves to the executable action, and extended the verifier to resolve and prove the connected chain while emitting a machine-readable bundle report.",
+    "result": "The Bun-backed verification frontdoor now proves the connected `intent -> goal -> authority assignment -> task -> worldseed -> simulation report -> cell -> proof -> decision -> action -> artifact` bundle live on this host and emits both runtime and bundle reports."
+  },
+  "changed_files": [
+    "planning-spine-v0/examples/mvp-bundle.json",
+    "planning-spine-v0/examples/decision.json",
+    "planning-spine-v0/README.md",
+    "planning-spine-v0/07_MVP_VERTICAL_SLICE.md",
+    "scripts/verify-planning-spine.mjs",
+    "planning-spine-v0/state/verification_runtime_report.json",
+    "planning-spine-v0/state/mvp_bundle_report.json",
+    "planning-spine-v0/proof_records/LPS-021.proof.json"
+  ],
+  "verification_commands": [
+    {
+      "command": "bun run planning-spine:verify",
+      "exit_code": 0,
+      "purpose": "Run the documented verification frontdoor live in the host runtime and emit the updated proof-bearing reports."
+    },
+    {
+      "command": "jq empty planning-spine-v0/state/verification_runtime_report.json",
+      "exit_code": 0,
+      "purpose": "Verify the generated runtime report is valid JSON."
+    },
+    {
+      "command": "jq empty planning-spine-v0/state/mvp_bundle_report.json",
+      "exit_code": 0,
+      "purpose": "Verify the generated MVP bundle report is valid JSON."
+    },
+    {
+      "command": "sha256sum planning-spine-v0/state/verification_runtime_report.json planning-spine-v0/state/mvp_bundle_report.json",
+      "exit_code": 0,
+      "purpose": "Capture stable digests for the generated proof artifacts."
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "planning-spine-v0/state/verification_runtime_report.json",
+      "status": "pass",
+      "sha256": "25314828b31b36df1ac15a174870fe73ae12b81c35a534e9ac06d8b5b17f4bf7"
+    },
+    {
+      "path": "planning-spine-v0/state/mvp_bundle_report.json",
+      "status": "pass",
+      "sha256": "c3e6723c348fb28f46634fa5cfd27ed18b90bec8cf099ccef55516c6a7876268"
+    },
+    {
+      "path": "planning-spine-v0/proof_records/LPS-021.proof.json",
+      "status": "pass"
+    }
+  ],
+  "runtime_observation": {
+    "frontdoor_command": "bun run planning-spine:verify",
+    "effective_executable": "/home/flexnetos/FlexNetOS/.toolchains/.bun/bin/bun",
+    "runtime_name": "bun",
+    "runtime_version": "1.3.14",
+    "outcome": "planning-spine-v0 verification passed"
+  },
+  "bundle_observation": {
+    "bundle_id": "mvp-bundle.v0.vertical-slice",
+    "bundle_scope": "v0",
+    "bundle_report_result": "pass",
+    "linkage_check_count": 14,
+    "verified_chain": [
+      "intent -> goal",
+      "goal -> authority assignment",
+      "authority assignment -> task",
+      "task -> worldseed",
+      "worldseed -> simulation report",
+      "simulation report -> cell",
+      "cell -> proof",
+      "proof -> decision",
+      "decision -> action",
+      "action -> artifact"
+    ]
+  },
+  "boundary_checks": [
+    "The bundle manifest preserves the existing v0, RFC, and post-v0 boundary markers.",
+    "No Odysseus, Hermes, Docker-first, or hierarchy-expansion work was added.",
+    "All writes remained inside planning-spine-v0/** and scripts/**."
+  ]
+}

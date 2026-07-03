@@ -1,0 +1,140 @@
+{
+  "task_id": "LPS-013",
+  "title": "Normalize task graph JSON",
+  "status": "pass",
+  "observed_at": "2026-07-03T19:37:51Z",
+  "local_path": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+  "scope": {
+    "allowed_paths": [
+      "scripts/**",
+      "generated/**",
+      "proof_records/LPS-013.proof.json"
+    ],
+    "blocked_paths": [
+      "source sheet mutation",
+      "secrets/**"
+    ]
+  },
+  "files_changed": [
+    "scripts/normalize-task-graph.py",
+    "generated/task_graph.normalized.json",
+    "generated/task_graph.index.json",
+    "generated/task_graph.normalize_report.json",
+    "generated/fixtures/task_graph.missing-required.raw.json",
+    "generated/fixtures/task_graph.missing-required.normalize_report.json",
+    "proof_records/LPS-013.proof.json"
+  ],
+  "artifacts": {
+    "normalizer_script": {
+      "path": "scripts/normalize-task-graph.py",
+      "sha256": "017bce490948402e987d82c74c2ee0b8c180e2fe88dc681c3d57892d70346edb"
+    },
+    "normalized_task_graph": {
+      "path": "generated/task_graph.normalized.json",
+      "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
+      "task_count": 11,
+      "first_task_id": "LPS-012",
+      "last_task_id": "LPS-022",
+      "sha256": "a4baff3b6a748ff5d81fe14a4c4b1bc8ef4207133aca8331dccc05edbefa8918"
+    },
+    "task_graph_index": {
+      "path": "generated/task_graph.index.json",
+      "schema_version": "lifeos-planning-spine.task-graph.index.v0",
+      "task_count": 11,
+      "ready_task_ids": [
+        "LPS-012",
+        "LPS-013",
+        "LPS-014",
+        "LPS-015",
+        "LPS-016",
+        "LPS-017",
+        "LPS-018"
+      ],
+      "complete_task_ids": [
+        "LPS-019",
+        "LPS-020",
+        "LPS-021",
+        "LPS-022"
+      ],
+      "sha256": "ef3ab496412ff774232f39ee8271a744380daba20754b8edf54eca8d9680464e"
+    },
+    "normalize_report": {
+      "path": "generated/task_graph.normalize_report.json",
+      "result": "pass",
+      "error_count": 0,
+      "sha256": "289df0e65d6fa6323b1f0c8dda3a995851e12c668755c3f2149739c74c551cdc"
+    },
+    "missing_required_fixture_report": {
+      "path": "generated/fixtures/task_graph.missing-required.normalize_report.json",
+      "result": "fail",
+      "expected_failure": true,
+      "error_count": 1,
+      "failed_field": "proof_uri",
+      "sha256": "12ba611ba5086e80b8ef9540b0a3e1136574bebd4ba219838308b55f5d65867a"
+    }
+  },
+  "verification_commands": [
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/normalize-task-graph.py generated/task_graph.raw.json -o generated/task_graph.normalized.json --index generated/task_graph.index.json --report generated/task_graph.normalize_report.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "normalize-task-graph: wrote generated/task_graph.normalized.json and generated/task_graph.index.json with 11 task(s)"
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/normalize-task-graph.py generated/fixtures/task_graph.missing-required.raw.json -o /tmp/lps013-missing.normalized.json --index /tmp/lps013-missing.index.json --report generated/fixtures/task_graph.missing-required.normalize_report.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 1,
+      "output": "normalize-task-graph: validation failed with 1 error(s); see generated/fixtures/task_graph.missing-required.normalize_report.json",
+      "expected_failure": true
+    },
+    {
+      "command": "jq empty generated/task_graph.normalized.json generated/task_graph.index.json generated/task_graph.normalize_report.json generated/fixtures/task_graph.missing-required.normalize_report.json generated/fixtures/task_graph.missing-required.raw.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/home/flexnetos/.local/bin:/home/flexnetos/FlexNetOS/usr/bin:/usr/bin:/bin bun run planning-spine:verify",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos",
+      "exit_code": 0,
+      "output": "$ bun scripts/verify-planning-spine.mjs\nplanning-spine-v0 verification passed"
+    }
+  ],
+  "checks": [
+    {
+      "name": "required_columns_validated",
+      "result": "pass",
+      "detail": "Normalizer fails if the raw graph header differs from the Task Graph v0 column set."
+    },
+    {
+      "name": "required_execution_fields_validated",
+      "result": "pass",
+      "detail": "Normalizer requires task_id, allowed_paths, blocked_paths, verification_gate, rollback_plan, proof_uri, and execution_cell."
+    },
+    {
+      "name": "booleans_normalized",
+      "result": "pass",
+      "detail": "simulation_required is converted from TRUE/FALSE text into JSON booleans."
+    },
+    {
+      "name": "lists_normalized",
+      "result": "pass",
+      "detail": "parent_id, inputs, target_artifacts, allowed_paths, and blocked_paths are emitted as arrays."
+    },
+    {
+      "name": "task_ids_enforced",
+      "result": "pass",
+      "detail": "task_id values must match LPS-000 style and be unique."
+    },
+    {
+      "name": "index_emitted",
+      "result": "pass",
+      "detail": "generated/task_graph.index.json maps task IDs to status, parents, proof URI, source row, and execution cell."
+    }
+  ],
+  "drift_or_blockers": [
+    "generated/task_graph.raw.json currently covers the active execution/proof rows LPS-012 through LPS-022, not the older planning rows LPS-000 through LPS-011.",
+    "LPS-013 preserves the MVP boundary and does not expand into Hermes, Odysseus, full company hierarchy, or standalone Mirofish."
+  ],
+  "recommended_next_task_id": "LPS-014"
+}

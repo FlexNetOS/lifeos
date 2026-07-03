@@ -1,0 +1,116 @@
+{
+  "id": "mvp-bundle.v0.vertical-slice",
+  "version": "0.1.0",
+  "scope": "v0",
+  "scope_boundaries": {
+    "v0": "in-scope",
+    "rfc": "proposed-only",
+    "post_v0": "deferred"
+  },
+  "bundle_order": [
+    "intent",
+    "goal",
+    "authority_assignment",
+    "task",
+    "worldseed",
+    "simulation_report",
+    "cell",
+    "proof",
+    "decision",
+    "action",
+    "artifact"
+  ],
+  "objects": {
+    "intent": {
+      "schema": "Intent",
+      "path": "examples/intent.json",
+      "id": "intent.mvp.vertical-slice"
+    },
+    "goal": {
+      "schema": "Goal",
+      "path": "examples/goal.json",
+      "id": "goal.mvp.slice"
+    },
+    "task": {
+      "schema": "Task",
+      "path": "examples/task.json",
+      "id": "task.execute.slice"
+    },
+    "worldseed": {
+      "schema": "WorldSeed",
+      "path": "examples/worldseed.json",
+      "id": "worldseed.mvp.execute"
+    },
+    "simulation_report": {
+      "schema": "SimulationReport",
+      "path": "examples/simulation-report.json",
+      "id": "simreport.mvp.execute"
+    },
+    "cell": {
+      "schema": "Cell",
+      "path": "examples/cell.json",
+      "id": "cell.mvp.execute"
+    },
+    "proof": {
+      "schema": "ProofRecord",
+      "path": "examples/proof-record.json",
+      "id": "proof.task.execute.slice"
+    },
+    "decision": {
+      "schema": "Decision",
+      "path": "examples/decision.json",
+      "id": "decision.next-action"
+    },
+    "action": {
+      "schema": "Action",
+      "path": "examples/action.json",
+      "id": "action.run.slice"
+    },
+    "artifact": {
+      "schema": "Artifact",
+      "path": "examples/artifact.json",
+      "id": "artifact.simulation.patch"
+    }
+  },
+  "authority_assignment": {
+    "authority_root": "noa",
+    "operational_delegate": "cecca",
+    "task_id": "task.execute.slice",
+    "assigned_role": {
+      "schema": "Role",
+      "path": "examples/role.json",
+      "id": "role.executor"
+    },
+    "assigned_agent": {
+      "schema": "Agent",
+      "path": "examples/agent.json",
+      "id": "agent.executor"
+    },
+    "required_capabilities": [
+      {
+        "schema": "Capability",
+        "path": "examples/capability.json",
+        "id": "cap.execute.hermetic"
+      }
+    ],
+    "proof_verifier": {
+      "agent": {
+        "schema": "Agent",
+        "path": "examples/verifier-agent.json",
+        "id": "agent.verifier"
+      },
+      "role": {
+        "schema": "Role",
+        "path": "examples/verifier-role.json",
+        "id": "role.verifier"
+      },
+      "required_capabilities": [
+        {
+          "schema": "Capability",
+          "path": "examples/verifier-capability.json",
+          "id": "cap.verify.proof"
+        }
+      ]
+    }
+  }
+}

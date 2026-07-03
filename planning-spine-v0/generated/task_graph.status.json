@@ -1,0 +1,461 @@
+{
+  "complete_task_ids": [
+    "LPS-012",
+    "LPS-013",
+    "LPS-014",
+    "LPS-015",
+    "LPS-016",
+    "LPS-017",
+    "LPS-018",
+    "LPS-019",
+    "LPS-020",
+    "LPS-021",
+    "LPS-022"
+  ],
+  "forbidden_update_count": 0,
+  "forbidden_updates": [],
+  "generated_at": "2026-07-03T20:03:52Z",
+  "ledger_entry_count": 16,
+  "next_ready_task_id": null,
+  "proof_ledger_sha256": "600fe0b19e0775410e1c1de363af170ddc4126b36211fe5e85f47fcdadc2011e",
+  "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
+  "ready_task_ids": [],
+  "result": "pass",
+  "schema_version": "lifeos-planning-spine.task-graph.status.v0",
+  "source_graph_sha256": "a4baff3b6a748ff5d81fe14a4c4b1bc8ef4207133aca8331dccc05edbefa8918",
+  "source_graph_uri": "generated/task_graph.normalized.json",
+  "task_count": 11,
+  "tasks": [
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-012.proof.json; next child task: LPS-013.",
+        "proof_uri": "proof_records/LPS-012.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-008"
+      ],
+      "phase": "8-execution-pipeline",
+      "proof": {
+        "ledger_line_number": 1,
+        "observed_at": "2026-07-03T19:30:12Z",
+        "revision": null,
+        "sha256": "6e42ae20b6a6a1d596d3da2e960f4106089d8e43bf4c6d3ac7d2ebcf98d41f72"
+      },
+      "source": {
+        "next_action": "Implement extractor against CSV first; Sheet API later.",
+        "proof_uri": "proof_records/LPS-012.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 2,
+      "task_id": "LPS-012",
+      "title": "Python task graph extractor",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Implement extractor against CSV first; Sheet API later.",
+          "to": "Proof accepted from proof_records/LPS-012.proof.json; next child task: LPS-013."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-013.proof.json; next child task: LPS-014.",
+        "proof_uri": "proof_records/LPS-013.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-012"
+      ],
+      "phase": "8-execution-pipeline",
+      "proof": {
+        "ledger_line_number": 2,
+        "observed_at": "2026-07-03T19:37:51Z",
+        "revision": null,
+        "sha256": "e9293f639b35ea8f575632e74b69df32756d77c0d18238fd003debc5aff99916"
+      },
+      "source": {
+        "next_action": "Use JSON Schema-compatible field names.",
+        "proof_uri": "proof_records/LPS-013.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 3,
+      "task_id": "LPS-013",
+      "title": "Normalize task graph JSON",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Use JSON Schema-compatible field names.",
+          "to": "Proof accepted from proof_records/LPS-013.proof.json; next child task: LPS-014."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-014.proof.json; next child task: LPS-015.",
+        "proof_uri": "proof_records/LPS-014.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-013"
+      ],
+      "phase": "8-execution-pipeline",
+      "proof": {
+        "ledger_line_number": 3,
+        "observed_at": "2026-07-03T19:39:08Z",
+        "revision": null,
+        "sha256": "1bc1a25bde15643f0ce7a9ddf91be28745ad9c7223b2f54770a53988d6ae319e"
+      },
+      "source": {
+        "next_action": "Do not include full doc prose in packets.",
+        "proof_uri": "proof_records/LPS-014.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 4,
+      "task_id": "LPS-014",
+      "title": "Build JSON execution packets",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Do not include full doc prose in packets.",
+          "to": "Proof accepted from proof_records/LPS-014.proof.json; next child task: LPS-015."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-015.proof.json; next child task: LPS-016.",
+        "proof_uri": "proof_records/LPS-015.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-014"
+      ],
+      "phase": "8-execution-pipeline",
+      "proof": {
+        "ledger_line_number": 4,
+        "observed_at": "2026-07-03T19:42:46Z",
+        "revision": null,
+        "sha256": "2e04c0a5d6e18852bf11ad87a2e337f7695a7ad08aaf2df23cf4c1a026b293e5"
+      },
+      "source": {
+        "next_action": "Wire into Bun verify if useful, but Python remains required.",
+        "proof_uri": "proof_records/LPS-015.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 5,
+      "task_id": "LPS-015",
+      "title": "Validate execution packet",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Wire into Bun verify if useful, but Python remains required.",
+          "to": "Proof accepted from proof_records/LPS-015.proof.json; next child task: LPS-016."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-016.proof.json; next child task: LPS-017.",
+        "proof_uri": "proof_records/LPS-016.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-015"
+      ],
+      "phase": "8-execution-pipeline",
+      "proof": {
+        "ledger_line_number": 10,
+        "observed_at": "2026-07-03T19:47:30Z",
+        "revision": "2",
+        "sha256": "2c852e8eb4b2ff152a854751a04da8eb87ed0bacd2fbf36a0ab65845e37a273c"
+      },
+      "source": {
+        "next_action": "Add proof schema validation.",
+        "proof_uri": "proof_records/LPS-016.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 6,
+      "task_id": "LPS-016",
+      "title": "Merge proof records",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Add proof schema validation.",
+          "to": "Proof accepted from proof_records/LPS-016.proof.json; next child task: LPS-017."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-017.proof.json; next child task: LPS-018.",
+        "proof_uri": "proof_records/LPS-017.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-016"
+      ],
+      "phase": "8-execution-pipeline",
+      "proof": {
+        "ledger_line_number": 12,
+        "observed_at": "2026-07-03T19:53:15Z",
+        "revision": "2",
+        "sha256": "8b6f1a77cb5c17ca8872bd435e73a1b41f82567961817ebf9736c2527b14c57a"
+      },
+      "source": {
+        "next_action": "Keep source-of-truth sheet human-readable.",
+        "proof_uri": "proof_records/LPS-017.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 7,
+      "task_id": "LPS-017",
+      "title": "Update task graph status from proof",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Keep source-of-truth sheet human-readable.",
+          "to": "Proof accepted from proof_records/LPS-017.proof.json; next child task: LPS-018."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-018.proof.json; next child task: LPS-019.",
+        "proof_uri": "proof_records/LPS-018.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-017"
+      ],
+      "phase": "8-execution-pipeline",
+      "proof": {
+        "ledger_line_number": 16,
+        "observed_at": "2026-07-03T20:03:20Z",
+        "revision": "4",
+        "sha256": "5a30e6436b3ed47d0e76b8e6204ab2c2b3fc9b98fb44279868e8bd0462387c6a"
+      },
+      "source": {
+        "next_action": "Use for Codex handoff and future reruns.",
+        "proof_uri": "proof_records/LPS-018.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 8,
+      "task_id": "LPS-018",
+      "title": "Package execution bundle",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Use for Codex handoff and future reruns.",
+          "to": "Proof accepted from proof_records/LPS-018.proof.json; next child task: LPS-019."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-019.proof.json; next child task: LPS-020.",
+        "proof_uri": "proof_records/LPS-019.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-018"
+      ],
+      "phase": "9-state-map",
+      "proof": {
+        "ledger_line_number": 6,
+        "observed_at": "2026-07-03T18:30:22Z",
+        "revision": null,
+        "sha256": "d53ef6628e858d9dd6175e66c396105cdd4f61112b56f970533789ed6e9acb5e"
+      },
+      "source": {
+        "next_action": "Reconciled into sheet. Next absorb LPS-020/LPS-021/LPS-022 proof surfaces, then resume LPS-012.",
+        "proof_uri": "proof_records/LPS-019.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 9,
+      "task_id": "LPS-019",
+      "title": "Accurate current state map",
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Reconciled into sheet. Next absorb LPS-020/LPS-021/LPS-022 proof surfaces, then resume LPS-012.",
+          "to": "Proof accepted from proof_records/LPS-019.proof.json; next child task: LPS-020."
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-020.proof.json; next child task: LPS-021.",
+        "proof_uri": "proof_records/LPS-020.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-019"
+      ],
+      "phase": "10-runtime-proof",
+      "proof": {
+        "ledger_line_number": 7,
+        "observed_at": "2026-07-03T18:42:37Z",
+        "revision": null,
+        "sha256": "088d3b162b41e8bd33979857908dcb6f31de8b8e0d0f69610d78c4da4bb16e38"
+      },
+      "source": {
+        "next_action": "Completed locally per Codex; retained as observed proof surface.",
+        "proof_uri": "proof_records/LPS-020.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 10,
+      "task_id": "LPS-020",
+      "title": "Repair verification frontdoor",
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Completed locally per Codex; retained as observed proof surface.",
+          "to": "Proof accepted from proof_records/LPS-020.proof.json; next child task: LPS-021."
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-021.proof.json; next child task: LPS-022.",
+        "proof_uri": "proof_records/LPS-021.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-020"
+      ],
+      "phase": "10-runtime-proof",
+      "proof": {
+        "ledger_line_number": 8,
+        "observed_at": "2026-07-03T18:46:59Z",
+        "revision": null,
+        "sha256": "5a0476bb9d2e87d2d87589c78f8511502af2e2453103710e7259e3844613d829"
+      },
+      "source": {
+        "next_action": "Completed locally per Codex; retained as observed proof surface.",
+        "proof_uri": "proof_records/LPS-021.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 11,
+      "task_id": "LPS-021",
+      "title": "Connected MVP bundle verification",
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Completed locally per Codex; retained as observed proof surface.",
+          "to": "Proof accepted from proof_records/LPS-021.proof.json; next child task: LPS-022."
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/LPS-022.proof.json; no child task is declared in this graph.",
+        "proof_uri": "proof_records/LPS-022.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LPS-021"
+      ],
+      "phase": "10-runtime-proof",
+      "proof": {
+        "ledger_line_number": 9,
+        "observed_at": "2026-07-03T18:50:10Z",
+        "revision": null,
+        "sha256": "a0056a0d78195d9b27d78cfe3bf97d6ed4350bd1c5efb3e7e9da005d343cb06a"
+      },
+      "source": {
+        "next_action": "Completed locally per Codex; after reconciliation resume LPS-012.",
+        "proof_uri": "proof_records/LPS-022.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 12,
+      "task_id": "LPS-022",
+      "title": "Verifier authority integrity",
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Completed locally per Codex; after reconciliation resume LPS-012.",
+          "to": "Proof accepted from proof_records/LPS-022.proof.json; no child task is declared in this graph."
+        }
+      }
+    }
+  ],
+  "update_policy": {
+    "allowed_updated_fields": [
+      "next_action",
+      "proof_uri",
+      "status"
+    ],
+    "mutates_sheet": false,
+    "mutates_source_graph": false
+  },
+  "updated_task_ids": [
+    "LPS-012",
+    "LPS-013",
+    "LPS-014",
+    "LPS-015",
+    "LPS-016",
+    "LPS-017",
+    "LPS-018",
+    "LPS-019",
+    "LPS-020",
+    "LPS-021",
+    "LPS-022"
+  ]
+}

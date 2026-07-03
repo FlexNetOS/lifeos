@@ -1,0 +1,101 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-018",
+  "status": "pass",
+  "observed_at": "2026-07-03T20:03:20Z",
+  "revision": 4,
+  "summary": {
+    "problem": "The execution pipeline needed a releasable bundle that proves its contents before packaging and excludes secrets or host-local state.",
+    "repair": "Verified and tightened the Python bundle packager so it validates the execution manifest, status projection, payload JSON/JSONL, and proof ledger before writing release artifacts; the bundled proof ledger is now a sanitized snapshot that excludes LPS-018 entries while the live append-only ledger remains unchanged.",
+    "result": "The release bundle, external manifest, validation report, and checksum list are generated from clean-env commands. The zip includes bundle_manifest.json, has no blocked/secret-like entries, excludes LPS-018 proof and LPS-018 ledger entries, and checksum verification passes."
+  },
+  "commands": [
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 -m py_compile scripts/package-execution-bundle.py",
+      "result": "pass"
+    },
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 scripts/package-execution-bundle.py",
+      "result": "pass",
+      "output_summary": "package-execution-bundle wrote dist/lifeos-planning-spine-execution-bundle.zip and refreshed the release checksum surfaces; current checksums are intentionally read from dist/lifeos-planning-spine-execution-bundle.SHA256SUMS and generated/execution_bundle.validation_report.json after the final ledger merge."
+    },
+    {
+      "cmd": "jq '{result, output_path, sha256, manifest_sha256, payload_file_count, zip_validation, checksum_manifest_path, exclusions}' generated/execution_bundle.validation_report.json",
+      "result": "pass",
+      "output_summary": "result pass; payload_file_count 92; zip entry_count 93; has_bundle_manifest true; checksum list dist/lifeos-planning-spine-execution-bundle.SHA256SUMS; bundled ledger snapshot excludes LPS-018 entries from the release payload while the live ledger remains append-only."
+    },
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 zip inspection for bundle_manifest.json and blocked entries",
+      "result": "pass",
+      "output_summary": "entry_count 93; has_bundle_manifest true; corrupt_member null; blocked_entry_count 0; has_lps018_proof false; bundled_ledger_entry_count 12; bundled_ledger_lps018_count 0."
+    },
+    {
+      "cmd": "(cd dist && sha256sum -c lifeos-planning-spine-execution-bundle.SHA256SUMS)",
+      "result": "pass",
+      "output": "lifeos-planning-spine-execution-bundle.zip: OK\nlifeos-planning-spine-execution-bundle.manifest.json: OK"
+    },
+    {
+      "cmd": "jq empty dist/lifeos-planning-spine-execution-bundle.manifest.json generated/execution_bundle.validation_report.json",
+      "result": "pass"
+    },
+    {
+      "cmd": "sha256sum scripts/package-execution-bundle.py proof_records/LPS-018.proof.json proof_records/proof_ledger.jsonl generated/task_graph.status.json dist/lifeos-planning-spine-execution-bundle.zip dist/lifeos-planning-spine-execution-bundle.manifest.json dist/lifeos-planning-spine-execution-bundle.SHA256SUMS generated/execution_bundle.validation_report.json",
+      "result": "pass",
+      "output_summary": "script checksum is pinned below; release artifact checksums are intentionally sourced from the final generated checksum list and validation report so the proof record does not create a self-referential bundle checksum loop."
+    }
+  ],
+  "artifacts": {
+    "bundle_packager_script": {
+      "path": "scripts/package-execution-bundle.py",
+      "sha256": "d7da8a079e6e0732f75a96f7aef7c49544af257d9129626632abb331ff367485"
+    },
+    "bundle_zip": {
+      "path": "dist/lifeos-planning-spine-execution-bundle.zip",
+      "checksum_source": "dist/lifeos-planning-spine-execution-bundle.SHA256SUMS",
+      "entry_count": 93
+    },
+    "bundle_manifest": {
+      "path": "dist/lifeos-planning-spine-execution-bundle.manifest.json",
+      "checksum_source": "dist/lifeos-planning-spine-execution-bundle.SHA256SUMS"
+    },
+    "bundle_checksum_list": {
+      "path": "dist/lifeos-planning-spine-execution-bundle.SHA256SUMS",
+      "verification": "sha256sum -c passes from dist/"
+    },
+    "bundle_validation_report": {
+      "path": "generated/execution_bundle.validation_report.json",
+      "result_field": "pass",
+      "checksum_source": "sha256sum generated/execution_bundle.validation_report.json"
+    },
+    "bundled_ledger_snapshot": {
+      "path": "proof_records/proof_ledger.jsonl",
+      "checksum_source": "bundle_manifest.json file entry for proof_records/proof_ledger.jsonl",
+      "excluded_task_id": "LPS-018",
+      "exclusion_rule": "all live LPS-018 proof ledger entries are excluded from the bundled ledger snapshot"
+    }
+  },
+  "scope": {
+    "allowed_paths_used": [
+      "scripts/**",
+      "generated/**",
+      "proof_records/**",
+      "dist/**"
+    ],
+    "blocked_paths_excluded": [
+      "secrets/**",
+      "host home root",
+      ".env*",
+      "*.pem",
+      "*.key",
+      ".ssh/**",
+      "node_modules/**",
+      ".git/**",
+      "__pycache__/**",
+      "dist/** inside the release payload"
+    ],
+    "source_graph_mutated": false,
+    "sheet_mutated": false,
+    "proof_record_packaged": false,
+    "proof_record_packaging_note": "proof_records/LPS-018.proof.json and LPS-018 ledger entries are intentionally excluded from the release payload to avoid self-referential release checksum loops; the live append-only proof ledger on disk keeps the LPS-018 history."
+  }
+}

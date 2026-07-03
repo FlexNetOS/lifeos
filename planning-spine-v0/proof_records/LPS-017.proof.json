@@ -1,0 +1,87 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-017",
+  "status": "pass",
+  "observed_at": "2026-07-03T19:53:15Z",
+  "revision": 2,
+  "summary": {
+    "problem": "The normalized task graph preserves sheet-authored status values, so locally completed proof-backed tasks still appeared ready in generated task surfaces.",
+    "repair": "Added a generated status projector that reads the normalized graph plus append-only proof ledger and emits an effective status view without mutating source graph or sheet data.",
+    "result": "The status projection updates only status, proof_uri, and next_action fields in generated/task_graph.status.json and reports forbidden_update_count=0."
+  },
+  "commands": [
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 -m py_compile scripts/update-task-graph-status.py",
+      "result": "pass"
+    },
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 scripts/update-task-graph-status.py generated/task_graph.normalized.json --ledger proof_records/proof_ledger.jsonl -o generated/task_graph.status.json",
+      "result": "pass",
+      "output": "update-task-graph-status: wrote 11 task status entrie(s), 9 task(s) updated, next_ready_task_id=LPS-017"
+    },
+    {
+      "cmd": "jq '{result, task_count, ledger_entry_count, updated_task_ids, complete_task_ids, ready_task_ids, next_ready_task_id, forbidden_update_count}' generated/task_graph.status.json",
+      "result": "pass",
+      "output_summary": "result pass; 11 tasks; 10 ledger entries before LPS-017 proof merge; forbidden_update_count 0; next_ready_task_id LPS-017"
+    },
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 scripts/merge-proof-records.py proof_records --ledger proof_records/proof_ledger.jsonl --report proof_records/proof_ledger.merge_report.json",
+      "result": "pass",
+      "output": "merge-proof-records: appended 1 entrie(s), skipped 9 existing entrie(s), ledger proof_records/proof_ledger.jsonl"
+    },
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 scripts/update-task-graph-status.py generated/task_graph.normalized.json --ledger proof_records/proof_ledger.jsonl -o generated/task_graph.status.json",
+      "result": "pass",
+      "output": "update-task-graph-status: wrote 11 task status entrie(s), 10 task(s) updated, next_ready_task_id=LPS-018"
+    },
+    {
+      "cmd": "env -i PATH=/usr/bin:/bin python3 scripts/merge-proof-records.py proof_records --ledger proof_records/proof_ledger.jsonl --report proof_records/proof_ledger.idempotency_report.json --dry-run",
+      "result": "pass",
+      "output": "merge-proof-records: would append 0 entrie(s), skipped 10 existing entrie(s), ledger proof_records/proof_ledger.jsonl"
+    },
+    {
+      "cmd": "jq -e '[.tasks[].updated_fields[]? | select(. != \"status\" and . != \"proof_uri\" and . != \"next_action\")] | length == 0' generated/task_graph.status.json",
+      "result": "pass",
+      "output": "true"
+    },
+    {
+      "cmd": "env -i PATH=/home/flexnetos/.local/bin:/home/flexnetos/FlexNetOS/usr/bin:/usr/bin:/bin bun run planning-spine:verify",
+      "result": "pass",
+      "output": "planning-spine-v0 verification passed"
+    }
+  ],
+  "artifacts": {
+    "status_projector_script": {
+      "path": "scripts/update-task-graph-status.py",
+      "sha256": "5374163c60ec5a9632447e4577a603ab02f2a7af4ac3399b332b0e9d81d4a57f"
+    },
+    "status_projection": {
+      "path": "generated/task_graph.status.json",
+      "schema_version": "lifeos-planning-spine.task-graph.status.v0",
+      "result": "pass",
+      "forbidden_update_count": 0,
+      "next_ready_task_id_after_lps017_merge": "LPS-018"
+    },
+    "source_graph": {
+      "path": "generated/task_graph.normalized.json",
+      "sha256": "a4baff3b6a748ff5d81fe14a4c4b1bc8ef4207133aca8331dccc05edbefa8918"
+    },
+    "proof_ledger_before_lps017_merge": {
+      "path": "proof_records/proof_ledger.jsonl",
+      "sha256": "9dbdfa8433f3d73c5c4f5b3430891385715d9c176e66c396741d7f2e004d65a7"
+    },
+    "proof_ledger_after_lps017_revision_1_merge": {
+      "path": "proof_records/proof_ledger.jsonl",
+      "sha256": "ab5260d0410630531474b95d071a37881aa168b1a3c820252718da6286d7ad70"
+    }
+  },
+  "scope": {
+    "source_graph_mutated": false,
+    "sheet_mutated": false,
+    "allowed_status_fields": [
+      "status",
+      "proof_uri",
+      "next_action"
+    ]
+  }
+}

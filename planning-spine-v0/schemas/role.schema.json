@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/role.schema.json",
+  "title": "Role",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "purpose",
+    "decision_scope",
+    "required_capability_ids",
+    "escalation_to"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "purpose": { "type": "string" },
+    "decision_scope": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "required_capability_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "escalation_to": { "type": "string" }
+  }
+}

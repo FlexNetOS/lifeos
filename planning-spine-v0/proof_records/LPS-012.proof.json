@@ -1,0 +1,120 @@
+{
+  "task_id": "LPS-012",
+  "status": "complete",
+  "observed_at": "2026-07-03T19:30:12Z",
+  "scope_guard": {
+    "allowed_write_paths": [
+      "scripts/**",
+      "generated/**",
+      "proof_records/LPS-012.proof.json"
+    ],
+    "out_of_scope_mutations_performed": false
+  },
+  "implementation": {
+    "script": "scripts/extract-task-graph.py",
+    "source_csv": "generated/task_graph.source.csv",
+    "raw_output": "generated/task_graph.raw.json",
+    "notes": [
+      "CSV extraction is implemented first; direct Sheet API extraction remains deferred to a later row.",
+      "The raw artifact preserves all 17 Task Graph v0 columns as source text.",
+      "Semantic normalization, boolean/list coercion, task id enforcement, and required-field validation remain assigned to LPS-013."
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "scripts/extract-task-graph.py",
+      "status": "complete",
+      "sha256": "abc02df8b2c9bb0d1109ed4fa0038ebf6fc7e5b595fff8c95a115552dee5228f"
+    },
+    {
+      "path": "generated/task_graph.source.csv",
+      "status": "complete",
+      "sha256": "4fe5a814659d1ffe5b60f65952bc4718514a3aea5eca003cd1c231f18bc21a93"
+    },
+    {
+      "path": "generated/task_graph.raw.json",
+      "status": "complete",
+      "sha256": "2c210afc86bc2dd210926eab2ed053144214df3726424bffe6938baadead6813"
+    },
+    {
+      "path": "generated/fixtures/task_graph.empty-row.csv",
+      "status": "complete",
+      "sha256": "653409e37707261325045625970672845de318e926e0806e6021c32d55002aa6"
+    },
+    {
+      "path": "generated/fixtures/task_graph.empty-row.raw.json",
+      "status": "complete",
+      "sha256": "c4a1b689a85071932d5ac3c9ad24bbe433d5385a48938adfd60cb05d10e8ebbc"
+    },
+    {
+      "path": "generated/fixtures/task_graph.malformed.csv",
+      "status": "negative-fixture",
+      "sha256": "fa6a95cf2944b18df95dda0c700be9d74c20a1da75bac11cca51917072cffb4c"
+    },
+    {
+      "path": "generated/fixtures/task_graph.empty.csv",
+      "status": "negative-fixture",
+      "sha256": "ac1321d0f332e295908c2e68048cb4199099c48e395c11096fa4d6d8f20b9377"
+    },
+    {
+      "path": "proof_records/LPS-012.proof.json",
+      "status": "complete"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "env -i HOME=/home/flexnetos PATH=/home/flexnetos/FlexNetOS/usr/bin:/home/flexnetos/.local/bin:/home/flexnetos/.nix-profile/bin:/usr/bin:/bin python3 scripts/extract-task-graph.py generated/task_graph.source.csv -o generated/task_graph.raw.json",
+      "exit_code": 0,
+      "output": "extract-task-graph: wrote generated/task_graph.raw.json with 11 row(s); skipped empty rows: [13]"
+    },
+    {
+      "command": "env -i HOME=/home/flexnetos PATH=/home/flexnetos/FlexNetOS/usr/bin:/home/flexnetos/.local/bin:/home/flexnetos/.nix-profile/bin:/usr/bin:/bin python3 scripts/extract-task-graph.py generated/fixtures/task_graph.empty-row.csv -o generated/fixtures/task_graph.empty-row.raw.json",
+      "exit_code": 0,
+      "output": "extract-task-graph: wrote generated/fixtures/task_graph.empty-row.raw.json with 1 row(s); skipped empty rows: [2]"
+    },
+    {
+      "command": "env -i HOME=/home/flexnetos PATH=/home/flexnetos/FlexNetOS/usr/bin:/home/flexnetos/.local/bin:/home/flexnetos/.nix-profile/bin:/usr/bin:/bin python3 scripts/extract-task-graph.py generated/fixtures/task_graph.malformed.csv -o /tmp/lps012-malformed.raw.json",
+      "exit_code": 1,
+      "output": "extract-task-graph: error: row 2 has 2 column(s); expected 3"
+    },
+    {
+      "command": "env -i HOME=/home/flexnetos PATH=/home/flexnetos/FlexNetOS/usr/bin:/home/flexnetos/.local/bin:/home/flexnetos/.nix-profile/bin:/usr/bin:/bin python3 scripts/extract-task-graph.py generated/fixtures/task_graph.empty.csv -o /tmp/lps012-empty.raw.json",
+      "exit_code": 1,
+      "output": "extract-task-graph: error: source CSV has no task graph rows after the header"
+    },
+    {
+      "command": "jq empty generated/task_graph.raw.json generated/fixtures/task_graph.empty-row.raw.json",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": "jq '{schema_version, row_count: .source.row_count, empty_rows_skipped: .source.empty_rows_skipped, first_task: .rows[0].columns.task_id, last_task: .rows[-1].columns.task_id, preserved_columns: (.source.header | length)}' generated/task_graph.raw.json",
+      "exit_code": 0,
+      "output": "{ \"schema_version\": \"lifeos-planning-spine.task-graph.raw.v0\", \"row_count\": 11, \"empty_rows_skipped\": [13], \"first_task\": \"LPS-012\", \"last_task\": \"LPS-022\", \"preserved_columns\": 17 }"
+    },
+    {
+      "command": "env -i HOME=/home/flexnetos PATH=/home/flexnetos/FlexNetOS/usr/bin:/home/flexnetos/.local/bin:/home/flexnetos/.nix-profile/bin:/usr/bin:/bin bun run planning-spine:verify",
+      "exit_code": 0,
+      "output": "$ bun scripts/verify-planning-spine.mjs\nplanning-spine-v0 verification passed"
+    }
+  ],
+  "result_summary": {
+    "rows_extracted": 11,
+    "preserved_columns": 17,
+    "empty_rows_skipped": [
+      13
+    ],
+    "malformed_rows_fail_loudly": true,
+    "empty_csv_fails_loudly": true,
+    "planning_spine_verifier_passed": true
+  },
+  "coordination_notes": [
+    "Concurrent local work produced the live LPS-012 extractor and source CSV while this watch loop was active.",
+    "Duplicate scratch CSV/error artifacts from the watcher were removed, leaving the live source CSV, fixture CSVs, raw JSON, and proof record as the active surface."
+  ],
+  "drift_or_blockers": [
+    "The source remains a CSV export, not a direct Google Sheets API pull; that matches the LPS-012 next action.",
+    "LPS-013 is still required to normalize booleans/lists, enforce required fields, and build task graph indexes."
+  ],
+  "recommended_next_task_id": "LPS-013"
+}

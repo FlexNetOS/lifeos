@@ -1,0 +1,29 @@
+{
+  "id": "cell.mvp.execute",
+  "name": "MVP Execution Cell",
+  "purpose": "Run the constrained task inside a bounded runtime.",
+  "boundary": "Hermetic filesystem and toolchain boundary without Docker dependence.",
+  "inputs": [
+    "task.execute.slice",
+    "simulation constraints",
+    "authority assignment"
+  ],
+  "outputs": [
+    "artifact.simulation.patch",
+    "proof.task.execute.slice"
+  ],
+  "toolchain": [
+    "lifeos-runtime",
+    "proof-ledger-client"
+  ],
+  "allowed_paths": [
+    "/var/lifeos/tasks/task.execute.slice",
+    "/var/lifeos/proofs/task.execute.slice"
+  ],
+  "blocked_paths": [
+    "/",
+    "/home/flexnetos/.local",
+    "/external"
+  ],
+  "verification_gate": "proof gate must pass before success is reported"
+}

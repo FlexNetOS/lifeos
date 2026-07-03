@@ -1,0 +1,571 @@
+import fs from "node:fs";
+import path from "node:path";
+
+const repoRoot = process.cwd();
+const pkgRoot = path.join(repoRoot, "planning-spine-v0");
+const runtimeReportPath = path.join(pkgRoot, "state", "verification_runtime_report.json");
+const mvpBundlePath = path.join(pkgRoot, "examples", "mvp-bundle.json");
+const mvpBundleReportPath = path.join(pkgRoot, "state", "mvp_bundle_report.json");
+const authorityIntegrityReportPath = path.join(pkgRoot, "state", "authority_integrity_report.json");
+const performedChecks = [];
+const bundleReport = {
+  bundle_path: path.relative(repoRoot, mvpBundlePath),
+  observed_at: null,
+  result: "fail",
+  message: null,
+  bundle_id: null,
+  scope: null,
+  scope_boundaries: null,
+  bundle_order: [],
+  resolved_objects: {},
+  authority_assignment: null,
+  linkage_checks: []
+};
+const authorityIntegrityReport = {
+  bundle_path: path.relative(repoRoot, mvpBundlePath),
+  observed_at: null,
+  result: "fail",
+  message: null,
+  verifier_authority: null,
+  proof_record: null,
+  integrity_checks: []
+};
+
+const requiredDocs = [
+  "README.md",
+  "00_NORTH_STAR.md",
+  "01_OBJECT_MODEL.md",
+  "02_AUTHORITY_GRAPH.md",
+  "03_TASK_GRAPH_SCHEMA.md",
+  "04_WORLDSEED_SCHEMA.md",
+  "05_HERMETIC_CELL_CONTRACT.md",
+  "06_PROOF_LEDGER.md",
+  "07_MVP_VERTICAL_SLICE.md",
+  "08_EXECUTION_GATES.md",
+  "09_OPEN_QUESTIONS.md",
+  "rfcs/RFC-001_DEVWORLD_MIROFISH_ADAPTER.md",
+  "rfcs/RFC-002_COMPILED_AGENT_BRAINPACK.md"
+];
+
+const schemaFiles = {
+  Intent: "schemas/intent.schema.json",
+  Goal: "schemas/goal.schema.json",
+  Agent: "schemas/agent.schema.json",
+  Role: "schemas/role.schema.json",
+  Capability: "schemas/capability.schema.json",
+  Task: "schemas/task.schema.json",
+  Cell: "schemas/cell.schema.json",
+  WorldSeed: "schemas/worldseed.schema.json",
+  SimulationReport: "schemas/simulation-report.schema.json",
+  ProofRecord: "schemas/proof-record.schema.json",
+  Decision: "schemas/decision.schema.json",
+  Action: "schemas/action.schema.json",
+  Artifact: "schemas/artifact.schema.json"
+};
+
+const exampleFiles = {
+  Intent: "examples/intent.json",
+  Goal: "examples/goal.json",
+  Agent: "examples/agent.json",
+  Role: "examples/role.json",
+  Capability: "examples/capability.json",
+  Task: "examples/task.json",
+  Cell: "examples/cell.json",
+  WorldSeed: "examples/worldseed.json",
+  SimulationReport: "examples/simulation-report.json",
+  ProofRecord: "examples/proof-record.json",
+  Decision: "examples/decision.json",
+  Action: "examples/action.json",
+  Artifact: "examples/artifact.json"
+};
+
+function readJson(relativePath) {
+  return JSON.parse(fs.readFileSync(path.join(pkgRoot, relativePath), "utf8"));
+}
+
+function assert(condition, message) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+function recordCheck(name) {
+  performedChecks.push(name);
+}
+
+function recordBundleLink(name, from, to, detail, passed) {
+  bundleReport.linkage_checks.push({
+    name,
+    from,
+    to,
+    detail,
+    result: passed ? "pass" : "fail"
+  });
+
+  assert(passed, detail);
+}
+
+function recordAuthorityCheck(name, detail, passed, context = {}) {
+  authorityIntegrityReport.integrity_checks.push({
+    name,
+    detail,
+    result: passed ? "pass" : "fail",
+    context
+  });
+
+  assert(passed, detail);
+}
+
+function writeRuntimeReport(result, message) {
+  const report = {
+    command: process.env.npm_lifecycle_event === "planning-spine:verify"
+      ? "bun run planning-spine:verify"
+      : `bun ${path.relative(repoRoot, process.argv[1] ?? "scripts/verify-planning-spine.mjs")}`,
+    cwd: repoRoot,
+    pkg_root: pkgRoot,
+    executable: process.execPath,
+    runtime: {
+      name: typeof Bun !== "undefined" ? "bun" : "node",
+      version: typeof Bun !== "undefined" ? Bun.version : process.version,
+      argv: process.argv
+    },
+    lifecycle_event: process.env.npm_lifecycle_event ?? null,
+    observed_at: new Date().toISOString(),
+    performed_checks: performedChecks,
+    result,
+    message
+  };
+
+  fs.mkdirSync(path.dirname(runtimeReportPath), { recursive: true });
+  fs.writeFileSync(runtimeReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+}
+
+function writeMvpBundleReport(result, message) {
+  bundleReport.observed_at = new Date().toISOString();
+  bundleReport.result = result;
+  bundleReport.message = message;
+
+  fs.mkdirSync(path.dirname(mvpBundleReportPath), { recursive: true });
+  fs.writeFileSync(mvpBundleReportPath, `${JSON.stringify(bundleReport, null, 2)}\n`, "utf8");
+}
+
+function writeAuthorityIntegrityReport(result, message) {
+  authorityIntegrityReport.observed_at = new Date().toISOString();
+  authorityIntegrityReport.result = result;
+  authorityIntegrityReport.message = message;
+
+  fs.mkdirSync(path.dirname(authorityIntegrityReportPath), { recursive: true });
+  fs.writeFileSync(authorityIntegrityReportPath, `${JSON.stringify(authorityIntegrityReport, null, 2)}\n`, "utf8");
+}
+
+function validate(schema, value, at = "$") {
+  if (schema.type === "object") {
+    assert(value && typeof value === "object" && !Array.isArray(value), `${at} must be an object`);
+    for (const requiredKey of schema.required ?? []) {
+      assert(Object.hasOwn(value, requiredKey), `${at}.${requiredKey} is required`);
+    }
+    if (schema.additionalProperties === false) {
+      for (const key of Object.keys(value)) {
+        assert(schema.properties && Object.hasOwn(schema.properties, key), `${at}.${key} is not allowed`);
+      }
+    }
+    for (const [key, propSchema] of Object.entries(schema.properties ?? {})) {
+      if (Object.hasOwn(value, key)) {
+        validate(propSchema, value[key], `${at}.${key}`);
+      }
+    }
+    return;
+  }
+
+  if (schema.type === "array") {
+    assert(Array.isArray(value), `${at} must be an array`);
+    if (typeof schema.minItems === "number") {
+      assert(value.length >= schema.minItems, `${at} must contain at least ${schema.minItems} item(s)`);
+    }
+    if (schema.items) {
+      value.forEach((item, index) => validate(schema.items, item, `${at}[${index}]`));
+    }
+    return;
+  }
+
+  if (schema.type === "string") {
+    assert(typeof value === "string", `${at} must be a string`);
+    if (schema.enum) {
+      assert(schema.enum.includes(value), `${at} must be one of: ${schema.enum.join(", ")}`);
+    }
+    return;
+  }
+
+  throw new Error(`Unsupported schema type at ${at}: ${schema.type}`);
+}
+
+function verifyDocs() {
+  recordCheck("required_docs_exist");
+  for (const relativePath of requiredDocs) {
+    assert(fs.existsSync(path.join(pkgRoot, relativePath)), `Missing required doc: ${relativePath}`);
+  }
+}
+
+function verifySchemas() {
+  recordCheck("schemas_define_required_fields");
+  for (const [name, relativePath] of Object.entries(schemaFiles)) {
+    const schema = readJson(relativePath);
+    assert(Array.isArray(schema.required) && schema.required.length > 0, `${name} schema must define required fields`);
+  }
+
+  recordCheck("task_schema_requires_execution_constraints");
+  const taskSchema = readJson(schemaFiles.Task);
+  for (const field of ["allowed_paths", "blocked_paths", "verification_gate", "rollback_plan", "proof_uri"]) {
+    assert(taskSchema.required.includes(field), `Task schema must require ${field}`);
+  }
+}
+
+function verifyExamples() {
+  recordCheck("examples_satisfy_schemas");
+  for (const [name, schemaPath] of Object.entries(schemaFiles)) {
+    const schema = readJson(schemaPath);
+    const example = readJson(exampleFiles[name]);
+    validate(schema, example);
+  }
+}
+
+function verifyMvpConstraints() {
+  recordCheck("readme_preserves_scope_boundaries");
+  const readme = fs.readFileSync(path.join(pkgRoot, "README.md"), "utf8");
+  assert(readme.includes("v0"), "README must identify v0 scope");
+  assert(readme.includes("RFC"), "README must identify RFC scope");
+  assert(readme.includes("post-v0"), "README must identify post-v0 scope");
+
+  recordCheck("task_example_preserves_proof_constraints");
+  const task = readJson(exampleFiles.Task);
+  assert(task.proof_uri && task.proof_uri.startsWith("proof://"), "Task example must declare proof_uri");
+  assert(Array.isArray(task.allowed_paths) && task.allowed_paths.length > 0, "Task example must declare allowed_paths");
+  assert(Array.isArray(task.blocked_paths) && task.blocked_paths.length > 0, "Task example must declare blocked_paths");
+
+  recordCheck("simulation_report_emits_constraint_updates");
+  const report = readJson(exampleFiles.SimulationReport);
+  assert(report.constraint_updates.length > 0, "Simulation report must emit constraint updates");
+}
+
+function loadBundleRef(ref, label) {
+  assert(ref && typeof ref === "object", `${label} must be an object`);
+  assert(typeof ref.schema === "string" && schemaFiles[ref.schema], `${label}.schema must name a known schema`);
+  assert(typeof ref.path === "string" && ref.path.startsWith("examples/"), `${label}.path must stay inside examples/`);
+  assert(typeof ref.id === "string" && ref.id.length > 0, `${label}.id must be a non-empty string`);
+
+  const value = readJson(ref.path);
+  const schema = readJson(schemaFiles[ref.schema]);
+  validate(schema, value, `$bundle.${label}`);
+  assert(value.id === ref.id, `${label} id mismatch: expected ${ref.id}, received ${value.id}`);
+  return value;
+}
+
+function verifyMvpBundle() {
+  recordCheck("mvp_bundle_manifest_exists");
+  assert(fs.existsSync(mvpBundlePath), "Missing required bundle manifest: examples/mvp-bundle.json");
+
+  const bundle = JSON.parse(fs.readFileSync(mvpBundlePath, "utf8"));
+  const requiredOrder = [
+    "intent",
+    "goal",
+    "authority_assignment",
+    "task",
+    "worldseed",
+    "simulation_report",
+    "cell",
+    "proof",
+    "decision",
+    "action",
+    "artifact"
+  ];
+
+  bundleReport.bundle_id = bundle.id ?? null;
+  bundleReport.scope = bundle.scope ?? null;
+  bundleReport.scope_boundaries = bundle.scope_boundaries ?? null;
+  bundleReport.bundle_order = bundle.bundle_order ?? [];
+
+  recordCheck("mvp_bundle_preserves_scope_boundaries");
+  assert(bundle.scope === "v0", "MVP bundle scope must remain v0");
+  assert(bundle.scope_boundaries?.v0 === "in-scope", "MVP bundle must keep v0 in scope");
+  assert(bundle.scope_boundaries?.rfc === "proposed-only", "MVP bundle must keep RFC proposed-only");
+  assert(bundle.scope_boundaries?.post_v0 === "deferred", "MVP bundle must keep post-v0 deferred");
+  assert(JSON.stringify(bundle.bundle_order) === JSON.stringify(requiredOrder), "MVP bundle order must match the required end-to-end chain");
+
+  recordCheck("mvp_bundle_resolves_canonical_examples");
+  const resolved = {};
+  for (const key of Object.keys(bundle.objects ?? {})) {
+    const ref = bundle.objects[key];
+    const value = loadBundleRef(ref, `objects.${key}`);
+    resolved[key] = value;
+    bundleReport.resolved_objects[key] = {
+      schema: ref.schema,
+      path: ref.path,
+      id: value.id
+    };
+  }
+
+  for (const key of requiredOrder.filter((entry) => entry !== "authority_assignment")) {
+    assert(resolved[key], `MVP bundle must define object reference for ${key}`);
+  }
+
+  const authority = bundle.authority_assignment;
+  assert(authority && typeof authority === "object", "MVP bundle must define authority_assignment");
+  assert(Array.isArray(authority.required_capabilities) && authority.required_capabilities.length > 0, "Authority assignment must declare at least one capability");
+  assert(authority.proof_verifier && typeof authority.proof_verifier === "object", "Authority assignment must declare proof_verifier");
+
+  const assignedRole = loadBundleRef(authority.assigned_role, "authority_assignment.assigned_role");
+  const assignedAgent = loadBundleRef(authority.assigned_agent, "authority_assignment.assigned_agent");
+  const requiredCapabilities = authority.required_capabilities.map((ref, index) =>
+    loadBundleRef(ref, `authority_assignment.required_capabilities[${index}]`)
+  );
+  const proofVerifierAgent = loadBundleRef(authority.proof_verifier.agent, "authority_assignment.proof_verifier.agent");
+  const proofVerifierRole = loadBundleRef(authority.proof_verifier.role, "authority_assignment.proof_verifier.role");
+  const proofVerifierCapabilities = authority.proof_verifier.required_capabilities.map((ref, index) =>
+    loadBundleRef(ref, `authority_assignment.proof_verifier.required_capabilities[${index}]`)
+  );
+
+  bundleReport.authority_assignment = {
+    authority_root: authority.authority_root,
+    operational_delegate: authority.operational_delegate,
+    task_id: authority.task_id,
+    assigned_role_id: assignedRole.id,
+    assigned_agent_id: assignedAgent.id,
+    required_capability_ids: requiredCapabilities.map((capability) => capability.id),
+    proof_verifier: {
+      agent_id: proofVerifierAgent.id,
+      role_id: proofVerifierRole.id,
+      required_capability_ids: proofVerifierCapabilities.map((capability) => capability.id)
+    }
+  };
+
+  authorityIntegrityReport.verifier_authority = {
+    authority_root: authority.authority_root,
+    operational_delegate: authority.operational_delegate,
+    task_id: authority.task_id,
+    executor_agent_id: assignedAgent.id,
+    executor_role_id: assignedRole.id,
+    verifier_agent_id: proofVerifierAgent.id,
+    verifier_role_id: proofVerifierRole.id,
+    verifier_capability_ids: proofVerifierCapabilities.map((capability) => capability.id)
+  };
+  authorityIntegrityReport.proof_record = {
+    proof_id: resolved.proof.id,
+    subject_type: resolved.proof.subject_type,
+    subject_id: resolved.proof.subject_id,
+    verified_by: resolved.proof.verified_by,
+    result: resolved.proof.result
+  };
+
+  recordCheck("mvp_bundle_cross_object_integrity");
+  recordBundleLink(
+    "intent_to_goal",
+    resolved.intent.id,
+    resolved.goal.id,
+    "Intent.goal_ids must include the bundle goal id",
+    resolved.intent.goal_ids.includes(resolved.goal.id) && resolved.goal.intent_id === resolved.intent.id
+  );
+  recordBundleLink(
+    "goal_to_authority_assignment",
+    resolved.goal.id,
+    assignedAgent.id,
+    "Goal authority_scope must match the operational delegate",
+    resolved.goal.authority_scope === authority.operational_delegate
+  );
+  recordBundleLink(
+    "authority_assignment_to_task",
+    assignedAgent.id,
+    resolved.task.id,
+    "Authority assignment task_id and assigned agent must match the task owner",
+    authority.task_id === resolved.task.id && resolved.task.owner_agent_id === assignedAgent.id
+  );
+  recordBundleLink(
+    "authority_role_to_agent",
+    assignedRole.id,
+    assignedAgent.id,
+    "Assigned agent must carry the assigned role",
+    assignedAgent.role_ids.includes(assignedRole.id)
+  );
+  recordBundleLink(
+    "authority_capabilities_to_role",
+    requiredCapabilities.map((capability) => capability.id).join(","),
+    assignedRole.id,
+    "Assigned role must require every declared capability",
+    requiredCapabilities.every((capability) => assignedRole.required_capability_ids.includes(capability.id))
+  );
+  recordBundleLink(
+    "authority_capabilities_to_agent",
+    requiredCapabilities.map((capability) => capability.id).join(","),
+    assignedAgent.id,
+    "Assigned agent must carry every declared capability",
+    requiredCapabilities.every((capability) => assignedAgent.capability_ids.includes(capability.id))
+  );
+  recordBundleLink(
+    "task_to_worldseed",
+    resolved.task.id,
+    resolved.worldseed.id,
+    "WorldSeed must target the bundle intent and task",
+    resolved.worldseed.intent_id === resolved.intent.id && resolved.worldseed.task_id === resolved.task.id
+  );
+  recordBundleLink(
+    "worldseed_to_simulation_report",
+    resolved.worldseed.id,
+    resolved.simulation_report.id,
+    "SimulationReport must reference the bundle worldseed and task",
+    resolved.simulation_report.worldseed_id === resolved.worldseed.id && resolved.simulation_report.task_id === resolved.task.id
+  );
+  recordBundleLink(
+    "simulation_report_to_cell",
+    resolved.simulation_report.id,
+    resolved.cell.id,
+    "Cell inputs and outputs must expose the bundle task, proof, and artifact ids",
+    resolved.cell.inputs.includes(resolved.task.id)
+      && resolved.cell.outputs.includes(resolved.proof.id)
+      && resolved.cell.outputs.includes(resolved.artifact.id)
+  );
+  recordBundleLink(
+    "task_to_cell",
+    resolved.task.id,
+    resolved.cell.id,
+    "Task cell_id and path boundaries must match the bundle cell",
+    resolved.task.cell_id === resolved.cell.id
+      && JSON.stringify(resolved.task.allowed_paths) === JSON.stringify(resolved.cell.allowed_paths)
+      && JSON.stringify(resolved.task.blocked_paths) === JSON.stringify(resolved.cell.blocked_paths)
+  );
+  recordBundleLink(
+    "cell_to_proof",
+    resolved.cell.id,
+    resolved.proof.id,
+    "ProofRecord must be a passing task proof verified by the declared verifier",
+    resolved.proof.subject_type === "task"
+      && resolved.proof.subject_id === resolved.task.id
+      && resolved.proof.result === "pass"
+      && resolved.proof.verified_by === proofVerifierAgent.id
+  );
+  recordBundleLink(
+    "proof_to_decision",
+    resolved.proof.id,
+    resolved.decision.id,
+    "Decision must derive from proof-backed task state and be made by the operational delegate",
+    resolved.decision.intent_id === resolved.intent.id
+      && resolved.decision.made_by === authority.operational_delegate
+      && resolved.decision.inputs.includes(resolved.proof.id)
+      && resolved.decision.inputs.includes(resolved.task.id)
+  );
+  recordBundleLink(
+    "decision_to_action",
+    resolved.decision.id,
+    resolved.action.id,
+    "Decision selected_option must resolve to the bundle action",
+    resolved.decision.selected_option === resolved.action.id
+  );
+  recordBundleLink(
+    "action_to_artifact",
+    resolved.action.id,
+    resolved.artifact.id,
+    "Action, Task, and Artifact must agree on actor, task, and expected artifact ids",
+    resolved.action.task_id === resolved.task.id
+      && resolved.action.actor_id === assignedAgent.id
+      && resolved.task.action_ids.includes(resolved.action.id)
+      && resolved.action.expected_artifacts.includes(resolved.artifact.id)
+      && resolved.artifact.task_id === resolved.task.id
+      && resolved.artifact.generated_by === assignedAgent.id
+      && resolved.task.artifact_ids.includes(resolved.artifact.id)
+      && resolved.artifact.proof_record_ids.includes(resolved.proof.id)
+  );
+
+  recordCheck("mvp_bundle_verifier_authority_integrity");
+  recordAuthorityCheck(
+    "verifier_agent_is_distinct_from_executor",
+    "Verifier agent must be distinct from the executing agent",
+    proofVerifierAgent.id !== assignedAgent.id,
+    {
+      verifier_agent_id: proofVerifierAgent.id,
+      executor_agent_id: assignedAgent.id
+    }
+  );
+  recordAuthorityCheck(
+    "verifier_role_is_carried_by_verifier_agent",
+    "Verifier agent must carry the declared verifier role",
+    proofVerifierAgent.role_ids.includes(proofVerifierRole.id),
+    {
+      verifier_agent_id: proofVerifierAgent.id,
+      verifier_role_id: proofVerifierRole.id
+    }
+  );
+  recordAuthorityCheck(
+    "verifier_capabilities_are_required_by_verifier_role",
+    "Verifier role must require every declared verifier capability",
+    proofVerifierCapabilities.every((capability) => proofVerifierRole.required_capability_ids.includes(capability.id)),
+    {
+      verifier_role_id: proofVerifierRole.id,
+      verifier_capability_ids: proofVerifierCapabilities.map((capability) => capability.id)
+    }
+  );
+  recordAuthorityCheck(
+    "verifier_capabilities_are_carried_by_verifier_agent",
+    "Verifier agent must carry every declared verifier capability",
+    proofVerifierCapabilities.every((capability) => proofVerifierAgent.capability_ids.includes(capability.id)),
+    {
+      verifier_agent_id: proofVerifierAgent.id,
+      verifier_capability_ids: proofVerifierCapabilities.map((capability) => capability.id)
+    }
+  );
+  recordAuthorityCheck(
+    "verifier_scope_matches_operational_delegate",
+    "Verifier authority scope must stay inside the declared operational delegation boundary",
+    proofVerifierAgent.authority_scope === `${authority.operational_delegate}-delegated`,
+    {
+      verifier_agent_id: proofVerifierAgent.id,
+      authority_scope: proofVerifierAgent.authority_scope,
+      operational_delegate: authority.operational_delegate
+    }
+  );
+  recordAuthorityCheck(
+    "proof_record_verified_by_resolved_verifier_agent",
+    "ProofRecord.verified_by must resolve to the declared verifier agent object",
+    resolved.proof.verified_by === proofVerifierAgent.id,
+    {
+      proof_id: resolved.proof.id,
+      verified_by: resolved.proof.verified_by,
+      verifier_agent_id: proofVerifierAgent.id
+    }
+  );
+  recordAuthorityCheck(
+    "proof_record_subject_matches_bundle_task",
+    "ProofRecord subject must resolve to the bundle task",
+    resolved.proof.subject_type === "task" && resolved.proof.subject_id === resolved.task.id,
+    {
+      proof_id: resolved.proof.id,
+      subject_type: resolved.proof.subject_type,
+      subject_id: resolved.proof.subject_id,
+      task_id: resolved.task.id
+    }
+  );
+  recordAuthorityCheck(
+    "verifier_boundary_rules_forbid_execution",
+    "Verifier agent boundary rules must explicitly forbid task execution",
+    proofVerifierAgent.boundary_rules.some((rule) => rule.includes("Cannot execute")),
+    {
+      verifier_agent_id: proofVerifierAgent.id,
+      boundary_rules: proofVerifierAgent.boundary_rules
+    }
+  );
+}
+
+try {
+  verifyDocs();
+  verifySchemas();
+  verifyExamples();
+  verifyMvpConstraints();
+  verifyMvpBundle();
+  writeMvpBundleReport("pass", "planning-spine-v0 MVP bundle verification passed");
+  writeAuthorityIntegrityReport("pass", "planning-spine-v0 verifier authority integrity passed");
+  writeRuntimeReport("pass", "planning-spine-v0 verification passed");
+  console.log("planning-spine-v0 verification passed");
+} catch (error) {
+  writeMvpBundleReport("fail", `planning-spine-v0 MVP bundle verification failed: ${error.message}`);
+  writeAuthorityIntegrityReport("fail", `planning-spine-v0 verifier authority integrity failed: ${error.message}`);
+  writeRuntimeReport("fail", `planning-spine-v0 verification failed: ${error.message}`);
+  console.error(`planning-spine-v0 verification failed: ${error.message}`);
+  process.exit(1);
+}

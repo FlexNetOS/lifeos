@@ -1,0 +1,17 @@
+{
+  "id": "action.run.slice",
+  "task_id": "task.execute.slice",
+  "action_type": "execute",
+  "description": "Run the constrained vertical slice inside the hermetic execution cell.",
+  "actor_id": "agent.executor",
+  "preconditions": [
+    "authority_gate passed",
+    "simulation_gate passed",
+    "cell_gate passed"
+  ],
+  "expected_artifacts": [
+    "artifact.simulation.patch"
+  ],
+  "verification_gate": "proof_gate",
+  "status": "ready"
+}

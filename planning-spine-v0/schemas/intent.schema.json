@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/intent.schema.json",
+  "title": "Intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "summary",
+    "requester",
+    "authority_scope",
+    "success_criteria",
+    "constraints",
+    "goal_ids",
+    "status"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "summary": { "type": "string" },
+    "requester": { "type": "string" },
+    "authority_scope": { "type": "string" },
+    "success_criteria": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "goal_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "status": { "type": "string", "enum": ["draft", "active", "complete", "blocked"] }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "task_id": "LPS-015",
+  "title": "Validate execution packet",
+  "status": "pass",
+  "observed_at": "2026-07-03T19:42:46Z",
+  "local_path": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+  "scope": {
+    "allowed_paths": [
+      "scripts/**",
+      "generated/**",
+      "proof_records/LPS-015.proof.json"
+    ],
+    "blocked_paths": [
+      "execution against local repos",
+      "secrets/**"
+    ]
+  },
+  "files_changed": [
+    "scripts/validate-execution-packet.py",
+    "generated/execution_packets/LPS-015.validation_report.json",
+    "generated/fixtures/execution_packet.missing-proof.json",
+    "generated/fixtures/execution_packet.missing-proof.validation_report.json",
+    "proof_records/LPS-015.proof.json"
+  ],
+  "artifacts": {
+    "validator_script": {
+      "path": "scripts/validate-execution-packet.py",
+      "sha256": "7894978a9c52e4d0e8cd1071d9944625bb92c159be2d0c85a81b6713298e5a2b"
+    },
+    "valid_packet_validation_report": {
+      "path": "generated/execution_packets/LPS-015.validation_report.json",
+      "schema_version": "lifeos-planning-spine.execution-packet.validation-report.v0",
+      "result": "pass",
+      "error_count": 0,
+      "task_id": "LPS-015",
+      "sha256": "6aae7e539c7c209083dda72a3662ff4bc9788f66b690e3832e3ffe12de576b74"
+    },
+    "missing_proof_fixture": {
+      "path": "generated/fixtures/execution_packet.missing-proof.json",
+      "expected_result": "fail",
+      "expected_error_field": "proof_uri",
+      "sha256": "bc69f716b232f1b4d473aa2b15dcfdcc1384c125ad0fd22fa4af5ca1f2e17f20"
+    },
+    "missing_proof_validation_report": {
+      "path": "generated/fixtures/execution_packet.missing-proof.validation_report.json",
+      "schema_version": "lifeos-planning-spine.execution-packet.validation-report.v0",
+      "result": "fail",
+      "error_count": 1,
+      "task_id": "LPS-015",
+      "failed_field": "proof_uri",
+      "sha256": "6a283181ff9968dd35dc65edf80f61b340e788d9e651365c62f476b9a78d9a59"
+    }
+  },
+  "verification_commands": [
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/validate-execution-packet.py generated/execution_packets/LPS-015.json --report generated/execution_packets/LPS-015.validation_report.json --expect-task-id LPS-015",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "validate-execution-packet: generated/execution_packets/LPS-015.json passed; report generated/execution_packets/LPS-015.validation_report.json"
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/validate-execution-packet.py generated/fixtures/execution_packet.missing-proof.json --report generated/fixtures/execution_packet.missing-proof.validation_report.json --expect-task-id LPS-015",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 1,
+      "output": "validate-execution-packet: validation failed with 1 error(s); see generated/fixtures/execution_packet.missing-proof.validation_report.json",
+      "expected_failure": true
+    },
+    {
+      "command": "jq empty generated/execution_packets/LPS-015.validation_report.json generated/fixtures/execution_packet.missing-proof.json generated/fixtures/execution_packet.missing-proof.validation_report.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/home/flexnetos/.local/bin:/home/flexnetos/FlexNetOS/usr/bin:/usr/bin:/bin bun run planning-spine:verify",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "planning-spine-v0 verification passed"
+    }
+  ],
+  "checks": [
+    {
+      "name": "valid_packet_required_fields",
+      "result": "pass",
+      "detail": "LPS-015 packet includes owner, scope, cell, verification gate, rollback plan, and proof URI."
+    },
+    {
+      "name": "invalid_packet_rejected",
+      "result": "pass",
+      "detail": "Fixture missing proof_uri exits nonzero and records proof_uri as the failing field."
+    },
+    {
+      "name": "single_packet_validator",
+      "result": "pass",
+      "detail": "Validator verifies one execution packet before agent consumption, matching the LPS-015 row."
+    },
+    {
+      "name": "no_repo_execution",
+      "result": "pass",
+      "detail": "Validation reads packet JSON and writes validation reports only; it does not execute local repo tasks."
+    }
+  ],
+  "drift_or_blockers": [
+    "Validator currently validates one packet per invocation as required by LPS-015; batch validation remains a future wire-in concern.",
+    "Python validator remains standalone and is not wired into Bun verify because the row says to wire it in only if useful while Python remains required.",
+    "LPS-015 preserves the MVP boundary and does not expand into Hermes, Odysseus, full company hierarchy, or standalone Mirofish."
+  ],
+  "recommended_next_task_id": "LPS-016"
+}

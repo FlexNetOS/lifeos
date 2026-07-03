@@ -1,0 +1,645 @@
+{
+  "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
+  "generated_at": "2026-07-03T19:37:31Z",
+  "source_graph_uri": "generated/task_graph.raw.json",
+  "task_count": 11,
+  "source": {
+    "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
+    "generated_at": "2026-07-03T19:30:47Z",
+    "format": "csv",
+    "path": "generated/task_graph.source.csv",
+    "row_count": 11,
+    "empty_rows_skipped": [
+      13
+    ],
+    "required_columns": [
+      "task_id",
+      "parent_id",
+      "phase",
+      "title",
+      "owner_agent",
+      "goal",
+      "inputs",
+      "target_artifacts",
+      "allowed_paths",
+      "blocked_paths",
+      "simulation_required",
+      "execution_cell",
+      "verification_gate",
+      "rollback_plan",
+      "status",
+      "proof_uri",
+      "next_action"
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": "LPS-012",
+      "source_row_number": 2,
+      "phase": "8-execution-pipeline",
+      "title": "Python task graph extractor",
+      "owner_agent": "Runtime Kernel",
+      "goal": "Create scripts/extract-task-graph.py to ingest/export Sheet or CSV task graph rows into generated/task_graph.raw.json.",
+      "simulation_required": false,
+      "execution_cell": "doc-cell",
+      "verification_gate": "Script produces raw JSON rows without dropping columns; malformed rows fail loudly.",
+      "rollback_plan": "Delete generated raw file; preserve source sheet/CSV.",
+      "status": "ready",
+      "proof_uri": "proof_records/LPS-012.proof.json",
+      "next_action": "Implement extractor against CSV first; Sheet API later.",
+      "source_columns": {
+        "task_id": "LPS-012",
+        "parent_id": "LPS-008",
+        "phase": "8-execution-pipeline",
+        "title": "Python task graph extractor",
+        "owner_agent": "Runtime Kernel",
+        "goal": "Create scripts/extract-task-graph.py to ingest/export Sheet or CSV task graph rows into generated/task_graph.raw.json.",
+        "inputs": "Task Graph v0 sheet or CSV export",
+        "target_artifacts": "scripts/extract-task-graph.py; generated/task_graph.raw.json",
+        "allowed_paths": "scripts/**; generated/**",
+        "blocked_paths": "src production code; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "doc-cell",
+        "verification_gate": "Script produces raw JSON rows without dropping columns; malformed rows fail loudly.",
+        "rollback_plan": "Delete generated raw file; preserve source sheet/CSV.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-012.proof.json",
+        "next_action": "Implement extractor against CSV first; Sheet API later."
+      },
+      "parent_ids": [
+        "LPS-008"
+      ],
+      "inputs": [
+        "Task Graph v0 sheet or CSV export"
+      ],
+      "target_artifacts": [
+        "scripts/extract-task-graph.py",
+        "generated/task_graph.raw.json"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        "generated/**"
+      ],
+      "blocked_paths": [
+        "src production code",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "LPS-013",
+      "source_row_number": 3,
+      "phase": "8-execution-pipeline",
+      "title": "Normalize task graph JSON",
+      "owner_agent": "Runtime Kernel",
+      "goal": "Create scripts/normalize-task-graph.py to validate required columns, normalize booleans/lists, enforce task IDs, and emit generated/task_graph.normalized.json + task_graph.index.json.",
+      "simulation_required": false,
+      "execution_cell": "doc-cell",
+      "verification_gate": "Fails if any task lacks allowed_paths, blocked_paths, verification_gate, rollback_plan, proof_uri, or execution_cell.",
+      "rollback_plan": "Keep raw JSON and emit validation error report.",
+      "status": "ready",
+      "proof_uri": "proof_records/LPS-013.proof.json",
+      "next_action": "Use JSON Schema-compatible field names.",
+      "source_columns": {
+        "task_id": "LPS-013",
+        "parent_id": "LPS-012",
+        "phase": "8-execution-pipeline",
+        "title": "Normalize task graph JSON",
+        "owner_agent": "Runtime Kernel",
+        "goal": "Create scripts/normalize-task-graph.py to validate required columns, normalize booleans/lists, enforce task IDs, and emit generated/task_graph.normalized.json + task_graph.index.json.",
+        "inputs": "generated/task_graph.raw.json",
+        "target_artifacts": "scripts/normalize-task-graph.py; generated/task_graph.normalized.json; generated/task_graph.index.json",
+        "allowed_paths": "scripts/**; generated/**",
+        "blocked_paths": "source sheet mutation; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "doc-cell",
+        "verification_gate": "Fails if any task lacks allowed_paths, blocked_paths, verification_gate, rollback_plan, proof_uri, or execution_cell.",
+        "rollback_plan": "Keep raw JSON and emit validation error report.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-013.proof.json",
+        "next_action": "Use JSON Schema-compatible field names."
+      },
+      "parent_ids": [
+        "LPS-012"
+      ],
+      "inputs": [
+        "generated/task_graph.raw.json"
+      ],
+      "target_artifacts": [
+        "scripts/normalize-task-graph.py",
+        "generated/task_graph.normalized.json",
+        "generated/task_graph.index.json"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        "generated/**"
+      ],
+      "blocked_paths": [
+        "source sheet mutation",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "LPS-014",
+      "source_row_number": 4,
+      "phase": "8-execution-pipeline",
+      "title": "Build JSON execution packets",
+      "owner_agent": "Runtime Kernel",
+      "goal": "Create scripts/build-execution-packets.py to produce one bounded execution_packets/<TASK_ID>.json file per Ready task.",
+      "simulation_required": false,
+      "execution_cell": "doc-cell",
+      "verification_gate": "Each packet includes task_id, paths, cell, verification gate, rollback plan, proof_uri, source_graph_uri, generated_at, packet_schema_version.",
+      "rollback_plan": "Delete generated packets and rebuild from normalized graph.",
+      "status": "ready",
+      "proof_uri": "proof_records/LPS-014.proof.json",
+      "next_action": "Do not include full doc prose in packets.",
+      "source_columns": {
+        "task_id": "LPS-014",
+        "parent_id": "LPS-013",
+        "phase": "8-execution-pipeline",
+        "title": "Build JSON execution packets",
+        "owner_agent": "Runtime Kernel",
+        "goal": "Create scripts/build-execution-packets.py to produce one bounded execution_packets/<TASK_ID>.json file per Ready task.",
+        "inputs": "generated/task_graph.normalized.json",
+        "target_artifacts": "scripts/build-execution-packets.py; generated/execution_manifest.json; generated/execution_packets/*.json",
+        "allowed_paths": "scripts/**; generated/**",
+        "blocked_paths": "unbounded repo roots; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "doc-cell",
+        "verification_gate": "Each packet includes task_id, paths, cell, verification gate, rollback plan, proof_uri, source_graph_uri, generated_at, packet_schema_version.",
+        "rollback_plan": "Delete generated packets and rebuild from normalized graph.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-014.proof.json",
+        "next_action": "Do not include full doc prose in packets."
+      },
+      "parent_ids": [
+        "LPS-013"
+      ],
+      "inputs": [
+        "generated/task_graph.normalized.json"
+      ],
+      "target_artifacts": [
+        "scripts/build-execution-packets.py",
+        "generated/execution_manifest.json",
+        "generated/execution_packets/*.json"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        "generated/**"
+      ],
+      "blocked_paths": [
+        "unbounded repo roots",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "LPS-015",
+      "source_row_number": 5,
+      "phase": "8-execution-pipeline",
+      "title": "Validate execution packet",
+      "owner_agent": "QA Agent",
+      "goal": "Create scripts/validate-execution-packet.py to verify one packet before any agent consumes it.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "A packet is invalid if it lacks scope, verification, rollback, proof, owner, or cell.",
+      "rollback_plan": "Reject invalid packet; do not mutate workspace.",
+      "status": "ready",
+      "proof_uri": "proof_records/LPS-015.proof.json",
+      "next_action": "Wire into Bun verify if useful, but Python remains required.",
+      "source_columns": {
+        "task_id": "LPS-015",
+        "parent_id": "LPS-014",
+        "phase": "8-execution-pipeline",
+        "title": "Validate execution packet",
+        "owner_agent": "QA Agent",
+        "goal": "Create scripts/validate-execution-packet.py to verify one packet before any agent consumes it.",
+        "inputs": "generated/execution_packets/*.json",
+        "target_artifacts": "scripts/validate-execution-packet.py; validation report",
+        "allowed_paths": "scripts/**; generated/**",
+        "blocked_paths": "execution against local repos",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "A packet is invalid if it lacks scope, verification, rollback, proof, owner, or cell.",
+        "rollback_plan": "Reject invalid packet; do not mutate workspace.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-015.proof.json",
+        "next_action": "Wire into Bun verify if useful, but Python remains required."
+      },
+      "parent_ids": [
+        "LPS-014"
+      ],
+      "inputs": [
+        "generated/execution_packets/*.json"
+      ],
+      "target_artifacts": [
+        "scripts/validate-execution-packet.py",
+        "validation report"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        "generated/**"
+      ],
+      "blocked_paths": [
+        "execution against local repos"
+      ]
+    },
+    {
+      "task_id": "LPS-016",
+      "source_row_number": 6,
+      "phase": "8-execution-pipeline",
+      "title": "Merge proof records",
+      "owner_agent": "QA Agent",
+      "goal": "Create scripts/merge-proof-records.py to collect proof_records/*.proof.json into proof_records/proof_ledger.jsonl.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Proof ledger is append-only; duplicate task IDs must reconcile by revision or fail.",
+      "rollback_plan": "Preserve existing proof files; write new ledger revision.",
+      "status": "ready",
+      "proof_uri": "proof_records/LPS-016.proof.json",
+      "next_action": "Add proof schema validation.",
+      "source_columns": {
+        "task_id": "LPS-016",
+        "parent_id": "LPS-015",
+        "phase": "8-execution-pipeline",
+        "title": "Merge proof records",
+        "owner_agent": "QA Agent",
+        "goal": "Create scripts/merge-proof-records.py to collect proof_records/*.proof.json into proof_records/proof_ledger.jsonl.",
+        "inputs": "proof_records/*.proof.json",
+        "target_artifacts": "scripts/merge-proof-records.py; proof_records/proof_ledger.jsonl",
+        "allowed_paths": "scripts/**; proof_records/**",
+        "blocked_paths": "rewriting existing proof history",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "Proof ledger is append-only; duplicate task IDs must reconcile by revision or fail.",
+        "rollback_plan": "Preserve existing proof files; write new ledger revision.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-016.proof.json",
+        "next_action": "Add proof schema validation."
+      },
+      "parent_ids": [
+        "LPS-015"
+      ],
+      "inputs": [
+        "proof_records/*.proof.json"
+      ],
+      "target_artifacts": [
+        "scripts/merge-proof-records.py",
+        "proof_records/proof_ledger.jsonl"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        "proof_records/**"
+      ],
+      "blocked_paths": [
+        "rewriting existing proof history"
+      ]
+    },
+    {
+      "task_id": "LPS-017",
+      "source_row_number": 7,
+      "phase": "8-execution-pipeline",
+      "title": "Update task graph status from proof",
+      "owner_agent": "Runtime Kernel",
+      "goal": "Create scripts/update-task-graph-status.py to update statuses from proof results without changing goals, paths, or gates.",
+      "simulation_required": false,
+      "execution_cell": "policy-cell",
+      "verification_gate": "Only status/proof_uri/next_action fields may be updated by this script.",
+      "rollback_plan": "Regenerate status view from ledger.",
+      "status": "ready",
+      "proof_uri": "proof_records/LPS-017.proof.json",
+      "next_action": "Keep source-of-truth sheet human-readable.",
+      "source_columns": {
+        "task_id": "LPS-017",
+        "parent_id": "LPS-016",
+        "phase": "8-execution-pipeline",
+        "title": "Update task graph status from proof",
+        "owner_agent": "Runtime Kernel",
+        "goal": "Create scripts/update-task-graph-status.py to update statuses from proof results without changing goals, paths, or gates.",
+        "inputs": "proof_records/proof_ledger.jsonl; task_graph.normalized.json",
+        "target_artifacts": "scripts/update-task-graph-status.py; generated/task_graph.status.json",
+        "allowed_paths": "scripts/**; generated/**",
+        "blocked_paths": "source goals; allowed_paths; blocked_paths; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "policy-cell",
+        "verification_gate": "Only status/proof_uri/next_action fields may be updated by this script.",
+        "rollback_plan": "Regenerate status view from ledger.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-017.proof.json",
+        "next_action": "Keep source-of-truth sheet human-readable."
+      },
+      "parent_ids": [
+        "LPS-016"
+      ],
+      "inputs": [
+        "proof_records/proof_ledger.jsonl",
+        "task_graph.normalized.json"
+      ],
+      "target_artifacts": [
+        "scripts/update-task-graph-status.py",
+        "generated/task_graph.status.json"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        "generated/**"
+      ],
+      "blocked_paths": [
+        "source goals",
+        "allowed_paths",
+        "blocked_paths",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "LPS-018",
+      "source_row_number": 8,
+      "phase": "8-execution-pipeline",
+      "title": "Package execution bundle",
+      "owner_agent": "Release Agent",
+      "goal": "Create scripts/package-execution-bundle.py to package normalized graph, packets, schemas, examples, and proof ledger into a transferable execution bundle.",
+      "simulation_required": false,
+      "execution_cell": "release-cell",
+      "verification_gate": "Bundle excludes secrets, includes manifest, and validates before packaging.",
+      "rollback_plan": "Delete dist bundle; source artifacts remain.",
+      "status": "ready",
+      "proof_uri": "proof_records/LPS-018.proof.json",
+      "next_action": "Use for Codex handoff and future reruns.",
+      "source_columns": {
+        "task_id": "LPS-018",
+        "parent_id": "LPS-017",
+        "phase": "8-execution-pipeline",
+        "title": "Package execution bundle",
+        "owner_agent": "Release Agent",
+        "goal": "Create scripts/package-execution-bundle.py to package normalized graph, packets, schemas, examples, and proof ledger into a transferable execution bundle.",
+        "inputs": "schemas/*.schema.json; generated/**; proof_records/**",
+        "target_artifacts": "scripts/package-execution-bundle.py; dist/lifeos-planning-spine-execution-bundle.zip",
+        "allowed_paths": "scripts/**; generated/**; proof_records/**; dist/**",
+        "blocked_paths": "secrets/**; host home root",
+        "simulation_required": "FALSE",
+        "execution_cell": "release-cell",
+        "verification_gate": "Bundle excludes secrets, includes manifest, and validates before packaging.",
+        "rollback_plan": "Delete dist bundle; source artifacts remain.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-018.proof.json",
+        "next_action": "Use for Codex handoff and future reruns."
+      },
+      "parent_ids": [
+        "LPS-017"
+      ],
+      "inputs": [
+        "schemas/*.schema.json",
+        "generated/**",
+        "proof_records/**"
+      ],
+      "target_artifacts": [
+        "scripts/package-execution-bundle.py",
+        "dist/lifeos-planning-spine-execution-bundle.zip"
+      ],
+      "allowed_paths": [
+        "scripts/**",
+        "generated/**",
+        "proof_records/**",
+        "dist/**"
+      ],
+      "blocked_paths": [
+        "secrets/**",
+        "host home root"
+      ]
+    },
+    {
+      "task_id": "LPS-019",
+      "source_row_number": 9,
+      "phase": "9-state-map",
+      "title": "Accurate current state map",
+      "owner_agent": "Codex / Runtime Kernel",
+      "goal": "Map the current local machine/repo state so ChatGPT can plan from observed reality: directory tree graph, repos on disk, related FlexNetOS/LifeOS folders, Nix/Yazelix surfaces, /usr dependency surfaces, generated artifacts, verification commands, and drift from the intended planning-spine package.",
+      "simulation_required": false,
+      "execution_cell": "doc-cell",
+      "verification_gate": "State map must be generated from observed filesystem/repo commands, include command log and exclusions, identify all git repos, show current branch/HEAD/dirty state, summarize Nix/Yazelix and /usr surfaces without dumping secrets or huge store contents, and produce machine-readable JSON plus human-readable Markdown.",
+      "rollback_plan": "Delete generated state files; no workspace mutation beyond state/** and proof_records/**.",
+      "status": "complete",
+      "proof_uri": "proof_records/LPS-019.proof.json",
+      "next_action": "Reconciled into sheet. Next absorb LPS-020/LPS-021/LPS-022 proof surfaces, then resume LPS-012.",
+      "source_columns": {
+        "task_id": "LPS-019",
+        "parent_id": "LPS-018",
+        "phase": "9-state-map",
+        "title": "Accurate current state map",
+        "owner_agent": "Codex / Runtime Kernel",
+        "goal": "Map the current local machine/repo state so ChatGPT can plan from observed reality: directory tree graph, repos on disk, related FlexNetOS/LifeOS folders, Nix/Yazelix surfaces, /usr dependency surfaces, generated artifacts, verification commands, and drift from the intended planning-spine package.",
+        "inputs": "/home/flexnetos/FlexNetOS; /home/flexnetos; /nix/store metadata; /usr metadata; current git repos; planning-spine-v0 artifacts",
+        "target_artifacts": "state/current_state_map.md; state/current_state_map.json; state/repo_inventory.json; state/tree_snapshot.txt; state/nix_surface_report.json; state/usr_surface_report.json; proof_records/LPS-019.proof.json",
+        "allowed_paths": "/home/flexnetos/FlexNetOS/**; /home/flexnetos/** read-only; /nix/store read-only metadata; /usr read-only metadata; state/**; proof_records/**",
+        "blocked_paths": "secrets/**; private keys; token files; wallet files; credential values; full /nix/store content copy; destructive commands; mutation outside state/** and proof_records/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "doc-cell",
+        "verification_gate": "State map must be generated from observed filesystem/repo commands, include command log and exclusions, identify all git repos, show current branch/HEAD/dirty state, summarize Nix/Yazelix and /usr surfaces without dumping secrets or huge store contents, and produce machine-readable JSON plus human-readable Markdown.",
+        "rollback_plan": "Delete generated state files; no workspace mutation beyond state/** and proof_records/**.",
+        "status": "Complete",
+        "proof_uri": "proof_records/LPS-019.proof.json",
+        "next_action": "Reconciled into sheet. Next absorb LPS-020/LPS-021/LPS-022 proof surfaces, then resume LPS-012."
+      },
+      "parent_ids": [
+        "LPS-018"
+      ],
+      "inputs": [
+        "/home/flexnetos/FlexNetOS",
+        "/home/flexnetos",
+        "/nix/store metadata",
+        "/usr metadata",
+        "current git repos",
+        "planning-spine-v0 artifacts"
+      ],
+      "target_artifacts": [
+        "state/current_state_map.md",
+        "state/current_state_map.json",
+        "state/repo_inventory.json",
+        "state/tree_snapshot.txt",
+        "state/nix_surface_report.json",
+        "state/usr_surface_report.json",
+        "proof_records/LPS-019.proof.json"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/FlexNetOS/**",
+        "/home/flexnetos/** read-only",
+        "/nix/store read-only metadata",
+        "/usr read-only metadata",
+        "state/**",
+        "proof_records/**"
+      ],
+      "blocked_paths": [
+        "secrets/**",
+        "private keys",
+        "token files",
+        "wallet files",
+        "credential values",
+        "full /nix/store content copy",
+        "destructive commands",
+        "mutation outside state/** and proof_records/**"
+      ]
+    },
+    {
+      "task_id": "LPS-020",
+      "source_row_number": 10,
+      "phase": "10-runtime-proof",
+      "title": "Repair verification frontdoor",
+      "owner_agent": "Runtime Kernel",
+      "goal": "Align the verifier entrypoint with the actual Bun runtime used by the local planning-spine package.",
+      "simulation_required": false,
+      "execution_cell": "dev-cell",
+      "verification_gate": "bun run planning-spine:verify passes and records runtime findings.",
+      "rollback_plan": "Revert verifier entrypoint if validation fails.",
+      "status": "complete",
+      "proof_uri": "proof_records/LPS-020.proof.json",
+      "next_action": "Completed locally per Codex; retained as observed proof surface.",
+      "source_columns": {
+        "task_id": "LPS-020",
+        "parent_id": "LPS-019",
+        "phase": "10-runtime-proof",
+        "title": "Repair verification frontdoor",
+        "owner_agent": "Runtime Kernel",
+        "goal": "Align the verifier entrypoint with the actual Bun runtime used by the local planning-spine package.",
+        "inputs": "package.json; verification script; runtime report",
+        "target_artifacts": "state/verification_runtime_report.json; proof_records/LPS-020.proof.json",
+        "allowed_paths": "planning-spine-v0/**; state/**; proof_records/**",
+        "blocked_paths": "outside approved package scope",
+        "simulation_required": "FALSE",
+        "execution_cell": "dev-cell",
+        "verification_gate": "bun run planning-spine:verify passes and records runtime findings.",
+        "rollback_plan": "Revert verifier entrypoint if validation fails.",
+        "status": "Complete",
+        "proof_uri": "proof_records/LPS-020.proof.json",
+        "next_action": "Completed locally per Codex; retained as observed proof surface."
+      },
+      "parent_ids": [
+        "LPS-019"
+      ],
+      "inputs": [
+        "package.json",
+        "verification script",
+        "runtime report"
+      ],
+      "target_artifacts": [
+        "state/verification_runtime_report.json",
+        "proof_records/LPS-020.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/**",
+        "state/**",
+        "proof_records/**"
+      ],
+      "blocked_paths": [
+        "outside approved package scope"
+      ]
+    },
+    {
+      "task_id": "LPS-021",
+      "source_row_number": 11,
+      "phase": "10-runtime-proof",
+      "title": "Connected MVP bundle verification",
+      "owner_agent": "QA Agent",
+      "goal": "Add and verify a connected MVP bundle manifest covering the full v0 chain from intent through artifact.",
+      "simulation_required": true,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Verifier confirms the MVP object chain is connected and valid.",
+      "rollback_plan": "Regenerate bundle/report from schemas and examples if validation fails.",
+      "status": "complete",
+      "proof_uri": "proof_records/LPS-021.proof.json",
+      "next_action": "Completed locally per Codex; retained as observed proof surface.",
+      "source_columns": {
+        "task_id": "LPS-021",
+        "parent_id": "LPS-020",
+        "phase": "10-runtime-proof",
+        "title": "Connected MVP bundle verification",
+        "owner_agent": "QA Agent",
+        "goal": "Add and verify a connected MVP bundle manifest covering the full v0 chain from intent through artifact.",
+        "inputs": "examples/*.json; schemas/*.schema.json; verifier",
+        "target_artifacts": "examples/mvp-bundle.json; state/mvp_bundle_report.json; proof_records/LPS-021.proof.json",
+        "allowed_paths": "planning-spine-v0/examples/**; state/**; proof_records/**",
+        "blocked_paths": "outside approved package scope",
+        "simulation_required": "TRUE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "Verifier confirms the MVP object chain is connected and valid.",
+        "rollback_plan": "Regenerate bundle/report from schemas and examples if validation fails.",
+        "status": "Complete",
+        "proof_uri": "proof_records/LPS-021.proof.json",
+        "next_action": "Completed locally per Codex; retained as observed proof surface."
+      },
+      "parent_ids": [
+        "LPS-020"
+      ],
+      "inputs": [
+        "examples/*.json",
+        "schemas/*.schema.json",
+        "verifier"
+      ],
+      "target_artifacts": [
+        "examples/mvp-bundle.json",
+        "state/mvp_bundle_report.json",
+        "proof_records/LPS-021.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/examples/**",
+        "state/**",
+        "proof_records/**"
+      ],
+      "blocked_paths": [
+        "outside approved package scope"
+      ]
+    },
+    {
+      "task_id": "LPS-022",
+      "source_row_number": 12,
+      "phase": "10-runtime-proof",
+      "title": "Verifier authority integrity",
+      "owner_agent": "Governance Board / QA Agent",
+      "goal": "Make verifier authority explicit and machine-readable so proof is tied to a distinct verifier role and capability chain.",
+      "simulation_required": false,
+      "execution_cell": "policy-cell",
+      "verification_gate": "Verifier authority is distinct from executor authority and passes integrity checks.",
+      "rollback_plan": "Regenerate authority report from source examples if validation fails.",
+      "status": "complete",
+      "proof_uri": "proof_records/LPS-022.proof.json",
+      "next_action": "Completed locally per Codex; after reconciliation resume LPS-012.",
+      "source_columns": {
+        "task_id": "LPS-022",
+        "parent_id": "LPS-021",
+        "phase": "10-runtime-proof",
+        "title": "Verifier authority integrity",
+        "owner_agent": "Governance Board / QA Agent",
+        "goal": "Make verifier authority explicit and machine-readable so proof is tied to a distinct verifier role and capability chain.",
+        "inputs": "authority graph; proof records; verifier output",
+        "target_artifacts": "state/authority_integrity_report.json; proof_records/LPS-022.proof.json",
+        "allowed_paths": "planning-spine-v0/state/**; proof_records/**; examples/**; scripts/**",
+        "blocked_paths": "unbounded authority expansion; outside approved package scope",
+        "simulation_required": "FALSE",
+        "execution_cell": "policy-cell",
+        "verification_gate": "Verifier authority is distinct from executor authority and passes integrity checks.",
+        "rollback_plan": "Regenerate authority report from source examples if validation fails.",
+        "status": "Complete",
+        "proof_uri": "proof_records/LPS-022.proof.json",
+        "next_action": "Completed locally per Codex; after reconciliation resume LPS-012."
+      },
+      "parent_ids": [
+        "LPS-021"
+      ],
+      "inputs": [
+        "authority graph",
+        "proof records",
+        "verifier output"
+      ],
+      "target_artifacts": [
+        "state/authority_integrity_report.json",
+        "proof_records/LPS-022.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/state/**",
+        "proof_records/**",
+        "examples/**",
+        "scripts/**"
+      ],
+      "blocked_paths": [
+        "unbounded authority expansion",
+        "outside approved package scope"
+      ]
+    }
+  ]
+}

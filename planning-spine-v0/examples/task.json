@@ -1,0 +1,32 @@
+{
+  "id": "task.execute.slice",
+  "goal_id": "goal.mvp.slice",
+  "title": "Execute the MVP vertical slice after simulation constraints are applied",
+  "status": "simulated",
+  "owner_agent_id": "agent.executor",
+  "depends_on": [
+    "task.apply.constraints"
+  ],
+  "allowed_paths": [
+    "/var/lifeos/tasks/task.execute.slice",
+    "/var/lifeos/proofs/task.execute.slice"
+  ],
+  "blocked_paths": [
+    "/",
+    "/home/flexnetos/.local",
+    "/external"
+  ],
+  "verification_gate": "proof_gate: task must emit at least one passing ProofRecord",
+  "rollback_plan": "Revert artifacts in /var/lifeos/tasks/task.execute.slice and mark task rolled_back",
+  "proof_uri": "proof://task/task.execute.slice",
+  "simulation_constraint_ids": [
+    "constraint.devworld.path-tightening"
+  ],
+  "cell_id": "cell.mvp.execute",
+  "action_ids": [
+    "action.run.slice"
+  ],
+  "artifact_ids": [
+    "artifact.simulation.patch"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/cell.schema.json",
+  "title": "Cell",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "purpose",
+    "boundary",
+    "inputs",
+    "outputs",
+    "toolchain",
+    "allowed_paths",
+    "blocked_paths",
+    "verification_gate"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "purpose": { "type": "string" },
+    "boundary": { "type": "string" },
+    "inputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "outputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "toolchain": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "allowed_paths": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "blocked_paths": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "verification_gate": { "type": "string" }
+  }
+}

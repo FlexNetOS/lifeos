@@ -1,0 +1,53 @@
+{
+  "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
+  "generated_at": "2026-07-03T19:33:00Z",
+  "source": {
+    "format": "fixture",
+    "path": "generated/fixtures/task_graph.invalid-task-id.raw.json",
+    "header": [
+      "task_id",
+      "parent_id",
+      "phase",
+      "title",
+      "owner_agent",
+      "goal",
+      "inputs",
+      "target_artifacts",
+      "allowed_paths",
+      "blocked_paths",
+      "simulation_required",
+      "execution_cell",
+      "verification_gate",
+      "rollback_plan",
+      "status",
+      "proof_uri",
+      "next_action"
+    ],
+    "row_count": 1,
+    "empty_rows_skipped": []
+  },
+  "rows": [
+    {
+      "source_row_number": 2,
+      "columns": {
+        "task_id": "bad-task",
+        "parent_id": "",
+        "phase": "fixture",
+        "title": "Invalid task id fixture",
+        "owner_agent": "QA Agent",
+        "goal": "Prove LPS-013 rejects malformed task IDs.",
+        "inputs": "fixture",
+        "target_artifacts": "fixture",
+        "allowed_paths": "generated/**",
+        "blocked_paths": "secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "doc-cell",
+        "verification_gate": "Normalizer rejects malformed task IDs.",
+        "rollback_plan": "Delete fixture outputs.",
+        "status": "Ready",
+        "proof_uri": "proof_records/FIXTURE.proof.json",
+        "next_action": "Expect validation failure."
+      }
+    }
+  ]
+}

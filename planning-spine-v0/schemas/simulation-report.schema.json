@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/simulation-report.schema.json",
+  "title": "SimulationReport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "worldseed_id",
+    "task_id",
+    "status",
+    "constraint_updates",
+    "evidence",
+    "recommended_next_actions"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "worldseed_id": { "type": "string" },
+    "task_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["pass", "fail", "warning"] },
+    "constraint_updates": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "evidence": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "recommended_next_actions": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+  }
+}

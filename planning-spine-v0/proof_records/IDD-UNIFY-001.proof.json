@@ -1,0 +1,90 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "IDD-UNIFY-001",
+  "observed_at": "2026-07-07T10:26:38Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "envctl migration database + nu_plugin CodeDB are implemented and a fresh end-to-end run PROVES the capability: import 4 real systems (.kb GitKB, .meta, .handoff, .idd rusty-idd) into the database and export ONE unified .idd tree with zero downgrade and zero feature loss - agent-driven, no human step; acceptance A-E green, replay-verified, rerun-deterministic.",
+  "gate_result": {
+    "implementation_executed": true,
+    "envctl_migration_db_implemented": true,
+    "codedb_capture_materialize_implemented": true,
+    "nu_plugin_registered_in_nu": true,
+    "one_command_e2e": true,
+    "A_byte_parity_4_of_4_identical": true,
+    "B_behavior_parity_4_of_4": true,
+    "C_feature_verb_matrix_zero_unmapped": true,
+    "D_capture_gaps_enumerated_agent_approved": true,
+    "E_agent_approval_loop_deny_then_approve": true,
+    "replay_verify_11_of_11": true,
+    "rerun_lock_identical": true,
+    "human_review_replaced_by_agent_review": true,
+    "no_deletions_performed": true
+  },
+  "proof_summary": "Follow-on to IDD-UNIFY-000 (the plan): the execution substrate is BUILT and the capability is TESTED. envctl gained an event-sourced migration database ('envctl migration', engine module migration_db on pure-Rust redb - no-c.sh gate PASS, NOT SQLite): all 15 package-DDL entities, fail-closed run/operation state machines, hash-chained append-only event ledger, R3+ approval gate per AGENT_CONTROL_PROTOCOL, the sql/002 views, replay verification (verify-only recomputes target/recipe/contract hashes, full event chain, command hashes, evidence/artifact file hashes, approval decisions, reproducibility hash). CodeDB's report-only CLI was wired to its redb store: 'codedb capture' persists exact bytes as content-addressed sha256 blobs (+unix modes), 'codedb materialize' re-emits byte-for-byte with per-file roundtrip checks; unpersistable entries become capture_gaps rows. nu_plugin_codedb registered in nu 0.113.1 (19 plugin commands). ONE command (nu idd_unify_e2e.nu <work>) drives the E2E on real snapshots (nu_plugin/.kb 419 files, meta manifests 2, envctl/.handoff 340, rusty-idd/.idd 83): capture x4 -> baselines as evidence -> wikilink/task-twin graph edges (566 kb wikilinks) -> R3 export DENIED by agent-reviewer while evidence was absent (deny-by-default), APPROVED after verifying 4/4 baselines + 4/4 store hashes -> unified .idd/{kb,handoff,meta,+idd-contract-surfaces} with .kb/.handoff compat symlinks -> content-hash lock. Acceptance: A byte parity IDENTICAL 4/4 (external sha256sum manifests); B git-kb served 133/133 docs through the .kb symlink, hf rendered 56 tasks from the copied ledger, rusty-idd validate reports identical findings on unified vs pristine source, meta manifests parse; C feature-verb matrix 9 rows 0 unmapped; D 1 gap (.cache/gitkb.sock unix socket) enumerated + agent-approved; E deny-then-approve recorded as ledger events with reviewer session in _agent_sessions. Replay verify-only --verify-files 11/11. Second fresh run reproduced the identical tree lock 3f92a5dfa9291853e904b302bea60ef89362f62452c65304daacdce118ff0a2f (deterministic re-render). Runtime deltas recorded: CodeDB task CSV stale vs code (crates implemented, binaries build); codedb doctor recommends nu 0.112.2 but plugin protocol is 0.113.1; installed git-kb misresolves KB root from a worktree cwd (repo-rule warning confirmed live); envctl catalog scan test flakes under parallel cargo test (passes isolated + at base).",
+  "artifact_paths": [
+    "/home/flexnetos/FlexNetOS/src/envctl-idd-unify (worktree, branch idd-unify/migration-db, commits 2981b2c + 3aee261)",
+    "/home/flexnetos/FlexNetOS/src/nu_plugin (master, commits 13a4992 + 09f2005)",
+    "/home/flexnetos/FlexNetOS/src/nu_plugin/examples/idd_unify_e2e.nu",
+    "/home/flexnetos/FlexNetOS/var/idd-unify/e2e/run-20260707-052425 (E2E run 1)",
+    "/home/flexnetos/FlexNetOS/var/idd-unify/e2e/run-20260707-052509 (E2E run 2, lock-check)",
+    "/home/flexnetos/FlexNetOS/var/idd-unify/JOURNAL.md",
+    "/home/flexnetos/FlexNetOS/var/idd-unify/baselines/"
+  ],
+  "live_commands": [
+    {
+      "purpose": "envctl migration DB acceptance tests + CI gates",
+      "cwd": "/home/flexnetos/FlexNetOS/src/envctl-idd-unify",
+      "command": "cargo test -p envctl-engine migration_db; cargo test -p envctl --bin envctl; bash ci/gates/no-c.sh; bash ci/gates/shape.sh; cargo clippy -p envctl-engine -p envctl -- -D warnings",
+      "exit_status": 0,
+      "output": [
+        "migration_db: 9 passed; 0 failed (R3 gate block->agent approve->run, deny terminal, chained events, idempotent ops, replay verify)",
+        "envctl bin: 23 passed; 0 failed (incl every_command_has_long_about_and_examples over the migration tree)",
+        "NO-C GATE PASS (redb in graph; rustls ring-only; zero C-SQLite) | SHAPE GATE PASS | clippy clean"
+      ]
+    },
+    {
+      "purpose": "codedb capture/materialize roundtrip on a real .kb snapshot",
+      "cwd": "/home/flexnetos/FlexNetOS/var/idd-unify",
+      "command": "codedb capture sources/kb --store db/kb.redb; codedb materialize --store db/kb.redb --out-dir reemit/kb; diff baselines/kb.sha256 <(manifest reemit/kb)",
+      "exit_status": 0,
+      "output": [
+        "capture_summary: files_captured=419 bytes=25456246 gaps=1 (.cache/gitkb.sock unix socket, enumerated)",
+        "materialize_summary: 419 files, every row sha256_roundtrip_ok",
+        "BYTE PARITY: IDENTICAL"
+      ]
+    },
+    {
+      "purpose": "nu plugin registration (agent cockpit surface)",
+      "cwd": "/home/flexnetos/FlexNetOS/var/idd-unify",
+      "command": "nu 0.113.1: plugin add/use --plugin-config nu-home/plugins.msgpackz; plugin list; codedb fs entries --repo sources/kb | where kind == 'file' | length",
+      "exit_status": 0,
+      "output": [
+        "[{\"name\":\"codedb\",\"version\":\"0.1.0\",\"status\":\"loaded\"}] (19 plugin commands)",
+        "419"
+      ]
+    },
+    {
+      "purpose": "THE capability: one-command E2E, fresh run",
+      "cwd": "/home/flexnetos/FlexNetOS/var/idd-unify",
+      "command": "nu idd_unify_e2e.nu /home/flexnetos/FlexNetOS/var/idd-unify",
+      "exit_status": 0,
+      "output": [
+        "E: premature export DENIED by agent-reviewer (approval-000001); after evidence: APPROVED (approval-000002)",
+        "A byte parity kb/meta/handoff/idd: IDENTICAL (419/2/340/83 files)",
+        "B behavior: kb=true (133 docs via .kb symlink) hf=true (56 tasks) idd=true (same findings as source) meta=true",
+        "C feature-verb matrix: 9 rows, 0 unmapped | D gaps: 1 enumerated + agent-approved",
+        "replay verify-only --verify-files: 11/11 | run completed, 10 ops, 6 artifacts, 0 open approvals"
+      ]
+    },
+    {
+      "purpose": "rerun determinism (fresh second run must reproduce the lock)",
+      "cwd": "/home/flexnetos/FlexNetOS/var/idd-unify",
+      "command": "nu idd_unify_e2e.nu <work> --check-lock e2e/run-20260707-052425/unified.lock.json",
+      "exit_status": 0,
+      "output": [
+        "run-20260707-052509 lock == run-20260707-052425 lock == 3f92a5dfa9291853e904b302bea60ef89362f62452c65304daacdce118ff0a2f"
+      ]
+    }
+  ]
+}

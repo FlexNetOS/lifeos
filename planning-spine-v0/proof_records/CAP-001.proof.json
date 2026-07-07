@@ -1,0 +1,79 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "CAP-001",
+  "status": "pass",
+  "observed_at": "2026-07-06T17:22:41Z",
+  "revision": 4,
+  "summary": {
+    "problem": "CAP-001 still pointed to an in-progress Lane A even though the remaining package-defined heartbeat/status artifacts for OPS-001 had not yet been materialized.",
+    "repair": "Materialized the missing OPS-001 heartbeat artifacts, refreshed the CAP-001 report surfaces, and kept the existing CONN-001 and WEAVE-001 blocker-backed lane states explicit instead of implying completion.",
+    "result": "CAP-001 again provides a current package-local status/proof surface naming completed heartbeat work, preserved blockers, artifact locations, and the next decision without mutating the control plane."
+  },
+  "commands": [
+    {
+      "cmd": "git -C /home/flexnetos/FlexNetOS/src/lifeos status --short --branch",
+      "result": "pass",
+      "output_summary": "Verified the current repo/branch state before refreshing package artifacts."
+    },
+    {
+      "cmd": "rg -n \"OPS-001|CAP-001|CONN-001|WEAVE-001\" planning-spine-v0",
+      "result": "pass",
+      "output_summary": "Confirmed that OPS-001 was the missing executable artifact lane and that CONN-001 and WEAVE-001 already had blocker-backed proof surfaces."
+    },
+    {
+      "cmd": "jq empty planning-spine-v0/state/heartbeat_lane_a.json planning-spine-v0/connector_state/heartbeat_lane_b.json planning-spine-v0/proof_records/OPS-001.proof.json planning-spine-v0/capability_state/p0_priority_report.json planning-spine-v0/proof_records/CAP-001.proof.json",
+      "result": "pass",
+      "output_summary": "Validated the refreshed OPS-001 and CAP-001 JSON artifacts."
+    },
+    {
+      "cmd": "sha256sum planning-spine-v0/state/heartbeat_lane_a.json planning-spine-v0/connector_state/heartbeat_lane_b.json planning-spine-v0/docs/heartbeat_notes.md planning-spine-v0/proof_records/OPS-001.proof.json planning-spine-v0/capability_state/p0_priority_report.md planning-spine-v0/capability_state/p0_priority_report.json planning-spine-v0/proof_records/CAP-001.proof.json",
+      "result": "pass",
+      "output_summary": "Captured stable digests for the refreshed heartbeat and CAP proof surfaces."
+    }
+  ],
+  "artifacts": {
+    "priority_report_md": {
+      "path": "capability_state/p0_priority_report.md"
+    },
+    "priority_report_json": {
+      "path": "capability_state/p0_priority_report.json"
+    },
+    "proof_record": {
+      "path": "proof_records/CAP-001.proof.json"
+    },
+    "ops001_lane_a_json": {
+      "path": "state/heartbeat_lane_a.json"
+    },
+    "ops001_lane_b_json": {
+      "path": "connector_state/heartbeat_lane_b.json"
+    },
+    "ops001_notes": {
+      "path": "docs/heartbeat_notes.md"
+    },
+    "ops001_proof_record": {
+      "path": "proof_records/OPS-001.proof.json"
+    },
+    "weave001_proof_record": {
+      "path": "proof_records/WEAVE-001.proof.json"
+    }
+  },
+  "scope": {
+    "allowed_paths_used": [
+      "capability_state/**",
+      "state/**",
+      "connector_state/**",
+      "docs/**",
+      "proof_records/**"
+    ],
+    "blocked_paths_excluded": [
+      "unapproved expansion",
+      "sheet mutations",
+      "source graph mutations",
+      "production mutation",
+      "secrets or token values"
+    ],
+    "source_graph_mutated": false,
+    "sheet_mutated": false,
+    "drive_comment_reply_created": false
+  }
+}

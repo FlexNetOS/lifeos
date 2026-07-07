@@ -1,0 +1,49 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "OPS-001",
+  "observed_at": "2026-07-06T17:22:41Z",
+  "revision": 2,
+  "status": "pass",
+  "verification_gate": "Required heartbeat/status artifacts exist in-package, are valid JSON where applicable, and preserve the existing blocker boundaries for sibling lanes.",
+  "gate_result": {
+    "lane_a_heartbeat_materialized": true,
+    "lane_b_heartbeat_materialized": true,
+    "heartbeat_notes_written": true,
+    "json_artifacts_valid": true,
+    "scope_guard_passed": true
+  },
+  "proof_summary": "OPS-001 is satisfied for the package-defined heartbeat/status surface. Lane A now has current heartbeat state, Lane B has a paired blocker-aware heartbeat view, and heartbeat notes were added without mutating the sheet, source graph, or production control paths.",
+  "artifact_paths": [
+    "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0/state/heartbeat_lane_a.json",
+    "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0/connector_state/heartbeat_lane_b.json",
+    "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0/docs/heartbeat_notes.md",
+    "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0/proof_records/OPS-001.proof.json"
+  ],
+  "live_commands": [
+    {
+      "purpose": "validate new JSON artifacts",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos",
+      "command": "jq empty planning-spine-v0/state/heartbeat_lane_a.json planning-spine-v0/connector_state/heartbeat_lane_b.json planning-spine-v0/proof_records/OPS-001.proof.json",
+      "exit_status": 0,
+      "output_summary": "All OPS-001 JSON artifacts parsed successfully."
+    }
+  ],
+  "scope": {
+    "allowed_paths_used": [
+      "state/**",
+      "connector_state/**",
+      "docs/**",
+      "proof_records/**"
+    ],
+    "blocked_paths_excluded": [
+      "sheet mutations",
+      "source graph mutations",
+      "production runtime mutations",
+      "secrets or token values"
+    ],
+    "source_graph_mutated": false,
+    "sheet_mutated": false,
+    "production_mutated": false
+  },
+  "next_safe_task": "Use the refreshed CAP-001 lane map as the current control surface, then address the external blockers for CONN-001 implementation source and WEAVE-001 clean frontdoor adoption."
+}

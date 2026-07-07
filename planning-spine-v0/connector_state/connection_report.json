@@ -1,0 +1,47 @@
+{
+  "generated_at_utc": "2026-07-03T21:58:09Z",
+  "task": "CONN-001",
+  "connection_status": "not_started_no_gateway_implementation",
+  "transport_status": "not_configured",
+  "service_status": "not_started",
+  "public_exposure": false,
+  "host_wide_service_mutation": false,
+  "reason": "The zip contains connector requirements, security model, runbook, app metadata, and task table only. It does not contain an MCP gateway server or tunnel/client implementation to start.",
+  "runbook_declared_first_run_order": [
+    "Run availability gates: ChatGPT custom app, Secure MCP Tunnel, Codex CLI auth/version.",
+    "Discover local users and homes.",
+    "Decide permission model for /home/drdave and /home/flexnetos.",
+    "Generate connector_policy.toml with roots and denial classes.",
+    "Start gateway locally in read-only mode.",
+    "Connect ChatGPT app/connector to /mcp endpoint.",
+    "Test health_check, fs_roots, fs_search, fs_fetch.",
+    "Test codex_detect, then codex_start in read-only mode.",
+    "Enable write tools only after negative tests pass."
+  ],
+  "security_controls_observed_this_run": {
+    "secrets_or_tokens_captured": false,
+    "private_keys_read": false,
+    "browser_session_data_read": false,
+    "public_tunnel_opened": false,
+    "sudo_or_host_service_mutation": false
+  },
+  "connection_tests_possible_now": [],
+  "connection_tests_blocked": [
+    {
+      "test": "health_check MCP tool",
+      "blocker": "No gateway implementation/server present in archive."
+    },
+    {
+      "test": "fs_roots/fs_search/fs_fetch MCP tools",
+      "blocker": "No gateway implementation/server present in archive."
+    },
+    {
+      "test": "codex_detect/codex_start MCP tools",
+      "blocker": "No gateway implementation/server present in archive."
+    },
+    {
+      "test": "ChatGPT app/connector registration",
+      "blocker": "No reachable /mcp endpoint present; tunnel setup is a later task after implementation."
+    }
+  ]
+}

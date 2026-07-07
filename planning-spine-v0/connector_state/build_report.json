@@ -1,0 +1,69 @@
+{
+  "generated_at_utc": "2026-07-03T21:58:09Z",
+  "task": "CONN-001",
+  "build_status": "blocked_no_buildable_source",
+  "workspace": "/home/flexnetos/FlexNetOS/var/tmp/conn001-connector-workspace-20260703T215706Z",
+  "source_zip": "/home/flexnetos/Downloads/chatgpt_local_codex_connector_pack_v0.2.zip",
+  "commands": [
+    {
+      "command": "unzip -l /home/flexnetos/Downloads/chatgpt_local_codex_connector_pack_v0.2.zip",
+      "cwd": "/home/flexnetos/FlexNetOS",
+      "exit_code": 0,
+      "result": "Listed 7 files: PRD, task table, security model, runbook, app metadata, next prompt, internal manifest."
+    },
+    {
+      "command": "unzip -q /home/flexnetos/Downloads/chatgpt_local_codex_connector_pack_v0.2.zip -d /home/flexnetos/FlexNetOS/var/tmp/conn001-connector-workspace-20260703T215706Z/extracted",
+      "cwd": "/home/flexnetos/FlexNetOS",
+      "exit_code": 0,
+      "result": "Extracted package into isolated connector workspace."
+    },
+    {
+      "command": "unzip -t /home/flexnetos/Downloads/chatgpt_local_codex_connector_pack_v0.2.zip",
+      "cwd": "/home/flexnetos/FlexNetOS/var/tmp/conn001-connector-workspace-20260703T215706Z",
+      "exit_code": 0,
+      "result": "No errors detected in compressed data."
+    },
+    {
+      "command": "sha256sum /home/flexnetos/Downloads/chatgpt_local_codex_connector_pack_v0.2.zip extracted/*",
+      "cwd": "/home/flexnetos/FlexNetOS/var/tmp/conn001-connector-workspace-20260703T215706Z",
+      "exit_code": 0,
+      "result": "Zip and extracted file hashes recorded; manifest-declared files match."
+    },
+    {
+      "command": "python3 csv/json validation over PACK_MANIFEST_CONNECTOR_v0.2.json and chatgpt_local_codex_connector_task_table_v0.2.csv",
+      "cwd": "/home/flexnetos/FlexNetOS/var/tmp/conn001-connector-workspace-20260703T215706Z",
+      "exit_code": 0,
+      "result": "Manifest file count 6; CSV rows 83; duplicate task IDs none; manifest hash errors none."
+    },
+    {
+      "command": "find extracted -maxdepth 4 -type f for Cargo.toml/package.json/bun.lock/Makefile/Justfile/pyproject.toml/go.mod/deno.json/tsconfig.json",
+      "cwd": "/home/flexnetos/FlexNetOS/var/tmp/conn001-connector-workspace-20260703T215706Z",
+      "exit_code": 0,
+      "result": "No build manifests found."
+    }
+  ],
+  "build_commands_attempted": [],
+  "test_commands_attempted": [
+    "unzip -t",
+    "manifest sha256 verification",
+    "CSV row and duplicate task-id validation",
+    "build manifest discovery"
+  ],
+  "build_blocker": {
+    "kind": "no_source_or_build_manifest",
+    "details": "The archive contains documentation and a task table only. There is no Rust/Node/Python/Go/etc. implementation entrypoint to build or test."
+  },
+  "required_next_build_entrypoint": {
+    "expected_repo_from_runbook": "/home/flexnetos/FlexNetOS/src/chatgpt-local-codex-connector",
+    "expected_first_build_files": [
+      "Cargo.toml",
+      "README.md",
+      "SECURITY.md",
+      "RUNBOOK.md"
+    ],
+    "expected_commands_after_source_exists": [
+      "cargo build --workspace",
+      "cargo test --workspace"
+    ]
+  }
+}

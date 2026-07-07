@@ -116,11 +116,16 @@ Execute in order:
 - Use latest stable Vue 3 + Tauri toolchain.
 - Surgical, targeted changes only — no wholesale rewrites unless structural failure makes targeted changes impossible (must be explicitly justified).
 
-## Toolchain (this host, mise-managed)
+## Toolchain (host reality, corrected 2026-07-07)
 
-```
-node 24.15.0 · bun 1.3.13 · rustc 1.95.0 · cargo 1.95.0 · tauri-cli 2.11.1
-```
+Toolchain ownership is migrating to the Yazelix/Nix foundation
+(`lifeos_foundation_yzx`). The previously documented "mise-managed" toolchain
+does not exist on this host: there is no mise binary, no mise.toml, and node is
+absent from the login PATH; `bun` currently resolves from the legacy
+`FlexNetOS/usr/bin` frontdoor, which is quarantined-pack residue slated for
+refactor (see FlexNetOS/LOCAL_WORKAROUNDS.md, 2026-07-07 owner correction).
+Until this repo gains a flake.nix consuming the foundation, verify tool
+provenance with `command -v` + `readlink -f` before trusting any version claim.
 
 Use `bun` for everything JS (not npm). Tauri's `beforeDevCommand` / `beforeBuildCommand` already point at `bun run dev` / `bun run build`.
 

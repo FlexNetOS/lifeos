@@ -1,0 +1,65 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "IDD-UNIFY-002",
+  "observed_at": "2026-07-07T11:05:06Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "rusty-idd pre-existing dirt resolved upgrade-only (hook capability restored, not deleted); the 4 task systems merged again via the ESTATE-INSTALLED envctl tools; DEEP retention verify proves logic, blobs, semantics, metadata, features/functions, and contracts are retained in a seamless one-command workflow; all changes committed and PRs merged.",
+  "gate_result": {
+    "rusty_idd_dirt_resolved_upgrade_only": true,
+    "hooks_capability_restored_binary_first": true,
+    "estate_envctl_serves_migration_verbs": true,
+    "four_systems_merged_via_envctl_tools": true,
+    "deep_metadata_mode_parity_4_of_4": true,
+    "deep_logic_kb_write_via_compat_symlink": true,
+    "deep_semantics_edge_crosscheck_96_eq_96": true,
+    "deep_blob_provenance_sha256_4_of_4": true,
+    "deep_feature_verb_surfaces_alive": true,
+    "deep_contract_artifacts_6_of_6": true,
+    "acceptance_A_to_E_still_green": true,
+    "replay_11_of_11": true,
+    "lock_identical_across_binaries_and_runs": true,
+    "no_deletions_performed": true
+  },
+  "proof_summary": "Follow-on to IDD-UNIFY-001. (1) rusty-idd's long-standing dirty tree ('.codex/config.toml hooks=false' + deleted hooks.json) decoded: the committed hooks ran 'cargo run … rusty-idd' on every Codex lifecycle event but cargo is absent from login PATH, so hooks had been disabled locally by DELETION — a capability loss. Upgrade-only fix (PR #141): rusty-idd 0.1.0 installed to usr/bin (login PATH serves it), hooks.json restored with all 6 commands rewritten binary-first with the original cargo-run retained verbatim as fallback, hooks=true stands; every hook verb proven live (next, workflow-check pre/post/stop x2, env-check — the SessionStart hook executed via its exact sh -lc command string). (2) usr/bin/envctl is a symlink to the repo's target/release build; rebuilding merged master (PR #440 incl. the redb 2.6 MSRV pin) put 'envctl migration' on the estate PATH — verified live. (3) The one-command E2E ran with ESTATE binaries (envctl + rusty-idd from usr/bin): acceptance A-E green again (byte parity IDENTICAL 4/4: kb 419/meta 2/handoff 340/idd 83; kb 133 docs + hf 56 tasks + idd same-findings + meta parse; verb matrix 0 unmapped; 1 gap enumerated+approved; deny-then-approve agent review), replay verify-only --verify-files 11/11, unified-tree lock IDENTICAL to all prior runs (3f92a5dfa9291853e904b302bea60ef89362f62452c65304daacdce118ff0a2f) — deterministic across store major (redb 4->2.6) and across binaries. (4) NEW --deep retention verify (nu_plugin PR #11), six recorded validations, all pass: METADATA unix-mode manifests identical 4/4; LOGIC/FUNCTIONS a real git-kb create+commit+show through the .kb compat symlink on a throwaway copy of the exported tree; SEMANTICS DB wikilink edges == independent recount (96 == 96; corrects IDD-UNIFY-001 prose which said 566 — the measured, crosschecked figure is 96); BLOB PROVENANCE 4/4 stores self-report sha256; FEATURES live verb surfaces (git-kb 99 / hf 10 / rusty-idd 25 / envctl migration 36 help lines); CONTRACTS 6/6 contract artifacts recorded complete. Deep run: e2e/run-20260707-060342, 11 ops, 6 artifacts, 0 open approvals.",
+  "artifact_paths": [
+    "/home/flexnetos/FlexNetOS/var/idd-unify/e2e/run-20260707-060342 (deep run)",
+    "/home/flexnetos/FlexNetOS/src/rusty-idd/.codex/hooks.json (binary-first, PR #141)",
+    "/home/flexnetos/FlexNetOS/usr/bin/rusty-idd (installed 0.1.0)",
+    "/home/flexnetos/FlexNetOS/usr/bin/envctl -> src/envctl/target/release/envctl (master c2f960a build)",
+    "/home/flexnetos/FlexNetOS/src/nu_plugin/examples/idd_unify_e2e.nu (--deep; PR #11 MERGED)",
+    "/home/flexnetos/FlexNetOS/var/idd-unify/GOAL-IDD-UNIFY-002.md",
+    "/home/flexnetos/FlexNetOS/var/idd-unify/JOURNAL.md"
+  ],
+  "live_commands": [
+    {
+      "purpose": "hook verbs proven with the installed binary",
+      "cwd": "/home/flexnetos/FlexNetOS/src/rusty-idd",
+      "command": "rusty-idd next --base .; rusty-idd codex workflow-check --workspace . --phase pre-tool; rusty-idd codex env-check --workspace .; sh -lc '<exact SessionStart hook command>'",
+      "exit_status": 0,
+      "output": [
+        "front door renders active change unify-handoff-prompthub; workflow-check reports findings (its job); env-check: invariant check passed; hook command exit 0"
+      ]
+    },
+    {
+      "purpose": "estate envctl serves the migration verbs",
+      "cwd": "/home/flexnetos",
+      "command": "envctl migration --help",
+      "exit_status": 0,
+      "output": [
+        "The database-backed migration automation engine … Usage: envctl migration [OPTIONS] <COMMAND>"
+      ]
+    },
+    {
+      "purpose": "deep retention verify via the one-command workflow (estate binaries)",
+      "cwd": "/home/flexnetos/FlexNetOS/var/idd-unify",
+      "command": "nu idd_unify_e2e.nu <work> --deep --check-lock e2e/run-20260707-052425/unified.lock.json",
+      "exit_status": 0,
+      "output": [
+        "A byte parity IDENTICAL 4/4; B kb=133 docs hf=56 tasks idd=same-findings meta=true",
+        "DEEP metadata modes identical=true; kb write via symlink=true; 96==96 edges; 4/4 sha256; verb surfaces alive; contracts 6/6",
+        "replay 11/11; LOCK CHECK identical (3f92a5df…) — deterministic re-render PROVEN"
+      ]
+    }
+  ]
+}

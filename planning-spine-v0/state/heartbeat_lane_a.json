@@ -1,0 +1,28 @@
+{
+  "schema_version": "lifeos-planning-spine.ops-heartbeat.v0",
+  "task_id": "OPS-001",
+  "lane": "A",
+  "helper_id": "/root/lps017_readiness",
+  "observed_at": "2026-07-06T17:22:41Z",
+  "status": "pass",
+  "summary": "Lane A heartbeat artifacts were refreshed in the planning-spine package. The lane now has a current status artifact instead of a pending placeholder.",
+  "artifact_role": "root package heartbeat/status surface",
+  "checks": [
+    {
+      "name": "artifact_materialized",
+      "result": "pass",
+      "evidence": "state/heartbeat_lane_a.json exists and records the current Lane A heartbeat state."
+    },
+    {
+      "name": "task_alignment",
+      "result": "pass",
+      "evidence": "Artifact path and task id match the active reset sheet target for OPS-001."
+    },
+    {
+      "name": "package_scope_only",
+      "result": "pass",
+      "evidence": "No production control paths or external runtime state were mutated."
+    }
+  ],
+  "next_action": "Use this heartbeat state to refresh CAP-001 lane reporting and keep B/C blockers explicit."
+}

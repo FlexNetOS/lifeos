@@ -1,0 +1,238 @@
+{
+  "schema_version": "lifeos-planning-spine.weave-evaluation.v0",
+  "task_id": "WEAVE-001",
+  "observed_at": "2026-07-06T17:36:28Z",
+  "status": "pass_with_adoption_blocker",
+  "summary": "Evaluation complete. src/weave has the expected local bus primitives and heartbeat design, and `yzx` is confirmed as the installed runtime owner, but neither the clean pack prefix nor plain `yzx run` expose a weave runtime frontdoor or Rust toolchain frontdoor.",
+  "control_surface": {
+    "spreadsheet_id": "1LYeO7PA64Fg7d0Gi2PLs7661zxwgOITg5GCSJS4oPBI",
+    "spreadsheet_title": "LifeOS Planning Spine v0 - Task Graph COMMENT RESET",
+    "sheet": "Task Graph v0",
+    "row": 27,
+    "comment_thread": "AAAB_HbRiho",
+    "next_action": "Use weave as event bus only; task graph remains control plane."
+  },
+  "target_artifacts": [
+    "weave_state/weave_bus_evaluation.md",
+    "weave_state/weave_bus_evaluation.json",
+    "proof_records/WEAVE-001.proof.json"
+  ],
+  "path_policy": {
+    "allowed_paths": [
+      "weave_state/**",
+      "proof_records/**",
+      "read-only repo inspection"
+    ],
+    "blocked_paths": [
+      "production mutation",
+      "replacing task graph/proof ledger"
+    ]
+  },
+  "repositories": {
+    "weave": {
+      "path": "/home/flexnetos/FlexNetOS/src/weave",
+      "branch": "master",
+      "head": "9605104b8c7418d9bb9a72e8ae1da0a100a3d4b2",
+      "remote": "git@github.com:FlexNetOS/weave.git",
+      "status": "clean"
+    },
+    "lifeos": {
+      "path": "/home/flexnetos/FlexNetOS/src/lifeos",
+      "branch": "codex/lifeos-planning-spine-v0",
+      "head": "6f8905d01701133d5dca5831a13fd3001dbb98ac",
+      "remote": "git@github.com:FlexNetOS/lifeos.git",
+      "status": "existing untracked planning-spine artifacts present; WEAVE artifacts refreshed"
+    }
+  },
+  "current_weave_state": {
+    "source_repo_present": true,
+    "source_repo_clean": true,
+    "clean_runtime_frontdoor_present": false,
+    "plain_yazelix_runtime_frontdoor_present": true,
+    "plain_yazelix_weave_command_present": false,
+    "clean_build_frontdoor_present": false,
+    "plain_yazelix_rust_toolchain_present": false,
+    "runtime_smoke_status": "blocked_by_missing_clean_weave_command"
+  },
+  "usable_message_primitives": [
+    {
+      "name": "peer discovery and liveness",
+      "commands": [
+        "weave peers",
+        "weave scan",
+        "weave sessions --watch",
+        "weave connect"
+      ],
+      "evidence": "src/weave/README.md:96-103"
+    },
+    {
+      "name": "point-to-point messaging",
+      "commands": [
+        "weave send",
+        "weave inbox",
+        "weave export",
+        "weave backup",
+        "weave restore",
+        "weave session export",
+        "weave session import"
+      ],
+      "evidence": "src/weave/README.md:104-112"
+    },
+    {
+      "name": "tracked request response",
+      "commands": [
+        "weave ask",
+        "weave answer",
+        "weave ack",
+        "weave asks",
+        "weave ask-get"
+      ],
+      "evidence": "src/weave/README.md:114-119"
+    },
+    {
+      "name": "fan-out request response",
+      "commands": [
+        "weave ask-many",
+        "weave ask-many-result"
+      ],
+      "evidence": "src/weave/README.md:121-124"
+    },
+    {
+      "name": "durable job board",
+      "commands": [
+        "weave job create",
+        "weave job list",
+        "weave job show",
+        "weave job status",
+        "weave job claim",
+        "weave job dispatch",
+        "weave job update",
+        "weave job result",
+        "weave job cancel"
+      ],
+      "evidence": "src/weave/README.md:126-136"
+    },
+    {
+      "name": "notify and delivery trace",
+      "commands": [
+        "weave notify",
+        "weave delivery",
+        "weave inject"
+      ],
+      "evidence": "src/weave/README.md:157-163"
+    },
+    {
+      "name": "MCP parity surface",
+      "commands": [
+        "weave_send",
+        "weave_inbox",
+        "weave_peers",
+        "weave_ask",
+        "weave_job_*",
+        "weave_notify",
+        "weave_delivery",
+        "weave_spawn_peer",
+        "weave_kill_peer"
+      ],
+      "evidence": "src/weave/README.md:311-324"
+    }
+  ],
+  "heartbeat_support": {
+    "source_supported": true,
+    "daemon_cli": "weave daemon start|stop|status",
+    "daemon_mcp": "weave_daemon_start|stop|status",
+    "heartbeat_interval_seconds": 15,
+    "sweep_interval_seconds": 60,
+    "stale_presence_seconds": 30,
+    "store_methods": [
+      "heartbeat",
+      "presence",
+      "evict_stale_presence",
+      "peer_liveness"
+    ],
+    "evidence": [
+      "src/weave/ARCHITECTURE.md:1174-1189",
+      "src/weave/weave-core/src/store.rs:643-672"
+    ],
+    "runtime_proof": "blocked: clean environment cannot resolve weave"
+  },
+  "clean_environment": {
+    "prefix": "env -i HOME=/home/flexnetos USER=flexnetos LOGNAME=flexnetos PATH=/home/flexnetos/FlexNetOS/usr/bin:/home/flexnetos/.local/bin:/home/flexnetos/.nix-profile/bin:/run/current-system/sw/bin:/usr/bin:/bin",
+    "command": "bash --noprofile --norc -c 'set -eu; for c in weave envctl git-kb codex cargo; do if p=$(command -v \"$c\" 2>/dev/null); then printf \"%s=%s\\n\" \"$c\" \"$p\"; else printf \"%s=NOT_FOUND\\n\" \"$c\"; fi; done'",
+    "exit_status": 0,
+    "output": [
+      "weave=NOT_FOUND",
+      "envctl=/home/flexnetos/FlexNetOS/usr/bin/envctl",
+      "git-kb=/home/flexnetos/FlexNetOS/usr/bin/git-kb",
+      "codex=/home/flexnetos/.local/bin/codex",
+      "cargo=NOT_FOUND"
+    ]
+  },
+  "installed_runtime": {
+    "command": "env -i HOME=/home/flexnetos USER=flexnetos LOGNAME=flexnetos PATH=/home/flexnetos/.nix-profile/bin:/run/current-system/sw/bin:/usr/bin:/bin yzx inspect",
+    "exit_status": 0,
+    "runtime": "/nix/store/dpp8f11dbpfgfxdb0c0k535vcxidgcyy-yazelix-flexnetos-foundation",
+    "version": "v17.9",
+    "variant": "mars",
+    "generated_state": "noop"
+  },
+  "plain_yazelix_runtime_environment": {
+    "command": "env -i HOME=/home/flexnetos USER=flexnetos LOGNAME=flexnetos PATH=/home/flexnetos/.nix-profile/bin:/run/current-system/sw/bin:/usr/bin:/bin yzx run bash -lc 'for c in cargo rustc bun bunx felix kache wild-linker weave; do if p=$(command -v \"$c\" 2>/dev/null); then printf \"%s=%s\\n\" \"$c\" \"$p\"; else printf \"%s=NOT_FOUND\\n\" \"$c\"; fi; done'",
+    "exit_status": 0,
+    "output": [
+      "cargo=NOT_FOUND",
+      "rustc=NOT_FOUND",
+      "bun=/home/flexnetos/FlexNetOS/usr/bin/bun",
+      "bunx=/home/flexnetos/FlexNetOS/usr/bin/bunx",
+      "felix=NOT_FOUND",
+      "kache=/home/flexnetos/.local/bin/kache",
+      "wild-linker=NOT_FOUND",
+      "weave=NOT_FOUND"
+    ]
+  },
+  "envctl_table_proof": {
+    "command": "envctl catalog tables --repo-root /home/flexnetos/FlexNetOS/src/envctl",
+    "exit_status": 0,
+    "tables": 11,
+    "notable_tables": [
+      "components",
+      "paths",
+      "settings",
+      "env_vars",
+      "agent_assets",
+      "registries",
+      "config_files",
+      "codedb_file_imports",
+      "observed_facts"
+    ]
+  },
+  "integration_guidance": {
+    "use_as": "local event bus only",
+    "do_not_replace": [
+      "Drive comments",
+      "Sheet task graph",
+      "proof_records ledger"
+    ],
+    "safe_path": [
+      "Expose a clean weave frontdoor through owned packaging, workspace usr/bin, or a documented Yazelix entrypoint that actually resolves weave.",
+      "Prove command resolution and read-only health from both the clean pack prefix and the intended Yazelix invocation surface.",
+      "Run an isolated store smoke for register/send/inbox or notify/delivery.",
+      "Prove heartbeat using WEAVE_PIDFILE and temporary runtime state before production daemon hookup."
+    ]
+  },
+  "blockers": [
+    {
+      "id": "WEAVE-CLEAN-FRONTDOOR-MISSING",
+      "severity": "blocking_live_adoption",
+      "description": "Neither the clean pack PATH nor plain `yzx run` resolves weave, so weave --version, weave doctor, peers, MCP, and heartbeat smoke cannot be proven from the currently verified installed frontdoor.",
+      "evidence": "clean_environment.output + plain_yazelix_runtime_environment.output"
+    },
+    {
+      "id": "WEAVE-CLEAN-BUILD-TOOL-MISSING",
+      "severity": "blocking_from-source_clean_build_in_this_prefix",
+      "description": "Neither the clean pack PATH nor plain `yzx run` resolves cargo or rustc, so a Rust-side source build is not available through the currently verified installed frontdoor.",
+      "evidence": "clean_environment.output + plain_yazelix_runtime_environment.output"
+    }
+  ],
+  "next_safe_task": "Create a narrow packaging/frontdoor task that exposes src/weave as a clean-prefix runtime command or a documented Yazelix invocation that also surfaces cargo/rustc as intended, then run an isolated clean-environment bus smoke covering register, send or notify, inbox or delivery, and daemon status without mutating production control paths."
+}

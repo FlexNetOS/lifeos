@@ -1,0 +1,115 @@
+{
+  "checks": [
+    {
+      "name": "required:README.md",
+      "path": "README.md",
+      "result": "pass"
+    },
+    {
+      "name": "required:schemas/index.json",
+      "path": "schemas/index.json",
+      "result": "pass"
+    },
+    {
+      "name": "required:examples/mvp-bundle.json",
+      "path": "examples/mvp-bundle.json",
+      "result": "pass"
+    },
+    {
+      "name": "required:generated/task_graph.normalized.json",
+      "path": "generated/task_graph.normalized.json",
+      "result": "pass"
+    },
+    {
+      "name": "required:generated/task_graph.status.json",
+      "path": "generated/task_graph.status.json",
+      "result": "pass"
+    },
+    {
+      "name": "required:generated/execution_manifest.json",
+      "path": "generated/execution_manifest.json",
+      "result": "pass"
+    },
+    {
+      "name": "required:proof_records/proof_ledger.jsonl",
+      "path": "proof_records/proof_ledger.jsonl",
+      "result": "pass"
+    },
+    {
+      "missing_packets": [],
+      "name": "execution_manifest_packets_present",
+      "packet_count": 7,
+      "result": "pass"
+    },
+    {
+      "forbidden_update_count": 0,
+      "name": "status_projection_passes_field_gate",
+      "result": "pass",
+      "status_result": "pass"
+    },
+    {
+      "entry_count": 16,
+      "name": "proof_ledger_jsonl_valid",
+      "result": "pass"
+    },
+    {
+      "bundled_entry_count": 12,
+      "excluded_entry_count": 4,
+      "excluded_task_id": "LPS-018",
+      "name": "proof_ledger_bundle_snapshot_excludes_bundle_task",
+      "result": "pass",
+      "source_entry_count": 16
+    },
+    {
+      "json_file_count": 66,
+      "name": "payload_json_parse",
+      "result": "pass"
+    }
+  ],
+  "checksum_manifest_path": "dist/lifeos-planning-spine-execution-bundle.SHA256SUMS",
+  "checksum_path": "dist/lifeos-planning-spine-execution-bundle.zip.sha256",
+  "exclusions": {
+    "excluded_files": [
+      "dist/lifeos-planning-spine-execution-bundle.SHA256SUMS",
+      "dist/lifeos-planning-spine-execution-bundle.manifest.json",
+      "dist/lifeos-planning-spine-execution-bundle.zip.sha256",
+      "generated/execution_bundle.manifest.json",
+      "generated/execution_bundle.validation_report.json",
+      "proof_records/LPS-018.proof.json"
+    ],
+    "excluded_path_parts": [
+      ".git",
+      ".hg",
+      ".ssh",
+      ".svn",
+      "__pycache__",
+      "dist",
+      "node_modules",
+      "secrets"
+    ],
+    "ledger_snapshot_note": "The bundled proof ledger is a sanitized snapshot that excludes LPS-018 entries; the live append-only ledger on disk remains unchanged.",
+    "note": "The LPS-018 completion proof is recorded outside the bundle to avoid a self-referential release checksum loop.",
+    "secret_file_names": [
+      ".env",
+      ".env.local",
+      ".envrc",
+      "id_dsa",
+      "id_ecdsa",
+      "id_ed25519",
+      "id_rsa"
+    ]
+  },
+  "generated_at": "2026-07-03T20:03:52Z",
+  "manifest_path": "dist/lifeos-planning-spine-execution-bundle.manifest.json",
+  "manifest_sha256": "373ff264fb99e7c015c7be884fe8deacf5d4c01d2c668a1f67796fd0c5715431",
+  "output_path": "dist/lifeos-planning-spine-execution-bundle.zip",
+  "payload_file_count": 92,
+  "result": "pass",
+  "schema_version": "lifeos-planning-spine.execution-bundle.validation-report.v0",
+  "sha256": "c122a26dd8d5d081b0d23b3916e049ca70d88512b068917e9074e5ef1281ccdc",
+  "zip_validation": {
+    "corrupt_member": null,
+    "entry_count": 93,
+    "has_bundle_manifest": true
+  }
+}

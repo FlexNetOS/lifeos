@@ -1,0 +1,93 @@
+{
+  "schema_version": "lifeos-planning-spine.capability-state.v0",
+  "task_id": "CAP-001",
+  "status": "pass",
+  "observed_at": "2026-07-06T17:22:41Z",
+  "active_control_surface": {
+    "document_id": "1G2wBHIl906eszJckWCPoP79B5OixcJhcpy4pGfO55DU",
+    "document_thread_id": "AAAB-0ICCJc",
+    "active_spreadsheet_id": "1LYeO7PA64Fg7d0Gi2PLs7661zxwgOITg5GCSJS4oPBI",
+    "active_spreadsheet_thread_id": "AAAB_HbRiho",
+    "archived_spreadsheet_id": "1hqQ_FU3lEl-T9sBQZkwSmN1KRCZq32Z3BVL5TaJGOfU"
+  },
+  "priority_lock": {
+    "current_p0": "CAP-001",
+    "decision": "Finish communication bridge workstreams before broader architecture expansion.",
+    "old_sheet_watermarks_stopped": true
+  },
+  "lanes": [
+    {
+      "lane": "A",
+      "helper_id": "/root/lps017_readiness",
+      "active_task": "OPS-001",
+      "artifact_targets": [
+        "state/heartbeat_lane_a.json",
+        "connector_state/heartbeat_lane_b.json",
+        "proof_records/OPS-001.proof.json"
+      ],
+      "status": "pass",
+      "blocker": "none"
+    },
+    {
+      "lane": "B",
+      "helper_id": "/root/lps017_readiness/lps018_readiness/drive_watchdog/cn006_lane_b_conn001",
+      "active_task": "CONN-001",
+      "artifact_targets": [
+        "connector_state/connector_current_state.md",
+        "connector_state/connector_current_state.json",
+        "connector_state/build_report.json",
+        "connector_state/connection_report.json",
+        "connector_state/connector_tree_snapshot.txt",
+        "connector_proof/CONN-001.proof.json"
+      ],
+      "status": "verified_package_blocked_build_connection",
+      "blocker": "zip is a spec/task pack only; no buildable connector source, MCP gateway, /mcp endpoint, or ChatGPT app/tunnel confirmation",
+      "proof_reply_id": "AAAB_HbRiiU"
+    },
+    {
+      "lane": "C",
+      "helper_id": "/root/lps017_readiness/lps018_readiness/drive_watchdog/cn006_lane_c_weave001",
+      "active_task": "WEAVE-001",
+      "artifact_targets": [
+        "weave_state/weave_bus_evaluation.md",
+        "weave_state/weave_bus_evaluation.json",
+        "proof_records/WEAVE-001.proof.json"
+      ],
+      "status": "evaluation_pass_blocked_live_adoption",
+      "blocker": "clean pack PATH does not resolve weave or cargo; source repo has bus primitives and heartbeat design but live runtime adoption is not proven",
+      "proof_paths": [
+        "weave_state/weave_bus_evaluation.md",
+        "weave_state/weave_bus_evaluation.json",
+        "proof_records/WEAVE-001.proof.json"
+      ]
+    },
+    {
+      "lane": "D",
+      "helper_id": "/root",
+      "active_task": "CAP-001",
+      "artifact_targets": [
+        "capability_state/p0_priority_report.md",
+        "capability_state/p0_priority_report.json",
+        "proof_records/CAP-001.proof.json"
+      ],
+      "status": "pass",
+      "blocker": "none"
+    }
+  ],
+  "next_decision": "Treat A as complete for the current package pass, preserve B as proof-backed but blocked on missing implementation source, preserve C as evaluation-complete but blocked for live adoption until an owned clean-prefix weave frontdoor exists, and keep CAP-001 reporting current without broadening architecture.",
+  "verification": {
+    "active_sheet_rows_read": [
+      "CAP-001",
+      "OPS-001",
+      "CONN-001",
+      "WEAVE-001"
+    ],
+    "conn001_artifacts_validated": true,
+    "ops001_artifacts_materialized": true,
+    "weave001_artifacts_validated": true,
+    "weave001_clean_runtime_frontdoor_present": false,
+    "weave001_clean_build_frontdoor_present": false,
+    "broader_architecture_expansion": false,
+    "writes_limited_to_package_paths": true
+  }
+}

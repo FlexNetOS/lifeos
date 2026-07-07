@@ -1,0 +1,72 @@
+{
+  "task_id": "LPS-020",
+  "status": "pass",
+  "observed_at": "2026-07-03T18:42:37Z",
+  "scope_guard": {
+    "repo_root": "/home/flexnetos/FlexNetOS/src/lifeos",
+    "package_root": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+    "allowed_write_paths": [
+      "planning-spine-v0/**",
+      "scripts/**",
+      "package.json"
+    ],
+    "out_of_scope_mutations_performed": false
+  },
+  "summary": {
+    "problem": "The documented verification frontdoor was implemented as a `node` script even though this FlexNetOS host runtime does not expose a standalone `node` binary.",
+    "repair": "Repointed `planning-spine:verify` to Bun, added runtime-report emission to the verifier, and documented the Bun-backed frontdoor without changing the package deliverables or the v0/RFC/post-v0 boundary.",
+    "result": "The documented `bun run planning-spine:verify` command now runs live on this host and emits a machine-readable runtime report with a passing outcome."
+  },
+  "changed_files": [
+    "package.json",
+    "scripts/verify-planning-spine.mjs",
+    "planning-spine-v0/README.md",
+    "planning-spine-v0/state/verification_runtime_report.json",
+    "planning-spine-v0/proof_records/LPS-020.proof.json"
+  ],
+  "verification_commands": [
+    {
+      "command": "bun run planning-spine:verify",
+      "exit_code": 0,
+      "purpose": "Run the documented verification frontdoor in the real host runtime."
+    },
+    {
+      "command": "jq empty planning-spine-v0/state/verification_runtime_report.json",
+      "exit_code": 0,
+      "purpose": "Verify the generated runtime report is valid JSON."
+    },
+    {
+      "command": "sha256sum planning-spine-v0/state/verification_runtime_report.json",
+      "exit_code": 0,
+      "purpose": "Capture a stable digest for the runtime proof artifact."
+    }
+  ],
+  "diagnostics": [
+    {
+      "command": "which bun && bun --version && which node && node --version",
+      "observed": "bun present at /home/flexnetos/.local/bin/bun, bun 1.3.14, standalone node absent on PATH"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "planning-spine-v0/state/verification_runtime_report.json",
+      "status": "pass",
+      "sha256": "50fc184752b2fef59a5dff4582720348056ef60f70be2437d3f0f22aeab0d581"
+    },
+    {
+      "path": "planning-spine-v0/proof_records/LPS-020.proof.json",
+      "status": "pass"
+    }
+  ],
+  "runtime_observation": {
+    "frontdoor_command": "bun run planning-spine:verify",
+    "effective_executable": "/home/flexnetos/FlexNetOS/.toolchains/.bun/bin/bun",
+    "lifecycle_event": "planning-spine:verify",
+    "outcome": "planning-spine-v0 verification passed"
+  },
+  "boundary_checks": [
+    "v0, RFC, and post-v0 scope markers remain present in planning-spine-v0/README.md.",
+    "No Docker-first or broad integration work was added.",
+    "Verification remains package-local and documentation-aligned."
+  ]
+}

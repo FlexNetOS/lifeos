@@ -1,0 +1,132 @@
+{
+  "task_id": "LPS-016",
+  "title": "Merge proof records",
+  "revision": 2,
+  "status": "pass",
+  "observed_at": "2026-07-03T19:47:30Z",
+  "local_path": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+  "scope": {
+    "allowed_paths": [
+      "scripts/**",
+      "proof_records/**"
+    ],
+    "blocked_paths": [
+      "rewriting existing proof history"
+    ]
+  },
+  "files_changed": [
+    "scripts/merge-proof-records.py",
+    "proof_records/fixtures/duplicate-task-id/a.proof.json",
+    "proof_records/fixtures/duplicate-task-id/b.proof.json",
+    "proof_records/proof_ledger.jsonl",
+    "proof_records/proof_ledger.merge_report.json",
+    "proof_records/proof_ledger.idempotency_report.json",
+    "proof_records/LPS-016.proof.json"
+  ],
+  "artifacts": {
+    "merge_script": {
+      "path": "scripts/merge-proof-records.py",
+      "sha256": "8bd052923f399cc91eb0b7ddaf01278c5418865e6ac6f15a731dd77884768e97"
+    },
+    "same_revision_duplicate_fixture_a": {
+      "path": "proof_records/fixtures/duplicate-task-id/a.proof.json",
+      "sha256": "9fe7a3637a4e9a86847112cb8379dbd14eea84f18a2f43037effa4a8e3bf7e43"
+    },
+    "same_revision_duplicate_fixture_b": {
+      "path": "proof_records/fixtures/duplicate-task-id/b.proof.json",
+      "sha256": "660d1d939525b8eb7abcc489138114c36da658546123579f2d24c3075a9f73e0"
+    },
+    "proof_ledger": {
+      "path": "proof_records/proof_ledger.jsonl",
+      "schema_version": "lifeos-planning-spine.proof-ledger.v0",
+      "append_only_policy": "append new task_id/revision/sha256 records; skip identical existing records; fail same task_id/revision with different sha256"
+    },
+    "merge_report": {
+      "path": "proof_records/proof_ledger.merge_report.json",
+      "schema_version": "lifeos-planning-spine.proof-ledger.merge-report.v0",
+      "expected_result": "pass",
+      "expected_appended_entries": 1,
+      "expected_skipped_entries": 8
+    },
+    "idempotency_report": {
+      "path": "proof_records/proof_ledger.idempotency_report.json",
+      "schema_version": "lifeos-planning-spine.proof-ledger.merge-report.v0",
+      "expected_result": "pass",
+      "expected_dry_run_appended_entries": 0,
+      "expected_dry_run_skipped_entries": 9
+    }
+  },
+  "verification_commands": [
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 -m py_compile scripts/merge-proof-records.py",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/merge-proof-records.py proof_records/fixtures/duplicate-task-id --ledger /tmp/lps016-duplicate-ledger.jsonl --report /tmp/lps016-duplicate-report.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 1,
+      "expected_failure": true,
+      "output": "merge-proof-records: error: duplicate task_id/revision with different sha256: LPS-DUP revision 1 at proof_records/fixtures/duplicate-task-id/a.proof.json and proof_records/fixtures/duplicate-task-id/b.proof.json"
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/merge-proof-records.py proof_records --ledger proof_records/proof_ledger.jsonl --report proof_records/proof_ledger.merge_report.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "merge-proof-records: appended 1 entrie(s), skipped 8 existing entrie(s), ledger proof_records/proof_ledger.jsonl"
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/usr/bin:/bin python3 scripts/merge-proof-records.py proof_records --ledger proof_records/proof_ledger.jsonl --report proof_records/proof_ledger.idempotency_report.json --dry-run",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "merge-proof-records: would append 0 entrie(s), skipped 9 existing entrie(s), ledger proof_records/proof_ledger.jsonl"
+    },
+    {
+      "command": "jq empty proof_records/LPS-016.proof.json proof_records/proof_ledger.merge_report.json proof_records/proof_ledger.idempotency_report.json proof_records/fixtures/duplicate-task-id/a.proof.json proof_records/fixtures/duplicate-task-id/b.proof.json",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": "jq -R 'fromjson' proof_records/proof_ledger.jsonl >/dev/null",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": "/usr/bin/env -i PATH=/home/flexnetos/.local/bin:/home/flexnetos/FlexNetOS/usr/bin:/usr/bin:/bin bun run planning-spine:verify",
+      "cwd": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+      "exit_code": 0,
+      "output": "planning-spine-v0 verification passed"
+    }
+  ],
+  "checks": [
+    {
+      "name": "proof_records_collected",
+      "result": "pass",
+      "detail": "The script collects non-recursive proof_records/*.proof.json records and ignores fixtures unless explicitly pointed at a fixture directory."
+    },
+    {
+      "name": "append_only_ledger",
+      "result": "pass",
+      "detail": "The script opens the ledger in append mode, never rewrites existing ledger lines, and skips identical task_id/revision/sha256 entries."
+    },
+    {
+      "name": "duplicate_policy",
+      "result": "pass",
+      "detail": "Different revisions may coexist; same task_id and revision with different sha256 is rejected."
+    },
+    {
+      "name": "no_history_rewrite",
+      "result": "pass",
+      "detail": "Existing proof files are preserved and corrected LPS-016 evidence is appended as revision 2."
+    }
+  ],
+  "drift_or_blockers": [
+    "A concurrent/earlier LPS-016 proof existed before this correction. I preserved the prior ledger line and appended corrected LPS-016 evidence as revision 2 instead of rewriting history.",
+    "The existing proof_ledger.report.json is a legacy sidecar from the earlier rewrite-style script; the live append-only report is proof_records/proof_ledger.merge_report.json.",
+    "LPS-016 preserves the MVP boundary and does not expand into Hermes, Odysseus, full company hierarchy, or standalone Mirofish."
+  ],
+  "recommended_next_task_id": "LPS-017"
+}

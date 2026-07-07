@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/capability.schema.json",
+  "title": "Capability",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "kind",
+    "inputs",
+    "outputs",
+    "verification_method"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "kind": { "type": "string", "enum": ["planning", "simulation", "execution", "verification", "decision"] },
+    "inputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "outputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "verification_method": { "type": "string" }
+  }
+}

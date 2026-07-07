@@ -1,0 +1,195 @@
+{
+  "bundle_path": "planning-spine-v0/examples/mvp-bundle.json",
+  "observed_at": "2026-07-07T09:01:17.356Z",
+  "result": "pass",
+  "message": "planning-spine-v0 MVP bundle verification passed",
+  "bundle_id": "mvp-bundle.v0.vertical-slice",
+  "scope": "v0",
+  "scope_boundaries": {
+    "v0": "in-scope",
+    "rfc": "proposed-only",
+    "post_v0": "deferred"
+  },
+  "bundle_order": [
+    "intent",
+    "goal",
+    "authority_assignment",
+    "task",
+    "worldseed",
+    "simulation_report",
+    "cell",
+    "proof",
+    "decision",
+    "action",
+    "artifact"
+  ],
+  "resolved_objects": {
+    "intent": {
+      "schema": "Intent",
+      "path": "examples/intent.json",
+      "id": "intent.mvp.vertical-slice"
+    },
+    "goal": {
+      "schema": "Goal",
+      "path": "examples/goal.json",
+      "id": "goal.mvp.slice"
+    },
+    "task": {
+      "schema": "Task",
+      "path": "examples/task.json",
+      "id": "task.execute.slice"
+    },
+    "worldseed": {
+      "schema": "WorldSeed",
+      "path": "examples/worldseed.json",
+      "id": "worldseed.mvp.execute"
+    },
+    "simulation_report": {
+      "schema": "SimulationReport",
+      "path": "examples/simulation-report.json",
+      "id": "simreport.mvp.execute"
+    },
+    "cell": {
+      "schema": "Cell",
+      "path": "examples/cell.json",
+      "id": "cell.mvp.execute"
+    },
+    "proof": {
+      "schema": "ProofRecord",
+      "path": "examples/proof-record.json",
+      "id": "proof.task.execute.slice"
+    },
+    "decision": {
+      "schema": "Decision",
+      "path": "examples/decision.json",
+      "id": "decision.next-action"
+    },
+    "action": {
+      "schema": "Action",
+      "path": "examples/action.json",
+      "id": "action.run.slice"
+    },
+    "artifact": {
+      "schema": "Artifact",
+      "path": "examples/artifact.json",
+      "id": "artifact.simulation.patch"
+    }
+  },
+  "authority_assignment": {
+    "authority_root": "noa",
+    "operational_delegate": "cecca",
+    "task_id": "task.execute.slice",
+    "assigned_role_id": "role.executor",
+    "assigned_agent_id": "agent.executor",
+    "required_capability_ids": [
+      "cap.execute.hermetic"
+    ],
+    "proof_verifier": {
+      "agent_id": "agent.verifier",
+      "role_id": "role.verifier",
+      "required_capability_ids": [
+        "cap.verify.proof"
+      ]
+    }
+  },
+  "linkage_checks": [
+    {
+      "name": "intent_to_goal",
+      "from": "intent.mvp.vertical-slice",
+      "to": "goal.mvp.slice",
+      "detail": "Intent.goal_ids must include the bundle goal id",
+      "result": "pass"
+    },
+    {
+      "name": "goal_to_authority_assignment",
+      "from": "goal.mvp.slice",
+      "to": "agent.executor",
+      "detail": "Goal authority_scope must match the operational delegate",
+      "result": "pass"
+    },
+    {
+      "name": "authority_assignment_to_task",
+      "from": "agent.executor",
+      "to": "task.execute.slice",
+      "detail": "Authority assignment task_id and assigned agent must match the task owner",
+      "result": "pass"
+    },
+    {
+      "name": "authority_role_to_agent",
+      "from": "role.executor",
+      "to": "agent.executor",
+      "detail": "Assigned agent must carry the assigned role",
+      "result": "pass"
+    },
+    {
+      "name": "authority_capabilities_to_role",
+      "from": "cap.execute.hermetic",
+      "to": "role.executor",
+      "detail": "Assigned role must require every declared capability",
+      "result": "pass"
+    },
+    {
+      "name": "authority_capabilities_to_agent",
+      "from": "cap.execute.hermetic",
+      "to": "agent.executor",
+      "detail": "Assigned agent must carry every declared capability",
+      "result": "pass"
+    },
+    {
+      "name": "task_to_worldseed",
+      "from": "task.execute.slice",
+      "to": "worldseed.mvp.execute",
+      "detail": "WorldSeed must target the bundle intent and task",
+      "result": "pass"
+    },
+    {
+      "name": "worldseed_to_simulation_report",
+      "from": "worldseed.mvp.execute",
+      "to": "simreport.mvp.execute",
+      "detail": "SimulationReport must reference the bundle worldseed and task",
+      "result": "pass"
+    },
+    {
+      "name": "simulation_report_to_cell",
+      "from": "simreport.mvp.execute",
+      "to": "cell.mvp.execute",
+      "detail": "Cell inputs and outputs must expose the bundle task, proof, and artifact ids",
+      "result": "pass"
+    },
+    {
+      "name": "task_to_cell",
+      "from": "task.execute.slice",
+      "to": "cell.mvp.execute",
+      "detail": "Task cell_id and path boundaries must match the bundle cell",
+      "result": "pass"
+    },
+    {
+      "name": "cell_to_proof",
+      "from": "cell.mvp.execute",
+      "to": "proof.task.execute.slice",
+      "detail": "ProofRecord must be a passing task proof verified by the declared verifier",
+      "result": "pass"
+    },
+    {
+      "name": "proof_to_decision",
+      "from": "proof.task.execute.slice",
+      "to": "decision.next-action",
+      "detail": "Decision must derive from proof-backed task state and be made by the operational delegate",
+      "result": "pass"
+    },
+    {
+      "name": "decision_to_action",
+      "from": "decision.next-action",
+      "to": "action.run.slice",
+      "detail": "Decision selected_option must resolve to the bundle action",
+      "result": "pass"
+    },
+    {
+      "name": "action_to_artifact",
+      "from": "action.run.slice",
+      "to": "artifact.simulation.patch",
+      "detail": "Action, Task, and Artifact must agree on actor, task, and expected artifact ids",
+      "result": "pass"
+    }
+  ]
+}

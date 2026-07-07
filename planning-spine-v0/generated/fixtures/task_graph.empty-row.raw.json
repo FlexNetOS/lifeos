@@ -1,0 +1,55 @@
+{
+  "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
+  "generated_at": "2026-07-03T19:30:47Z",
+  "source": {
+    "format": "csv",
+    "path": "generated/fixtures/task_graph.empty-row.csv",
+    "header": [
+      "task_id",
+      "parent_id",
+      "phase",
+      "title",
+      "owner_agent",
+      "goal",
+      "inputs",
+      "target_artifacts",
+      "allowed_paths",
+      "blocked_paths",
+      "simulation_required",
+      "execution_cell",
+      "verification_gate",
+      "rollback_plan",
+      "status",
+      "proof_uri",
+      "next_action"
+    ],
+    "row_count": 1,
+    "empty_rows_skipped": [
+      2
+    ]
+  },
+  "rows": [
+    {
+      "source_row_number": 3,
+      "columns": {
+        "task_id": "LPS-012",
+        "parent_id": "LPS-008",
+        "phase": "8-execution-pipeline",
+        "title": "Python task graph extractor",
+        "owner_agent": "Runtime Kernel",
+        "goal": "Create scripts/extract-task-graph.py to ingest/export Sheet or CSV task graph rows into generated/task_graph.raw.json.",
+        "inputs": "Task Graph v0 sheet or CSV export",
+        "target_artifacts": "scripts/extract-task-graph.py; generated/task_graph.raw.json",
+        "allowed_paths": "scripts/**; generated/**",
+        "blocked_paths": "src production code; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "doc-cell",
+        "verification_gate": "Script produces raw JSON rows without dropping columns; malformed rows fail loudly.",
+        "rollback_plan": "Delete generated raw file; preserve source sheet/CSV.",
+        "status": "Ready",
+        "proof_uri": "proof_records/LPS-012.proof.json",
+        "next_action": "Implement extractor against CSV first; Sheet API later."
+      }
+    }
+  ]
+}

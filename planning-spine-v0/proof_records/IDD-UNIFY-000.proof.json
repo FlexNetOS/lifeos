@@ -1,0 +1,81 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "IDD-UNIFY-000",
+  "observed_at": "2026-07-07T05:43:51Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Four-system research (.kb GitKB, .meta meta, .handoff handoff, .idd rusty-idd) is runtime-proven; the .idd unification plan is landed in an existing repo planning surface with archive-first handling; the GitKB docs reference set (19/19 pages) is created clean in the operator-designated Drive folder with originals untouched.",
+  "gate_result": {
+    "four_system_research_runtime_proven": true,
+    "gitkb_store_relocation_question_answered": true,
+    "unification_plan_landed_archive_first": true,
+    "drive_docs_reference_set_complete_19_of_19": true,
+    "parity_baselines_recorded": true,
+    "no_deletions_performed": true,
+    "implementation_executed": false
+  },
+  "proof_summary": "Equation '.kb + .meta + .handoff + .idd -> .idd' planned, not yet executed. Decisive findings: git-kb 0.2.12 (= latest release v0.2.12 2026-06-06; closed-source binary, open protocol) stores canonically as TEXT (store/documents/*.md + commits/*.json) with derived SQLite cache; the .kb directory name is HARDCODED (GITKB_ROOT accepts only a directory containing .kb/) but a '.kb -> .idd/kb' symlink serves the full CLI (proven with a committed document); export/backup/bundle proven, no data lock-in. handoff's ledger is redb (magic bytes 'redb'), not SQLite; committed truth is ledger.events.jsonl per ADR-0004 SS3/ADR-0018 D1; live violation found: teri/.handoff/ledger.db.rvf is git-tracked. FlexNetOS/meta is a fork of gitkb/meta (vendor lineage; installed 0.2.22); GitKB documents a native '[repos] strategy=meta' integration. rusty-idd (v0.1.0, IDD = Intent-Driven Development) already defines the dot-directory authority model this plan extends; its knowledge index is stale (old /home/drdave workspace_root); hf and rusty-idd binaries are NOT installed (migration phase-0 gate). Plan: per-repo .idd/{kb,handoff,goals,knowledge,evidence,proofs,meta-references} with compatibility symlinks, text-canonical-journal storage rule (enforcing existing ADRs), 4-phase strangler migration with count+sha256 parity proofs and rollbacks. Docs polish: all 19 official gitkb.com docs pages recreated as clean stamped Google Docs with Local Notes (runtime deltas incl. nonexistent 'config set', [user]-not-[identity] author key, conflict verbs, 0.2.6-stale CLI page); originals + 7 vendor zips left untouched in place.",
+  "artifact_paths": [
+    "/home/flexnetos/FlexNetOS/src/rusty-idd/docs/rusty-idd/dot-directory-architecture.md",
+    "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0/proof_records/IDD-UNIFY-000.proof.json",
+    "/tmp/claude-1001/-home-flexnetos/e212f5cc-96c9-4a2a-a1fc-e6fbcc7ef76d/scratchpad/FINDINGS.md",
+    "/tmp/claude-1001/-home-flexnetos/e212f5cc-96c9-4a2a-a1fc-e6fbcc7ef76d/scratchpad/archive/dot-directory-architecture.md.pre-idd-plan.2026-07-07",
+    "/tmp/claude-1001/-home-flexnetos/e212f5cc-96c9-4a2a-a1fc-e6fbcc7ef76d/scratchpad/gitkb-docs/",
+    "/tmp/claude-1001/-home-flexnetos/e212f5cc-96c9-4a2a-a1fc-e6fbcc7ef76d/scratchpad/polish/",
+    "https://drive.google.com/drive/folders/1F3f2KcZ_Yd3ppN83kY5B76g_94YaN258"
+  ],
+  "live_commands": [
+    {
+      "purpose": "installed GitKB version and provenance",
+      "cwd": "/home/flexnetos",
+      "command": "git-kb --version; sha256sum $(readlink -f /home/flexnetos/FlexNetOS/usr/bin/git-kb) $(readlink -f /home/flexnetos/.nix-profile/bin/git-kb); gh api repos/gitkb/gitkb-releases/releases/latest --jq '{tag:.tag_name,published:.published_at}'",
+      "exit_status": 0,
+      "output": [
+        "git-kb 0.2.12",
+        "0d648382e169600e7e99b4a3d2c527fac249fcad9246889f73437fa07ce16e18  (identical for both copies)",
+        "{\"tag\":\"v0.2.12\",\"published\":\"2026-06-06T20:55:20Z\"}"
+      ]
+    },
+    {
+      "purpose": "decisive .kb relocation tests (scratch KB)",
+      "cwd": "/tmp/claude-1001/-home-flexnetos/e212f5cc-96c9-4a2a-a1fc-e6fbcc7ef76d/scratchpad/kbtest",
+      "command": "GITKB_ROOT=<parent-without-.kb> git-kb list --json (T3, renamed store .idd/kb); ln -s .idd/kb kb-d/.kb && cd kb-d && git-kb show tasks/alpha (T7)",
+      "exit_status": 0,
+      "output": [
+        "T3: error: GITKB_ROOT is set to \"...\" but no .kb/ directory found there (renamed store REFUSED)",
+        "T7: document tasks/alpha served through .kb -> .idd/kb symlink (frontmatter + body returned)"
+      ]
+    },
+    {
+      "purpose": "handoff ledger format determination (scratch copy)",
+      "cwd": "/tmp/claude-1001/-home-flexnetos/e212f5cc-96c9-4a2a-a1fc-e6fbcc7ef76d/scratchpad/copies",
+      "command": "sqlite3 ledger.db '.schema'; xxd ledger.db | head -1; git -C ~/FlexNetOS/src/teri ls-files .handoff/ledger.db.rvf",
+      "exit_status": 0,
+      "output": [
+        "sqlite3: Error: file is not a database",
+        "00000000: 7265 6462 ... (magic 'redb' -> redb store, ADR-0017)",
+        "teri tracked-binary violation confirmed: .handoff/ledger.db.rvf is git-tracked"
+      ]
+    },
+    {
+      "purpose": "plan landing, archive-first",
+      "cwd": "/home/flexnetos/FlexNetOS/src/rusty-idd",
+      "command": "cp docs/rusty-idd/dot-directory-architecture.md <scratch-archive>; append 'Fleet Unification Addendum' section; sha256sum before/after",
+      "exit_status": 0,
+      "output": [
+        "pre-edit  sha256 b455457e2ac5002a9354c631e0864adcb4d88f7914d68f1ad8e7ef05007b6684 (archived copy identical)",
+        "post-edit sha256 b7f4ce6df45d1ce4459c057c2964a2807170cad60270ad827e78e4fb79d9151e (+88 lines, append-only)"
+      ]
+    },
+    {
+      "purpose": "Drive docs polish completeness",
+      "cwd": "claude.ai Google Drive MCP",
+      "command": "curl 19 docs pages (all HTTP 200) -> HTML-to-markdown conversion -> create_file x19 into folder 1F3f2KcZ_Yd3ppN83kY5B76g_94YaN258 (titles '01 . Introduction ... 19 . Troubleshooting'); read-back verification on doc 01",
+      "exit_status": 0,
+      "output": [
+        "19/19 clean docs created; originals (Introduction doc + 18 docs misfiled in 'Introduction - GitKB Docs_files' + assets + 7 vendor zips) untouched",
+        "conversion fidelity verified by read_file_content on doc 01 (headings/lists/links/tables intact)"
+      ]
+    }
+  ]
+}

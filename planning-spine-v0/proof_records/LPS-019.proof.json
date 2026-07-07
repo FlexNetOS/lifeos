@@ -1,0 +1,138 @@
+{
+  "task_id": "LPS-019",
+  "status": "complete",
+  "observed_at": "2026-07-03T18:30:22Z",
+  "scope_guard": {
+    "allowed_write_paths": [
+      "state/**",
+      "proof_records/**"
+    ],
+    "out_of_scope_mutations_performed": false
+  },
+  "artifacts": [
+    {
+      "path": "state/current_state_map.md",
+      "status": "complete"
+    },
+    {
+      "path": "state/current_state_map.json",
+      "status": "complete"
+    },
+    {
+      "path": "state/repo_inventory.json",
+      "status": "complete"
+    },
+    {
+      "path": "state/tree_snapshot.txt",
+      "status": "complete"
+    },
+    {
+      "path": "state/nix_surface_report.json",
+      "status": "complete"
+    },
+    {
+      "path": "state/usr_surface_report.json",
+      "status": "complete"
+    },
+    {
+      "path": "proof_records/LPS-019.proof.json",
+      "status": "complete"
+    }
+  ],
+  "verification_commands": [
+    "jq empty state/current_state_map.json",
+    "jq empty state/repo_inventory.json",
+    "jq empty state/nix_surface_report.json",
+    "jq empty state/usr_surface_report.json",
+    "jq empty proof_records/LPS-019.proof.json",
+    "test -f state/current_state_map.md",
+    "test -f state/tree_snapshot.txt",
+    "find state proof_records -maxdepth 2 -type f | sort",
+    "bun run planning-spine:verify"
+  ],
+  "evidence_commands": [
+    "git -C /home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0 rev-parse --show-toplevel",
+    "git -C /home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0 status --short",
+    "find /home/flexnetos/FlexNetOS -name .git -type d -prune | sed s#/.git$## | sort",
+    "find /home/flexnetos/FlexNetOS/src -maxdepth 2 -type d matching relevant names",
+    "find /nix -maxdepth 1 -mindepth 1 | sort",
+    "find /nix/store -maxdepth 1 -mindepth 1 | wc -l",
+    "find /nix/store -maxdepth 1 -mindepth 1 | rg 'flexnetos|yazelix|lifeos|meta|envctl|hermes|teri|mirofish|runner'",
+    "find /usr -maxdepth 1 -mindepth 1 | sort",
+    "find /usr/bin -maxdepth 1 -mindepth 1 | wc -l",
+    "find /home/flexnetos/FlexNetOS/usr/bin -maxdepth 1 -mindepth 1 | sort"
+  ],
+  "key_drift_findings": [
+    "The active package lives inside /home/flexnetos/FlexNetOS/src/lifeos, while /home/flexnetos/FlexNetOS itself is not a git repo.",
+    "The src/lifeos worktree is dirty outside this task scope: package.json modified and planning-spine-v0 plus scripts/verify-planning-spine.mjs untracked.",
+    "The flexnetos_runner repo is clean relative to upstream counts but locally dirty with many mutable files under _work and a deleted .codex/hooks.json entry.",
+    "PATH contains both /home/flexnetos/FlexNetOS/usr/bin and /usr/bin, with the workspace overlay earlier than host /usr/bin.",
+    "Relevant generated or nested repos exist under flexnetos_runner/_work and teri/.worktrees; they should not be mistaken for canonical source repos.",
+    "Current interactive shell bare codex resolves to 0.143.0-alpha.34 from a Yazelix store path, while the clean frontdoor resolves to 0.143.0-alpha.35.",
+    "The LPS-019 package verifier was re-run live and passed: bun run planning-spine:verify -> planning-spine-v0 verification passed."
+  ],
+  "uncertainty": [
+    "Repository discovery was bounded to observed relevant paths under /home/flexnetos/FlexNetOS and sampled nested noisy areas rather than exhaustively traversing every external subtree.",
+    "meta_plugin_protocol did not return an upstream ahead/behind count in the observed command, so upstream drift for that repo remains unknown in this proof."
+  ],
+  "reverified_at": "2026-07-03T19:12:53Z",
+  "runtime_reverification": {
+    "observed_at": "2026-07-03T19:12:53Z",
+    "source": "background_helper_runtime_surface_map plus live root verification",
+    "ambient_codex": {
+      "path": "/nix/store/iv68194hlnmc7msgpksss6nag4c56gya-yazelix-flexnetos-foundation/toolbin/codex",
+      "version": "codex-cli 0.143.0-alpha.34",
+      "note": "Current interactive shell PATH shadows the repaired profile/local frontdoor."
+    },
+    "clean_frontdoor_codex": {
+      "path": "/home/flexnetos/.local/bin/codex -> /home/flexnetos/.nix-profile/bin/codex -> /nix/store/gh9ccwvjxnv0lhi8h6xc1ganabadrpqi-codex-cli-0.143.0-alpha.35/bin/codex",
+      "version": "codex-cli 0.143.0-alpha.35",
+      "note": "env -i clean PATH with workspace usr/bin, local bin, and nix-profile resolves the repaired alpha.35 frontdoor."
+    },
+    "tool_versions": {
+      "nix": "nix (Determinate Nix 3.21.1) 2.34.7",
+      "yzx": "Yazelix (v17.9)",
+      "envctl": "envctl 0.1.0",
+      "git-kb": "git-kb 0.2.12",
+      "meta": "meta 0.2.22",
+      "bun": "1.3.14",
+      "python3": "Python 3.14.4",
+      "nu": "0.112.2",
+      "git": "git version 2.54.0"
+    },
+    "missing_ambient_or_usr_tools": [
+      "yazelix command name",
+      "node",
+      "cargo",
+      "rustc",
+      "python",
+      "usr nu",
+      "usr xclip",
+      "usr wl-copy"
+    ],
+    "nix_profile_active": [
+      {
+        "name": "yazelix_flexnetos_foundation",
+        "originalUrl": "path:/home/flexnetos/FlexNetOS/src/yazelix",
+        "storePath": "/nix/store/q6k6lpircs2a66mxxhdzq9bkywj7wpvm-yazelix-flexnetos-foundation"
+      },
+      {
+        "name": "fira-code",
+        "originalUrl": "flake:nixpkgs"
+      },
+      {
+        "name": "symbols-only",
+        "originalUrl": "flake:nixpkgs"
+      }
+    ],
+    "root_flake": {
+      "flake.nix": "missing",
+      "flake.lock": "missing"
+    },
+    "verification_rerun": {
+      "command": "bun run planning-spine:verify",
+      "exit_code": 0,
+      "output": "planning-spine-v0 verification passed"
+    }
+  }
+}

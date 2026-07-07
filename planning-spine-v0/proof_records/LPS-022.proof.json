@@ -1,0 +1,129 @@
+{
+  "task_id": "LPS-022",
+  "status": "pass",
+  "observed_at": "2026-07-03T18:50:10Z",
+  "scope_guard": {
+    "repo_root": "/home/flexnetos/FlexNetOS/src/lifeos",
+    "package_root": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0",
+    "allowed_write_paths": [
+      "planning-spine-v0/**",
+      "scripts/**"
+    ],
+    "out_of_scope_mutations_performed": false
+  },
+  "summary": {
+    "problem": "planning-spine-v0 still treated verifier authority as an opaque id in the MVP bundle, so proof acceptance authority was implied rather than resolved into machine-readable objects and live-checked.",
+    "repair": "Added explicit verifier agent, role, and capability example objects; replaced the bundle's opaque verifier id with resolved verifier refs; and extended the Bun verification frontdoor to emit an authority integrity report and fail when verifier/proof links break.",
+    "result": "The host-runtime verification flow now resolves proof-verifier authority into explicit v0 objects, proves that verifier authority is distinct from execution authority, and emits both linkage and authority-integrity JSON artifacts before accepting proof-backed completion."
+  },
+  "changed_files": [
+    "planning-spine-v0/examples/mvp-bundle.json",
+    "planning-spine-v0/examples/verifier-agent.json",
+    "planning-spine-v0/examples/verifier-role.json",
+    "planning-spine-v0/examples/verifier-capability.json",
+    "planning-spine-v0/README.md",
+    "planning-spine-v0/07_MVP_VERTICAL_SLICE.md",
+    "planning-spine-v0/state/verification_runtime_report.json",
+    "planning-spine-v0/state/mvp_bundle_report.json",
+    "planning-spine-v0/state/authority_integrity_report.json",
+    "planning-spine-v0/proof_records/LPS-022.proof.json",
+    "scripts/verify-planning-spine.mjs"
+  ],
+  "verification_commands": [
+    {
+      "command": "bun run planning-spine:verify",
+      "exit_code": 0,
+      "purpose": "Run the Bun-backed verification frontdoor live in the host runtime and emit updated bundle, runtime, and authority-integrity reports."
+    },
+    {
+      "command": "jq empty planning-spine-v0/state/verification_runtime_report.json",
+      "exit_code": 0,
+      "purpose": "Verify the generated runtime report is valid JSON."
+    },
+    {
+      "command": "jq empty planning-spine-v0/state/mvp_bundle_report.json",
+      "exit_code": 0,
+      "purpose": "Verify the generated bundle linkage report is valid JSON."
+    },
+    {
+      "command": "jq empty planning-spine-v0/state/authority_integrity_report.json",
+      "exit_code": 0,
+      "purpose": "Verify the generated authority integrity report is valid JSON."
+    },
+    {
+      "command": "sha256sum planning-spine-v0/state/verification_runtime_report.json planning-spine-v0/state/mvp_bundle_report.json planning-spine-v0/state/authority_integrity_report.json",
+      "exit_code": 0,
+      "purpose": "Capture stable digests for the generated verification artifacts."
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "planning-spine-v0/state/verification_runtime_report.json",
+      "status": "pass",
+      "sha256": "c96f55114439c901915dc80902c461aee0d74fabc932501469df9c077fd77b4d"
+    },
+    {
+      "path": "planning-spine-v0/state/mvp_bundle_report.json",
+      "status": "pass",
+      "sha256": "5840c1bafef25fafb5e74647b3517b33dc835a6915e1729f8d834038509c68a7"
+    },
+    {
+      "path": "planning-spine-v0/state/authority_integrity_report.json",
+      "status": "pass",
+      "sha256": "6fd17f2608e69e27a8981dd51d01d786190ef8e40d6af97d1081b05daee02207"
+    },
+    {
+      "path": "planning-spine-v0/proof_records/LPS-022.proof.json",
+      "status": "pass"
+    }
+  ],
+  "runtime_observation": {
+    "frontdoor_command": "bun run planning-spine:verify",
+    "effective_executable": "/home/flexnetos/FlexNetOS/.toolchains/.bun/bin/bun",
+    "runtime_name": "bun",
+    "runtime_version": "1.3.14",
+    "outcome": "planning-spine-v0 verification passed"
+  },
+  "bundle_observation": {
+    "bundle_id": "mvp-bundle.v0.vertical-slice",
+    "bundle_scope": "v0",
+    "bundle_report_result": "pass",
+    "linkage_check_count": 14,
+    "verified_chain": [
+      "intent -> goal",
+      "goal -> authority assignment",
+      "authority assignment -> task",
+      "task -> worldseed",
+      "worldseed -> simulation report",
+      "simulation report -> cell",
+      "cell -> proof",
+      "proof -> decision",
+      "decision -> action",
+      "action -> artifact"
+    ]
+  },
+  "authority_observation": {
+    "authority_report_result": "pass",
+    "verifier_agent_id": "agent.verifier",
+    "verifier_role_id": "role.verifier",
+    "verifier_capability_ids": [
+      "cap.verify.proof"
+    ],
+    "integrity_check_count": 8,
+    "verified_conditions": [
+      "verifier agent is distinct from executor",
+      "verifier agent carries verifier role",
+      "verifier role requires verifier capability",
+      "verifier agent carries verifier capability",
+      "verifier authority scope matches CECCA delegation",
+      "proof record resolves to verifier agent",
+      "proof record subject resolves to bundle task",
+      "verifier boundary rules forbid execution"
+    ]
+  },
+  "boundary_checks": [
+    "The bundle manifest preserves the existing v0, RFC, and post-v0 boundary markers.",
+    "No hierarchy expansion, Hermes, Odysseus, or Docker-first work was added.",
+    "All writes remained inside planning-spine-v0/** and scripts/**."
+  ]
+}

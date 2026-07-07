@@ -1,0 +1,32 @@
+{
+  "packet_schema_version": "lifeos-planning-spine.execution-packet.v0",
+  "generated_at": "2026-07-03T19:38:56Z",
+  "source_graph_uri": "generated/task_graph.normalized.json",
+  "task_id": "LPS-012",
+  "title": "Python task graph extractor",
+  "phase": "8-execution-pipeline",
+  "owner_agent": "Runtime Kernel",
+  "parent_ids": [
+    "LPS-008"
+  ],
+  "source_row_number": 2,
+  "paths": {
+    "allowed": [
+      "scripts/**",
+      "generated/**"
+    ],
+    "blocked": [
+      "src production code",
+      "secrets/**"
+    ],
+    "target_artifacts": [
+      "scripts/extract-task-graph.py",
+      "generated/task_graph.raw.json"
+    ]
+  },
+  "cell": "doc-cell",
+  "simulation_required": false,
+  "verification_gate": "Script produces raw JSON rows without dropping columns; malformed rows fail loudly.",
+  "rollback_plan": "Delete generated raw file; preserve source sheet/CSV.",
+  "proof_uri": "proof_records/LPS-012.proof.json"
+}

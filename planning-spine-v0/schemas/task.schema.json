@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/task.schema.json",
+  "title": "Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "goal_id",
+    "title",
+    "status",
+    "owner_agent_id",
+    "depends_on",
+    "allowed_paths",
+    "blocked_paths",
+    "verification_gate",
+    "rollback_plan",
+    "proof_uri",
+    "simulation_constraint_ids",
+    "cell_id",
+    "action_ids",
+    "artifact_ids"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "goal_id": { "type": "string" },
+    "title": { "type": "string" },
+    "status": { "type": "string", "enum": ["draft", "ready", "simulated", "running", "blocked", "complete", "rolled_back"] },
+    "owner_agent_id": { "type": "string" },
+    "depends_on": { "type": "array", "items": { "type": "string" } },
+    "allowed_paths": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "blocked_paths": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "verification_gate": { "type": "string" },
+    "rollback_plan": { "type": "string" },
+    "proof_uri": { "type": "string" },
+    "simulation_constraint_ids": { "type": "array", "items": { "type": "string" } },
+    "cell_id": { "type": "string" },
+    "action_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "artifact_ids": { "type": "array", "items": { "type": "string" } }
+  }
+}

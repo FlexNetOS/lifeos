@@ -1,0 +1,34 @@
+{
+  "packet_schema_version": "lifeos-planning-spine.execution-packet.v0",
+  "generated_at": "2026-07-03T19:38:56Z",
+  "source_graph_uri": "generated/task_graph.normalized.json",
+  "task_id": "LPS-017",
+  "title": "Update task graph status from proof",
+  "phase": "8-execution-pipeline",
+  "owner_agent": "Runtime Kernel",
+  "parent_ids": [
+    "LPS-016"
+  ],
+  "source_row_number": 7,
+  "paths": {
+    "allowed": [
+      "scripts/**",
+      "generated/**"
+    ],
+    "blocked": [
+      "source goals",
+      "allowed_paths",
+      "blocked_paths",
+      "secrets/**"
+    ],
+    "target_artifacts": [
+      "scripts/update-task-graph-status.py",
+      "generated/task_graph.status.json"
+    ]
+  },
+  "cell": "policy-cell",
+  "simulation_required": false,
+  "verification_gate": "Only status/proof_uri/next_action fields may be updated by this script.",
+  "rollback_plan": "Regenerate status view from ledger.",
+  "proof_uri": "proof_records/LPS-017.proof.json"
+}

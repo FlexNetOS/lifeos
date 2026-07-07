@@ -1,0 +1,53 @@
+{
+  "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
+  "generated_at": "2026-07-03T19:31:00Z",
+  "source": {
+    "format": "csv",
+    "path": "generated/fixtures/task_graph.missing-required.csv",
+    "header": [
+      "task_id",
+      "parent_id",
+      "phase",
+      "title",
+      "owner_agent",
+      "goal",
+      "inputs",
+      "target_artifacts",
+      "allowed_paths",
+      "blocked_paths",
+      "simulation_required",
+      "execution_cell",
+      "verification_gate",
+      "rollback_plan",
+      "status",
+      "proof_uri",
+      "next_action"
+    ],
+    "row_count": 1,
+    "empty_rows_skipped": []
+  },
+  "rows": [
+    {
+      "source_row_number": 2,
+      "columns": {
+        "task_id": "LPS-999",
+        "parent_id": "LPS-013",
+        "phase": "8-execution-pipeline",
+        "title": "Missing proof URI fixture",
+        "owner_agent": "Runtime Kernel",
+        "goal": "Demonstrate required field failure.",
+        "inputs": "generated/task_graph.raw.json",
+        "target_artifacts": "generated/task_graph.normalized.json",
+        "allowed_paths": "scripts/**; generated/**",
+        "blocked_paths": "secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "doc-cell",
+        "verification_gate": "Must fail when proof_uri is missing.",
+        "rollback_plan": "Delete generated fixture output.",
+        "status": "Ready",
+        "proof_uri": "",
+        "next_action": "Expected failure for LPS-013."
+      }
+    }
+  ]
+}

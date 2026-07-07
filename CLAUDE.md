@@ -36,7 +36,7 @@ Shell layout in `src/App.vue`: **Sidebar | Workspace | main | AIAvatar**, where 
 
 ## Common commands
 
-Use **`bun`**, not npm (matches the host's mise-managed toolchain — node 24.15.0, bun 1.3.13, rustc 1.95.0, tauri-cli 2.11.1). Tauri's `beforeDevCommand`/`beforeBuildCommand` already invoke `bun run dev`/`bun run build`.
+Use **`bun`**, not npm. (Corrected 2026-07-07: the previously documented mise-managed toolchain does not exist on this host; toolchain ownership is migrating to the Yazelix/Nix foundation — see the Toolchain section in `AGENTS.md`.) Tauri's `beforeDevCommand`/`beforeBuildCommand` already invoke `bun run dev`/`bun run build`.
 
 ```bash
 bun install                 # install JS deps

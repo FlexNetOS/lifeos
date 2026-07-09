@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flexnetos.dev/lifeos/teas/proof_record.schema.json",
+  "title": "TEAS ProofRecord",
+  "description": "Canonical evidence-with-checksum that a WorkOrder ran and passed. Reconciles handoff's witnessed LedgerEvent (redb, blake3 action_hash), the execution-framework *.proof.json (sha256 checksums), and planning-spine-v0 proof-record.schema.json (git heads). Heals DOMAIN_MODEL contradiction 9.2: one versioned ProofRecord; the handoff redb ledger is the authority, proof_ledger.jsonl is an export mirror. Proof status overrides any card/CSV claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proof_schema_version",
+    "task_id",
+    "status",
+    "actor",
+    "started_at",
+    "completed_at",
+    "commands_run",
+    "verification_output",
+    "checksums",
+    "action_hash",
+    "next_action"
+  ],
+  "properties": {
+    "proof_schema_version": {
+      "type": "string",
+      "const": "teas.proof_record.v1",
+      "description": "Versioned; supersedes lifeos-planning-spine.proof-record.v0 and the exec-framework proof_schema_version 1.0."
+    },
+    "task_id": { "type": "string", "pattern": "^[A-Z]*TASK-[A-Z0-9][A-Z0-9-]*$" },
+    "correlation_id": { "type": ["string", "null"] },
+    "cell_id": { "type": ["string", "null"] },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "passed", "failed", "error", "rolled_back"],
+      "description": "Terminal outcome. Source→canonical mapping: execution-framework {completed,complete,passed}→completed; handoff {Done/passed}→passed; both success values retained to preserve each context's vocabulary. failed/error = failure; rolled_back = reverted."
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "actor": { "type": "string", "description": "Who executed (agent id / runner)." },
+    "helper_id": { "type": ["string", "null"] },
+    "model_tag": { "type": ["string", "null"] },
+    "repo_path": { "type": ["string", "null"] },
+    "git_head_before": { "type": ["string", "null"], "pattern": "^[0-9a-f]{7,40}$" },
+    "git_head_after": { "type": ["string", "null"], "pattern": "^[0-9a-f]{7,40}$" },
+    "diff_summary": { "type": ["string", "null"] },
+    "files_changed": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "commands_run": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Actual commands executed (real execution only — Law 4)."
+    },
+    "verification_output": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" }
+      ],
+      "description": "Raw output of the verification_command / test_commands (string) or a structured result object."
+    },
+    "checksums": {
+      "type": "object",
+      "description": "path -> sha256 of every changed file.",
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "action_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "blake3 witness hash linking this record into the append-only ledger witness chain."
+    },
+    "prev_action_hash": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Previous witness hash; chains the ledger for tamper-evidence."
+    },
+    "ledger_seq": { "type": ["integer", "null"], "minimum": 0 },
+    "logs_uri": { "type": ["string", "null"] },
+    "rollback_point": { "type": ["string", "null"], "description": "Snapshot/commit to revert to." },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "URIs of supporting artifacts (evidence triple: task/pr/validation, etc.)."
+    },
+    "failed_checks": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "failure_reason": { "type": ["string", "null"] },
+    "next_action": {
+      "type": "string",
+      "description": "The next Decision/Action to emit (the machine-readable 'what to do now')."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "enum": ["failed", "error"] } } },
+      "then": { "required": ["failure_reason"] }
+    }
+  ]
+}

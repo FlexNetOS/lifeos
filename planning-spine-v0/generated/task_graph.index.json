@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.index.v0",
-  "generated_at": "2026-07-10T20:08:57Z",
-  "source_graph_uri": "generated/task_graph.raw.json",
-  "task_count": 112,
+  "generated_at": "2026-07-10T20:23:40Z",
+  "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
+  "task_count": 119,
   "task_ids": [
     "LIFEOS-000",
     "LIFEOS-001",
@@ -19,6 +19,10 @@
     "LIFEOS-012",
     "PRESERVE-001",
     "PRESERVE-002",
+    "RECOVERY-001",
+    "RECOVERY-002",
+    "RECOVERY-003",
+    "RECOVERY-004",
     "PRESERVE-003",
     "STRUCTURE-001",
     "STRUCTURE-002",
@@ -33,6 +37,9 @@
     "PGAUTH-004",
     "PGAUTH-005",
     "PGAUTH-006",
+    "ADOPT-001",
+    "ADOPT-002",
+    "STORE-001",
     "POSTGRES-002",
     "POSTGRES-003",
     "POSTGRES-004",
@@ -292,7 +299,7 @@
       "proof_uri": "proof_records/PRESERVE-002.proof.json",
       "execution_cell": "proof-cell"
     },
-    "PRESERVE-003": {
+    "RECOVERY-001": {
       "index": 15,
       "source_row_number": 17,
       "phase": "1-preservation",
@@ -300,12 +307,56 @@
       "parent_ids": [
         "PRESERVE-002"
       ],
+      "proof_uri": "proof_records/RECOVERY-001.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "RECOVERY-002": {
+      "index": 16,
+      "source_row_number": 18,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-001"
+      ],
+      "proof_uri": "proof_records/RECOVERY-002.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "RECOVERY-003": {
+      "index": 17,
+      "source_row_number": 19,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-002"
+      ],
+      "proof_uri": "proof_records/RECOVERY-003.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "RECOVERY-004": {
+      "index": 18,
+      "source_row_number": 20,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-003"
+      ],
+      "proof_uri": "proof_records/RECOVERY-004.proof.json",
+      "execution_cell": "policy-cell"
+    },
+    "PRESERVE-003": {
+      "index": 19,
+      "source_row_number": 21,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-004"
+      ],
       "proof_uri": "proof_records/PRESERVE-003.proof.json",
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-001": {
-      "index": 16,
-      "source_row_number": 18,
+      "index": 20,
+      "source_row_number": 22,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -315,8 +366,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-002": {
-      "index": 17,
-      "source_row_number": 19,
+      "index": 21,
+      "source_row_number": 23,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -326,8 +377,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-003": {
-      "index": 18,
-      "source_row_number": 20,
+      "index": 22,
+      "source_row_number": 24,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -337,8 +388,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-004": {
-      "index": 19,
-      "source_row_number": 21,
+      "index": 23,
+      "source_row_number": 25,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -349,8 +400,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-005": {
-      "index": 20,
-      "source_row_number": 22,
+      "index": 24,
+      "source_row_number": 26,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -360,8 +411,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-006": {
-      "index": 21,
-      "source_row_number": 23,
+      "index": 25,
+      "source_row_number": 27,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -371,8 +422,8 @@
       "execution_cell": "proof-cell"
     },
     "POSTGRES-001": {
-      "index": 22,
-      "source_row_number": 24,
+      "index": 26,
+      "source_row_number": 28,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -382,8 +433,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-001": {
-      "index": 23,
-      "source_row_number": 25,
+      "index": 27,
+      "source_row_number": 29,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -393,8 +444,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-002": {
-      "index": 24,
-      "source_row_number": 26,
+      "index": 28,
+      "source_row_number": 30,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -404,8 +455,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-003": {
-      "index": 25,
-      "source_row_number": 27,
+      "index": 29,
+      "source_row_number": 31,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -415,8 +466,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-004": {
-      "index": 26,
-      "source_row_number": 28,
+      "index": 30,
+      "source_row_number": 32,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -426,8 +477,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-005": {
-      "index": 27,
-      "source_row_number": 29,
+      "index": 31,
+      "source_row_number": 33,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -437,8 +488,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-006": {
-      "index": 28,
-      "source_row_number": 30,
+      "index": 32,
+      "source_row_number": 34,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -450,20 +501,53 @@
       "proof_uri": "proof_records/PGAUTH-006.proof.json",
       "execution_cell": "proof-cell"
     },
-    "POSTGRES-002": {
-      "index": 29,
-      "source_row_number": 31,
+    "ADOPT-001": {
+      "index": 33,
+      "source_row_number": 35,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
         "PGAUTH-006"
       ],
+      "proof_uri": "proof_records/ADOPT-001.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "ADOPT-002": {
+      "index": 34,
+      "source_row_number": 36,
+      "phase": "2-postgres-foundation",
+      "status": "draft",
+      "parent_ids": [
+        "ADOPT-001"
+      ],
+      "proof_uri": "proof_records/ADOPT-002.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "STORE-001": {
+      "index": 35,
+      "source_row_number": 37,
+      "phase": "2-postgres-foundation",
+      "status": "draft",
+      "parent_ids": [
+        "ADOPT-002"
+      ],
+      "proof_uri": "proof_records/STORE-001.proof.json",
+      "execution_cell": "policy-cell"
+    },
+    "POSTGRES-002": {
+      "index": 36,
+      "source_row_number": 38,
+      "phase": "2-postgres-foundation",
+      "status": "draft",
+      "parent_ids": [
+        "STORE-001"
+      ],
       "proof_uri": "proof_records/POSTGRES-002.proof.json",
       "execution_cell": "policy-cell"
     },
     "POSTGRES-003": {
-      "index": 30,
-      "source_row_number": 32,
+      "index": 37,
+      "source_row_number": 39,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -473,8 +557,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-004": {
-      "index": 31,
-      "source_row_number": 33,
+      "index": 38,
+      "source_row_number": 40,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -484,8 +568,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-005": {
-      "index": 32,
-      "source_row_number": 34,
+      "index": 39,
+      "source_row_number": 41,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -495,8 +579,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-006": {
-      "index": 33,
-      "source_row_number": 35,
+      "index": 40,
+      "source_row_number": 42,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -506,8 +590,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-007": {
-      "index": 34,
-      "source_row_number": 36,
+      "index": 41,
+      "source_row_number": 43,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -517,8 +601,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-008": {
-      "index": 35,
-      "source_row_number": 37,
+      "index": 42,
+      "source_row_number": 44,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -529,8 +613,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-009": {
-      "index": 36,
-      "source_row_number": 38,
+      "index": 43,
+      "source_row_number": 45,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -540,8 +624,8 @@
       "execution_cell": "proof-cell"
     },
     "POSTGRES-010": {
-      "index": 37,
-      "source_row_number": 39,
+      "index": 44,
+      "source_row_number": 46,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -551,8 +635,8 @@
       "execution_cell": "policy-cell"
     },
     "FOUNDATION-001": {
-      "index": 38,
-      "source_row_number": 40,
+      "index": 45,
+      "source_row_number": 47,
       "phase": "2-foundation",
       "status": "draft",
       "parent_ids": [
@@ -562,8 +646,8 @@
       "execution_cell": "policy-cell"
     },
     "FOUNDATION-002": {
-      "index": 39,
-      "source_row_number": 41,
+      "index": 46,
+      "source_row_number": 48,
       "phase": "2-foundation",
       "status": "draft",
       "parent_ids": [
@@ -573,8 +657,8 @@
       "execution_cell": "policy-cell"
     },
     "FOUNDATION-003": {
-      "index": 40,
-      "source_row_number": 42,
+      "index": 47,
+      "source_row_number": 49,
       "phase": "2-foundation",
       "status": "draft",
       "parent_ids": [
@@ -584,8 +668,8 @@
       "execution_cell": "proof-cell"
     },
     "CONSOLIDATE-001": {
-      "index": 41,
-      "source_row_number": 43,
+      "index": 48,
+      "source_row_number": 50,
       "phase": "4-physical-consolidation",
       "status": "draft",
       "parent_ids": [
@@ -595,8 +679,8 @@
       "execution_cell": "policy-cell"
     },
     "CONSOLIDATE-002": {
-      "index": 42,
-      "source_row_number": 44,
+      "index": 49,
+      "source_row_number": 51,
       "phase": "4-physical-consolidation",
       "status": "draft",
       "parent_ids": [
@@ -606,8 +690,8 @@
       "execution_cell": "policy-cell"
     },
     "CONSOLIDATE-003": {
-      "index": 43,
-      "source_row_number": 45,
+      "index": 50,
+      "source_row_number": 52,
       "phase": "4-physical-consolidation",
       "status": "draft",
       "parent_ids": [
@@ -617,8 +701,8 @@
       "execution_cell": "release-cell"
     },
     "INTEL-001": {
-      "index": 44,
-      "source_row_number": 46,
+      "index": 51,
+      "source_row_number": 53,
       "phase": "5-intelligence-substrate",
       "status": "draft",
       "parent_ids": [
@@ -628,8 +712,8 @@
       "execution_cell": "policy-cell"
     },
     "INTEL-002": {
-      "index": 45,
-      "source_row_number": 47,
+      "index": 52,
+      "source_row_number": 54,
       "phase": "5-intelligence-substrate",
       "status": "draft",
       "parent_ids": [
@@ -639,8 +723,8 @@
       "execution_cell": "policy-cell"
     },
     "INTEL-003": {
-      "index": 46,
-      "source_row_number": 48,
+      "index": 53,
+      "source_row_number": 55,
       "phase": "5-intelligence-substrate",
       "status": "draft",
       "parent_ids": [
@@ -650,8 +734,8 @@
       "execution_cell": "policy-cell"
     },
     "MVP1-001": {
-      "index": 47,
-      "source_row_number": 49,
+      "index": 54,
+      "source_row_number": 56,
       "phase": "6-mvp1-financial-legal",
       "status": "draft",
       "parent_ids": [
@@ -661,8 +745,8 @@
       "execution_cell": "policy-cell"
     },
     "MVP1-002": {
-      "index": 48,
-      "source_row_number": 50,
+      "index": 55,
+      "source_row_number": 57,
       "phase": "6-mvp1-financial-legal",
       "status": "draft",
       "parent_ids": [
@@ -672,8 +756,8 @@
       "execution_cell": "policy-cell"
     },
     "MVP1-003": {
-      "index": 49,
-      "source_row_number": 51,
+      "index": 56,
+      "source_row_number": 58,
       "phase": "6-mvp1-financial-legal",
       "status": "draft",
       "parent_ids": [
@@ -683,8 +767,8 @@
       "execution_cell": "proof-cell"
     },
     "COMPANY-001": {
-      "index": 50,
-      "source_row_number": 52,
+      "index": 57,
+      "source_row_number": 59,
       "phase": "7-company-development",
       "status": "draft",
       "parent_ids": [
@@ -694,8 +778,8 @@
       "execution_cell": "policy-cell"
     },
     "DEVELOP-001": {
-      "index": 51,
-      "source_row_number": 53,
+      "index": 58,
+      "source_row_number": 60,
       "phase": "7-company-development",
       "status": "draft",
       "parent_ids": [
@@ -705,8 +789,8 @@
       "execution_cell": "policy-cell"
     },
     "COMPANY-002": {
-      "index": 52,
-      "source_row_number": 54,
+      "index": 59,
+      "source_row_number": 61,
       "phase": "7-company-development",
       "status": "draft",
       "parent_ids": [
@@ -716,8 +800,8 @@
       "execution_cell": "proof-cell"
     },
     "PERSONAL-001": {
-      "index": 53,
-      "source_row_number": 55,
+      "index": 60,
+      "source_row_number": 62,
       "phase": "8-personal",
       "status": "draft",
       "parent_ids": [
@@ -727,8 +811,8 @@
       "execution_cell": "policy-cell"
     },
     "PERSONAL-002": {
-      "index": 54,
-      "source_row_number": 56,
+      "index": 61,
+      "source_row_number": 63,
       "phase": "8-personal",
       "status": "draft",
       "parent_ids": [
@@ -738,8 +822,8 @@
       "execution_cell": "policy-cell"
     },
     "PERSONAL-003": {
-      "index": 55,
-      "source_row_number": 57,
+      "index": 62,
+      "source_row_number": 64,
       "phase": "8-personal",
       "status": "draft",
       "parent_ids": [
@@ -749,8 +833,8 @@
       "execution_cell": "proof-cell"
     },
     "HOME-001": {
-      "index": 56,
-      "source_row_number": 58,
+      "index": 63,
+      "source_row_number": 65,
       "phase": "9-home",
       "status": "draft",
       "parent_ids": [
@@ -760,8 +844,8 @@
       "execution_cell": "policy-cell"
     },
     "HOME-002": {
-      "index": 57,
-      "source_row_number": 59,
+      "index": 64,
+      "source_row_number": 66,
       "phase": "9-home",
       "status": "draft",
       "parent_ids": [
@@ -771,8 +855,8 @@
       "execution_cell": "policy-cell"
     },
     "HOME-003": {
-      "index": 58,
-      "source_row_number": 60,
+      "index": 65,
+      "source_row_number": 67,
       "phase": "9-home",
       "status": "draft",
       "parent_ids": [
@@ -782,8 +866,8 @@
       "execution_cell": "proof-cell"
     },
     "EXPERIENCE-001": {
-      "index": 59,
-      "source_row_number": 61,
+      "index": 66,
+      "source_row_number": 68,
       "phase": "10-experience",
       "status": "draft",
       "parent_ids": [
@@ -793,8 +877,8 @@
       "execution_cell": "policy-cell"
     },
     "EXPERIENCE-002": {
-      "index": 60,
-      "source_row_number": 62,
+      "index": 67,
+      "source_row_number": 69,
       "phase": "10-experience",
       "status": "draft",
       "parent_ids": [
@@ -804,8 +888,8 @@
       "execution_cell": "policy-cell"
     },
     "EXPERIENCE-003": {
-      "index": 61,
-      "source_row_number": 63,
+      "index": 68,
+      "source_row_number": 70,
       "phase": "10-experience",
       "status": "draft",
       "parent_ids": [
@@ -815,8 +899,8 @@
       "execution_cell": "proof-cell"
     },
     "RELEASE-001": {
-      "index": 62,
-      "source_row_number": 64,
+      "index": 69,
+      "source_row_number": 71,
       "phase": "11-system-proof-release",
       "status": "draft",
       "parent_ids": [
@@ -826,8 +910,8 @@
       "execution_cell": "proof-cell"
     },
     "RELEASE-002": {
-      "index": 63,
-      "source_row_number": 65,
+      "index": 70,
+      "source_row_number": 72,
       "phase": "11-system-proof-release",
       "status": "draft",
       "parent_ids": [
@@ -837,8 +921,8 @@
       "execution_cell": "release-cell"
     },
     "RELEASE-003": {
-      "index": 64,
-      "source_row_number": 66,
+      "index": 71,
+      "source_row_number": 73,
       "phase": "11-system-proof-release",
       "status": "draft",
       "parent_ids": [
@@ -848,8 +932,8 @@
       "execution_cell": "release-cell"
     },
     "LIVING-001": {
-      "index": 65,
-      "source_row_number": 67,
+      "index": 72,
+      "source_row_number": 74,
       "phase": "12-living-system",
       "status": "draft",
       "parent_ids": [
@@ -859,8 +943,8 @@
       "execution_cell": "policy-cell"
     },
     "LIVING-002": {
-      "index": 66,
-      "source_row_number": 68,
+      "index": 73,
+      "source_row_number": 75,
       "phase": "12-living-system",
       "status": "draft",
       "parent_ids": [
@@ -870,8 +954,8 @@
       "execution_cell": "policy-cell"
     },
     "LIVING-003": {
-      "index": 67,
-      "source_row_number": 69,
+      "index": 74,
+      "source_row_number": 76,
       "phase": "12-living-system",
       "status": "draft",
       "parent_ids": [
@@ -881,8 +965,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-000": {
-      "index": 68,
-      "source_row_number": 70,
+      "index": 75,
+      "source_row_number": 77,
       "phase": "0-foundation",
       "status": "draft",
       "parent_ids": [
@@ -892,8 +976,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-001": {
-      "index": 69,
-      "source_row_number": 71,
+      "index": 76,
+      "source_row_number": 78,
       "phase": "1-schema",
       "status": "draft",
       "parent_ids": [
@@ -903,8 +987,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-002": {
-      "index": 70,
-      "source_row_number": 72,
+      "index": 77,
+      "source_row_number": 79,
       "phase": "1-schema",
       "status": "draft",
       "parent_ids": [
@@ -914,8 +998,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-003": {
-      "index": 71,
-      "source_row_number": 73,
+      "index": 78,
+      "source_row_number": 80,
       "phase": "1-schema",
       "status": "draft",
       "parent_ids": [
@@ -925,8 +1009,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-004": {
-      "index": 72,
-      "source_row_number": 74,
+      "index": 79,
+      "source_row_number": 81,
       "phase": "2-simulation",
       "status": "draft",
       "parent_ids": [
@@ -936,8 +1020,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-005": {
-      "index": 73,
-      "source_row_number": 75,
+      "index": 80,
+      "source_row_number": 82,
       "phase": "2-simulation",
       "status": "draft",
       "parent_ids": [
@@ -947,8 +1031,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-006": {
-      "index": 74,
-      "source_row_number": 76,
+      "index": 81,
+      "source_row_number": 83,
       "phase": "3-execution",
       "status": "draft",
       "parent_ids": [
@@ -958,8 +1042,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-007": {
-      "index": 75,
-      "source_row_number": 77,
+      "index": 82,
+      "source_row_number": 84,
       "phase": "3-execution",
       "status": "draft",
       "parent_ids": [
@@ -969,8 +1053,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-008": {
-      "index": 76,
-      "source_row_number": 78,
+      "index": 83,
+      "source_row_number": 85,
       "phase": "4-mvp",
       "status": "draft",
       "parent_ids": [
@@ -980,8 +1064,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-009": {
-      "index": 77,
-      "source_row_number": 79,
+      "index": 84,
+      "source_row_number": 86,
       "phase": "5-gates",
       "status": "draft",
       "parent_ids": [
@@ -991,8 +1075,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-010": {
-      "index": 78,
-      "source_row_number": 80,
+      "index": 85,
+      "source_row_number": 87,
       "phase": "6-rfc",
       "status": "draft",
       "parent_ids": [
@@ -1002,8 +1086,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-011": {
-      "index": 79,
-      "source_row_number": 81,
+      "index": 86,
+      "source_row_number": 88,
       "phase": "7-review",
       "status": "draft",
       "parent_ids": [
@@ -1013,8 +1097,8 @@
       "execution_cell": "policy-cell"
     },
     "GRAPH-001": {
-      "index": 80,
-      "source_row_number": 82,
+      "index": 87,
+      "source_row_number": 89,
       "phase": "0-north-star-graph",
       "status": "running",
       "parent_ids": [
@@ -1024,8 +1108,8 @@
       "execution_cell": "policy-cell"
     },
     "NORTHSTAR-001": {
-      "index": 81,
-      "source_row_number": 83,
+      "index": 88,
+      "source_row_number": 90,
       "phase": "0-north-star-graph",
       "status": "complete",
       "parent_ids": [
@@ -1035,8 +1119,8 @@
       "execution_cell": "policy-cell"
     },
     "NORTHSTAR-002": {
-      "index": 82,
-      "source_row_number": 84,
+      "index": 89,
+      "source_row_number": 91,
       "phase": "0-north-star-graph",
       "status": "complete",
       "parent_ids": [
@@ -1046,8 +1130,8 @@
       "execution_cell": "policy-cell"
     },
     "GRAPH-002": {
-      "index": 83,
-      "source_row_number": 85,
+      "index": 90,
+      "source_row_number": 92,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -1057,8 +1141,8 @@
       "execution_cell": "proof-cell"
     },
     "GRAPH-003": {
-      "index": 84,
-      "source_row_number": 86,
+      "index": 91,
+      "source_row_number": 93,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -1068,8 +1152,8 @@
       "execution_cell": "policy-cell"
     },
     "GRAPH-004": {
-      "index": 85,
-      "source_row_number": 87,
+      "index": 92,
+      "source_row_number": 94,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -1079,8 +1163,8 @@
       "execution_cell": "proof-cell"
     },
     "GRAPH-005": {
-      "index": 86,
-      "source_row_number": 88,
+      "index": 93,
+      "source_row_number": 95,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -1090,8 +1174,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-012": {
-      "index": 87,
-      "source_row_number": 89,
+      "index": 94,
+      "source_row_number": 96,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -1101,8 +1185,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-013": {
-      "index": 88,
-      "source_row_number": 90,
+      "index": 95,
+      "source_row_number": 97,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -1112,8 +1196,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-014": {
-      "index": 89,
-      "source_row_number": 91,
+      "index": 96,
+      "source_row_number": 98,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -1123,8 +1207,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-015": {
-      "index": 90,
-      "source_row_number": 92,
+      "index": 97,
+      "source_row_number": 99,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -1134,8 +1218,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-016": {
-      "index": 91,
-      "source_row_number": 93,
+      "index": 98,
+      "source_row_number": 100,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -1145,8 +1229,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-017": {
-      "index": 92,
-      "source_row_number": 94,
+      "index": 99,
+      "source_row_number": 101,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -1156,8 +1240,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-018": {
-      "index": 93,
-      "source_row_number": 95,
+      "index": 100,
+      "source_row_number": 102,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -1167,8 +1251,8 @@
       "execution_cell": "release-cell"
     },
     "LPS-019": {
-      "index": 94,
-      "source_row_number": 96,
+      "index": 101,
+      "source_row_number": 103,
       "phase": "9-state-map",
       "status": "complete",
       "parent_ids": [
@@ -1178,8 +1262,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-020": {
-      "index": 95,
-      "source_row_number": 97,
+      "index": 102,
+      "source_row_number": 104,
       "phase": "10-runtime-proof",
       "status": "complete",
       "parent_ids": [
@@ -1189,8 +1273,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-021": {
-      "index": 96,
-      "source_row_number": 98,
+      "index": 103,
+      "source_row_number": 105,
       "phase": "10-runtime-proof",
       "status": "complete",
       "parent_ids": [
@@ -1200,8 +1284,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-022": {
-      "index": 97,
-      "source_row_number": 99,
+      "index": 104,
+      "source_row_number": 106,
       "phase": "10-runtime-proof",
       "status": "complete",
       "parent_ids": [
@@ -1211,8 +1295,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-023": {
-      "index": 98,
-      "source_row_number": 100,
+      "index": 105,
+      "source_row_number": 107,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -1222,8 +1306,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-024": {
-      "index": 99,
-      "source_row_number": 101,
+      "index": 106,
+      "source_row_number": 108,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -1233,8 +1317,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-025": {
-      "index": 100,
-      "source_row_number": 102,
+      "index": 107,
+      "source_row_number": 109,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -1244,8 +1328,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-026": {
-      "index": 101,
-      "source_row_number": 103,
+      "index": 108,
+      "source_row_number": 110,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -1255,8 +1339,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-027": {
-      "index": 102,
-      "source_row_number": 104,
+      "index": 109,
+      "source_row_number": 111,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -1266,8 +1350,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-028": {
-      "index": 103,
-      "source_row_number": 105,
+      "index": 110,
+      "source_row_number": 112,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -1277,8 +1361,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-029": {
-      "index": 104,
-      "source_row_number": 106,
+      "index": 111,
+      "source_row_number": 113,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1288,8 +1372,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-030": {
-      "index": 105,
-      "source_row_number": 107,
+      "index": 112,
+      "source_row_number": 114,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1299,8 +1383,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-031": {
-      "index": 106,
-      "source_row_number": 108,
+      "index": 113,
+      "source_row_number": 115,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1310,8 +1394,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-032": {
-      "index": 107,
-      "source_row_number": 109,
+      "index": 114,
+      "source_row_number": 116,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1321,8 +1405,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-033": {
-      "index": 108,
-      "source_row_number": 110,
+      "index": 115,
+      "source_row_number": 117,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1332,8 +1416,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-034": {
-      "index": 109,
-      "source_row_number": 111,
+      "index": 116,
+      "source_row_number": 118,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1343,8 +1427,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-035": {
-      "index": 110,
-      "source_row_number": 112,
+      "index": 117,
+      "source_row_number": 119,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1354,8 +1438,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-036": {
-      "index": 111,
-      "source_row_number": 113,
+      "index": 118,
+      "source_row_number": 120,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -1531,7 +1615,7 @@
       "proof_uri": "proof_records/PRESERVE-002.proof.json",
       "execution_cell": "proof-cell"
     },
-    "PRESERVE-003": {
+    "RECOVERY-001": {
       "index": 15,
       "source_row_number": 17,
       "phase": "1-preservation",
@@ -1539,12 +1623,56 @@
       "parent_ids": [
         "PRESERVE-002"
       ],
+      "proof_uri": "proof_records/RECOVERY-001.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "RECOVERY-002": {
+      "index": 16,
+      "source_row_number": 18,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-001"
+      ],
+      "proof_uri": "proof_records/RECOVERY-002.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "RECOVERY-003": {
+      "index": 17,
+      "source_row_number": 19,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-002"
+      ],
+      "proof_uri": "proof_records/RECOVERY-003.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "RECOVERY-004": {
+      "index": 18,
+      "source_row_number": 20,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-003"
+      ],
+      "proof_uri": "proof_records/RECOVERY-004.proof.json",
+      "execution_cell": "policy-cell"
+    },
+    "PRESERVE-003": {
+      "index": 19,
+      "source_row_number": 21,
+      "phase": "1-preservation",
+      "status": "draft",
+      "parent_ids": [
+        "RECOVERY-004"
+      ],
       "proof_uri": "proof_records/PRESERVE-003.proof.json",
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-001": {
-      "index": 16,
-      "source_row_number": 18,
+      "index": 20,
+      "source_row_number": 22,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -1554,8 +1682,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-002": {
-      "index": 17,
-      "source_row_number": 19,
+      "index": 21,
+      "source_row_number": 23,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -1565,8 +1693,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-003": {
-      "index": 18,
-      "source_row_number": 20,
+      "index": 22,
+      "source_row_number": 24,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -1576,8 +1704,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-004": {
-      "index": 19,
-      "source_row_number": 21,
+      "index": 23,
+      "source_row_number": 25,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -1588,8 +1716,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-005": {
-      "index": 20,
-      "source_row_number": 22,
+      "index": 24,
+      "source_row_number": 26,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -1599,8 +1727,8 @@
       "execution_cell": "policy-cell"
     },
     "STRUCTURE-006": {
-      "index": 21,
-      "source_row_number": 23,
+      "index": 25,
+      "source_row_number": 27,
       "phase": "1-preservation",
       "status": "draft",
       "parent_ids": [
@@ -1610,8 +1738,8 @@
       "execution_cell": "proof-cell"
     },
     "POSTGRES-001": {
-      "index": 22,
-      "source_row_number": 24,
+      "index": 26,
+      "source_row_number": 28,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1621,8 +1749,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-001": {
-      "index": 23,
-      "source_row_number": 25,
+      "index": 27,
+      "source_row_number": 29,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1632,8 +1760,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-002": {
-      "index": 24,
-      "source_row_number": 26,
+      "index": 28,
+      "source_row_number": 30,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1643,8 +1771,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-003": {
-      "index": 25,
-      "source_row_number": 27,
+      "index": 29,
+      "source_row_number": 31,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1654,8 +1782,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-004": {
-      "index": 26,
-      "source_row_number": 28,
+      "index": 30,
+      "source_row_number": 32,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1665,8 +1793,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-005": {
-      "index": 27,
-      "source_row_number": 29,
+      "index": 31,
+      "source_row_number": 33,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1676,8 +1804,8 @@
       "execution_cell": "policy-cell"
     },
     "PGAUTH-006": {
-      "index": 28,
-      "source_row_number": 30,
+      "index": 32,
+      "source_row_number": 34,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1689,20 +1817,53 @@
       "proof_uri": "proof_records/PGAUTH-006.proof.json",
       "execution_cell": "proof-cell"
     },
-    "POSTGRES-002": {
-      "index": 29,
-      "source_row_number": 31,
+    "ADOPT-001": {
+      "index": 33,
+      "source_row_number": 35,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
         "PGAUTH-006"
       ],
+      "proof_uri": "proof_records/ADOPT-001.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "ADOPT-002": {
+      "index": 34,
+      "source_row_number": 36,
+      "phase": "2-postgres-foundation",
+      "status": "draft",
+      "parent_ids": [
+        "ADOPT-001"
+      ],
+      "proof_uri": "proof_records/ADOPT-002.proof.json",
+      "execution_cell": "proof-cell"
+    },
+    "STORE-001": {
+      "index": 35,
+      "source_row_number": 37,
+      "phase": "2-postgres-foundation",
+      "status": "draft",
+      "parent_ids": [
+        "ADOPT-002"
+      ],
+      "proof_uri": "proof_records/STORE-001.proof.json",
+      "execution_cell": "policy-cell"
+    },
+    "POSTGRES-002": {
+      "index": 36,
+      "source_row_number": 38,
+      "phase": "2-postgres-foundation",
+      "status": "draft",
+      "parent_ids": [
+        "STORE-001"
+      ],
       "proof_uri": "proof_records/POSTGRES-002.proof.json",
       "execution_cell": "policy-cell"
     },
     "POSTGRES-003": {
-      "index": 30,
-      "source_row_number": 32,
+      "index": 37,
+      "source_row_number": 39,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1712,8 +1873,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-004": {
-      "index": 31,
-      "source_row_number": 33,
+      "index": 38,
+      "source_row_number": 40,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1723,8 +1884,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-005": {
-      "index": 32,
-      "source_row_number": 34,
+      "index": 39,
+      "source_row_number": 41,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1734,8 +1895,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-006": {
-      "index": 33,
-      "source_row_number": 35,
+      "index": 40,
+      "source_row_number": 42,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1745,8 +1906,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-007": {
-      "index": 34,
-      "source_row_number": 36,
+      "index": 41,
+      "source_row_number": 43,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1756,8 +1917,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-008": {
-      "index": 35,
-      "source_row_number": 37,
+      "index": 42,
+      "source_row_number": 44,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1768,8 +1929,8 @@
       "execution_cell": "policy-cell"
     },
     "POSTGRES-009": {
-      "index": 36,
-      "source_row_number": 38,
+      "index": 43,
+      "source_row_number": 45,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1779,8 +1940,8 @@
       "execution_cell": "proof-cell"
     },
     "POSTGRES-010": {
-      "index": 37,
-      "source_row_number": 39,
+      "index": 44,
+      "source_row_number": 46,
       "phase": "2-postgres-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1790,8 +1951,8 @@
       "execution_cell": "policy-cell"
     },
     "FOUNDATION-001": {
-      "index": 38,
-      "source_row_number": 40,
+      "index": 45,
+      "source_row_number": 47,
       "phase": "2-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1801,8 +1962,8 @@
       "execution_cell": "policy-cell"
     },
     "FOUNDATION-002": {
-      "index": 39,
-      "source_row_number": 41,
+      "index": 46,
+      "source_row_number": 48,
       "phase": "2-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1812,8 +1973,8 @@
       "execution_cell": "policy-cell"
     },
     "FOUNDATION-003": {
-      "index": 40,
-      "source_row_number": 42,
+      "index": 47,
+      "source_row_number": 49,
       "phase": "2-foundation",
       "status": "draft",
       "parent_ids": [
@@ -1823,8 +1984,8 @@
       "execution_cell": "proof-cell"
     },
     "CONSOLIDATE-001": {
-      "index": 41,
-      "source_row_number": 43,
+      "index": 48,
+      "source_row_number": 50,
       "phase": "4-physical-consolidation",
       "status": "draft",
       "parent_ids": [
@@ -1834,8 +1995,8 @@
       "execution_cell": "policy-cell"
     },
     "CONSOLIDATE-002": {
-      "index": 42,
-      "source_row_number": 44,
+      "index": 49,
+      "source_row_number": 51,
       "phase": "4-physical-consolidation",
       "status": "draft",
       "parent_ids": [
@@ -1845,8 +2006,8 @@
       "execution_cell": "policy-cell"
     },
     "CONSOLIDATE-003": {
-      "index": 43,
-      "source_row_number": 45,
+      "index": 50,
+      "source_row_number": 52,
       "phase": "4-physical-consolidation",
       "status": "draft",
       "parent_ids": [
@@ -1856,8 +2017,8 @@
       "execution_cell": "release-cell"
     },
     "INTEL-001": {
-      "index": 44,
-      "source_row_number": 46,
+      "index": 51,
+      "source_row_number": 53,
       "phase": "5-intelligence-substrate",
       "status": "draft",
       "parent_ids": [
@@ -1867,8 +2028,8 @@
       "execution_cell": "policy-cell"
     },
     "INTEL-002": {
-      "index": 45,
-      "source_row_number": 47,
+      "index": 52,
+      "source_row_number": 54,
       "phase": "5-intelligence-substrate",
       "status": "draft",
       "parent_ids": [
@@ -1878,8 +2039,8 @@
       "execution_cell": "policy-cell"
     },
     "INTEL-003": {
-      "index": 46,
-      "source_row_number": 48,
+      "index": 53,
+      "source_row_number": 55,
       "phase": "5-intelligence-substrate",
       "status": "draft",
       "parent_ids": [
@@ -1889,8 +2050,8 @@
       "execution_cell": "policy-cell"
     },
     "MVP1-001": {
-      "index": 47,
-      "source_row_number": 49,
+      "index": 54,
+      "source_row_number": 56,
       "phase": "6-mvp1-financial-legal",
       "status": "draft",
       "parent_ids": [
@@ -1900,8 +2061,8 @@
       "execution_cell": "policy-cell"
     },
     "MVP1-002": {
-      "index": 48,
-      "source_row_number": 50,
+      "index": 55,
+      "source_row_number": 57,
       "phase": "6-mvp1-financial-legal",
       "status": "draft",
       "parent_ids": [
@@ -1911,8 +2072,8 @@
       "execution_cell": "policy-cell"
     },
     "MVP1-003": {
-      "index": 49,
-      "source_row_number": 51,
+      "index": 56,
+      "source_row_number": 58,
       "phase": "6-mvp1-financial-legal",
       "status": "draft",
       "parent_ids": [
@@ -1922,8 +2083,8 @@
       "execution_cell": "proof-cell"
     },
     "COMPANY-001": {
-      "index": 50,
-      "source_row_number": 52,
+      "index": 57,
+      "source_row_number": 59,
       "phase": "7-company-development",
       "status": "draft",
       "parent_ids": [
@@ -1933,8 +2094,8 @@
       "execution_cell": "policy-cell"
     },
     "DEVELOP-001": {
-      "index": 51,
-      "source_row_number": 53,
+      "index": 58,
+      "source_row_number": 60,
       "phase": "7-company-development",
       "status": "draft",
       "parent_ids": [
@@ -1944,8 +2105,8 @@
       "execution_cell": "policy-cell"
     },
     "COMPANY-002": {
-      "index": 52,
-      "source_row_number": 54,
+      "index": 59,
+      "source_row_number": 61,
       "phase": "7-company-development",
       "status": "draft",
       "parent_ids": [
@@ -1955,8 +2116,8 @@
       "execution_cell": "proof-cell"
     },
     "PERSONAL-001": {
-      "index": 53,
-      "source_row_number": 55,
+      "index": 60,
+      "source_row_number": 62,
       "phase": "8-personal",
       "status": "draft",
       "parent_ids": [
@@ -1966,8 +2127,8 @@
       "execution_cell": "policy-cell"
     },
     "PERSONAL-002": {
-      "index": 54,
-      "source_row_number": 56,
+      "index": 61,
+      "source_row_number": 63,
       "phase": "8-personal",
       "status": "draft",
       "parent_ids": [
@@ -1977,8 +2138,8 @@
       "execution_cell": "policy-cell"
     },
     "PERSONAL-003": {
-      "index": 55,
-      "source_row_number": 57,
+      "index": 62,
+      "source_row_number": 64,
       "phase": "8-personal",
       "status": "draft",
       "parent_ids": [
@@ -1988,8 +2149,8 @@
       "execution_cell": "proof-cell"
     },
     "HOME-001": {
-      "index": 56,
-      "source_row_number": 58,
+      "index": 63,
+      "source_row_number": 65,
       "phase": "9-home",
       "status": "draft",
       "parent_ids": [
@@ -1999,8 +2160,8 @@
       "execution_cell": "policy-cell"
     },
     "HOME-002": {
-      "index": 57,
-      "source_row_number": 59,
+      "index": 64,
+      "source_row_number": 66,
       "phase": "9-home",
       "status": "draft",
       "parent_ids": [
@@ -2010,8 +2171,8 @@
       "execution_cell": "policy-cell"
     },
     "HOME-003": {
-      "index": 58,
-      "source_row_number": 60,
+      "index": 65,
+      "source_row_number": 67,
       "phase": "9-home",
       "status": "draft",
       "parent_ids": [
@@ -2021,8 +2182,8 @@
       "execution_cell": "proof-cell"
     },
     "EXPERIENCE-001": {
-      "index": 59,
-      "source_row_number": 61,
+      "index": 66,
+      "source_row_number": 68,
       "phase": "10-experience",
       "status": "draft",
       "parent_ids": [
@@ -2032,8 +2193,8 @@
       "execution_cell": "policy-cell"
     },
     "EXPERIENCE-002": {
-      "index": 60,
-      "source_row_number": 62,
+      "index": 67,
+      "source_row_number": 69,
       "phase": "10-experience",
       "status": "draft",
       "parent_ids": [
@@ -2043,8 +2204,8 @@
       "execution_cell": "policy-cell"
     },
     "EXPERIENCE-003": {
-      "index": 61,
-      "source_row_number": 63,
+      "index": 68,
+      "source_row_number": 70,
       "phase": "10-experience",
       "status": "draft",
       "parent_ids": [
@@ -2054,8 +2215,8 @@
       "execution_cell": "proof-cell"
     },
     "RELEASE-001": {
-      "index": 62,
-      "source_row_number": 64,
+      "index": 69,
+      "source_row_number": 71,
       "phase": "11-system-proof-release",
       "status": "draft",
       "parent_ids": [
@@ -2065,8 +2226,8 @@
       "execution_cell": "proof-cell"
     },
     "RELEASE-002": {
-      "index": 63,
-      "source_row_number": 65,
+      "index": 70,
+      "source_row_number": 72,
       "phase": "11-system-proof-release",
       "status": "draft",
       "parent_ids": [
@@ -2076,8 +2237,8 @@
       "execution_cell": "release-cell"
     },
     "RELEASE-003": {
-      "index": 64,
-      "source_row_number": 66,
+      "index": 71,
+      "source_row_number": 73,
       "phase": "11-system-proof-release",
       "status": "draft",
       "parent_ids": [
@@ -2087,8 +2248,8 @@
       "execution_cell": "release-cell"
     },
     "LIVING-001": {
-      "index": 65,
-      "source_row_number": 67,
+      "index": 72,
+      "source_row_number": 74,
       "phase": "12-living-system",
       "status": "draft",
       "parent_ids": [
@@ -2098,8 +2259,8 @@
       "execution_cell": "policy-cell"
     },
     "LIVING-002": {
-      "index": 66,
-      "source_row_number": 68,
+      "index": 73,
+      "source_row_number": 75,
       "phase": "12-living-system",
       "status": "draft",
       "parent_ids": [
@@ -2109,8 +2270,8 @@
       "execution_cell": "policy-cell"
     },
     "LIVING-003": {
-      "index": 67,
-      "source_row_number": 69,
+      "index": 74,
+      "source_row_number": 76,
       "phase": "12-living-system",
       "status": "draft",
       "parent_ids": [
@@ -2120,8 +2281,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-000": {
-      "index": 68,
-      "source_row_number": 70,
+      "index": 75,
+      "source_row_number": 77,
       "phase": "0-foundation",
       "status": "draft",
       "parent_ids": [
@@ -2131,8 +2292,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-001": {
-      "index": 69,
-      "source_row_number": 71,
+      "index": 76,
+      "source_row_number": 78,
       "phase": "1-schema",
       "status": "draft",
       "parent_ids": [
@@ -2142,8 +2303,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-002": {
-      "index": 70,
-      "source_row_number": 72,
+      "index": 77,
+      "source_row_number": 79,
       "phase": "1-schema",
       "status": "draft",
       "parent_ids": [
@@ -2153,8 +2314,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-003": {
-      "index": 71,
-      "source_row_number": 73,
+      "index": 78,
+      "source_row_number": 80,
       "phase": "1-schema",
       "status": "draft",
       "parent_ids": [
@@ -2164,8 +2325,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-004": {
-      "index": 72,
-      "source_row_number": 74,
+      "index": 79,
+      "source_row_number": 81,
       "phase": "2-simulation",
       "status": "draft",
       "parent_ids": [
@@ -2175,8 +2336,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-005": {
-      "index": 73,
-      "source_row_number": 75,
+      "index": 80,
+      "source_row_number": 82,
       "phase": "2-simulation",
       "status": "draft",
       "parent_ids": [
@@ -2186,8 +2347,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-006": {
-      "index": 74,
-      "source_row_number": 76,
+      "index": 81,
+      "source_row_number": 83,
       "phase": "3-execution",
       "status": "draft",
       "parent_ids": [
@@ -2197,8 +2358,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-007": {
-      "index": 75,
-      "source_row_number": 77,
+      "index": 82,
+      "source_row_number": 84,
       "phase": "3-execution",
       "status": "draft",
       "parent_ids": [
@@ -2208,8 +2369,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-008": {
-      "index": 76,
-      "source_row_number": 78,
+      "index": 83,
+      "source_row_number": 85,
       "phase": "4-mvp",
       "status": "draft",
       "parent_ids": [
@@ -2219,8 +2380,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-009": {
-      "index": 77,
-      "source_row_number": 79,
+      "index": 84,
+      "source_row_number": 86,
       "phase": "5-gates",
       "status": "draft",
       "parent_ids": [
@@ -2230,8 +2391,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-010": {
-      "index": 78,
-      "source_row_number": 80,
+      "index": 85,
+      "source_row_number": 87,
       "phase": "6-rfc",
       "status": "draft",
       "parent_ids": [
@@ -2241,8 +2402,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-011": {
-      "index": 79,
-      "source_row_number": 81,
+      "index": 86,
+      "source_row_number": 88,
       "phase": "7-review",
       "status": "draft",
       "parent_ids": [
@@ -2252,8 +2413,8 @@
       "execution_cell": "policy-cell"
     },
     "GRAPH-001": {
-      "index": 80,
-      "source_row_number": 82,
+      "index": 87,
+      "source_row_number": 89,
       "phase": "0-north-star-graph",
       "status": "running",
       "parent_ids": [
@@ -2263,8 +2424,8 @@
       "execution_cell": "policy-cell"
     },
     "NORTHSTAR-001": {
-      "index": 81,
-      "source_row_number": 83,
+      "index": 88,
+      "source_row_number": 90,
       "phase": "0-north-star-graph",
       "status": "complete",
       "parent_ids": [
@@ -2274,8 +2435,8 @@
       "execution_cell": "policy-cell"
     },
     "NORTHSTAR-002": {
-      "index": 82,
-      "source_row_number": 84,
+      "index": 89,
+      "source_row_number": 91,
       "phase": "0-north-star-graph",
       "status": "complete",
       "parent_ids": [
@@ -2285,8 +2446,8 @@
       "execution_cell": "policy-cell"
     },
     "GRAPH-002": {
-      "index": 83,
-      "source_row_number": 85,
+      "index": 90,
+      "source_row_number": 92,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -2296,8 +2457,8 @@
       "execution_cell": "proof-cell"
     },
     "GRAPH-003": {
-      "index": 84,
-      "source_row_number": 86,
+      "index": 91,
+      "source_row_number": 93,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -2307,8 +2468,8 @@
       "execution_cell": "policy-cell"
     },
     "GRAPH-004": {
-      "index": 85,
-      "source_row_number": 87,
+      "index": 92,
+      "source_row_number": 94,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -2318,8 +2479,8 @@
       "execution_cell": "proof-cell"
     },
     "GRAPH-005": {
-      "index": 86,
-      "source_row_number": 88,
+      "index": 93,
+      "source_row_number": 95,
       "phase": "0-north-star-graph",
       "status": "draft",
       "parent_ids": [
@@ -2329,8 +2490,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-012": {
-      "index": 87,
-      "source_row_number": 89,
+      "index": 94,
+      "source_row_number": 96,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -2340,8 +2501,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-013": {
-      "index": 88,
-      "source_row_number": 90,
+      "index": 95,
+      "source_row_number": 97,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -2351,8 +2512,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-014": {
-      "index": 89,
-      "source_row_number": 91,
+      "index": 96,
+      "source_row_number": 98,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -2362,8 +2523,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-015": {
-      "index": 90,
-      "source_row_number": 92,
+      "index": 97,
+      "source_row_number": 99,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -2373,8 +2534,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-016": {
-      "index": 91,
-      "source_row_number": 93,
+      "index": 98,
+      "source_row_number": 100,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -2384,8 +2545,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-017": {
-      "index": 92,
-      "source_row_number": 94,
+      "index": 99,
+      "source_row_number": 101,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -2395,8 +2556,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-018": {
-      "index": 93,
-      "source_row_number": 95,
+      "index": 100,
+      "source_row_number": 102,
       "phase": "8-execution-pipeline",
       "status": "draft",
       "parent_ids": [
@@ -2406,8 +2567,8 @@
       "execution_cell": "release-cell"
     },
     "LPS-019": {
-      "index": 94,
-      "source_row_number": 96,
+      "index": 101,
+      "source_row_number": 103,
       "phase": "9-state-map",
       "status": "complete",
       "parent_ids": [
@@ -2417,8 +2578,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-020": {
-      "index": 95,
-      "source_row_number": 97,
+      "index": 102,
+      "source_row_number": 104,
       "phase": "10-runtime-proof",
       "status": "complete",
       "parent_ids": [
@@ -2428,8 +2589,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-021": {
-      "index": 96,
-      "source_row_number": 98,
+      "index": 103,
+      "source_row_number": 105,
       "phase": "10-runtime-proof",
       "status": "complete",
       "parent_ids": [
@@ -2439,8 +2600,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-022": {
-      "index": 97,
-      "source_row_number": 99,
+      "index": 104,
+      "source_row_number": 106,
       "phase": "10-runtime-proof",
       "status": "complete",
       "parent_ids": [
@@ -2450,8 +2611,8 @@
       "execution_cell": "policy-cell"
     },
     "LPS-023": {
-      "index": 98,
-      "source_row_number": 100,
+      "index": 105,
+      "source_row_number": 107,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -2461,8 +2622,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-024": {
-      "index": 99,
-      "source_row_number": 101,
+      "index": 106,
+      "source_row_number": 108,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -2472,8 +2633,8 @@
       "execution_cell": "doc-cell"
     },
     "LPS-025": {
-      "index": 100,
-      "source_row_number": 102,
+      "index": 107,
+      "source_row_number": 109,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -2483,8 +2644,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-026": {
-      "index": 101,
-      "source_row_number": 103,
+      "index": 108,
+      "source_row_number": 110,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -2494,8 +2655,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-027": {
-      "index": 102,
-      "source_row_number": 104,
+      "index": 109,
+      "source_row_number": 111,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -2505,8 +2666,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-028": {
-      "index": 103,
-      "source_row_number": 105,
+      "index": 110,
+      "source_row_number": 112,
       "phase": "11-fleet-integration",
       "status": "draft",
       "parent_ids": [
@@ -2516,8 +2677,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-029": {
-      "index": 104,
-      "source_row_number": 106,
+      "index": 111,
+      "source_row_number": 113,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2527,8 +2688,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-030": {
-      "index": 105,
-      "source_row_number": 107,
+      "index": 112,
+      "source_row_number": 114,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2538,8 +2699,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-031": {
-      "index": 106,
-      "source_row_number": 108,
+      "index": 113,
+      "source_row_number": 115,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2549,8 +2710,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-032": {
-      "index": 107,
-      "source_row_number": 109,
+      "index": 114,
+      "source_row_number": 116,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2560,8 +2721,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-033": {
-      "index": 108,
-      "source_row_number": 110,
+      "index": 115,
+      "source_row_number": 117,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2571,8 +2732,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-034": {
-      "index": 109,
-      "source_row_number": 111,
+      "index": 116,
+      "source_row_number": 118,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2582,8 +2743,8 @@
       "execution_cell": "dev-cell"
     },
     "LPS-035": {
-      "index": 110,
-      "source_row_number": 112,
+      "index": 117,
+      "source_row_number": 119,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2593,8 +2754,8 @@
       "execution_cell": "proof-cell"
     },
     "LPS-036": {
-      "index": 111,
-      "source_row_number": 113,
+      "index": 118,
+      "source_row_number": 120,
       "phase": "12-worldsim-ingestion",
       "status": "draft",
       "parent_ids": [
@@ -2621,6 +2782,10 @@
       "LIFEOS-012",
       "PRESERVE-001",
       "PRESERVE-002",
+      "RECOVERY-001",
+      "RECOVERY-002",
+      "RECOVERY-003",
+      "RECOVERY-004",
       "PRESERVE-003",
       "STRUCTURE-001",
       "STRUCTURE-002",
@@ -2635,6 +2800,9 @@
       "PGAUTH-004",
       "PGAUTH-005",
       "PGAUTH-006",
+      "ADOPT-001",
+      "ADOPT-002",
+      "STORE-001",
       "POSTGRES-002",
       "POSTGRES-003",
       "POSTGRES-004",
@@ -2739,6 +2907,10 @@
       "LIFEOS-001",
       "PRESERVE-001",
       "PRESERVE-002",
+      "RECOVERY-001",
+      "RECOVERY-002",
+      "RECOVERY-003",
+      "RECOVERY-004",
       "PRESERVE-003",
       "STRUCTURE-001",
       "STRUCTURE-002",
@@ -2756,6 +2928,9 @@
       "PGAUTH-004",
       "PGAUTH-005",
       "PGAUTH-006",
+      "ADOPT-001",
+      "ADOPT-002",
+      "STORE-001",
       "POSTGRES-002",
       "POSTGRES-003",
       "POSTGRES-004",
@@ -2948,6 +3123,18 @@
       "PRESERVE-002"
     ],
     "PRESERVE-002": [
+      "RECOVERY-001"
+    ],
+    "RECOVERY-001": [
+      "RECOVERY-002"
+    ],
+    "RECOVERY-002": [
+      "RECOVERY-003"
+    ],
+    "RECOVERY-003": [
+      "RECOVERY-004"
+    ],
+    "RECOVERY-004": [
       "PRESERVE-003"
     ],
     "PRESERVE-003": [
@@ -2995,6 +3182,15 @@
       "PGAUTH-006"
     ],
     "PGAUTH-006": [
+      "ADOPT-001"
+    ],
+    "ADOPT-001": [
+      "ADOPT-002"
+    ],
+    "ADOPT-002": [
+      "STORE-001"
+    ],
+    "STORE-001": [
       "POSTGRES-002"
     ],
     "POSTGRES-002": [
@@ -3224,6 +3420,10 @@
     "LIFEOS-012": "proof_records/LIFEOS-012.proof.json",
     "PRESERVE-001": "proof_records/PRESERVE-001.proof.json",
     "PRESERVE-002": "proof_records/PRESERVE-002.proof.json",
+    "RECOVERY-001": "proof_records/RECOVERY-001.proof.json",
+    "RECOVERY-002": "proof_records/RECOVERY-002.proof.json",
+    "RECOVERY-003": "proof_records/RECOVERY-003.proof.json",
+    "RECOVERY-004": "proof_records/RECOVERY-004.proof.json",
     "PRESERVE-003": "proof_records/PRESERVE-003.proof.json",
     "STRUCTURE-001": "proof_records/STRUCTURE-001.proof.json",
     "STRUCTURE-002": "proof_records/STRUCTURE-002.proof.json",
@@ -3238,6 +3438,9 @@
     "PGAUTH-004": "proof_records/PGAUTH-004.proof.json",
     "PGAUTH-005": "proof_records/PGAUTH-005.proof.json",
     "PGAUTH-006": "proof_records/PGAUTH-006.proof.json",
+    "ADOPT-001": "proof_records/ADOPT-001.proof.json",
+    "ADOPT-002": "proof_records/ADOPT-002.proof.json",
+    "STORE-001": "proof_records/STORE-001.proof.json",
     "POSTGRES-002": "proof_records/POSTGRES-002.proof.json",
     "POSTGRES-003": "proof_records/POSTGRES-003.proof.json",
     "POSTGRES-004": "proof_records/POSTGRES-004.proof.json",

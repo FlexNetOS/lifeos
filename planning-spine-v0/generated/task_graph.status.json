@@ -6,6 +6,7 @@
     "STRUCTURE-003",
     "STRUCTURE-004",
     "STRUCTURE-005",
+    "STRUCTURE-006",
     "NBSOURCE-000",
     "NBSOURCE-001",
     "NBSOURCE-002",
@@ -53,10 +54,10 @@
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-10T23:45:44Z",
-  "ledger_entry_count": 63,
+  "generated_at": "2026-07-10T23:48:58Z",
+  "ledger_entry_count": 64,
   "next_ready_task_id": "LIFEOS-000",
-  "proof_ledger_sha256": "010cce3f9447a16cf166cc62ce8e2e19e3533e2a7bf0d305d2e770020c151169",
+  "proof_ledger_sha256": "6e5f256590be5e7a966abbaabdc4c24c2083c8eccc73825a4785834b50234103",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "LIFEOS-000",
@@ -78,7 +79,6 @@
     "RECOVERY-003",
     "RECOVERY-004",
     "PRESERVE-003",
-    "STRUCTURE-006",
     "POSTGRES-001",
     "PGAUTH-001",
     "PGAUTH-002",
@@ -916,19 +916,19 @@
     },
     {
       "effective": {
-        "next_action": "After Meta manifest proof, run bounded query/diff replacements by owning source, then close with runtime and GitHub verification.",
+        "next_action": "Proof accepted from proof_records/STRUCTURE-006.proof.json; next child task: LIFEOS-002.",
         "proof_uri": "proof_records/STRUCTURE-006.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "parent_ids": [
         "STRUCTURE-005"
       ],
       "phase": "1-preservation",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 64,
+        "observed_at": "2026-07-10T23:48:30Z",
+        "revision": "1",
+        "sha256": "def264e68641a8afec6680a42616eb8d1b8858451926522e4d244c06397f98d9"
       },
       "source": {
         "next_action": "After Meta manifest proof, run bounded query/diff replacements by owning source, then close with runtime and GitHub verification.",
@@ -938,8 +938,20 @@
       "source_row_number": 27,
       "task_id": "STRUCTURE-006",
       "title": "Canonical Meta root and consumer names proven",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After Meta manifest proof, run bounded query/diff replacements by owning source, then close with runtime and GitHub verification.",
+          "to": "Proof accepted from proof_records/STRUCTURE-006.proof.json; next child task: LIFEOS-002."
+        },
+        "status": {
+          "from": "draft",
+          "to": "complete"
+        }
+      }
     },
     {
       "effective": {
@@ -4794,6 +4806,7 @@
     "STRUCTURE-003",
     "STRUCTURE-004",
     "STRUCTURE-005",
+    "STRUCTURE-006",
     "NBSOURCE-000",
     "NBSOURCE-001",
     "NBSOURCE-002",

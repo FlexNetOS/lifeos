@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-10T23:20:02Z",
+  "generated_at": "2026-07-10T23:20:56Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 135,
+    "row_count": 136,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -2995,6 +2995,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBSOURCE-014.proof.json",
         "next_action": "NBSOURCE-015 Orchestrating Vector Ingestion and Embedding Workflows"
+      }
+    },
+    {
+      "source_row_number": 137,
+      "columns": {
+        "task_id": "NBSOURCE-015",
+        "parent_id": "NBSOURCE-014",
+        "phase": "0-north-star-graph",
+        "title": "Orchestrating Vector Ingestion and Embedding Workflows source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Capture and semantically normalize Orchestrating Vector Ingestion and Embedding Workflows, preserve questions, classify every atom, and expose primary-evidence, benchmark, authority, recovery, and owner-decision paths without product execution.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source 5d060f76-549f-476c-b7ab-13726c3911a4; fulltext SHA-256 d442e53ebeeb83ff3440bc0fa9f1599f0bcfbbb2c920bdff62f27e2e9651a259; NBSOURCE-001 through NBSOURCE-014; NBVERIFY-000; packet validation pass",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-015-vector-ingestion-embedding-workflows.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-015.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product, agent, model, store, profile, runtime, release, or workspace execution; fabricated proof; invented citations; processing NBSOURCE-016; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 11 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T232047Z-lifeos-notebooklm-integration-before-NBSOURCE-015.tar.gz and remove only NBSOURCE-015 rows and artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-015.proof.json",
+        "next_action": "NBSOURCE-016 Portable Nix Builds via Musl Static Compilation"
       }
     }
   ]

@@ -1,5 +1,21 @@
 {
   "complete_task_ids": [
+    "PRESERVE-001",
+    "STRUCTURE-001",
+    "STRUCTURE-002",
+    "STRUCTURE-003",
+    "STRUCTURE-004",
+    "STRUCTURE-005",
+    "NBSOURCE-000",
+    "NBSOURCE-001",
+    "NBSOURCE-002",
+    "NBVERIFY-000",
+    "NBSOURCE-003",
+    "NBSOURCE-004",
+    "NBSOURCE-005",
+    "NBSOURCE-006",
+    "NORTHSTAR-001",
+    "NORTHSTAR-002",
     "LPS-012",
     "LPS-013",
     "LPS-014",
@@ -14,18 +30,3051 @@
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-06T17:37:44Z",
-  "ledger_entry_count": 21,
-  "next_ready_task_id": null,
-  "proof_ledger_sha256": "4f596a79c6735edd0a029b8d7f31be10b14b353c260011cf134e567f7318b4f4",
-  "proof_ledger_uri": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0/proof_records/proof_ledger.jsonl",
-  "ready_task_ids": [],
+  "generated_at": "2026-07-10T23:37:25Z",
+  "ledger_entry_count": 40,
+  "next_ready_task_id": "LIFEOS-000",
+  "proof_ledger_sha256": "1c62da479fef5680b597c6520493d19a811d858234fb7d3225baabc83f1ee650",
+  "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
+  "ready_task_ids": [
+    "LIFEOS-000",
+    "LIFEOS-001",
+    "LIFEOS-002",
+    "LIFEOS-003",
+    "LIFEOS-004",
+    "LIFEOS-005",
+    "LIFEOS-006",
+    "LIFEOS-007",
+    "LIFEOS-008",
+    "LIFEOS-009",
+    "LIFEOS-010",
+    "LIFEOS-011",
+    "LIFEOS-012",
+    "PRESERVE-002",
+    "RECOVERY-001",
+    "RECOVERY-002",
+    "RECOVERY-003",
+    "RECOVERY-004",
+    "PRESERVE-003",
+    "STRUCTURE-006",
+    "POSTGRES-001",
+    "PGAUTH-001",
+    "PGAUTH-002",
+    "PGAUTH-003",
+    "PGAUTH-004",
+    "PGAUTH-005",
+    "PGAUTH-006",
+    "ADOPT-001",
+    "ADOPT-002",
+    "STORE-001",
+    "POSTGRES-002",
+    "POSTGRES-003",
+    "POSTGRES-004",
+    "POSTGRES-005",
+    "POSTGRES-006",
+    "POSTGRES-007",
+    "POSTGRES-008",
+    "POSTGRES-009",
+    "POSTGRES-010",
+    "FOUNDATION-001",
+    "FOUNDATION-002",
+    "FOUNDATION-003",
+    "CONSOLIDATE-001",
+    "CONSOLIDATE-002",
+    "CONSOLIDATE-003",
+    "INTEL-001",
+    "INTEL-002",
+    "INTEL-003",
+    "MVP1-001",
+    "MVP1-002",
+    "MVP1-003",
+    "COMPANY-001",
+    "DEVELOP-001",
+    "COMPANY-002",
+    "PERSONAL-001",
+    "PERSONAL-002",
+    "PERSONAL-003",
+    "HOME-001",
+    "HOME-002",
+    "HOME-003",
+    "EXPERIENCE-001",
+    "EXPERIENCE-002",
+    "EXPERIENCE-003",
+    "RELEASE-001",
+    "RELEASE-002",
+    "RELEASE-003",
+    "LIVING-001",
+    "LIVING-002",
+    "LIVING-003",
+    "LPS-000",
+    "LPS-001",
+    "LPS-002",
+    "LPS-003",
+    "LPS-004",
+    "LPS-005",
+    "LPS-006",
+    "LPS-007",
+    "LPS-008",
+    "LPS-009",
+    "LPS-010",
+    "LPS-011",
+    "GRAPH-001",
+    "GRAPH-002",
+    "GRAPH-003",
+    "GRAPH-004",
+    "GRAPH-005",
+    "LPS-023",
+    "LPS-024",
+    "LPS-025",
+    "LPS-026",
+    "LPS-027",
+    "LPS-028",
+    "LPS-029",
+    "LPS-030",
+    "LPS-031",
+    "LPS-032",
+    "LPS-033",
+    "LPS-034",
+    "LPS-035",
+    "LPS-036"
+  ],
   "result": "pass",
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
-  "source_graph_sha256": "a4baff3b6a748ff5d81fe14a4c4b1bc8ef4207133aca8331dccc05edbefa8918",
-  "source_graph_uri": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0/generated/task_graph.normalized.json",
-  "task_count": 11,
+  "source_graph_sha256": "828d84041e7f87e50b2b03c03bf9618085ca75105002a5fa73939e08b9d3f8f0",
+  "source_graph_uri": "generated/task_graph.normalized.json",
+  "task_count": 127,
   "tasks": [
+    {
+      "effective": {
+        "next_action": "Iterate scan -> evaluate -> add/refine phases until the graph coverage gate passes; do not execute product work.",
+        "proof_uri": "proof_records/LIFEOS-000.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Iterate scan -> evaluate -> add/refine phases until the graph coverage gate passes; do not execute product work.",
+        "proof_uri": "proof_records/LIFEOS-000.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 2,
+      "task_id": "LIFEOS-000",
+      "title": "North Star execution graph completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose preservation into one bounded task per repository/state surface.",
+        "proof_uri": "proof_records/LIFEOS-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-000"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose preservation into one bounded task per repository/state surface.",
+        "proof_uri": "proof_records/LIFEOS-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 3,
+      "task_id": "LIFEOS-001",
+      "title": "All valid existing work preserved for consolidation",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "POSTGRES-001 now has bounded authority targets; keep every child Draft and next decompose POSTGRES-002 by entity family and relationship boundary.",
+        "proof_uri": "proof_records/LIFEOS-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "STRUCTURE-006"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "POSTGRES-001 now has bounded authority targets; keep every child Draft and next decompose POSTGRES-002 by entity family and relationship boundary.",
+        "proof_uri": "proof_records/LIFEOS-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 4,
+      "task_id": "LIFEOS-002",
+      "title": "PostgreSQL-first user-space foundation proven",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Reconcile existing LPS and TEAS rows beneath this phase only after PostgreSQL authority cutover and full North Star coverage pass.",
+        "proof_uri": "proof_records/LIFEOS-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-010"
+      ],
+      "phase": "3-governed-execution",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Reconcile existing LPS and TEAS rows beneath this phase only after PostgreSQL authority cutover and full North Star coverage pass.",
+        "proof_uri": "proof_records/LIFEOS-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 5,
+      "task_id": "LIFEOS-003",
+      "title": "Governed intent-to-proof execution spine completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose consolidation by capability and dependency order.",
+        "proof_uri": "proof_records/LIFEOS-004.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-003"
+      ],
+      "phase": "4-physical-consolidation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose consolidation by capability and dependency order.",
+        "proof_uri": "proof_records/LIFEOS-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 6,
+      "task_id": "LIFEOS-004",
+      "title": "Peer capabilities physically consolidated into LifeOS",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose each substrate capability behind authority and simulation gates.",
+        "proof_uri": "proof_records/LIFEOS-005.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-004"
+      ],
+      "phase": "5-intelligence-substrate",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose each substrate capability behind authority and simulation gates.",
+        "proof_uri": "proof_records/LIFEOS-005.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 7,
+      "task_id": "LIFEOS-005",
+      "title": "Unified memory compute network and learning substrate integrated",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose the smallest financial and legal vertical slices.",
+        "proof_uri": "proof_records/LIFEOS-006.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-005"
+      ],
+      "phase": "6-mvp1-financial-legal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose the smallest financial and legal vertical slices.",
+        "proof_uri": "proof_records/LIFEOS-006.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 8,
+      "task_id": "LIFEOS-006",
+      "title": "Financial and legal MVP1 operating domain completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose company and development capabilities into bounded vertical slices.",
+        "proof_uri": "proof_records/LIFEOS-007.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-006"
+      ],
+      "phase": "7-company-development",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose company and development capabilities into bounded vertical slices.",
+        "proof_uri": "proof_records/LIFEOS-007.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 9,
+      "task_id": "LIFEOS-007",
+      "title": "Company and development operating environments consolidated",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose personal capabilities into bounded user-controlled slices.",
+        "proof_uri": "proof_records/LIFEOS-008.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-006"
+      ],
+      "phase": "8-personal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose personal capabilities into bounded user-controlled slices.",
+        "proof_uri": "proof_records/LIFEOS-008.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 10,
+      "task_id": "LIFEOS-008",
+      "title": "Personal operating environment consolidated",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose home capabilities from read-only observation toward gated physical control.",
+        "proof_uri": "proof_records/LIFEOS-009.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-006"
+      ],
+      "phase": "9-home",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose home capabilities from read-only observation toward gated physical control.",
+        "proof_uri": "proof_records/LIFEOS-009.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 11,
+      "task_id": "LIFEOS-009",
+      "title": "Home operating environment consolidated",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose interfaces only after their underlying domain workflows are proven.",
+        "proof_uri": "proof_records/LIFEOS-010.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-007",
+        "LIFEOS-008",
+        "LIFEOS-009"
+      ],
+      "phase": "10-experience",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose interfaces only after their underlying domain workflows are proven.",
+        "proof_uri": "proof_records/LIFEOS-010.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 12,
+      "task_id": "LIFEOS-010",
+      "title": "Coherent LifeOS experience delivered across user interfaces",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After all child task graphs are complete and proven, decompose release and acceptance into bounded gates.",
+        "proof_uri": "proof_records/LIFEOS-011.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-010"
+      ],
+      "phase": "11-system-proof-release",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After all child task graphs are complete and proven, decompose release and acceptance into bounded gates.",
+        "proof_uri": "proof_records/LIFEOS-011.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 13,
+      "task_id": "LIFEOS-011",
+      "title": "Whole LifeOS product proven and reproducibly released",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After full graph coverage passes, decompose continuous operation into bounded observation, learning, promotion, and rollback tasks.",
+        "proof_uri": "proof_records/LIFEOS-012.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "12-living-system",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After full graph coverage passes, decompose continuous operation into bounded observation, learning, promotion, and rollback tasks.",
+        "proof_uri": "proof_records/LIFEOS-012.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 14,
+      "task_id": "LIFEOS-012",
+      "title": "LifeOS continuously improves under governed feedback",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/PRESERVE-001.proof.json; next child task: PRESERVE-002.",
+        "proof_uri": "proof_records/PRESERVE-001.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "LIFEOS-001"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": 35,
+        "observed_at": "2026-07-10T23:37:00Z",
+        "revision": "1",
+        "sha256": "c7cebaaa921e19729f11372fa0fcbd68353e77979432df6257705d20afe69541"
+      },
+      "source": {
+        "next_action": "Capture the checksummed LifeOS, Meta, parent-shadow, consumer, worktree, and runtime inventory now; then write PRESERVE-001 proof before any filesystem move.",
+        "proof_uri": "proof_records/PRESERVE-001.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 15,
+      "task_id": "PRESERVE-001",
+      "title": "Complete valid-work preservation inventory defined",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Capture the checksummed LifeOS, Meta, parent-shadow, consumer, worktree, and runtime inventory now; then write PRESERVE-001 proof before any filesystem move.",
+          "to": "Proof accepted from proof_records/PRESERVE-001.proof.json; next child task: PRESERVE-002."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Decompose provenance and baseline capture by peer after PRESERVE-001 is complete.",
+        "proof_uri": "proof_records/PRESERVE-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PRESERVE-001"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose provenance and baseline capture by peer after PRESERVE-001 is complete.",
+        "proof_uri": "proof_records/PRESERVE-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 16,
+      "task_id": "PRESERVE-002",
+      "title": "Capability provenance and behavioral baselines defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After graph closure, seal checksums and complete the generated-task inventory without changing peer task status.",
+        "proof_uri": "proof_records/RECOVERY-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PRESERVE-002"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After graph closure, seal checksums and complete the generated-task inventory without changing peer task status.",
+        "proof_uri": "proof_records/RECOVERY-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 17,
+      "task_id": "RECOVERY-001",
+      "title": "Prior generated task and completion-claim inventory sealed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Do not rebuild merged CodeDB capability; produce one evidence-backed disposition per prior CDB task.",
+        "proof_uri": "proof_records/RECOVERY-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "RECOVERY-001"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Do not rebuild merged CodeDB capability; produce one evidence-backed disposition per prior CDB task.",
+        "proof_uri": "proof_records/RECOVERY-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 18,
+      "task_id": "RECOVERY-002",
+      "title": "nu_plugin CodeDB task truth reconciled",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Separate package proof, merged product proof, live runtime proof, and pending work; do not collapse them into one Complete label.",
+        "proof_uri": "proof_records/RECOVERY-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "RECOVERY-002"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Separate package proof, merged product proof, live runtime proof, and pending work; do not collapse them into one Complete label.",
+        "proof_uri": "proof_records/RECOVERY-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 19,
+      "task_id": "RECOVERY-003",
+      "title": "envctl task and proof truth reconciled",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "This closes prior-work recovery; only then may topology planning and capability adoption proceed.",
+        "proof_uri": "proof_records/RECOVERY-004.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "RECOVERY-003"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "This closes prior-work recovery; only then may topology planning and capability adoption proceed.",
+        "proof_uri": "proof_records/RECOVERY-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 20,
+      "task_id": "RECOVERY-004",
+      "title": "Recovered capability adoption and stray-state disposition closed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose topology only after prior task truth, valid capabilities, and stray state are reconciled.",
+        "proof_uri": "proof_records/PRESERVE-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "RECOVERY-004"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose topology only after prior task truth, valid capabilities, and stray state are reconciled.",
+        "proof_uri": "proof_records/PRESERVE-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 21,
+      "task_id": "PRESERVE-003",
+      "title": "Canonical topology transition tasks defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/STRUCTURE-001.proof.json; next child task: STRUCTURE-002.",
+        "proof_uri": "proof_records/STRUCTURE-001.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "PRESERVE-003"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": 36,
+        "observed_at": "2026-07-10T23:37:00Z",
+        "revision": "1",
+        "sha256": "20959749e066b487a169941e0fb51ffd773432dff7b650a6ad554393e8676a4f"
+      },
+      "source": {
+        "next_action": "Execute the one same-filesystem rename immediately after PRESERVE-001 proof and after removing the temporary linked planning worktree.",
+        "proof_uri": "proof_records/STRUCTURE-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 22,
+      "task_id": "STRUCTURE-001",
+      "title": "Parent workspace atomically renamed to Meta root",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Execute the one same-filesystem rename immediately after PRESERVE-001 proof and after removing the temporary linked planning worktree.",
+          "to": "Proof accepted from proof_records/STRUCTURE-001.proof.json; next child task: STRUCTURE-002."
+        },
+        "status": {
+          "from": "draft",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/STRUCTURE-002.proof.json; next child task: STRUCTURE-004.",
+        "proof_uri": "proof_records/STRUCTURE-002.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "STRUCTURE-001"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": 37,
+        "observed_at": "2026-07-10T23:37:00Z",
+        "revision": "1",
+        "sha256": "34e5cc3e1f5e78109436f48956041c69453126b07614d22cef5cb58ffe7cc263"
+      },
+      "source": {
+        "next_action": "Verify the product at /home/flexnetos/meta/lifeos immediately after STRUCTURE-001; no second product move is required.",
+        "proof_uri": "proof_records/STRUCTURE-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 23,
+      "task_id": "STRUCTURE-002",
+      "title": "LifeOS product preserved as Meta-owned child",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Verify the product at /home/flexnetos/meta/lifeos immediately after STRUCTURE-001; no second product move is required.",
+          "to": "Proof accepted from proof_records/STRUCTURE-002.proof.json; next child task: STRUCTURE-004."
+        },
+        "status": {
+          "from": "draft",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/STRUCTURE-003.proof.json; next child task: STRUCTURE-004.",
+        "proof_uri": "proof_records/STRUCTURE-003.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "STRUCTURE-001"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": 38,
+        "observed_at": "2026-07-10T23:37:00Z",
+        "revision": "1",
+        "sha256": "357f08460df9bad1c0d08c07e4b4d688274ab5050eacc4a65ff2056798e285d3"
+      },
+      "source": {
+        "next_action": "After the parent rename, compute the collision diff and promote the existing checkout in place; do not clone or bulk-add the enclosing tree.",
+        "proof_uri": "proof_records/STRUCTURE-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 24,
+      "task_id": "STRUCTURE-003",
+      "title": "Existing Meta checkout promoted into Meta root",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After the parent rename, compute the collision diff and promote the existing checkout in place; do not clone or bulk-add the enclosing tree.",
+          "to": "Proof accepted from proof_records/STRUCTURE-003.proof.json; next child task: STRUCTURE-004."
+        },
+        "status": {
+          "from": "draft",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/STRUCTURE-004.proof.json; next child task: STRUCTURE-005.",
+        "proof_uri": "proof_records/STRUCTURE-004.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "STRUCTURE-002",
+        "STRUCTURE-003"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": 39,
+        "observed_at": "2026-07-10T23:37:00Z",
+        "revision": "1",
+        "sha256": "7c9aad8f82a1825afa2da848037d27af89c256b2e5563c4a1bba0313c6736ae3"
+      },
+      "source": {
+        "next_action": "Run the collision query and tracked-versus-untracked diff immediately after Meta promotion; archive before each replacement.",
+        "proof_uri": "proof_records/STRUCTURE-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 25,
+      "task_id": "STRUCTURE-004",
+      "title": "Meta root collisions and shadow names resolved",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Run the collision query and tracked-versus-untracked diff immediately after Meta promotion; archive before each replacement.",
+          "to": "Proof accepted from proof_records/STRUCTURE-004.proof.json; next child task: STRUCTURE-005."
+        },
+        "status": {
+          "from": "draft",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/STRUCTURE-005.proof.json; next child task: STRUCTURE-006.",
+        "proof_uri": "proof_records/STRUCTURE-005.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "STRUCTURE-004"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": 40,
+        "observed_at": "2026-07-10T23:37:00Z",
+        "revision": "1",
+        "sha256": "f6ca1d62362374aedfea911c4a946f9b642fba942fe504065768c9389b99465c"
+      },
+      "source": {
+        "next_action": "Update the one root Meta manifest, then prove project, dependency, GitKB, and command routing with no duplicate owner.",
+        "proof_uri": "proof_records/STRUCTURE-005.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 26,
+      "task_id": "STRUCTURE-005",
+      "title": "Meta fleet composition and LifeOS ownership established",
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Update the one root Meta manifest, then prove project, dependency, GitKB, and command routing with no duplicate owner.",
+          "to": "Proof accepted from proof_records/STRUCTURE-005.proof.json; next child task: STRUCTURE-006."
+        },
+        "status": {
+          "from": "draft",
+          "to": "complete"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "After Meta manifest proof, run bounded query/diff replacements by owning source, then close with runtime and GitHub verification.",
+        "proof_uri": "proof_records/STRUCTURE-006.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "STRUCTURE-005"
+      ],
+      "phase": "1-preservation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After Meta manifest proof, run bounded query/diff replacements by owning source, then close with runtime and GitHub verification.",
+        "proof_uri": "proof_records/STRUCTURE-006.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 27,
+      "task_id": "STRUCTURE-006",
+      "title": "Canonical Meta root and consumer names proven",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006, prior capability adoption, and STORE-001; keep all targets Draft until owner discussion closes the store relationship.",
+        "proof_uri": "proof_records/POSTGRES-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-002"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006, prior capability adoption, and STORE-001; keep all targets Draft until owner discussion closes the store relationship.",
+        "proof_uri": "proof_records/POSTGRES-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 28,
+      "task_id": "POSTGRES-001",
+      "title": "PostgreSQL authority and store boundaries defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After graph closure, produce the durable-state contract from preserved planning evidence only; do not deploy schemas or write live data.",
+        "proof_uri": "proof_records/PGAUTH-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-001"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After graph closure, produce the durable-state contract from preserved planning evidence only; do not deploy schemas or write live data.",
+        "proof_uri": "proof_records/PGAUTH-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 29,
+      "task_id": "PGAUTH-001",
+      "title": "Durable macro-state authority contract bounded",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Hold final classification for the owner discussion represented by STORE-001; do not activate or migrate any store.",
+        "proof_uri": "proof_records/PGAUTH-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PGAUTH-001"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Hold final classification for the owner discussion represented by STORE-001; do not activate or migrate any store.",
+        "proof_uri": "proof_records/PGAUTH-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 30,
+      "task_id": "PGAUTH-002",
+      "title": "redb use-case and authority contract bounded",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After graph closure, define cognition, learning, promotion, portability, and recovery boundaries without running agents or training models.",
+        "proof_uri": "proof_records/PGAUTH-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PGAUTH-001"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After graph closure, define cognition, learning, promotion, portability, and recovery boundaries without running agents or training models.",
+        "proof_uri": "proof_records/PGAUTH-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 31,
+      "task_id": "PGAUTH-003",
+      "title": "Per-agent cognition authority contract bounded",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After graph closure, define projection classes and one-way provenance without materializing or editing generated output.",
+        "proof_uri": "proof_records/PGAUTH-004.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PGAUTH-001"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After graph closure, define projection classes and one-way provenance without materializing or editing generated output.",
+        "proof_uri": "proof_records/PGAUTH-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 32,
+      "task_id": "PGAUTH-004",
+      "title": "Derived projection authority contract bounded",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After graph closure, define one external-boundary contract per source class without connecting to external systems.",
+        "proof_uri": "proof_records/PGAUTH-005.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PGAUTH-001"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After graph closure, define one external-boundary contract per source class without connecting to external systems.",
+        "proof_uri": "proof_records/PGAUTH-005.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 33,
+      "task_id": "PGAUTH-005",
+      "title": "External source authority contract bounded",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After all five authority contracts pass, proceed through ADOPT-001, ADOPT-002, and STORE-001 before POSTGRES-002; do not open product execution.",
+        "proof_uri": "proof_records/PGAUTH-006.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PGAUTH-002",
+        "PGAUTH-003",
+        "PGAUTH-004",
+        "PGAUTH-005"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After all five authority contracts pass, proceed through ADOPT-001, ADOPT-002, and STORE-001 before POSTGRES-002; do not open product execution.",
+        "proof_uri": "proof_records/PGAUTH-006.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 34,
+      "task_id": "PGAUTH-006",
+      "title": "State ownership synchronization and recovery matrix closed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Preserve and map the implementation; do not redesign it before STORE-001 resolves ownership boundaries.",
+        "proof_uri": "proof_records/ADOPT-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PGAUTH-006"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Preserve and map the implementation; do not redesign it before STORE-001 resolves ownership boundaries.",
+        "proof_uri": "proof_records/ADOPT-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 35,
+      "task_id": "ADOPT-001",
+      "title": "Existing nu_plugin CodeDB storage capability adopted without rebuild",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Carry all valid capability into STORE-001 without deciding its final store role in advance.",
+        "proof_uri": "proof_records/ADOPT-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "ADOPT-001"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Carry all valid capability into STORE-001 without deciding its final store role in advance.",
+        "proof_uri": "proof_records/ADOPT-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 36,
+      "task_id": "ADOPT-002",
+      "title": "Existing envctl migration secrets and RuVector capability adopted without rebuild",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Use the claim queue and evidence relations; NotebookLM repetition is corroboration only, local or upstream primary evidence verifies capability, benchmark evidence verifies performance, and David decides architecture.",
+        "proof_uri": "proof_records/STORE-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "ADOPT-002",
+        "NBSOURCE-004",
+        "NBVERIFY-000"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Use the claim queue and evidence relations; NotebookLM repetition is corroboration only, local or upstream primary evidence verifies capability, benchmark evidence verifies performance, and David decides architecture.",
+        "proof_uri": "proof_records/STORE-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 37,
+      "task_id": "STORE-001",
+      "title": "redb PostgreSQL and nu_plugin CodeDB relationship decided",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose by entity family only after STORE-001 is owner-approved.",
+        "proof_uri": "proof_records/POSTGRES-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "STORE-001"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose by entity family only after STORE-001 is owner-approved.",
+        "proof_uri": "proof_records/POSTGRES-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 38,
+      "task_id": "POSTGRES-002",
+      "title": "Whole user-space relational graph and identity model defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Next split one bounded migration task per control-plane table and keep CSV authoritative until parity passes.",
+        "proof_uri": "proof_records/POSTGRES-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-002"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Next split one bounded migration task per control-plane table and keep CSV authoritative until parity passes.",
+        "proof_uri": "proof_records/POSTGRES-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 39,
+      "task_id": "POSTGRES-003",
+      "title": "Planning and control tables made database-native",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After graph closure, decompose one read-only inventory task and one staging-ingestion task per entity family.",
+        "proof_uri": "proof_records/POSTGRES-004.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-003"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After graph closure, decompose one read-only inventory task and one staging-ingestion task per entity family.",
+        "proof_uri": "proof_records/POSTGRES-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 40,
+      "task_id": "POSTGRES-004",
+      "title": "Complete user-space inventory and lossless ingestion defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose retrieval, edit, branch, integrity, and merge as separate bounded target tasks after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-005.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-004"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose retrieval, edit, branch, integrity, and merge as separate bounded target tasks after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-005.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 41,
+      "task_id": "POSTGRES-005",
+      "title": "RuVector embedding and semantic database editing defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Break buffering, cognition, routing, learning, and recovery into separate small tasks after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-006.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-005"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Break buffering, cognition, routing, learning, and recovery into separate small tasks after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-006.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 42,
+      "task_id": "POSTGRES-006",
+      "title": "redb and AgentDB runtime boundaries defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose read, command, status, audit, and recovery paths into bounded vertical slices after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-007.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-006"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose read, command, status, audit, and recovery paths into bounded vertical slices after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-007.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 43,
+      "task_id": "POSTGRES-007",
+      "title": "LifeOS direct database control surface defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose query, projection, metadata, determinism, and cleanup into separate target tasks after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-008.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-007",
+        "FOUNDATION-003"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose query, projection, metadata, determinism, and cleanup into separate target tasks after graph closure.",
+        "proof_uri": "proof_records/POSTGRES-008.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 44,
+      "task_id": "POSTGRES-008",
+      "title": "envctl database-to-directory materialization defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After graph closure, split the proof into the smallest sequential ingestion, projection, build, run, and UDS tasks.",
+        "proof_uri": "proof_records/POSTGRES-009.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-008"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After graph closure, split the proof into the smallest sequential ingestion, projection, build, run, and UDS tasks.",
+        "proof_uri": "proof_records/POSTGRES-009.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 45,
+      "task_id": "POSTGRES-009",
+      "title": "Portable projected LifeOS build proven end to end",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Keep authority unchanged; after graph closure decompose parity, restore rehearsal, staged dual-read, explicit switch, and retention decisions.",
+        "proof_uri": "proof_records/POSTGRES-010.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "POSTGRES-009"
+      ],
+      "phase": "2-postgres-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Keep authority unchanged; after graph closure decompose parity, restore rehearsal, staged dual-read, explicit switch, and retention decisions.",
+        "proof_uri": "proof_records/POSTGRES-010.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 46,
+      "task_id": "POSTGRES-010",
+      "title": "Whole user-space parity recovery and authority cutover defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose package ownership by capability after full graph closure.",
+        "proof_uri": "proof_records/FOUNDATION-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-002"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose package ownership by capability after full graph closure.",
+        "proof_uri": "proof_records/FOUNDATION-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 47,
+      "task_id": "FOUNDATION-001",
+      "title": "Single Yazelix and Nix foundation package plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose foundation build tasks only after FOUNDATION-001 ownership is proven.",
+        "proof_uri": "proof_records/FOUNDATION-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "FOUNDATION-001"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose foundation build tasks only after FOUNDATION-001 ownership is proven.",
+        "proof_uri": "proof_records/FOUNDATION-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 48,
+      "task_id": "FOUNDATION-002",
+      "title": "Rust-native application and governed Lua build plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose runtime proof and shadow retirement after package and build tasks pass.",
+        "proof_uri": "proof_records/FOUNDATION-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "FOUNDATION-002"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose runtime proof and shadow retirement after package and build tasks pass.",
+        "proof_uri": "proof_records/FOUNDATION-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 49,
+      "task_id": "FOUNDATION-003",
+      "title": "Foundation runtime reproducibility and shadow retirement plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose one architecture-decision task per bounded context after preservation baselines pass.",
+        "proof_uri": "proof_records/CONSOLIDATE-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-004"
+      ],
+      "phase": "4-physical-consolidation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose one architecture-decision task per bounded context after preservation baselines pass.",
+        "proof_uri": "proof_records/CONSOLIDATE-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 50,
+      "task_id": "CONSOLIDATE-001",
+      "title": "LifeOS target bounded-context architecture defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose one migration task chain per capability after target architecture is proven.",
+        "proof_uri": "proof_records/CONSOLIDATE-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "CONSOLIDATE-001"
+      ],
+      "phase": "4-physical-consolidation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose one migration task chain per capability after target architecture is proven.",
+        "proof_uri": "proof_records/CONSOLIDATE-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 51,
+      "task_id": "CONSOLIDATE-002",
+      "title": "Upgrade-only capability migration waves defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose cutover only after each migration wave has accepted proof.",
+        "proof_uri": "proof_records/CONSOLIDATE-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "CONSOLIDATE-002"
+      ],
+      "phase": "4-physical-consolidation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose cutover only after each migration wave has accepted proof.",
+        "proof_uri": "proof_records/CONSOLIDATE-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 52,
+      "task_id": "CONSOLIDATE-003",
+      "title": "Capability parity cutover and legacy retirement plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose storage and memory by data class after consolidation contracts are stable.",
+        "proof_uri": "proof_records/INTEL-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-005"
+      ],
+      "phase": "5-intelligence-substrate",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose storage and memory by data class after consolidation contracts are stable.",
+        "proof_uri": "proof_records/INTEL-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 53,
+      "task_id": "INTEL-001",
+      "title": "Unified governed memory and data substrate plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose compute, model, mesh, and network capabilities after memory ownership is proven.",
+        "proof_uri": "proof_records/INTEL-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "INTEL-001"
+      ],
+      "phase": "5-intelligence-substrate",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose compute, model, mesh, and network capabilities after memory ownership is proven.",
+        "proof_uri": "proof_records/INTEL-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 54,
+      "task_id": "INTEL-002",
+      "title": "Local intelligence compute and mesh substrate plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose configuration, secrets, identity, and learning loops after substrate contracts are complete.",
+        "proof_uri": "proof_records/INTEL-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "INTEL-002"
+      ],
+      "phase": "5-intelligence-substrate",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose configuration, secrets, identity, and learning loops after substrate contracts are complete.",
+        "proof_uri": "proof_records/INTEL-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 55,
+      "task_id": "INTEL-003",
+      "title": "Regenerative configuration secrets and learning plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose read-only financial value slices before any action-capable task.",
+        "proof_uri": "proof_records/MVP1-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-006"
+      ],
+      "phase": "6-mvp1-financial-legal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose read-only financial value slices before any action-capable task.",
+        "proof_uri": "proof_records/MVP1-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 56,
+      "task_id": "MVP1-001",
+      "title": "Governed financial operating slice plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose read-only legal understanding and deadline slices before action-capable tasks.",
+        "proof_uri": "proof_records/MVP1-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "MVP1-001"
+      ],
+      "phase": "6-mvp1-financial-legal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose read-only legal understanding and deadline slices before action-capable tasks.",
+        "proof_uri": "proof_records/MVP1-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 57,
+      "task_id": "MVP1-002",
+      "title": "Governed legal operating slice plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose acceptance after the financial and legal slices are fully bounded.",
+        "proof_uri": "proof_records/MVP1-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "MVP1-002"
+      ],
+      "phase": "6-mvp1-financial-legal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose acceptance after the financial and legal slices are fully bounded.",
+        "proof_uri": "proof_records/MVP1-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 58,
+      "task_id": "MVP1-003",
+      "title": "Financial and legal MVP1 acceptance plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose company capabilities by governed vertical after MVP1 proof.",
+        "proof_uri": "proof_records/COMPANY-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-007"
+      ],
+      "phase": "7-company-development",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose company capabilities by governed vertical after MVP1 proof.",
+        "proof_uri": "proof_records/COMPANY-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 59,
+      "task_id": "COMPANY-001",
+      "title": "Company governance and operating model task family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose one bounded development workflow at a time after company authority is defined.",
+        "proof_uri": "proof_records/DEVELOP-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "COMPANY-001"
+      ],
+      "phase": "7-company-development",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose one bounded development workflow at a time after company authority is defined.",
+        "proof_uri": "proof_records/DEVELOP-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 60,
+      "task_id": "DEVELOP-001",
+      "title": "Development build and release operating family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose the smallest company-to-development proof after both task families are bounded.",
+        "proof_uri": "proof_records/COMPANY-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "DEVELOP-001"
+      ],
+      "phase": "7-company-development",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose the smallest company-to-development proof after both task families are bounded.",
+        "proof_uri": "proof_records/COMPANY-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 61,
+      "task_id": "COMPANY-002",
+      "title": "Company and development vertical acceptance plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose personal data classes before domain workflows.",
+        "proof_uri": "proof_records/PERSONAL-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-008"
+      ],
+      "phase": "8-personal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose personal data classes before domain workflows.",
+        "proof_uri": "proof_records/PERSONAL-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 62,
+      "task_id": "PERSONAL-001",
+      "title": "Personal identity privacy and data ownership family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose one read-only personal workflow per domain before any action.",
+        "proof_uri": "proof_records/PERSONAL-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PERSONAL-001"
+      ],
+      "phase": "8-personal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose one read-only personal workflow per domain before any action.",
+        "proof_uri": "proof_records/PERSONAL-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 63,
+      "task_id": "PERSONAL-002",
+      "title": "Personal domain workflow families defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose the smallest cross-domain personal proof after domain tasks are bounded.",
+        "proof_uri": "proof_records/PERSONAL-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "PERSONAL-002"
+      ],
+      "phase": "8-personal",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose the smallest cross-domain personal proof after domain tasks are bounded.",
+        "proof_uri": "proof_records/PERSONAL-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 64,
+      "task_id": "PERSONAL-003",
+      "title": "Personal operating environment acceptance plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Reconcile LPS-029 through LPS-036 and decompose read-only home observation first.",
+        "proof_uri": "proof_records/HOME-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-009"
+      ],
+      "phase": "9-home",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Reconcile LPS-029 through LPS-036 and decompose read-only home observation first.",
+        "proof_uri": "proof_records/HOME-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 65,
+      "task_id": "HOME-001",
+      "title": "Home digital twin inventory and observation family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose one resource or service workflow at a time after the home twin is proven.",
+        "proof_uri": "proof_records/HOME-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "HOME-001"
+      ],
+      "phase": "9-home",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose one resource or service workflow at a time after the home twin is proven.",
+        "proof_uri": "proof_records/HOME-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 66,
+      "task_id": "HOME-002",
+      "title": "Home resource service and media workflow families defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose the smallest harmless reversible physical proof only after all prior gates pass.",
+        "proof_uri": "proof_records/HOME-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "HOME-002"
+      ],
+      "phase": "9-home",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose the smallest harmless reversible physical proof only after all prior gates pass.",
+        "proof_uri": "proof_records/HOME-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 67,
+      "task_id": "HOME-003",
+      "title": "Home physical-control acceptance plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose application APIs after domain and consolidation contracts stabilize.",
+        "proof_uri": "proof_records/EXPERIENCE-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-010"
+      ],
+      "phase": "10-experience",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose application APIs after domain and consolidation contracts stabilize.",
+        "proof_uri": "proof_records/EXPERIENCE-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 68,
+      "task_id": "EXPERIENCE-001",
+      "title": "Rust-native LifeOS application boundary and API family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose desktop proof first; mobile, glasses, and ambient clients remain gated by proven substrate and owner approval.",
+        "proof_uri": "proof_records/EXPERIENCE-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "EXPERIENCE-001"
+      ],
+      "phase": "10-experience",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose desktop proof first; mobile, glasses, and ambient clients remain gated by proven substrate and owner approval.",
+        "proof_uri": "proof_records/EXPERIENCE-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 69,
+      "task_id": "EXPERIENCE-002",
+      "title": "Desktop mobile glasses and ambient client families defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose continuity tests after the first approved client is bounded.",
+        "proof_uri": "proof_records/EXPERIENCE-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "EXPERIENCE-002"
+      ],
+      "phase": "10-experience",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose continuity tests after the first approved client is bounded.",
+        "proof_uri": "proof_records/EXPERIENCE-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 70,
+      "task_id": "EXPERIENCE-003",
+      "title": "Cross-interface continuity and accessibility acceptance plan defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose one acceptance gate per North Star anchor after all phases are bounded.",
+        "proof_uri": "proof_records/RELEASE-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "11-system-proof-release",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose one acceptance gate per North Star anchor after all phases are bounded.",
+        "proof_uri": "proof_records/RELEASE-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 71,
+      "task_id": "RELEASE-001",
+      "title": "North Star system acceptance family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose Ubuntu release tasks only after North Star acceptance task definitions are complete.",
+        "proof_uri": "proof_records/RELEASE-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "RELEASE-001"
+      ],
+      "phase": "11-system-proof-release",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose Ubuntu release tasks only after North Star acceptance task definitions are complete.",
+        "proof_uri": "proof_records/RELEASE-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 72,
+      "task_id": "RELEASE-002",
+      "title": "Ubuntu-first reproducible build install and rollback family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose secondary platforms only after RELEASE-002 is proven.",
+        "proof_uri": "proof_records/RELEASE-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "RELEASE-002"
+      ],
+      "phase": "11-system-proof-release",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose secondary platforms only after RELEASE-002 is proven.",
+        "proof_uri": "proof_records/RELEASE-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 73,
+      "task_id": "RELEASE-003",
+      "title": "Secondary platform and distribution rollout family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Reconcile existing heartbeat and priority work as evidence, then decompose bounded audit loops.",
+        "proof_uri": "proof_records/LIVING-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-012"
+      ],
+      "phase": "12-living-system",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Reconcile existing heartbeat and priority work as evidence, then decompose bounded audit loops.",
+        "proof_uri": "proof_records/LIVING-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 74,
+      "task_id": "LIVING-001",
+      "title": "Continuous observation audit and governance cadence family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose observation-to-lesson first; promotion remains blocked until simulation and regression tasks are proven.",
+        "proof_uri": "proof_records/LIVING-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIVING-001"
+      ],
+      "phase": "12-living-system",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose observation-to-lesson first; promotion remains blocked until simulation and regression tasks are proven.",
+        "proof_uri": "proof_records/LIVING-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 75,
+      "task_id": "LIVING-002",
+      "title": "Failure learning and proven-world promotion family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Decompose bounded autonomy proofs only after the released product and learning pipeline are proven.",
+        "proof_uri": "proof_records/LIVING-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIVING-002"
+      ],
+      "phase": "12-living-system",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Decompose bounded autonomy proofs only after the released product and learning pipeline are proven.",
+        "proof_uri": "proof_records/LIVING-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 76,
+      "task_id": "LIVING-003",
+      "title": "Upgrade-only autonomous operation acceptance family defined",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded proof-backfill task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-000.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LIFEOS-003"
+      ],
+      "phase": "0-foundation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded proof-backfill task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-000.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 77,
+      "task_id": "LPS-000",
+      "title": "Planning Spine package and North Star proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded schema-proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-001.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-000"
+      ],
+      "phase": "1-schema",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded schema-proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 78,
+      "task_id": "LPS-001",
+      "title": "Object model proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded authority-proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-001"
+      ],
+      "phase": "1-schema",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded authority-proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 79,
+      "task_id": "LPS-002",
+      "title": "Authority graph proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded graph-schema and North-Star-coverage proof task after the high-level graph is complete.",
+        "proof_uri": "proof_records/LPS-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-002"
+      ],
+      "phase": "1-schema",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded graph-schema and North-Star-coverage proof task after the high-level graph is complete.",
+        "proof_uri": "proof_records/LPS-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 80,
+      "task_id": "LPS-003",
+      "title": "Task graph schema proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded WorldSeed-proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-004.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-003"
+      ],
+      "phase": "2-simulation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded WorldSeed-proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 81,
+      "task_id": "LPS-004",
+      "title": "WorldSeed schema proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded simulation-contract proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-005.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-004"
+      ],
+      "phase": "2-simulation",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded simulation-contract proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-005.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 82,
+      "task_id": "LPS-005",
+      "title": "SimulationReport contract proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded cell-contract proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-006.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-005"
+      ],
+      "phase": "3-execution",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded cell-contract proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-006.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 83,
+      "task_id": "LPS-006",
+      "title": "Hermetic cell contract proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded proof-ledger reconciliation task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-007.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-006"
+      ],
+      "phase": "3-execution",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded proof-ledger reconciliation task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-007.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 84,
+      "task_id": "LPS-007",
+      "title": "Proof ledger schema proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded connected-MVP proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-008.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-007"
+      ],
+      "phase": "4-mvp",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded connected-MVP proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-008.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 85,
+      "task_id": "LPS-008",
+      "title": "Governed MVP vertical slice proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded execution-gate proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-009.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-008"
+      ],
+      "phase": "5-gates",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded execution-gate proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-009.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 86,
+      "task_id": "LPS-009",
+      "title": "Execution gates proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create a bounded RFC-boundary proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-010.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-009"
+      ],
+      "phase": "6-rfc",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Create a bounded RFC-boundary proof task after the full graph coverage gate passes.",
+        "proof_uri": "proof_records/LPS-010.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 87,
+      "task_id": "LPS-010",
+      "title": "Compiled brainpack RFC boundary proof completed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After high-level coverage passes, add one bounded decision row per unresolved question before any dependent product task becomes ready.",
+        "proof_uri": "proof_records/LPS-011.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-010"
+      ],
+      "phase": "7-review",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "After high-level coverage passes, add one bounded decision row per unresolved question before any dependent product task becomes ready.",
+        "proof_uri": "proof_records/LPS-011.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 88,
+      "task_id": "LPS-011",
+      "title": "Open questions represented as blocking task rows",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "NBVERIFY-000 locks claim verification and provenance; next process NBSOURCE-003 one source at a time, then update the queue without parallel web synthesis.",
+        "proof_uri": "proof_records/GRAPH-001.proof.json",
+        "status": "running"
+      },
+      "parent_ids": [
+        "LIFEOS-000"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "NBVERIFY-000 locks claim verification and provenance; next process NBSOURCE-003 one source at a time, then update the queue without parallel web synthesis.",
+        "proof_uri": "proof_records/GRAPH-001.proof.json",
+        "status": "running"
+      },
+      "source_row_number": 89,
+      "task_id": "GRAPH-001",
+      "title": "High-level phases decomposed into bounded task families",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-000.proof.json; next child task: NBSOURCE-001.",
+        "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-000.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "GRAPH-001"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 27,
+        "observed_at": "2026-07-10T20:45:20Z",
+        "revision": "1",
+        "sha256": "3016390b3d96bf660b3267f0d0df0f80912831f6d71ff13291f49b85a64b3f5a"
+      },
+      "source": {
+        "next_action": "Protocol established; process NBSOURCE-001 only.",
+        "proof_uri": "proof_records/NBSOURCE-000.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 90,
+      "task_id": "NBSOURCE-000",
+      "title": "NotebookLM source-by-source extraction protocol established",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Protocol established; process NBSOURCE-001 only.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-000.proof.json; next child task: NBSOURCE-001."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBSOURCE-000.proof.json",
+          "to": "planning-spine-v0/proof_records/NBSOURCE-000.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-001.proof.json; next child task: NBSOURCE-002.",
+        "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-001.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-000"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 28,
+        "observed_at": "2026-07-10T20:45:20Z",
+        "revision": "1",
+        "sha256": "055474f2a64a216af60f6692eb320e5365735a9b765680f15e798647630aed1a"
+      },
+      "source": {
+        "next_action": "Source one is captured; do not select source two until the owner discussion or next-source instruction.",
+        "proof_uri": "proof_records/NBSOURCE-001.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 91,
+      "task_id": "NBSOURCE-001",
+      "title": "Redb architectural-role report captured and mapped",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Source one is captured; do not select source two until the owner discussion or next-source instruction.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-001.proof.json; next child task: NBSOURCE-002."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBSOURCE-001.proof.json",
+          "to": "planning-spine-v0/proof_records/NBSOURCE-001.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-002.proof.json; next child task: NBVERIFY-000.",
+        "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-002.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-001"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 29,
+        "observed_at": "2026-07-10T20:53:19Z",
+        "revision": "1",
+        "sha256": "f579d7d68af29ba333fc8c2c7bbc324d9700cd7e21c975d03ac0f68120cb8c3f"
+      },
+      "source": {
+        "next_action": "Source two is captured and all unresolved claims are queued by NBVERIFY-000; next process Architecting Nushell Plugin Integration with Redb and PostgreSQL.",
+        "proof_uri": "proof_records/NBSOURCE-002.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 92,
+      "task_id": "NBSOURCE-002",
+      "title": "Edge high-frequency buffering source captured and mapped",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Source two is captured and all unresolved claims are queued by NBVERIFY-000; next process Architecting Nushell Plugin Integration with Redb and PostgreSQL.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-002.proof.json; next child task: NBVERIFY-000."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBSOURCE-002.proof.json",
+          "to": "planning-spine-v0/proof_records/NBSOURCE-002.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBVERIFY-000.proof.json; next child task: STORE-001.",
+        "proof_uri": "planning-spine-v0/proof_records/NBVERIFY-000.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-002"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 30,
+        "observed_at": "2026-07-10T21:20:09Z",
+        "revision": "1",
+        "sha256": "251ac4617f0947a32e40c32c7d76bce13771cd7249f18a3b0f31ebf71ce8ed69"
+      },
+      "source": {
+        "next_action": "Verification control is locked; process future NotebookLM sources sequentially and append support, contradiction, or qualification evidence without resolving claims by repetition.",
+        "proof_uri": "proof_records/NBVERIFY-000.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 93,
+      "task_id": "NBVERIFY-000",
+      "title": "Claim-scoped verification and evidence-provenance queue established",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Verification control is locked; process future NotebookLM sources sequentially and append support, contradiction, or qualification evidence without resolving claims by repetition.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBVERIFY-000.proof.json; next child task: STORE-001."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBVERIFY-000.proof.json",
+          "to": "planning-spine-v0/proof_records/NBVERIFY-000.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-003.proof.json; next child task: NBSOURCE-004.",
+        "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-003.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-002",
+        "NBVERIFY-000"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 31,
+        "observed_at": "2026-07-10T21:39:39Z",
+        "revision": "1",
+        "sha256": "57c50e1c80745095def3196390a05a921860521e22a9619d8628b01bcc7afc78"
+      },
+      "source": {
+        "next_action": "Source three is captured; process Architectural Integration of LifeOS and the Ruvnet Swarm, source 72e22d9c-72c9-4389-8358-700bb46b55b6, only on an explicit later-source instruction.",
+        "proof_uri": "proof_records/NBSOURCE-003.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 94,
+      "task_id": "NBSOURCE-003",
+      "title": "Nushell redb PostgreSQL integration source captured and mapped",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Source three is captured; process Architectural Integration of LifeOS and the Ruvnet Swarm, source 72e22d9c-72c9-4389-8358-700bb46b55b6, only on an explicit later-source instruction.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-003.proof.json; next child task: NBSOURCE-004."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBSOURCE-003.proof.json",
+          "to": "planning-spine-v0/proof_records/NBSOURCE-003.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-004.proof.json; next child task: STORE-001.",
+        "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-004.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-003"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 33,
+        "observed_at": "2026-07-10T21:59:24Z",
+        "revision": "2",
+        "sha256": "4931f07a1f3baf17aea52a04891d5c07c4c1fc17a4610c257f141e67d9d248e5"
+      },
+      "source": {
+        "next_action": "Source four is captured; process Autonomous Database Transformation and Swarm Defense Mechanisms, stable list index 3 and source fef30a8a-bb06-4b23-904a-c7a77af0d6c0, only in the next sequential loop.",
+        "proof_uri": "proof_records/NBSOURCE-004.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 95,
+      "task_id": "NBSOURCE-004",
+      "title": "LifeOS and Ruvnet swarm integration source captured and mapped",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Source four is captured; process Autonomous Database Transformation and Swarm Defense Mechanisms, stable list index 3 and source fef30a8a-bb06-4b23-904a-c7a77af0d6c0, only in the next sequential loop.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-004.proof.json; next child task: STORE-001."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBSOURCE-004.proof.json",
+          "to": "planning-spine-v0/proof_records/NBSOURCE-004.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-005.proof.json; next child task: NBSOURCE-006.",
+        "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-005.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-004"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 34,
+        "observed_at": "2026-07-10T22:07:18Z",
+        "revision": "1",
+        "sha256": "54895dbacde5a1f89bbb10c976b7b1c39a5fba079e5fb99fc76c296747f1c63f"
+      },
+      "source": {
+        "next_action": "Source five is captured; process Charting the Chaos: Forecasting Software Trajectories via Temporal Attractors, stable list index 4 and source 3ff7375b-84a8-46c0-a90e-47fd55392841, only after commit, push, and clean receipt.",
+        "proof_uri": "proof_records/NBSOURCE-005.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 96,
+      "task_id": "NBSOURCE-005",
+      "title": "Autonomous database transformation and swarm defense source captured",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Source five is captured; process Charting the Chaos: Forecasting Software Trajectories via Temporal Attractors, stable list index 4 and source 3ff7375b-84a8-46c0-a90e-47fd55392841, only after commit, push, and clean receipt.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-005.proof.json; next child task: NBSOURCE-006."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBSOURCE-005.proof.json",
+          "to": "planning-spine-v0/proof_records/NBSOURCE-005.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Source six is captured; process Cognitive Evolution: Redb Versus AgentDB Architecture, stable list index 5 and source cc245f6e-77d8-4093-a016-fe847f6813a5, only after commit, push, and clean receipt.",
+        "proof_uri": "proof_records/NBSOURCE-006.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-005"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Source six is captured; process Cognitive Evolution: Redb Versus AgentDB Architecture, stable list index 5 and source cc245f6e-77d8-4093-a016-fe847f6813a5, only after commit, push, and clean receipt.",
+        "proof_uri": "proof_records/NBSOURCE-006.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 97,
+      "task_id": "NBSOURCE-006",
+      "title": "Temporal Attractor forecasting source captured and mapped",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/NORTHSTAR-001.proof.json; next child task: NORTHSTAR-002.",
+        "proof_uri": "proof_records/NORTHSTAR-001.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "GRAPH-001"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 25,
+        "observed_at": "2026-07-10T18:11:02Z",
+        "revision": "1",
+        "sha256": "cd2017ec4dfe07ac44a0fcf611fb78f65614550973219b56dadc2e4fd99900dd"
+      },
+      "source": {
+        "next_action": "Compact revision locked with proof; await David's follow-up before evaluating or adding missing meaning.",
+        "proof_uri": "proof_records/NORTHSTAR-001.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 98,
+      "task_id": "NORTHSTAR-001",
+      "title": "Compact semantic North Star locked",
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Compact revision locked with proof; await David's follow-up before evaluating or adding missing meaning.",
+          "to": "Proof accepted from proof_records/NORTHSTAR-001.proof.json; next child task: NORTHSTAR-002."
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/NORTHSTAR-002.proof.json; no child task is declared in this graph.",
+        "proof_uri": "proof_records/NORTHSTAR-002.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NORTHSTAR-001"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 26,
+        "observed_at": "2026-07-10T19:14:55Z",
+        "revision": "1",
+        "sha256": "72c8edb8f4387a894e1a8f82ba866df8ca577578e3c97d9c82f06d8fb66917b9"
+      },
+      "source": {
+        "next_action": "Human-centered vision locked with proof; continue graph planning only.",
+        "proof_uri": "proof_records/NORTHSTAR-002.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 99,
+      "task_id": "NORTHSTAR-002",
+      "title": "Human-centered LifeOS vision locked",
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Human-centered vision locked with proof; continue graph planning only.",
+          "to": "Proof accepted from proof_records/NORTHSTAR-002.proof.json; no child task is declared in this graph."
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "RECOVERY-001 through RECOVERY-004 are the bounded reconciliation path; do not bulk-import or bulk-complete prior rows.",
+        "proof_uri": "proof_records/GRAPH-002.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "GRAPH-001"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "RECOVERY-001 through RECOVERY-004 are the bounded reconciliation path; do not bulk-import or bulk-complete prior rows.",
+        "proof_uri": "proof_records/GRAPH-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 100,
+      "task_id": "GRAPH-002",
+      "title": "Competing task tables reconciled into one canonical plan",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Implement only after the complete task graph exists and GRAPH-002 reconciliation passes.",
+        "proof_uri": "proof_records/GRAPH-003.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "GRAPH-002"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Implement only after the complete task graph exists and GRAPH-002 reconciliation passes.",
+        "proof_uri": "proof_records/GRAPH-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 101,
+      "task_id": "GRAPH-003",
+      "title": "North Star coverage gate enforced before packet generation",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Implement after GRAPH-003 establishes the global fail-closed execution gate.",
+        "proof_uri": "proof_records/GRAPH-004.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "GRAPH-003"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Implement after GRAPH-003 establishes the global fail-closed execution gate.",
+        "proof_uri": "proof_records/GRAPH-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 102,
+      "task_id": "GRAPH-004",
+      "title": "Task lifecycle projection respects planning and proof state",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "This is the final planning gate; no product execution before its proof is accepted.",
+        "proof_uri": "proof_records/GRAPH-005.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "GRAPH-004"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "This is the final planning gate; no product execution before its proof is accepted.",
+        "proof_uri": "proof_records/GRAPH-005.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 103,
+      "task_id": "GRAPH-005",
+      "title": "Pre-execution graph closure proven",
+      "updated_fields": [],
+      "updates": {}
+    },
     {
       "effective": {
         "next_action": "Proof accepted from proof_records/LPS-012.proof.json; next child task: LPS-013.",
@@ -45,9 +3094,9 @@
       "source": {
         "next_action": "Implement extractor against CSV first; Sheet API later.",
         "proof_uri": "proof_records/LPS-012.proof.json",
-        "status": "ready"
+        "status": "draft"
       },
-      "source_row_number": 2,
+      "source_row_number": 104,
       "task_id": "LPS-012",
       "title": "Python task graph extractor",
       "updated_fields": [
@@ -60,7 +3109,7 @@
           "to": "Proof accepted from proof_records/LPS-012.proof.json; next child task: LPS-013."
         },
         "status": {
-          "from": "ready",
+          "from": "draft",
           "to": "complete"
         }
       }
@@ -84,9 +3133,9 @@
       "source": {
         "next_action": "Use JSON Schema-compatible field names.",
         "proof_uri": "proof_records/LPS-013.proof.json",
-        "status": "ready"
+        "status": "draft"
       },
-      "source_row_number": 3,
+      "source_row_number": 105,
       "task_id": "LPS-013",
       "title": "Normalize task graph JSON",
       "updated_fields": [
@@ -99,7 +3148,7 @@
           "to": "Proof accepted from proof_records/LPS-013.proof.json; next child task: LPS-014."
         },
         "status": {
-          "from": "ready",
+          "from": "draft",
           "to": "complete"
         }
       }
@@ -123,9 +3172,9 @@
       "source": {
         "next_action": "Do not include full doc prose in packets.",
         "proof_uri": "proof_records/LPS-014.proof.json",
-        "status": "ready"
+        "status": "draft"
       },
-      "source_row_number": 4,
+      "source_row_number": 106,
       "task_id": "LPS-014",
       "title": "Build JSON execution packets",
       "updated_fields": [
@@ -138,7 +3187,7 @@
           "to": "Proof accepted from proof_records/LPS-014.proof.json; next child task: LPS-015."
         },
         "status": {
-          "from": "ready",
+          "from": "draft",
           "to": "complete"
         }
       }
@@ -162,9 +3211,9 @@
       "source": {
         "next_action": "Wire into Bun verify if useful, but Python remains required.",
         "proof_uri": "proof_records/LPS-015.proof.json",
-        "status": "ready"
+        "status": "draft"
       },
-      "source_row_number": 5,
+      "source_row_number": 107,
       "task_id": "LPS-015",
       "title": "Validate execution packet",
       "updated_fields": [
@@ -177,7 +3226,7 @@
           "to": "Proof accepted from proof_records/LPS-015.proof.json; next child task: LPS-016."
         },
         "status": {
-          "from": "ready",
+          "from": "draft",
           "to": "complete"
         }
       }
@@ -201,9 +3250,9 @@
       "source": {
         "next_action": "Add proof schema validation.",
         "proof_uri": "proof_records/LPS-016.proof.json",
-        "status": "ready"
+        "status": "draft"
       },
-      "source_row_number": 6,
+      "source_row_number": 108,
       "task_id": "LPS-016",
       "title": "Merge proof records",
       "updated_fields": [
@@ -216,7 +3265,7 @@
           "to": "Proof accepted from proof_records/LPS-016.proof.json; next child task: LPS-017."
         },
         "status": {
-          "from": "ready",
+          "from": "draft",
           "to": "complete"
         }
       }
@@ -240,9 +3289,9 @@
       "source": {
         "next_action": "Keep source-of-truth sheet human-readable.",
         "proof_uri": "proof_records/LPS-017.proof.json",
-        "status": "ready"
+        "status": "draft"
       },
-      "source_row_number": 7,
+      "source_row_number": 109,
       "task_id": "LPS-017",
       "title": "Update task graph status from proof",
       "updated_fields": [
@@ -255,7 +3304,7 @@
           "to": "Proof accepted from proof_records/LPS-017.proof.json; next child task: LPS-018."
         },
         "status": {
-          "from": "ready",
+          "from": "draft",
           "to": "complete"
         }
       }
@@ -279,9 +3328,9 @@
       "source": {
         "next_action": "Use for Codex handoff and future reruns.",
         "proof_uri": "proof_records/LPS-018.proof.json",
-        "status": "ready"
+        "status": "draft"
       },
-      "source_row_number": 8,
+      "source_row_number": 110,
       "task_id": "LPS-018",
       "title": "Package execution bundle",
       "updated_fields": [
@@ -294,7 +3343,7 @@
           "to": "Proof accepted from proof_records/LPS-018.proof.json; next child task: LPS-019."
         },
         "status": {
-          "from": "ready",
+          "from": "draft",
           "to": "complete"
         }
       }
@@ -320,7 +3369,7 @@
         "proof_uri": "proof_records/LPS-019.proof.json",
         "status": "complete"
       },
-      "source_row_number": 9,
+      "source_row_number": 111,
       "task_id": "LPS-019",
       "title": "Accurate current state map",
       "updated_fields": [
@@ -354,7 +3403,7 @@
         "proof_uri": "proof_records/LPS-020.proof.json",
         "status": "complete"
       },
-      "source_row_number": 10,
+      "source_row_number": 112,
       "task_id": "LPS-020",
       "title": "Repair verification frontdoor",
       "updated_fields": [
@@ -388,7 +3437,7 @@
         "proof_uri": "proof_records/LPS-021.proof.json",
         "status": "complete"
       },
-      "source_row_number": 11,
+      "source_row_number": 113,
       "task_id": "LPS-021",
       "title": "Connected MVP bundle verification",
       "updated_fields": [
@@ -403,7 +3452,7 @@
     },
     {
       "effective": {
-        "next_action": "Proof accepted from proof_records/LPS-022.proof.json; no child task is declared in this graph.",
+        "next_action": "Proof accepted from proof_records/LPS-022.proof.json; next child task: LPS-029.",
         "proof_uri": "proof_records/LPS-022.proof.json",
         "status": "complete"
       },
@@ -422,7 +3471,7 @@
         "proof_uri": "proof_records/LPS-022.proof.json",
         "status": "complete"
       },
-      "source_row_number": 12,
+      "source_row_number": 114,
       "task_id": "LPS-022",
       "title": "Verifier authority integrity",
       "updated_fields": [
@@ -431,9 +3480,387 @@
       "updates": {
         "next_action": {
           "from": "Completed locally per Codex; after reconciliation resume LPS-012.",
-          "to": "Proof accepted from proof_records/LPS-022.proof.json; no child task is declared in this graph."
+          "to": "Proof accepted from proof_records/LPS-022.proof.json; next child task: LPS-029."
         }
       }
+    },
+    {
+      "effective": {
+        "next_action": "Reference src/meta/.kb skills kb-start/kb-tasks/kb-handoff. Gate: config.toml [user] section present.",
+        "proof_uri": "proof_records/LPS-023.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-018"
+      ],
+      "phase": "11-fleet-integration",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Reference src/meta/.kb skills kb-start/kb-tasks/kb-handoff. Gate: config.toml [user] section present.",
+        "proof_uri": "proof_records/LPS-023.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 115,
+      "task_id": "LPS-023",
+      "title": "GitKB planning-plane adoption",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Depends on LPS-023. Preserve the ADR-0003 one-way invariant.",
+        "proof_uri": "proof_records/LPS-024.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-023"
+      ],
+      "phase": "11-fleet-integration",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Depends on LPS-023. Preserve the ADR-0003 one-way invariant.",
+        "proof_uri": "proof_records/LPS-024.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 116,
+      "task_id": "LPS-024",
+      "title": "handoff (hf) execution seam",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation.",
+        "proof_uri": "proof_records/LPS-025.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-024"
+      ],
+      "phase": "11-fleet-integration",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation.",
+        "proof_uri": "proof_records/LPS-025.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 117,
+      "task_id": "LPS-025",
+      "title": "rusty-idd IDD/OpenSpec control binary",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Honors git-topology: PRs target develop; develop to main is fast-forward only.",
+        "proof_uri": "proof_records/LPS-026.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-025"
+      ],
+      "phase": "11-fleet-integration",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Honors git-topology: PRs target develop; develop to main is fast-forward only.",
+        "proof_uri": "proof_records/LPS-026.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 118,
+      "task_id": "LPS-026",
+      "title": "meta git fleet branch/PR surface",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here.",
+        "proof_uri": "proof_records/LPS-027.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-026"
+      ],
+      "phase": "11-fleet-integration",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here.",
+        "proof_uri": "proof_records/LPS-027.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 119,
+      "task_id": "LPS-027",
+      "title": "meta exec multi-repo run/release",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears.",
+        "proof_uri": "proof_records/LPS-028.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-027"
+      ],
+      "phase": "11-fleet-integration",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears.",
+        "proof_uri": "proof_records/LPS-028.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 120,
+      "task_id": "LPS-028",
+      "title": "Fleet loop spine wiring and inventory closure",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles.",
+        "proof_uri": "proof_records/LPS-029.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-022"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles.",
+        "proof_uri": "proof_records/LPS-029.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 121,
+      "task_id": "LPS-029",
+      "title": "LiDAR capture of room and workstation",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Package openusd and meshlab from nixpkgs; keep toolchain out of ~/.local per toolchain contract.",
+        "proof_uri": "proof_records/LPS-030.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-029"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Package openusd and meshlab from nixpkgs; keep toolchain out of ~/.local per toolchain contract.",
+        "proof_uri": "proof_records/LPS-030.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 122,
+      "task_id": "LPS-030",
+      "title": "Nix USD toolchain dev shell",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs.",
+        "proof_uri": "proof_records/LPS-031.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-030"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs.",
+        "proof_uri": "proof_records/LPS-031.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 123,
+      "task_id": "LPS-031",
+      "title": "Mesh cleanup to watertight",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Verify model VRAM fit on RTX 5080 (15.5 GB) before batch inference.",
+        "proof_uri": "proof_records/LPS-032.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-031"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Verify model VRAM fit on RTX 5080 (15.5 GB) before batch inference.",
+        "proof_uri": "proof_records/LPS-032.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 124,
+      "task_id": "LPS-032",
+      "title": "Semantic and instance segmentation",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry.",
+        "proof_uri": "proof_records/LPS-033.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-032"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry.",
+        "proof_uri": "proof_records/LPS-033.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 125,
+      "task_id": "LPS-033",
+      "title": "OpenUSD composition with physics schemas",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Mirror the WorldSim doctrine: agent code must never mutate the base scan layer.",
+        "proof_uri": "proof_records/LPS-034.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-033"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Mirror the WorldSim doctrine: agent code must never mutate the base scan layer.",
+        "proof_uri": "proof_records/LPS-034.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 126,
+      "task_id": "LPS-034",
+      "title": "Immutable base layer and colliders",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Wire the report into proof_records as the LPS-035 proof.",
+        "proof_uri": "proof_records/LPS-035.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-034"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Wire the report into proof_records as the LPS-035 proof.",
+        "proof_uri": "proof_records/LPS-035.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 127,
+      "task_id": "LPS-035",
+      "title": "Automated twin acceptance gate",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report.",
+        "proof_uri": "proof_records/LPS-036.proof.json",
+        "status": "draft"
+      },
+      "parent_ids": [
+        "LPS-035"
+      ],
+      "phase": "12-worldsim-ingestion",
+      "proof": {
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null
+      },
+      "source": {
+        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report.",
+        "proof_uri": "proof_records/LPS-036.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 128,
+      "task_id": "LPS-036",
+      "title": "Genesis feasibility on validated twin",
+      "updated_fields": [],
+      "updates": {}
     }
   ],
   "update_policy": {
@@ -446,6 +3873,21 @@
     "mutates_source_graph": false
   },
   "updated_task_ids": [
+    "PRESERVE-001",
+    "STRUCTURE-001",
+    "STRUCTURE-002",
+    "STRUCTURE-003",
+    "STRUCTURE-004",
+    "STRUCTURE-005",
+    "NBSOURCE-000",
+    "NBSOURCE-001",
+    "NBSOURCE-002",
+    "NBVERIFY-000",
+    "NBSOURCE-003",
+    "NBSOURCE-004",
+    "NBSOURCE-005",
+    "NORTHSTAR-001",
+    "NORTHSTAR-002",
     "LPS-012",
     "LPS-013",
     "LPS-014",

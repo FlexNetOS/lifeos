@@ -1,0 +1,77 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "NBSOURCE-005",
+  "observed_at": "2026-07-10T22:07:18Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "All fourteen source claims are atomized, classified, mapped, and queued; registry mapped_task_ids exactly equals the canonical claim-task union; NBE-008 includes every DBX claim plus preserved prior relations; global IDs and task references are valid; Ready is zero; no implementation, database, agent, web, or later-source work occurred.",
+  "gate_result": {
+    "source_id_exact": true,
+    "kind_markdown": true,
+    "fulltext_sha256_recorded": true,
+    "atomic_claim_count": 14,
+    "mapped_claim_count": 14,
+    "queued_claim_count": 14,
+    "unmapped_claim_count": 0,
+    "classification_counts": {
+      "architecture-proposal": 3,
+      "application-claim": 7,
+      "engine-fact": 1,
+      "comparison-claim": 1,
+      "performance-claim": 1,
+      "source-provenance-claim": 1
+    },
+    "registry_mapping_exact": true,
+    "relationship_evidence_complete": true,
+    "global_ids_unique": true,
+    "queue_task_references_exist": true,
+    "task_count": 126,
+    "ready_count": 0,
+    "normalization_errors": 0,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true,
+    "later_source_processed": false
+  },
+  "proof_summary": "Captured the 1,210-byte Markdown source as fourteen unresolved claims covering database-native editing, RuVector operator semantics, MinCut defense, Cryptographic Witness Chains, absolute security language, Phase 4 ordering, and missing citations. All claims remain queued for primary evidence, benchmarks, threat models, or owner decisions; NotebookLM repetition verifies nothing.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-005-autonomous-db-swarm-defense.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/proof_records/NBSOURCE-005.proof.json",
+    "/home/flexnetos/lifeos/var/lib/codex-runtime-gate/archives/20260710T220330Z-lifeos-before-notebooklm-source-005.tar.gz"
+  ],
+  "checksums": {
+    "notebooklm_fulltext_sha256": "e5291dd850cc830ced1a187e64d281e0b003268c11b00945028590988b1852d0",
+    "structured_extract_sha256": "f5948e494b0fcdee790b97df497d4cf674e69855ec01f66397e11df85ee07167",
+    "source_registry_sha256": "e2a34deef2b95c5c4fbaa8776466f8c8dcd8dd2e65a850f46eb1b9c2cdf8a115",
+    "claim_table_sha256": "3095e952a14f08df47001ad8d4a3fb5e820a0f34837e83fc758ec85ceac0a526",
+    "verification_queue_sha256": "eae4d6f823164d3fdfcd835e6bf2c2143713b7707afb6467cca55e38eccda341",
+    "claim_evidence_sha256": "80ee35fbb225afba19fbc8a1a9933db23b600c7bfd484ab413590eb87ec79832",
+    "task_graph_sha256": "feff75da9eefed1fe48d1d481c2810dbc9f61bf0d22852bc59e50adb2ab3d380",
+    "archive_sha256": "c347cad881683d8a0697fe7d5e4fb5b4317e8f44443c690ffa6a9feba423b221"
+  },
+  "live_commands": [
+    {
+      "purpose": "Retrieve exact source",
+      "command": "notebooklm source fulltext fef30a8a-bb06-4b23-904a-c7a77af0d6c0 -n b09afb74-b464-4bc3-94f0-d5193f7c7d36 --json",
+      "exit_status": 0
+    },
+    {
+      "purpose": "Assert mappings and normalize graph",
+      "command": "python3 NBSOURCE-005 assertions && extract-task-graph.py && normalize-task-graph.py",
+      "exit_status": 0
+    },
+    {
+      "purpose": "Append proof and run gates",
+      "command": "merge-proof-records.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0
+    }
+  ]
+}

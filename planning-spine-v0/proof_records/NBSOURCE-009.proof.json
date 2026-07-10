@@ -1,0 +1,74 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-009-agentic-temporal-branching.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/proof_records/NBSOURCE-009.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T230321Z-lifeos-notebooklm-integration-before-NBSOURCE-009.tar.gz"
+  ],
+  "checksums": {
+    "archive_sha256": "bd435e902aa4ae3e4c58aa2f6b25b461c6de998dd323d7e3c0dc7404b7150cab",
+    "claim_evidence_sha256": "5d7b0a2c60123cf955d05e64a590db069874030196716e1b7d51c0d95012b104",
+    "claim_table_sha256": "1e8e4e6fe1a495f4be614f759b8d0e27da39059e86210171e9fc7b7679c81d40",
+    "notebooklm_fulltext_sha256": "c9ea76f8363a29790c7f270e2b994e3d43b27bd0aa8685a25001bab70ed03252",
+    "source_registry_sha256": "ef0a20e82521ce4bd810480da44f79aad548207783808ea99f3ffb2f488b1b7f",
+    "structured_extract_sha256": "c42078fb43decfd0d702c6944e5aa56363656c3f4e3843fd48270bf6c33f882b",
+    "task_graph_sha256": "7607e58ee8939f2b887678f0ed786ad2fb0e9a09533ef86b10449f598165f9e8",
+    "verification_queue_sha256": "7f8586016b14e4b07f121c131f7e49d9af429b970e35d9eb6491dd3fee8f0ba9"
+  },
+  "gate_result": {
+    "all_task_references_exist": true,
+    "atomic_claim_count": 8,
+    "classification_counts": {
+      "architecture-proposal": 3,
+      "current-implementation-claim": 2,
+      "question-claim": 2,
+      "source-provenance-claim": 1
+    },
+    "fulltext_sha256_exact": true,
+    "git_diff_check_passed": true,
+    "global_ids_unique": true,
+    "later_source_processed": false,
+    "mapped_claim_count": 8,
+    "normalization_errors": 0,
+    "packet_validation_passed": true,
+    "planning_spine_verify_passed": true,
+    "question_count": 2,
+    "queued_claim_count": 8,
+    "ready_count": 0,
+    "registry_mapping_exact": true,
+    "source_id_exact": true,
+    "task_count": 130
+  },
+  "live_commands": [
+    {
+      "command": "packet validation + sha256 + byte-count assertions for NBSOURCE-009",
+      "exit_status": 0,
+      "purpose": "Validate isolated packet/source"
+    },
+    {
+      "command": "exact global assertions && extract-task-graph.py && normalize-task-graph.py",
+      "exit_status": 0,
+      "purpose": "Assert mappings and normalize graph"
+    },
+    {
+      "command": "merge-proof-records.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Append proof and run gates"
+    }
+  ],
+  "observed_at": "2026-07-10T23:04:08Z",
+  "proof_summary": "Captured 1117 source bytes as 8 unresolved atoms covering ATAS copy-on-write futures, performed-work selection, ESN branch selection, reproduction guarantees, immune-system and truthfulness questions, and unresolved citations. Questions remain questions, all atoms are queued, and relation evidence closes no claim.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBSOURCE-009",
+  "verification_gate": "All 8 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; all task refs resolve; global IDs are unique; repetition verifies nothing; Ready remains zero; global assertions, normalization, planning-spine verification, and git diff checks pass."
+}

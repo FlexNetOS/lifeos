@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-10T23:22:55Z",
+  "generated_at": "2026-07-10T23:24:00Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 138,
+    "row_count": 139,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -3061,6 +3061,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBSOURCE-017.proof.json",
         "next_action": "NBSOURCE-018 PostgreSQL Semantic Codebase Management"
+      }
+    },
+    {
+      "source_row_number": 140,
+      "columns": {
+        "task_id": "NBSOURCE-018",
+        "parent_id": "NBSOURCE-017",
+        "phase": "0-north-star-graph",
+        "title": "PostgreSQL Semantic Codebase Management source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Capture and semantically normalize PostgreSQL Semantic Codebase Management, preserve questions, classify every atom, and expose primary-evidence, benchmark, authority, recovery, and owner-decision paths without product execution.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source b1e48fb2-6229-41cc-b96e-384e7afbb02a; fulltext SHA-256 ceb68e682d764633b1064f62078da8fed5998d5aeb35d0d9f5ee403ddf7b4fce; NBSOURCE-001 through NBSOURCE-017; NBVERIFY-000; packet validation pass",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-018-postgresql-semantic-codebase.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-018.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product, agent, model, store, profile, runtime, release, or workspace execution; fabricated proof; invented citations; processing later sources; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 7 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T232349Z-lifeos-notebooklm-integration-before-NBSOURCE-018.tar.gz and remove only NBSOURCE-018 rows and artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-018.proof.json",
+        "next_action": "batch complete; await explicit owner instruction"
       }
     }
   ]

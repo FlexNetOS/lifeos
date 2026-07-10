@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-10T23:04:08Z",
+  "generated_at": "2026-07-10T23:05:45Z",
   "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
-  "task_count": 130,
+  "task_count": 131,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-10T23:04:08Z",
+    "generated_at": "2026-07-10T23:05:45Z",
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
-    "row_count": 130,
+    "row_count": 131,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -7699,6 +7699,73 @@
         "fabricated proof",
         "invented citations",
         "processing NBSOURCE-010",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "NBSOURCE-010",
+      "source_row_number": 132,
+      "phase": "0-north-star-graph",
+      "title": "Edge Node Deployment and Agent Swarm Initialization source captured and mapped",
+      "owner_agent": "LifeOS Planning Spine / QA Agent",
+      "goal": "Capture and semantically normalize Edge Node Deployment and Agent Swarm Initialization one source at a time, preserve questions, classify all atoms, map them to canonical tasks, and expose unresolved proof or owner-decision paths without product execution.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "All 13 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; all task refs resolve; global IDs are unique; repetition verifies nothing; Ready remains zero; global assertions, normalization, planning-spine verification, and git diff checks pass.",
+      "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T230451Z-lifeos-notebooklm-integration-before-NBSOURCE-010.tar.gz and remove only NBSOURCE-010 rows and artifacts after preserving failure evidence.",
+      "status": "complete",
+      "proof_uri": "proof_records/NBSOURCE-010.proof.json",
+      "next_action": "NBSOURCE-011 Engineering Fully Portable Nix and Rust Static Binaries",
+      "source_columns": {
+        "task_id": "NBSOURCE-010",
+        "parent_id": "NBSOURCE-009",
+        "phase": "0-north-star-graph",
+        "title": "Edge Node Deployment and Agent Swarm Initialization source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Capture and semantically normalize Edge Node Deployment and Agent Swarm Initialization one source at a time, preserve questions, classify all atoms, map them to canonical tasks, and expose unresolved proof or owner-decision paths without product execution.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source 128d9867-01e7-4415-a711-c748f52c507d; fulltext SHA-256 aa90a47f25fcb9eabd76274d3e42dae9d0ef29098a3e59c65e52fb1885196e78; NBSOURCE-001 through NBSOURCE-009; NBVERIFY-000; packet validation pass",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-010-edge-node-agent-swarm.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-010.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product implementation; peer or runtime mutation; fabricated proof; invented citations; processing NBSOURCE-011; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 13 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; all task refs resolve; global IDs are unique; repetition verifies nothing; Ready remains zero; global assertions, normalization, planning-spine verification, and git diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T230451Z-lifeos-notebooklm-integration-before-NBSOURCE-010.tar.gz and remove only NBSOURCE-010 rows and artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-010.proof.json",
+        "next_action": "NBSOURCE-011 Engineering Fully Portable Nix and Rust Static Binaries"
+      },
+      "parent_ids": [
+        "NBSOURCE-009"
+      ],
+      "inputs": [
+        "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36",
+        "source 128d9867-01e7-4415-a711-c748f52c507d",
+        "fulltext SHA-256 aa90a47f25fcb9eabd76274d3e42dae9d0ef29098a3e59c65e52fb1885196e78",
+        "NBSOURCE-001 through NBSOURCE-009",
+        "NBVERIFY-000",
+        "packet validation pass"
+      ],
+      "target_artifacts": [
+        "generated/notebooklm_source_extracts/NBSOURCE-010-edge-node-agent-swarm.md",
+        "generated/notebooklm_source_registry.source.csv",
+        "generated/notebooklm_source_claims.source.csv",
+        "generated/notebooklm_claim_verification_queue.source.csv",
+        "generated/notebooklm_claim_evidence.source.csv",
+        "generated/prior_task_conflict.source.csv",
+        "proof_records/NBSOURCE-010.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "planning-spine-v0/state/**"
+      ],
+      "blocked_paths": [
+        "product implementation",
+        "peer or runtime mutation",
+        "fabricated proof",
+        "invented citations",
+        "processing NBSOURCE-011",
         "secrets/**"
       ]
     }

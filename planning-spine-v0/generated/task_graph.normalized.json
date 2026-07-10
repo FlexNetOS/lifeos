@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-10T20:23:40Z",
+  "generated_at": "2026-07-10T20:45:20Z",
   "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
-  "task_count": 119,
+  "task_count": 121,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-10T20:23:40Z",
+    "generated_at": "2026-07-10T20:45:20Z",
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
-    "row_count": 119,
+    "row_count": 121,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -2141,37 +2141,40 @@
       "goal": "Make the explicit owner decision for redb, PostgreSQL plus RuVector, and nu_plugin CodeDB: use cases, authority, data classes, synchronization direction, durability, performance, failure recovery, materialization, secret boundaries, and transition from current state.",
       "simulation_required": true,
       "execution_cell": "policy-cell",
-      "verification_gate": "David-approved decision assigns every relevant data class exactly once, preserves justified current capabilities, identifies derived and transient copies, defines directional synchronization and recovery, resolves CodeDB and envctl durable-redb conflicts, and leaves no silent dual authority.",
+      "verification_gate": "David-approved decision assigns every relevant data class exactly once, preserves justified current capabilities, identifies derived and transient copies, defines directional synchronization and recovery, resolves CodeDB and envctl durable-redb conflicts, distinguishes redb engine facts from application-layer claims, and leaves no silent dual authority.",
       "rollback_plan": "Restore the prior undecided relationship and keep all store execution blocked; no runtime state changes during planning.",
       "status": "draft",
       "proof_uri": "proof_records/STORE-001.proof.json",
-      "next_action": "Discuss and decide redb use cases and the redb-PostgreSQL-CodeDB relationship before decomposing POSTGRES-002.",
+      "next_action": "Use the verified NBSOURCE-001 redb claim map as discussion input; do not treat report-only performance or geometry claims as established facts.",
       "source_columns": {
         "task_id": "STORE-001",
-        "parent_id": "ADOPT-002",
+        "parent_id": "ADOPT-002; NBSOURCE-001",
         "phase": "2-postgres-foundation",
         "title": "redb PostgreSQL and nu_plugin CodeDB relationship decided",
         "owner_agent": "David / LifeOS Data Agent / Runtime Kernel",
         "goal": "Make the explicit owner decision for redb, PostgreSQL plus RuVector, and nu_plugin CodeDB: use cases, authority, data classes, synchronization direction, durability, performance, failure recovery, materialization, secret boundaries, and transition from current state.",
-        "inputs": "PGAUTH-001 through PGAUTH-006; ADOPT-001; ADOPT-002; generated/prior_task_conflict.source.csv; North Star",
+        "inputs": "PGAUTH-001 through PGAUTH-006; ADOPT-001; ADOPT-002; NBSOURCE-001; generated/notebooklm_source_claims.source.csv; generated/prior_task_conflict.source.csv; North Star",
         "target_artifacts": "generated/task_families/STORE-001.json; generated/store_relationship_decision.json; proof_records/STORE-001.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "live store mutation; database start; migration; source cutover; product implementation; credential or secret reads",
         "simulation_required": "TRUE",
         "execution_cell": "policy-cell",
-        "verification_gate": "David-approved decision assigns every relevant data class exactly once, preserves justified current capabilities, identifies derived and transient copies, defines directional synchronization and recovery, resolves CodeDB and envctl durable-redb conflicts, and leaves no silent dual authority.",
+        "verification_gate": "David-approved decision assigns every relevant data class exactly once, preserves justified current capabilities, identifies derived and transient copies, defines directional synchronization and recovery, resolves CodeDB and envctl durable-redb conflicts, distinguishes redb engine facts from application-layer claims, and leaves no silent dual authority.",
         "rollback_plan": "Restore the prior undecided relationship and keep all store execution blocked; no runtime state changes during planning.",
         "status": "Draft",
         "proof_uri": "proof_records/STORE-001.proof.json",
-        "next_action": "Discuss and decide redb use cases and the redb-PostgreSQL-CodeDB relationship before decomposing POSTGRES-002."
+        "next_action": "Use the verified NBSOURCE-001 redb claim map as discussion input; do not treat report-only performance or geometry claims as established facts."
       },
       "parent_ids": [
-        "ADOPT-002"
+        "ADOPT-002",
+        "NBSOURCE-001"
       ],
       "inputs": [
         "PGAUTH-001 through PGAUTH-006",
         "ADOPT-001",
         "ADOPT-002",
+        "NBSOURCE-001",
+        "generated/notebooklm_source_claims.source.csv",
         "generated/prior_task_conflict.source.csv",
         "North Star"
       ],
@@ -5141,11 +5144,11 @@
       "goal": "Iterate the canonical task graph until every high-level LifeOS phase is decomposed into complete, dependency-ordered, proof-bearing task families whose summed outcomes equal the North Star.",
       "simulation_required": false,
       "execution_cell": "policy-cell",
-      "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, conflicting prior tasks have explicit dispositions, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
+      "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, conflicting prior tasks have explicit dispositions, every processed NotebookLM claim maps to a task or explicit verification gap, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
       "rollback_plan": "Restore the archived pre-coverage graph; retain the rejected graph revision as evidence.",
       "status": "running",
       "proof_uri": "proof_records/GRAPH-001.proof.json",
-      "next_action": "Prior-task recovery and adoption are represented by RECOVERY-001 through RECOVERY-004 and ADOPT-001 through ADOPT-002; next discuss STORE-001 before decomposing POSTGRES-002.",
+      "next_action": "NBSOURCE-001 captured the redb report claim by claim; next discuss its mapped redb use cases before selecting and processing source two.",
       "source_columns": {
         "task_id": "GRAPH-001",
         "parent_id": "LIFEOS-000",
@@ -5153,17 +5156,17 @@
         "title": "High-level phases decomposed into bounded task families",
         "owner_agent": "LifeOS Planning Spine",
         "goal": "Iterate the canonical task graph until every high-level LifeOS phase is decomposed into complete, dependency-ordered, proof-bearing task families whose summed outcomes equal the North Star.",
-        "inputs": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; generated/current_state_gap.source.csv; generated/prior_task_conflict.source.csv; NORTH_STAR.md",
-        "target_artifacts": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; generated/prior_task_conflict.source.csv; proof_records/GRAPH-001.proof.json",
+        "inputs": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; generated/current_state_gap.source.csv; generated/prior_task_conflict.source.csv; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; NORTH_STAR.md",
+        "target_artifacts": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; generated/prior_task_conflict.source.csv; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; proof_records/GRAPH-001.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "product implementation; peer-repo mutation; execution packet consumption; secrets/**",
         "simulation_required": "FALSE",
         "execution_cell": "policy-cell",
-        "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, conflicting prior tasks have explicit dispositions, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
+        "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, conflicting prior tasks have explicit dispositions, every processed NotebookLM claim maps to a task or explicit verification gap, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
         "rollback_plan": "Restore the archived pre-coverage graph; retain the rejected graph revision as evidence.",
         "status": "Running",
         "proof_uri": "proof_records/GRAPH-001.proof.json",
-        "next_action": "Prior-task recovery and adoption are represented by RECOVERY-001 through RECOVERY-004 and ADOPT-001 through ADOPT-002; next discuss STORE-001 before decomposing POSTGRES-002."
+        "next_action": "NBSOURCE-001 captured the redb report claim by claim; next discuss its mapped redb use cases before selecting and processing source two."
       },
       "parent_ids": [
         "LIFEOS-000"
@@ -5173,12 +5176,16 @@
         "generated/north_star_coverage.source.csv",
         "generated/current_state_gap.source.csv",
         "generated/prior_task_conflict.source.csv",
+        "generated/notebooklm_source_registry.source.csv",
+        "generated/notebooklm_source_claims.source.csv",
         "NORTH_STAR.md"
       ],
       "target_artifacts": [
         "generated/task_graph.source.csv",
         "generated/north_star_coverage.source.csv",
         "generated/prior_task_conflict.source.csv",
+        "generated/notebooklm_source_registry.source.csv",
+        "generated/notebooklm_source_claims.source.csv",
         "proof_records/GRAPH-001.proof.json"
       ],
       "allowed_paths": [
@@ -5193,8 +5200,129 @@
       ]
     },
     {
-      "task_id": "NORTHSTAR-001",
+      "task_id": "NBSOURCE-000",
       "source_row_number": 90,
+      "phase": "0-north-star-graph",
+      "title": "NotebookLM source-by-source extraction protocol established",
+      "owner_agent": "LifeOS Planning Spine / QA Agent",
+      "goal": "Establish a deterministic one-object-at-a-time process that resolves NotebookLM provenance, preserves content checksum, atomizes claims, distinguishes facts from proposals, maps every claim to canonical tasks, records gaps, verifies coverage, and forbids advancing before proof.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "The protocol requires one object at a time, exact notebook and object IDs, type and checksum, atomic claims, classification, task mapping, explicit unresolved verification, graph normalization, planning verification, proof, and a closed next-source gate until all checks pass.",
+      "rollback_plan": "Restore the archived pre-protocol graph and remove only the new extraction tables and protocol after preserving their checksums.",
+      "status": "complete",
+      "proof_uri": "proof_records/NBSOURCE-000.proof.json",
+      "next_action": "Protocol established; process NBSOURCE-001 only.",
+      "source_columns": {
+        "task_id": "NBSOURCE-000",
+        "parent_id": "GRAPH-001",
+        "phase": "0-north-star-graph",
+        "title": "NotebookLM source-by-source extraction protocol established",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Establish a deterministic one-object-at-a-time process that resolves NotebookLM provenance, preserves content checksum, atomizes claims, distinguishes facts from proposals, maps every claim to canonical tasks, records gaps, verifies coverage, and forbids advancing before proof.",
+        "inputs": "Owner instruction; NotebookLM skill; canonical task graph; source provenance and proof rules",
+        "target_artifacts": "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; proof_records/NBSOURCE-000.proof.json",
+        "allowed_paths": "planning-spine-v0/docs/**; planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "product implementation; peer mutation; NotebookLM source deletion; unsupported fact promotion; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "The protocol requires one object at a time, exact notebook and object IDs, type and checksum, atomic claims, classification, task mapping, explicit unresolved verification, graph normalization, planning verification, proof, and a closed next-source gate until all checks pass.",
+        "rollback_plan": "Restore the archived pre-protocol graph and remove only the new extraction tables and protocol after preserving their checksums.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-000.proof.json",
+        "next_action": "Protocol established; process NBSOURCE-001 only."
+      },
+      "parent_ids": [
+        "GRAPH-001"
+      ],
+      "inputs": [
+        "Owner instruction",
+        "NotebookLM skill",
+        "canonical task graph",
+        "source provenance and proof rules"
+      ],
+      "target_artifacts": [
+        "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+        "generated/notebooklm_source_registry.source.csv",
+        "generated/notebooklm_source_claims.source.csv",
+        "proof_records/NBSOURCE-000.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/docs/**",
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "product implementation",
+        "peer mutation",
+        "NotebookLM source deletion",
+        "unsupported fact promotion",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "NBSOURCE-001",
+      "source_row_number": 91,
+      "phase": "0-north-star-graph",
+      "title": "Redb architectural-role report captured and mapped",
+      "owner_agent": "LifeOS Planning Spine / LifeOS Data Agent / QA Agent",
+      "goal": "Extract the NotebookLM report Technical Report: The Architectural Role of Redb in High-Frequency Agentic Systems claim by claim, preserve artifact provenance, map every detail to canonical tasks, and expose report-only or application-layer claims requiring technical proof.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "All 29 report claims are captured and mapped; engine facts, architecture proposals, current-implementation claims, performance claims, and AgentDB comparisons are distinguished; every unresolved claim names a verification task; STORE-001 consumes the map; no claim silently becomes architecture truth.",
+      "rollback_plan": "Restore the archived pre-source graph and claim tables; retain the report artifact ID and checksum as provenance.",
+      "status": "complete",
+      "proof_uri": "proof_records/NBSOURCE-001.proof.json",
+      "next_action": "Source one is captured; do not select source two until the owner discussion or next-source instruction.",
+      "source_columns": {
+        "task_id": "NBSOURCE-001",
+        "parent_id": "NBSOURCE-000",
+        "phase": "0-north-star-graph",
+        "title": "Redb architectural-role report captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / LifeOS Data Agent / QA Agent",
+        "goal": "Extract the NotebookLM report Technical Report: The Architectural Role of Redb in High-Frequency Agentic Systems claim by claim, preserve artifact provenance, map every detail to canonical tasks, and expose report-only or application-layer claims requiring technical proof.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; report artifact 3f01ed32-7fb8-47e3-bc25-241c06596b4e; downloaded report SHA-256 7705f5e51693a5f674014aaf9957f8719c1c58faf14dcbfe0a5935684b020f2e",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-001-redb-report.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-001.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "redb or PostgreSQL mutation; benchmark fabrication; treating application vector math as redb-native behavior; product implementation; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 29 report claims are captured and mapped; engine facts, architecture proposals, current-implementation claims, performance claims, and AgentDB comparisons are distinguished; every unresolved claim names a verification task; STORE-001 consumes the map; no claim silently becomes architecture truth.",
+        "rollback_plan": "Restore the archived pre-source graph and claim tables; retain the report artifact ID and checksum as provenance.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-001.proof.json",
+        "next_action": "Source one is captured; do not select source two until the owner discussion or next-source instruction."
+      },
+      "parent_ids": [
+        "NBSOURCE-000"
+      ],
+      "inputs": [
+        "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36",
+        "report artifact 3f01ed32-7fb8-47e3-bc25-241c06596b4e",
+        "downloaded report SHA-256 7705f5e51693a5f674014aaf9957f8719c1c58faf14dcbfe0a5935684b020f2e"
+      ],
+      "target_artifacts": [
+        "generated/notebooklm_source_extracts/NBSOURCE-001-redb-report.md",
+        "generated/notebooklm_source_registry.source.csv",
+        "generated/notebooklm_source_claims.source.csv",
+        "generated/prior_task_conflict.source.csv",
+        "proof_records/NBSOURCE-001.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "redb or PostgreSQL mutation",
+        "benchmark fabrication",
+        "treating application vector math as redb-native behavior",
+        "product implementation",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "NORTHSTAR-001",
+      "source_row_number": 92,
       "phase": "0-north-star-graph",
       "title": "Compact semantic North Star locked",
       "owner_agent": "David / LifeOS Planning Spine",
@@ -5254,7 +5382,7 @@
     },
     {
       "task_id": "NORTHSTAR-002",
-      "source_row_number": 91,
+      "source_row_number": 93,
       "phase": "0-north-star-graph",
       "title": "Human-centered LifeOS vision locked",
       "owner_agent": "David / LifeOS Planning Spine",
@@ -5317,7 +5445,7 @@
     },
     {
       "task_id": "GRAPH-002",
-      "source_row_number": 92,
+      "source_row_number": 94,
       "phase": "0-north-star-graph",
       "title": "Competing task tables reconciled into one canonical plan",
       "owner_agent": "LifeOS Planning Spine / QA Agent",
@@ -5383,7 +5511,7 @@
     },
     {
       "task_id": "GRAPH-003",
-      "source_row_number": 93,
+      "source_row_number": 95,
       "phase": "0-north-star-graph",
       "title": "North Star coverage gate enforced before packet generation",
       "owner_agent": "Runtime Kernel / QA Agent",
@@ -5441,7 +5569,7 @@
     },
     {
       "task_id": "GRAPH-004",
-      "source_row_number": 94,
+      "source_row_number": 96,
       "phase": "0-north-star-graph",
       "title": "Task lifecycle projection respects planning and proof state",
       "owner_agent": "Runtime Kernel / QA Agent",
@@ -5499,7 +5627,7 @@
     },
     {
       "task_id": "GRAPH-005",
-      "source_row_number": 95,
+      "source_row_number": 97,
       "phase": "0-north-star-graph",
       "title": "Pre-execution graph closure proven",
       "owner_agent": "Governance Board / QA Agent",
@@ -5557,7 +5685,7 @@
     },
     {
       "task_id": "LPS-012",
-      "source_row_number": 96,
+      "source_row_number": 98,
       "phase": "8-execution-pipeline",
       "title": "Python task graph extractor",
       "owner_agent": "Runtime Kernel",
@@ -5609,7 +5737,7 @@
     },
     {
       "task_id": "LPS-013",
-      "source_row_number": 97,
+      "source_row_number": 99,
       "phase": "8-execution-pipeline",
       "title": "Normalize task graph JSON",
       "owner_agent": "Runtime Kernel",
@@ -5662,7 +5790,7 @@
     },
     {
       "task_id": "LPS-014",
-      "source_row_number": 98,
+      "source_row_number": 100,
       "phase": "8-execution-pipeline",
       "title": "Build JSON execution packets",
       "owner_agent": "Runtime Kernel",
@@ -5715,7 +5843,7 @@
     },
     {
       "task_id": "LPS-015",
-      "source_row_number": 99,
+      "source_row_number": 101,
       "phase": "8-execution-pipeline",
       "title": "Validate execution packet",
       "owner_agent": "QA Agent",
@@ -5766,7 +5894,7 @@
     },
     {
       "task_id": "LPS-016",
-      "source_row_number": 100,
+      "source_row_number": 102,
       "phase": "8-execution-pipeline",
       "title": "Merge proof records",
       "owner_agent": "QA Agent",
@@ -5817,7 +5945,7 @@
     },
     {
       "task_id": "LPS-017",
-      "source_row_number": 101,
+      "source_row_number": 103,
       "phase": "8-execution-pipeline",
       "title": "Update task graph status from proof",
       "owner_agent": "Runtime Kernel",
@@ -5872,7 +6000,7 @@
     },
     {
       "task_id": "LPS-018",
-      "source_row_number": 102,
+      "source_row_number": 104,
       "phase": "8-execution-pipeline",
       "title": "Package execution bundle",
       "owner_agent": "Release Agent",
@@ -5928,7 +6056,7 @@
     },
     {
       "task_id": "LPS-019",
-      "source_row_number": 103,
+      "source_row_number": 105,
       "phase": "9-state-map",
       "title": "Accurate current state map",
       "owner_agent": "Codex / Runtime Kernel",
@@ -6000,7 +6128,7 @@
     },
     {
       "task_id": "LPS-020",
-      "source_row_number": 104,
+      "source_row_number": 106,
       "phase": "10-runtime-proof",
       "title": "Repair verification frontdoor",
       "owner_agent": "Runtime Kernel",
@@ -6054,7 +6182,7 @@
     },
     {
       "task_id": "LPS-021",
-      "source_row_number": 105,
+      "source_row_number": 107,
       "phase": "10-runtime-proof",
       "title": "Connected MVP bundle verification",
       "owner_agent": "QA Agent",
@@ -6109,7 +6237,7 @@
     },
     {
       "task_id": "LPS-022",
-      "source_row_number": 106,
+      "source_row_number": 108,
       "phase": "10-runtime-proof",
       "title": "Verifier authority integrity",
       "owner_agent": "Governance Board / QA Agent",
@@ -6165,7 +6293,7 @@
     },
     {
       "task_id": "LPS-023",
-      "source_row_number": 107,
+      "source_row_number": 109,
       "phase": "11-fleet-integration",
       "title": "GitKB planning-plane adoption",
       "owner_agent": "Runtime Kernel",
@@ -6219,7 +6347,7 @@
     },
     {
       "task_id": "LPS-024",
-      "source_row_number": 108,
+      "source_row_number": 110,
       "phase": "11-fleet-integration",
       "title": "handoff (hf) execution seam",
       "owner_agent": "Runtime Kernel",
@@ -6276,7 +6404,7 @@
     },
     {
       "task_id": "LPS-025",
-      "source_row_number": 109,
+      "source_row_number": 111,
       "phase": "11-fleet-integration",
       "title": "rusty-idd IDD/OpenSpec control binary",
       "owner_agent": "Runtime Kernel",
@@ -6331,7 +6459,7 @@
     },
     {
       "task_id": "LPS-026",
-      "source_row_number": 110,
+      "source_row_number": 112,
       "phase": "11-fleet-integration",
       "title": "meta git fleet branch/PR surface",
       "owner_agent": "Release Agent",
@@ -6387,7 +6515,7 @@
     },
     {
       "task_id": "LPS-027",
-      "source_row_number": 111,
+      "source_row_number": 113,
       "phase": "11-fleet-integration",
       "title": "meta exec multi-repo run/release",
       "owner_agent": "Release Agent",
@@ -6445,7 +6573,7 @@
     },
     {
       "task_id": "LPS-028",
-      "source_row_number": 112,
+      "source_row_number": 114,
       "phase": "11-fleet-integration",
       "title": "Fleet loop spine wiring and inventory closure",
       "owner_agent": "Governance Board / QA Agent",
@@ -6502,7 +6630,7 @@
     },
     {
       "task_id": "LPS-029",
-      "source_row_number": 113,
+      "source_row_number": 115,
       "phase": "12-worldsim-ingestion",
       "title": "LiDAR capture of room and workstation",
       "owner_agent": "Operator",
@@ -6555,7 +6683,7 @@
     },
     {
       "task_id": "LPS-030",
-      "source_row_number": 114,
+      "source_row_number": 116,
       "phase": "12-worldsim-ingestion",
       "title": "Nix USD toolchain dev shell",
       "owner_agent": "Runtime Kernel",
@@ -6608,7 +6736,7 @@
     },
     {
       "task_id": "LPS-031",
-      "source_row_number": 115,
+      "source_row_number": 117,
       "phase": "12-worldsim-ingestion",
       "title": "Mesh cleanup to watertight",
       "owner_agent": "Runtime Kernel",
@@ -6662,7 +6790,7 @@
     },
     {
       "task_id": "LPS-032",
-      "source_row_number": 116,
+      "source_row_number": 118,
       "phase": "12-worldsim-ingestion",
       "title": "Semantic and instance segmentation",
       "owner_agent": "Runtime Kernel",
@@ -6715,7 +6843,7 @@
     },
     {
       "task_id": "LPS-033",
-      "source_row_number": 117,
+      "source_row_number": 119,
       "phase": "12-worldsim-ingestion",
       "title": "OpenUSD composition with physics schemas",
       "owner_agent": "Runtime Kernel",
@@ -6769,7 +6897,7 @@
     },
     {
       "task_id": "LPS-034",
-      "source_row_number": 118,
+      "source_row_number": 120,
       "phase": "12-worldsim-ingestion",
       "title": "Immutable base layer and colliders",
       "owner_agent": "Runtime Kernel",
@@ -6820,7 +6948,7 @@
     },
     {
       "task_id": "LPS-035",
-      "source_row_number": 119,
+      "source_row_number": 121,
       "phase": "12-worldsim-ingestion",
       "title": "Automated twin acceptance gate",
       "owner_agent": "QA Agent",
@@ -6873,7 +7001,7 @@
     },
     {
       "task_id": "LPS-036",
-      "source_row_number": 120,
+      "source_row_number": 122,
       "phase": "12-worldsim-ingestion",
       "title": "Genesis feasibility on validated twin",
       "owner_agent": "Runtime Kernel",

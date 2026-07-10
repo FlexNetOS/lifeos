@@ -1,0 +1,101 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "NBSOURCE-001",
+  "observed_at": "2026-07-10T20:45:20Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "All 29 redb report claims are captured and mapped; engine facts, architecture proposals, application behavior, current-implementation claims, performance claims, and AgentDB comparisons are distinguished; every unresolved claim has a verification or owner-decision path; STORE-001 consumes the map; no report claim silently becomes architecture truth.",
+  "gate_result": {
+    "notebook_id_exact": true,
+    "artifact_id_exact": true,
+    "object_classified_as_report_artifact_not_original_source": true,
+    "downloaded_content_sha256_recorded": true,
+    "atomic_claim_count": 29,
+    "mapped_claim_count": 29,
+    "unmapped_claim_count": 0,
+    "verification_or_owner_resolution_count": 19,
+    "redb_engine_and_application_behavior_separated": true,
+    "geometry_and_cosine_claims_not_promoted_as_redb_native": true,
+    "performance_claims_require_benchmark": true,
+    "current_codedb_and_envctl_redb_conflict_preserved": true,
+    "prior_task_conflict_row_added": true,
+    "store_decision_depends_on_capture": true,
+    "task_graph_normalization_passed": true,
+    "task_graph_ready_count_zero": true,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Downloaded the completed NotebookLM redb report artifact, recorded its exact identity and SHA-256, split its 87 lines into 29 atomic claims, and mapped all 29 to existing canonical tasks. Nineteen claims remain explicitly subject to technical verification, owner decision, or gap closure. Added a conflict row for report prose that attributes geometry, SIMD, protocol, synchronization, or latency behavior to redb without implementation proof. STORE-001 now depends on this capture and must distinguish storage-engine facts from application behavior.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-001-redb-report.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "/home/flexnetos/lifeos/var/lib/codex-runtime-gate/archives/20260710T204140Z-lifeos-before-notebooklm-source-extraction-protocol.tar.gz"
+  ],
+  "checksums": {
+    "notebooklm_download_sha256": "7705f5e51693a5f674014aaf9957f8719c1c58faf14dcbfe0a5935684b020f2e",
+    "structured_extract_sha256": "b17dca87fe0487ad3d5ca86afa38d9611ae598c2aa7d5b08376b9b94e3aa876d",
+    "source_registry_sha256": "a05ccb9ac98648102292e99657d8eef5426b734dcf41843b2159dadfe4aa6ba3",
+    "claim_table_sha256": "7aa0b0699a88647f2488438dfb76208872ef434d051cda6a5db67128ebfef47b",
+    "task_graph_sha256": "5006c06b1d9447b530071963367d37d3547130fd5de5629bcf3eabbf6dfa8ff4",
+    "conflict_table_sha256": "0af1aab4205ba9c0fdc741c23b2368e47e4b9a6248a33811d2c39e2434deb183",
+    "archive_sha256": "b59095a68711778af921c9932e12278a13e414a72601a47f780b2d3abe551206"
+  },
+  "live_commands": [
+    {
+      "purpose": "Resolve report identity",
+      "cwd": "/home/flexnetos/lifeos",
+      "command": "notebooklm artifact list -n b09afb74-b464-4bc3-94f0-d5193f7c7d36 --json",
+      "exit_status": 0,
+      "output": [
+        "artifact_id=3f01ed32-7fb8-47e3-bc25-241c06596b4e",
+        "type=Report",
+        "status=completed"
+      ]
+    },
+    {
+      "purpose": "Download complete report artifact",
+      "cwd": "/home/flexnetos/lifeos",
+      "command": "notebooklm download report /tmp/notebooklm-redb-architectural-role-report.md -a 3f01ed32-7fb8-47e3-bc25-241c06596b4e -n b09afb74-b464-4bc3-94f0-d5193f7c7d36 --json",
+      "exit_status": 0,
+      "output": [
+        "status=downloaded",
+        "lines=87",
+        "bytes=8866",
+        "sha256=7705f5e51693a5f674014aaf9957f8719c1c58faf14dcbfe0a5935684b020f2e"
+      ]
+    },
+    {
+      "purpose": "Validate claim coverage and canonical task references",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "python3 notebooklm capture assertions",
+      "exit_status": 0,
+      "output": [
+        "tasks=121",
+        "claims=29",
+        "mapped=29",
+        "unresolved=19",
+        "missing task references=0",
+        "ready=0"
+      ]
+    },
+    {
+      "purpose": "Normalize and verify the updated planning graph",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "python3 planning-spine-v0/scripts/extract-task-graph.py ... && python3 planning-spine-v0/scripts/normalize-task-graph.py ... && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "output": [
+        "task graph rows=121",
+        "normalization errors=0",
+        "planning-spine-v0 verification passed",
+        "git diff --check passed"
+      ]
+    }
+  ]
+}

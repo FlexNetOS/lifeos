@@ -1,0 +1,60 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "NBSOURCE-000",
+  "observed_at": "2026-07-10T20:45:20Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The protocol requires one NotebookLM object at a time, exact object provenance and checksum, atomic claims, classification, task mapping, explicit unresolved verification, graph normalization, planning verification, proof, and a closed next-source gate until all checks pass.",
+  "gate_result": {
+    "one_object_at_a_time_rule_present": true,
+    "object_type_and_identity_required": true,
+    "content_checksum_required": true,
+    "atomic_claim_table_required": true,
+    "engine_fact_vs_application_claim_classification_required": true,
+    "prior_generated_task_conflict_search_required": true,
+    "canonical_task_mapping_required": true,
+    "unresolved_claim_path_required": true,
+    "graph_and_planning_verification_required": true,
+    "proof_before_next_source_required": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Established a ten-step NotebookLM extraction loop that resolves object provenance, extracts and checksums content, atomizes and classifies claims, cross-references prior generated tasks, maps every detail to the canonical task graph, exposes unresolved verification, validates the graph, writes proof, and forbids moving to the next object before completion.",
+  "artifact_paths": [
+    "planning-spine-v0/docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "/home/flexnetos/lifeos/var/lib/codex-runtime-gate/archives/20260710T204140Z-lifeos-before-notebooklm-source-extraction-protocol.tar.gz"
+  ],
+  "checksums": {
+    "protocol_sha256": "f819db9948a6f5d409989baec25ac601d8988946438740b3e87d47fa76afccf9",
+    "source_registry_sha256": "a05ccb9ac98648102292e99657d8eef5426b734dcf41843b2159dadfe4aa6ba3",
+    "claim_table_sha256": "7aa0b0699a88647f2488438dfb76208872ef434d051cda6a5db67128ebfef47b",
+    "archive_sha256": "b59095a68711778af921c9932e12278a13e414a72601a47f780b2d3abe551206"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate NotebookLM authentication",
+      "cwd": "/home/flexnetos/lifeos",
+      "command": "notebooklm auth check --test --json",
+      "exit_status": 0,
+      "output": [
+        "status=ok",
+        "checks.token_fetch=true"
+      ]
+    },
+    {
+      "purpose": "Verify the protocol and first claim map against the canonical graph",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "python3 notebooklm capture assertions",
+      "exit_status": 0,
+      "output": [
+        "notebooklm_capture=pass",
+        "claims=29",
+        "mapped=29",
+        "unresolved=19",
+        "ready=0"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-021-ruvector-cognitive-neural-database.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/proof_records/NBSOURCE-021.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T233157Z-lifeos-notebooklm-integration-before-NBSOURCE-021.tar.gz"
+  ],
+  "checksums": {
+    "archive_sha256": "8c6efe9519db7f21fa77a0e7ae1d392e8f5bf4ed5ef8108a4a74c267447e8c76",
+    "claim_evidence_sha256": "611d81617f4b9188c3f60cfe6c0add70ccaf9616c8577fd8d7c9a90659fc3df5",
+    "claim_table_sha256": "64cc72b1edc5a831ee25a5eb3aa02a0b96864146d50fc68ebec38915ad252122",
+    "notebooklm_fulltext_sha256": "9f0b828fe34a7ab339aa5abb0ce56b7be889b802ab24afef47252aebc7b3c050",
+    "source_registry_sha256": "4e942872abc4bd46857d6fb4d16309832ce82c4ddb80a6a2da4b3f7c0101396b",
+    "structured_extract_sha256": "61bcf81011ecf0509083246a19ad14ecc54fa8acee25416b9df786625acb2923",
+    "task_graph_sha256": "db43d64c5b321fdc171f687e496b94d03c0d5004efc4d8b34c72937f34d87c9b",
+    "verification_queue_sha256": "93818b4b2c74f6eb3a024b76ed0735ff6f6c5a665b09a00fbe3f9f2485aefcad"
+  },
+  "gate_result": {
+    "all_task_references_exist": true,
+    "atomic_claim_count": 14,
+    "classification_counts": {
+      "architecture-proposal": 1,
+      "current-application-claim": 7,
+      "engine-fact": 1,
+      "performance-or-safety-claim": 3,
+      "question-claim": 1,
+      "source-provenance-claim": 1
+    },
+    "fulltext_sha256_exact": true,
+    "git_diff_check_passed": true,
+    "global_ids_unique": true,
+    "later_source_processed": false,
+    "mapped_claim_count": 14,
+    "normalization_errors": 0,
+    "packet_validation_passed": true,
+    "planning_spine_verify_passed": true,
+    "question_count": 1,
+    "queued_claim_count": 14,
+    "ready_count": 0,
+    "registry_mapping_exact": true,
+    "source_id_exact": true,
+    "task_count": 142
+  },
+  "live_commands": [
+    {
+      "command": "packet validation + exact source SHA-256 + byte-count assertions for NBSOURCE-021",
+      "exit_status": 0,
+      "purpose": "Validate isolated packet/source"
+    },
+    {
+      "command": "exact global assertions && extract-task-graph.py && normalize-task-graph.py",
+      "exit_status": 0,
+      "purpose": "Assert mappings and normalize graph"
+    },
+    {
+      "command": "merge-proof-records.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Append proof and run gates"
+    }
+  ],
+  "observed_at": "2026-07-10T23:32:07Z",
+  "proof_summary": "Captured 1184 source bytes as 14 unresolved atoms covering RuVector/GNN cognition, SONA, FastGRNN, witness and causal verification, absolute anti-hallucination claims, routing/build question, and citations. Questions remain questions, all atoms are queued, and relation evidence closes no claim.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBSOURCE-021",
+  "verification_gate": "All 14 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass."
+}

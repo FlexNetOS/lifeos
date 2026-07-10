@@ -1,0 +1,83 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "PRESERVE-001",
+  "title": "Complete valid-work preservation inventory defined",
+  "status": "ready",
+  "owner": "Governance Board / QA Agent",
+  "owner_decision_at": "2026-07-10T22:19:22Z",
+  "objective": "Preserve every repository, control-plane, parent-shadow, consumer, and evidence surface before correcting the LifeOS and Meta topology.",
+  "work_items": [
+    {
+      "id": "PRESERVE-001-A",
+      "surface": "/home/flexnetos/lifeos/lifeos -> /home/flexnetos/meta/lifeos",
+      "owner": "FlexNetOS/lifeos",
+      "capture": [
+        "Git bundle with all refs",
+        "HEAD, branches, remotes, reflogs, worktrees, status, fsck",
+        "tracked and untracked path checksums",
+        "file count, byte count, permissions, device and inode"
+      ],
+      "restore": "Move the repository back to its recorded source path and run git worktree repair using the receipt."
+    },
+    {
+      "id": "PRESERVE-001-B",
+      "surface": "/home/flexnetos/lifeos/src/meta -> /home/flexnetos/meta/src/meta -> /home/flexnetos/meta",
+      "owner": "FlexNetOS/meta",
+      "capture": [
+        "Git bundle with all refs",
+        "origin and upstream remotes",
+        "nested project repository inventory",
+        "Meta .meta.yaml and populated GitKB",
+        "HEAD, branches, reflogs, status, fsck, file and byte counts"
+      ],
+      "restore": "Move Meta and its nested repositories back, restore the manifest and GitKB receipt, and run worktree repair."
+    },
+    {
+      "id": "PRESERVE-001-C",
+      "surface": "/home/flexnetos/lifeos -> /home/flexnetos/meta",
+      "owner": "transitional parent state",
+      "capture": [
+        "AGENTS.md and WORKSPACE_LAYOUT.md",
+        "empty parent .kb including derived code index",
+        "malformed .git marker",
+        "agent and shell configuration shadows",
+        "usr, var, artifacts, release, worktrees, and evidence path inventory"
+      ],
+      "restore": "Restore checksummed surfaces only after their active consumers are retargeted to the prior topology."
+    },
+    {
+      "id": "PRESERVE-001-D",
+      "surface": "active consumers",
+      "owner": "owning config or profile repository",
+      "capture": [
+        "home and Codex AGENTS chain",
+        "Codex GitKB MCP GITKB_ROOT",
+        "GTK bookmarks and desktop entries",
+        "shell and systemd environment",
+        "profile source URLs and runtime frontdoors",
+        "absolute path references and live process cwd/exe references"
+      ],
+      "restore": "Restore archived owner inputs and restart only the affected consumers."
+    },
+    {
+      "id": "PRESERVE-001-E",
+      "surface": "GitHub",
+      "owner": "FlexNetOS organization",
+      "capture": [
+        "default branches and remote URLs",
+        "open and merged PR inventory",
+        "check state for touched PRs",
+        "local and remote stale branch inventory"
+      ],
+      "restore": "Recreate a deleted branch only from the archived bundle and recorded commit ID."
+    }
+  ],
+  "execution_order": [
+    "PRESERVE-001-A",
+    "PRESERVE-001-B",
+    "PRESERVE-001-C",
+    "PRESERVE-001-D",
+    "PRESERVE-001-E"
+  ],
+  "completion_gate": "All capture artifacts exist beneath one checksummed archive root, every item has a restore command, and PRESERVE-001.proof.json records zero unarchived destructive actions."
+}

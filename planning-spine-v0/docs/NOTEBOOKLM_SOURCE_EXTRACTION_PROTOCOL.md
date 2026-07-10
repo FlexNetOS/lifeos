@@ -50,3 +50,29 @@ until the current object is captured, mapped, verified, and proof-recorded.
 10. **Advance**
     - Only after steps 1-9 pass may the registry mark the object `captured`.
     - Then and only then may the next object be selected.
+
+## Claim Verification
+
+Source extraction and claim verification are separate loops.
+
+1. Every unresolved claim is inserted into
+   `generated/notebooklm_claim_verification_queue.source.csv`.
+2. Later NotebookLM objects may `support`, `contradict`, `qualify`, or
+   `duplicate` the claim. Repetition does not verify it.
+3. Native capability claims are verified from the current local dependency
+   source and tests first, then official upstream source if local evidence is
+   insufficient.
+4. Current-implementation claims are verified through local source call paths,
+   tests, commits, PRs, and runtime evidence.
+5. Performance claims require a reproducible local benchmark with workload,
+   hardware, configuration, and percentile results.
+6. Architecture proposals require technical evidence followed by the explicit
+   owner decision represented in the task graph.
+7. Web research is allowed only for one stable claim at a time, only when local
+   primary evidence is insufficient, and only from primary upstream sources.
+   Record URL, version or commit, retrieval time, content hash, exact pointer,
+   and relationship in `generated/notebooklm_claim_evidence.source.csv`.
+8. Do not run broad or parallel web synthesis while extracting a NotebookLM
+   source. It blends provenance and is forbidden.
+9. A claim closes only as `verified`, `qualified`, `refuted`, or
+   `owner-decided`, with a proof URI. Otherwise it remains queued.

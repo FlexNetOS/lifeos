@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-10T23:01:28Z",
+  "generated_at": "2026-07-10T23:02:37Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 128,
+    "row_count": 129,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -2841,6 +2841,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBSOURCE-007.proof.json",
         "next_action": "NBSOURCE-008 Database Branching and Concurrent Code Management"
+      }
+    },
+    {
+      "source_row_number": 130,
+      "columns": {
+        "task_id": "NBSOURCE-008",
+        "parent_id": "NBSOURCE-007",
+        "phase": "0-north-star-graph",
+        "title": "Database Branching and Concurrent Code Management source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Capture and semantically normalize Database Branching and Concurrent Code Management one source at a time, preserve questions, classify all atoms, map them to canonical tasks, and expose unresolved proof or owner-decision paths without product execution.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source c13eed5e-6c4d-4cf1-8794-c80a40bd00ff; fulltext SHA-256 a642aa1a1ba5460cd19150afedb3951a10bdbb0902350be3d02ea4d15983c3aa; NBSOURCE-001 through NBSOURCE-007; NBVERIFY-000; packet validation pass",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-008-database-branching-concurrent-code.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-008.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product implementation; peer or runtime mutation; fabricated proof; invented citations; processing NBSOURCE-009; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 10 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; all task refs resolve; global IDs are unique; repetition verifies nothing; Ready remains zero; global assertions, normalization, planning-spine verification, and git diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T230231Z-lifeos-notebooklm-integration-before-NBSOURCE-008.tar.gz and remove only NBSOURCE-008 rows and artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-008.proof.json",
+        "next_action": "NBSOURCE-009 Deterministic Timeline Selection via Agentic Temporal Branching"
       }
     }
   ]

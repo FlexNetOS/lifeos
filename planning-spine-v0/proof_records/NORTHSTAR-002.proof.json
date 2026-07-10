@@ -1,0 +1,67 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "NORTHSTAR-002",
+  "observed_at": "2026-07-10T19:14:55Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The canonical North Star expresses only the owner-approved human-centered LifeOS vision, five design anchors, and the human success test; architecture and doctrine depth remains preserved outside North Star coverage; direct task mappings use the new stable IDs; planning verification passes and product execution remains closed.",
+  "gate_result": {
+    "human_centered_statement_present": true,
+    "human_success_test_present": true,
+    "five_design_anchor_ids_present": true,
+    "old_technical_anchor_ids_removed_from_current_vision": true,
+    "north_star_coverage_contains_exactly_five_vision_anchors": true,
+    "twelve_technical_depth_rows_preserved_outside_north_star": true,
+    "active_task_rows_use_new_anchor_ids": true,
+    "task_graph_normalization_passed": true,
+    "task_graph_ready_count_zero": true,
+    "git_diff_check_passed": true,
+    "planning_spine_verify_passed": true,
+    "archive_first_receipt_present": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Updated the canonical North Star from compact-v2 to vision-v3. The vision now defines LifeOS as David's living operating environment and single extension for seeing, directing, and advancing company, personal, development, and home life as one coherent whole. Replaced the technical anchors with NS-EXTENSION, NS-WHOLE, NS-CLARITY, NS-DIRECTION, and NS-PROGRESS. Reduced North Star coverage to those five vision anchors and preserved all twelve prior architecture/doctrine requirements in architecture_depth.source.csv. Updated active task mappings, normalized 90 graph rows, and kept the Ready count at zero.",
+  "artifact_paths": [
+    "planning-spine-v0/1.0_VISION/NORTH_STAR.md",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "/home/flexnetos/lifeos/var/lib/codex-runtime-gate/archives/20260710T191021Z-lifeos-north-star-before-human-vision-update.tar.gz"
+  ],
+  "checksums": {
+    "north_star_before_sha256": "1a79f57563e1c8b79cdb549ecde3d914c8c0e683b78c97ce875ff1ccbc00466f",
+    "north_star_after_sha256": "3ea183ca0cf66778096eef75ceac97cb75f801a8fb0712660999cfacf6c812b9",
+    "archive_sha256": "3f4fef336276fb267387d2757f6cd8f51c7852e914d9af41fc4919fe07dc7d52"
+  },
+  "live_commands": [
+    {
+      "purpose": "Normalize the canonical graph after vision mapping changes",
+      "cwd": "/home/flexnetos/lifeos/lifeos/planning-spine-v0",
+      "command": "python3 scripts/extract-task-graph.py generated/task_graph.source.csv -o generated/task_graph.raw.json && python3 scripts/normalize-task-graph.py generated/task_graph.raw.json -o generated/task_graph.normalized.json --index generated/task_graph.index.json --report generated/task_graph.normalize_report.json",
+      "exit_status": 0,
+      "output": [
+        "extract-task-graph: wrote generated/task_graph.raw.json with 90 row(s)",
+        "normalize-task-graph: wrote generated/task_graph.normalized.json and generated/task_graph.index.json with 90 task(s)"
+      ]
+    },
+    {
+      "purpose": "Verify vision, anchor mapping, depth separation, and closed execution",
+      "cwd": "/home/flexnetos/lifeos/lifeos/planning-spine-v0",
+      "command": "python3 human-centered North Star assertion",
+      "exit_status": 0,
+      "output": [
+        "human_vision=pass anchors=5 coverage_rows=5 architecture_depth_rows=12 task_rows=90 ready=0"
+      ]
+    },
+    {
+      "purpose": "Verify planning package and diff integrity",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "git diff --check && bun run planning-spine:verify",
+      "exit_status": 0,
+      "output": [
+        "git diff --check: pass",
+        "planning-spine-v0 verification passed"
+      ]
+    }
+  ]
+}

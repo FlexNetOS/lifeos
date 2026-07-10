@@ -1,0 +1,68 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "NORTHSTAR-001",
+  "observed_at": "2026-07-10T18:11:02Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The owner-approved compact North Star is canonical; it contains the exact semantic statement, five stable anchors, success test, and depth pointers; subsystem names do not define the anchor; coverage rows use only stable anchor IDs; task graph normalization, diff check, and planning-spine verification pass; product execution remains closed.",
+  "gate_result": {
+    "exact_compact_statement_present": true,
+    "exact_success_test_present": true,
+    "five_stable_anchor_ids_present": true,
+    "subsystems_do_not_define_anchor": true,
+    "coverage_rows_use_stable_anchor_ids": true,
+    "legacy_numeric_north_star_references_removed_from_task_graph": true,
+    "task_graph_normalization_passed": true,
+    "task_graph_ready_count_zero": true,
+    "git_diff_check_passed": true,
+    "planning_spine_verify_passed": true,
+    "archive_first_receipt_present": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Replaced the 135-line implementation-heavy canonical anchor with compact-v2: a 65-line semantic North Star containing the approved statement, five immutable IDs (NS-IDENTITY, NS-ACTION, NS-PRODUCT, NS-AUTHORITY, NS-EVOLUTION), one success test, and pointers to coverage, task graph, architecture, and proof surfaces. Preserved the prior revision in Git history and archive 20260710T175557Z. Updated the coverage table to retain all twelve depth requirements under stable IDs and updated canonical task rows to stop referencing removed numeric North Star sections. The canonical graph contains 89 rows and zero Ready tasks.",
+  "artifact_paths": [
+    "planning-spine-v0/1.0_VISION/NORTH_STAR.md",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/generated/task_graph.raw.json",
+    "planning-spine-v0/generated/task_graph.normalized.json",
+    "planning-spine-v0/generated/task_graph.index.json",
+    "/home/flexnetos/lifeos/var/lib/codex-runtime-gate/archives/20260710T175557Z-lifeos-north-star-before-compact-lock.tar.gz"
+  ],
+  "checksums": {
+    "north_star_before_sha256": "13b3d02bf706d2e5dd3876c42c849b5fcad24ae833ce6cb4722a2ba2230ee8d8",
+    "north_star_after_sha256": "1a79f57563e1c8b79cdb549ecde3d914c8c0e683b78c97ce875ff1ccbc00466f",
+    "archive_sha256": "779c8ee5841a9cce2264baa1c9e3ce7e2c4b54e2846209995f563d081c90762c"
+  },
+  "live_commands": [
+    {
+      "purpose": "Normalize the canonical task graph after the North Star lock",
+      "cwd": "/home/flexnetos/lifeos/lifeos/planning-spine-v0",
+      "command": "python3 scripts/extract-task-graph.py generated/task_graph.source.csv -o generated/task_graph.raw.json && python3 scripts/normalize-task-graph.py generated/task_graph.raw.json -o generated/task_graph.normalized.json --index generated/task_graph.index.json --report generated/task_graph.normalize_report.json",
+      "exit_status": 0,
+      "output": [
+        "extract-task-graph: wrote generated/task_graph.raw.json with 89 row(s)",
+        "normalize-task-graph: wrote generated/task_graph.normalized.json and generated/task_graph.index.json with 89 task(s)"
+      ]
+    },
+    {
+      "purpose": "Verify semantic anchor, stable coverage IDs, and closed execution gate",
+      "cwd": "/home/flexnetos/lifeos/lifeos/planning-spine-v0",
+      "command": "python3 compact North Star and task graph assertion",
+      "exit_status": 0,
+      "output": [
+        "compact_north_star=pass anchors=5 coverage_rows=12 task_rows=89 ready=0"
+      ]
+    },
+    {
+      "purpose": "Verify planning package and diff integrity",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "git diff --check && bun run planning-spine:verify",
+      "exit_status": 0,
+      "output": [
+        "git diff --check: pass",
+        "planning-spine-v0 verification passed"
+      ]
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-10T20:08:57Z",
-  "source_graph_uri": "generated/task_graph.raw.json",
-  "task_count": 112,
+  "generated_at": "2026-07-10T20:23:40Z",
+  "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
+  "task_count": 119,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-10T20:08:57Z",
+    "generated_at": "2026-07-10T20:23:40Z",
     "format": "csv",
-    "path": "generated/task_graph.source.csv",
-    "row_count": 112,
+    "path": "planning-spine-v0/generated/task_graph.source.csv",
+    "row_count": 119,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -912,8 +912,266 @@
       ]
     },
     {
-      "task_id": "PRESERVE-003",
+      "task_id": "RECOVERY-001",
       "source_row_number": 17,
+      "phase": "1-preservation",
+      "title": "Prior generated task and completion-claim inventory sealed",
+      "owner_agent": "LifeOS Planning Spine / QA Agent",
+      "goal": "Inventory every active, generated, archived, and proof-derived task table relevant to envctl, nu_plugin CodeDB, blobs, secrets, PostgreSQL, RuVector, redb, migration, and materialization before creating replacement work.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Every discovered task source has a stable URI, task count, status vocabulary, authority classification, proof surface, and checksum; archived copies are evidence only; no prior task is silently omitted.",
+      "rollback_plan": "Restore the archived pre-reconciliation graph and conflict table; peer repositories remain untouched.",
+      "status": "draft",
+      "proof_uri": "proof_records/RECOVERY-001.proof.json",
+      "next_action": "After graph closure, seal checksums and complete the generated-task inventory without changing peer task status.",
+      "source_columns": {
+        "task_id": "RECOVERY-001",
+        "parent_id": "PRESERVE-002",
+        "phase": "1-preservation",
+        "title": "Prior generated task and completion-claim inventory sealed",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Inventory every active, generated, archived, and proof-derived task table relevant to envctl, nu_plugin CodeDB, blobs, secrets, PostgreSQL, RuVector, redb, migration, and materialization before creating replacement work.",
+        "inputs": "PRESERVE-002; GRAPH-002; nu_plugin execution task graphs; envctl package and issue-414 task graphs; envctl .handoff task cards and loop state; merged PR and CI receipts",
+        "target_artifacts": "generated/prior_task_conflict.source.csv; generated/task_families/RECOVERY-001.json; proof_records/RECOVERY-001.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; peer task and proof surfaces read-only",
+        "blocked_paths": "peer task mutation; product implementation; worktree cleanup; branch deletion; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "Every discovered task source has a stable URI, task count, status vocabulary, authority classification, proof surface, and checksum; archived copies are evidence only; no prior task is silently omitted.",
+        "rollback_plan": "Restore the archived pre-reconciliation graph and conflict table; peer repositories remain untouched.",
+        "status": "Draft",
+        "proof_uri": "proof_records/RECOVERY-001.proof.json",
+        "next_action": "After graph closure, seal checksums and complete the generated-task inventory without changing peer task status."
+      },
+      "parent_ids": [
+        "PRESERVE-002"
+      ],
+      "inputs": [
+        "PRESERVE-002",
+        "GRAPH-002",
+        "nu_plugin execution task graphs",
+        "envctl package and issue-414 task graphs",
+        "envctl .handoff task cards and loop state",
+        "merged PR and CI receipts"
+      ],
+      "target_artifacts": [
+        "generated/prior_task_conflict.source.csv",
+        "generated/task_families/RECOVERY-001.json",
+        "proof_records/RECOVERY-001.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "peer task and proof surfaces read-only"
+      ],
+      "blocked_paths": [
+        "peer task mutation",
+        "product implementation",
+        "worktree cleanup",
+        "branch deletion",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "RECOVERY-002",
+      "source_row_number": 18,
+      "phase": "1-preservation",
+      "title": "nu_plugin CodeDB task truth reconciled",
+      "owner_agent": "LifeOS Consolidation Agent / CodeDB Maintainer / QA Agent",
+      "goal": "Reconcile nu_plugin V1.1, bidirectional, and polyglot task claims against current source, logs, manifests, merged PRs, CI, surviving worktrees, and explicit planning-only boundaries so completed capability is adopted and unfinished work remains visible.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Each CDB task is classified as proven product capability, proven planning artifact only, partial, pending, superseded, or unsupported; BlobStore, redb, PgStore, materialization, secret guards, envctl export, and live-parity gaps map once to canonical LifeOS tasks.",
+      "rollback_plan": "Restore the prior reconciliation artifact; nu_plugin source, tasks, branches, and worktrees remain unchanged.",
+      "status": "draft",
+      "proof_uri": "proof_records/RECOVERY-002.proof.json",
+      "next_action": "Do not rebuild merged CodeDB capability; produce one evidence-backed disposition per prior CDB task.",
+      "source_columns": {
+        "task_id": "RECOVERY-002",
+        "parent_id": "RECOVERY-001",
+        "phase": "1-preservation",
+        "title": "nu_plugin CodeDB task truth reconciled",
+        "owner_agent": "LifeOS Consolidation Agent / CodeDB Maintainer / QA Agent",
+        "goal": "Reconcile nu_plugin V1.1, bidirectional, and polyglot task claims against current source, logs, manifests, merged PRs, CI, surviving worktrees, and explicit planning-only boundaries so completed capability is adopted and unfinished work remains visible.",
+        "inputs": "RECOVERY-001; nu_plugin execution/TASK_GRAPH.csv; BIDIRECTIONAL_TASK_GRAPH.csv; POLYGLOT_TASK_GRAPH.csv; HANDOFF.md; current master source; PRs 11-19",
+        "target_artifacts": "generated/task_families/RECOVERY-002.json; generated/nu_plugin_task_reconciliation.csv; proof_records/RECOVERY-002.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; /home/flexnetos/src/nu_plugin/** read-only after structure; current nu_plugin paths read-only before structure",
+        "blocked_paths": "peer task mutation; source changes; branch or worktree deletion; live PostgreSQL write; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "Each CDB task is classified as proven product capability, proven planning artifact only, partial, pending, superseded, or unsupported; BlobStore, redb, PgStore, materialization, secret guards, envctl export, and live-parity gaps map once to canonical LifeOS tasks.",
+        "rollback_plan": "Restore the prior reconciliation artifact; nu_plugin source, tasks, branches, and worktrees remain unchanged.",
+        "status": "Draft",
+        "proof_uri": "proof_records/RECOVERY-002.proof.json",
+        "next_action": "Do not rebuild merged CodeDB capability; produce one evidence-backed disposition per prior CDB task."
+      },
+      "parent_ids": [
+        "RECOVERY-001"
+      ],
+      "inputs": [
+        "RECOVERY-001",
+        "nu_plugin execution/TASK_GRAPH.csv",
+        "BIDIRECTIONAL_TASK_GRAPH.csv",
+        "POLYGLOT_TASK_GRAPH.csv",
+        "HANDOFF.md",
+        "current master source",
+        "PRs 11-19"
+      ],
+      "target_artifacts": [
+        "generated/task_families/RECOVERY-002.json",
+        "generated/nu_plugin_task_reconciliation.csv",
+        "proof_records/RECOVERY-002.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "/home/flexnetos/src/nu_plugin/** read-only after structure",
+        "current nu_plugin paths read-only before structure"
+      ],
+      "blocked_paths": [
+        "peer task mutation",
+        "source changes",
+        "branch or worktree deletion",
+        "live PostgreSQL write",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "RECOVERY-003",
+      "source_row_number": 19,
+      "phase": "1-preservation",
+      "title": "envctl task and proof truth reconciled",
+      "owner_agent": "LifeOS Consolidation Agent / envctl Maintainer / QA Agent",
+      "goal": "Reconcile envctl's package source graph, proof-derived status, issue-414 graph, .handoff cards, loop DONE state, product source, merged PRs, CI, stash, worktrees, and untracked RuVector state without treating package-artifact completion as product completion.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "The 80-row pending-versus-complete projection conflict and 12-row issue-414 pending-versus-merged conflict are resolved by evidence classification; blocked TASK-0089 stays blocked; every valid migration, secret, RuVector, and semantic capability maps once to LifeOS.",
+      "rollback_plan": "Restore the prior reconciliation artifact; envctl source, task cards, stash, worktrees, and runtime remain unchanged.",
+      "status": "draft",
+      "proof_uri": "proof_records/RECOVERY-003.proof.json",
+      "next_action": "Separate package proof, merged product proof, live runtime proof, and pending work; do not collapse them into one Complete label.",
+      "source_columns": {
+        "task_id": "RECOVERY-003",
+        "parent_id": "RECOVERY-002",
+        "phase": "1-preservation",
+        "title": "envctl task and proof truth reconciled",
+        "owner_agent": "LifeOS Consolidation Agent / envctl Maintainer / QA Agent",
+        "goal": "Reconcile envctl's package source graph, proof-derived status, issue-414 graph, .handoff cards, loop DONE state, product source, merged PRs, CI, stash, worktrees, and untracked RuVector state without treating package-artifact completion as product completion.",
+        "inputs": "RECOVERY-002; envctl package task_graph.csv; status_report.json; issue-414/task_graph.csv; proof ledger; .handoff; PRs 415, 440, 450, 467, 470-476",
+        "target_artifacts": "generated/task_families/RECOVERY-003.json; generated/envctl_task_reconciliation.csv; proof_records/RECOVERY-003.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; /home/flexnetos/src/envctl/** read-only after structure; current envctl paths read-only before structure",
+        "blocked_paths": "peer task mutation; stash application or deletion; worktree cleanup; database start; product implementation; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "The 80-row pending-versus-complete projection conflict and 12-row issue-414 pending-versus-merged conflict are resolved by evidence classification; blocked TASK-0089 stays blocked; every valid migration, secret, RuVector, and semantic capability maps once to LifeOS.",
+        "rollback_plan": "Restore the prior reconciliation artifact; envctl source, task cards, stash, worktrees, and runtime remain unchanged.",
+        "status": "Draft",
+        "proof_uri": "proof_records/RECOVERY-003.proof.json",
+        "next_action": "Separate package proof, merged product proof, live runtime proof, and pending work; do not collapse them into one Complete label."
+      },
+      "parent_ids": [
+        "RECOVERY-002"
+      ],
+      "inputs": [
+        "RECOVERY-002",
+        "envctl package task_graph.csv",
+        "status_report.json",
+        "issue-414/task_graph.csv",
+        "proof ledger",
+        ".handoff",
+        "PRs 415",
+        "440",
+        "450",
+        "467",
+        "470-476"
+      ],
+      "target_artifacts": [
+        "generated/task_families/RECOVERY-003.json",
+        "generated/envctl_task_reconciliation.csv",
+        "proof_records/RECOVERY-003.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "/home/flexnetos/src/envctl/** read-only after structure",
+        "current envctl paths read-only before structure"
+      ],
+      "blocked_paths": [
+        "peer task mutation",
+        "stash application or deletion",
+        "worktree cleanup",
+        "database start",
+        "product implementation",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "RECOVERY-004",
+      "source_row_number": 20,
+      "phase": "1-preservation",
+      "title": "Recovered capability adoption and stray-state disposition closed",
+      "owner_agent": "Governance Board / LifeOS Consolidation Agent",
+      "goal": "Create the no-loss adoption map and archive-first disposition for valid nu_plugin and envctl implementations plus every surviving worktree, local or remote branch, stash, untracked file, proof, and generated task surface before topology changes.",
+      "simulation_required": false,
+      "execution_cell": "policy-cell",
+      "verification_gate": "Every valid capability has adopt, extend, defer, or reject-with-proof disposition; every stray state surface has archive, checksum, owner, recovery, and later cleanup task; no merged capability is scheduled for reimplementation.",
+      "rollback_plan": "Restore the archived reconciliation and disposition artifacts; no peer or runtime state changes during planning.",
+      "status": "draft",
+      "proof_uri": "proof_records/RECOVERY-004.proof.json",
+      "next_action": "This closes prior-work recovery; only then may topology planning and capability adoption proceed.",
+      "source_columns": {
+        "task_id": "RECOVERY-004",
+        "parent_id": "RECOVERY-003",
+        "phase": "1-preservation",
+        "title": "Recovered capability adoption and stray-state disposition closed",
+        "owner_agent": "Governance Board / LifeOS Consolidation Agent",
+        "goal": "Create the no-loss adoption map and archive-first disposition for valid nu_plugin and envctl implementations plus every surviving worktree, local or remote branch, stash, untracked file, proof, and generated task surface before topology changes.",
+        "inputs": "RECOVERY-002; RECOVERY-003; current repo and worktree inventory; generated/prior_task_conflict.source.csv",
+        "target_artifacts": "generated/task_families/RECOVERY-004.json; generated/recovered_capability_adoption.csv; generated/stray_state_disposition.csv; proof_records/RECOVERY-004.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; workspace archive paths",
+        "blocked_paths": "cleanup; deletion; branch removal; stash mutation; product implementation; database start; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "policy-cell",
+        "verification_gate": "Every valid capability has adopt, extend, defer, or reject-with-proof disposition; every stray state surface has archive, checksum, owner, recovery, and later cleanup task; no merged capability is scheduled for reimplementation.",
+        "rollback_plan": "Restore the archived reconciliation and disposition artifacts; no peer or runtime state changes during planning.",
+        "status": "Draft",
+        "proof_uri": "proof_records/RECOVERY-004.proof.json",
+        "next_action": "This closes prior-work recovery; only then may topology planning and capability adoption proceed."
+      },
+      "parent_ids": [
+        "RECOVERY-003"
+      ],
+      "inputs": [
+        "RECOVERY-002",
+        "RECOVERY-003",
+        "current repo and worktree inventory",
+        "generated/prior_task_conflict.source.csv"
+      ],
+      "target_artifacts": [
+        "generated/task_families/RECOVERY-004.json",
+        "generated/recovered_capability_adoption.csv",
+        "generated/stray_state_disposition.csv",
+        "proof_records/RECOVERY-004.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "workspace archive paths"
+      ],
+      "blocked_paths": [
+        "cleanup",
+        "deletion",
+        "branch removal",
+        "stash mutation",
+        "product implementation",
+        "database start",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "PRESERVE-003",
+      "source_row_number": 21,
       "phase": "1-preservation",
       "title": "Canonical topology transition tasks defined",
       "owner_agent": "Governance Board / QA Agent",
@@ -924,15 +1182,15 @@
       "rollback_plan": "Restore the archived topology plan; filesystem state remains unchanged.",
       "status": "draft",
       "proof_uri": "proof_records/PRESERVE-003.proof.json",
-      "next_action": "Decompose topology only after all preservation and capability baseline tasks are proven.",
+      "next_action": "Decompose topology only after prior task truth, valid capabilities, and stray state are reconciled.",
       "source_columns": {
         "task_id": "PRESERVE-003",
-        "parent_id": "PRESERVE-002",
+        "parent_id": "RECOVERY-004",
         "phase": "1-preservation",
         "title": "Canonical topology transition tasks defined",
         "owner_agent": "Governance Board / QA Agent",
         "goal": "Define archive-first, reversible topology tasks that preserve all valid state while establishing canonical LifeOS consolidation inputs and separating temporary worktrees and generated evidence.",
-        "inputs": "PRESERVE-001; PRESERVE-002; current workspace topology evidence",
+        "inputs": "PRESERVE-001; PRESERVE-002; RECOVERY-004; current workspace topology evidence",
         "target_artifacts": "generated/task_families/PRESERVE-003.json; proof_records/PRESERVE-003.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "filesystem move; worktree repair; repo mutation; deletion; secrets/**",
@@ -942,14 +1200,15 @@
         "rollback_plan": "Restore the archived topology plan; filesystem state remains unchanged.",
         "status": "Draft",
         "proof_uri": "proof_records/PRESERVE-003.proof.json",
-        "next_action": "Decompose topology only after all preservation and capability baseline tasks are proven."
+        "next_action": "Decompose topology only after prior task truth, valid capabilities, and stray state are reconciled."
       },
       "parent_ids": [
-        "PRESERVE-002"
+        "RECOVERY-004"
       ],
       "inputs": [
         "PRESERVE-001",
         "PRESERVE-002",
+        "RECOVERY-004",
         "current workspace topology evidence"
       ],
       "target_artifacts": [
@@ -970,7 +1229,7 @@
     },
     {
       "task_id": "STRUCTURE-001",
-      "source_row_number": 18,
+      "source_row_number": 22,
       "phase": "1-preservation",
       "title": "Home-level peer source root established",
       "owner_agent": "Governance Board / QA Agent",
@@ -1027,7 +1286,7 @@
     },
     {
       "task_id": "STRUCTURE-002",
-      "source_row_number": 19,
+      "source_row_number": 23,
       "phase": "1-preservation",
       "title": "LifeOS product repository relocated intact",
       "owner_agent": "Governance Board / LifeOS Consolidation Agent",
@@ -1089,7 +1348,7 @@
     },
     {
       "task_id": "STRUCTURE-003",
-      "source_row_number": 20,
+      "source_row_number": 24,
       "phase": "1-preservation",
       "title": "Meta engine source repository relocated intact",
       "owner_agent": "Governance Board / Meta Maintainer",
@@ -1150,7 +1409,7 @@
     },
     {
       "task_id": "STRUCTURE-004",
-      "source_row_number": 21,
+      "source_row_number": 25,
       "phase": "1-preservation",
       "title": "Thin LifeOS orchestration repository identity established",
       "owner_agent": "David / LifeOS Planning Spine",
@@ -1213,7 +1472,7 @@
     },
     {
       "task_id": "STRUCTURE-005",
-      "source_row_number": 22,
+      "source_row_number": 26,
       "phase": "1-preservation",
       "title": "LifeOS fleet composition removed from Meta engine ownership",
       "owner_agent": "LifeOS Planning Spine / Meta Maintainer",
@@ -1274,7 +1533,7 @@
     },
     {
       "task_id": "STRUCTURE-006",
-      "source_row_number": 23,
+      "source_row_number": 27,
       "phase": "1-preservation",
       "title": "Canonical structure and consumer paths proven",
       "owner_agent": "Governance Board / QA Agent",
@@ -1331,36 +1590,36 @@
     },
     {
       "task_id": "POSTGRES-001",
-      "source_row_number": 24,
+      "source_row_number": 28,
       "phase": "2-postgres-foundation",
       "title": "PostgreSQL authority and store boundaries defined",
       "owner_agent": "LifeOS Data Agent / Runtime Kernel",
-      "goal": "Define PostgreSQL plus RuVector as canonical editable macro state, redb as transient high-frequency buffer and WAL, AgentDB .rvf as canonical per-agent cognition, and flat files as derived projections rather than competing authorities.",
+      "goal": "Resolve the target PostgreSQL plus RuVector macro-state authority against valid existing redb, CodeDB, AgentDB, external-secret, and projection use cases without assuming that every current redb use is transient or that every existing completion claim is product proof.",
       "simulation_required": false,
       "execution_cell": "policy-cell",
-      "verification_gate": "Every durable, transient, cognitive, projected, and external state family has exactly one canonical owner, explicit synchronization direction, identity boundary, recovery source, and no unresolved dual-write authority.",
+      "verification_gate": "Every durable, transient, cognitive, projected, and external state family has exactly one canonical owner or explicit subordinate role, synchronization direction, identity boundary, recovery source, and no unresolved dual-write authority; current CodeDB and envctl redb uses are decided rather than erased by assumption.",
       "rollback_plan": "Restore the archived pre-PostgreSQL graph revision; no database or user-space state changes during planning.",
       "status": "draft",
       "proof_uri": "proof_records/POSTGRES-001.proof.json",
-      "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006; keep those targets Draft until graph closure, then continue with POSTGRES-002.",
+      "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006, prior capability adoption, and STORE-001; keep all targets Draft until owner discussion closes the store relationship.",
       "source_columns": {
         "task_id": "POSTGRES-001",
         "parent_id": "LIFEOS-002",
         "phase": "2-postgres-foundation",
         "title": "PostgreSQL authority and store boundaries defined",
         "owner_agent": "LifeOS Data Agent / Runtime Kernel",
-        "goal": "Define PostgreSQL plus RuVector as canonical editable macro state, redb as transient high-frequency buffer and WAL, AgentDB .rvf as canonical per-agent cognition, and flat files as derived projections rather than competing authorities.",
-        "inputs": "NotebookLM notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; Agentic Mindmap a033f801-5ddb-4b34-af1d-36d7288fe11c; 31-resource context table; STRUCTURE-006",
-        "target_artifacts": "generated/notebooklm_postgres_context.meta.json; generated/task_families/POSTGRES-001.json; proof_records/POSTGRES-001.proof.json",
+        "goal": "Resolve the target PostgreSQL plus RuVector macro-state authority against valid existing redb, CodeDB, AgentDB, external-secret, and projection use cases without assuming that every current redb use is transient or that every existing completion claim is product proof.",
+        "inputs": "NotebookLM notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; Agentic Mindmap a033f801-5ddb-4b34-af1d-36d7288fe11c; 31-resource context table; STRUCTURE-006; RECOVERY-004",
+        "target_artifacts": "generated/notebooklm_postgres_context.meta.json; generated/prior_task_conflict.source.csv; generated/task_families/POSTGRES-001.json; proof_records/POSTGRES-001.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "PostgreSQL mutation; user-space ingestion; flat-file deletion; product implementation; secrets/**",
         "simulation_required": "FALSE",
         "execution_cell": "policy-cell",
-        "verification_gate": "Every durable, transient, cognitive, projected, and external state family has exactly one canonical owner, explicit synchronization direction, identity boundary, recovery source, and no unresolved dual-write authority.",
+        "verification_gate": "Every durable, transient, cognitive, projected, and external state family has exactly one canonical owner or explicit subordinate role, synchronization direction, identity boundary, recovery source, and no unresolved dual-write authority; current CodeDB and envctl redb uses are decided rather than erased by assumption.",
         "rollback_plan": "Restore the archived pre-PostgreSQL graph revision; no database or user-space state changes during planning.",
         "status": "Draft",
         "proof_uri": "proof_records/POSTGRES-001.proof.json",
-        "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006; keep those targets Draft until graph closure, then continue with POSTGRES-002."
+        "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006, prior capability adoption, and STORE-001; keep all targets Draft until owner discussion closes the store relationship."
       },
       "parent_ids": [
         "LIFEOS-002"
@@ -1369,10 +1628,12 @@
         "NotebookLM notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36",
         "Agentic Mindmap a033f801-5ddb-4b34-af1d-36d7288fe11c",
         "31-resource context table",
-        "STRUCTURE-006"
+        "STRUCTURE-006",
+        "RECOVERY-004"
       ],
       "target_artifacts": [
         "generated/notebooklm_postgres_context.meta.json",
+        "generated/prior_task_conflict.source.csv",
         "generated/task_families/POSTGRES-001.json",
         "proof_records/POSTGRES-001.proof.json"
       ],
@@ -1390,7 +1651,7 @@
     },
     {
       "task_id": "PGAUTH-001",
-      "source_row_number": 25,
+      "source_row_number": 29,
       "phase": "2-postgres-foundation",
       "title": "Durable macro-state authority contract bounded",
       "owner_agent": "LifeOS Data Agent",
@@ -1447,36 +1708,36 @@
     },
     {
       "task_id": "PGAUTH-002",
-      "source_row_number": 26,
+      "source_row_number": 30,
       "phase": "2-postgres-foundation",
-      "title": "Transient redb state boundary contract bounded",
+      "title": "redb use-case and authority contract bounded",
       "owner_agent": "LifeOS Memory / Runtime Agent",
-      "goal": "Define the bounded transient classes redb may own as high-frequency cache, buffer, queue, and write-ahead state before ordered idempotent flush to durable PostgreSQL authority.",
+      "goal": "Inventory and decide redb use cases across CodeDB source blobs, envctl migration state, high-frequency buffers, queues, caches, WAL, local scratch, and recovery before assigning transient or durable authority.",
       "simulation_required": false,
       "execution_cell": "policy-cell",
-      "verification_gate": "Every redb record class has a durable destination or explicit expiry, bounded lifetime, sequence and deduplication key, flush direction, crash-replay rule, observability signal, and proof that redb cannot become silent macro authority.",
+      "verification_gate": "Every current and proposed redb record class has a justified use case, owner, lifetime, durability requirement, identity, synchronization edge, crash-replay rule, recovery source, observability signal, and explicit relationship to PostgreSQL and CodeDB; no existing durable use is silently reclassified.",
       "rollback_plan": "Restore the prior task-graph revision; no redb, PostgreSQL, runtime, or user-space state changes during planning.",
       "status": "draft",
       "proof_uri": "proof_records/PGAUTH-002.proof.json",
-      "next_action": "After graph closure, define buffer, queue, cache, and WAL boundaries without activating a runtime.",
+      "next_action": "Hold final classification for the owner discussion represented by STORE-001; do not activate or migrate any store.",
       "source_columns": {
         "task_id": "PGAUTH-002",
         "parent_id": "PGAUTH-001",
         "phase": "2-postgres-foundation",
-        "title": "Transient redb state boundary contract bounded",
+        "title": "redb use-case and authority contract bounded",
         "owner_agent": "LifeOS Memory / Runtime Agent",
-        "goal": "Define the bounded transient classes redb may own as high-frequency cache, buffer, queue, and write-ahead state before ordered idempotent flush to durable PostgreSQL authority.",
-        "inputs": "PGAUTH-001; POSTGRES-006; generated/notebooklm_postgres_context.meta.json",
-        "target_artifacts": "generated/task_families/PGAUTH-002.json; proof_records/PGAUTH-002.proof.json",
+        "goal": "Inventory and decide redb use cases across CodeDB source blobs, envctl migration state, high-frequency buffers, queues, caches, WAL, local scratch, and recovery before assigning transient or durable authority.",
+        "inputs": "PGAUTH-001; POSTGRES-006; RECOVERY-002; RECOVERY-003; generated/notebooklm_postgres_context.meta.json",
+        "target_artifacts": "generated/task_families/PGAUTH-002.json; generated/redb_use_case_matrix.json; proof_records/PGAUTH-002.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "live redb mutation; live PostgreSQL mutation; runtime activation; product implementation; secrets/**",
         "simulation_required": "FALSE",
         "execution_cell": "policy-cell",
-        "verification_gate": "Every redb record class has a durable destination or explicit expiry, bounded lifetime, sequence and deduplication key, flush direction, crash-replay rule, observability signal, and proof that redb cannot become silent macro authority.",
+        "verification_gate": "Every current and proposed redb record class has a justified use case, owner, lifetime, durability requirement, identity, synchronization edge, crash-replay rule, recovery source, observability signal, and explicit relationship to PostgreSQL and CodeDB; no existing durable use is silently reclassified.",
         "rollback_plan": "Restore the prior task-graph revision; no redb, PostgreSQL, runtime, or user-space state changes during planning.",
         "status": "Draft",
         "proof_uri": "proof_records/PGAUTH-002.proof.json",
-        "next_action": "After graph closure, define buffer, queue, cache, and WAL boundaries without activating a runtime."
+        "next_action": "Hold final classification for the owner discussion represented by STORE-001; do not activate or migrate any store."
       },
       "parent_ids": [
         "PGAUTH-001"
@@ -1484,10 +1745,13 @@
       "inputs": [
         "PGAUTH-001",
         "POSTGRES-006",
+        "RECOVERY-002",
+        "RECOVERY-003",
         "generated/notebooklm_postgres_context.meta.json"
       ],
       "target_artifacts": [
         "generated/task_families/PGAUTH-002.json",
+        "generated/redb_use_case_matrix.json",
         "proof_records/PGAUTH-002.proof.json"
       ],
       "allowed_paths": [
@@ -1504,7 +1768,7 @@
     },
     {
       "task_id": "PGAUTH-003",
-      "source_row_number": 27,
+      "source_row_number": 31,
       "phase": "2-postgres-foundation",
       "title": "Per-agent cognition authority contract bounded",
       "owner_agent": "LifeOS Memory / Runtime Agent",
@@ -1562,7 +1826,7 @@
     },
     {
       "task_id": "PGAUTH-004",
-      "source_row_number": 28,
+      "source_row_number": 32,
       "phase": "2-postgres-foundation",
       "title": "Derived projection authority contract bounded",
       "owner_agent": "envctl Agent / Runtime Kernel",
@@ -1621,7 +1885,7 @@
     },
     {
       "task_id": "PGAUTH-005",
-      "source_row_number": 29,
+      "source_row_number": 33,
       "phase": "2-postgres-foundation",
       "title": "External source authority contract bounded",
       "owner_agent": "LifeOS Data Agent / Governance Board",
@@ -1681,7 +1945,7 @@
     },
     {
       "task_id": "PGAUTH-006",
-      "source_row_number": 30,
+      "source_row_number": 34,
       "phase": "2-postgres-foundation",
       "title": "State ownership synchronization and recovery matrix closed",
       "owner_agent": "LifeOS Data Agent / Runtime Kernel / QA Agent",
@@ -1692,7 +1956,7 @@
       "rollback_plan": "Restore the prior task-graph revision and retain the rejected matrix as evidence; no live state changes during planning.",
       "status": "draft",
       "proof_uri": "proof_records/PGAUTH-006.proof.json",
-      "next_action": "After all five authority contracts pass, close POSTGRES-001 and unblock POSTGRES-002 planning; do not open product execution.",
+      "next_action": "After all five authority contracts pass, proceed through ADOPT-001, ADOPT-002, and STORE-001 before POSTGRES-002; do not open product execution.",
       "source_columns": {
         "task_id": "PGAUTH-006",
         "parent_id": "PGAUTH-002; PGAUTH-003; PGAUTH-004; PGAUTH-005",
@@ -1710,7 +1974,7 @@
         "rollback_plan": "Restore the prior task-graph revision and retain the rejected matrix as evidence; no live state changes during planning.",
         "status": "Draft",
         "proof_uri": "proof_records/PGAUTH-006.proof.json",
-        "next_action": "After all five authority contracts pass, close POSTGRES-001 and unblock POSTGRES-002 planning; do not open product execution."
+        "next_action": "After all five authority contracts pass, proceed through ADOPT-001, ADOPT-002, and STORE-001 before POSTGRES-002; do not open product execution."
       },
       "parent_ids": [
         "PGAUTH-002",
@@ -1741,44 +2005,233 @@
       ]
     },
     {
+      "task_id": "ADOPT-001",
+      "source_row_number": 35,
+      "phase": "2-postgres-foundation",
+      "title": "Existing nu_plugin CodeDB storage capability adopted without rebuild",
+      "owner_agent": "LifeOS Consolidation Agent / CodeDB Maintainer",
+      "goal": "Adopt the proven BlobStore trait, redb source-blob store, PostgreSQL PgStore, resumable capture, SHA-256 identity, exact-byte materialization, secret-output guards, bounded MCP, and envctl export capabilities as upgrade inputs rather than duplicate implementation tasks.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Each adopted capability has source commit and PR, current source path, passing CI receipt, behavioral boundary, known gap, target LifeOS owner, parity gate, and no second implementation row.",
+      "rollback_plan": "Restore the prior adoption map; nu_plugin and database state remain unchanged.",
+      "status": "draft",
+      "proof_uri": "proof_records/ADOPT-001.proof.json",
+      "next_action": "Preserve and map the implementation; do not redesign it before STORE-001 resolves ownership boundaries.",
+      "source_columns": {
+        "task_id": "ADOPT-001",
+        "parent_id": "PGAUTH-006",
+        "phase": "2-postgres-foundation",
+        "title": "Existing nu_plugin CodeDB storage capability adopted without rebuild",
+        "owner_agent": "LifeOS Consolidation Agent / CodeDB Maintainer",
+        "goal": "Adopt the proven BlobStore trait, redb source-blob store, PostgreSQL PgStore, resumable capture, SHA-256 identity, exact-byte materialization, secret-output guards, bounded MCP, and envctl export capabilities as upgrade inputs rather than duplicate implementation tasks.",
+        "inputs": "RECOVERY-002; RECOVERY-004; PGAUTH-006; nu_plugin master; merged PRs 13, 14, 16, 18, 19",
+        "target_artifacts": "generated/task_families/ADOPT-001.json; generated/codedb_capability_adoption.json; proof_records/ADOPT-001.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "nu_plugin mutation; duplicate BlobStore implementation; live database write; source cutover; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "Each adopted capability has source commit and PR, current source path, passing CI receipt, behavioral boundary, known gap, target LifeOS owner, parity gate, and no second implementation row.",
+        "rollback_plan": "Restore the prior adoption map; nu_plugin and database state remain unchanged.",
+        "status": "Draft",
+        "proof_uri": "proof_records/ADOPT-001.proof.json",
+        "next_action": "Preserve and map the implementation; do not redesign it before STORE-001 resolves ownership boundaries."
+      },
+      "parent_ids": [
+        "PGAUTH-006"
+      ],
+      "inputs": [
+        "RECOVERY-002",
+        "RECOVERY-004",
+        "PGAUTH-006",
+        "nu_plugin master",
+        "merged PRs 13",
+        "14",
+        "16",
+        "18",
+        "19"
+      ],
+      "target_artifacts": [
+        "generated/task_families/ADOPT-001.json",
+        "generated/codedb_capability_adoption.json",
+        "proof_records/ADOPT-001.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "nu_plugin mutation",
+        "duplicate BlobStore implementation",
+        "live database write",
+        "source cutover",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ADOPT-002",
+      "source_row_number": 36,
+      "phase": "2-postgres-foundation",
+      "title": "Existing envctl migration secrets and RuVector capability adopted without rebuild",
+      "owner_agent": "LifeOS Consolidation Agent / envctl Maintainer",
+      "goal": "Adopt envctl's replayable migration engine, catalog blob metadata, secrets-engine, secretd, secretctl, remote libSQL store, PostgreSQL-RuVector component, and semantic consumer as valid capabilities while separating package proof, merged product proof, live runtime proof, and unresolved store authority.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Each capability has source and proof provenance, current store and runtime owner, security boundary, known gap, target LifeOS role, and no duplicate task; raw secret values are never captured as planning evidence.",
+      "rollback_plan": "Restore the prior adoption map; envctl, secret stores, PostgreSQL, redb files, and runtime remain unchanged.",
+      "status": "draft",
+      "proof_uri": "proof_records/ADOPT-002.proof.json",
+      "next_action": "Carry all valid capability into STORE-001 without deciding its final store role in advance.",
+      "source_columns": {
+        "task_id": "ADOPT-002",
+        "parent_id": "ADOPT-001",
+        "phase": "2-postgres-foundation",
+        "title": "Existing envctl migration secrets and RuVector capability adopted without rebuild",
+        "owner_agent": "LifeOS Consolidation Agent / envctl Maintainer",
+        "goal": "Adopt envctl's replayable migration engine, catalog blob metadata, secrets-engine, secretd, secretctl, remote libSQL store, PostgreSQL-RuVector component, and semantic consumer as valid capabilities while separating package proof, merged product proof, live runtime proof, and unresolved store authority.",
+        "inputs": "RECOVERY-003; RECOVERY-004; ADOPT-001; envctl master; merged PRs 440, 450, 467, 470-472",
+        "target_artifacts": "generated/task_families/ADOPT-002.json; generated/envctl_capability_adoption.json; proof_records/ADOPT-002.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "envctl mutation; secret reads; database start; duplicate migration or secret implementation; source cutover; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "Each capability has source and proof provenance, current store and runtime owner, security boundary, known gap, target LifeOS role, and no duplicate task; raw secret values are never captured as planning evidence.",
+        "rollback_plan": "Restore the prior adoption map; envctl, secret stores, PostgreSQL, redb files, and runtime remain unchanged.",
+        "status": "Draft",
+        "proof_uri": "proof_records/ADOPT-002.proof.json",
+        "next_action": "Carry all valid capability into STORE-001 without deciding its final store role in advance."
+      },
+      "parent_ids": [
+        "ADOPT-001"
+      ],
+      "inputs": [
+        "RECOVERY-003",
+        "RECOVERY-004",
+        "ADOPT-001",
+        "envctl master",
+        "merged PRs 440",
+        "450",
+        "467",
+        "470-472"
+      ],
+      "target_artifacts": [
+        "generated/task_families/ADOPT-002.json",
+        "generated/envctl_capability_adoption.json",
+        "proof_records/ADOPT-002.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "envctl mutation",
+        "secret reads",
+        "database start",
+        "duplicate migration or secret implementation",
+        "source cutover",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "STORE-001",
+      "source_row_number": 37,
+      "phase": "2-postgres-foundation",
+      "title": "redb PostgreSQL and nu_plugin CodeDB relationship decided",
+      "owner_agent": "David / LifeOS Data Agent / Runtime Kernel",
+      "goal": "Make the explicit owner decision for redb, PostgreSQL plus RuVector, and nu_plugin CodeDB: use cases, authority, data classes, synchronization direction, durability, performance, failure recovery, materialization, secret boundaries, and transition from current state.",
+      "simulation_required": true,
+      "execution_cell": "policy-cell",
+      "verification_gate": "David-approved decision assigns every relevant data class exactly once, preserves justified current capabilities, identifies derived and transient copies, defines directional synchronization and recovery, resolves CodeDB and envctl durable-redb conflicts, and leaves no silent dual authority.",
+      "rollback_plan": "Restore the prior undecided relationship and keep all store execution blocked; no runtime state changes during planning.",
+      "status": "draft",
+      "proof_uri": "proof_records/STORE-001.proof.json",
+      "next_action": "Discuss and decide redb use cases and the redb-PostgreSQL-CodeDB relationship before decomposing POSTGRES-002.",
+      "source_columns": {
+        "task_id": "STORE-001",
+        "parent_id": "ADOPT-002",
+        "phase": "2-postgres-foundation",
+        "title": "redb PostgreSQL and nu_plugin CodeDB relationship decided",
+        "owner_agent": "David / LifeOS Data Agent / Runtime Kernel",
+        "goal": "Make the explicit owner decision for redb, PostgreSQL plus RuVector, and nu_plugin CodeDB: use cases, authority, data classes, synchronization direction, durability, performance, failure recovery, materialization, secret boundaries, and transition from current state.",
+        "inputs": "PGAUTH-001 through PGAUTH-006; ADOPT-001; ADOPT-002; generated/prior_task_conflict.source.csv; North Star",
+        "target_artifacts": "generated/task_families/STORE-001.json; generated/store_relationship_decision.json; proof_records/STORE-001.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "live store mutation; database start; migration; source cutover; product implementation; credential or secret reads",
+        "simulation_required": "TRUE",
+        "execution_cell": "policy-cell",
+        "verification_gate": "David-approved decision assigns every relevant data class exactly once, preserves justified current capabilities, identifies derived and transient copies, defines directional synchronization and recovery, resolves CodeDB and envctl durable-redb conflicts, and leaves no silent dual authority.",
+        "rollback_plan": "Restore the prior undecided relationship and keep all store execution blocked; no runtime state changes during planning.",
+        "status": "Draft",
+        "proof_uri": "proof_records/STORE-001.proof.json",
+        "next_action": "Discuss and decide redb use cases and the redb-PostgreSQL-CodeDB relationship before decomposing POSTGRES-002."
+      },
+      "parent_ids": [
+        "ADOPT-002"
+      ],
+      "inputs": [
+        "PGAUTH-001 through PGAUTH-006",
+        "ADOPT-001",
+        "ADOPT-002",
+        "generated/prior_task_conflict.source.csv",
+        "North Star"
+      ],
+      "target_artifacts": [
+        "generated/task_families/STORE-001.json",
+        "generated/store_relationship_decision.json",
+        "proof_records/STORE-001.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "live store mutation",
+        "database start",
+        "migration",
+        "source cutover",
+        "product implementation",
+        "credential or secret reads"
+      ]
+    },
+    {
       "task_id": "POSTGRES-002",
-      "source_row_number": 31,
+      "source_row_number": 38,
       "phase": "2-postgres-foundation",
       "title": "Whole user-space relational graph and identity model defined",
       "owner_agent": "LifeOS Data Agent",
       "goal": "Define the schemas, stable identities, temporal relations, content addressing, metadata, binary references, permissions, provenance, and graph edges needed to represent the entire user-space without losing meaning or reconstructability.",
       "simulation_required": false,
       "execution_cell": "policy-cell",
-      "verification_gate": "The model covers files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, and domain records with lossless round-trip keys.",
+      "verification_gate": "The model covers files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, and domain records with lossless round-trip keys under the approved store relationship.",
       "rollback_plan": "Restore the prior schema plan; no live schema or user data is touched during planning.",
       "status": "draft",
       "proof_uri": "proof_records/POSTGRES-002.proof.json",
-      "next_action": "Decompose by entity family and relationship boundary only after the phase model is accepted.",
+      "next_action": "Decompose by entity family only after STORE-001 is owner-approved.",
       "source_columns": {
         "task_id": "POSTGRES-002",
-        "parent_id": "PGAUTH-006",
+        "parent_id": "STORE-001",
         "phase": "2-postgres-foundation",
         "title": "Whole user-space relational graph and identity model defined",
         "owner_agent": "LifeOS Data Agent",
         "goal": "Define the schemas, stable identities, temporal relations, content addressing, metadata, binary references, permissions, provenance, and graph edges needed to represent the entire user-space without losing meaning or reconstructability.",
-        "inputs": "POSTGRES-001; PGAUTH-006; 31-resource data/entities and identity context; current user-space classes; North Star whole-life domains",
+        "inputs": "POSTGRES-001; STORE-001; 31-resource data/entities and identity context; current user-space classes; North Star whole-life domains",
         "target_artifacts": "generated/task_families/POSTGRES-002.json; generated/postgres_user_space_schema_plan.json; proof_records/POSTGRES-002.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "live schema mutation; user-data reads; credential values; product implementation; secrets/**",
         "simulation_required": "FALSE",
         "execution_cell": "policy-cell",
-        "verification_gate": "The model covers files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, and domain records with lossless round-trip keys.",
+        "verification_gate": "The model covers files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, and domain records with lossless round-trip keys under the approved store relationship.",
         "rollback_plan": "Restore the prior schema plan; no live schema or user data is touched during planning.",
         "status": "Draft",
         "proof_uri": "proof_records/POSTGRES-002.proof.json",
-        "next_action": "Decompose by entity family and relationship boundary only after the phase model is accepted."
+        "next_action": "Decompose by entity family only after STORE-001 is owner-approved."
       },
       "parent_ids": [
-        "PGAUTH-006"
+        "STORE-001"
       ],
       "inputs": [
         "POSTGRES-001",
-        "PGAUTH-006",
+        "STORE-001",
         "31-resource data/entities and identity context",
         "current user-space classes",
         "North Star whole-life domains"
@@ -1802,7 +2255,7 @@
     },
     {
       "task_id": "POSTGRES-003",
-      "source_row_number": 32,
+      "source_row_number": 39,
       "phase": "2-postgres-foundation",
       "title": "Planning and control tables made database-native",
       "owner_agent": "LifeOS Planning Spine / LifeOS Data Agent",
@@ -1860,7 +2313,7 @@
     },
     {
       "task_id": "POSTGRES-004",
-      "source_row_number": 33,
+      "source_row_number": 40,
       "phase": "2-postgres-foundation",
       "title": "Complete user-space inventory and lossless ingestion defined",
       "owner_agent": "LifeOS Data Agent / envctl Agent",
@@ -1921,7 +2374,7 @@
     },
     {
       "task_id": "POSTGRES-005",
-      "source_row_number": 34,
+      "source_row_number": 41,
       "phase": "2-postgres-foundation",
       "title": "RuVector embedding and semantic database editing defined",
       "owner_agent": "LifeOS Data Agent / RuVector Agent",
@@ -1984,7 +2437,7 @@
     },
     {
       "task_id": "POSTGRES-006",
-      "source_row_number": 35,
+      "source_row_number": 42,
       "phase": "2-postgres-foundation",
       "title": "redb and AgentDB runtime boundaries defined",
       "owner_agent": "LifeOS Memory / Runtime Agent",
@@ -2047,7 +2500,7 @@
     },
     {
       "task_id": "POSTGRES-007",
-      "source_row_number": 36,
+      "source_row_number": 43,
       "phase": "2-postgres-foundation",
       "title": "LifeOS direct database control surface defined",
       "owner_agent": "LifeOS Product / Runtime Agent",
@@ -2107,7 +2560,7 @@
     },
     {
       "task_id": "POSTGRES-008",
-      "source_row_number": 37,
+      "source_row_number": 44,
       "phase": "2-postgres-foundation",
       "title": "envctl database-to-directory materialization defined",
       "owner_agent": "envctl Agent / Runtime Kernel",
@@ -2168,7 +2621,7 @@
     },
     {
       "task_id": "POSTGRES-009",
-      "source_row_number": 38,
+      "source_row_number": 45,
       "phase": "2-postgres-foundation",
       "title": "Portable projected LifeOS build proven end to end",
       "owner_agent": "Runtime Kernel / QA Agent",
@@ -2230,7 +2683,7 @@
     },
     {
       "task_id": "POSTGRES-010",
-      "source_row_number": 39,
+      "source_row_number": 46,
       "phase": "2-postgres-foundation",
       "title": "Whole user-space parity recovery and authority cutover defined",
       "owner_agent": "Governance Board / LifeOS Data Agent / QA Agent",
@@ -2291,7 +2744,7 @@
     },
     {
       "task_id": "FOUNDATION-001",
-      "source_row_number": 40,
+      "source_row_number": 47,
       "phase": "2-foundation",
       "title": "Single Yazelix and Nix foundation package plan defined",
       "owner_agent": "Runtime Kernel",
@@ -2348,7 +2801,7 @@
     },
     {
       "task_id": "FOUNDATION-002",
-      "source_row_number": 41,
+      "source_row_number": 48,
       "phase": "2-foundation",
       "title": "Rust-native application and governed Lua build plan defined",
       "owner_agent": "Runtime Kernel / LifeOS Consolidation Agent",
@@ -2406,7 +2859,7 @@
     },
     {
       "task_id": "FOUNDATION-003",
-      "source_row_number": 42,
+      "source_row_number": 49,
       "phase": "2-foundation",
       "title": "Foundation runtime reproducibility and shadow retirement plan defined",
       "owner_agent": "Runtime Kernel / QA Agent",
@@ -2464,7 +2917,7 @@
     },
     {
       "task_id": "CONSOLIDATE-001",
-      "source_row_number": 43,
+      "source_row_number": 50,
       "phase": "4-physical-consolidation",
       "title": "LifeOS target bounded-context architecture defined",
       "owner_agent": "LifeOS Consolidation Agent",
@@ -2522,7 +2975,7 @@
     },
     {
       "task_id": "CONSOLIDATE-002",
-      "source_row_number": 44,
+      "source_row_number": 51,
       "phase": "4-physical-consolidation",
       "title": "Upgrade-only capability migration waves defined",
       "owner_agent": "LifeOS Consolidation Agent / QA Agent",
@@ -2580,7 +3033,7 @@
     },
     {
       "task_id": "CONSOLIDATE-003",
-      "source_row_number": 45,
+      "source_row_number": 52,
       "phase": "4-physical-consolidation",
       "title": "Capability parity cutover and legacy retirement plan defined",
       "owner_agent": "LifeOS Consolidation Agent / Release Agent",
@@ -2638,7 +3091,7 @@
     },
     {
       "task_id": "INTEL-001",
-      "source_row_number": 46,
+      "source_row_number": 53,
       "phase": "5-intelligence-substrate",
       "title": "Unified governed memory and data substrate plan defined",
       "owner_agent": "LifeOS Memory Agent",
@@ -2699,7 +3152,7 @@
     },
     {
       "task_id": "INTEL-002",
-      "source_row_number": 47,
+      "source_row_number": 54,
       "phase": "5-intelligence-substrate",
       "title": "Local intelligence compute and mesh substrate plan defined",
       "owner_agent": "LifeOS Runtime / Memory Agent",
@@ -2760,7 +3213,7 @@
     },
     {
       "task_id": "INTEL-003",
-      "source_row_number": 48,
+      "source_row_number": 55,
       "phase": "5-intelligence-substrate",
       "title": "Regenerative configuration secrets and learning plan defined",
       "owner_agent": "LifeOS Governance / Memory Agent",
@@ -2819,7 +3272,7 @@
     },
     {
       "task_id": "MVP1-001",
-      "source_row_number": 49,
+      "source_row_number": 56,
       "phase": "6-mvp1-financial-legal",
       "title": "Governed financial operating slice plan defined",
       "owner_agent": "LifeOS Product / Finance Governance Agent",
@@ -2877,7 +3330,7 @@
     },
     {
       "task_id": "MVP1-002",
-      "source_row_number": 50,
+      "source_row_number": 57,
       "phase": "6-mvp1-financial-legal",
       "title": "Governed legal operating slice plan defined",
       "owner_agent": "LifeOS Product / Legal Governance Agent",
@@ -2936,7 +3389,7 @@
     },
     {
       "task_id": "MVP1-003",
-      "source_row_number": 51,
+      "source_row_number": 58,
       "phase": "6-mvp1-financial-legal",
       "title": "Financial and legal MVP1 acceptance plan defined",
       "owner_agent": "LifeOS Product / QA Agent",
@@ -2993,7 +3446,7 @@
     },
     {
       "task_id": "COMPANY-001",
-      "source_row_number": 52,
+      "source_row_number": 59,
       "phase": "7-company-development",
       "title": "Company governance and operating model task family defined",
       "owner_agent": "LifeOS Governance Agent",
@@ -3052,7 +3505,7 @@
     },
     {
       "task_id": "DEVELOP-001",
-      "source_row_number": 53,
+      "source_row_number": 60,
       "phase": "7-company-development",
       "title": "Development build and release operating family defined",
       "owner_agent": "LifeOS Development Agent",
@@ -3111,7 +3564,7 @@
     },
     {
       "task_id": "COMPANY-002",
-      "source_row_number": 54,
+      "source_row_number": 61,
       "phase": "7-company-development",
       "title": "Company and development vertical acceptance plan defined",
       "owner_agent": "LifeOS Governance / QA Agent",
@@ -3169,7 +3622,7 @@
     },
     {
       "task_id": "PERSONAL-001",
-      "source_row_number": 55,
+      "source_row_number": 62,
       "phase": "8-personal",
       "title": "Personal identity privacy and data ownership family defined",
       "owner_agent": "LifeOS Privacy Agent",
@@ -3227,7 +3680,7 @@
     },
     {
       "task_id": "PERSONAL-002",
-      "source_row_number": 56,
+      "source_row_number": 63,
       "phase": "8-personal",
       "title": "Personal domain workflow families defined",
       "owner_agent": "LifeOS Product / Privacy Agent",
@@ -3285,7 +3738,7 @@
     },
     {
       "task_id": "PERSONAL-003",
-      "source_row_number": 57,
+      "source_row_number": 64,
       "phase": "8-personal",
       "title": "Personal operating environment acceptance plan defined",
       "owner_agent": "LifeOS Product / QA Agent",
@@ -3343,7 +3796,7 @@
     },
     {
       "task_id": "HOME-001",
-      "source_row_number": 58,
+      "source_row_number": 65,
       "phase": "9-home",
       "title": "Home digital twin inventory and observation family defined",
       "owner_agent": "LifeOS Safety Agent",
@@ -3401,7 +3854,7 @@
     },
     {
       "task_id": "HOME-002",
-      "source_row_number": 59,
+      "source_row_number": 66,
       "phase": "9-home",
       "title": "Home resource service and media workflow families defined",
       "owner_agent": "LifeOS Product / Safety Agent",
@@ -3459,7 +3912,7 @@
     },
     {
       "task_id": "HOME-003",
-      "source_row_number": 60,
+      "source_row_number": 67,
       "phase": "9-home",
       "title": "Home physical-control acceptance plan defined",
       "owner_agent": "LifeOS Safety / QA Agent",
@@ -3517,7 +3970,7 @@
     },
     {
       "task_id": "EXPERIENCE-001",
-      "source_row_number": 61,
+      "source_row_number": 68,
       "phase": "10-experience",
       "title": "Rust-native LifeOS application boundary and API family defined",
       "owner_agent": "LifeOS Experience / Runtime Agent",
@@ -3574,7 +4027,7 @@
     },
     {
       "task_id": "EXPERIENCE-002",
-      "source_row_number": 62,
+      "source_row_number": 69,
       "phase": "10-experience",
       "title": "Desktop mobile glasses and ambient client families defined",
       "owner_agent": "LifeOS Experience Agent",
@@ -3632,7 +4085,7 @@
     },
     {
       "task_id": "EXPERIENCE-003",
-      "source_row_number": 63,
+      "source_row_number": 70,
       "phase": "10-experience",
       "title": "Cross-interface continuity and accessibility acceptance plan defined",
       "owner_agent": "LifeOS Experience / QA Agent",
@@ -3688,7 +4141,7 @@
     },
     {
       "task_id": "RELEASE-001",
-      "source_row_number": 64,
+      "source_row_number": 71,
       "phase": "11-system-proof-release",
       "title": "North Star system acceptance family defined",
       "owner_agent": "Governance Board / QA Agent",
@@ -3745,7 +4198,7 @@
     },
     {
       "task_id": "RELEASE-002",
-      "source_row_number": 65,
+      "source_row_number": 72,
       "phase": "11-system-proof-release",
       "title": "Ubuntu-first reproducible build install and rollback family defined",
       "owner_agent": "Release Agent / Runtime Kernel",
@@ -3803,7 +4256,7 @@
     },
     {
       "task_id": "RELEASE-003",
-      "source_row_number": 66,
+      "source_row_number": 73,
       "phase": "11-system-proof-release",
       "title": "Secondary platform and distribution rollout family defined",
       "owner_agent": "Release Agent / QA Agent",
@@ -3860,7 +4313,7 @@
     },
     {
       "task_id": "LIVING-001",
-      "source_row_number": 67,
+      "source_row_number": 74,
       "phase": "12-living-system",
       "title": "Continuous observation audit and governance cadence family defined",
       "owner_agent": "LifeOS Governance Agent",
@@ -3917,7 +4370,7 @@
     },
     {
       "task_id": "LIVING-002",
-      "source_row_number": 68,
+      "source_row_number": 75,
       "phase": "12-living-system",
       "title": "Failure learning and proven-world promotion family defined",
       "owner_agent": "LifeOS Memory / Governance Agent",
@@ -3975,7 +4428,7 @@
     },
     {
       "task_id": "LIVING-003",
-      "source_row_number": 69,
+      "source_row_number": 76,
       "phase": "12-living-system",
       "title": "Upgrade-only autonomous operation acceptance family defined",
       "owner_agent": "Governance Board / QA Agent",
@@ -4033,7 +4486,7 @@
     },
     {
       "task_id": "LPS-000",
-      "source_row_number": 70,
+      "source_row_number": 77,
       "phase": "0-foundation",
       "title": "Planning Spine package and North Star proof completed",
       "owner_agent": "NOA / CECCA",
@@ -4087,7 +4540,7 @@
     },
     {
       "task_id": "LPS-001",
-      "source_row_number": 71,
+      "source_row_number": 78,
       "phase": "1-schema",
       "title": "Object model proof completed",
       "owner_agent": "CTO Agent",
@@ -4141,7 +4594,7 @@
     },
     {
       "task_id": "LPS-002",
-      "source_row_number": 72,
+      "source_row_number": 79,
       "phase": "1-schema",
       "title": "Authority graph proof completed",
       "owner_agent": "Governance Board",
@@ -4196,7 +4649,7 @@
     },
     {
       "task_id": "LPS-003",
-      "source_row_number": 73,
+      "source_row_number": 80,
       "phase": "1-schema",
       "title": "Task graph schema proof completed",
       "owner_agent": "CTO Agent",
@@ -4250,7 +4703,7 @@
     },
     {
       "task_id": "LPS-004",
-      "source_row_number": 74,
+      "source_row_number": 81,
       "phase": "2-simulation",
       "title": "WorldSeed schema proof completed",
       "owner_agent": "Teri / Mirofish Agent",
@@ -4304,7 +4757,7 @@
     },
     {
       "task_id": "LPS-005",
-      "source_row_number": 75,
+      "source_row_number": 82,
       "phase": "2-simulation",
       "title": "SimulationReport contract proof completed",
       "owner_agent": "Teri / Mirofish Agent",
@@ -4359,7 +4812,7 @@
     },
     {
       "task_id": "LPS-006",
-      "source_row_number": 76,
+      "source_row_number": 83,
       "phase": "3-execution",
       "title": "Hermetic cell contract proof completed",
       "owner_agent": "Runtime Kernel",
@@ -4414,7 +4867,7 @@
     },
     {
       "task_id": "LPS-007",
-      "source_row_number": 77,
+      "source_row_number": 84,
       "phase": "3-execution",
       "title": "Proof ledger schema proof completed",
       "owner_agent": "QA Agent",
@@ -4468,7 +4921,7 @@
     },
     {
       "task_id": "LPS-008",
-      "source_row_number": 78,
+      "source_row_number": 85,
       "phase": "4-mvp",
       "title": "Governed MVP vertical slice proof completed",
       "owner_agent": "NOA / CECCA",
@@ -4522,7 +4975,7 @@
     },
     {
       "task_id": "LPS-009",
-      "source_row_number": 79,
+      "source_row_number": 86,
       "phase": "5-gates",
       "title": "Execution gates proof completed",
       "owner_agent": "Governance Board",
@@ -4575,7 +5028,7 @@
     },
     {
       "task_id": "LPS-010",
-      "source_row_number": 80,
+      "source_row_number": 87,
       "phase": "6-rfc",
       "title": "Compiled brainpack RFC boundary proof completed",
       "owner_agent": "Hermes / Memory Agent",
@@ -4628,7 +5081,7 @@
     },
     {
       "task_id": "LPS-011",
-      "source_row_number": 81,
+      "source_row_number": 88,
       "phase": "7-review",
       "title": "Open questions represented as blocking task rows",
       "owner_agent": "NOA / CECCA",
@@ -4681,18 +5134,18 @@
     },
     {
       "task_id": "GRAPH-001",
-      "source_row_number": 82,
+      "source_row_number": 89,
       "phase": "0-north-star-graph",
       "title": "High-level phases decomposed into bounded task families",
       "owner_agent": "LifeOS Planning Spine",
       "goal": "Iterate the canonical task graph until every high-level LifeOS phase is decomposed into complete, dependency-ordered, proof-bearing task families whose summed outcomes equal the North Star.",
       "simulation_required": false,
       "execution_cell": "policy-cell",
-      "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
+      "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, conflicting prior tasks have explicit dispositions, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
       "rollback_plan": "Restore the archived pre-coverage graph; retain the rejected graph revision as evidence.",
       "status": "running",
       "proof_uri": "proof_records/GRAPH-001.proof.json",
-      "next_action": "POSTGRES-001 authority decomposition is recorded as PGAUTH-001 through PGAUTH-006; next continue graph-only decomposition at POSTGRES-002, with product execution still closed.",
+      "next_action": "Prior-task recovery and adoption are represented by RECOVERY-001 through RECOVERY-004 and ADOPT-001 through ADOPT-002; next discuss STORE-001 before decomposing POSTGRES-002.",
       "source_columns": {
         "task_id": "GRAPH-001",
         "parent_id": "LIFEOS-000",
@@ -4700,17 +5153,17 @@
         "title": "High-level phases decomposed into bounded task families",
         "owner_agent": "LifeOS Planning Spine",
         "goal": "Iterate the canonical task graph until every high-level LifeOS phase is decomposed into complete, dependency-ordered, proof-bearing task families whose summed outcomes equal the North Star.",
-        "inputs": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; generated/current_state_gap.source.csv; NORTH_STAR.md",
-        "target_artifacts": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; proof_records/GRAPH-001.proof.json",
+        "inputs": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; generated/current_state_gap.source.csv; generated/prior_task_conflict.source.csv; NORTH_STAR.md",
+        "target_artifacts": "generated/task_graph.source.csv; generated/north_star_coverage.source.csv; generated/prior_task_conflict.source.csv; proof_records/GRAPH-001.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "product implementation; peer-repo mutation; execution packet consumption; secrets/**",
         "simulation_required": "FALSE",
         "execution_cell": "policy-cell",
-        "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
+        "verification_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, conflicting prior tasks have explicit dispositions, no phase is empty, no task lacks a North Star path, and product execution remains closed.",
         "rollback_plan": "Restore the archived pre-coverage graph; retain the rejected graph revision as evidence.",
         "status": "Running",
         "proof_uri": "proof_records/GRAPH-001.proof.json",
-        "next_action": "POSTGRES-001 authority decomposition is recorded as PGAUTH-001 through PGAUTH-006; next continue graph-only decomposition at POSTGRES-002, with product execution still closed."
+        "next_action": "Prior-task recovery and adoption are represented by RECOVERY-001 through RECOVERY-004 and ADOPT-001 through ADOPT-002; next discuss STORE-001 before decomposing POSTGRES-002."
       },
       "parent_ids": [
         "LIFEOS-000"
@@ -4719,11 +5172,13 @@
         "generated/task_graph.source.csv",
         "generated/north_star_coverage.source.csv",
         "generated/current_state_gap.source.csv",
+        "generated/prior_task_conflict.source.csv",
         "NORTH_STAR.md"
       ],
       "target_artifacts": [
         "generated/task_graph.source.csv",
         "generated/north_star_coverage.source.csv",
+        "generated/prior_task_conflict.source.csv",
         "proof_records/GRAPH-001.proof.json"
       ],
       "allowed_paths": [
@@ -4739,7 +5194,7 @@
     },
     {
       "task_id": "NORTHSTAR-001",
-      "source_row_number": 83,
+      "source_row_number": 90,
       "phase": "0-north-star-graph",
       "title": "Compact semantic North Star locked",
       "owner_agent": "David / LifeOS Planning Spine",
@@ -4799,7 +5254,7 @@
     },
     {
       "task_id": "NORTHSTAR-002",
-      "source_row_number": 84,
+      "source_row_number": 91,
       "phase": "0-north-star-graph",
       "title": "Human-centered LifeOS vision locked",
       "owner_agent": "David / LifeOS Planning Spine",
@@ -4862,18 +5317,18 @@
     },
     {
       "task_id": "GRAPH-002",
-      "source_row_number": 85,
+      "source_row_number": 92,
       "phase": "0-north-star-graph",
       "title": "Competing task tables reconciled into one canonical plan",
       "owner_agent": "LifeOS Planning Spine / QA Agent",
       "goal": "Preserve and reconcile every valid task from local CSVs, JSON graphs, proof ledgers, and archived Sheet-derived tables into the committed canonical task graph without duplicate or competing authority.",
       "simulation_required": false,
       "execution_cell": "proof-cell",
-      "verification_gate": "Every valid source task is preserved or mapped to one canonical row, duplicate intent is explicit, subordinate tables have declared disposition, and only generated/task_graph.source.csv authorizes execution.",
+      "verification_gate": "Every valid source task is preserved or mapped to one canonical row, contradictory status and completion semantics are explicit, duplicate intent has one adoption or implementation disposition, subordinate tables have declared roles, and only generated/task_graph.source.csv authorizes LifeOS execution.",
       "rollback_plan": "Restore the archived task tables and canonical graph; no valid task source is deleted.",
       "status": "draft",
       "proof_uri": "proof_records/GRAPH-002.proof.json",
-      "next_action": "Run only after GRAPH-001 has stable phase/task-family coverage.",
+      "next_action": "RECOVERY-001 through RECOVERY-004 are the bounded reconciliation path; do not bulk-import or bulk-complete prior rows.",
       "source_columns": {
         "task_id": "GRAPH-002",
         "parent_id": "GRAPH-001",
@@ -4881,28 +5336,34 @@
         "title": "Competing task tables reconciled into one canonical plan",
         "owner_agent": "LifeOS Planning Spine / QA Agent",
         "goal": "Preserve and reconcile every valid task from local CSVs, JSON graphs, proof ledgers, and archived Sheet-derived tables into the committed canonical task graph without duplicate or competing authority.",
-        "inputs": "generated/task_graph.source.csv; 1.0_VISION/teas/BUILD_TASK_GRAPH.csv; proof_records/proof_ledger.jsonl; Master Plan \u00a74 unified task graph",
-        "target_artifacts": "generated/task_table_reconciliation.csv; generated/task_graph.source.csv; proof_records/GRAPH-002.proof.json",
+        "inputs": "generated/task_graph.source.csv; generated/prior_task_conflict.source.csv; 1.0_VISION/teas/BUILD_TASK_GRAPH.csv; nu_plugin task graphs; envctl package, issue-414, and .handoff task surfaces; proof_records/proof_ledger.jsonl; Master Plan \u00a74 unified task graph",
+        "target_artifacts": "generated/prior_task_conflict.source.csv; generated/task_table_reconciliation.csv; generated/task_graph.source.csv; proof_records/GRAPH-002.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/1.0_VISION/teas/**",
-        "blocked_paths": "deleting valid task rows; source-table replacement without provenance; product implementation; secrets/**",
+        "blocked_paths": "deleting valid task rows; source-table replacement without provenance; peer task mutation; product implementation; secrets/**",
         "simulation_required": "FALSE",
         "execution_cell": "proof-cell",
-        "verification_gate": "Every valid source task is preserved or mapped to one canonical row, duplicate intent is explicit, subordinate tables have declared disposition, and only generated/task_graph.source.csv authorizes execution.",
+        "verification_gate": "Every valid source task is preserved or mapped to one canonical row, contradictory status and completion semantics are explicit, duplicate intent has one adoption or implementation disposition, subordinate tables have declared roles, and only generated/task_graph.source.csv authorizes LifeOS execution.",
         "rollback_plan": "Restore the archived task tables and canonical graph; no valid task source is deleted.",
         "status": "Draft",
         "proof_uri": "proof_records/GRAPH-002.proof.json",
-        "next_action": "Run only after GRAPH-001 has stable phase/task-family coverage."
+        "next_action": "RECOVERY-001 through RECOVERY-004 are the bounded reconciliation path; do not bulk-import or bulk-complete prior rows."
       },
       "parent_ids": [
         "GRAPH-001"
       ],
       "inputs": [
         "generated/task_graph.source.csv",
+        "generated/prior_task_conflict.source.csv",
         "1.0_VISION/teas/BUILD_TASK_GRAPH.csv",
+        "nu_plugin task graphs",
+        "envctl package",
+        "issue-414",
+        "and .handoff task surfaces",
         "proof_records/proof_ledger.jsonl",
         "Master Plan \u00a74 unified task graph"
       ],
       "target_artifacts": [
+        "generated/prior_task_conflict.source.csv",
         "generated/task_table_reconciliation.csv",
         "generated/task_graph.source.csv",
         "proof_records/GRAPH-002.proof.json"
@@ -4915,13 +5376,14 @@
       "blocked_paths": [
         "deleting valid task rows",
         "source-table replacement without provenance",
+        "peer task mutation",
         "product implementation",
         "secrets/**"
       ]
     },
     {
       "task_id": "GRAPH-003",
-      "source_row_number": 86,
+      "source_row_number": 93,
       "phase": "0-north-star-graph",
       "title": "North Star coverage gate enforced before packet generation",
       "owner_agent": "Runtime Kernel / QA Agent",
@@ -4979,7 +5441,7 @@
     },
     {
       "task_id": "GRAPH-004",
-      "source_row_number": 87,
+      "source_row_number": 94,
       "phase": "0-north-star-graph",
       "title": "Task lifecycle projection respects planning and proof state",
       "owner_agent": "Runtime Kernel / QA Agent",
@@ -5037,7 +5499,7 @@
     },
     {
       "task_id": "GRAPH-005",
-      "source_row_number": 88,
+      "source_row_number": 95,
       "phase": "0-north-star-graph",
       "title": "Pre-execution graph closure proven",
       "owner_agent": "Governance Board / QA Agent",
@@ -5095,7 +5557,7 @@
     },
     {
       "task_id": "LPS-012",
-      "source_row_number": 89,
+      "source_row_number": 96,
       "phase": "8-execution-pipeline",
       "title": "Python task graph extractor",
       "owner_agent": "Runtime Kernel",
@@ -5147,7 +5609,7 @@
     },
     {
       "task_id": "LPS-013",
-      "source_row_number": 90,
+      "source_row_number": 97,
       "phase": "8-execution-pipeline",
       "title": "Normalize task graph JSON",
       "owner_agent": "Runtime Kernel",
@@ -5200,7 +5662,7 @@
     },
     {
       "task_id": "LPS-014",
-      "source_row_number": 91,
+      "source_row_number": 98,
       "phase": "8-execution-pipeline",
       "title": "Build JSON execution packets",
       "owner_agent": "Runtime Kernel",
@@ -5253,7 +5715,7 @@
     },
     {
       "task_id": "LPS-015",
-      "source_row_number": 92,
+      "source_row_number": 99,
       "phase": "8-execution-pipeline",
       "title": "Validate execution packet",
       "owner_agent": "QA Agent",
@@ -5304,7 +5766,7 @@
     },
     {
       "task_id": "LPS-016",
-      "source_row_number": 93,
+      "source_row_number": 100,
       "phase": "8-execution-pipeline",
       "title": "Merge proof records",
       "owner_agent": "QA Agent",
@@ -5355,7 +5817,7 @@
     },
     {
       "task_id": "LPS-017",
-      "source_row_number": 94,
+      "source_row_number": 101,
       "phase": "8-execution-pipeline",
       "title": "Update task graph status from proof",
       "owner_agent": "Runtime Kernel",
@@ -5410,7 +5872,7 @@
     },
     {
       "task_id": "LPS-018",
-      "source_row_number": 95,
+      "source_row_number": 102,
       "phase": "8-execution-pipeline",
       "title": "Package execution bundle",
       "owner_agent": "Release Agent",
@@ -5466,7 +5928,7 @@
     },
     {
       "task_id": "LPS-019",
-      "source_row_number": 96,
+      "source_row_number": 103,
       "phase": "9-state-map",
       "title": "Accurate current state map",
       "owner_agent": "Codex / Runtime Kernel",
@@ -5538,7 +6000,7 @@
     },
     {
       "task_id": "LPS-020",
-      "source_row_number": 97,
+      "source_row_number": 104,
       "phase": "10-runtime-proof",
       "title": "Repair verification frontdoor",
       "owner_agent": "Runtime Kernel",
@@ -5592,7 +6054,7 @@
     },
     {
       "task_id": "LPS-021",
-      "source_row_number": 98,
+      "source_row_number": 105,
       "phase": "10-runtime-proof",
       "title": "Connected MVP bundle verification",
       "owner_agent": "QA Agent",
@@ -5647,7 +6109,7 @@
     },
     {
       "task_id": "LPS-022",
-      "source_row_number": 99,
+      "source_row_number": 106,
       "phase": "10-runtime-proof",
       "title": "Verifier authority integrity",
       "owner_agent": "Governance Board / QA Agent",
@@ -5703,7 +6165,7 @@
     },
     {
       "task_id": "LPS-023",
-      "source_row_number": 100,
+      "source_row_number": 107,
       "phase": "11-fleet-integration",
       "title": "GitKB planning-plane adoption",
       "owner_agent": "Runtime Kernel",
@@ -5757,7 +6219,7 @@
     },
     {
       "task_id": "LPS-024",
-      "source_row_number": 101,
+      "source_row_number": 108,
       "phase": "11-fleet-integration",
       "title": "handoff (hf) execution seam",
       "owner_agent": "Runtime Kernel",
@@ -5814,7 +6276,7 @@
     },
     {
       "task_id": "LPS-025",
-      "source_row_number": 102,
+      "source_row_number": 109,
       "phase": "11-fleet-integration",
       "title": "rusty-idd IDD/OpenSpec control binary",
       "owner_agent": "Runtime Kernel",
@@ -5869,7 +6331,7 @@
     },
     {
       "task_id": "LPS-026",
-      "source_row_number": 103,
+      "source_row_number": 110,
       "phase": "11-fleet-integration",
       "title": "meta git fleet branch/PR surface",
       "owner_agent": "Release Agent",
@@ -5925,7 +6387,7 @@
     },
     {
       "task_id": "LPS-027",
-      "source_row_number": 104,
+      "source_row_number": 111,
       "phase": "11-fleet-integration",
       "title": "meta exec multi-repo run/release",
       "owner_agent": "Release Agent",
@@ -5983,7 +6445,7 @@
     },
     {
       "task_id": "LPS-028",
-      "source_row_number": 105,
+      "source_row_number": 112,
       "phase": "11-fleet-integration",
       "title": "Fleet loop spine wiring and inventory closure",
       "owner_agent": "Governance Board / QA Agent",
@@ -6040,7 +6502,7 @@
     },
     {
       "task_id": "LPS-029",
-      "source_row_number": 106,
+      "source_row_number": 113,
       "phase": "12-worldsim-ingestion",
       "title": "LiDAR capture of room and workstation",
       "owner_agent": "Operator",
@@ -6093,7 +6555,7 @@
     },
     {
       "task_id": "LPS-030",
-      "source_row_number": 107,
+      "source_row_number": 114,
       "phase": "12-worldsim-ingestion",
       "title": "Nix USD toolchain dev shell",
       "owner_agent": "Runtime Kernel",
@@ -6146,7 +6608,7 @@
     },
     {
       "task_id": "LPS-031",
-      "source_row_number": 108,
+      "source_row_number": 115,
       "phase": "12-worldsim-ingestion",
       "title": "Mesh cleanup to watertight",
       "owner_agent": "Runtime Kernel",
@@ -6200,7 +6662,7 @@
     },
     {
       "task_id": "LPS-032",
-      "source_row_number": 109,
+      "source_row_number": 116,
       "phase": "12-worldsim-ingestion",
       "title": "Semantic and instance segmentation",
       "owner_agent": "Runtime Kernel",
@@ -6253,7 +6715,7 @@
     },
     {
       "task_id": "LPS-033",
-      "source_row_number": 110,
+      "source_row_number": 117,
       "phase": "12-worldsim-ingestion",
       "title": "OpenUSD composition with physics schemas",
       "owner_agent": "Runtime Kernel",
@@ -6307,7 +6769,7 @@
     },
     {
       "task_id": "LPS-034",
-      "source_row_number": 111,
+      "source_row_number": 118,
       "phase": "12-worldsim-ingestion",
       "title": "Immutable base layer and colliders",
       "owner_agent": "Runtime Kernel",
@@ -6358,7 +6820,7 @@
     },
     {
       "task_id": "LPS-035",
-      "source_row_number": 112,
+      "source_row_number": 119,
       "phase": "12-worldsim-ingestion",
       "title": "Automated twin acceptance gate",
       "owner_agent": "QA Agent",
@@ -6411,7 +6873,7 @@
     },
     {
       "task_id": "LPS-036",
-      "source_row_number": 113,
+      "source_row_number": 120,
       "phase": "12-worldsim-ingestion",
       "title": "Genesis feasibility on validated twin",
       "owner_agent": "Runtime Kernel",

@@ -1,0 +1,76 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-025-ruflo-meta-harness.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/proof_records/NBSOURCE-025.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T233856Z-lifeos-notebooklm-integration-before-NBSOURCE-025.tar.gz"
+  ],
+  "checksums": {
+    "archive_sha256": "0900ee54f2b171ebcac937d7a51f3dc2a6aac32cbc775cf3527b9a7d6d48dcdf",
+    "claim_evidence_sha256": "3c2d24e62962f561278c6af75a5ab43fe7b684d1da14f9963b725a8d1ad1eaaa",
+    "claim_table_sha256": "6c6a32473fc99901800f95fa2209eea02adcee46420baa1bb588fcaeaf640004",
+    "notebooklm_fulltext_sha256": "63b31b3a459913ddaae19e4dad442e4257391a591a9bf875438b8ca0baa70d7d",
+    "source_registry_sha256": "725d463d38065ba32dc211cc62f981f4d60491c2b6f1e3dda97e00af028bb9b9",
+    "structured_extract_sha256": "bcf309851dc4e5c995ce5664dc416176586d7b3c19c022bafe3b646aa5919bbd",
+    "task_graph_sha256": "79a78af1f65fcb2a8126ddc2837e0691d774b6783797eb57ac7ccab20567f40c",
+    "verification_queue_sha256": "bce454b815e3a265fa727e5ee359285afbd4a155faf8f315c8e2f365cc6154af"
+  },
+  "gate_result": {
+    "all_task_references_exist": true,
+    "atomic_claim_count": 12,
+    "classification_counts": {
+      "architecture-proposal": 1,
+      "authority-claim": 1,
+      "current-implementation-claim": 7,
+      "performance-claim": 1,
+      "question-claim": 1,
+      "source-provenance-claim": 1
+    },
+    "fulltext_sha256_exact": true,
+    "git_diff_check_passed": true,
+    "global_ids_unique": true,
+    "later_source_processed": false,
+    "mapped_claim_count": 12,
+    "normalization_errors": 0,
+    "packet_validation_passed": true,
+    "planning_spine_verify_passed": true,
+    "question_count": 1,
+    "queued_claim_count": 12,
+    "ready_count": 0,
+    "registry_mapping_exact": true,
+    "source_id_exact": true,
+    "task_count": 146
+  },
+  "live_commands": [
+    {
+      "command": "packet validation + exact source SHA-256 + byte-count assertions for NBSOURCE-025",
+      "exit_status": 0,
+      "purpose": "Validate isolated packet/source"
+    },
+    {
+      "command": "exact global assertions && extract-task-graph.py && normalize-task-graph.py",
+      "exit_status": 0,
+      "purpose": "Assert mappings and normalize graph"
+    },
+    {
+      "command": "merge-proof-records.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Append proof and run gates"
+    }
+  ],
+  "observed_at": "2026-07-10T23:41:17Z",
+  "proof_summary": "Captured 1123 source bytes as 12 unresolved atoms covering Ruflo/RuvLTRA adaptive routing, model assignment, ensemble timeline swarms, steering authority, truth/audit question, and citations. Questions remain questions, all atoms are queued, and relation evidence closes no claim.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBSOURCE-025",
+  "verification_gate": "All 12 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass."
+}

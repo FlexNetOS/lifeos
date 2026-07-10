@@ -1,0 +1,73 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-019-ruvltra-proportional-routing.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/proof_records/NBSOURCE-019.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T232740Z-lifeos-notebooklm-integration-before-NBSOURCE-019.tar.gz"
+  ],
+  "checksums": {
+    "archive_sha256": "2953a3fc5bff7a0e39a8a8936d64e27596ce99d43ae5f3d724c6f31d8b1acd93",
+    "claim_evidence_sha256": "dc98f08e5b9076f94c3f1c0b4879af1a9837a32de9840268af916366919924b4",
+    "claim_table_sha256": "129fb11e00e23cf30c4c1617a18af20fc3d559353fa67aebee8e3ff65159baf0",
+    "notebooklm_fulltext_sha256": "0587b245c0a4bd1e02d4290427b7822442269073abd3accc43345fee00879aad",
+    "source_registry_sha256": "d4ba32cdde6c74070acf781a5044f0c22836880125bc22d719e8a2ad59090e97",
+    "structured_extract_sha256": "bfb297ee6da5120762b7a29ab93d3a164110cd4694c547fd0ebccb93711c880f",
+    "task_graph_sha256": "8d5a0f6f923bfc4362ee8642cbaf7a7ab918214704be06d45c80daafc55ba6ba",
+    "verification_queue_sha256": "a946d4dacd36d376bf1d5219043d99e501139b406f6d45e366761070ee78e570"
+  },
+  "gate_result": {
+    "all_task_references_exist": true,
+    "atomic_claim_count": 8,
+    "classification_counts": {
+      "current-implementation-claim": 6,
+      "question-claim": 1,
+      "source-provenance-claim": 1
+    },
+    "fulltext_sha256_exact": true,
+    "git_diff_check_passed": true,
+    "global_ids_unique": true,
+    "later_source_processed": false,
+    "mapped_claim_count": 8,
+    "normalization_errors": 0,
+    "packet_validation_passed": true,
+    "planning_spine_verify_passed": true,
+    "question_count": 1,
+    "queued_claim_count": 8,
+    "ready_count": 0,
+    "registry_mapping_exact": true,
+    "source_id_exact": true,
+    "task_count": 140
+  },
+  "live_commands": [
+    {
+      "command": "packet validation + exact source SHA-256 + byte-count assertions for NBSOURCE-019",
+      "exit_status": 0,
+      "purpose": "Validate isolated packet/source"
+    },
+    {
+      "command": "exact global assertions && extract-task-graph.py && normalize-task-graph.py",
+      "exit_status": 0,
+      "purpose": "Assert mappings and normalize graph"
+    },
+    {
+      "command": "merge-proof-records.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Append proof and run gates"
+    }
+  ],
+  "observed_at": "2026-07-10T23:30:18Z",
+  "proof_summary": "Captured 934 source bytes as 8 unresolved atoms covering RuvLTRA proportional routing, local/cloud model selection, future-timeline steering, build/review question, and citations. Questions remain questions, all atoms are queued, and relation evidence closes no claim.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBSOURCE-019",
+  "verification_gate": "All 8 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass."
+}

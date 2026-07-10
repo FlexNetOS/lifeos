@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-10T21:19:55Z",
+  "generated_at": "2026-07-10T22:12:12Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 123,
+    "row_count": 127,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -801,12 +801,12 @@
       "source_row_number": 37,
       "columns": {
         "task_id": "STORE-001",
-        "parent_id": "ADOPT-002; NBVERIFY-000",
+        "parent_id": "ADOPT-002; NBSOURCE-004; NBVERIFY-000",
         "phase": "2-postgres-foundation",
         "title": "redb PostgreSQL and nu_plugin CodeDB relationship decided",
         "owner_agent": "David / LifeOS Data Agent / Runtime Kernel",
         "goal": "Make the explicit owner decision for redb, PostgreSQL plus RuVector, and nu_plugin CodeDB: use cases, authority, data classes, synchronization direction, durability, performance, failure recovery, materialization, secret boundaries, and transition from current state.",
-        "inputs": "PGAUTH-001 through PGAUTH-006; ADOPT-001; ADOPT-002; NBSOURCE-001; NBSOURCE-002; NBVERIFY-000; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; North Star",
+        "inputs": "PGAUTH-001 through PGAUTH-006; ADOPT-001; ADOPT-002; NBSOURCE-001; NBSOURCE-002; NBSOURCE-003; NBSOURCE-004; NBVERIFY-000; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; North Star",
         "target_artifacts": "generated/task_families/STORE-001.json; generated/store_relationship_decision.json; proof_records/STORE-001.proof.json",
         "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
         "blocked_paths": "live store mutation; database start; migration; source cutover; product implementation; credential or secret reads",
@@ -2054,6 +2054,94 @@
     {
       "source_row_number": 94,
       "columns": {
+        "task_id": "NBSOURCE-003",
+        "parent_id": "NBSOURCE-002; NBVERIFY-000",
+        "phase": "0-north-star-graph",
+        "title": "Nushell redb PostgreSQL integration source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / LifeOS Data Agent / QA Agent",
+        "goal": "Extract the original NotebookLM source Architecting Nushell Plugin Integration with Redb and PostgreSQL, separate protocol facts, performance language, current nu_plugin and envctl assertions, architecture proposals, and unresolved citations, then cross-reference prior claims and preserved implementation conflicts without executing product work.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source bf0acabe-a19e-4d99-9747-43751fc6efec; fulltext SHA-256 daa9009d785714fb81aa2b6580a475950acc9e5a199514058dce14eb55907131; NBSOURCE-001; NBSOURCE-002; NBVERIFY-000",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-003-nushell-redb-postgresql.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-003.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "nu_plugin or envctl mutation; redb or PostgreSQL mutation; direct plugin implementation; fabricated benchmark; invented citation resolution; processing NBSOURCE-004; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All ten source claims are mapped; two architecture proposals, one engine fact, one comparison, one performance claim, four current-implementation claims, and one provenance claim are distinct; all ten unresolved claims are queued; prior claim and implementation conflicts are linked; NotebookLM repetition closes no claim; task graph normalizes with Ready count zero.",
+        "rollback_plan": "Restore the archived pre-source-003 graph and tables; retain source ID, retrieval time, checksum, and archive receipt as provenance.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-003.proof.json",
+        "next_action": "Source three is captured; process Architectural Integration of LifeOS and the Ruvnet Swarm, source 72e22d9c-72c9-4389-8358-700bb46b55b6, only on an explicit later-source instruction."
+      }
+    },
+    {
+      "source_row_number": 95,
+      "columns": {
+        "task_id": "NBSOURCE-004",
+        "parent_id": "NBSOURCE-003",
+        "phase": "0-north-star-graph",
+        "title": "LifeOS and Ruvnet swarm integration source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / Runtime Kernel / QA Agent",
+        "goal": "Extract the original NotebookLM source Architectural Integration of LifeOS and the Ruvnet Swarm, separate portable-launch and installed-runtime assertions, agent lifecycle and cognition claims, UDS/shared-redb architecture choices, UI status and performance claims, forecasting assertions, and unresolved citations, then map each claim without executing the described system.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; stable list index 2; source 72e22d9c-72c9-4389-8358-700bb46b55b6; fulltext SHA-256 c39bccfcc14b72e2338f58f90a0b3b4344e5f8023baad08c98dc9a7709f3095c; NBSOURCE-001 through NBSOURCE-003; NBVERIFY-000",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-004-lifeos-ruvnet-swarm.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-004.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "profile, launcher, generated runtime, agent, redb, database, socket, UI, or model mutation; fabricated runtime or benchmark proof; invented citations; processing NBSOURCE-005; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All fourteen source claims are mapped; eight current-implementation claims, three architecture proposals, one application claim, one performance claim, and one provenance claim are distinct; all fourteen unresolved claims are queued; runtime and authority conflicts are explicit; NotebookLM repetition closes no claim; task graph normalizes with Ready count zero.",
+        "rollback_plan": "Restore the archived pre-source-004 graph and tables; retain source ID, stable list index, retrieval time, checksum, and archive receipt as provenance.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-004.proof.json",
+        "next_action": "Source four is captured; process Autonomous Database Transformation and Swarm Defense Mechanisms, stable list index 3 and source fef30a8a-bb06-4b23-904a-c7a77af0d6c0, only in the next sequential loop."
+      }
+    },
+    {
+      "source_row_number": 96,
+      "columns": {
+        "task_id": "NBSOURCE-005",
+        "parent_id": "NBSOURCE-004",
+        "phase": "0-north-star-graph",
+        "title": "Autonomous database transformation and swarm defense source captured",
+        "owner_agent": "LifeOS Planning Spine / Data Agent / QA Agent",
+        "goal": "Extract the original NotebookLM source Autonomous Database Transformation and Swarm Defense Mechanisms, separate database-editing architecture, RuVector operator facts, application behavior, performance, MinCut intervention, witness guarantees, phase ordering, and unresolved citations without executing database or agent work.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; stable list index 3; source fef30a8a-bb06-4b23-904a-c7a77af0d6c0; fulltext SHA-256 e5291dd850cc830ced1a187e64d281e0b003268c11b00945028590988b1852d0; NBSOURCE-001 through NBSOURCE-004; NBVERIFY-000",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-005-autonomous-db-swarm-defense.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-005.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "database, source, agent, MinCut, witness, projection, profile, or release mutation; fabricated implementation, benchmark, or security proof; invented citations; processing NBSOURCE-006; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All fourteen source claims are mapped; three architecture proposals, seven application claims, one engine fact, one comparison, one performance claim, and one provenance claim are distinct; every unresolved claim is queued; registry and relation evidence exactly cover canonical mappings; Ready remains zero.",
+        "rollback_plan": "Restore the archived pre-source-005 planning state; retain source identity, checksum, and archive receipt.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-005.proof.json",
+        "next_action": "Source five is captured; process Charting the Chaos: Forecasting Software Trajectories via Temporal Attractors, stable list index 4 and source 3ff7375b-84a8-46c0-a90e-47fd55392841, only after commit, push, and clean receipt."
+      }
+    },
+    {
+      "source_row_number": 97,
+      "columns": {
+        "task_id": "NBSOURCE-006",
+        "parent_id": "NBSOURCE-005",
+        "phase": "0-north-star-graph",
+        "title": "Temporal Attractor forecasting source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / Simulation Agent / QA Agent",
+        "goal": "Extract the original NotebookLM source Charting the Chaos: Forecasting Software Trajectories via Temporal Attractors, separate model architecture, current-use assertions, input data, ESN behavior, ensemble simulation, horizon performance, failure prediction, and unresolved citations without running models or agents.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; stable list index 4; source 3ff7375b-84a8-46c0-a90e-47fd55392841; fulltext SHA-256 a38557fe735783130ece2e4368e287d1679ed982bfc3840e01490a86155e7bc4; NBSOURCE-001 through NBSOURCE-005; NBVERIFY-000",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-006-temporal-attractors.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-006.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**",
+        "blocked_paths": "model, agent, database, source, simulation, policy, or production mutation; fabricated model, benchmark, prediction, or citation proof; processing NBSOURCE-007; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All thirteen source claims are mapped; seven current-implementation claims, one architecture proposal, three application claims, one performance claim, and one provenance claim are distinct; every unresolved claim is queued; registry and relation evidence exactly cover canonical mappings; Ready remains zero.",
+        "rollback_plan": "Restore the archived pre-source-006 planning state; retain source identity, checksum, and archive receipt.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-006.proof.json",
+        "next_action": "Source six is captured; process Cognitive Evolution: Redb Versus AgentDB Architecture, stable list index 5 and source cc245f6e-77d8-4093-a016-fe847f6813a5, only after commit, push, and clean receipt."
+      }
+    },
+    {
+      "source_row_number": 98,
+      "columns": {
         "task_id": "NORTHSTAR-001",
         "parent_id": "GRAPH-001",
         "phase": "0-north-star-graph",
@@ -2074,7 +2162,7 @@
       }
     },
     {
-      "source_row_number": 95,
+      "source_row_number": 99,
       "columns": {
         "task_id": "NORTHSTAR-002",
         "parent_id": "NORTHSTAR-001",
@@ -2096,7 +2184,7 @@
       }
     },
     {
-      "source_row_number": 96,
+      "source_row_number": 100,
       "columns": {
         "task_id": "GRAPH-002",
         "parent_id": "GRAPH-001",
@@ -2118,7 +2206,7 @@
       }
     },
     {
-      "source_row_number": 97,
+      "source_row_number": 101,
       "columns": {
         "task_id": "GRAPH-003",
         "parent_id": "GRAPH-002",
@@ -2140,7 +2228,7 @@
       }
     },
     {
-      "source_row_number": 98,
+      "source_row_number": 102,
       "columns": {
         "task_id": "GRAPH-004",
         "parent_id": "GRAPH-003",
@@ -2162,7 +2250,7 @@
       }
     },
     {
-      "source_row_number": 99,
+      "source_row_number": 103,
       "columns": {
         "task_id": "GRAPH-005",
         "parent_id": "GRAPH-004",
@@ -2184,7 +2272,7 @@
       }
     },
     {
-      "source_row_number": 100,
+      "source_row_number": 104,
       "columns": {
         "task_id": "LPS-012",
         "parent_id": "LPS-008",
@@ -2206,7 +2294,7 @@
       }
     },
     {
-      "source_row_number": 101,
+      "source_row_number": 105,
       "columns": {
         "task_id": "LPS-013",
         "parent_id": "LPS-012",
@@ -2228,7 +2316,7 @@
       }
     },
     {
-      "source_row_number": 102,
+      "source_row_number": 106,
       "columns": {
         "task_id": "LPS-014",
         "parent_id": "LPS-013",
@@ -2250,7 +2338,7 @@
       }
     },
     {
-      "source_row_number": 103,
+      "source_row_number": 107,
       "columns": {
         "task_id": "LPS-015",
         "parent_id": "LPS-014",
@@ -2272,7 +2360,7 @@
       }
     },
     {
-      "source_row_number": 104,
+      "source_row_number": 108,
       "columns": {
         "task_id": "LPS-016",
         "parent_id": "LPS-015",
@@ -2294,7 +2382,7 @@
       }
     },
     {
-      "source_row_number": 105,
+      "source_row_number": 109,
       "columns": {
         "task_id": "LPS-017",
         "parent_id": "LPS-016",
@@ -2316,7 +2404,7 @@
       }
     },
     {
-      "source_row_number": 106,
+      "source_row_number": 110,
       "columns": {
         "task_id": "LPS-018",
         "parent_id": "LPS-017",
@@ -2338,7 +2426,7 @@
       }
     },
     {
-      "source_row_number": 107,
+      "source_row_number": 111,
       "columns": {
         "task_id": "LPS-019",
         "parent_id": "LPS-018",
@@ -2360,7 +2448,7 @@
       }
     },
     {
-      "source_row_number": 108,
+      "source_row_number": 112,
       "columns": {
         "task_id": "LPS-020",
         "parent_id": "LPS-019",
@@ -2382,7 +2470,7 @@
       }
     },
     {
-      "source_row_number": 109,
+      "source_row_number": 113,
       "columns": {
         "task_id": "LPS-021",
         "parent_id": "LPS-020",
@@ -2404,7 +2492,7 @@
       }
     },
     {
-      "source_row_number": 110,
+      "source_row_number": 114,
       "columns": {
         "task_id": "LPS-022",
         "parent_id": "LPS-021",
@@ -2426,7 +2514,7 @@
       }
     },
     {
-      "source_row_number": 111,
+      "source_row_number": 115,
       "columns": {
         "task_id": "LPS-023",
         "parent_id": "LPS-018",
@@ -2448,7 +2536,7 @@
       }
     },
     {
-      "source_row_number": 112,
+      "source_row_number": 116,
       "columns": {
         "task_id": "LPS-024",
         "parent_id": "LPS-023",
@@ -2470,7 +2558,7 @@
       }
     },
     {
-      "source_row_number": 113,
+      "source_row_number": 117,
       "columns": {
         "task_id": "LPS-025",
         "parent_id": "LPS-024",
@@ -2492,7 +2580,7 @@
       }
     },
     {
-      "source_row_number": 114,
+      "source_row_number": 118,
       "columns": {
         "task_id": "LPS-026",
         "parent_id": "LPS-025",
@@ -2514,7 +2602,7 @@
       }
     },
     {
-      "source_row_number": 115,
+      "source_row_number": 119,
       "columns": {
         "task_id": "LPS-027",
         "parent_id": "LPS-026",
@@ -2536,7 +2624,7 @@
       }
     },
     {
-      "source_row_number": 116,
+      "source_row_number": 120,
       "columns": {
         "task_id": "LPS-028",
         "parent_id": "LPS-027",
@@ -2558,7 +2646,7 @@
       }
     },
     {
-      "source_row_number": 117,
+      "source_row_number": 121,
       "columns": {
         "task_id": "LPS-029",
         "parent_id": "LPS-022",
@@ -2580,7 +2668,7 @@
       }
     },
     {
-      "source_row_number": 118,
+      "source_row_number": 122,
       "columns": {
         "task_id": "LPS-030",
         "parent_id": "LPS-029",
@@ -2602,7 +2690,7 @@
       }
     },
     {
-      "source_row_number": 119,
+      "source_row_number": 123,
       "columns": {
         "task_id": "LPS-031",
         "parent_id": "LPS-030",
@@ -2624,7 +2712,7 @@
       }
     },
     {
-      "source_row_number": 120,
+      "source_row_number": 124,
       "columns": {
         "task_id": "LPS-032",
         "parent_id": "LPS-031",
@@ -2646,7 +2734,7 @@
       }
     },
     {
-      "source_row_number": 121,
+      "source_row_number": 125,
       "columns": {
         "task_id": "LPS-033",
         "parent_id": "LPS-032",
@@ -2668,7 +2756,7 @@
       }
     },
     {
-      "source_row_number": 122,
+      "source_row_number": 126,
       "columns": {
         "task_id": "LPS-034",
         "parent_id": "LPS-033",
@@ -2690,7 +2778,7 @@
       }
     },
     {
-      "source_row_number": 123,
+      "source_row_number": 127,
       "columns": {
         "task_id": "LPS-035",
         "parent_id": "LPS-034",
@@ -2712,7 +2800,7 @@
       }
     },
     {
-      "source_row_number": 124,
+      "source_row_number": 128,
       "columns": {
         "task_id": "LPS-036",
         "parent_id": "LPS-035",

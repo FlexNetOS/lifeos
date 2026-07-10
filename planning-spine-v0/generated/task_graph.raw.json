@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-10T23:30:18Z",
+  "generated_at": "2026-07-10T23:31:11Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 140,
+    "row_count": 141,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -3105,6 +3105,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBSOURCE-019.proof.json",
         "next_action": "NBSOURCE-020 Relational Synthesis: Code Manipulation via Semantic SQL Queries"
+      }
+    },
+    {
+      "source_row_number": 142,
+      "columns": {
+        "task_id": "NBSOURCE-020",
+        "parent_id": "NBSOURCE-019",
+        "phase": "0-north-star-graph",
+        "title": "Relational Synthesis: Code Manipulation via Semantic SQL Queries source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Capture and semantically normalize Relational Synthesis: Code Manipulation via Semantic SQL Queries, preserve questions, classify every atom, and expose primary-evidence, benchmark, authority, recovery, and owner-decision paths without product execution.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source 29a4bf59-2173-42fd-b2e2-d3f0143f1b0c; fulltext SHA-256 ede1acf90a1688f3113e0ae2c1c367e6d9d830d485d4e20afcb3618effb152e3; NBSOURCE-001 through NBSOURCE-019; NBVERIFY-000; packet validation pass",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-020-relational-semantic-sql-code.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-020.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product, agent, model, store, profile, runtime, release, or workspace execution; fabricated proof; invented citations; processing NBSOURCE-021; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 8 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T233104Z-lifeos-notebooklm-integration-before-NBSOURCE-020.tar.gz and remove only NBSOURCE-020 rows and artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-020.proof.json",
+        "next_action": "NBSOURCE-021 RuVector Cognitive Architecture and Neural Database Logic"
       }
     }
   ]

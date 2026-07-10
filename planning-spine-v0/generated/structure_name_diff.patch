@@ -1,0 +1,23 @@
+FlexNetOS Meta authority path correction summary
+
+- /home/flexnetos/lifeos/src/meta
++ /home/flexnetos/meta
+
+- /home/flexnetos/lifeos/lifeos
++ /home/flexnetos/meta/lifeos
+
+- /home/flexnetos/lifeos/src/<peer>
++ /home/flexnetos/meta/src/<peer>
+
+Corrected owner inputs:
+- active Codex project trust and GitKB MCP root
+- envctl harness model-catalog consumers
+- harness skill command paths
+- GTK navigation bookmarks
+- Meta documentation and CI child-repository owner
+
+Intentionally retained:
+- historical proof records and archived snapshots
+- /home/flexnetos/FlexNetOS as a compatibility symlink to /home/flexnetos/meta
+- the active Nix profile generation; it resolves through the compatibility link
+  and remains profile-owned rather than becoming a second workspace authority

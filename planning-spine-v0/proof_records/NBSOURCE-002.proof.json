@@ -1,0 +1,76 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "NBSOURCE-002",
+  "observed_at": "2026-07-10T20:53:19Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "All five Edge Orchestration with High-Frequency Buffering claims are mapped; the source remains architecture guidance rather than implementation proof; unresolved citations, latency, compression, flush timing, ordering, replay, and failure behavior map to verification or owner-decision tasks.",
+  "gate_result": {
+    "source_id_exact": true,
+    "object_is_original_markdown_source": true,
+    "fulltext_sha256_recorded": true,
+    "atomic_claim_count": 5,
+    "mapped_claim_count": 5,
+    "unmapped_claim_count": 0,
+    "verification_or_owner_resolution_count": 5,
+    "citation_markers_unresolved_and_not_overclaimed": true,
+    "background_flush_protocol_gaps_explicit": true,
+    "wal_outbox_queue_authority_question_explicit": true,
+    "performance_claim_requires_benchmark": true,
+    "store_decision_depends_on_capture": true,
+    "task_graph_normalization_passed": true,
+    "task_graph_ready_count_zero": true,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Retrieved the complete 984-character original NotebookLM source, recorded its exact source ID and SHA-256, split it into five claims, and mapped all five to the canonical task graph. The source strengthens the embedded-buffer, background-flush, and outage-WAL use cases but supplies no implementation, benchmark, synchronization semantics, or resolvable citation list. Those gaps remain explicit in PGAUTH-002, PGAUTH-006, STORE-001, POSTGRES-006, and POSTGRES-009.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-002-edge-buffering.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "/home/flexnetos/lifeos/var/lib/codex-runtime-gate/archives/20260710T205105Z-lifeos-before-notebooklm-source-002.tar.gz"
+  ],
+  "checksums": {
+    "notebooklm_fulltext_sha256": "d09461732015678cb93f84bcf1986c94d371e9df43a873654c2cb42bdfce3391",
+    "structured_extract_sha256": "a41aef7582665c891a9020259f4beeb566e81975aab246dc6effceac68f8df81",
+    "source_registry_sha256": "e27258a786d94bffe566e08b04960f5b7cca9858c58501aaa32859853dba8c89",
+    "claim_table_sha256": "7e12568509e9ae749c685dcccb5a9df325b0c923bcb887f0f5b7cbeb8038f4bc",
+    "task_graph_sha256": "99e92b1a7cf4071b90777c86bff6cbd1a477dd8b9d9f4f904245ea2f9f4ed7f2",
+    "conflict_table_sha256": "69eb0f93d9a2a06e93026e68324703e76b1b3dca19954fc9082ea84c729ebd1a",
+    "archive_sha256": "6ca043c3af81de4424bedb8395184453700dae5bfd640582a682ce01e2f3d17f"
+  },
+  "live_commands": [
+    {
+      "purpose": "Retrieve exact indexed fulltext",
+      "cwd": "/home/flexnetos/lifeos",
+      "command": "notebooklm source fulltext b003eeae-301b-4958-94f8-946cebec9ebd -n b09afb74-b464-4bc3-94f0-d5193f7c7d36 --json",
+      "exit_status": 0,
+      "output": [
+        "title=Edge Orchestration with High-Frequency Buffering",
+        "kind=markdown",
+        "characters=984",
+        "lines=12",
+        "sha256=d09461732015678cb93f84bcf1986c94d371e9df43a873654c2cb42bdfce3391"
+      ]
+    },
+    {
+      "purpose": "Validate claim coverage and graph",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "python3 source-002 assertions && task graph normalize && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "output": [
+        "tasks=122",
+        "total claims=34",
+        "source-002 claims=5",
+        "mapped=5",
+        "unresolved=5",
+        "Ready=0",
+        "normalization pass",
+        "planning-spine-v0 verification passed"
+      ]
+    }
+  ]
+}

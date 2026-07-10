@@ -1,0 +1,79 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "NBVERIFY-000",
+  "observed_at": "2026-07-10T21:20:09Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "All 24 unresolved NotebookLM claims are queued exactly once; source assertions remain captured but unverified; verification is claim-scoped and closes only through local or official upstream primary evidence, reproducible benchmark evidence, or explicit owner decision.",
+  "gate_result": {
+    "total_claim_count": 34,
+    "unresolved_claim_count": 24,
+    "verification_queue_row_count": 24,
+    "verification_queue_unique_claim_count": 24,
+    "verification_queue_exact_unresolved_coverage": true,
+    "verification_queue_required_fields_present": true,
+    "verification_queue_blocking_task_references_valid": true,
+    "source_evidence_relation_count": 2,
+    "source_evidence_covered_claim_count": 24,
+    "source_evidence_exact_unresolved_coverage": true,
+    "notebooklm_repetition_treated_as_verification": false,
+    "claim_scoped_primary_web_research_only": true,
+    "broad_parallel_web_synthesis_allowed": false,
+    "claim_text_rewritten": false,
+    "task_graph_normalization_passed": true,
+    "task_graph_task_count": 123,
+    "task_graph_ready_count": 0,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Established a stable return path for every unresolved claim from NBSOURCE-001 and NBSOURCE-002. The queue separates source extraction from verification, preserves each original claim ID, assigns its verification method and required primary evidence, and blocks dependent architecture tasks until evidence or an owner decision exists. Initial NotebookLM assertions are linked as captured-unverified evidence and cannot close their own claims. No web research or product execution was performed.",
+  "artifact_paths": [
+    "planning-spine-v0/docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "/home/flexnetos/lifeos/var/lib/codex-runtime-gate/archives/20260710T211440Z-lifeos-before-claim-verification-queue.tar.gz"
+  ],
+  "checksums": {
+    "verification_protocol_sha256": "b6c148425812fc346f0e3a03cf40ebf48f9d5e7c98ddd6c0332f79069e409f06",
+    "claim_verification_queue_sha256": "1a6efad2359232f8c9300f10e875f784578d3ba94eae195cfc973b9650d9cd59",
+    "claim_evidence_table_sha256": "ca358d7e725b32066a4ae63f920c184fea6246e1785106bef488e611948d05cb",
+    "task_graph_source_sha256": "7a6ca4d11f8597f7d2fa2ca7fd3d91bcaccb6e11d3f230d42e394394bf4452a7",
+    "architecture_depth_sha256": "62f6653a4f131ae049d49bd51af36bfcaced092b27ffede3dc440831dbfb7301",
+    "north_star_coverage_sha256": "bbb3e891f2bf564d57f69249865b7698ba746b7acebb021a8eb9f49672f9450a",
+    "archive_sha256": "1b9a4f2cc594b96a04bac44a9274df9cde02bfe15ad3c94cbed32265315185e4"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate exact unresolved-claim queue and evidence coverage",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "python3 claim queue assertions",
+      "exit_status": 0,
+      "output": [
+        "claims_total=34",
+        "unresolved_claims=24",
+        "queue_rows=24 unique=24 exact_coverage=true",
+        "evidence_relations=2 covered_claims=24 exact_coverage=true",
+        "queue_blocking_task_references=valid",
+        "all_task_proof_uris=present"
+      ]
+    },
+    {
+      "purpose": "Normalize and verify the planning graph",
+      "cwd": "/home/flexnetos/lifeos/lifeos",
+      "command": "extract-task-graph.py && normalize-task-graph.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "output": [
+        "task_count=123",
+        "normalization result=pass",
+        "Ready=0",
+        "planning-spine-v0 verification passed",
+        "git diff --check passed"
+      ]
+    }
+  ]
+}

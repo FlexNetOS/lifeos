@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-10T23:24:00Z",
+  "generated_at": "2026-07-10T23:30:18Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 139,
+    "row_count": 140,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -3083,6 +3083,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBSOURCE-018.proof.json",
         "next_action": "batch complete; await explicit owner instruction"
+      }
+    },
+    {
+      "source_row_number": 141,
+      "columns": {
+        "task_id": "NBSOURCE-019",
+        "parent_id": "NBSOURCE-018",
+        "phase": "0-north-star-graph",
+        "title": "Proportional Intelligence and Task Routing in RuvLTRA source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Capture and semantically normalize Proportional Intelligence and Task Routing in RuvLTRA, preserve questions, classify every atom, and expose primary-evidence, benchmark, authority, recovery, and owner-decision paths without product execution.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source 1b6f53c5-4065-4a3d-b0ea-4c3ea1b74365; fulltext SHA-256 0587b245c0a4bd1e02d4290427b7822442269073abd3accc43345fee00879aad; NBSOURCE-001 through NBSOURCE-018; NBVERIFY-000; packet validation pass",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-019-ruvltra-proportional-routing.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-019.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product, agent, model, store, profile, runtime, release, or workspace execution; fabricated proof; invented citations; processing NBSOURCE-020; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 8 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T232740Z-lifeos-notebooklm-integration-before-NBSOURCE-019.tar.gz and remove only NBSOURCE-019 rows and artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-019.proof.json",
+        "next_action": "NBSOURCE-020 Relational Synthesis: Code Manipulation via Semantic SQL Queries"
       }
     }
   ]

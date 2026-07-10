@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-10T22:47:37Z",
-  "source_graph_uri": "generated/task_graph.raw.json",
-  "task_count": 127,
+  "generated_at": "2026-07-10T23:01:28Z",
+  "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
+  "task_count": 128,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-10T22:47:37Z",
+    "generated_at": "2026-07-10T23:01:28Z",
     "format": "csv",
-    "path": "generated/task_graph.source.csv",
-    "row_count": 127,
+    "path": "planning-spine-v0/generated/task_graph.source.csv",
+    "row_count": 128,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -804,9 +804,9 @@
       "execution_cell": "policy-cell",
       "verification_gate": "Every observed valid-work and authority surface has a bounded archive task, checksum gate, restore command, owner, and proof URI; LifeOS and Meta dirty work is settled or archived; nothing is classified for deletion.",
       "rollback_plan": "Restore the archived graph revision; existing work remains untouched.",
-      "status": "ready",
+      "status": "draft",
       "proof_uri": "proof_records/PRESERVE-001.proof.json",
-      "next_action": "Capture the checksummed LifeOS, Meta, parent-shadow, consumer, worktree, and runtime inventory now; then write PRESERVE-001 proof before any filesystem move.",
+      "next_action": "Capture the checksummed LifeOS, Meta, parent-shadow, consumer, worktree, and runtime inventory now; then write PRESERVE-001 proof before any filesystem move. Execution remains closed during NotebookLM source integration; restore readiness only through an explicit later owner gate.",
       "source_columns": {
         "task_id": "PRESERVE-001",
         "parent_id": "LIFEOS-001",
@@ -822,9 +822,9 @@
         "execution_cell": "policy-cell",
         "verification_gate": "Every observed valid-work and authority surface has a bounded archive task, checksum gate, restore command, owner, and proof URI; LifeOS and Meta dirty work is settled or archived; nothing is classified for deletion.",
         "rollback_plan": "Restore the archived graph revision; existing work remains untouched.",
-        "status": "Ready",
+        "status": "Draft",
         "proof_uri": "proof_records/PRESERVE-001.proof.json",
-        "next_action": "Capture the checksummed LifeOS, Meta, parent-shadow, consumer, worktree, and runtime inventory now; then write PRESERVE-001 proof before any filesystem move."
+        "next_action": "Capture the checksummed LifeOS, Meta, parent-shadow, consumer, worktree, and runtime inventory now; then write PRESERVE-001 proof before any filesystem move. Execution remains closed during NotebookLM source integration; restore readiness only through an explicit later owner gate."
       },
       "parent_ids": [
         "LIFEOS-001"
@@ -7498,6 +7498,73 @@
       ],
       "blocked_paths": [
         "src production code",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "NBSOURCE-007",
+      "source_row_number": 129,
+      "phase": "0-north-star-graph",
+      "title": "Cognitive Evolution: Redb Versus AgentDB Architecture source captured and mapped",
+      "owner_agent": "LifeOS Planning Spine / QA Agent",
+      "goal": "Capture and semantically normalize Cognitive Evolution: Redb Versus AgentDB Architecture one source at a time, preserve questions, classify all atoms, map them to canonical tasks, and expose unresolved proof or owner-decision paths without product execution.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "All 14 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; all task refs resolve; global IDs are unique; repetition verifies nothing; Ready remains zero; global assertions, normalization, planning-spine verification, and git diff checks pass.",
+      "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T225619Z-lifeos-notebooklm-integration-before-NBSOURCE-007.tar.gz and remove only NBSOURCE-007 rows and artifacts after preserving failure evidence.",
+      "status": "complete",
+      "proof_uri": "proof_records/NBSOURCE-007.proof.json",
+      "next_action": "NBSOURCE-008 Database Branching and Concurrent Code Management",
+      "source_columns": {
+        "task_id": "NBSOURCE-007",
+        "parent_id": "NBSOURCE-006",
+        "phase": "0-north-star-graph",
+        "title": "Cognitive Evolution: Redb Versus AgentDB Architecture source captured and mapped",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Capture and semantically normalize Cognitive Evolution: Redb Versus AgentDB Architecture one source at a time, preserve questions, classify all atoms, map them to canonical tasks, and expose unresolved proof or owner-decision paths without product execution.",
+        "inputs": "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36; source cc245f6e-77d8-4093-a016-fe847f6813a5; fulltext SHA-256 72510f5e0ec20a6a424450497f0197291c5d83e97f530213f5912f1aa3cd6c77; NBSOURCE-001 through NBSOURCE-006; NBVERIFY-000; packet validation pass",
+        "target_artifacts": "generated/notebooklm_source_extracts/NBSOURCE-007-cognitive-evolution-redb-agentdb.md; generated/notebooklm_source_registry.source.csv; generated/notebooklm_source_claims.source.csv; generated/notebooklm_claim_verification_queue.source.csv; generated/notebooklm_claim_evidence.source.csv; generated/prior_task_conflict.source.csv; proof_records/NBSOURCE-007.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product implementation; peer or runtime mutation; fabricated proof; invented citations; processing NBSOURCE-008; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 14 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; all task refs resolve; global IDs are unique; repetition verifies nothing; Ready remains zero; global assertions, normalization, planning-spine verification, and git diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T225619Z-lifeos-notebooklm-integration-before-NBSOURCE-007.tar.gz and remove only NBSOURCE-007 rows and artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBSOURCE-007.proof.json",
+        "next_action": "NBSOURCE-008 Database Branching and Concurrent Code Management"
+      },
+      "parent_ids": [
+        "NBSOURCE-006"
+      ],
+      "inputs": [
+        "Notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36",
+        "source cc245f6e-77d8-4093-a016-fe847f6813a5",
+        "fulltext SHA-256 72510f5e0ec20a6a424450497f0197291c5d83e97f530213f5912f1aa3cd6c77",
+        "NBSOURCE-001 through NBSOURCE-006",
+        "NBVERIFY-000",
+        "packet validation pass"
+      ],
+      "target_artifacts": [
+        "generated/notebooklm_source_extracts/NBSOURCE-007-cognitive-evolution-redb-agentdb.md",
+        "generated/notebooklm_source_registry.source.csv",
+        "generated/notebooklm_source_claims.source.csv",
+        "generated/notebooklm_claim_verification_queue.source.csv",
+        "generated/notebooklm_claim_evidence.source.csv",
+        "generated/prior_task_conflict.source.csv",
+        "proof_records/NBSOURCE-007.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "planning-spine-v0/state/**"
+      ],
+      "blocked_paths": [
+        "product implementation",
+        "peer or runtime mutation",
+        "fabricated proof",
+        "invented citations",
+        "processing NBSOURCE-008",
         "secrets/**"
       ]
     }

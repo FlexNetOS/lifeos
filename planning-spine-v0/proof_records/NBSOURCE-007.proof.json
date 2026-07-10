@@ -1,0 +1,81 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-007-cognitive-evolution-redb-agentdb.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/proof_records/NBSOURCE-007.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T225619Z-lifeos-notebooklm-integration-before-NBSOURCE-007.tar.gz"
+  ],
+  "checksums": {
+    "archive_sha256": "905707a8634967acc225a3c027926e566e2c14ef3ca9d4f00cdf5a91455e54d2",
+    "claim_evidence_sha256": "0ec1ea4078f3edfd9e7d68a62497e19b4f5bfb2bb273c15515c132d85efdf2b6",
+    "claim_table_sha256": "f4ffb652e4a9e50152c4dd7e2b2b23ef34dc02613c553990a9e0e1236db74807",
+    "notebooklm_fulltext_sha256": "72510f5e0ec20a6a424450497f0197291c5d83e97f530213f5912f1aa3cd6c77",
+    "source_registry_sha256": "c36caa6e49c35d6d5d49f54ecfb6b2bf12148a8d022f91f81f0be3c155e43774",
+    "structured_extract_sha256": "9dcbb22df193f27e6c4d4039e8ba499702a83f1045a37eba65ec4064d31b0366",
+    "task_graph_sha256": "9e551f0482f138121f3180888fed4c0872fb87896632bfa5cd3f3cbdb6311e50",
+    "verification_queue_sha256": "957063637126b44dddcfe3343b938956d85e9b8db1acfdf54ca752bd1a170ec7"
+  },
+  "gate_result": {
+    "all_task_references_exist": true,
+    "atomic_claim_count": 14,
+    "classification_counts": {
+      "application-claim": 1,
+      "architecture-proposal": 1,
+      "authority-proposal": 1,
+      "current-application-and-engine-integration-claim": 1,
+      "current-application-behavior-claim": 1,
+      "current-engine-behavior-and-authority-claim": 1,
+      "current-engine-behavior-claim": 3,
+      "current-engine-format-claim": 1,
+      "engine-fact-and-comparison-claim": 1,
+      "question-claim": 2,
+      "source-provenance-claim": 1
+    },
+    "fulltext_sha256_exact": true,
+    "git_diff_check_passed": true,
+    "global_ids_unique": true,
+    "later_source_processed": false,
+    "mapped_claim_count": 14,
+    "normalization_errors": 0,
+    "packet_validation_passed": true,
+    "planning_spine_verify_passed": true,
+    "question_count": 2,
+    "queued_claim_count": 14,
+    "ready_count": 0,
+    "registry_mapping_exact": true,
+    "source_id_exact": true,
+    "task_count": 128
+  },
+  "live_commands": [
+    {
+      "command": "packet validation + sha256 + byte-count assertions for NBSOURCE-007",
+      "exit_status": 0,
+      "purpose": "Validate isolated packet/source"
+    },
+    {
+      "command": "exact global assertions && extract-task-graph.py && normalize-task-graph.py",
+      "exit_status": 0,
+      "purpose": "Assert mappings and normalize graph"
+    },
+    {
+      "command": "merge-proof-records.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Append proof and run gates"
+    }
+  ],
+  "observed_at": "2026-07-10T23:01:28Z",
+  "proof_summary": "Captured 853 source bytes as 14 unresolved atoms covering passive/active memory, redb retrieval and learning boundaries, AgentDB RVF learning assertions, forecasting questions, and unresolved citations. Questions remain questions, all atoms are queued, and relation evidence closes no claim.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBSOURCE-007",
+  "verification_gate": "All 14 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; all task refs resolve; global IDs are unique; repetition verifies nothing; Ready remains zero; global assertions, normalization, planning-spine verification, and git diff checks pass."
+}

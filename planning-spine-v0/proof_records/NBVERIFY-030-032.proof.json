@@ -1,0 +1,107 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-030-032.local-evidence.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-030-032.truth-matrix.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-030-032.msgpack-benchmark.nu",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-030-032.msgpack-benchmark.raw.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-030-032.msgpack-benchmark.summary.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-030-032.meta-ruvector-reference-receipt.json",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T011740Z-lifeos-nbverify-030-032-before-local-truth-integration.tar.gz",
+    "planning-spine-v0/proof_records/NBVERIFY-030-032.proof.json"
+  ],
+  "checksums": {
+    "archive_sha256": "fe3616b20ef82d9110dc2300ffe3a32e7e192b5c6fc26a3c7fa74a6f83c97617",
+    "benchmark_harness_sha256": "434421f23fc7e211a7090382f1df121754550bc8e6237095a7ead24261acf1a9",
+    "benchmark_raw_sha256": "101f32d13703e18fbed7e34162d4ed38f98c6b7a5524e0195cf691e39f7051b5",
+    "benchmark_summary_sha256": "80dcbfb6a3b40df2d7aa2751fa4a2d792589a3a304bbdbc8a2ac37d1cffc1b1a",
+    "claims_sha256": "f38fe89c378fb13633ad33bf8078f1b68b576cb3b99f027071ec15af8e0f11ce",
+    "conflicts_sha256": "bd2ae0238197a54d34e0489e4136ae48bd9423a3dbe553b321eb20bff509e4ea",
+    "evidence_sha256": "8b7cac63d9da11e7f6f74d386a8b80f4dea528c6313e6ab65d650f8fb58f7c73",
+    "gaps_sha256": "018cebad0dc2d8b066a7877f5d77c5860aa4446b5dcf6cae8561d536bdb4f131",
+    "local_evidence_sha256": "1c5b2d840c4caf1473c9bd19493cdab51b9830c14b87709e5bbf630bbcff4095",
+    "meta_ruvector_reference_receipt_sha256": "99ac695f0ba581aad03205e1e366285b29c12604a74e5d9e15a7807d5b932531",
+    "queue_sha256": "c69cb73409d1990dd93fddb0acb7c7a1ce23812cf4580d5f8c72d83f08809be1",
+    "registry_sha256": "20c3e9eb73875f648de38a1455af037b881eb4e0d0deb35c0020f9c1676f0917",
+    "task_graph_sha256": "2f48f70966dd7bf794d5318e3ab2eaaec5ec8e2a34feb66c02ee94be0a4db49e",
+    "truth_matrix_sha256": "184b539989222c47211e677e61f78d8ab1222a09352f4dbfb3e3f209ec7969ad"
+  },
+  "gate_result": {
+    "all_claims_truth_classified": true,
+    "all_proof_uris_present": true,
+    "benchmark_raw_samples_present": true,
+    "claims": 29,
+    "git_diff_check_passed": true,
+    "global_ids_unique": true,
+    "local_evidence_rows": 29,
+    "meta_ruvector_mutated": false,
+    "meta_ruvector_reference_only": true,
+    "normalization_errors": 0,
+    "planning_spine_verify_passed": true,
+    "qualified": 14,
+    "queued": 0,
+    "ready_count": 0,
+    "refuted": 8,
+    "source_hash_receipts": [
+      {
+        "byte_count": 810,
+        "capture_id": "NBSOURCE-030",
+        "logical_line_count": 17,
+        "path": "/home/flexnetos/meta/var/tmp/notebooklm-parallel/NBSOURCE-030/extract.md",
+        "sha256": "5be7cc69c29db15c613ba3ed58c0025fcb75e805701a51f9a49c68498532dec9"
+      },
+      {
+        "byte_count": 752,
+        "capture_id": "NBSOURCE-031",
+        "logical_line_count": 16,
+        "path": "/home/flexnetos/meta/var/tmp/notebooklm-parallel/NBSOURCE-031/extract.md",
+        "sha256": "26779f9766b49a775a56fdf33ae1ef1d55134179923876a62e0d430cfe3588b6"
+      },
+      {
+        "byte_count": 647,
+        "capture_id": "NBSOURCE-032",
+        "logical_line_count": 7,
+        "path": "/home/flexnetos/meta/var/tmp/notebooklm-parallel/NBSOURCE-032/extract.md",
+        "sha256": "d0045cf515b2f422dbe04434d88dccb7108e670031c7b289beebff399bfe36a5"
+      }
+    ],
+    "task_count": 154,
+    "task_status": "Complete",
+    "verified": 7
+  },
+  "live_commands": [
+    {
+      "command": "29 read-only claim-scoped local-primary verification workers",
+      "exit_status": 0,
+      "purpose": "Collect exact current source, test, git, and installed-runtime evidence"
+    },
+    {
+      "command": "nu 0.113.1 benchmark: 1,000 structured rows, 20 warmups, 200 MessagePack and 200 JSON measurements",
+      "exit_status": 0,
+      "purpose": "Qualify YNP-CLAIM-004 with reproducible raw performance samples"
+    },
+    {
+      "command": "exact fulltext SHA-256/byte/logical-line assertions for NBSOURCE-030..032",
+      "exit_status": 0,
+      "purpose": "Verify provenance and correct NBSOURCE-030 line metadata"
+    },
+    {
+      "command": "extract-task-graph.py && normalize-task-graph.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Validate canonical integration before proof append"
+    }
+  ],
+  "observed_at": "2026-07-11T01:23:16Z",
+  "proof_summary": "Truth-tested all 29 NBSOURCE-030 through NBSOURCE-032 atoms against local primary source, tests, exact fulltext, active profile runtime, and a reproducible MessagePack qualification benchmark: 7 verified, 14 qualified, 8 refuted, and 0 queued. meta-ruvector remained reference-only.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBVERIFY-030",
+  "verification_gate": "All 29 claims close exactly once as verified, qualified, or refuted; every queue row and local-primary evidence row has a proof URI and exact pointer; source hashes match; installed claims use profile evidence; performance qualification includes raw samples; meta-ruvector is unchanged; normalization, planning verification, application gates, and diff checks pass."
+}

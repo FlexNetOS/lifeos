@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-11T00:13:43Z",
+  "generated_at": "2026-07-11T01:23:02Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 153,
+    "row_count": 154,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -3391,6 +3391,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBSOURCE-032.proof.json",
         "next_action": "batch complete; await explicit owner instruction"
+      }
+    },
+    {
+      "source_row_number": 155,
+      "columns": {
+        "task_id": "NBVERIFY-030",
+        "parent_id": "NBVERIFY-000; NBSOURCE-032",
+        "phase": "0-north-star-graph",
+        "title": "NotebookLM sources 030 through 032 truth-tested against local primary evidence",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Truth-test every NBSOURCE-030 through NBSOURCE-032 atom against current local source, tests, installed profile runtime, reproducible benchmark, and exact retained fulltext without treating repetition as proof.",
+        "inputs": "NBSOURCE-030 through NBSOURCE-032; NBVERIFY-000; current envctl, nu_plugin, Yazelix, LifeOS, and handoff source; active /home/flexnetos/.nix-profile/bin/yzx runtime; exact staged fulltext; reference-only meta-ruvector source",
+        "target_artifacts": "generated/notebooklm_claim_verification/NBVERIFY-030-032.local-evidence.json; generated/notebooklm_claim_verification/NBVERIFY-030-032.truth-matrix.csv; generated/notebooklm_claim_verification/NBVERIFY-030-032.msgpack-benchmark.nu; generated/notebooklm_claim_verification/NBVERIFY-030-032.msgpack-benchmark.raw.json; generated/notebooklm_claim_verification/NBVERIFY-030-032.msgpack-benchmark.summary.json; generated/notebooklm_claim_verification/NBVERIFY-030-032.meta-ruvector-reference-receipt.json; proof_records/NBVERIFY-030-032.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**; /home/flexnetos/meta/var/log/raw/**",
+        "blocked_paths": "product implementation; store mutation; generated Yazelix runtime edits; secrets/**; meta-ruvector edits, builds, tests, branches, commits, installs, or product/runtime execution",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 29 claims are processed exactly once and close as verified, qualified, or refuted with local-primary evidence and proof URI; zero remain queued; installed behavior is claimed only from the profile frontdoor; performance qualification includes a reproducible workload and raw samples; exact fulltext hashes match; NBSOURCE-030 line-count metadata is corrected; meta-ruvector remains reference-only and unchanged; normalization, planning verification, tests, build, dev boot, and diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T011740Z-lifeos-nbverify-030-032-before-local-truth-integration.tar.gz (SHA-256 fe3616b20ef82d9110dc2300ffe3a32e7e192b5c6fc26a3c7fa74a6f83c97617) and remove only NBVERIFY-030 truth-testing rows/artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBVERIFY-030-032.proof.json",
+        "next_action": "Use the truth matrix when decomposing architecture: retain verified capability, narrow qualified claims, reject refuted current-state wording, and obtain explicit owner decisions before implementation."
       }
     }
   ]

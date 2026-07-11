@@ -71,7 +71,7 @@ try {
 const claim = {
   claim_id: "SWARM-CLAIM-005",
   verification_status: "unverified",
-  status: "partial",
+  status: "qualified",
   conclusion:
     "No automatic governed Ruvnet-agent startup is proven. LifeOS desktop startup and the installed Yazelix workspace are present, but no agent inventory, authority gate, ordering/readiness contract, isolation, shutdown, or restart receipt exists.",
   evidence: [

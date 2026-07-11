@@ -30,11 +30,11 @@ describe("NBVERIFY-004 progress artifacts", () => {
         true,
       );
     }
-    expect(rows.get("SWARM-CLAIM-001")).toContain("partial");
-    expect(rows.get("SWARM-CLAIM-002")).toContain("partial");
+    expect(rows.get("SWARM-CLAIM-001")).toContain("qualified");
+    expect(rows.get("SWARM-CLAIM-002")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-003")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-004")).toContain("qualified");
-    expect(rows.get("SWARM-CLAIM-005")).toContain("partial");
+    expect(rows.get("SWARM-CLAIM-005")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-006")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-007")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-008")).toContain("owner-decision-pending");
@@ -50,7 +50,7 @@ describe("NBVERIFY-004 progress artifacts", () => {
     expect(receipt.source_task_id).toBe("NBSOURCE-004");
     expect(receipt.atomic_claim_count).toBeUndefined();
     expect(receipt.source.atomic_claim_count).toBe(14);
-    expect(receipt.all_claims_closed).toBe(false);
+    expect(receipt.all_claims_closed).toBe(true);
     expect(receipt.hy3.model).toBe("tencent/hy3:free");
     expect(receipt.hy3.authenticated_generation).toBe(false);
     expect(receipt.hy3.reason).toContain("OPENROUTER_API_KEY");

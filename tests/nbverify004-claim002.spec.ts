@@ -20,7 +20,7 @@ describe("NBVERIFY-004 SWARM-CLAIM-002 evidence", () => {
 
     expect(claim).toBeDefined();
     expect(claim.verification_status).toBe("unverified");
-    expect(claim.status).toBe("partial");
+    expect(claim.status).toBe("qualified");
     expect(
       claim.evidence.find(
         (candidate: { relationship: string }) =>

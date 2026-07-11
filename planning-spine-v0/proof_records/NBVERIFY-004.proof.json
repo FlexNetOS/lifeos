@@ -1,0 +1,85 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.source-receipt.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.truth-matrix.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-RUNTIME-001.node-authority-proof.raw.json",
+    "planning-spine-v0/proof_records/NBVERIFY-001-v2.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-002-v2.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-003-v2.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-004.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T214537Z-lifeos-before-notebooklm-source-004.tar.gz",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T2229Z-before-nbverify-004-proof-append.tar.gz"
+  ],
+  "checksums": {
+    "NBVERIFY-004.local-evidence.json": "94dd689421702ab4dcb29d522bb90b052c2d4af4e6c4783f86fc4d62cee656e8",
+    "NBVERIFY-004.source-receipt.json": "c8f9adf5faae90e0da77206581912ad1da5fee6a323f813a7fd1124776d483bc",
+    "NBVERIFY-004.truth-matrix.csv": "d77a43d1a8595e069f2e715977ed3e6e5123f83bf1d9a8160f34f99245ca2cf9",
+    "NBVERIFY-RUNTIME-001.node-authority-proof.raw.json": "abac0d64ab8feb406ac66f979c9626bdb2656ff88c11eab09101d286af9d059d",
+    "NBVERIFY-001-v2.proof.json": "226cbbb879a8c1ab7299d3530b5867b240a7910ca2244fca6097f7cea60ea6dc",
+    "NBVERIFY-002-v2.proof.json": "db78b6409c7018d10e824b1797ce917cfea0c22ddcc41e2e62cf73d0fcdc1cb0",
+    "NBVERIFY-003-v2.proof.json": "28ce001d67c627980f6b3b766f4a2b6445caf6b578e26bfff0e168f3bc9379c5",
+    "20260710T214537Z-lifeos-before-notebooklm-source-004.tar.gz": "3519fb0bbfdafbad11d8f0effdecdbdbeca66ff3b7b31f5e0d41e024765c2792",
+    "20260711T2229Z-before-nbverify-004-proof-append.tar.gz": "383a4a20c4807ed98f96ec7420a2a8b8f7a022999a8cf74de8b21b5e09dcf4f1"
+  },
+  "gate_result": {
+    "claims": 14,
+    "verified": 0,
+    "qualified": 11,
+    "refuted": 0,
+    "owner_decision_pending": 3,
+    "queued": 0,
+    "all_claims_closed": true,
+    "runtime_and_source_boundaries_distinct": true,
+    "active_profile_frontdoor_used": true,
+    "uds_and_shared_redb_not_conflated": true,
+    "performance_claim_requires_reproducible_benchmark": true,
+    "citation_targets_not_invented": true,
+    "hy3_model": "tencent/hy3:free",
+    "hy3_authenticated_generation": false,
+    "hy3_blocker": "OPENROUTER_API_KEY was unavailable; no authenticated generation was attempted or claimed.",
+    "no_product_mutation": true,
+    "no_generated_yazelix_runtime_mutation": true,
+    "normalization_errors": 0,
+    "task_status": "Complete"
+  },
+  "live_commands": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "exit_status": 0,
+      "purpose": "Verify the root-owned Bun lockfile installation without a temporary package project."
+    },
+    {
+      "command": "bun run verify:node-authority",
+      "exit_status": 0,
+      "purpose": "Exercise native RuVector, RVF, SONA, AgentDB, RuvLLM, Tiny Dancer, and optional native packages."
+    },
+    {
+      "command": "bun run test:node-authority",
+      "exit_status": 0,
+      "purpose": "Run focused N-API installation tests through Bun/Bunx."
+    },
+    {
+      "command": "bun run check",
+      "exit_status": 0,
+      "purpose": "Run the full TypeScript, Vitest, accessibility, and design gates."
+    },
+    {
+      "command": "bun run build",
+      "exit_status": 0,
+      "purpose": "Verify the production LifeOS build."
+    },
+    {
+      "command": "bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Verify planning-spine integrity and whitespace cleanliness."
+    }
+  ],
+  "observed_at": "2026-07-11T22:29:30Z",
+  "proof_summary": "All fourteen NBSOURCE-004 claims were processed in queue order with claim-scoped evidence. Unsupported launch and lifecycle assertions remain qualified rather than verified; UDS/shared-redb proposals remain explicit owner decisions; the real-time claim remains qualified without a benchmark; citation absence is qualified without invented targets. The real root-owned Bun/N-API installation and full LifeOS gates passed. HY3 authenticated generation remains an explicit external blocker, not fabricated evidence.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBVERIFY-004",
+  "verification_gate": "All fourteen claims close exactly once as qualified or explicit owner-decision pending; installed claims use the active profile frontdoor; runtime and source boundaries remain distinct; UDS/shared-redb authority is not conflated; performance claims remain benchmark-gated; citations remain unresolved; normalization and planning verification pass."
+}

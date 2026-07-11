@@ -125,7 +125,7 @@ const result = {
     {
       claim_id: "SWARM-CLAIM-001",
       verification_status: "unverified",
-      status: "partial",
+      status: "qualified",
       conclusion:
         "The profile-owned Yazelix frontdoor, launcher target, and a live Yazelix process snapshot are present, but no portable artifact identity or LifeOS/Tauri UI readiness acceptance receipt binds them into the claimed portable launch flow.",
       evidence: [

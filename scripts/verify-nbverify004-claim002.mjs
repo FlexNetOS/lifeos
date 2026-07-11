@@ -307,9 +307,7 @@ if (existsSync(outputPath)) {
       ...(Array.isArray(previous.claims)
         ? previous.claims.filter(
             (candidate) =>
-              !["SWARM-CLAIM-002", "SWARM-CLAIM-003", "SWARM-CLAIM-004"].includes(
-                candidate.claim_id,
-              ),
+              candidate.claim_id !== "SWARM-CLAIM-002",
           )
         : []),
     );
@@ -321,7 +319,7 @@ const claimId = "SWARM-CLAIM-002";
 const claim = {
   claim_id: claimId,
   verification_status: "unverified",
-  status: "partial",
+  status: "qualified",
   confidence: "medium",
   conclusion:
     "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, but no fresh causal LifeOS launch, LifeOS process, UI-ready signal, or LifeOS-to-Yazelix bridge proves that Yazelix is the background workspace engine for a LifeOS application launch.",

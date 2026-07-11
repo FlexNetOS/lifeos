@@ -55,6 +55,65 @@ until the current object is captured, mapped, verified, and proof-recorded.
 
 Source extraction and claim verification are separate loops.
 
+### Execution roles and loop
+
+The verification team repeats this loop for one task-graph row at a time:
+
+```text
+research -> surface -> plan -> red test -> implement -> green test
+         -> update task graph and proof ledger -> repeat
+```
+
+- **Sol** owns deep reasoning, conflict resolution, task ordering, and final
+  proof integration.
+- **Terra** owns bounded implementation work after the red test exists.
+- **Luna** owns high-volume claim routing and classification.
+- **OpenRouter `tencent/hy3:free`** is the external research lane. Every issue
+  or conflict discovered in the loop is sent to that lane for deeper research.
+  HY3 participation is recorded only when a live authenticated generation
+  receipt identifies the exact model and response. Configuration, catalog
+  presence, an attempted request, or another model's summary is not
+  participation.
+
+If the HY3 route cannot authenticate or generate, record the exact blocker and
+keep any HY3-dependent research gate open. Never silently substitute another
+model.
+
+### Real Bun installation requirement
+
+Node-package capability evidence counts only from the real repository-owned
+installation:
+
+- `package.json` owns every directly imported verification package at an exact
+  version.
+- `bun.lock` owns the complete resolved graph.
+- profile-owned `bun` and `bunx` are the only package-manager frontdoors:
+  `npm = bun` and `npx = bunx`.
+- `bun install --frozen-lockfile` must reproduce the install.
+- package entrypoints must resolve under this repository's `node_modules`.
+- lifecycle scripts remain blocked until their exact contents are inspected;
+  any approved package is recorded in `trustedDependencies`.
+- receipts preserve the Bun executable, Bun version, repository root,
+  `package.json` and `bun.lock` hashes, direct package versions, compatible
+  transitive runtime versions, and loaded native/WASM backend.
+
+Temporary directories, generated package manifests, renamed lockfiles,
+`bun add --cwd` probes, `bunx` package downloads, and ambient/global
+`node_modules` may support research, but they do not verify installed LifeOS
+behavior and cannot close a claim.
+
+### TDD and task order
+
+1. Select the earliest unresolved verification row whose parents are complete.
+2. Add a failing test that expresses the row's verification gate.
+3. Capture the red result.
+4. Implement the smallest repo-owned setup or evidence collector that can make
+   the test pass.
+5. Run the targeted green test, then the complete required gate.
+6. Record issues and conflicts and send them to HY3 research.
+7. Append a proof revision and regenerate the task graph before selecting the
+   next row.
+
 1. Every unresolved claim is inserted into
    `generated/notebooklm_claim_verification_queue.source.csv`.
 2. Later NotebookLM objects may `support`, `contradict`, `qualify`, or

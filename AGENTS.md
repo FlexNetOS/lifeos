@@ -116,18 +116,19 @@ Execute in order:
 - Use latest stable Vue 3 + Tauri toolchain.
 - Surgical, targeted changes only — no wholesale rewrites unless structural failure makes targeted changes impossible (must be explicitly justified).
 
-## Toolchain (host reality, corrected 2026-07-07)
+## Toolchain (host reality, corrected 2026-07-11)
 
-Toolchain ownership is migrating to the Yazelix/Nix foundation
-(`lifeos_foundation_yzx`). The previously documented "mise-managed" toolchain
-does not exist on this host: there is no mise binary, no mise.toml, and node is
-absent from the login PATH; `bun` currently resolves from the legacy
-`FlexNetOS/usr/bin` frontdoor, which is quarantined-pack residue slated for
-refactor (see FlexNetOS/LOCAL_WORKAROUNDS.md, 2026-07-07 owner correction).
-Until this repo gains a flake.nix consuming the foundation, verify tool
-provenance with `command -v` + `readlink -f` before trusting any version claim.
+The Yazelix/Nix foundation (`lifeos_foundation_yzx`) owns the active Bun
+toolchain. `bun` and `bunx` resolve through the profile package's `toolbin` and
+then to the immutable Nix-store Bun executable. The previously documented
+"mise-managed" toolchain does not exist on this host. Verify every toolchain
+receipt with `command -v`, `readlink -f`, and the tool's version before trusting
+it; a legacy `FlexNetOS/usr/bin` result is stale-shadow evidence, not an
+alternate owner.
 
-Use `bun` for everything JS (not npm). Tauri's `beforeDevCommand` / `beforeBuildCommand` already point at `bun run dev` / `bun run build`.
+Use `bun` for npm-compatible package management and JS execution, and `bunx`
+for npx-compatible package execution. Tauri's `beforeDevCommand` /
+`beforeBuildCommand` already point at `bun run dev` / `bun run build`.
 
 ## Verification commands
 

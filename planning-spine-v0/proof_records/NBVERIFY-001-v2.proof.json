@@ -1,0 +1,129 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-RUNTIME-001.node-authority-proof.raw.json",
+    "package.json",
+    "bun.lock",
+    "scripts/verify-node-authority.mjs",
+    "tests/bun-frontdoor.spec.ts",
+    "tests/node-authority-install.spec.ts",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T102430Z-lifeos-nbverify-001-before-node-truth-integration.tar.gz",
+    "planning-spine-v0/proof_records/NBVERIFY-001.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-001-v2.proof.json"
+  ],
+  "checksums": {
+    "NBVERIFY-RUNTIME-001.node-authority-proof.raw.json": "773824c3e6dfe100f5342b67c699259760b4597eef962db1598d35f38a9765ae",
+    "package.json": "4c71000f37bb5620ebf760998656c39982a2f3a0c2aa67cd0a7307155a32a73e",
+    "bun.lock": "24bfefaccedfd1d7ca90324f7c2b6d3f217aa4a359820d73e46482073003cb22",
+    "20260711T102430Z-lifeos-nbverify-001-before-node-truth-integration.tar.gz": "a6957aa2baff507cfa148d597d0b3511627ca257a2950aa5c82758f66cfddec2"
+  },
+  "gate_result": {
+    "correction_scope_only": true,
+    "claim_verdicts_unchanged": true,
+    "prior_revision_preserved": true,
+    "real_repo_owned_install": true,
+    "frozen_install_passed": true,
+    "frozen_install_summary": "bun install v1.3.14; 681 installs across 728 packages; no changes",
+    "focused_frontdoor_tests_passed": 2,
+    "node_authority_tests_passed": 7,
+    "direct_packages": {
+      "ruvector": "0.2.34",
+      "agentdb": "3.0.0-alpha.17",
+      "@ruvector/rvf": "0.2.3",
+      "@ruvector/ruvllm": "2.6.0",
+      "@ruvector/sona": "0.1.7",
+      "@ruvector/tiny-dancer": "0.1.22"
+    },
+    "transitive_runtime_packages": {
+      "@ruvector/core": "0.1.31",
+      "@ruvector/rvf-node": "0.1.8"
+    },
+    "bun": "1.3.14",
+    "bun_executable": "/nix/store/xklcw145lqbfc06l175q790m17yxqia1-bun-1.3.14/bin/bun",
+    "bunx_executable": "/nix/store/xklcw145lqbfc06l175q790m17yxqia1-bun-1.3.14/bin/bun",
+    "node_compatibility": "v24.3.0",
+    "napi": "10",
+    "ruvector_implementation": "native",
+    "ruvector_features": [
+      "SIMD",
+      "Multi-threading",
+      "Rust-native"
+    ],
+    "ruvector_capabilities": {
+      "sona": true,
+      "gnn": true,
+      "graph": true,
+      "router": true,
+      "rvf": true
+    },
+    "rvf_backend": "NodeBackend",
+    "rvf_vectors_ingested": 2,
+    "sona_enabled": true,
+    "agentdb_learning_enabled": true,
+    "ruvllm_in_memory_adapters": 51,
+    "tiny_dancer_model_bytes": 1268,
+    "blocked_unrelated_lifecycle_scripts": [
+      "esbuild@0.28.0",
+      "argon2@0.44.0",
+      "better-sqlite3@11.10.0",
+      "hnswlib-node@3.0.0",
+      "sharp@0.32.6"
+    ],
+    "agentdb_witness": {
+      "valid": false,
+      "error": "this.db.verifyWitness is not a function"
+    },
+    "hy3": {
+      "catalog_visible": true,
+      "authenticated_generation_receipt": false,
+      "blocker": "OPENROUTER_API_KEY is absent; tencent/hy3:free did not participate"
+    },
+    "planning_spine_verify_passed": true,
+    "full_check_passed": true,
+    "build_passed": true,
+    "git_diff_check_passed": true
+  },
+  "live_commands": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "exit_status": 0,
+      "purpose": "Reproduce the real repository-owned Bun installation without a temporary package project."
+    },
+    {
+      "command": "bunx --no-install --bun vitest run tests/bun-frontdoor.spec.ts",
+      "exit_status": 0,
+      "purpose": "Verify the profile-owned Bun and Bunx frontdoors from the repository test surface."
+    },
+    {
+      "command": "bun run test:node-authority",
+      "exit_status": 0,
+      "purpose": "Verify direct package ownership and native N-API resolution from repository node_modules."
+    },
+    {
+      "command": "bun run verify:node-authority -- --output=planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-RUNTIME-001.node-authority-proof.raw.json",
+      "exit_status": 0,
+      "purpose": "Load native RuVector/RVF/SONA/RuvLLM/AgentDB/Tiny Dancer capabilities through the real root installation."
+    },
+    {
+      "command": "bun run check",
+      "exit_status": 0,
+      "purpose": "Run the complete LifeOS type, unit, accessibility, and design gates."
+    },
+    {
+      "command": "bun run build",
+      "exit_status": 0,
+      "purpose": "Verify the production build after real package installation."
+    },
+    {
+      "command": "bun run planning-spine:verify",
+      "exit_status": 0,
+      "purpose": "Verify the canonical planning-spine projections."
+    }
+  ],
+  "observed_at": "2026-07-11T20:54:05Z",
+  "proof_summary": "Append-only correction of NBVERIFY-001 package authority: the required N-API/RuVector packages were installed and executed from the LifeOS root package.json and bun.lock through profile-owned Bun/Bunx. Prior claim verdicts remain unchanged. Native runtime proof passed, with the known AgentDB witness API failure preserved and HY3 participation left unverified because no OpenRouter credential was available.",
+  "revision": 2,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBVERIFY-001",
+  "verification_gate": "Real root-owned Bun installation, exact direct and transitive package provenance, native N-API capability proof, focused TDD gates, full LifeOS gates, preserved prior verdicts, and explicit HY3 authentication status."
+}

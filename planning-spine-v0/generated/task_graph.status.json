@@ -51,14 +51,15 @@
     "NBSOURCE-027",
     "NBSOURCE-028",
     "NBSOURCE-029",
-    "NBSOURCE-030"
+    "NBSOURCE-030",
+    "NBSOURCE-031"
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-11T00:13:04Z",
-  "ledger_entry_count": 66,
+  "generated_at": "2026-07-11T00:13:25Z",
+  "ledger_entry_count": 67,
   "next_ready_task_id": "LIFEOS-000",
-  "proof_ledger_sha256": "1e00b66a459db18abef3f9b0b61bb19efba6b50465c82218081911de112aaa05",
+  "proof_ledger_sha256": "32f7126a9cb2358edd1dfbdbd435a34600c9de0bd6355e577f50c66e34a439b7",
   "proof_ledger_uri": "planning-spine-v0/proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "LIFEOS-000",
@@ -163,9 +164,9 @@
   ],
   "result": "pass",
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
-  "source_graph_sha256": "b4e9b4377b5a1b895a73c192b2482c1c314d60b23733d806e8d2993f944dcf85",
+  "source_graph_sha256": "4829ed30862b435818424b485ab0d8fc281062d331da8741ef317163ee6890e8",
   "source_graph_uri": "planning-spine-v0/generated/task_graph.normalized.json",
-  "task_count": 151,
+  "task_count": 152,
   "tasks": [
     {
       "effective": {
@@ -4797,7 +4798,7 @@
     },
     {
       "effective": {
-        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-030.proof.json; no child task is declared in this graph.",
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-030.proof.json; next child task: NBSOURCE-031.",
         "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-030.proof.json",
         "status": "complete"
       },
@@ -4826,11 +4827,50 @@
       "updates": {
         "next_action": {
           "from": "NBSOURCE-031 The envctl Projection Engine: From Database to Directory",
-          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-030.proof.json; no child task is declared in this graph."
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-030.proof.json; next child task: NBSOURCE-031."
         },
         "proof_uri": {
           "from": "proof_records/NBSOURCE-030.proof.json",
           "to": "planning-spine-v0/proof_records/NBSOURCE-030.proof.json"
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-031.proof.json; no child task is declared in this graph.",
+        "proof_uri": "planning-spine-v0/proof_records/NBSOURCE-031.proof.json",
+        "status": "complete"
+      },
+      "parent_ids": [
+        "NBSOURCE-030"
+      ],
+      "phase": "0-north-star-graph",
+      "proof": {
+        "ledger_line_number": 67,
+        "observed_at": "2026-07-11T00:13:25Z",
+        "revision": "1",
+        "sha256": "eb30808ce8f24bb8ca4384af7f3bf1bb4aa05698194312c31be856676a251955"
+      },
+      "source": {
+        "next_action": "NBSOURCE-032 Yazelix and Nushell Native Plugin Architecture",
+        "proof_uri": "proof_records/NBSOURCE-031.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 153,
+      "task_id": "NBSOURCE-031",
+      "title": "The envctl Projection Engine: From Database to Directory source captured and mapped",
+      "updated_fields": [
+        "next_action",
+        "proof_uri"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "NBSOURCE-032 Yazelix and Nushell Native Plugin Architecture",
+          "to": "Proof accepted from planning-spine-v0/proof_records/NBSOURCE-031.proof.json; no child task is declared in this graph."
+        },
+        "proof_uri": {
+          "from": "proof_records/NBSOURCE-031.proof.json",
+          "to": "planning-spine-v0/proof_records/NBSOURCE-031.proof.json"
         }
       }
     }
@@ -4895,6 +4935,7 @@
     "NBSOURCE-027",
     "NBSOURCE-028",
     "NBSOURCE-029",
-    "NBSOURCE-030"
+    "NBSOURCE-030",
+    "NBSOURCE-031"
   ]
 }

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { mkdir, realpath, rm, stat } from "node:fs/promises";
+import { mkdir, readdir, realpath, rm, stat } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import * as ruvector from "ruvector";
 import { SelfLearningRvfBackend } from "agentdb/backends/self-learning";
@@ -75,6 +75,23 @@ function findPackageJson(entrypoint) {
   throw new Error(`No repository-owned package.json found for ${entrypoint}`);
 }
 
+async function findNativeBinary(packageDirectory) {
+  const entries = await readdir(packageDirectory, { withFileTypes: true });
+  for (const entry of entries) {
+    const entryPath = join(packageDirectory, entry.name);
+    if (entry.isFile() && entry.name.endsWith(".node")) {
+      return entryPath;
+    }
+    if (entry.isDirectory()) {
+      const nested = await findNativeBinary(entryPath);
+      if (nested) {
+        return nested;
+      }
+    }
+  }
+  return undefined;
+}
+
 assert(typeof Bun !== "undefined", "Node authority verification must run through Bun");
 assert(existsSync(packageJsonPath), "Run from the LifeOS repository root: package.json is missing");
 assert(existsSync(bunLockPath), "Run from the LifeOS repository root: bun.lock is missing");
@@ -112,6 +129,40 @@ for (const name of transitiveRuntimePackages) {
   };
 }
 
+const platform = `${process.platform}-${process.arch}-gnu`;
+const platformOptionalPackages =
+  platform === "linux-x64-gnu"
+    ? [
+        ["@ruvector/attention-linux-x64-gnu", "@ruvector/attention"],
+        ["@ruvector/gnn-linux-x64-gnu", "@ruvector/gnn"],
+        ["@ruvector/graph-node-linux-x64-gnu", "@ruvector/graph-node"],
+        ["@ruvector/router-linux-x64-gnu", "@ruvector/router"],
+        ["@ruvector/ruvllm-linux-x64-gnu", "@ruvector/ruvllm"],
+        ["@ruvector/rvf-node-linux-x64-gnu", "@ruvector/rvf-node"],
+        ["@ruvector/sona-linux-x64-gnu", "@ruvector/sona"],
+        ["@ruvector/tiny-dancer-linux-x64-gnu", "@ruvector/tiny-dancer"],
+        ["ruvector-core-linux-x64-gnu", "@ruvector/core"],
+      ]
+    : [];
+const platformNativeOptionalPackages = {
+  platform,
+  packages: {},
+};
+for (const [name, owner] of platformOptionalPackages) {
+  const entrypoint = Bun.resolveSync(name, repoRoot);
+  const packagePath = findPackageJson(entrypoint);
+  const packageDirectory = dirname(packagePath);
+  const installed = JSON.parse(readFileSync(packagePath, "utf8"));
+  const nativeBinary = await findNativeBinary(packageDirectory);
+  assert(nativeBinary, `${name} has no installed native .node binary`);
+  platformNativeOptionalPackages.packages[name] = {
+    ownerOptionalDependency: owner,
+    version: installed.version,
+    package_json: relative(repoRoot, await realpath(packagePath)),
+    binary: relative(repoRoot, await realpath(nativeBinary)),
+  };
+}
+
 await rm(runtimeDir, { recursive: true, force: true });
 await mkdir(runtimeDir, { recursive: true });
 await mkdir(dirname(evidencePath), { recursive: true });
@@ -125,6 +176,7 @@ const result = {
     bun_lock_sha256: sha256(bunLockPath),
     trusted_dependencies: packageJson.trustedDependencies,
     packages: packageResolution,
+    platformNativeOptionalPackages,
   },
   runtime: {
     bun: Bun.version,

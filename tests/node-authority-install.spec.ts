@@ -28,6 +28,18 @@ const requiredPackages = {
   ruvector: "0.2.34",
 } as const;
 
+const requiredLinuxX64NativeOptionalPackages = [
+  "@ruvector/attention-linux-x64-gnu",
+  "@ruvector/gnn-linux-x64-gnu",
+  "@ruvector/graph-node-linux-x64-gnu",
+  "@ruvector/router-linux-x64-gnu",
+  "@ruvector/ruvllm-linux-x64-gnu",
+  "@ruvector/rvf-node-linux-x64-gnu",
+  "@ruvector/sona-linux-x64-gnu",
+  "@ruvector/tiny-dancer-linux-x64-gnu",
+  "ruvector-core-linux-x64-gnu",
+] as const;
+
 describe("repo-owned Node verification runtime", () => {
   test("owns verification packages in the root Bun manifest", () => {
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
@@ -113,6 +125,29 @@ describe("repo-owned Node verification runtime", () => {
         "LifeOS root package.json and bun.lock",
       );
       expect(result.ruvector.implementationType).toBe("native");
+      expect(result.ruvector.capabilities).toEqual({
+        sona: true,
+        gnn: true,
+        graph: true,
+        router: true,
+        rvf: true,
+      });
+      expect(result.install.platformNativeOptionalPackages.platform).toBe(
+        "linux-x64-gnu",
+      );
+      expect(
+        Object.keys(result.install.platformNativeOptionalPackages.packages).sort(),
+      ).toEqual([...requiredLinuxX64NativeOptionalPackages].sort());
+      for (const name of requiredLinuxX64NativeOptionalPackages) {
+        const receipt =
+          result.install.platformNativeOptionalPackages.packages[name];
+        expect(receipt.ownerOptionalDependency).toBeDefined();
+        expect(receipt.version).toMatch(/^\d+\.\d+\.\d+/);
+        expect(receipt.package_json).toBe(`node_modules/${name}/package.json`);
+        expect(receipt.binary).toMatch(
+          new RegExp(`^node_modules/${name.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}/.+\\.node$`),
+        );
+      }
       expect(result.rvf.selectedBackend).toBe("NodeBackend");
       expect(result.rvf.ingestResult.accepted).toBe(2);
       expect(result.sona.enabled).toBe(true);

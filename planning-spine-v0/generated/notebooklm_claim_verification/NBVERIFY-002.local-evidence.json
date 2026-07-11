@@ -1,0 +1,71 @@
+{
+  "schema_version": "lifeos.notebooklm.local-evidence.v1",
+  "task_id": "NBVERIFY-002",
+  "capture_id": "NBSOURCE-002",
+  "observed_at": "2026-07-11T10:36:55Z",
+  "source_receipt": "generated/notebooklm_claim_verification/NBVERIFY-002.source-receipt.json",
+  "reused_primary_proof": "proof_records/NBVERIFY-001.proof.json",
+  "current_revisions": {
+    "lifeos": "5dd4240cde4f0c64e81d25878714165d02b830de",
+    "envctl": "c911286d948437384ae3f7e3a27aeb795907f3ff",
+    "nu_plugin_canonical_master": "9451b20e42d79f72d4fa5b2a190a39bd1d9d5e5a",
+    "redb": "4.1.0"
+  },
+  "claims": [
+    {
+      "claim_id": "EDGE-CLAIM-001",
+      "status": "qualified",
+      "confidence": 98,
+      "conclusion": "redb can technically be embedded in a hot edge runtime, and NBVERIFY-001 measured low in-process read/commit latency. The source prescribes an architecture but supplies no adopted LifeOS data-class, retention, durability, authority, privacy, promotion, or recovery decision, so it is not verified as current design.",
+      "primary_pointers": [
+        "NBVERIFY-001 redb source/tests and five-run benchmark",
+        "envctl@c911286 and nu_plugin origin/master@9451b20 call-path audit",
+        "NBVERIFY-002 exact NotebookLM source receipt"
+      ]
+    },
+    {
+      "claim_id": "EDGE-CLAIM-002",
+      "status": "refuted",
+      "confidence": 100,
+      "conclusion": "The exact causal claim is false for pinned redb 4.1.0: redb removed its mmap backend and uses positioned file I/O plus a userspace cache. The five-run NBVERIFY-001 benchmark proves microsecond-class measured operations and in-process use has no network hop, but neither fact rescues the asserted mmap/zero-copy mechanism or makes arbitrary thought/trace writes microsecond-safe.",
+      "primary_pointers": [
+        "NBVERIFY-001 redb source/tests and five-run benchmark",
+        "envctl@c911286 and nu_plugin origin/master@9451b20 call-path audit",
+        "NBVERIFY-002 exact NotebookLM source receipt"
+      ]
+    },
+    {
+      "claim_id": "EDGE-CLAIM-003",
+      "status": "qualified",
+      "confidence": 99,
+      "conclusion": "A background outbox worker can technically flush selected local records to PostgreSQL, but no current CodeDB/envctl call path implements the claimed per-agent-cycle compression and permanent commit. Thread ownership, final-record identity, sequence keys, compression/version identity, transaction scope, acknowledgment, retry, idempotency, and crash recovery remain absent.",
+      "primary_pointers": [
+        "NBVERIFY-001 redb source/tests and five-run benchmark",
+        "envctl@c911286 and nu_plugin origin/master@9451b20 call-path audit",
+        "NBVERIFY-002 exact NotebookLM source receipt"
+      ]
+    },
+    {
+      "claim_id": "EDGE-CLAIM-004",
+      "status": "qualified",
+      "confidence": 99,
+      "conclusion": "redb can back a durable outage queue or outbox, but it is not PostgreSQL WAL and no implemented protocol proves indefinite retention until connectivity returns. Capacity, backpressure, ordering, duplicates, conflict resolution, poison records, split brain, replay acknowledgment, and authority remain undefined.",
+      "primary_pointers": [
+        "NBVERIFY-001 redb source/tests and five-run benchmark",
+        "envctl@c911286 and nu_plugin origin/master@9451b20 call-path audit",
+        "NBVERIFY-002 exact NotebookLM source receipt"
+      ]
+    },
+    {
+      "claim_id": "EDGE-CLAIM-005",
+      "status": "verified",
+      "confidence": 100,
+      "conclusion": "The exact 984-character, 12-line NotebookLM fulltext contains citation markers [1, 2], [2], and [3] but no bibliography, source identity, URL, immutable version, or cited passage. The references are therefore unavailable from this source and verify none of its technical assertions.",
+      "primary_pointers": [
+        "NBVERIFY-001 redb source/tests and five-run benchmark",
+        "envctl@c911286 and nu_plugin origin/master@9451b20 call-path audit",
+        "NBVERIFY-002 exact NotebookLM source receipt"
+      ]
+    }
+  ]
+}

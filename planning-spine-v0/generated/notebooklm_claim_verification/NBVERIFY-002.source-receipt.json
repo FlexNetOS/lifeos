@@ -1,0 +1,22 @@
+{
+  "observed_at": "2026-07-11T10:36:55Z",
+  "notebook_id": "b09afb74-b464-4bc3-94f0-d5193f7c7d36",
+  "source_id": "b003eeae-301b-4958-94f8-946cebec9ebd",
+  "title": "Edge Orchestration with High-Frequency Buffering",
+  "kind": "markdown",
+  "char_count": 984,
+  "logical_line_count": 12,
+  "content_sha256": "d09461732015678cb93f84bcf1986c94d371e9df43a873654c2cb42bdfce3391",
+  "content": "Edge Orchestration with High-Frequency Buffering\nTo configure \nredb\n as a high-frequency buffer, you embed it directly into your application's hot runtime at the edge. Because it natively uses memory-mapped I/O and zero-copy reads, agents can write rapid state changes, intermediate \"thoughts,\" and raw trace logs into \nredb\n in mere microseconds without any network lag [1, 2].\nYou then configure a background thread to handle the synchronization. Once an agent finishes a task cycle, this thread automatically flushes the final, compressed data out of \nredb\n and permanently commits it to the global PostgreSQL database [2]. If Postgres ever goes offline or experiences latency, \nredb\n safely acts as an application-level Write-Ahead Log, storing the data until the connection returns [3].\nNow that we have covered how agents store their thoughts and execute changes, are you ready to explore Phase 4 (Materialization & Portable Release) to see how the system compiles the final OS?",
+  "citation_inventory": {
+    "markers": [
+      "1",
+      "2",
+      "3"
+    ],
+    "bibliography_present": false,
+    "reference_identities_present": false,
+    "urls_present": false,
+    "exact_passages_present": false
+  }
+}

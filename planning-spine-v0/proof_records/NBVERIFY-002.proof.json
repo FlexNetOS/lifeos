@@ -1,0 +1,73 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-002.local-evidence.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-002.source-receipt.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-002.truth-matrix.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T103525Z-lifeos-nbverify-002-before-local-truth-integration.tar.gz",
+    "planning-spine-v0/proof_records/NBVERIFY-002.proof.json"
+  ],
+  "checksums": {
+    "NBVERIFY-002.local-evidence.json": "16f392cf92141f18175ef55f06e4421a5cb5e32efc4327e8fa8755276452a796",
+    "NBVERIFY-002.source-receipt.json": "b7bcc976aa9b23746c8acf089cf1b2ec44a54e987f7fe34eae85a3d15c732fa4",
+    "NBVERIFY-002.truth-matrix.csv": "f86c3d5b75d822626af95163712e728d79b506ad22ad3c4114dbbc6ac1d2bdc4",
+    "notebooklm_source_claims.source.csv": "7ec108852e7a8b081750761b2da9143a79034289d2e57e871e5a99dcec4fed3b",
+    "notebooklm_claim_verification_queue.source.csv": "f28c6fccb90d308af04e046af5599ba4436d85eaa8702282c2799a27d46da8e5",
+    "notebooklm_claim_evidence.source.csv": "ea4b993ae63c87e0720861932aba463c2cca4da52f9ae9619edde1937f2a72d9",
+    "prior_task_conflict.source.csv": "dbd7c2e1651e2a37dfcb7f5880a78c8692b97c2f2057de315b8e162927e6f02c",
+    "task_graph.source.csv": "fffa24985908e873201b1aef577dd71a233bfc12923d284b48b0b4e6c25762a2",
+    "20260711T103525Z-lifeos-nbverify-002-before-local-truth-integration.tar.gz": "82c7be074cffad29399d4801a9128b9bf3142f0f8af0c403bbb2b809eefcfcd7"
+  },
+  "gate_result": {
+    "all_claims_truth_classified": true,
+    "all_proof_uris_present": true,
+    "claims": 5,
+    "verified": 1,
+    "qualified": 3,
+    "refuted": 1,
+    "queued": 0,
+    "source_char_count": 984,
+    "source_logical_line_count": 12,
+    "source_sha256": "d09461732015678cb93f84bcf1986c94d371e9df43a873654c2cb42bdfce3391",
+    "reused_proof": "NBVERIFY-001",
+    "normalization_errors": 0,
+    "task_count": 156,
+    "task_status": "Complete",
+    "ready_count": 0,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true
+  },
+  "live_commands": [
+    {
+      "command": "notebooklm auth check --test --json",
+      "exit_status": 0,
+      "purpose": "Prove live NotebookLM authentication and token fetch."
+    },
+    {
+      "command": "notebooklm source fulltext b003eeae-301b-4958-94f8-946cebec9ebd --notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36 --json",
+      "exit_status": 0,
+      "purpose": "Retrieve exact original source and citation inventory."
+    },
+    {
+      "command": "NBVERIFY-001 redb source/tests, Bun/N-API runtime, and five-run benchmark",
+      "exit_status": 0,
+      "purpose": "Reuse stronger primary evidence for repeated engine/performance claims."
+    },
+    {
+      "command": "extract-task-graph.py && normalize-task-graph.py && bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Validate canonical integration."
+    }
+  ],
+  "observed_at": "2026-07-11T10:37:25Z",
+  "proof_summary": "Truth-tested all five NBSOURCE-002 claims against exact NotebookLM fulltext, NBVERIFY-001 redb/Bun primary proof, and current peer call paths: 1 verified, 3 qualified, 1 refuted, 0 queued.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBVERIFY-002",
+  "verification_gate": "All five claims close exactly once with proof URI; exact source identity/hash/counts match; repeated mmap and latency statements inherit primary evidence rather than repetition; missing citations prove no technical claim; architecture proposals are not misrepresented as current or adopted."
+}

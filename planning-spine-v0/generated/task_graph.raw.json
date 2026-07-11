@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-11T10:29:43Z",
+  "generated_at": "2026-07-11T10:36:55Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 155,
+    "row_count": 156,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -3435,6 +3435,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBVERIFY-001.proof.json",
         "next_action": "Use the truth matrix for architecture decomposition, fix the observed AgentDB feedback/witness API defects in its owning repository, and advance to NBSOURCE-002 verification."
+      }
+    },
+    {
+      "source_row_number": 157,
+      "columns": {
+        "task_id": "NBVERIFY-002",
+        "parent_id": "NBVERIFY-001; NBSOURCE-002",
+        "phase": "0-north-star-graph",
+        "title": "NotebookLM source 002 truth-tested against local edge-buffer evidence",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Truth-test all NBSOURCE-002 claims using the exact NotebookLM fulltext, NBVERIFY-001 redb/Bun proof, current peer call paths, and explicit architecture-boundary handling.",
+        "inputs": "NBSOURCE-002; NBVERIFY-001; exact source fulltext SHA-256 d0946173; redb 4.1.0; envctl c911286; nu_plugin origin/master 9451b20",
+        "target_artifacts": "generated/notebooklm_claim_verification/NBVERIFY-002.local-evidence.json; generated/notebooklm_claim_verification/NBVERIFY-002.source-receipt.json; generated/notebooklm_claim_verification/NBVERIFY-002.truth-matrix.csv; proof_records/NBVERIFY-002.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product implementation; peer mutation; secrets/**; treating source repetition or missing citations as proof",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All five claims close exactly once with proof URI; exact fulltext hash/line/character counts match; mmap wording reflects redb 4.1; performance reuses a reproducible benchmark rather than prose; architecture proposals remain unadopted; normalization, planning verification, tests, build, dev boot, and diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T103525Z-lifeos-nbverify-002-before-local-truth-integration.tar.gz (SHA-256 82c7be074cffad29399d4801a9128b9bf3142f0f8af0c403bbb2b809eefcfcd7) and remove only NBVERIFY-002 rows/artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBVERIFY-002.proof.json",
+        "next_action": "Advance to NBSOURCE-003 while retaining the explicit WAL/outbox/queue and synchronization owner decisions."
       }
     }
   ]

@@ -1,0 +1,78 @@
+{
+  "schema_version": "lifeos.notebooklm.local-evidence.v1",
+  "task_id": "NBVERIFY-003",
+  "capture_id": "NBSOURCE-003",
+  "observed_at": "2026-07-11T10:42:21Z",
+  "source_receipt": "generated/notebooklm_claim_verification/NBVERIFY-003.source-receipt.json",
+  "reused_proofs": [
+    "proof_records/NBVERIFY-001.proof.json",
+    "proof_records/NBVERIFY-030-032.proof.json"
+  ],
+  "revisions": {
+    "lifeos": "f3eddc09cdf2f4d421b748449668d9b7c8681cd7",
+    "nu_plugin_canonical_master": "9451b20e42d79f72d4fa5b2a190a39bd1d9d5e5a",
+    "envctl": "c911286d948437384ae3f7e3a27aeb795907f3ff"
+  },
+  "claims": [
+    {
+      "claim_id": "NUPG-CLAIM-001",
+      "status": "qualified",
+      "confidence": 99,
+      "conclusion": "The current CodeDB Nushell plugin is a Rust-native executable and the active source boundary is proven. Rust is an ecosystem implementation choice, not a Nushell protocol requirement, and the source's prescriptive 'should' is not an owner architecture decision."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-002",
+      "status": "verified",
+      "confidence": 100,
+      "conclusion": "nu_plugin_codedb at canonical origin/master 9451b20 calls serve_plugin with MsgPackSerializer. The pinned Nushell plugin framework and prior installed wire capture prove the shell/plugin protocol path uses MessagePack."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-003",
+      "status": "qualified",
+      "confidence": 98,
+      "conclusion": "The pinned plugin protocol payload is MessagePack rather than JSON text, verified by source and wire capture. Qualification is required because CodeDB compatibility, import, export, metadata, and envctl-facing paths also use JSON; the no-JSON statement is true only at the plugin wire boundary."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-004",
+      "status": "qualified",
+      "confidence": 98,
+      "conclusion": "A reproducible 200-run, 1000-row benchmark in NBVERIFY-030-032 measured MessagePack materially faster and smaller than JSON for the pinned serializer. The current CodeDB SimplePluginCommand path still eagerly materializes input/output Values and does not prove zero-copy, bounded-memory, or direct streaming, so the full claim is too broad."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-005",
+      "status": "qualified",
+      "confidence": 99,
+      "conclusion": "The FlexNetOS/nu_plugin repository contains a durable redb-backed codedb CLI/BlobStore with tests, but the nu_plugin_codedb binary itself has no redb dependency and returns Nushell Values. The repository works with redb; the plugin process does not directly persist to it."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-006",
+      "status": "qualified",
+      "confidence": 98,
+      "conclusion": "No new PostgreSQL plugin is necessary merely to add persistence because the existing CodeDB CLI already has a direct PgStore backend. That fact contradicts the source's redb-to-envctl rationale, and no owner decision has adopted the proposed indirect boundary."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-007",
+      "status": "refuted",
+      "confidence": 100,
+      "conclusion": "Canonical nu_plugin origin/master does not buffer parsed code blocks from the plugin into redb. The separate codedb capture CLI stores raw relative-path/source-byte blobs through BlobStore; parsed syntax rows remain plugin output."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-008",
+      "status": "refuted",
+      "confidence": 100,
+      "conclusion": "envctl c911286 has no automatic nu_plugin-redb-to-PostgreSQL synchronization bridge. Its default-off semantic adapter consumes exported JSONL rows that already contain embeddings and builds an in-memory RuVector index."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-009",
+      "status": "refuted",
+      "confidence": 100,
+      "conclusion": "envctl does not permanently commit synchronized CodeDB blocks into PostgreSQL. Existing PostgreSQL writes belong to CodeDB's separate direct PgStore backend, which targets a dedicated table and is selected as an alternative to redb."
+    },
+    {
+      "claim_id": "NUPG-CLAIM-010",
+      "status": "verified",
+      "confidence": 100,
+      "conclusion": "The exact 837-character NotebookLM fulltext contains markers [1], [2], [3], and [4] but no bibliography, identities, URLs, versions, or cited passages; the absent references verify none of the technical claims."
+    }
+  ]
+}

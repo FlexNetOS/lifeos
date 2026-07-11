@@ -1,0 +1,73 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-003.local-evidence.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-003.source-receipt.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-003.truth-matrix.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T104100Z-lifeos-nbverify-003-before-local-truth-integration.tar.gz",
+    "planning-spine-v0/proof_records/NBVERIFY-003.proof.json"
+  ],
+  "checksums": {
+    "NBVERIFY-003.local-evidence.json": "8d31e0413babe9269e7426cf33217d9e343a26e06721e153851c906d2cc6baff",
+    "NBVERIFY-003.source-receipt.json": "8ce74d339ad66790db8ed65adc0bb145f0198ce65c8115cc3aa3a2e4be116af7",
+    "NBVERIFY-003.truth-matrix.csv": "caf6086f42f62728964e70ca5cb234a90dd25b198b81384db20252c5c011f97e",
+    "notebooklm_source_claims.source.csv": "267e243154f42bfe427298f7fcfbb2e01d77c8631d9a822a16491182327695c4",
+    "notebooklm_claim_verification_queue.source.csv": "1cbe3c0d0baf6230e98cf6101846fee14ef32ca02c0042354fb73a507556f420",
+    "notebooklm_claim_evidence.source.csv": "23c17274b7b0960de72ad880ad54eff6f7e2a0eba97ef75fd031ec18a4b99e19",
+    "prior_task_conflict.source.csv": "7e27c2db7a82bddcc87e360004168038b7ff95d4d9c56c418f5df0bd4cf7320b",
+    "task_graph.source.csv": "d830b4672228796ebb6c67eace42a5f29e5c802f8210a3623b30a3608b999cdd",
+    "20260711T104100Z-lifeos-nbverify-003-before-local-truth-integration.tar.gz": "6ebe4d526d8b9812b17bd1e0d6a42e648d4d592e25de1b13f92105fbafc33e87"
+  },
+  "gate_result": {
+    "all_claims_truth_classified": true,
+    "all_proof_uris_present": true,
+    "claims": 10,
+    "verified": 2,
+    "qualified": 5,
+    "refuted": 3,
+    "queued": 0,
+    "source_char_count": 837,
+    "source_logical_line_count": 12,
+    "source_sha256": "daa9009d785714fb81aa2b6580a475950acc9e5a199514058dce14eb55907131",
+    "canonical_nu_plugin_master": "9451b20e42d79f72d4fa5b2a190a39bd1d9d5e5a",
+    "normalization_errors": 0,
+    "task_count": 157,
+    "task_status": "Complete",
+    "ready_count": 0,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true
+  },
+  "live_commands": [
+    {
+      "command": "notebooklm source fulltext bf0acabe-a19e-4d99-9747-43751fc6efec --notebook b09afb74-b464-4bc3-94f0-d5193f7c7d36 --json",
+      "exit_status": 0,
+      "purpose": "Retrieve exact source and citation inventory."
+    },
+    {
+      "command": "NBVERIFY-030-032 installed MessagePack wire capture and 200-run serializer benchmark",
+      "exit_status": 0,
+      "purpose": "Verify protocol and qualify optimization/direct-memory wording."
+    },
+    {
+      "command": "nu_plugin origin/master 9451b20 and envctl c911286 call-path audit",
+      "exit_status": 0,
+      "purpose": "Separate plugin, CLI BlobStore, PgStore, and nonexistent envctl bridge behavior."
+    },
+    {
+      "command": "extract/normalize/verify/diff gates",
+      "exit_status": 0,
+      "purpose": "Validate canonical integration."
+    }
+  ],
+  "observed_at": "2026-07-11T10:43:31Z",
+  "proof_summary": "Truth-tested all ten NBSOURCE-003 claims against exact fulltext, canonical peer source, installed MessagePack wire evidence, and a reproducible serializer benchmark: 2 verified, 5 qualified, 3 refuted, 0 queued.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBVERIFY-003",
+  "verification_gate": "All ten claims close exactly once; exact source provenance matches; repository/plugin/CLI boundaries are not conflated; protocol performance uses reproducible evidence; current synchronization assertions are tested against canonical local source; no concurrent nu_plugin work is mutated."
+}

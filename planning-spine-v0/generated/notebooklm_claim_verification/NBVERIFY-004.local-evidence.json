@@ -1,18 +1,14 @@
 {
   "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
   "task_id": "NBVERIFY-004",
-  "observed_at": "2026-07-11T22:01:37.985Z",
+  "observed_at": "2026-07-11T22:04:44.517Z",
   "repository": {
     "root": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification",
-    "package_json_sha256": "7dd2ed2df4020684a569959764386549d3ab8482a980d452828a78febeaa6830"
+    "package_json_sha256": "a496dafb751f037e0e1ae9bd5cc46d86d3791cea42b808373b2ecb34abe2b8cd"
   },
   "collector": {
-    "claim_ids": [
-      "SWARM-CLAIM-005",
-      "SWARM-CLAIM-006",
-      "SWARM-CLAIM-007"
-    ],
-    "mode": "read-only-installed-runtime-and-source-boundary-trace",
+    "claim_id": "SWARM-CLAIM-005",
+    "mode": "read-only-startup-boundary-trace",
     "writes_only": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
     "does_not_launch": true,
     "does_not_install": true,
@@ -879,38 +875,6 @@
       ]
     },
     {
-      "claim_id": "SWARM-CLAIM-005",
-      "verification_status": "unverified",
-      "status": "partial",
-      "conclusion": "The LifeOS root contains installed Ruvector/AgentDB capabilities, but no LifeOS/Yazelix startup orchestration source or live Ruvnet agent process proves automatic governed agent startup.",
-      "evidence": [
-        {
-          "relationship": "startup-orchestration",
-          "proven": false,
-          "search": {
-            "command": "rg -n -i ruvnet|agentdb|ruvllm|rvf src src-tauri",
-            "exit_status": 1,
-            "matches": []
-          },
-          "note": "Package declarations and verifier scripts are not automatic product startup orchestration."
-        },
-        {
-          "relationship": "agent-process-search",
-          "proven": false,
-          "command": "ps -eo pid=,ppid=,comm=,args=",
-          "exit_status": 0,
-          "matches": [],
-          "note": "A point-in-time absence does not prove the agents can never start; it leaves automatic startup unverified."
-        },
-        {
-          "relationship": "runtime-capability-boundary",
-          "proven": true,
-          "agentdb_learning_enabled": true,
-          "note": "This is native capability proof only, not startup, lifecycle, authority, or readiness proof."
-        }
-      ]
-    },
-    {
       "claim_id": "SWARM-CLAIM-006",
       "verification_status": "unverified",
       "status": "qualified",
@@ -1065,6 +1029,107 @@
             "authority-and-mutation-policy",
             "retention-and-recovery-test"
           ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-005",
+      "verification_status": "unverified",
+      "status": "partial",
+      "conclusion": "No automatic governed Ruvnet-agent startup is proven. LifeOS desktop startup and the installed Yazelix workspace are present, but no agent inventory, authority gate, ordering/readiness contract, isolation, shutdown, or restart receipt exists.",
+      "evidence": [
+        {
+          "relationship": "startup-orchestration",
+          "proven": false,
+          "source_files": [
+            {
+              "path": "src-tauri/src/main.rs",
+              "exists": true,
+              "sha256": "fd16a2aebef2178c6c9ed8436d4a7db851eb3531409e14dbe4997ab8ff7faed1"
+            },
+            {
+              "path": "src-tauri/src/lib.rs",
+              "exists": true,
+              "sha256": "3b67c810ba5da41e0ba5d5484098699dfc9f6ebf6890fd5e09507a331dd2c85f"
+            },
+            {
+              "path": "crates/lifeos-core/src/mcp/ruvector.rs",
+              "exists": true,
+              "sha256": "f472ab011626f1cc057b309ea7f337fc342141a86dac23d6233a4f1383bc9586"
+            },
+            {
+              "path": "crates/lifeos-daemon/src/main.rs",
+              "exists": true,
+              "sha256": "cd0277faef02beca316820626464a608a97d2a1ddf7bf79e4fbae2fc6fac5bec"
+            },
+            {
+              "path": "crates/lifeos-daemon/README.md",
+              "exists": true,
+              "sha256": "d3b1716181a2eed68547fae6abff1ae0991bdd69111fbca913a903f848b8cbe3"
+            },
+            {
+              "path": "planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md",
+              "exists": true,
+              "sha256": "6630a1c30464d4e6f7ba5d72a7ffc1c689516391f5c3945cd24b4c7b407b0b3a"
+            }
+          ],
+          "search_command": "rg -n -i ruvnet|agentdb|ruvllm|rvf src src-tauri",
+          "search_exit_status": 1,
+          "source_matches": [],
+          "boundary": "Tauri setup initializes the application and storage; Yazelix owns terminal workspace orchestration; neither is proof of Ruvnet-agent startup."
+        },
+        {
+          "relationship": "agent-inventory",
+          "proven": false,
+          "agent_ids": [],
+          "missing": [
+            "declared-agent-identities",
+            "executable-and-config-identities"
+          ]
+        },
+        {
+          "relationship": "authority-gate",
+          "proven": false,
+          "missing": [
+            "governance-policy",
+            "authorization-check",
+            "owner-approval-receipt"
+          ]
+        },
+        {
+          "relationship": "ordering-readiness",
+          "proven": false,
+          "missing": [
+            "dependency-order",
+            "readiness-signal",
+            "timeout-policy"
+          ]
+        },
+        {
+          "relationship": "failure-isolation",
+          "proven": false,
+          "missing": [
+            "per-agent-failure-boundary",
+            "error-routing",
+            "isolation-test"
+          ]
+        },
+        {
+          "relationship": "shutdown-restart",
+          "proven": false,
+          "missing": [
+            "graceful-stop",
+            "restart-policy",
+            "bounded-restart-test"
+          ]
+        },
+        {
+          "relationship": "agent-process-search",
+          "proven": false,
+          "command": "ps -eo pid=,ppid=,comm=,args=",
+          "exit_status": 0,
+          "matches": [],
+          "note": "No Ruvnet/RuvLLM/AgentDB process was visible at this observation point; this does not prove a global negative."
         }
       ]
     }

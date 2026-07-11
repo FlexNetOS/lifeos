@@ -1,0 +1,76 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-032-yazelix-nushell-native-plugin.md",
+    "planning-spine-v0/generated/notebooklm_source_registry.source.csv",
+    "planning-spine-v0/generated/notebooklm_source_claims.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_verification_queue.source.csv",
+    "planning-spine-v0/generated/notebooklm_claim_evidence.source.csv",
+    "planning-spine-v0/generated/prior_task_conflict.source.csv",
+    "planning-spine-v0/generated/current_state_gap.source.csv",
+    "planning-spine-v0/generated/architecture_depth.source.csv",
+    "planning-spine-v0/generated/north_star_coverage.source.csv",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/proof_records/NBSOURCE-032.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T000823Z-lifeos-notebooklm-integration-before-NBSOURCE-030-032.tar.gz"
+  ],
+  "checksums": {
+    "archive_sha256": "dcf62a44cd912721eb63a1dab5d44858fcca62a57e18ba11f756bcb6a3b613a6",
+    "claim_evidence_sha256": "e73db5dfafd9d5ae4161fe45db18b41090dccb069a85762ad53b4cb10aed126e",
+    "claim_table_sha256": "6c8f9086681edec0f20553c707aa4c846160377ce39e1cba043eecac9fa29017",
+    "notebooklm_fulltext_sha256": "d0045cf515b2f422dbe04434d88dccb7108e670031c7b289beebff399bfe36a5",
+    "source_registry_sha256": "3ab783f89e72b83fbfd6082a2074403fecd0aa7ba6fd72a4744014e9a2dc568c",
+    "structured_extract_sha256": "b6c7d99b7cc5445b21586e1787f124b5a3e0d6c7b4995df2eb029a043326ba3c",
+    "task_graph_sha256": "1cd4ba7bed9610edbc4112680dddeaa20c49a62b89e6d2daa2e245ff54d4fc72",
+    "verification_queue_sha256": "ea67a198433feb78b6380af1c67aef50c622ea4ee0ec37c5fbd83d6be93f7493"
+  },
+  "gate_result": {
+    "all_task_references_exist": true,
+    "atomic_claim_count": 13,
+    "classification_counts": {
+      "comparison-claim": 1,
+      "current-implementation-claim": 6,
+      "engine-fact": 1,
+      "performance-claim": 2,
+      "question-claim": 2,
+      "source-provenance-claim": 1
+    },
+    "fulltext_sha256_exact": true,
+    "git_diff_check_passed": true,
+    "global_ids_unique": true,
+    "later_source_processed": false,
+    "mapped_claim_count": 13,
+    "normalization_errors": 0,
+    "packet_validation_passed": true,
+    "planning_spine_verify_passed": true,
+    "question_count": 2,
+    "queued_claim_count": 13,
+    "ready_count": 0,
+    "registry_mapping_exact": true,
+    "source_id_exact": true,
+    "task_count": 153
+  },
+  "live_commands": [
+    {
+      "command": "packet validation + exact source SHA-256 + byte-count assertions for NBSOURCE-032",
+      "exit_status": 0,
+      "purpose": "Validate isolated packet/source"
+    },
+    {
+      "command": "exact global assertions && extract-task-graph.py && normalize-task-graph.py",
+      "exit_status": 0,
+      "purpose": "Assert mappings and normalize graph"
+    },
+    {
+      "command": "bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Run canonical integration gates before proof append"
+    }
+  ],
+  "observed_at": "2026-07-11T00:13:44Z",
+  "proof_summary": "Captured 647 source bytes as 13 unresolved atoms covering Nushell plugin binaries and MessagePack, structured streaming, memory/vectorization, .rvf/redb writes, JSON comparison, Yazelix initialization questions, and citations. Questions remain questions, all atoms are queued, and relation evidence closes no claim.",
+  "revision": 1,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBSOURCE-032",
+  "verification_gate": "All 13 atoms are preserved, classified, mapped, and queued; questions remain questions; registry mapping equals the claim-task union excluding workflow-control IDs; task refs resolve; IDs are unique; repetition verifies nothing; Ready is zero; normalization, planning verification, and diff checks pass."
+}

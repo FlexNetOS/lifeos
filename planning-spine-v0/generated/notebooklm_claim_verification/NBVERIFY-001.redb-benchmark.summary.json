@@ -1,0 +1,150 @@
+{
+  "observed_at": "2026-07-11T10:29:30Z",
+  "runs": 5,
+  "metrics": {
+    "redb_read_1536b": {
+      "p50_ns": {
+        "min": 260,
+        "max": 350,
+        "values": [
+          270,
+          300,
+          270,
+          260,
+          350
+        ]
+      },
+      "p95_ns": {
+        "min": 311,
+        "max": 411,
+        "values": [
+          350,
+          351,
+          350,
+          311,
+          411
+        ]
+      },
+      "p99_ns": {
+        "min": 341,
+        "max": 441,
+        "values": [
+          420,
+          371,
+          391,
+          341,
+          441
+        ]
+      }
+    },
+    "redb_write_commit_immediate_1536b": {
+      "p50_ns": {
+        "min": 20451,
+        "max": 22224,
+        "values": [
+          21362,
+          20451,
+          21543,
+          22224,
+          21833
+        ]
+      },
+      "p95_ns": {
+        "min": 29975,
+        "max": 32860,
+        "values": [
+          30397,
+          29975,
+          30196,
+          32860,
+          32820
+        ]
+      },
+      "p99_ns": {
+        "min": 36726,
+        "max": 60953,
+        "values": [
+          49576,
+          53111,
+          36726,
+          36926,
+          60953
+        ]
+      }
+    },
+    "application_cosine_dim_384": {
+      "p50_ns": {
+        "min": 260,
+        "max": 320,
+        "values": [
+          260,
+          260,
+          320,
+          260,
+          260
+        ]
+      },
+      "p95_ns": {
+        "min": 261,
+        "max": 371,
+        "values": [
+          261,
+          261,
+          371,
+          341,
+          281
+        ]
+      },
+      "p99_ns": {
+        "min": 261,
+        "max": 401,
+        "values": [
+          261,
+          261,
+          401,
+          370,
+          330
+        ]
+      }
+    },
+    "application_cosine_dim_4096": {
+      "p50_ns": {
+        "min": 2584,
+        "max": 2584,
+        "values": [
+          2584,
+          2584,
+          2584,
+          2584,
+          2584
+        ]
+      },
+      "p95_ns": {
+        "min": 2594,
+        "max": 3456,
+        "values": [
+          3405,
+          3415,
+          2594,
+          2594,
+          3456
+        ]
+      },
+      "p99_ns": {
+        "min": 2724,
+        "max": 3535,
+        "values": [
+          3506,
+          3515,
+          3396,
+          2724,
+          3535
+        ]
+      }
+    }
+  },
+  "interpretation": {
+    "supported": "Measured redb reads and Immediate commits are in the sub-microsecond/microsecond class on this hardware.",
+    "not_supported": "No LMDB or PostgreSQL comparator was measured; cosine is not redb and AVX-512 dispatch was not demonstrated."
+  }
+}

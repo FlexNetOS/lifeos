@@ -1,0 +1,42 @@
+{
+  "observed_at": "2026-07-11T10:29:30Z",
+  "authority_path": "published Node package -> napi-rs native binding -> local Rust crate implementation",
+  "executor": {
+    "bun": "1.3.14",
+    "node_compatibility": "v24.3.0",
+    "napi": "10"
+  },
+  "packages": {
+    "ruvector": "0.2.34",
+    "agentdb": "3.0.0-alpha.17",
+    "@ruvector/rvf": "0.2.3",
+    "@ruvector/rvf-node": "0.1.8",
+    "@ruvector/ruvllm": "2.6.0",
+    "@ruvector/sona": "0.1.7",
+    "@ruvector/tiny-dancer": "0.1.22 (native binding reports 2.2.3)",
+    "@ruvector/core": "0.1.31"
+  },
+  "runtime_proof": {
+    "ruvector_implementation": "native",
+    "rvf_backend": "NodeBackend",
+    "sona_learning": "Forced learning: 1 trajectories -> 1 patterns, status: completed",
+    "agentdb_learning_enabled": true,
+    "ruvllm_adapter_count": 51,
+    "tiny_dancer_model_bytes": 1268
+  },
+  "negative_findings": {
+    "agentdb_feedback": "recordFeedback called with the documented search hit ID did not increment trajectoriesRecorded because SelfLearningRvfBackend expects an internal q_* ID that search does not return.",
+    "agentdb_witness": {
+      "valid": false,
+      "entries": 0,
+      "error": "this.db.verifyWitness is not a function. (In 'this.db.verifyWitness()', 'this.db.verifyWitness' is undefined)"
+    },
+    "rvf_combined_payload": "The live AgentDB RVF contained manifest/vector/witness segments; it did not prove persisted Micro-LoRA plus FastGRNN segments in the same file."
+  },
+  "checksums": {
+    "NBVERIFY-001.node-authority-proof.mjs": "56eb843f72c0db29496a56b90691851ba946940ff8abc4d6e50b0760bb589499",
+    "NBVERIFY-001.node-authority-proof.raw.json": "9307cda583e58b865093d87f30c63f68b631fe9e39e8a834427494c0f809deb4",
+    "NBVERIFY-001.node-authority-package.json": "07633a732220631d0d9ddfc77b40b34947260f9b2aa97baf210a9956e4458d34",
+    "NBVERIFY-001.node-authority.bun.lock": "d77c94b548b46ab646767a6ae00b078b1d3bf6891e3b8884f3cdf614d8015330"
+  }
+}

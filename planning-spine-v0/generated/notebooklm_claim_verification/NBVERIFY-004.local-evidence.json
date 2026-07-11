@@ -1,0 +1,116 @@
+{
+  "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
+  "task_id": "NBVERIFY-004",
+  "observed_at": "2026-07-11T21:35:09.279Z",
+  "repository": {
+    "root": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification",
+    "package_json_sha256": "d8f1222b7566b755739945997f686c207d532cb79fa902f76365a5d7d0354065"
+  },
+  "claims": [
+    {
+      "claim_id": "SWARM-CLAIM-001",
+      "verification_status": "unverified",
+      "status": "partial",
+      "conclusion": "The profile-owned Yazelix frontdoor, launcher target, and a live Yazelix process snapshot are present, but no portable artifact identity or LifeOS/Tauri UI readiness acceptance receipt binds them into the claimed portable launch flow.",
+      "evidence": [
+        {
+          "relationship": "portable-artifact-identity",
+          "proven": false,
+          "candidates": [],
+          "note": "No portable artifact is identified; an installed Nix profile is not portable-artifact proof."
+        },
+        {
+          "relationship": "profile-frontdoor",
+          "proven": true,
+          "frontdoor": "/home/flexnetos/.nix-profile/bin/yzx",
+          "frontdoor_realpath": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/bin/yzx",
+          "frontdoor_sha256": "b5686dc4baf5170667ed2924050149098a98d06f49100e314df917794734b8af",
+          "layout": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_realpath": "/nix/store/h1p85lbg4ghz1r5jlrrdxrgci2bdhj6d-yazelix-package-source/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_sha256": "88490095aac3c94092123061e13900913a697891325a6cb1637a6933c2373771",
+          "doctor_exit_status": 0,
+          "doctor_output": "🔍 Running Yazelix Health Checks...\n\nℹ️  Runtime/distribution capability: store/package runtime\n✅ Generated runtime state is current\n✅ Yazelix launch script is present\n✅ Yazelix generated Zellij layout is present\n✅ The selected Yazelix terminal command is available\n✅ Graphics previews: Yazelix Kitty passthrough bridge is active\nℹ️  Chafa probe safety: no Chafa probe is active\nℹ️  Optional host runtime tool unavailable: mise\nℹ️  Optional host runtime tool unavailable: tombi\n✅ Shell initializers do not reference deleted transient runtime paths\n✅ No conflicting Helix runtime directories found\n✅ Helix runtime healthy with 291 grammars\n✅ Managed Helix reveal integration is healthy\n✅ Managed Helix Steel command surface is healthy\n✅ Using custom settings.jsonc configuration\nℹ️  Native config integration status\n✅ Workspace runtime assets are present\n✅ Generated workspace assets match the active runtime\nℹ️  Install owner: default Nix profile\n✅ Yazelix desktop entry uses the expected launcher path\n✅ Yazelix pane-orchestrator permissions granted\n✅ Managed sidebar pane detected: terminal:0\nℹ️  Managed editor pane not detected in the current tab\n\n🎉 All checks passed! Yazelix is healthy.\n",
+          "profile_exit_status": 0,
+          "profile_output": "Name:               \u001b[1mfira-code\u001b[0m\nFlake attribute:    legacyPackages.x86_64-linux.nerd-fonts.fira-code\nOriginal flake URL: flake:nixpkgs\nLocked flake URL:   https://api.flakehub.com/f/pinned/DeterminateSystems/nixpkgs-weekly/0.1.1017464%2Brev-567a49d1913ce81ac6e9582e3553dd90a955875f/019f1749-32d6-7283-9e9a-861bd8478e6a/source.tar.gz?narHash=sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H%2BCNW1Ck8B%2B8%3D\nStore paths:        /nix/store/yhnilvwv835jnvd0cwakj8x75niqbz0w-nerd-fonts-fira-code-3.4.0+6.2\n\nName:               \u001b[1mlifeos_foundation_yzx\u001b[0m\nFlake attribute:    packages.x86_64-linux.lifeos_foundation_yzx\nOriginal flake URL: github:FlexNetOS/yazelix\nLocked flake URL:   github:FlexNetOS/yazelix/84363904ed67768bd91e5bcf0cebdc56b0788921\nStore paths:        /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx\n\nName:               \u001b[1mrclone\u001b[0m\nFlake attribute:    legacyPackages.x86_64-linux.rclone\nOriginal flake URL: flake:nixpkgs\nLocked flake URL:   https://api.flakehub.com/f/pinned/DeterminateSystems/nixpkgs-weekly/0.1.1017464%2Brev-567a49d1913ce81ac6e9582e3553dd90a955875f/019f1749-32d6-7283-9e9a-861bd8478e6a/source.tar.gz?narHash=sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H%2BCNW1Ck8B%2B8%3D\nStore paths:        /nix/store/cr19g4j3ccpgb61aqy6knb7l2xsfq4v6-rclone-1.74.3-man /nix/store/lhr13fn0qnjcgiy1kyvplxygchmmnj43-rclone-1.74.3\n\nName:               \u001b[1msymbols-only\u001b[0m\nFlake attribute:    legacyPackages.x86_64-linux.nerd-fonts.symbols-only\nOriginal flake URL: flake:nixpkgs\nLocked flake URL:   https://api.flakehub.com/f/pinned/DeterminateSystems/nixpkgs-weekly/0.1.1017464%2Brev-567a49d1913ce81ac6e9582e3553dd90a955875f/019f1749-32d6-7283-9e9a-861bd8478e6a/source.tar.gz?narHash=sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H%2BCNW1Ck8B%2B8%3D\nStore paths:        /nix/store/hwyn9a96xi19s7gw3srvxhhazp417x44-nerd-fonts-symbols-only-3.4.0\n\nName:               \u001b[1myazelix\u001b[0m\nFlake attribute:    packages.x86_64-linux.yazelix\nOriginal flake URL: github:FlexNetOS/yazelix\nLocked flake URL:   github:FlexNetOS/yazelix/73519be5381825052b3717d3d21c557c0069d266\nStore paths:        /nix/store/xv4nyps1h5bi00jqzcaw5dg8g7l8yw2p-yazelix\n"
+        },
+        {
+          "relationship": "launcher-target",
+          "proven": true,
+          "desktop_path": "/home/flexnetos/.local/share/applications/com.flexnetos.Yazelix.Agent.desktop",
+          "exec": "/usr/bin/env YAZELIX_LAYOUT_OVERRIDE=\"/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl\" \"/home/flexnetos/.nix-profile/bin/yzx\" desktop launch"
+        },
+        {
+          "relationship": "process-tree",
+          "proven": true,
+          "relevant_processes": [
+            "3562937    4021 desktop_deferre /bin/sh /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/desktop_deferred_launch_probe.sh --detached /home/flexnetos/.local/share/yazelix/logs/terminal_launch/kitty_1783803527583.log 3562933 -- /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nixGLMesa /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/kitty --title Yazelix - Kitty --directory /home/flexnetos /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/start_yazelix.sh",
+            "3562948 3562937 .kitty-wrapped  /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/kitty --title Yazelix - Kitty --directory /home/flexnetos /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/start_yazelix.sh",
+            "3563025 3562948 kitten          /nix/store/716pli9h8hd9x7p6wb7zp27kqv676g4s-kitty-0.47.4/bin/kitten __atexit__",
+            "3563032 3562948 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control enter",
+            "3563183 3563032 zellij          zellij --config-dir /home/flexnetos/.local/share/yazelix/configs/zellij options --default-cwd /home/flexnetos --default-layout /home/flexnetos/.local/share/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl --default-shell /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/yazelix_nu.sh",
+            "3563187    4021 zellij          /nix/store/3i0aizr76i6pih3z4mnwd7j0675ibvw9-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/implacable-diplodocus",
+            "3563222 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3563231 3563222 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3563281 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx env",
+            "3563283 3563281 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control env",
+            "3563290 3563283 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3563307 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx agent",
+            "3563316 3563307 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control agent",
+            "3563317 3563316 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3563318 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx env",
+            "3563320 3563317 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3563321 3563318 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control env",
+            "3563324 3563321 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3563395 3563187 ccboard         /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/ccboard",
+            "3597291 3563324 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3597293 3597291 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3609582 3563290 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3609584 3609582 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3610072 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3610778 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3611430 3610778 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk claude",
+            "3611432 3611430 .claude-wrapped /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/claude",
+            "3611458 3611432 MainThread      /nix/store/rd29hc9xjbsv9p2i86q90k038j5glxvf-lifeos-foundation-yzx/toolbin/node /home/flexnetos/meta/var/lib/gitnexus-cli/node_modules/gitnexus/dist/cli/index.js mcp",
+            "3646847    4021 .wl-copy-wrappe /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/wl-copy --primary",
+            "3646899    4021 .wl-copy-wrappe /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/wl-copy",
+            "3656423 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3656430 3656423 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3657378 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3657385 3657378 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3662018 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3662916 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3728397 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728398 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728763 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728764 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728765 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728766 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728767 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728768 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728769 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728770 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728771 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728772 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728777 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728778 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728779 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728780 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728781 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728782 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728784 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728787 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728790 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728792 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3728810 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3728811 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false"
+          ]
+        },
+        {
+          "relationship": "ui-readiness",
+          "proven": false,
+          "reason": "No LifeOS/Tauri readiness signal or portable-launch acceptance receipt was observed."
+        }
+      ]
+    }
+  ]
+}

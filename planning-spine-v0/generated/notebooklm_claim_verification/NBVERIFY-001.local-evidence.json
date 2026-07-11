@@ -1,0 +1,612 @@
+{
+  "schema_version": "lifeos.notebooklm.local-evidence.v1",
+  "task_id": "NBVERIFY-001",
+  "capture_id": "NBSOURCE-001",
+  "observed_at": "2026-07-11T10:29:30Z",
+  "artifact": {
+    "notebook_id": "b09afb74-b464-4bc3-94f0-d5193f7c7d36",
+    "object_id": "3f01ed32-7fb8-47e3-bc25-241c06596b4e",
+    "object_type": "report-artifact",
+    "title": "Technical Report: The Architectural Role of Redb in High-Frequency Agentic Systems",
+    "sha256": "7705f5e51693a5f674014aaf9957f8719c1c58faf14dcbfe0a5935684b020f2e",
+    "line_count": 87,
+    "byte_count": 8866
+  },
+  "authority": {
+    "observed_at": "2026-07-11T10:29:30Z",
+    "authority_path": "published Node package -> napi-rs native binding -> local Rust crate implementation",
+    "executor": {
+      "bun": "1.3.14",
+      "node_compatibility": "v24.3.0",
+      "napi": "10"
+    },
+    "packages": {
+      "ruvector": "0.2.34",
+      "agentdb": "3.0.0-alpha.17",
+      "@ruvector/rvf": "0.2.3",
+      "@ruvector/rvf-node": "0.1.8",
+      "@ruvector/ruvllm": "2.6.0",
+      "@ruvector/sona": "0.1.7",
+      "@ruvector/tiny-dancer": "0.1.22 (native binding reports 2.2.3)",
+      "@ruvector/core": "0.1.31"
+    },
+    "runtime_proof": {
+      "ruvector_implementation": "native",
+      "rvf_backend": "NodeBackend",
+      "sona_learning": "Forced learning: 1 trajectories -> 1 patterns, status: completed",
+      "agentdb_learning_enabled": true,
+      "ruvllm_adapter_count": 51,
+      "tiny_dancer_model_bytes": 1268
+    },
+    "negative_findings": {
+      "agentdb_feedback": "recordFeedback called with the documented search hit ID did not increment trajectoriesRecorded because SelfLearningRvfBackend expects an internal q_* ID that search does not return.",
+      "agentdb_witness": {
+        "valid": false,
+        "entries": 0,
+        "error": "this.db.verifyWitness is not a function. (In 'this.db.verifyWitness()', 'this.db.verifyWitness' is undefined)"
+      },
+      "rvf_combined_payload": "The live AgentDB RVF contained manifest/vector/witness segments; it did not prove persisted Micro-LoRA plus FastGRNN segments in the same file."
+    },
+    "checksums": {
+      "NBVERIFY-001.node-authority-proof.mjs": "56eb843f72c0db29496a56b90691851ba946940ff8abc4d6e50b0760bb589499",
+      "NBVERIFY-001.node-authority-proof.raw.json": "9307cda583e58b865093d87f30c63f68b631fe9e39e8a834427494c0f809deb4",
+      "NBVERIFY-001.node-authority-package.json": "07633a732220631d0d9ddfc77b40b34947260f9b2aa97baf210a9956e4458d34",
+      "NBVERIFY-001.node-authority.bun.lock": "d77c94b548b46ab646767a6ae00b078b1d3bf6891e3b8884f3cdf614d8015330"
+    }
+  },
+  "revisions": {
+    "lifeos_base": "637ff56d7ac74ff16008b4987802c3f546ce9e2c",
+    "envctl": "c911286d948437384ae3f7e3a27aeb795907f3ff",
+    "nu_plugin_canonical_master": "9451b20e42d79f72d4fa5b2a190a39bd1d9d5e5a",
+    "meta_ruvector_reference_checkout": "b2e06780868c68aa53fe0169eeb577f2086b390c",
+    "redb": "4.1.0"
+  },
+  "test_receipts": {
+    "redb": {
+      "passed": 196,
+      "failed": 0
+    },
+    "rvf_adapter_agentdb": {
+      "passed": 17,
+      "failed": 0
+    },
+    "rvf_adapter_sona": {
+      "passed": 30,
+      "failed": 0
+    },
+    "ruvector_sona": {
+      "passed": 94,
+      "failed": 0
+    },
+    "bun_node_probe": "pass"
+  },
+  "benchmark": {
+    "observed_at": "2026-07-11T10:29:30Z",
+    "runs": 5,
+    "metrics": {
+      "redb_read_1536b": {
+        "p50_ns": {
+          "min": 260,
+          "max": 350,
+          "values": [
+            270,
+            300,
+            270,
+            260,
+            350
+          ]
+        },
+        "p95_ns": {
+          "min": 311,
+          "max": 411,
+          "values": [
+            350,
+            351,
+            350,
+            311,
+            411
+          ]
+        },
+        "p99_ns": {
+          "min": 341,
+          "max": 441,
+          "values": [
+            420,
+            371,
+            391,
+            341,
+            441
+          ]
+        }
+      },
+      "redb_write_commit_immediate_1536b": {
+        "p50_ns": {
+          "min": 20451,
+          "max": 22224,
+          "values": [
+            21362,
+            20451,
+            21543,
+            22224,
+            21833
+          ]
+        },
+        "p95_ns": {
+          "min": 29975,
+          "max": 32860,
+          "values": [
+            30397,
+            29975,
+            30196,
+            32860,
+            32820
+          ]
+        },
+        "p99_ns": {
+          "min": 36726,
+          "max": 60953,
+          "values": [
+            49576,
+            53111,
+            36726,
+            36926,
+            60953
+          ]
+        }
+      },
+      "application_cosine_dim_384": {
+        "p50_ns": {
+          "min": 260,
+          "max": 320,
+          "values": [
+            260,
+            260,
+            320,
+            260,
+            260
+          ]
+        },
+        "p95_ns": {
+          "min": 261,
+          "max": 371,
+          "values": [
+            261,
+            261,
+            371,
+            341,
+            281
+          ]
+        },
+        "p99_ns": {
+          "min": 261,
+          "max": 401,
+          "values": [
+            261,
+            261,
+            401,
+            370,
+            330
+          ]
+        }
+      },
+      "application_cosine_dim_4096": {
+        "p50_ns": {
+          "min": 2584,
+          "max": 2584,
+          "values": [
+            2584,
+            2584,
+            2584,
+            2584,
+            2584
+          ]
+        },
+        "p95_ns": {
+          "min": 2594,
+          "max": 3456,
+          "values": [
+            3405,
+            3415,
+            2594,
+            2594,
+            3456
+          ]
+        },
+        "p99_ns": {
+          "min": 2724,
+          "max": 3535,
+          "values": [
+            3506,
+            3515,
+            3396,
+            2724,
+            3535
+          ]
+        }
+      }
+    },
+    "interpretation": {
+      "supported": "Measured redb reads and Immediate commits are in the sub-microsecond/microsecond class on this hardware.",
+      "not_supported": "No LMDB or PostgreSQL comparator was measured; cosine is not redb and AVX-512 dispatch was not demonstrated."
+    }
+  },
+  "claims": [
+    {
+      "claim_id": "REDB-CLAIM-001",
+      "classification": "engine-fact",
+      "status": "verified",
+      "confidence": 99,
+      "node_authority_applied": false,
+      "conclusion": "redb 4.1.0 README and 196 passing upstream library/integration tests prove a pure-Rust embedded key-value library with no database daemon or sidecar. This verdict is about redb itself, not the larger dynamically linked LifeOS closure.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-002",
+      "classification": "engine-fact",
+      "status": "refuted",
+      "confidence": 100,
+      "node_authority_applied": false,
+      "conclusion": "Current pinned redb 4.1.0 removed its mmap backend. Its optimized file backend uses positioned file reads/writes, and Database exposes a configurable userspace cache (default 1 GiB). The report's current mmap and operating-system-cache-bypass statement is false.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-003",
+      "classification": "engine-fact",
+      "status": "qualified",
+      "confidence": 98,
+      "node_authority_applied": false,
+      "conclusion": "redb documents a zero-copy, BTreeMap-based API and can return borrowed views, but its Value trait explicitly serializes with as_bytes and deserializes with from_bytes. Storage uses copy-on-write B-trees, not std::collections::BTreeMap, so 'native Rust types without serialization' is too broad.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-004",
+      "classification": "engine-fact",
+      "status": "verified",
+      "confidence": 99,
+      "node_authority_applied": false,
+      "conclusion": "redb 4.1.0 documents full ACID transactions and serializable isolation; the complete local redb test suite passed 196 tests including immediate persistence, read isolation, transaction behavior, recovery-sensitive paths, and multithreading.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-005",
+      "classification": "engine-fact",
+      "status": "verified",
+      "confidence": 98,
+      "node_authority_applied": false,
+      "conclusion": "redb 4.1.0 documents MVCC with one writer and multiple concurrent snapshot readers; design documentation and passing concurrency tests prove readers do not block the active writer. Writer-to-writer concurrency remains serialized.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-006",
+      "classification": "engine-fact",
+      "status": "verified",
+      "confidence": 100,
+      "node_authority_applied": false,
+      "conclusion": "The pinned artifact is a Rust library crate linked into applications. It is not a compiler and exposes embedded database APIs.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-007",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 99,
+      "node_authority_applied": false,
+      "conclusion": "redb's Rust implementation is compatible with a musl/static target in principle, but portability is a whole-closure property. The active CodeDB/Yazelix binaries are dynamically linked glibc ELF files with Nix-store interpreter/RUNPATH entries, and the effective Rust toolchain lacked the musl std target, so the claimed portable closure is not currently proven.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-008",
+      "classification": "application-claim",
+      "status": "refuted",
+      "confidence": 100,
+      "node_authority_applied": true,
+      "conclusion": "redb 4.1.0 is a transactional key-value B-tree engine. It exposes no vector coordinate, geometry, nearest-neighbor, HNSW, or distance-computation API. The current Bun-loaded ruvector Node package owns vector geometry.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-receipt.json"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-009",
+      "classification": "application-claim",
+      "status": "refuted",
+      "confidence": 99,
+      "node_authority_applied": true,
+      "conclusion": "redb implements no cosine-similarity operation. Cosine is supplied by application or RuVector code; the Bun-loaded ruvector 0.2.34 package exports cosineSimilarity and native vector database APIs.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-receipt.json"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-010",
+      "classification": "performance-claim",
+      "status": "refuted",
+      "confidence": 100,
+      "node_authority_applied": false,
+      "conclusion": "The exact zero-copy-f32-plus-AVX-512 redb path does not exist in redb 4.1.0. A reproducible benchmark measured redb byte reads and commits plus a separate scalar application cosine loop at 384 and 4096 dimensions; microsecond results do not convert that application loop into redb functionality or prove AVX-512 use.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-011",
+      "classification": "component-boundary",
+      "status": "verified",
+      "confidence": 98,
+      "node_authority_applied": false,
+      "conclusion": "The component boundary is correct: embedding models create semantic vectors while redb passively stores and retrieves caller-supplied encoded values. Distance computation and semantic meaning remain external.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-012",
+      "classification": "engine-fact",
+      "status": "verified",
+      "confidence": 99,
+      "node_authority_applied": false,
+      "conclusion": "redb is an in-process single-node embedded store and exposes no network server, replication protocol, or distributed-consensus API. Distribution therefore belongs to application protocols.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-013",
+      "classification": "engine-fact",
+      "status": "qualified",
+      "confidence": 98,
+      "node_authority_applied": false,
+      "conclusion": "redb is key-value and has no SQL or automatic relational secondary-index facility. Qualification is required because it supports named tables, range scans, and multimap tables from which an application can explicitly build indexes.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-014",
+      "classification": "performance-claim",
+      "status": "qualified",
+      "confidence": 92,
+      "node_authority_applied": false,
+      "conclusion": "The local benchmark proves low redb latency on this workstation (1536-byte read p50 about 0.27 microseconds; Immediate commit p50 about 20-24 microseconds), but no claim-scoped LMDB comparator, edge-node hardware run, determinism definition, or crash/sync matrix exists. Competitive-with-LMDB remains unproved.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-015",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 96,
+      "node_authority_applied": false,
+      "conclusion": "redb can technically implement an embedded high-frequency scratchpad, and measured local operations are fast enough for that use class. No accepted LifeOS data-class, retention, privacy, promotion, or recovery decision makes this its current exclusive role.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-016",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 97,
+      "node_authority_applied": false,
+      "conclusion": "redb can store an embedding under a BLAKE3-derived key, so the mechanism is feasible. No current model-aware cache schema or implementation proves that content, model, version, configuration, invalidation, and collision handling are all covered.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-017",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 96,
+      "node_authority_applied": false,
+      "conclusion": "redb can back a durable application outbox or replay queue, but it is not PostgreSQL WAL and no current ordered/idempotent redb-to-PostgreSQL outage protocol is implemented. WAL, outbox, queue, buffer, and authority semantics must not be conflated.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-018",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 97,
+      "node_authority_applied": false,
+      "conclusion": "Current CodeDB Rust code can transform supported source files into structured syntax rows and Nushell can host those rows. It is not a universal Nushell-owned AST transformer: language coverage varies and Cargo dependency rows come from cargo metadata rather than the Rust AST.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-019",
+      "classification": "current-implementation-claim",
+      "status": "refuted",
+      "confidence": 99,
+      "node_authority_applied": false,
+      "conclusion": "At canonical nu_plugin origin/master 9451b20, the Rust plugin uses the Nushell MessagePack protocol but returns typed table values and has no direct redb dependency. Durable redb capture is a separate codedb CLI/BlobStore path, so no direct plugin-MessagePack-to-redb stream exists.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-020",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 97,
+      "node_authority_applied": false,
+      "conclusion": "An intermediate redb ingestion buffer is a technically possible target, but it is not the universal current role. Current CodeDB uses redb as a durable default source-blob store and envctl uses redb separately for migration/state; authority must be decided per data class.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-021",
+      "classification": "current-implementation-claim",
+      "status": "refuted",
+      "confidence": 100,
+      "node_authority_applied": false,
+      "conclusion": "envctl commit c911286 reads exported JSONL rows that already contain embedding_minilm vectors into an in-memory RuVector index. It neither pulls CodeDB redb blocks, generates MiniLM embeddings, nor commits code and vectors to PostgreSQL.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-022",
+      "classification": "performance-claim",
+      "status": "qualified",
+      "confidence": 94,
+      "node_authority_applied": true,
+      "conclusion": "Reproducible local evidence supports the redb microsecond tier for the measured byte-read and Immediate-commit operations. No equivalent PostgreSQL-plus-RuVector relational/GNN benchmark was run, and Bun-loaded ruvector itself exposes native sub-millisecond vector operations, so the report's global microsecond-versus-millisecond boundary is not established.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-receipt.json"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-023",
+      "classification": "engine-fact",
+      "status": "qualified",
+      "confidence": 98,
+      "node_authority_applied": true,
+      "conclusion": "RuVector includes a native pgrx PostgreSQL extension that installs with CREATE EXTENSION and needs no vector-database sidecar. RuVector is broader than that extension: the current developer-facing ruvector 0.2.34 Node package loaded a standalone native N-API vector database through Bun, and no installed LifeOS PostgreSQL extension activation was proven.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-receipt.json"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-024",
+      "classification": "architecture-proposal",
+      "status": "refuted",
+      "confidence": 99,
+      "node_authority_applied": false,
+      "conclusion": "Current envctl does not select PostgreSQL branch state or reconstruct files from module_path. Its optional semantic adapter treats module_path as vector identity/metadata; current materialization is a separate CodeDB operation.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-025",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 97,
+      "node_authority_applied": false,
+      "conclusion": "Nix/Yazelix can compile a source directory and CodeDB can separately materialize stored files, but no current end-to-end selected-PostgreSQL-state to materialized directory to isolated Yazelix/Nix build trace exists.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-026",
+      "classification": "comparison-claim",
+      "status": "verified",
+      "confidence": 100,
+      "node_authority_applied": false,
+      "conclusion": "redb is passive transactional storage and has no ranking or learning semantics. Any ranking change is owned by application, model, RuVector, SONA, or AgentDB code.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-027",
+      "classification": "comparison-claim",
+      "status": "qualified",
+      "confidence": 97,
+      "node_authority_applied": true,
+      "conclusion": "The latest developer-facing AgentDB package proves the core integration: agentdb 3.0.0-alpha.17 exposes SelfLearningRvfBackend over .rvf, wraps @ruvector/sona, enhances searches, records trajectories, accepts quality feedback, trains patterns, and a Bun live probe created an AgentDB .rvf plus native SONA learning. Qualification is required because search does not expose the internal q_* trajectory ID expected by recordFeedback; the documented hit-ID call recorded zero trajectories in the live probe, so the complete feedback-to-ranking contract is currently defective.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-receipt.json"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-028",
+      "classification": "comparison-claim",
+      "status": "qualified",
+      "confidence": 96,
+      "node_authority_applied": true,
+      "conclusion": "The latest Bun-loaded packages prove every narrower component: RVF defines model/overlay/LoRA segments, native SONA exposes Micro-LoRA, ruvllm held and switched 51 in-memory LoRA adapters, and Tiny Dancer trained and scored a FastGRNN router. They do not prove that one current AgentDB .rvf file persisted both the Micro-LoRA adapters and FastGRNN model, nor that 50+ complete ruvllm personalities hot-swap within one measured hardware footprint.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-receipt.json"
+      ]
+    },
+    {
+      "claim_id": "REDB-CLAIM-029",
+      "classification": "architecture-proposal",
+      "status": "qualified",
+      "confidence": 99,
+      "node_authority_applied": false,
+      "conclusion": "The defensible boundary is verified: redb can be one portable embedded storage component but is not a geometry engine, vector database, learning system, SQL authority, or complete intelligence architecture. Its elevation to the strategic LifeOS foundation remains an unrecorded owner architecture decision.",
+      "primary_pointers": [
+        "redb-4.1.0 README.md, CHANGELOG.md, docs/design.md, src/db.rs, src/types.rs and 196-test run",
+        "generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json",
+        "current pinned LifeOS peer source call paths"
+      ]
+    }
+  ]
+}

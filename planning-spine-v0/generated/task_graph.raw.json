@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-11T01:23:02Z",
+  "generated_at": "2026-07-11T10:29:43Z",
   "source": {
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 154,
+    "row_count": 155,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -3413,6 +3413,28 @@
         "status": "Complete",
         "proof_uri": "proof_records/NBVERIFY-030-032.proof.json",
         "next_action": "Use the truth matrix when decomposing architecture: retain verified capability, narrow qualified claims, reject refuted current-state wording, and obtain explicit owner decisions before implementation."
+      }
+    },
+    {
+      "source_row_number": 156,
+      "columns": {
+        "task_id": "NBVERIFY-001",
+        "parent_id": "NBVERIFY-000; NBSOURCE-001",
+        "phase": "0-north-star-graph",
+        "title": "NotebookLM source 001 truth-tested through Bun and local primary evidence",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Truth-test every NBSOURCE-001 atom against redb primary source/tests, current peer call paths, reproducible benchmarks, and the developer-facing published Node packages executed through Bun and traced to N-API.",
+        "inputs": "NBSOURCE-001; NBVERIFY-000; redb 4.1.0 source/tests; envctl c911286; nu_plugin origin/master 9451b20; ruvector 0.2.34; agentdb 3.0.0-alpha.17; @ruvector/rvf 0.2.3; @ruvector/ruvllm 2.6.0; Bun 1.3.14",
+        "target_artifacts": "generated/notebooklm_claim_verification/NBVERIFY-001.local-evidence.json; generated/notebooklm_claim_verification/NBVERIFY-001.truth-matrix.csv; generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-receipt.json; generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-proof.mjs; generated/notebooklm_claim_verification/NBVERIFY-001.node-authority-proof.raw.json; generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.raw.json; generated/notebooklm_claim_verification/NBVERIFY-001.redb-benchmark.summary.json; proof_records/NBVERIFY-001.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "product implementation; peer mutation; generated Yazelix runtime edits; secrets/**; treating Cargo/crates.io as latest RuVector developer API authority",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All 29 claims close exactly once as verified, qualified, or refuted with proof URI; zero remain queued; RuVector-family claims use published Node packages executed by Bun and native N-API runtime proof; performance claims preserve reproducible workloads and raw results; owner proposals are not misrepresented as adopted; normalization, planning verification, and diff checks pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T102430Z-lifeos-nbverify-001-before-node-truth-integration.tar.gz (SHA-256 a6957aa2baff507cfa148d597d0b3511627ca257a2950aa5c82758f66cfddec2) and remove only NBVERIFY-001 rows/artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBVERIFY-001.proof.json",
+        "next_action": "Use the truth matrix for architecture decomposition, fix the observed AgentDB feedback/witness API defects in its owning repository, and advance to NBSOURCE-002 verification."
       }
     }
   ]

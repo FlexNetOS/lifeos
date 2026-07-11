@@ -1,0 +1,179 @@
+{
+  "observed_at": "2026-07-11T10:29:30Z",
+  "workload": {
+    "redb_version": "4.1.0",
+    "read_iterations": 5000,
+    "write_iterations": 250,
+    "payload_bytes": 1536,
+    "write_durability": "Immediate",
+    "application_cosine_iterations": 10000,
+    "application_cosine_dimensions": [
+      384,
+      4096
+    ],
+    "separation_warning": "Cosine is a scalar application loop, not redb code."
+  },
+  "hardware": {
+    "cpu_model": "AMD Ryzen Threadripper PRO 7965WX 24-Cores",
+    "machine": "x86_64",
+    "avx2": true,
+    "avx512f": true
+  },
+  "runs": [
+    {
+      "run": 1,
+      "stdout": "redb_read_1536b,count=5000,p50_ns=270,p95_ns=350,p99_ns=420\nredb_write_commit_immediate_1536b,count=250,p50_ns=21362,p95_ns=30397,p99_ns=49576\napplication_cosine_dim_384,count=10000,p50_ns=260,p95_ns=261,p99_ns=261\napplication_cosine_dim_4096,count=10000,p50_ns=2584,p95_ns=3405,p99_ns=3506\ndb_bytes=827392\n",
+      "metrics": {
+        "redb_read_1536b": {
+          "count": 5000,
+          "p50_ns": 270,
+          "p95_ns": 350,
+          "p99_ns": 420
+        },
+        "redb_write_commit_immediate_1536b": {
+          "count": 250,
+          "p50_ns": 21362,
+          "p95_ns": 30397,
+          "p99_ns": 49576
+        },
+        "application_cosine_dim_384": {
+          "count": 10000,
+          "p50_ns": 260,
+          "p95_ns": 261,
+          "p99_ns": 261
+        },
+        "application_cosine_dim_4096": {
+          "count": 10000,
+          "p50_ns": 2584,
+          "p95_ns": 3405,
+          "p99_ns": 3506
+        }
+      },
+      "db_bytes": 827392
+    },
+    {
+      "run": 2,
+      "stdout": "redb_read_1536b,count=5000,p50_ns=300,p95_ns=351,p99_ns=371\nredb_write_commit_immediate_1536b,count=250,p50_ns=20451,p95_ns=29975,p99_ns=53111\napplication_cosine_dim_384,count=10000,p50_ns=260,p95_ns=261,p99_ns=261\napplication_cosine_dim_4096,count=10000,p50_ns=2584,p95_ns=3415,p99_ns=3515\ndb_bytes=827392\n",
+      "metrics": {
+        "redb_read_1536b": {
+          "count": 5000,
+          "p50_ns": 300,
+          "p95_ns": 351,
+          "p99_ns": 371
+        },
+        "redb_write_commit_immediate_1536b": {
+          "count": 250,
+          "p50_ns": 20451,
+          "p95_ns": 29975,
+          "p99_ns": 53111
+        },
+        "application_cosine_dim_384": {
+          "count": 10000,
+          "p50_ns": 260,
+          "p95_ns": 261,
+          "p99_ns": 261
+        },
+        "application_cosine_dim_4096": {
+          "count": 10000,
+          "p50_ns": 2584,
+          "p95_ns": 3415,
+          "p99_ns": 3515
+        }
+      },
+      "db_bytes": 827392
+    },
+    {
+      "run": 3,
+      "stdout": "redb_read_1536b,count=5000,p50_ns=270,p95_ns=350,p99_ns=391\nredb_write_commit_immediate_1536b,count=250,p50_ns=21543,p95_ns=30196,p99_ns=36726\napplication_cosine_dim_384,count=10000,p50_ns=320,p95_ns=371,p99_ns=401\napplication_cosine_dim_4096,count=10000,p50_ns=2584,p95_ns=2594,p99_ns=3396\ndb_bytes=827392\n",
+      "metrics": {
+        "redb_read_1536b": {
+          "count": 5000,
+          "p50_ns": 270,
+          "p95_ns": 350,
+          "p99_ns": 391
+        },
+        "redb_write_commit_immediate_1536b": {
+          "count": 250,
+          "p50_ns": 21543,
+          "p95_ns": 30196,
+          "p99_ns": 36726
+        },
+        "application_cosine_dim_384": {
+          "count": 10000,
+          "p50_ns": 320,
+          "p95_ns": 371,
+          "p99_ns": 401
+        },
+        "application_cosine_dim_4096": {
+          "count": 10000,
+          "p50_ns": 2584,
+          "p95_ns": 2594,
+          "p99_ns": 3396
+        }
+      },
+      "db_bytes": 827392
+    },
+    {
+      "run": 4,
+      "stdout": "redb_read_1536b,count=5000,p50_ns=260,p95_ns=311,p99_ns=341\nredb_write_commit_immediate_1536b,count=250,p50_ns=22224,p95_ns=32860,p99_ns=36926\napplication_cosine_dim_384,count=10000,p50_ns=260,p95_ns=341,p99_ns=370\napplication_cosine_dim_4096,count=10000,p50_ns=2584,p95_ns=2594,p99_ns=2724\ndb_bytes=827392\n",
+      "metrics": {
+        "redb_read_1536b": {
+          "count": 5000,
+          "p50_ns": 260,
+          "p95_ns": 311,
+          "p99_ns": 341
+        },
+        "redb_write_commit_immediate_1536b": {
+          "count": 250,
+          "p50_ns": 22224,
+          "p95_ns": 32860,
+          "p99_ns": 36926
+        },
+        "application_cosine_dim_384": {
+          "count": 10000,
+          "p50_ns": 260,
+          "p95_ns": 341,
+          "p99_ns": 370
+        },
+        "application_cosine_dim_4096": {
+          "count": 10000,
+          "p50_ns": 2584,
+          "p95_ns": 2594,
+          "p99_ns": 2724
+        }
+      },
+      "db_bytes": 827392
+    },
+    {
+      "run": 5,
+      "stdout": "redb_read_1536b,count=5000,p50_ns=350,p95_ns=411,p99_ns=441\nredb_write_commit_immediate_1536b,count=250,p50_ns=21833,p95_ns=32820,p99_ns=60953\napplication_cosine_dim_384,count=10000,p50_ns=260,p95_ns=281,p99_ns=330\napplication_cosine_dim_4096,count=10000,p50_ns=2584,p95_ns=3456,p99_ns=3535\ndb_bytes=827392\n",
+      "metrics": {
+        "redb_read_1536b": {
+          "count": 5000,
+          "p50_ns": 350,
+          "p95_ns": 411,
+          "p99_ns": 441
+        },
+        "redb_write_commit_immediate_1536b": {
+          "count": 250,
+          "p50_ns": 21833,
+          "p95_ns": 32820,
+          "p99_ns": 60953
+        },
+        "application_cosine_dim_384": {
+          "count": 10000,
+          "p50_ns": 260,
+          "p95_ns": 281,
+          "p99_ns": 330
+        },
+        "application_cosine_dim_4096": {
+          "count": 10000,
+          "p50_ns": 2584,
+          "p95_ns": 3456,
+          "p99_ns": 3535
+        }
+      },
+      "db_bytes": 827392
+    }
+  ]
+}

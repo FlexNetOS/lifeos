@@ -6,7 +6,7 @@
 - Object ID: `aa7c6940-c8a9-4a26-8120-7f9092f6db08`
 - Object type: `markdown`
 - Source SHA-256: `5be7cc69c29db15c613ba3ed58c0025fcb75e805701a51f9a49c68498532dec9`
-- Source bytes / logical lines: `810` / `1`
+- Source bytes / logical lines: `810` / `17`
 - Packet validation: `pass`
 - Evidence boundary: source wording proves no implementation, performance, authority, readiness, or citation claim.
 
@@ -35,7 +35,7 @@
 
 ## Resolution boundary
 
-- All 9 atoms remain queued for primary evidence, benchmark proof, or owner decision.
-- Questions remain questions and grant no build, deployment, phase, test, or execution authority.
-- Repetition is relationship evidence only and verifies no claim.
-- Raw external fulltext is not duplicated merely for provenance.
+- Local-primary truth testing is complete: `2` verified, `3` qualified, and `4` refuted; `0` remain queued.
+- Claim-level findings and exact commands are recorded in `generated/notebooklm_claim_verification/NBVERIFY-030-032.local-evidence.json`.
+- Closure classifies source truth only; qualified or refuted claims grant no product, store-authority, build, phase, or runtime execution permission.
+- Repetition remains relationship evidence only and verifies no claim.

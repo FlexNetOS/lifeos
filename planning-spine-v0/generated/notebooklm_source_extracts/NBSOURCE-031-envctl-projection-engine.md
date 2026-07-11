@@ -32,7 +32,7 @@
 
 ## Resolution boundary
 
-- All 7 atoms remain queued for primary evidence, benchmark proof, or owner decision.
-- Questions remain questions and grant no build, deployment, phase, test, or execution authority.
-- Repetition is relationship evidence only and verifies no claim.
-- Raw external fulltext is not duplicated merely for provenance.
+- Local-primary truth testing is complete: `2` verified, `2` qualified, and `3` refuted; `0` remain queued.
+- Claim-level findings and exact commands are recorded in `generated/notebooklm_claim_verification/NBVERIFY-030-032.local-evidence.json`.
+- Closure classifies source truth only; qualified or refuted claims grant no product, store-authority, build, phase, or runtime execution permission.
+- Repetition remains relationship evidence only and verifies no claim.

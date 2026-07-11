@@ -39,8 +39,7 @@
 
 ## Resolution boundary
 
-- All 13 atoms remain queued for primary evidence, benchmark proof, or owner decision.
-- Questions remain questions and grant no build, deployment, phase, test, or execution authority.
-- Repetition is relationship evidence only and verifies no claim.
-- Raw external fulltext is not duplicated merely for provenance.
-- Yazelix ownership remains split between editable input under `/home/flexnetos/.config/yazelix`, generated proof under `/home/flexnetos/.local/share/yazelix`, and the active `/home/flexnetos/.nix-profile/bin/yzx` frontdoor.
+- Local-primary truth testing is complete: `3` verified, `9` qualified, and `1` refuted; `0` remain queued.
+- Claim-level findings and exact commands are recorded in `generated/notebooklm_claim_verification/NBVERIFY-030-032.local-evidence.json`.
+- Closure classifies source truth only; qualified or refuted claims grant no product, store-authority, build, phase, or runtime execution permission.
+- Repetition remains relationship evidence only and verifies no claim.

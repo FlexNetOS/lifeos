@@ -1,17 +1,18 @@
 {
   "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
   "task_id": "NBVERIFY-004",
-  "observed_at": "2026-07-11T21:55:33.102Z",
+  "observed_at": "2026-07-11T22:01:37.985Z",
   "repository": {
     "root": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification",
-    "package_json_sha256": "b11a5b3a3d4fe3d70e488f534b3ddc77f95aceb1390b7e5c80438f372c1338d5"
+    "package_json_sha256": "7dd2ed2df4020684a569959764386549d3ab8482a980d452828a78febeaa6830"
   },
   "collector": {
     "claim_ids": [
-      "SWARM-CLAIM-003",
-      "SWARM-CLAIM-004"
+      "SWARM-CLAIM-005",
+      "SWARM-CLAIM-006",
+      "SWARM-CLAIM-007"
     ],
-    "mode": "read-only-installed-runtime-trace",
+    "mode": "read-only-installed-runtime-and-source-boundary-trace",
     "writes_only": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
     "does_not_launch": true,
     "does_not_install": true,
@@ -873,6 +874,196 @@
             "3610778 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
             "3662018 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
             "3662916 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-005",
+      "verification_status": "unverified",
+      "status": "partial",
+      "conclusion": "The LifeOS root contains installed Ruvector/AgentDB capabilities, but no LifeOS/Yazelix startup orchestration source or live Ruvnet agent process proves automatic governed agent startup.",
+      "evidence": [
+        {
+          "relationship": "startup-orchestration",
+          "proven": false,
+          "search": {
+            "command": "rg -n -i ruvnet|agentdb|ruvllm|rvf src src-tauri",
+            "exit_status": 1,
+            "matches": []
+          },
+          "note": "Package declarations and verifier scripts are not automatic product startup orchestration."
+        },
+        {
+          "relationship": "agent-process-search",
+          "proven": false,
+          "command": "ps -eo pid=,ppid=,comm=,args=",
+          "exit_status": 0,
+          "matches": [],
+          "note": "A point-in-time absence does not prove the agents can never start; it leaves automatic startup unverified."
+        },
+        {
+          "relationship": "runtime-capability-boundary",
+          "proven": true,
+          "agentdb_learning_enabled": true,
+          "note": "This is native capability proof only, not startup, lifecycle, authority, or readiness proof."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-006",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "A direct native @ruvector/ruvllm package and its Linux optional binary are installed, and the verifier exercised 51 in-memory adapters; the asserted static engine selection for automatically started agents is not proven.",
+      "evidence": [
+        {
+          "relationship": "ruvllm-package",
+          "proven": true,
+          "direct": {
+            "name": "@ruvector/ruvllm",
+            "path": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/@ruvector/ruvllm/package.json",
+            "proven": true,
+            "version": "2.6.0"
+          },
+          "platform_native": {
+            "name": "@ruvector/ruvllm-linux-x64-gnu",
+            "path": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/@ruvector/ruvllm-linux-x64-gnu/package.json",
+            "proven": true,
+            "version": "2.0.1"
+          },
+          "package_json_sha256": "7dd2ed2df4020684a569959764386549d3ab8482a980d452828a78febeaa6830"
+        },
+        {
+          "relationship": "ruvllm-runtime-proof",
+          "proven": true,
+          "adapter_count": 51,
+          "active_adapter": "personality-51",
+          "note": "This proves 51 in-memory LoRA adapters and switching, not RVF persistence or complete agent personalities."
+        },
+        {
+          "relationship": "static-engine-boundary",
+          "proven": false,
+          "missing": [
+            "static-link-or-packaging-definition",
+            "automatic-agent-selection",
+            "running-agent-process"
+          ],
+          "note": "Installed native package and in-memory adapter switching are not equivalent to a static engine used by automatically started agents."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-007",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "The native verifier created and loaded RVF-backed files through NodeBackend, including an AgentDB learning file; no per-agent .rvf discovery, identity, ownership, persistence, recovery, or automatic loading contract is proven.",
+      "evidence": [
+        {
+          "relationship": "rvf-runtime-proof",
+          "proven": true,
+          "backend": "NodeBackend",
+          "path": "node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/direct.rvf",
+          "path_exists": true,
+          "bytes": 680,
+          "ingest": {
+            "accepted": 2,
+            "rejected": 0,
+            "epoch": 1
+          },
+          "segments": [
+            {
+              "id": 1,
+              "offset": 0,
+              "payloadLength": 98,
+              "segType": "manifest"
+            },
+            {
+              "id": 2,
+              "offset": 162,
+              "payloadLength": 86,
+              "segType": "vec"
+            },
+            {
+              "id": 3,
+              "offset": 312,
+              "payloadLength": 67,
+              "segType": "witness"
+            },
+            {
+              "id": 4,
+              "offset": 443,
+              "payloadLength": 173,
+              "segType": "manifest"
+            }
+          ]
+        },
+        {
+          "relationship": "agent-rvf-boundary",
+          "proven": true,
+          "path": "node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/agentdb-self-learning.rvf",
+          "path_exists": true,
+          "learning_enabled": true,
+          "segments": [
+            {
+              "id": 1,
+              "offset": 0,
+              "payloadLength": 98,
+              "segType": "manifest"
+            },
+            {
+              "id": 2,
+              "offset": 162,
+              "payloadLength": 46,
+              "segType": "vec"
+            },
+            {
+              "id": 3,
+              "offset": 272,
+              "payloadLength": 67,
+              "segType": "witness"
+            },
+            {
+              "id": 4,
+              "offset": 403,
+              "payloadLength": 173,
+              "segType": "manifest"
+            },
+            {
+              "id": 5,
+              "offset": 640,
+              "payloadLength": 46,
+              "segType": "vec"
+            },
+            {
+              "id": 6,
+              "offset": 750,
+              "payloadLength": 67,
+              "segType": "witness"
+            },
+            {
+              "id": 7,
+              "offset": 881,
+              "payloadLength": 248,
+              "segType": "manifest"
+            }
+          ],
+          "witness": {
+            "result": {
+              "valid": false,
+              "entries": 0,
+              "error": "this.db.verifyWitness is not a function. (In 'this.db.verifyWitness()', 'this.db.verifyWitness' is undefined)"
+            }
+          },
+          "note": "This is a verifier-owned AgentDB learning artifact, not proof of per-agent Ruvnet .rvf personalities."
+        },
+        {
+          "relationship": "per-agent-loading-contract",
+          "proven": false,
+          "missing": [
+            "agent-identity-to-rvf-mapping",
+            "automatic-discovery",
+            "authority-and-mutation-policy",
+            "retention-and-recovery-test"
           ]
         }
       ]

@@ -34,7 +34,10 @@ describe("NBVERIFY-004 progress artifacts", () => {
     expect(rows.get("SWARM-CLAIM-002")).toContain("partial");
     expect(rows.get("SWARM-CLAIM-003")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-004")).toContain("qualified");
-    expect(rows.get("SWARM-CLAIM-005")).toContain("queued");
+    expect(rows.get("SWARM-CLAIM-005")).toContain("partial");
+    expect(rows.get("SWARM-CLAIM-006")).toContain("qualified");
+    expect(rows.get("SWARM-CLAIM-007")).toContain("qualified");
+    expect(rows.get("SWARM-CLAIM-008")).toContain("queued");
 
     const receipt = JSON.parse(readFileSync(sourceReceiptPath, "utf8"));
     expect(receipt.task_id).toBe("NBVERIFY-004");

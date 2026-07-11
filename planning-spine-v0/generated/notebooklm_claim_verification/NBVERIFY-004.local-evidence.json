@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
   "task_id": "NBVERIFY-004",
-  "observed_at": "2026-07-11T22:22:38.613Z",
+  "observed_at": "2026-07-11T22:25:25.387Z",
   "repository": {
     "root": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification",
     "package_json_sha256": "730ad5abed8a2e75ed263dcdfb05702ee8851c9fce4fdbf005d225fa257e046c"
   },
   "collector": {
-    "claim_id": "SWARM-CLAIM-002",
-    "mode": "read-only-installed-runtime-trace",
+    "claim_id": "SWARM-CLAIM-011",
+    "mode": "read-only-performance-boundary-trace",
     "writes_only": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
     "does_not_launch": true,
     "does_not_install": true,
@@ -602,87 +602,6 @@
             "stale-state",
             "disconnect-recovery",
             "freshness-marker"
-          ]
-        }
-      ]
-    },
-    {
-      "claim_id": "SWARM-CLAIM-011",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "conclusion": "No reproducible end-to-end swarm event-to-render benchmark defines or proves the claimed real-time UI status behavior.",
-      "evidence": [
-        {
-          "relationship": "performance-search",
-          "proven": true,
-          "command": "rg -n -i benchmark|p50|p95|p99|latency|real.time|freshness src src-tauri crates scripts tests --glob !**/AGENTS.md",
-          "exit_status": 0,
-          "matches": [
-            "scripts/verify-nbverify004-claim011.mjs:26:  \"benchmark|p50|p95|p99|latency|real.time|freshness\",",
-            "scripts/verify-nbverify004-claim011.mjs:44:    \"No reproducible end-to-end swarm event-to-render benchmark defines or proves the claimed real-time UI status behavior.\",",
-            "scripts/verify-nbverify004-claim011.mjs:52:      note: \"Generic test or performance terms are not an end-to-end swarm status benchmark.\",",
-            "scripts/verify-nbverify004-claim011.mjs:58:        \"freshness-budget\",",
-            "scripts/verify-nbverify004-claim011.mjs:67:      relationship: \"benchmark-result\",",
-            "scripts/verify-nbverify004-claim011.mjs:69:      missing: [\"event-to-render-p50\", \"event-to-render-p95\", \"event-to-render-p99\", \"stale-detection-measurement\"],",
-            "scripts/verify-nbverify004-claim011.mjs:94:console.log(JSON.stringify({ claim_id: claim.claim_id, status: claim.status, search_matches: claim.evidence[0].matches.length, benchmark_proven: false }, null, 2));",
-            "tests/IoTView.spec.js:135:  it(\"latency card shows average and a status pill\", () => {",
-            "tests/IoTView.spec.js:137:    const latCard = w.find('[aria-label=\"Average latency\"]');",
-            "tests/IoTView.spec.js:139:    // fixture online devices with latency: d1=12, d2=8, d3=22, d5=31 → avg = 18",
-            "tests/IoTView.spec.js:140:    const val = latCard.find(\".iot-latency-value\");",
-            "tests/IoTView.spec.js:142:    const pill = latCard.find('[class*=\"iot-latency-pill\"]');",
-            "scripts/verify-nbverify004-claim009.mjs:58:        \"freshness\",",
-            "scripts/verify-nbverify004-claim010.mjs:65:      missing: [\"unavailable-state\", \"stale-state\", \"disconnect-recovery\", \"freshness-marker\"],",
-            "scripts/verify-nbverify004-claim013.mjs:70:        \"benchmark-workload\",",
-            "scripts/verify-nbverify004-claim008.mjs:65:        \"freshness\",",
-            "tests/setup.js:140:      { id: \"d1\", roomId: \"living\",  label: \"Smart TV\",    type: \"tv\",      online: true,  latencyMs: 12, signal: 96, battery: null, lastSeen: \"just now\" },",
-            "tests/setup.js:141:      { id: \"d2\", roomId: \"living\",  label: \"Soundbar\",    type: \"audio\",   online: true,  latencyMs: 8,  signal: 92, battery: null, lastSeen: \"just now\" },",
-            "tests/setup.js:142:      { id: \"d3\", roomId: \"bed\",     label: \"Thermostat\",  type: \"climate\", online: true,  latencyMs: 22, signal: 84, battery: 78,   lastSeen: \"20 s ago\" },",
-            "tests/setup.js:143:      { id: \"d4\", roomId: \"bed\",     label: \"Air sensor\",  type: \"sensor\",  online: false, latencyMs: 0,  signal: 0,  battery: 8,    lastSeen: \"8 min ago\" },",
-            "tests/setup.js:144:      { id: \"d5\", roomId: \"kitchen\", label: \"Leak sensor\", type: \"sensor\",  online: true,  latencyMs: 31, signal: 78, battery: 55,   lastSeen: \"1 min ago\" },",
-            "src-tauri/src/lib.rs:309:    // take the small one-shot latency hit (≈200ms) so the widget shows a real",
-            "tests/nbverify004-claim011.spec.ts:11:  test(\"does not call UI status real time without an end-to-end benchmark\", () => {",
-            "tests/nbverify004-claim011.spec.ts:25:        expect.objectContaining({ relationship: \"benchmark-result\" }),",
-            "tests/nbverify004-claim011.spec.ts:31:          candidate.relationship === \"benchmark-result\",",
-            "src/data/types.ts:251:  latencyMs: number;",
-            "src/components/IoTView.vue:36:const avgLatency = computed(() => {",
-            "src/components/IoTView.vue:37:  const on = onlineDevices.value.filter((d) => d.latencyMs > 0);",
-            "src/components/IoTView.vue:39:  return Math.round(on.reduce((n, d) => n + d.latencyMs, 0) / on.length);",
-            "src/components/IoTView.vue:42:const latencyStatus = computed(() => {",
-            "src/components/IoTView.vue:43:  const ms = avgLatency.value;",
-            "src/components/IoTView.vue:153:              <!-- Latency -->",
-            "src/components/IoTView.vue:154:              <span class=\"iot-device-latency\" aria-label=\"Latency\">",
-            "src/components/IoTView.vue:155:                {{ device.online && device.latencyMs > 0 ? `${device.latencyMs} ms` : '—' }}",
-            "src/components/IoTView.vue:215:          <!-- Latency card -->",
-            "src/components/IoTView.vue:216:          <section class=\"iot-rail-card\" aria-label=\"Average latency\">",
-            "src/components/IoTView.vue:217:            <h2 class=\"iot-rail-head\">Latency</h2>",
-            "src/components/IoTView.vue:218:            <div class=\"iot-latency-row\">",
-            "src/components/IoTView.vue:219:              <span class=\"iot-latency-value\">{{ avgLatency > 0 ? `${avgLatency} ms` : '—' }}</span>",
-            "src/components/IoTView.vue:220:              <span :class=\"['iot-latency-pill', `iot-latency-pill--${latencyStatus.tone}`]\">",
-            "src/components/IoTView.vue:221:                {{ latencyStatus.label }}",
-            "src/components/IoTView.vue:224:            <p class=\"iot-latency-sub\">Average across {{ onlineCount }} online devices</p>"
-          ],
-          "note": "Generic test or performance terms are not an end-to-end swarm status benchmark."
-        },
-        {
-          "relationship": "workload-and-slo",
-          "proven": false,
-          "missing": [
-            "freshness-budget",
-            "event-rate",
-            "workload-definition",
-            "hardware",
-            "transport",
-            "disconnect-and-stale-policy"
-          ]
-        },
-        {
-          "relationship": "benchmark-result",
-          "proven": false,
-          "missing": [
-            "event-to-render-p50",
-            "event-to-render-p95",
-            "event-to-render-p99",
-            "stale-detection-measurement"
           ]
         }
       ]
@@ -1548,6 +1467,63 @@
             "3610778 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
             "3662018 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
             "3662916 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-011",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "No reproducible end-to-end swarm event-to-render benchmark defines or proves the claimed real-time UI status behavior.",
+      "evidence": [
+        {
+          "relationship": "performance-search",
+          "proven": true,
+          "command": "rg -n -i benchmark|p50|p95|p99|latency|real.time|freshness src src-tauri crates --glob !**/AGENTS.md",
+          "exit_status": 0,
+          "matches": [
+            "src/data/types.ts:251:  latencyMs: number;",
+            "src-tauri/src/lib.rs:309:    // take the small one-shot latency hit (≈200ms) so the widget shows a real",
+            "src/components/IoTView.vue:36:const avgLatency = computed(() => {",
+            "src/components/IoTView.vue:37:  const on = onlineDevices.value.filter((d) => d.latencyMs > 0);",
+            "src/components/IoTView.vue:39:  return Math.round(on.reduce((n, d) => n + d.latencyMs, 0) / on.length);",
+            "src/components/IoTView.vue:42:const latencyStatus = computed(() => {",
+            "src/components/IoTView.vue:43:  const ms = avgLatency.value;",
+            "src/components/IoTView.vue:153:              <!-- Latency -->",
+            "src/components/IoTView.vue:154:              <span class=\"iot-device-latency\" aria-label=\"Latency\">",
+            "src/components/IoTView.vue:155:                {{ device.online && device.latencyMs > 0 ? `${device.latencyMs} ms` : '—' }}",
+            "src/components/IoTView.vue:215:          <!-- Latency card -->",
+            "src/components/IoTView.vue:216:          <section class=\"iot-rail-card\" aria-label=\"Average latency\">",
+            "src/components/IoTView.vue:217:            <h2 class=\"iot-rail-head\">Latency</h2>",
+            "src/components/IoTView.vue:218:            <div class=\"iot-latency-row\">",
+            "src/components/IoTView.vue:219:              <span class=\"iot-latency-value\">{{ avgLatency > 0 ? `${avgLatency} ms` : '—' }}</span>",
+            "src/components/IoTView.vue:220:              <span :class=\"['iot-latency-pill', `iot-latency-pill--${latencyStatus.tone}`]\">",
+            "src/components/IoTView.vue:221:                {{ latencyStatus.label }}",
+            "src/components/IoTView.vue:224:            <p class=\"iot-latency-sub\">Average across {{ onlineCount }} online devices</p>"
+          ],
+          "note": "Generic test or performance terms are not an end-to-end swarm status benchmark."
+        },
+        {
+          "relationship": "workload-and-slo",
+          "proven": false,
+          "missing": [
+            "freshness-budget",
+            "event-rate",
+            "workload-definition",
+            "hardware",
+            "transport",
+            "disconnect-and-stale-policy"
+          ]
+        },
+        {
+          "relationship": "benchmark-result",
+          "proven": false,
+          "missing": [
+            "event-to-render-p50",
+            "event-to-render-p95",
+            "event-to-render-p99",
+            "stale-detection-measurement"
           ]
         }
       ]

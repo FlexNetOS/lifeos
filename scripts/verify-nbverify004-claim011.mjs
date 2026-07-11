@@ -27,8 +27,6 @@ const search = run("rg", [
   "src",
   "src-tauri",
   "crates",
-  "scripts",
-  "tests",
   "--glob",
   "!**/AGENTS.md",
 ]);

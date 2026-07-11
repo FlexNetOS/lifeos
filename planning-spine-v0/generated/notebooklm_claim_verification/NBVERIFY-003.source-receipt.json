@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-07-11T10:42:21Z",
+  "notebook_id": "b09afb74-b464-4bc3-94f0-d5193f7c7d36",
+  "source_id": "bf0acabe-a19e-4d99-9747-43751fc6efec",
+  "title": "Architecting Nushell Plugin Integration with Redb and PostgreSQL",
+  "kind": "markdown",
+  "char_count": 837,
+  "logical_line_count": 12,
+  "content_sha256": "daa9009d785714fb81aa2b6580a475950acc9e5a199514058dce14eb55907131",
+  "content": "Architecting Nushell Plugin Integration with Redb and PostgreSQL\nTo build a Nushell plugin for this ecosystem, you create a Rust-native binary that communicates with the shell using a highly optimized MessagePack protocol [1]. This allows you to stream structured data directly into memory without serializing it to JSON text [1].\nHowever, since you already built the \nFlexNetOS/nu_plugin\n to work with \nredb\n [2], the intended architecture doesn't actually require you to build a new, direct Postgres plugin. Instead, your current plugin buffers the parsed code blocks into \nredb\n, and \nenvctl\n acts as the bridge to automatically synchronize and commit those blocks permanently into PostgreSQL [3, 4].\nWould you like to explore how PostgreSQL structures this codebase data, or should we look at how agents use standard SQL to query it?",
+  "citation_markers": [
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "citation_targets_present": false
+}

@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-11T10:36:55Z",
+  "generated_at": "2026-07-11T10:42:21Z",
   "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
-  "task_count": 156,
+  "task_count": 157,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-11T10:36:55Z",
+    "generated_at": "2026-07-11T10:42:21Z",
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
-    "row_count": 156,
+    "row_count": 157,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -9581,6 +9581,68 @@
         "peer mutation",
         "secrets/**",
         "treating source repetition or missing citations as proof"
+      ]
+    },
+    {
+      "task_id": "NBVERIFY-003",
+      "source_row_number": 158,
+      "phase": "0-north-star-graph",
+      "title": "NotebookLM source 003 truth-tested against current plugin boundaries",
+      "owner_agent": "LifeOS Planning Spine / QA Agent",
+      "goal": "Truth-test all NBSOURCE-003 claims using exact fulltext, current canonical nu_plugin/envctl call paths, installed MessagePack wire proof, and reproducible serializer evidence.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "All ten claims close exactly once; exact source identity/hash/counts match; plugin/repository/CLI boundaries remain distinct; protocol performance uses reproducible evidence; current synchronization claims use canonical peer source; normalization and repository gates pass.",
+      "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T104100Z-lifeos-nbverify-003-before-local-truth-integration.tar.gz (SHA-256 6ebe4d526d8b9812b17bd1e0d6a42e648d4d592e25de1b13f92105fbafc33e87) and remove only NBVERIFY-003 rows/artifacts after preserving failure evidence.",
+      "status": "complete",
+      "proof_uri": "proof_records/NBVERIFY-003.proof.json",
+      "next_action": "Advance to NBSOURCE-004; do not duplicate the separately owned nu_plugin implementation session.",
+      "source_columns": {
+        "task_id": "NBVERIFY-003",
+        "parent_id": "NBVERIFY-002; NBSOURCE-003",
+        "phase": "0-north-star-graph",
+        "title": "NotebookLM source 003 truth-tested against current plugin boundaries",
+        "owner_agent": "LifeOS Planning Spine / QA Agent",
+        "goal": "Truth-test all NBSOURCE-003 claims using exact fulltext, current canonical nu_plugin/envctl call paths, installed MessagePack wire proof, and reproducible serializer evidence.",
+        "inputs": "NBSOURCE-003; NBVERIFY-001; NBVERIFY-030-032; nu_plugin origin/master 9451b20; envctl c911286",
+        "target_artifacts": "generated/notebooklm_claim_verification/NBVERIFY-003.local-evidence.json; generated/notebooklm_claim_verification/NBVERIFY-003.source-receipt.json; generated/notebooklm_claim_verification/NBVERIFY-003.truth-matrix.csv; proof_records/NBVERIFY-003.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "nu_plugin/envctl mutation; product implementation; secrets/**; treating dirty concurrent nu_plugin work as canonical",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All ten claims close exactly once; exact source identity/hash/counts match; plugin/repository/CLI boundaries remain distinct; protocol performance uses reproducible evidence; current synchronization claims use canonical peer source; normalization and repository gates pass.",
+        "rollback_plan": "Restore archive /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T104100Z-lifeos-nbverify-003-before-local-truth-integration.tar.gz (SHA-256 6ebe4d526d8b9812b17bd1e0d6a42e648d4d592e25de1b13f92105fbafc33e87) and remove only NBVERIFY-003 rows/artifacts after preserving failure evidence.",
+        "status": "Complete",
+        "proof_uri": "proof_records/NBVERIFY-003.proof.json",
+        "next_action": "Advance to NBSOURCE-004; do not duplicate the separately owned nu_plugin implementation session."
+      },
+      "parent_ids": [
+        "NBVERIFY-002",
+        "NBSOURCE-003"
+      ],
+      "inputs": [
+        "NBSOURCE-003",
+        "NBVERIFY-001",
+        "NBVERIFY-030-032",
+        "nu_plugin origin/master 9451b20",
+        "envctl c911286"
+      ],
+      "target_artifacts": [
+        "generated/notebooklm_claim_verification/NBVERIFY-003.local-evidence.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-003.source-receipt.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-003.truth-matrix.csv",
+        "proof_records/NBVERIFY-003.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "planning-spine-v0/state/**"
+      ],
+      "blocked_paths": [
+        "nu_plugin/envctl mutation",
+        "product implementation",
+        "secrets/**",
+        "treating dirty concurrent nu_plugin work as canonical"
       ]
     }
   ]

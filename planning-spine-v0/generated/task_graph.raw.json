@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-12T17:47:38Z",
+  "generated_at": "2026-07-12T23:30:31Z",
   "source": {
     "format": "csv",
     "path": "generated/task_graph.source.csv",
@@ -1474,7 +1474,7 @@
         "execution_cell": "proof-cell",
         "verification_gate": "Each adopted capability has source commit and PR, current source path, passing CI receipt, behavioral boundary, known gap, target LifeOS owner, parity gate, and no second implementation row.",
         "rollback_plan": "Restore the prior adoption map; nu_plugin and database state remain unchanged.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/ADOPT-001.proof.json",
         "next_action": "Preserve and map the implementation; do not redesign it before STORE-001 resolves ownership boundaries."
       }
@@ -1496,7 +1496,7 @@
         "execution_cell": "proof-cell",
         "verification_gate": "Each capability has source and proof provenance, current store and runtime owner, security boundary, known gap, target LifeOS role, and no duplicate task; raw secret values are never captured as planning evidence.",
         "rollback_plan": "Restore the prior adoption map; envctl, secret stores, PostgreSQL, redb files, and runtime remain unchanged.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/ADOPT-002.proof.json",
         "next_action": "Carry all valid capability into STORE-001 without deciding its final store role in advance."
       }
@@ -2904,7 +2904,7 @@
         "execution_cell": "proof-cell",
         "verification_gate": "Every valid source task is preserved or mapped to one canonical row, contradictory status and completion semantics are explicit, duplicate intent has one adoption or implementation disposition, subordinate tables have declared roles, and only generated/task_graph.source.csv authorizes LifeOS execution.",
         "rollback_plan": "Restore the archived task tables and canonical graph; no valid task source is deleted.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/GRAPH-002.proof.json",
         "next_action": "RECOVERY-001 through RECOVERY-004 are the bounded reconciliation path; do not bulk-import or bulk-complete prior rows."
       }
@@ -2926,7 +2926,7 @@
         "execution_cell": "policy-cell",
         "verification_gate": "Negative fixtures prove incomplete coverage, missing parents, cycles, orphan phases, unanchored tasks, and closed owner approval all block execution-packet generation; the complete graph passes.",
         "rollback_plan": "Revert gate code and generated reports to the archived graph-control baseline; execution remains closed.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/GRAPH-003.proof.json",
         "next_action": "Implement only after the complete task graph exists and GRAPH-002 reconciliation passes."
       }
@@ -2948,7 +2948,7 @@
         "execution_cell": "proof-cell",
         "verification_gate": "Lifecycle fixtures prove Draft, blocked, Ready, running, Complete, and rolled-back projection; next_ready_task_id is null while the global coverage gate is closed.",
         "rollback_plan": "Revert lifecycle projection changes and regenerate the archived status view; proof history remains append-only.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/GRAPH-004.proof.json",
         "next_action": "Implement after GRAPH-003 establishes the global fail-closed execution gate."
       }

@@ -1,0 +1,18 @@
+{
+  "schema_version": "lifeos-planning-spine.coverage-control.v0",
+  "description": "Negative fixture: DEMO-001 and DEMO-002 depend on each other. The coverage gate must CLOSE on no_dependency_cycles.",
+  "owner_execution_approval": "open",
+  "phases": ["phase-alpha"],
+  "anchors": [
+    {
+      "anchor_id": "NS-DEMO",
+      "coverage_status": "complete",
+      "decomposition_status": "complete",
+      "phase_task_ids": ["DEMO-001", "DEMO-002"]
+    }
+  ],
+  "tasks": [
+    {"task_id": "DEMO-001", "phase": "phase-alpha", "parent_ids": ["DEMO-002"]},
+    {"task_id": "DEMO-002", "phase": "phase-alpha", "parent_ids": ["DEMO-001"]}
+  ]
+}

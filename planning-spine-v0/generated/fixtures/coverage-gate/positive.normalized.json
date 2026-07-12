@@ -1,0 +1,48 @@
+{
+  "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
+  "generated_at": "2026-07-12T00:00:00Z",
+  "source_graph_uri": "generated/fixtures/coverage-gate/positive.normalized.json",
+  "task_count": 2,
+  "tasks": [
+    {
+      "task_id": "DEMO-001",
+      "parent_ids": [],
+      "phase": "phase-alpha",
+      "title": "Demo bounded task one",
+      "owner_agent": "Coverage Gate Fixture Agent",
+      "goal": "Prove the coverage gate lets a fully covered, owner-opened graph build packets.",
+      "inputs": ["generated/fixtures/coverage-gate/coverage-control.valid.json"],
+      "target_artifacts": ["generated/fixtures/coverage-gate/out/DEMO-001.txt"],
+      "allowed_paths": ["planning-spine-v0/generated/fixtures/coverage-gate/**"],
+      "blocked_paths": ["secrets/**"],
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Packet is built only after the coverage gate opens.",
+      "rollback_plan": "Discard the fixture packet directory.",
+      "status": "ready",
+      "proof_uri": "proof://planning-spine/fixtures/DEMO-001",
+      "next_action": "Build the bounded packet.",
+      "source_row_number": 1
+    },
+    {
+      "task_id": "DEMO-002",
+      "parent_ids": ["DEMO-001"],
+      "phase": "phase-alpha",
+      "title": "Demo bounded task two",
+      "owner_agent": "Coverage Gate Fixture Agent",
+      "goal": "Prove a dependent bounded task also packages once the gate is open.",
+      "inputs": ["generated/fixtures/coverage-gate/coverage-control.valid.json"],
+      "target_artifacts": ["generated/fixtures/coverage-gate/out/DEMO-002.txt"],
+      "allowed_paths": ["planning-spine-v0/generated/fixtures/coverage-gate/**"],
+      "blocked_paths": ["secrets/**"],
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "Packet is built only after the coverage gate opens.",
+      "rollback_plan": "Discard the fixture packet directory.",
+      "status": "ready",
+      "proof_uri": "proof://planning-spine/fixtures/DEMO-002",
+      "next_action": "Build the bounded packet.",
+      "source_row_number": 2
+    }
+  ]
+}

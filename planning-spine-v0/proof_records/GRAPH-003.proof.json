@@ -1,0 +1,99 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "GRAPH-003",
+  "observed_at": "2026-07-12T23:24:17Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Negative fixtures prove incomplete coverage, missing parents, cycles, orphan phases, unanchored tasks, and closed owner approval all block execution-packet generation; the complete graph passes.",
+  "gate_result": {
+    "gate_added_to": "scripts/build-execution-packets.py (--coverage-control, fail-closed evaluate_coverage_gate)",
+    "gate_is_additive": true,
+    "legacy_path_without_coverage_control_unchanged": true,
+    "tdd_baseline": "HEAD build-execution-packets.py rejects --coverage-control (unrecognized argument, exit 2): the gate did not exist before this change.",
+    "positive_fixture_passes_and_builds_packets": true,
+    "positive_fixture_packets": ["DEMO-001", "DEMO-002"],
+    "negative_fixtures_block": {
+      "incomplete-coverage": {"exit": 1, "failed_check": "coverage_complete"},
+      "missing-parents": {"exit": 1, "failed_check": "dependencies_resolve"},
+      "cycles": {"exit": 1, "failed_check": "no_dependency_cycles"},
+      "orphan-phases": {"exit": 1, "failed_check": "phases_decomposed"},
+      "unanchored-tasks": {"exit": 1, "failed_check": "tasks_anchored"},
+      "closed-owner-approval": {"exit": 1, "failed_check": "owner_opened_execution"}
+    },
+    "fail_closed_preserves_existing_packets": true,
+    "fail_closed_writes_no_manifest": true,
+    "real_graph_currently_blocked": true,
+    "real_graph_failed_checks": ["coverage_complete", "tasks_anchored", "owner_opened_execution"],
+    "real_graph_structural_checks_pass": ["dependencies_resolve", "no_dependency_cycles", "phases_decomposed"],
+    "product_execution_performed": false
+  },
+  "proof_summary": "GRAPH-003 adds a fail-closed North Star coverage gate to the execution-packet builder. The gate is additive: it runs only when --coverage-control is supplied, and it executes BEFORE any stale-packet deletion or packet write, so a closed gate can neither create nor destroy packets. TDD baseline: the pre-change HEAD builder rejects --coverage-control with argparse exit 2 (no gate existed). Six negative fixtures under generated/fixtures/coverage-gate/ each violate exactly one required condition and each blocks packet generation with exit 1 on precisely the matching check: incomplete-coverage->coverage_complete, missing-parents->dependencies_resolve, cycles->no_dependency_cycles, orphan-phases->phases_decomposed, unanchored-tasks->tasks_anchored, closed-owner-approval->owner_opened_execution. The positive fixture (complete coverage, resolved dependencies, acyclic, decomposed phases, all tasks anchored, owner execution open) passes the gate AND builds packets DEMO-001 and DEMO-002. Fail-closed was verified against a pre-populated packet directory: the closed gate left the sentinel packet intact and wrote no manifest. Applied to the actual graph via a derived generated/north_star_coverage.control.json, the gate is correctly CLOSED today (coverage_complete + tasks_anchored + owner_opened_execution fail; dependencies_resolve, no_dependency_cycles, phases_decomposed pass), and the verdict is written to the declared target artifact generated/north_star_coverage.report.json. No product execution was performed.",
+  "artifact_paths": [
+    "scripts/build-execution-packets.py",
+    "generated/north_star_coverage.report.json",
+    "generated/north_star_coverage.control.json",
+    "generated/fixtures/coverage-gate/coverage-control.valid.json",
+    "generated/fixtures/coverage-gate/coverage-control.incomplete-coverage.json",
+    "generated/fixtures/coverage-gate/coverage-control.missing-parents.json",
+    "generated/fixtures/coverage-gate/coverage-control.cycles.json",
+    "generated/fixtures/coverage-gate/coverage-control.orphan-phases.json",
+    "generated/fixtures/coverage-gate/coverage-control.unanchored-tasks.json",
+    "generated/fixtures/coverage-gate/coverage-control.closed-owner-approval.json",
+    "generated/fixtures/coverage-gate/positive.normalized.json"
+  ],
+  "checksums": {
+    "scripts/build-execution-packets.py": "2e0a935d5b5bb466d23e2a3b6c95e9f8ff2a2859a53a9379d99ce1d5fa5a151c",
+    "generated/north_star_coverage.report.json": "14ac960e1a39786494bc15704dae88d1cc821e88b173c57f7e194ae8e8dc40ea",
+    "generated/north_star_coverage.control.json": "bb990dc43de0ed34466e17752bcc9f66feb030063900b11e1e6e75eeb957105b",
+    "generated/fixtures/coverage-gate/coverage-control.valid.json": "cf4ab592507ba35ef86a38f311079dd9c475ad2d77b295a0098b571e32f4df97",
+    "generated/fixtures/coverage-gate/coverage-control.incomplete-coverage.json": "39a4d1daa9fb663f2402e4c4860f0c20b7952cf524409e8d751d5f0e4c5c1300",
+    "generated/fixtures/coverage-gate/coverage-control.missing-parents.json": "4ef0d1524d0ed6864b6ea4ecf243b18d32b21ca708aef00bdf1ac9e7230c577a",
+    "generated/fixtures/coverage-gate/coverage-control.cycles.json": "0b5d38191718abc1bebe1f0642174df06e69cfffd21cbdd132243c30c8f2b693",
+    "generated/fixtures/coverage-gate/coverage-control.orphan-phases.json": "24158ed9e2bd93cfa8b18a6af317acbee717d38e604d2e29c3d05f3d239f150b",
+    "generated/fixtures/coverage-gate/coverage-control.unanchored-tasks.json": "9e1b43250efe4d08022afd89571c9f42d72eb92fd1212287bf7cb0ffc8e826e3",
+    "generated/fixtures/coverage-gate/coverage-control.closed-owner-approval.json": "02d7de9d92a68918b11fde8a851034cdea66467cb714b284df7a744f67d7b657",
+    "generated/fixtures/coverage-gate/positive.normalized.json": "9177d7b903048f9258b951180b6ae37190ac68154b023bb5ee79e9252479d46d"
+  },
+  "live_commands": [
+    {
+      "purpose": "TDD baseline: pre-change builder has no coverage gate",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (HEAD build-execution-packets.py) --coverage-control generated/fixtures/coverage-gate/coverage-control.incomplete-coverage.json positive.normalized.json",
+      "exit_status": 2,
+      "output": ["error: unrecognized arguments: --coverage-control positive.normalized.json"]
+    },
+    {
+      "purpose": "Positive fixture opens the gate and builds packets; each negative fixture blocks on its single check",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 scripts/build-execution-packets.py --coverage-control generated/fixtures/coverage-gate/coverage-control.<scenario>.json generated/fixtures/coverage-gate/positive.normalized.json",
+      "exit_status": 0,
+      "output": [
+        "valid exit=0 result=pass []  (built DEMO-001.json, DEMO-002.json)",
+        "incomplete-coverage exit=1 result=fail ['coverage_complete']",
+        "missing-parents exit=1 result=fail ['dependencies_resolve']",
+        "cycles exit=1 result=fail ['no_dependency_cycles']",
+        "orphan-phases exit=1 result=fail ['phases_decomposed']",
+        "unanchored-tasks exit=1 result=fail ['tasks_anchored']",
+        "closed-owner-approval exit=1 result=fail ['owner_opened_execution']"
+      ]
+    },
+    {
+      "purpose": "Fail-closed does not delete existing packets or write a manifest",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 scripts/build-execution-packets.py --coverage-control generated/fixtures/coverage-gate/coverage-control.closed-owner-approval.json positive.normalized.json --packet-dir /tmp/fc-packets (pre-seeded with EXISTING.json)",
+      "exit_status": 1,
+      "output": ["coverage gate CLOSED — execution-packet generation blocked", "EXISTING.json survived", "manifest written? NO"]
+    },
+    {
+      "purpose": "Real graph is currently fail-closed; report written to the declared target artifact",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 scripts/build-execution-packets.py --coverage-control generated/north_star_coverage.control.json --coverage-report generated/north_star_coverage.report.json",
+      "exit_status": 1,
+      "output": [
+        "coverage gate CLOSED — failed checks: coverage_complete, tasks_anchored, owner_opened_execution",
+        "dependencies_resolve pass; no_dependency_cycles pass; phases_decomposed pass",
+        "packets built? NO"
+      ]
+    }
+  ]
+}

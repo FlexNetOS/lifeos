@@ -1,0 +1,54 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ADOPT-002",
+  "observed_at": "2026-07-12T23:24:17Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each capability has source and proof provenance, current store and runtime owner, security boundary, known gap, target LifeOS role, and no duplicate task; raw secret values are never captured as planning evidence.",
+  "gate_result": {
+    "capability_map": "generated/adopted_capabilities.source.csv",
+    "adopt_002_rows": 7,
+    "capabilities": [
+      "Replayable migration engine",
+      "Catalog blob metadata",
+      "Secrets engine / secretd / secretctl",
+      "Remote libSQL store",
+      "PostgreSQL-RuVector component",
+      "Semantic consumer",
+      "envctl db code-graph surface (roots/query/refactor)"
+    ],
+    "every_row_has_source_and_proof_provenance": true,
+    "every_row_has_current_store_and_runtime_owner": true,
+    "every_row_has_security_boundary": true,
+    "every_row_has_known_gap": true,
+    "every_row_has_target_lifeos_role": true,
+    "no_duplicate_task": true,
+    "raw_secret_values_never_captured_as_evidence": true,
+    "secrets_row_known_gap": "raw secret values never captured as evidence; live runtime proof separate",
+    "package_vs_merged_vs_runtime_proof_separated": true,
+    "store_role_deferred_to_STORE_001": true,
+    "provenance_derived_from": "generated/recovery_adoption_map.csv (RECOVERY-004, Complete)",
+    "product_execution_performed": false
+  },
+  "proof_summary": "ADOPT-002 adopts envctl's replayable migration engine, catalog blob metadata, secrets engine/secretd/secretctl, remote libSQL store, PostgreSQL-RuVector component, semantic consumer, and the envctl db code-graph surface as valid capabilities. In generated/adopted_capabilities.source.csv these 7 ADOPT-002 rows each carry source-and-proof provenance (source_commit_or_pr + ci_receipt), current store/runtime owner (current_path + target_lifeos_owner), security boundary, known gap, target LifeOS role, and a parity gate; each capability appears once (no duplicate task). Package proof, merged-product proof, live-runtime proof, and unresolved store authority are kept separate: the migration and catalog rows note that package proof is not product-runtime proof, and the libSQL / RuVector / semantic rows are disposition=defer with store_role=deferred-to-STORE-001. Raw secret values are never captured as planning evidence: the secrets-engine row's known_gap states 'raw secret values never captured as evidence; live runtime proof separate', and only external-provisioning boundaries are recorded. Provenance is inherited from the Complete RECOVERY-004 adoption map. The map gate holds; the final store role stays deferred to STORE-001; no product execution, secret read, or envctl mutation was performed.",
+  "artifact_paths": [
+    "generated/adopted_capabilities.source.csv",
+    "generated/recovery_adoption_map.csv"
+  ],
+  "checksums": {
+    "generated/adopted_capabilities.source.csv": "2d85de652f8c0e71a5018c90be1b365a113673fdb0135a293481f2c0d6f0d6c8"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate ADOPT-002 map gate: all columns present, no duplicate task, secrets row never captures raw values",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (ADOPT map-gate validation over generated/adopted_capabilities.source.csv)",
+      "exit_status": 0,
+      "output": [
+        "ADOPT-002: rows=7 all_columns_present=True no_duplicate_row=True store_role_deferred_to_STORE001=True",
+        "ADOPT-002 secrets row raw_values_never_captured: True",
+        "STORE-001 deferral row present: True"
+      ]
+    }
+  ]
+}

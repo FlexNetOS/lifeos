@@ -1,0 +1,62 @@
+{
+  "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
+  "generated_at": "2026-07-12T00:00:00Z",
+  "source_graph_uri": "generated/fixtures/lifecycle/lifecycle.normalized.json",
+  "task_count": 6,
+  "tasks": [
+    {
+      "task_id": "LC-DRAFT",
+      "parent_ids": [],
+      "phase": "lifecycle-demo",
+      "title": "Draft stays non-executable",
+      "status": "Draft",
+      "proof_uri": "proof_records/LC-DRAFT.proof.json",
+      "next_action": "Await authority gate."
+    },
+    {
+      "task_id": "LC-BLOCKED",
+      "parent_ids": ["LC-DRAFT"],
+      "phase": "lifecycle-demo",
+      "title": "Blocked stays blocked",
+      "status": "blocked",
+      "proof_uri": "proof_records/LC-BLOCKED.proof.json",
+      "next_action": "Await unblock."
+    },
+    {
+      "task_id": "LC-READY",
+      "parent_ids": ["LC-DRAFT"],
+      "phase": "lifecycle-demo",
+      "title": "Ready requires all gates",
+      "status": "ready",
+      "proof_uri": "proof_records/LC-READY.proof.json",
+      "next_action": "Execute once the global coverage gate opens."
+    },
+    {
+      "task_id": "LC-RUNNING",
+      "parent_ids": ["LC-DRAFT"],
+      "phase": "lifecycle-demo",
+      "title": "Running is not ready",
+      "status": "running",
+      "proof_uri": "proof_records/LC-RUNNING.proof.json",
+      "next_action": "In flight."
+    },
+    {
+      "task_id": "LC-COMPLETE",
+      "parent_ids": ["LC-READY"],
+      "phase": "lifecycle-demo",
+      "title": "Proof-backed task becomes Complete",
+      "status": "running",
+      "proof_uri": "proof_records/LC-COMPLETE.proof.json",
+      "next_action": "Proof pending merge."
+    },
+    {
+      "task_id": "LC-ROLLBACK",
+      "parent_ids": ["LC-READY"],
+      "phase": "lifecycle-demo",
+      "title": "Proof failure reopens as rolled-back",
+      "status": "running",
+      "proof_uri": "proof_records/LC-ROLLBACK.proof.json",
+      "next_action": "Proof failed; reopen."
+    }
+  ]
+}

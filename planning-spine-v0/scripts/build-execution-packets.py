@@ -15,6 +15,12 @@ from typing import Any
 NORMALIZED_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.normalized.v0"
 PACKET_SCHEMA_VERSION = "lifeos-planning-spine.execution-packet.v0"
 MANIFEST_SCHEMA_VERSION = "lifeos-planning-spine.execution-manifest.v0"
+COVERAGE_CONTROL_SCHEMA_VERSION = "lifeos-planning-spine.coverage-control.v0"
+COVERAGE_REPORT_SCHEMA_VERSION = "lifeos-planning-spine.coverage-gate-report.v0"
+COMPLETE_COVERAGE_STATUSES = {"complete", "covered-complete"}
+COMPLETE_DECOMPOSITION_STATUSES = {"complete", "decomposed", "task-families-complete"}
+OWNER_APPROVAL_OPEN = "open"
+MAX_OFFENDING_IN_REPORT = 25
 REQUIRED_PACKET_FIELDS = [
     "packet_schema_version",
     "generated_at",
@@ -181,6 +187,165 @@ def rebuild_packets(
     return manifest
 
 
+def _cap(items: list[str]) -> list[str]:
+    return sorted(items)[:MAX_OFFENDING_IN_REPORT]
+
+
+def load_coverage_control(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        raise PacketError(f"coverage control does not exist: {path}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise PacketError(f"coverage control is not valid JSON: {error}")
+    if not isinstance(data, dict):
+        raise PacketError("coverage control must be a JSON object")
+    if data.get("schema_version") != COVERAGE_CONTROL_SCHEMA_VERSION:
+        raise PacketError(
+            "coverage control schema_version must be "
+            f"{COVERAGE_CONTROL_SCHEMA_VERSION!r}; got {data.get('schema_version')!r}"
+        )
+    for key in ("anchors", "tasks", "phases"):
+        if not isinstance(data.get(key), list):
+            raise PacketError(f"coverage control missing required list: {key}")
+    if not isinstance(data.get("owner_execution_approval"), str):
+        raise PacketError("coverage control missing owner_execution_approval string")
+    return data
+
+
+def _detect_cycle(tasks: list[dict[str, Any]], task_ids: set[str]) -> list[str]:
+    """Return the task_ids that participate in a dependency cycle (empty if acyclic)."""
+    parents = {
+        str(task.get("task_id", "")).strip(): [
+            str(pid).strip()
+            for pid in task.get("parent_ids", [])
+            if str(pid).strip() in task_ids
+        ]
+        for task in tasks
+    }
+    WHITE, GREY, BLACK = 0, 1, 2
+    color = {tid: WHITE for tid in parents}
+    in_cycle: set[str] = set()
+
+    def visit(node: str, stack: list[str]) -> None:
+        color[node] = GREY
+        stack.append(node)
+        for parent in parents.get(node, []):
+            if color.get(parent) == GREY:
+                # back-edge: everything from parent..node is on the cycle
+                idx = stack.index(parent)
+                in_cycle.update(stack[idx:])
+            elif color.get(parent) == WHITE:
+                visit(parent, stack)
+        stack.pop()
+        color[node] = BLACK
+
+    for tid in parents:
+        if color[tid] == WHITE:
+            visit(tid, [])
+    return sorted(in_cycle)
+
+
+def evaluate_coverage_gate(control: dict[str, Any]) -> dict[str, Any]:
+    """Fail-closed North Star coverage gate. Returns a report with an overall result."""
+    anchors = control["anchors"]
+    tasks = control["tasks"]
+    declared_phases = [str(p).strip() for p in control["phases"] if str(p).strip()]
+    owner_approval = str(control["owner_execution_approval"]).strip().lower()
+
+    task_ids = {str(t.get("task_id", "")).strip() for t in tasks if str(t.get("task_id", "")).strip()}
+
+    # 1. incomplete-coverage
+    incomplete_anchors = [
+        str(a.get("anchor_id", "<unknown>"))
+        for a in anchors
+        if str(a.get("coverage_status", "")).strip().lower() not in COMPLETE_COVERAGE_STATUSES
+        or str(a.get("decomposition_status", "")).strip().lower() not in COMPLETE_DECOMPOSITION_STATUSES
+    ]
+
+    # 2. missing-parents
+    missing_parents = sorted(
+        {
+            f"{str(t.get('task_id'))}->{str(pid).strip()}"
+            for t in tasks
+            for pid in t.get("parent_ids", [])
+            if str(pid).strip() and str(pid).strip() not in task_ids
+        }
+    )
+
+    # 3. cycles
+    cyclic_tasks = _detect_cycle(tasks, task_ids)
+
+    # 4. orphan-phases: a declared phase with zero member tasks, or a task in an undeclared phase
+    task_phases = {str(t.get("phase", "")).strip() for t in tasks if str(t.get("phase", "")).strip()}
+    empty_phases = [p for p in declared_phases if p not in task_phases]
+    undeclared_phases = sorted(task_phases - set(declared_phases))
+    orphan_phases = sorted(set(empty_phases) | set(undeclared_phases))
+
+    # 5. unanchored-tasks
+    anchored = {
+        str(tid).strip()
+        for a in anchors
+        for tid in a.get("phase_task_ids", [])
+        if str(tid).strip()
+    }
+    unanchored_tasks = sorted(task_ids - anchored)
+
+    # 6. closed-owner-approval
+    owner_open = owner_approval == OWNER_APPROVAL_OPEN
+
+    checks = [
+        {
+            "name": "coverage_complete",
+            "result": "pass" if not incomplete_anchors else "fail",
+            "detail": "every North Star anchor must be coverage- and decomposition-complete",
+            "offending": _cap(incomplete_anchors),
+        },
+        {
+            "name": "dependencies_resolve",
+            "result": "pass" if not missing_parents else "fail",
+            "detail": "every parent_id must reference a task in the graph",
+            "offending": _cap(missing_parents),
+        },
+        {
+            "name": "no_dependency_cycles",
+            "result": "pass" if not cyclic_tasks else "fail",
+            "detail": "the dependency graph must be acyclic",
+            "offending": _cap(cyclic_tasks),
+        },
+        {
+            "name": "phases_decomposed",
+            "result": "pass" if not orphan_phases else "fail",
+            "detail": "no declared phase may be empty and no task may sit in an undeclared phase",
+            "offending": _cap(orphan_phases),
+        },
+        {
+            "name": "tasks_anchored",
+            "result": "pass" if not unanchored_tasks else "fail",
+            "detail": "every task must be anchored to a North Star outcome",
+            "offending": _cap(unanchored_tasks),
+        },
+        {
+            "name": "owner_opened_execution",
+            "result": "pass" if owner_open else "fail",
+            "detail": "the owner must explicitly open execution",
+            "offending": [] if owner_open else [owner_approval or "<unset>"],
+        },
+    ]
+
+    failed = [c["name"] for c in checks if c["result"] == "fail"]
+    return {
+        "schema_version": COVERAGE_REPORT_SCHEMA_VERSION,
+        "generated_at": utc_now(),
+        "result": "pass" if not failed else "fail",
+        "task_count": len(task_ids),
+        "anchor_count": len(anchors),
+        "owner_execution_approval": owner_approval,
+        "failed_checks": failed,
+        "checks": checks,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build bounded execution packet JSON files.")
     parser.add_argument(
@@ -207,7 +372,42 @@ def main() -> int:
         default="ready",
         help="Normalized task status to package",
     )
+    parser.add_argument(
+        "--coverage-control",
+        type=Path,
+        default=None,
+        help=(
+            "Coverage-control JSON. When supplied, the fail-closed North Star coverage "
+            "gate runs first and blocks packet generation unless it passes."
+        ),
+    )
+    parser.add_argument(
+        "--coverage-report",
+        type=Path,
+        default=Path("generated/north_star_coverage.report.json"),
+        help="Coverage gate report output path (written whenever --coverage-control is given)",
+    )
     args = parser.parse_args()
+
+    if args.coverage_control is not None:
+        try:
+            control = load_coverage_control(args.coverage_control)
+            report = evaluate_coverage_gate(control)
+        except PacketError as error:
+            print(f"build-execution-packets: error: {error}", file=sys.stderr)
+            return 1
+        write_json(args.coverage_report, report)
+        if report["result"] != "pass":
+            print(
+                "build-execution-packets: coverage gate CLOSED — execution-packet "
+                f"generation blocked; failed checks: {', '.join(report['failed_checks'])} "
+                f"(report: {args.coverage_report})",
+                file=sys.stderr,
+            )
+            return 1
+        print(
+            f"build-execution-packets: coverage gate OPEN (report: {args.coverage_report})"
+        )
 
     try:
         manifest = rebuild_packets(

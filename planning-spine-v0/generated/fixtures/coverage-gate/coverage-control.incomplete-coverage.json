@@ -1,0 +1,18 @@
+{
+  "schema_version": "lifeos-planning-spine.coverage-control.v0",
+  "description": "Negative fixture: one anchor is only covered-high-level (not decomposition-complete). The coverage gate must CLOSE on coverage_complete.",
+  "owner_execution_approval": "open",
+  "phases": ["phase-alpha"],
+  "anchors": [
+    {
+      "anchor_id": "NS-DEMO",
+      "coverage_status": "covered-high-level",
+      "decomposition_status": "task-families-present-owner-decision-pending",
+      "phase_task_ids": ["DEMO-001", "DEMO-002"]
+    }
+  ],
+  "tasks": [
+    {"task_id": "DEMO-001", "phase": "phase-alpha", "parent_ids": []},
+    {"task_id": "DEMO-002", "phase": "phase-alpha", "parent_ids": ["DEMO-001"]}
+  ]
+}

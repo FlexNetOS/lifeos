@@ -1,0 +1,60 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-002.local-evidence.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-002.source-receipt.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-002.truth-matrix.csv",
+    "planning-spine-v0/proof_records/NBVERIFY-001-v2.proof.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-RUNTIME-001.node-authority-proof.raw.json",
+    "planning-spine-v0/proof_records/NBVERIFY-002.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-002-v2.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T103525Z-lifeos-nbverify-002-before-local-truth-integration.tar.gz"
+  ],
+  "checksums": {
+    "NBVERIFY-001-v2.proof.json": "226cbbb879a8c1ab7299d3530b5867b240a7910ca2244fca6097f7cea60ea6dc",
+    "NBVERIFY-RUNTIME-001.node-authority-proof.raw.json": "abac0d64ab8feb406ac66f979c9626bdb2656ff88c11eab09101d286af9d059d",
+    "20260711T103525Z-lifeos-nbverify-002-before-local-truth-integration.tar.gz": "82c7be074cffad29399d4801a9128b9bf3142f0f8af0c403bbb2b809eefcfcd7"
+  },
+  "gate_result": {
+    "correction_scope_only": true,
+    "prior_revision_preserved": true,
+    "claim_verdicts_unchanged": true,
+    "claims": 5,
+    "verified": 1,
+    "qualified": 3,
+    "refuted": 1,
+    "queued": 0,
+    "reused_authority": "planning-spine-v0/proof_records/NBVERIFY-001-v2.proof.json",
+    "real_root_bun_authority": true,
+    "redb_evidence_unchanged": true,
+    "normalization_errors": 0,
+    "task_count": 156,
+    "task_status": "Complete",
+    "ready_count": 0,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true
+  },
+  "live_commands": [
+    {
+      "command": "NBVERIFY-001-v2 real root Bun/N-API proof",
+      "exit_status": 0,
+      "purpose": "Supersede only the inherited package-authority interpretation; preserve redb and claim evidence."
+    },
+    {
+      "command": "NBVERIFY-001 redb source/tests and five-run benchmark",
+      "exit_status": 0,
+      "purpose": "Reuse unchanged primary redb and performance evidence."
+    },
+    {
+      "command": "bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Validate the corrected proof chain."
+    }
+  ],
+  "observed_at": "2026-07-11T21:28:11Z",
+  "proof_summary": "Append-only correction of NBVERIFY-002 authority inheritance: all five existing claim verdicts and redb conclusions remain unchanged, while the inherited Bun/N-API authority now explicitly consumes NBVERIFY-001 revision 2 from the real LifeOS root installation.",
+  "revision": 2,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBVERIFY-002",
+  "verification_gate": "NBVERIFY-001 revision 2 is consumed before this revision; all five existing classifications remain unchanged; redb primary evidence and benchmark boundaries remain intact; no temporary package authority is used."
+}

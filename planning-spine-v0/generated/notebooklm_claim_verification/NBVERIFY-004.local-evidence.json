@@ -1,0 +1,1532 @@
+{
+  "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
+  "task_id": "NBVERIFY-004",
+  "observed_at": "2026-07-11T22:25:25.387Z",
+  "repository": {
+    "root": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification",
+    "package_json_sha256": "730ad5abed8a2e75ed263dcdfb05702ee8851c9fce4fdbf005d225fa257e046c"
+  },
+  "collector": {
+    "claim_id": "SWARM-CLAIM-011",
+    "mode": "read-only-performance-boundary-trace",
+    "writes_only": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+    "does_not_launch": true,
+    "does_not_install": true,
+    "does_not_mutate_generated_runtime": true
+  },
+  "claims": [
+    {
+      "claim_id": "SWARM-CLAIM-001",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "The profile-owned Yazelix frontdoor, launcher target, and a live Yazelix process snapshot are present, but no portable artifact identity or LifeOS/Tauri UI readiness acceptance receipt binds them into the claimed portable launch flow.",
+      "evidence": [
+        {
+          "relationship": "portable-artifact-identity",
+          "proven": false,
+          "candidates": [],
+          "note": "No portable artifact is identified; an installed Nix profile is not portable-artifact proof."
+        },
+        {
+          "relationship": "profile-frontdoor",
+          "proven": true,
+          "frontdoor": "/home/flexnetos/.nix-profile/bin/yzx",
+          "frontdoor_realpath": "/nix/store/66llanvj1g9qbcvbj8c674jc595ri2rr-lifeos-foundation-yzx/bin/yzx",
+          "frontdoor_sha256": "e0de83d7cac4f27f89322b5d6abbcbf39078214fabb44e7d28237af24e5bde6c",
+          "layout": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_realpath": "/nix/store/d0k50bxd4gd4rrhrp7zb2ckqqwsdh873-yazelix-package-source/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_sha256": "88490095aac3c94092123061e13900913a697891325a6cb1637a6933c2373771",
+          "doctor_exit_status": 0,
+          "doctor_output": "🔍 Running Yazelix Health Checks...\n\nℹ️  Runtime/distribution capability: store/package runtime\n✅ Generated runtime state is current\n✅ Yazelix launch script is present\n✅ Yazelix generated Zellij layout is present\n✅ The selected Yazelix terminal command is available\n✅ Graphics previews: Yazelix Kitty passthrough bridge is active\nℹ️  Chafa probe safety: no Chafa probe is active\nℹ️  Optional host runtime tool unavailable: mise\nℹ️  Optional host runtime tool unavailable: tombi\n✅ Shell initializers do not reference deleted transient runtime paths\n✅ No conflicting Helix runtime directories found\n✅ Helix runtime healthy with 291 grammars\n✅ Managed Helix reveal integration is healthy\n✅ Managed Helix Steel command surface is healthy\n✅ Using custom settings.jsonc configuration\nℹ️  Native config integration status\n✅ Workspace runtime assets are present\n✅ Generated workspace assets match the active runtime\nℹ️  Install owner: default Nix profile\n✅ Yazelix desktop entry uses the expected launcher path\n✅ Yazelix pane-orchestrator permissions granted\n✅ Managed sidebar pane detected: terminal:0\nℹ️  Managed editor pane not detected in the current tab\n\n🎉 All checks passed! Yazelix is healthy.\n",
+          "profile_exit_status": 0,
+          "profile_output": "Name:               \u001b[1mfira-code\u001b[0m\nFlake attribute:    legacyPackages.x86_64-linux.nerd-fonts.fira-code\nOriginal flake URL: flake:nixpkgs\nLocked flake URL:   https://api.flakehub.com/f/pinned/DeterminateSystems/nixpkgs-weekly/0.1.1017464%2Brev-567a49d1913ce81ac6e9582e3553dd90a955875f/019f1749-32d6-7283-9e9a-861bd8478e6a/source.tar.gz?narHash=sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H%2BCNW1Ck8B%2B8%3D\nStore paths:        /nix/store/yhnilvwv835jnvd0cwakj8x75niqbz0w-nerd-fonts-fira-code-3.4.0+6.2\n\nName:               \u001b[1mlifeos_foundation_yzx\u001b[0m\nFlake attribute:    packages.x86_64-linux.lifeos_foundation_yzx\nOriginal flake URL: github:FlexNetOS/yazelix\nLocked flake URL:   github:FlexNetOS/yazelix/692264585a94c7d0a4d3fa243a14737bb1aa9813\nStore paths:        /nix/store/66llanvj1g9qbcvbj8c674jc595ri2rr-lifeos-foundation-yzx\n\nName:               \u001b[1mrclone\u001b[0m\nFlake attribute:    legacyPackages.x86_64-linux.rclone\nOriginal flake URL: flake:nixpkgs\nLocked flake URL:   https://api.flakehub.com/f/pinned/DeterminateSystems/nixpkgs-weekly/0.1.1017464%2Brev-567a49d1913ce81ac6e9582e3553dd90a955875f/019f1749-32d6-7283-9e9a-861bd8478e6a/source.tar.gz?narHash=sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H%2BCNW1Ck8B%2B8%3D\nStore paths:        /nix/store/cr19g4j3ccpgb61aqy6knb7l2xsfq4v6-rclone-1.74.3-man /nix/store/lhr13fn0qnjcgiy1kyvplxygchmmnj43-rclone-1.74.3\n\nName:               \u001b[1msymbols-only\u001b[0m\nFlake attribute:    legacyPackages.x86_64-linux.nerd-fonts.symbols-only\nOriginal flake URL: flake:nixpkgs\nLocked flake URL:   https://api.flakehub.com/f/pinned/DeterminateSystems/nixpkgs-weekly/0.1.1017464%2Brev-567a49d1913ce81ac6e9582e3553dd90a955875f/019f1749-32d6-7283-9e9a-861bd8478e6a/source.tar.gz?narHash=sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H%2BCNW1Ck8B%2B8%3D\nStore paths:        /nix/store/hwyn9a96xi19s7gw3srvxhhazp417x44-nerd-fonts-symbols-only-3.4.0\n\nName:               \u001b[1myazelix\u001b[0m\nFlake attribute:    packages.x86_64-linux.yazelix\nOriginal flake URL: github:FlexNetOS/yazelix\nLocked flake URL:   github:FlexNetOS/yazelix/73519be5381825052b3717d3d21c557c0069d266\nStore paths:        /nix/store/xv4nyps1h5bi00jqzcaw5dg8g7l8yw2p-yazelix\n"
+        },
+        {
+          "relationship": "launcher-target",
+          "proven": true,
+          "desktop_path": "/home/flexnetos/.local/share/applications/com.flexnetos.Yazelix.Agent.desktop",
+          "exec": "/usr/bin/env YAZELIX_LAYOUT_OVERRIDE=\"/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl\" \"/home/flexnetos/.nix-profile/bin/yzx\" desktop launch"
+        },
+        {
+          "relationship": "process-tree",
+          "proven": true,
+          "relevant_processes": [
+            "3562937    4021 desktop_deferre /bin/sh /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/desktop_deferred_launch_probe.sh --detached /home/flexnetos/.local/share/yazelix/logs/terminal_launch/kitty_1783803527583.log 3562933 -- /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nixGLMesa /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/kitty --title Yazelix - Kitty --directory /home/flexnetos /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/start_yazelix.sh",
+            "3562948 3562937 .kitty-wrapped  /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/kitty --title Yazelix - Kitty --directory /home/flexnetos /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/start_yazelix.sh",
+            "3563025 3562948 kitten          /nix/store/716pli9h8hd9x7p6wb7zp27kqv676g4s-kitty-0.47.4/bin/kitten __atexit__",
+            "3563032 3562948 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control enter",
+            "3563183 3563032 zellij          zellij --config-dir /home/flexnetos/.local/share/yazelix/configs/zellij options --default-cwd /home/flexnetos --default-layout /home/flexnetos/.local/share/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl --default-shell /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/yazelix_nu.sh",
+            "3563187    4021 zellij          /nix/store/3i0aizr76i6pih3z4mnwd7j0675ibvw9-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/implacable-diplodocus",
+            "3563222 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3563231 3563222 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3563281 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx env",
+            "3563283 3563281 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control env",
+            "3563290 3563283 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3563307 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx agent",
+            "3563316 3563307 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control agent",
+            "3563317 3563316 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3563318 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx env",
+            "3563320 3563317 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3563321 3563318 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control env",
+            "3563324 3563321 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3563395 3563187 ccboard         /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/ccboard",
+            "3597291 3563324 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3597293 3597291 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3609582 3563290 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3609584 3609582 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3610072 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3610778 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3611430 3610778 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk claude",
+            "3611432 3611430 .claude-wrapped /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/claude",
+            "3611458 3611432 MainThread      /nix/store/rd29hc9xjbsv9p2i86q90k038j5glxvf-lifeos-foundation-yzx/toolbin/node /home/flexnetos/meta/var/lib/gitnexus-cli/node_modules/gitnexus/dist/cli/index.js mcp",
+            "3656423 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3656430 3656423 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3657378 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3657385 3657378 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3662018 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3662916 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3785821 3610072 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3785823 3785821 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3946109 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946111 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946212 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946213 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946216 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946217 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946267 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946268 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946371 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946372 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946397 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946410 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946480 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946481 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946482 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946483 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946484 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946485 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false",
+            "3946486 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget cpu --widget-frame none --widget-separator empty --widget-first false",
+            "3946487 3563187 yazelix_zellij_ /nix/store/ac6hf0z7pz0qp9pczlbqpl2yc921whhq-yazelix_zellij_bar-0.1.0/bin/yazelix_zellij_bar_widget ram --widget-frame none --widget-separator empty --widget-first false"
+          ]
+        },
+        {
+          "relationship": "ui-readiness",
+          "proven": false,
+          "reason": "No LifeOS/Tauri readiness signal or portable-launch acceptance receipt was observed."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-005",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "No automatic governed Ruvnet-agent startup is proven. LifeOS desktop startup and the installed Yazelix workspace are present, but no agent inventory, authority gate, ordering/readiness contract, isolation, shutdown, or restart receipt exists.",
+      "evidence": [
+        {
+          "relationship": "startup-orchestration",
+          "proven": false,
+          "source_files": [
+            {
+              "path": "src-tauri/src/main.rs",
+              "exists": true,
+              "sha256": "fd16a2aebef2178c6c9ed8436d4a7db851eb3531409e14dbe4997ab8ff7faed1"
+            },
+            {
+              "path": "src-tauri/src/lib.rs",
+              "exists": true,
+              "sha256": "3b67c810ba5da41e0ba5d5484098699dfc9f6ebf6890fd5e09507a331dd2c85f"
+            },
+            {
+              "path": "crates/lifeos-core/src/mcp/ruvector.rs",
+              "exists": true,
+              "sha256": "f472ab011626f1cc057b309ea7f337fc342141a86dac23d6233a4f1383bc9586"
+            },
+            {
+              "path": "crates/lifeos-daemon/src/main.rs",
+              "exists": true,
+              "sha256": "cd0277faef02beca316820626464a608a97d2a1ddf7bf79e4fbae2fc6fac5bec"
+            },
+            {
+              "path": "crates/lifeos-daemon/README.md",
+              "exists": true,
+              "sha256": "d3b1716181a2eed68547fae6abff1ae0991bdd69111fbca913a903f848b8cbe3"
+            },
+            {
+              "path": "planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md",
+              "exists": true,
+              "sha256": "6630a1c30464d4e6f7ba5d72a7ffc1c689516391f5c3945cd24b4c7b407b0b3a"
+            }
+          ],
+          "search_command": "rg -n -i ruvnet|agentdb|ruvllm|rvf src src-tauri",
+          "search_exit_status": 1,
+          "source_matches": [],
+          "boundary": "Tauri setup initializes the application and storage; Yazelix owns terminal workspace orchestration; neither is proof of Ruvnet-agent startup."
+        },
+        {
+          "relationship": "agent-inventory",
+          "proven": false,
+          "agent_ids": [],
+          "missing": [
+            "declared-agent-identities",
+            "executable-and-config-identities"
+          ]
+        },
+        {
+          "relationship": "authority-gate",
+          "proven": false,
+          "missing": [
+            "governance-policy",
+            "authorization-check",
+            "owner-approval-receipt"
+          ]
+        },
+        {
+          "relationship": "ordering-readiness",
+          "proven": false,
+          "missing": [
+            "dependency-order",
+            "readiness-signal",
+            "timeout-policy"
+          ]
+        },
+        {
+          "relationship": "failure-isolation",
+          "proven": false,
+          "missing": [
+            "per-agent-failure-boundary",
+            "error-routing",
+            "isolation-test"
+          ]
+        },
+        {
+          "relationship": "shutdown-restart",
+          "proven": false,
+          "missing": [
+            "graceful-stop",
+            "restart-policy",
+            "bounded-restart-test"
+          ]
+        },
+        {
+          "relationship": "agent-process-search",
+          "proven": false,
+          "command": "ps -eo pid=,ppid=,comm=,args=",
+          "exit_status": 0,
+          "matches": [],
+          "note": "No Ruvnet/RuvLLM/AgentDB process was visible at this observation point; this does not prove a global negative."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-006",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "A real Bun-installed RuvLLM package and native Linux optional binary load, and the native verifier exercised 51 in-memory adapters; static engine selection by automatically started Ruvnet agents remains unproven.",
+      "evidence": [
+        {
+          "relationship": "ruvllm-package",
+          "proven": true,
+          "direct": {
+            "name": "@ruvector/ruvllm",
+            "path": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/@ruvector/ruvllm/package.json",
+            "proven": true,
+            "version": "2.6.0"
+          },
+          "platform_native": {
+            "name": "@ruvector/ruvllm-linux-x64-gnu",
+            "path": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/@ruvector/ruvllm-linux-x64-gnu/package.json",
+            "proven": true,
+            "version": "2.0.1"
+          },
+          "package_json_sha256": "78f0373a1536086dbd4a9f2d18e8a10f86419116d9816f6b5c5d766e9fc35309"
+        },
+        {
+          "relationship": "native-capability",
+          "proven": true,
+          "bun": "1.3.14",
+          "napi": "10",
+          "implementation": "native",
+          "features": [
+            "SIMD",
+            "Multi-threading",
+            "Rust-native"
+          ],
+          "native_binary": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/@ruvector/ruvllm-linux-x64-gnu/ruvllm.linux-x64-gnu.node",
+          "native_binary_exists": true
+        },
+        {
+          "relationship": "ruvllm-runtime-proof",
+          "proven": true,
+          "adapter_count": 51,
+          "active_adapter": "personality-51",
+          "note": "This proves 51 in-memory LoRA adapters and switching, not RVF persistence or complete agent personalities."
+        },
+        {
+          "relationship": "static-engine-boundary",
+          "proven": false,
+          "missing": [
+            "static-link-or-packaging-definition",
+            "fixed-agent-engine-selection",
+            "running-agent-process"
+          ]
+        },
+        {
+          "relationship": "automatic-agent-usage",
+          "proven": false,
+          "process_snapshot": "ps -eo pid=,ppid=,comm=,args=",
+          "agent_processes": [],
+          "note": "Native package capability is not proof that an automatically started Ruvnet agent uses the engine."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-007",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "The real Bun verifier produced and loaded RVF-backed files through NodeBackend, including an AgentDB learning artifact; no per-agent Ruvnet .rvf discovery, identity, authority, retention, or recovery contract is proven.",
+      "evidence": [
+        {
+          "relationship": "rvf-runtime-proof",
+          "proven": true,
+          "package": {
+            "direct": {
+              "path": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/@ruvector/rvf/package.json",
+              "proven": true
+            },
+            "native": {
+              "path": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/@ruvector/rvf-node-linux-x64-gnu/package.json",
+              "proven": true
+            }
+          },
+          "backend": "NodeBackend",
+          "artifact": {
+            "path": "node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/direct.rvf",
+            "exists": true,
+            "absolute": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/direct.rvf"
+          },
+          "bytes": 680,
+          "ingest": {
+            "accepted": 2,
+            "rejected": 0,
+            "epoch": 1
+          },
+          "segments": [
+            {
+              "id": 1,
+              "offset": 0,
+              "payloadLength": 98,
+              "segType": "manifest"
+            },
+            {
+              "id": 2,
+              "offset": 162,
+              "payloadLength": 86,
+              "segType": "vec"
+            },
+            {
+              "id": 3,
+              "offset": 312,
+              "payloadLength": 67,
+              "segType": "witness"
+            },
+            {
+              "id": 4,
+              "offset": 443,
+              "payloadLength": 173,
+              "segType": "manifest"
+            }
+          ]
+        },
+        {
+          "relationship": "agent-rvf-boundary",
+          "proven": true,
+          "artifact": {
+            "path": "node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/agentdb-self-learning.rvf",
+            "exists": true,
+            "absolute": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/agentdb-self-learning.rvf"
+          },
+          "learning_enabled": true,
+          "segments": [
+            {
+              "id": 1,
+              "offset": 0,
+              "payloadLength": 98,
+              "segType": "manifest"
+            },
+            {
+              "id": 2,
+              "offset": 162,
+              "payloadLength": 46,
+              "segType": "vec"
+            },
+            {
+              "id": 3,
+              "offset": 272,
+              "payloadLength": 67,
+              "segType": "witness"
+            },
+            {
+              "id": 4,
+              "offset": 403,
+              "payloadLength": 173,
+              "segType": "manifest"
+            },
+            {
+              "id": 5,
+              "offset": 640,
+              "payloadLength": 46,
+              "segType": "vec"
+            },
+            {
+              "id": 6,
+              "offset": 750,
+              "payloadLength": 67,
+              "segType": "witness"
+            },
+            {
+              "id": 7,
+              "offset": 881,
+              "payloadLength": 248,
+              "segType": "manifest"
+            }
+          ],
+          "witness": {
+            "result": {
+              "valid": false,
+              "entries": 0,
+              "error": "this.db.verifyWitness is not a function. (In 'this.db.verifyWitness()', 'this.db.verifyWitness' is undefined)"
+            }
+          },
+          "note": "This artifact is verifier-owned under node-authority cache, not an identified per-agent cognitive-state directory."
+        },
+        {
+          "relationship": "per-agent-loading-contract",
+          "proven": false,
+          "missing": [
+            "agent-identity-to-rvf-mapping",
+            "automatic-discovery",
+            "authority-and-mutation-policy",
+            "retention-and-recovery-test"
+          ],
+          "rvf_files_found": [
+            "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/direct.rvf",
+            "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/NBVERIFY-RUNTIME-001.node-authority-proof.raw/agentdb-self-learning.rvf",
+            "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/proof/direct.rvf",
+            "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/proof/agentdb-self-learning.rvf",
+            "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/direct.rvf",
+            "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/node_modules/.cache/lifeos/node-authority/agentdb-self-learning.rvf"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-008",
+      "verification_status": "unverified",
+      "status": "owner-decision-pending",
+      "conclusion": "UDS remains an architecture proposal. No LifeOS UDS endpoint or protocol was found, and no owner decision selected UDS or defined its contract.",
+      "evidence": [
+        {
+          "relationship": "uds-implementation-search",
+          "proven": false,
+          "command": "rg -n -i UnixStream|UnixListener|AF_UNIX|unix.*socket|domain socket|uds src src-tauri crates",
+          "exit_status": 1,
+          "matches": [],
+          "implementation_matches": [],
+          "note": "A source mention or proposal is not an implemented endpoint."
+        },
+        {
+          "relationship": "uds-contract",
+          "proven": false,
+          "missing": [
+            "endpoint-identity",
+            "request-response-schema",
+            "peer-identity",
+            "authorization",
+            "freshness",
+            "audit",
+            "failure-and-recovery"
+          ]
+        },
+        {
+          "relationship": "owner-decision",
+          "proven": false,
+          "proposal": "LifeOS should connect to the active workspace through Unix Domain Sockets.",
+          "decision_required": "Select UDS or another transport only after the protocol and authority contract is reviewed.",
+          "owner_decision_path": "POSTGRES-007; POSTGRES-009; LIFEOS-010"
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-009",
+      "verification_status": "unverified",
+      "status": "owner-decision-pending",
+      "conclusion": "No shared redb state-file implementation or authority contract exists in the LifeOS source surface. The proposal remains unresolved against UDS, PostgreSQL, and existing store boundaries.",
+      "evidence": [
+        {
+          "relationship": "redb-implementation-search",
+          "proven": false,
+          "command": "rg -n -i redb|shared.*state|state.*redb src src-tauri crates --glob !**/AGENTS.md",
+          "exit_status": 1,
+          "matches": []
+        },
+        {
+          "relationship": "shared-redb-contract",
+          "proven": false,
+          "missing": [
+            "owner-and-writer-count",
+            "schema-and-locking",
+            "snapshot-version",
+            "freshness",
+            "corruption-recovery",
+            "postgresql-relationship"
+          ]
+        },
+        {
+          "relationship": "authority-decision",
+          "proven": false,
+          "proposal": "LifeOS could connect through shared redb state files instead of or alongside UDS.",
+          "decision_required": "Choose derived view, IPC mechanism, cache, or authority before implementation.",
+          "owner_decision_path": "PGAUTH-002; PGAUTH-006; STORE-001; POSTGRES-007"
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-010",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "LifeOS contains agent-team and workflow UI surfaces, but no canonical active-swarm status schema, selected transport projection, agent identity flow, or stale/unavailable state behavior is proven.",
+      "evidence": [
+        {
+          "relationship": "ui-status-search",
+          "proven": true,
+          "command": "rg -n -i swarm|agent team|agent status src tests --glob !**/AGENTS.md",
+          "exit_status": 0,
+          "matches": [
+            "src/lib/nav.ts:55:      pushIfChanged(router, buildPath(\"ai\", \"Agent Teams\", item?.label));",
+            "tests/nbverify004-claim006.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-006 evidence\", () => {",
+            "tests/nbverify004-claim006.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-006\",",
+            "tests/nbverify004-claim012.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-012 evidence\", () => {",
+            "tests/nbverify004-claim012.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-012\",",
+            "src/lib/nav.js:45:      pushIfChanged(router, buildPath(\"ai\", \"Agent Teams\", item?.label));",
+            "tests/SubsectionAndFlow.spec.js:36:    store.pickSub({ label: \"Day Captain\", flowId: \"day\", view: \"n8n-flow\", icon: \"users-2\" }, \"Agent Teams\");",
+            "tests/SubsectionAndFlow.spec.js:46:    store.pickSub({ label: \"Mystery\", flowId: \"nope\", view: \"n8n-flow\" }, \"Agent Teams\");",
+            "tests/SubsectionAndFlow.spec.js:54:    store.pickSub({ label: \"Day Captain\", flowId: \"day\", view: \"n8n-flow\" }, \"Agent Teams\");",
+            "tests/nbverify004-claim008.spec.ts:11:describe(\"NBVERIFY-004 SWARM-CLAIM-008 evidence\", () => {",
+            "tests/nbverify004-claim008.spec.ts:18:        candidate.claim_id === \"SWARM-CLAIM-008\",",
+            "tests/Dashboard.spec.js:12:  it(\"renders greeting + stat cards + agent team grid\", () => {",
+            "tests/Dashboard.spec.js:29:  it(\"clicking an agent team card jumps to AI workspace + opens the flow\", async () => {",
+            "tests/Dashboard.spec.js:34:    expect(store.sectionByWs.ai).toBe(\"Agent Teams\");",
+            "tests/Workspace.spec.js:30:    const teamsOption = w.findAll(\".ws-selector-option\").find(b => b.text().includes(\"Agent Teams\"));",
+            "tests/Workspace.spec.js:32:    expect(store.sectionByWs.ai).toBe(\"Agent Teams\");",
+            "tests/setup.js:28:        { title: \"Agent Teams\",",
+            "tests/setup.js:196:      link: { workspaceId: \"ai\", sectionTitle: \"Agent Teams\", itemLabel: \"Day Captain\" } },",
+            "tests/nbverify004-claim011.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-011 evidence\", () => {",
+            "tests/nbverify004-claim011.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-011\",",
+            "tests/nbverify004-claim010.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-010 evidence\", () => {",
+            "tests/nbverify004-claim010.spec.ts:11:  test(\"does not confuse mock agent-team UI with a live swarm projection\", () => {",
+            "tests/nbverify004-claim010.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-010\",",
+            "src/stores/lifeos.ts:141:      this.sectionByWs.ai = \"Agent Teams\";",
+            "src/stores/lifeos.ts:142:      this.activeSub = { workspaceId: \"ai\", sectionTitle: \"Agent Teams\", item: teamItem };",
+            "src/stores/lifeos.ts:143:      this.pendingExpand = `Agent Teams-${teamIndex}`;",
+            "tests/store.spec.js:31:  it(\"jumpToTeam sets ai workspace + Agent Teams section + activeSub + pendingExpand\", () => {",
+            "tests/store.spec.js:36:    expect(s.sectionByWs.ai).toBe(\"Agent Teams\");",
+            "tests/store.spec.js:38:    expect(s.pendingExpand).toBe(\"Agent Teams-0\");",
+            "src/stores/lifeos.js:86:      this.sectionByWs.ai = \"Agent Teams\";",
+            "src/stores/lifeos.js:87:      this.activeSub = { workspaceId: \"ai\", sectionTitle: \"Agent Teams\", item: teamItem };",
+            "src/stores/lifeos.js:88:      this.pendingExpand = `Agent Teams-${teamIndex}`;",
+            "tests/nbverify004-claims005-007.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-005 through 007 evidence\", () => {",
+            "tests/nbverify004-claims005-007.spec.ts:22:      \"SWARM-CLAIM-005\",",
+            "tests/nbverify004-claims005-007.spec.ts:23:      \"SWARM-CLAIM-006\",",
+            "tests/nbverify004-claims005-007.spec.ts:24:      \"SWARM-CLAIM-007\",",
+            "tests/nbverify004-claims005-007.spec.ts:31:    expect(claims.get(\"SWARM-CLAIM-005\").evidence).toEqual(",
+            "tests/nbverify004-claims005-007.spec.ts:37:    expect(claims.get(\"SWARM-CLAIM-006\").evidence).toEqual(",
+            "tests/nbverify004-claims005-007.spec.ts:43:    expect(claims.get(\"SWARM-CLAIM-007\").evidence).toEqual(",
+            "tests/store-sync.spec.js:60:    expect(buildPathTs(\"ai\", \"Agent Teams\", \"Day Captain\"))",
+            "tests/store-sync.spec.js:61:      .toBe(buildPathJs(\"ai\", \"Agent Teams\", \"Day Captain\"));",
+            "tests/nbverify004-claim007.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-007 evidence\", () => {",
+            "tests/nbverify004-claim007.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-007\",",
+            "tests/nbverify004-claim009.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-009 evidence\", () => {",
+            "tests/nbverify004-claim009.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-009\",",
+            "tests/nbverify004-claim005.spec.ts:11:describe(\"NBVERIFY-004 SWARM-CLAIM-005 evidence\", () => {",
+            "tests/nbverify004-claim005.spec.ts:18:        candidate.claim_id === \"SWARM-CLAIM-005\",",
+            "tests/nbverify004-claim001.spec.ts:11:describe(\"NBVERIFY-004 SWARM-CLAIM-001 evidence\", () => {",
+            "tests/nbverify004-claim001.spec.ts:18:        candidate.claim_id === \"SWARM-CLAIM-001\",",
+            "tests/nbverify004-claim014.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-014 evidence\", () => {",
+            "tests/nbverify004-claim014.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-014\",",
+            "tests/nbverify004-claim013.spec.ts:10:describe(\"NBVERIFY-004 SWARM-CLAIM-013 evidence\", () => {",
+            "tests/nbverify004-claim013.spec.ts:16:        candidate.claim_id === \"SWARM-CLAIM-013\",",
+            "tests/nbverify004-progress.spec.ts:29:      expect(rows.has(`SWARM-CLAIM-${String(index).padStart(3, \"0\")}`)).toBe(",
+            "tests/nbverify004-progress.spec.ts:33:    expect(rows.get(\"SWARM-CLAIM-001\")).toContain(\"partial\");",
+            "tests/nbverify004-progress.spec.ts:34:    expect(rows.get(\"SWARM-CLAIM-002\")).toContain(\"partial\");",
+            "tests/nbverify004-progress.spec.ts:35:    expect(rows.get(\"SWARM-CLAIM-003\")).toContain(\"qualified\");",
+            "tests/nbverify004-progress.spec.ts:36:    expect(rows.get(\"SWARM-CLAIM-004\")).toContain(\"qualified\");",
+            "tests/nbverify004-progress.spec.ts:37:    expect(rows.get(\"SWARM-CLAIM-005\")).toContain(\"partial\");",
+            "tests/nbverify004-progress.spec.ts:38:    expect(rows.get(\"SWARM-CLAIM-006\")).toContain(\"qualified\");",
+            "tests/nbverify004-progress.spec.ts:39:    expect(rows.get(\"SWARM-CLAIM-007\")).toContain(\"qualified\");",
+            "tests/nbverify004-progress.spec.ts:40:    expect(rows.get(\"SWARM-CLAIM-008\")).toContain(\"owner-decision-pending\");",
+            "tests/nbverify004-progress.spec.ts:41:    expect(rows.get(\"SWARM-CLAIM-009\")).toContain(\"owner-decision-pending\");",
+            "tests/nbverify004-progress.spec.ts:42:    expect(rows.get(\"SWARM-CLAIM-010\")).toContain(\"qualified\");",
+            "tests/nbverify004-progress.spec.ts:43:    expect(rows.get(\"SWARM-CLAIM-011\")).toContain(\"qualified\");",
+            "tests/nbverify004-progress.spec.ts:44:    expect(rows.get(\"SWARM-CLAIM-012\")).toContain(\"owner-decision-pending\");",
+            "tests/nbverify004-progress.spec.ts:45:    expect(rows.get(\"SWARM-CLAIM-013\")).toContain(\"qualified\");",
+            "tests/nbverify004-progress.spec.ts:46:    expect(rows.get(\"SWARM-CLAIM-014\")).toContain(\"qualified\");",
+            "tests/nav.spec.js:36:    expect(buildPath(\"ai\", \"Agent Teams\", \"Day Captain\"))",
+            "tests/nav.spec.js:76:    wrapper.vm.nav.pickSection(\"Agent Teams\");",
+            "tests/nav.spec.js:78:    expect(wrapper.vm.lifeos.sectionByWs.ai).toBe(\"Agent Teams\");",
+            "tests/nav.spec.js:100:  it(\"jumpToTeam jumps to /workspace/ai/Agent Teams/<team>\", async () => {",
+            "tests/nav.spec.js:106:    expect(wrapper.vm.lifeos.sectionByWs.ai).toBe(\"Agent Teams\");",
+            "tests/nbverify004-claim002.spec.ts:11:describe(\"NBVERIFY-004 SWARM-CLAIM-002 evidence\", () => {",
+            "tests/nbverify004-claim002.spec.ts:18:        candidate.claim_id === \"SWARM-CLAIM-002\",",
+            "src/components/CommandPalette.vue:72:    out.push({ kind: \"team\", id: `team/${t.id}`, icon: t.icon, label: t.name, hint: `Agent team · ${t.meta || \"\"}`, route: { team: t } });",
+            "src/components/Dashboard.vue:27:  (window).LIFEOS_DATA?.workspaces?.ai?.sections?.find((s) => s.title === \"Agent Teams\")?.items || []);",
+            "src/components/Dashboard.vue:118:        <h2>Your agent teams</h2>"
+          ],
+          "note": "UI labels and fixtures are not live workspace status evidence."
+        },
+        {
+          "relationship": "canonical-status-flow",
+          "proven": false,
+          "missing": [
+            "canonical-agent-status-schema",
+            "selected-transport",
+            "agent-identity-projection",
+            "event-source",
+            "LifeOS-runtime-bridge"
+          ]
+        },
+        {
+          "relationship": "stale-unavailable-states",
+          "proven": false,
+          "missing": [
+            "unavailable-state",
+            "stale-state",
+            "disconnect-recovery",
+            "freshness-marker"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-012",
+      "verification_status": "unverified",
+      "status": "owner-decision-pending",
+      "conclusion": "No selected transport, canonical writer, snapshot consistency contract, dual-write prevention, or split-brain recovery proof establishes the claimed no-overlap state.",
+      "evidence": [
+        {
+          "relationship": "authority-search",
+          "proven": true,
+          "command": "rg -n -i canonical.*authority|single.writer|dual.write|split.brain|no.overlap|consistency src src-tauri crates planning-spine-v0 --glob !**/AGENTS.md --glob !**/generated/**",
+          "exit_status": 0,
+          "matches": [
+            "planning-spine-v0/07_MVP_VERTICAL_SLICE.md:39:The package-local machine-readable proof surface for this path lives at `examples/mvp-bundle.json`. Verification must resolve that manifest against the canonical v0 example objects, emit `state/mvp_bundle_report.json` with cross-object linkage results, and emit `state/authority_integrity_report.json` proving that the verifier authority resolves to explicit agent, role, and capability objects before proof-backed completion is accepted.",
+            "planning-spine-v0/1.0_VISION/VISION - Project Artifacts.md:106:| **Incremental sync plan** | Defines CDC, dual writes, event replay, or batch sync strategy. |",
+            "planning-spine-v0/proof_records/NORTHSTAR-001.proof.json:22:  \"proof_summary\": \"Replaced the 135-line implementation-heavy canonical anchor with compact-v2: a 65-line semantic North Star containing the approved statement, five immutable IDs (NS-IDENTITY, NS-ACTION, NS-PRODUCT, NS-AUTHORITY, NS-EVOLUTION), one success test, and pointers to coverage, task graph, architecture, and proof surfaces. Preserved the prior revision in Git history and archive 20260710T175557Z. Updated the coverage table to retain all twelve depth requirements under stable IDs and updated canonical task rows to stop referencing removed numeric North Star sections. The canonical graph contains 89 rows and zero Ready tasks.\",",
+            "planning-spine-v0/proof_records/NBSOURCE-012.proof.json:69:  \"proof_summary\": \"Captured 713 source bytes as 10 unresolved atoms covering HTTP exclusion, UDS/shared-redb communication, direct active-file reads, instant UI status, no-overlap and full-pipeline assertions, initialization and deployment questions, and unresolved citations. Questions remain questions, all atoms are queued, and relation evidence closes no claim.\",",
+            "planning-spine-v0/proof_records/IDD-UNIFY-000.proof.json:17:  \"proof_summary\": \"Equation '.kb + .meta + .handoff + .idd -> .idd' planned, not yet executed. Decisive findings: git-kb 0.2.12 (= latest release v0.2.12 2026-06-06; closed-source binary, open protocol) stores canonically as TEXT (store/documents/*.md + commits/*.json) with derived SQLite cache; the .kb directory name is HARDCODED (GITKB_ROOT accepts only a directory containing .kb/) but a '.kb -> .idd/kb' symlink serves the full CLI (proven with a committed document); export/backup/bundle proven, no data lock-in. handoff's ledger is redb (magic bytes 'redb'), not SQLite; committed truth is ledger.events.jsonl per ADR-0004 SS3/ADR-0018 D1; live violation found: teri/.handoff/ledger.db.rvf is git-tracked. FlexNetOS/meta is a fork of gitkb/meta (vendor lineage; installed 0.2.22); GitKB documents a native '[repos] strategy=meta' integration. rusty-idd (v0.1.0, IDD = Intent-Driven Development) already defines the dot-directory authority model this plan extends; its knowledge index is stale (old /home/drdave workspace_root); hf and rusty-idd binaries are NOT installed (migration phase-0 gate). Plan: per-repo .idd/{kb,handoff,goals,knowledge,evidence,proofs,meta-references} with compatibility symlinks, text-canonical-journal storage rule (enforcing existing ADRs), 4-phase strangler migration with count+sha256 parity proofs and rollbacks. Docs polish: all 19 official gitkb.com docs pages recreated as clean stamped Google Docs with Local Notes (runtime deltas incl. nonexistent 'config set', [user]-not-[identity] author key, conflict verbs, 0.2.6-stale CLI page); originals + 7 vendor zips left untouched in place.\",",
+            "planning-spine-v0/1.0_VISION/teas/schemas/proof_record.schema.json:5:  \"description\": \"Canonical evidence-with-checksum that a WorkOrder ran and passed. Reconciles handoff's witnessed LedgerEvent (redb, blake3 action_hash), the execution-framework *.proof.json (sha256 checksums), and planning-spine-v0 proof-record.schema.json (git heads). Heals DOMAIN_MODEL contradiction 9.2: one versioned ProofRecord; the handoff redb ledger is the authority, proof_ledger.jsonl is an export mirror. Proof status overrides any card/CSV claim.\",",
+            "planning-spine-v0/1.0_VISION/lifeos-planning-spine v0.md:2453:Parallel-safe: no, proof ledger append requires single writer  ",
+            "planning-spine-v0/proof_records/NBSOURCE-004.proof.json:45:    \"no_overlap_state_guarantee_not_overclaimed\": true,"
+          ],
+          "note": "Architecture discussion is not an owner-selected authority contract."
+        },
+        {
+          "relationship": "no-overlap-contract",
+          "proven": false,
+          "missing": [
+            "canonical-writer",
+            "transport-selection",
+            "snapshot-version",
+            "consistency-model",
+            "dual-write-prevention"
+          ]
+        },
+        {
+          "relationship": "split-brain-recovery",
+          "proven": false,
+          "missing": [
+            "conflict-detection",
+            "reconciliation",
+            "recovery-test",
+            "owner-approval"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-013",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "No Temporal Strange Attractor implementation, orchestrator, forecast output, calibration, accuracy evaluation, uncertainty model, or runtime proof exists in the candidate product source.",
+      "evidence": [
+        {
+          "relationship": "forecasting-implementation-search",
+          "proven": false,
+          "command": "rg -n -i Temporal Strange Attractor|strange attractor|Echo.State Network|\\bESN\\b|timeline prediction|forecasting src src-tauri crates --glob !**/AGENTS.md",
+          "exit_status": 1,
+          "matches": [],
+          "note": "Generic simulation schemas or source prose are not a forecasting implementation."
+        },
+        {
+          "relationship": "forecast-model-boundary",
+          "proven": false,
+          "missing": [
+            "algorithm",
+            "model-definition",
+            "orchestrator-path",
+            "input-state",
+            "output-schema",
+            "uncertainty"
+          ]
+        },
+        {
+          "relationship": "evaluation-runtime",
+          "proven": false,
+          "missing": [
+            "training-or-calibration",
+            "accuracy-metric",
+            "benchmark-workload",
+            "runtime-process",
+            "non-executing-simulation-boundary"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-014",
+      "verification_status": "qualified",
+      "status": "qualified",
+      "conclusion": "The indexed source's citation-absence condition is verified: markers [1] through [3] have no recoverable bibliography, document identity, or exact passage. No citation target is inferred, so the technical assertions remain unverified.",
+      "evidence": [
+        {
+          "relationship": "citation-absence",
+          "proven": true,
+          "source_path": "/home/flexnetos/meta/var/lib/codex-runtime-gate/worktrees/lifeos-real-bun-verification/planning-spine-v0/generated/notebooklm_source_extracts/NBSOURCE-004-lifeos-ruvnet-swarm.md",
+          "source_id": "72e22d9c-72c9-4389-8358-700bb46b55b6",
+          "extract_sha256": "4b20acf6a560147679fbdd76b6ac01325640fd27c90e34f82ba62df3b23a36b7",
+          "source_fulltext_sha256": "c39bccfcc14b72e2338f58f90a0b3b4344e5f8023baad08c98dc9a7709f3095c"
+        },
+        {
+          "relationship": "citation-targets",
+          "proven": false,
+          "targets": [],
+          "missing": [
+            "document-identities",
+            "immutable-versions",
+            "exact-supporting-passages"
+          ],
+          "note": "No citation target was inferred from repeated source wording or neighboring sources."
+        },
+        {
+          "relationship": "technical-claim-impact",
+          "proven": false,
+          "affected_claims": [
+            "SWARM-CLAIM-001",
+            "SWARM-CLAIM-002",
+            "SWARM-CLAIM-003",
+            "SWARM-CLAIM-004",
+            "SWARM-CLAIM-005",
+            "SWARM-CLAIM-006",
+            "SWARM-CLAIM-007",
+            "SWARM-CLAIM-008",
+            "SWARM-CLAIM-009",
+            "SWARM-CLAIM-010",
+            "SWARM-CLAIM-011",
+            "SWARM-CLAIM-012",
+            "SWARM-CLAIM-013"
+          ],
+          "note": "Citation absence closes provenance availability only; it verifies no technical behavior."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-002",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "confidence": "medium",
+      "conclusion": "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, but no fresh causal LifeOS launch, LifeOS process, UI-ready signal, or LifeOS-to-Yazelix bridge proves that Yazelix is the background workspace engine for a LifeOS application launch.",
+      "evidence": [
+        {
+          "relationship": "profile-owner",
+          "proven": true,
+          "profile_root": "/home/flexnetos/.nix-profile",
+          "manifest_element": "lifeos_foundation_yzx",
+          "flake_attr": "packages.x86_64-linux.lifeos_foundation_yzx",
+          "locked_revision": "692264585a94c7d0a4d3fa243a14737bb1aa9813",
+          "store_path": "/nix/store/66llanvj1g9qbcvbj8c674jc595ri2rr-lifeos-foundation-yzx",
+          "frontdoor": "/home/flexnetos/.nix-profile/bin/yzx",
+          "frontdoor_realpath": "/nix/store/66llanvj1g9qbcvbj8c674jc595ri2rr-lifeos-foundation-yzx/bin/yzx",
+          "frontdoor_sha256": "e0de83d7cac4f27f89322b5d6abbcbf39078214fabb44e7d28237af24e5bde6c",
+          "profile_listing_exit_status": 0,
+          "profile_listing_sha256": "c5d61cbc857bcbe20d6771bba6bb5a5884ef2845bbe7e2c8782e01a29eebc79f",
+          "profile_entries": []
+        },
+        {
+          "relationship": "launcher-code",
+          "proven": true,
+          "desktop_path": "/home/flexnetos/.local/share/applications/com.flexnetos.Yazelix.Agent.desktop",
+          "desktop_sha256": "ea6f24a5700199ebf080debb811afa76d6c0d3cd78d3049ad525ec0857763894",
+          "exec": "/usr/bin/env YAZELIX_LAYOUT_OVERRIDE=\"/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl\" \"/home/flexnetos/.nix-profile/bin/yzx\" desktop launch",
+          "layout_override": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_override_exists": true,
+          "profile_layout": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "profile_layout_sha256": "88490095aac3c94092123061e13900913a697891325a6cb1637a6933c2373771"
+        },
+        {
+          "relationship": "process-tree",
+          "proven": true,
+          "observed_at_utc": "2026-07-11T22:20:38.261Z",
+          "process_snapshot_command": "ps -eo pid=,ppid=,comm=,args=",
+          "process_snapshot_exit_status": 0,
+          "process_tree": [
+            "3562937    4021 desktop_deferre /bin/sh /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/desktop_deferred_launch_probe.sh --detached /home/flexnetos/.local/share/yazelix/logs/terminal_launch/kitty_1783803527583.log 3562933 -- /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nixGLMesa /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/kitty --title Yazelix - Kitty --directory /home/flexnetos /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/start_yazelix.sh",
+            "3562948 3562937 .kitty-wrapped  /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/kitty --title Yazelix - Kitty --directory /home/flexnetos /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/start_yazelix.sh",
+            "3563025 3562948 kitten          /nix/store/716pli9h8hd9x7p6wb7zp27kqv676g4s-kitty-0.47.4/bin/kitten __atexit__",
+            "3563032 3562948 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control enter",
+            "3563183 3563032 zellij          zellij --config-dir /home/flexnetos/.local/share/yazelix/configs/zellij options --default-cwd /home/flexnetos --default-layout /home/flexnetos/.local/share/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl --default-shell /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/yazelix_nu.sh",
+            "3563187    4021 zellij          /nix/store/3i0aizr76i6pih3z4mnwd7j0675ibvw9-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/implacable-diplodocus",
+            "3563222 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3563231 3563222 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3563281 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx env",
+            "3563283 3563281 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control env",
+            "3563290 3563283 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3563307 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx agent",
+            "3563316 3563307 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control agent",
+            "3563317 3563316 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3563318 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx env",
+            "3563320 3563317 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3563321 3563318 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control env",
+            "3563324 3563321 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3563395 3563187 ccboard         /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/ccboard",
+            "3597291 3563324 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3597293 3597291 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3609582 3563290 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3609584 3609582 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex",
+            "3610072 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3610778 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3611430 3610778 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk claude",
+            "3611432 3611430 .claude-wrapped /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/claude",
+            "3611458 3611432 MainThread      /nix/store/rd29hc9xjbsv9p2i86q90k038j5glxvf-lifeos-foundation-yzx/toolbin/node /home/flexnetos/meta/var/lib/gitnexus-cli/node_modules/gitnexus/dist/cli/index.js mcp",
+            "3656423 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3656430 3656423 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3657378 3563187 yzx             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx sidebar yazi",
+            "3657385 3657378 yzx_control     /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/yzx_control sidebar yazi",
+            "3662018 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3662916 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3785821 3610072 rtk             /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/rtk codex",
+            "3785823 3785821 codex           /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/toolbin/codex"
+          ],
+          "active_store_processes": []
+        },
+        {
+          "relationship": "environment-allowlist",
+          "proven": true,
+          "allowed_names": [
+            "YAZELIX_RUNTIME_DIR",
+            "YAZELIX_CONFIG_DIR",
+            "YAZELIX_STATE_DIR",
+            "YAZELIX_LAYOUT_OVERRIDE",
+            "YAZELIX_SESSION_CONFIG_PATH",
+            "YAZELIX_SESSION_TERMINAL",
+            "ZELLIJ_DEFAULT_LAYOUT",
+            "ZELLIJ_SESSION_NAME"
+          ],
+          "values_by_process": [
+            {
+              "pid": 3562937,
+              "comm": "desktop_deferre",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix"
+              }
+            },
+            {
+              "pid": 3562948,
+              "comm": ".kitty-wrapped",
+              "values": {
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix"
+              }
+            },
+            {
+              "pid": 3563025,
+              "comm": "kitten",
+              "values": {
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix"
+              }
+            },
+            {
+              "pid": 3563032,
+              "comm": "yzx_control",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix"
+              }
+            },
+            {
+              "pid": 3563183,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side"
+              }
+            },
+            {
+              "pid": 3563187,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3563222,
+              "comm": "yzx",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563231,
+              "comm": "yzx_control",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563281,
+              "comm": "yzx",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3563283,
+              "comm": "yzx_control",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3563290,
+              "comm": "nu",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563307,
+              "comm": "yzx",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563316,
+              "comm": "yzx_control",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563317,
+              "comm": "rtk",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563318,
+              "comm": "yzx",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3563320,
+              "comm": "codex",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563321,
+              "comm": "yzx_control",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3563324,
+              "comm": "nu",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3563395,
+              "comm": "ccboard",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3597291,
+              "comm": "rtk",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3597293,
+              "comm": "codex",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3609582,
+              "comm": "rtk",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3609584,
+              "comm": "codex",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3610072,
+              "comm": "nu",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3610778,
+              "comm": "nu",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3611430,
+              "comm": "rtk",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3611432,
+              "comm": ".claude-wrapped",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3611458,
+              "comm": "MainThread",
+              "values": {
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix"
+              }
+            },
+            {
+              "pid": 3656423,
+              "comm": "yzx",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3656430,
+              "comm": "yzx_control",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3657378,
+              "comm": "yzx",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3657385,
+              "comm": "yzx_control",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3662018,
+              "comm": "nu",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3662916,
+              "comm": "nu",
+              "values": {
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json"
+              }
+            },
+            {
+              "pid": 3785821,
+              "comm": "rtk",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            },
+            {
+              "pid": 3785823,
+              "comm": "codex",
+              "values": {
+                "YAZELIX_CONFIG_DIR": "/home/flexnetos/.config/yazelix",
+                "YAZELIX_LAYOUT_OVERRIDE": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+                "YAZELIX_RUNTIME_DIR": "/nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx",
+                "YAZELIX_SESSION_CONFIG_PATH": "/home/flexnetos/.local/share/yazelix/sessions/1783803528046508362/config_snapshot.json",
+                "YAZELIX_SESSION_TERMINAL": "kitty",
+                "YAZELIX_STATE_DIR": "/home/flexnetos/.local/share/yazelix",
+                "ZELLIJ_DEFAULT_LAYOUT": "yzx_side",
+                "ZELLIJ_SESSION_NAME": "implacable-diplodocus"
+              }
+            }
+          ],
+          "secret_policy": "Only allowlisted runtime-boundary variable names are recorded; all other environment entries are excluded."
+        },
+        {
+          "relationship": "workspace-responsibility",
+          "proven": true,
+          "source_layout": "/home/flexnetos/meta/src/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "source_layout_sha256": "88490095aac3c94092123061e13900913a697891325a6cb1637a6933c2373771",
+          "generated_layout": "/home/flexnetos/.local/share/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "generated_layout_sha256": "c3c58c46f027e52ba73fb1a1e21bd71c3a59d3a8dfaa87a62723c4f5feea4375",
+          "active_layout": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "active_layout_sha256": "88490095aac3c94092123061e13900913a697891325a6cb1637a6933c2373771",
+          "pane_map": [
+            "sidebar/yazi",
+            "workspace/env",
+            "tools/env",
+            "agent",
+            "Mission Control"
+          ],
+          "owner_boundary": "Yazelix owns terminal workspace layout, session, environment, and pane orchestration; this does not establish LifeOS launch ownership.",
+          "source_anchors": [
+            {
+              "path": "/home/flexnetos/meta/src/yazelix/packaging/flake_outputs.nix",
+              "exists": true,
+              "sha256": "b6f487e2caf78f107ecf91dc755d2b38f57b75641c6ebf3ddd1c2ae28f2873b7",
+              "lines": {
+                "lifeos_foundation_yzx": 131,
+                "mkYazelix": 5
+              }
+            },
+            {
+              "path": "/home/flexnetos/meta/src/yazelix/docs/contracts/cross_language_runtime_ownership.md",
+              "exists": true,
+              "sha256": "00dfa4a40134dddfff862960d4b8d7bd5a581ed4ca308d2640588e4b02a10728",
+              "lines": {
+                "pane orchestrator": 17,
+                "workspace root": 57
+              }
+            },
+            {
+              "path": "/home/flexnetos/meta/src/yazelix/rust_core/yazelix_core/src/agent_commands.rs",
+              "exists": true,
+              "sha256": "c4ffe8170aefbebef238a535041806869722a961b1d0c7fb7b4fe5a8b802e8d9",
+              "lines": {
+                "rtk codex": 79,
+                "yzx agent": 44
+              }
+            }
+          ]
+        },
+        {
+          "relationship": "lifeos-binding",
+          "proven": false,
+          "lifeos_processes": [],
+          "missing": [
+            "lifeos_process_receipt_missing",
+            "lifeos_ui_acceptance_receipt_missing",
+            "lifeos_bridge_contract_missing",
+            "fresh_launch_causality_missing",
+            "failure_shutdown_behavior_missing"
+          ],
+          "boundary": "Yazelix workspace orchestration is not proof of LifeOS launch ownership."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-003",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "Profile-owned and generated Zellij layout state is live; this proves installed Zellij initialization, not LifeOS launch acceptance.",
+      "evidence": [
+        {
+          "relationship": "profile-layout",
+          "path": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "proven": true,
+          "source_layout": {
+            "path": "/home/flexnetos/meta/src/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+            "proven": true
+          },
+          "layout_contains_workspace_pane": true
+        },
+        {
+          "relationship": "generated-zellij-runtime",
+          "proven": true,
+          "layout": {
+            "path": "/home/flexnetos/.local/share/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+            "proven": true
+          },
+          "config": {
+            "path": "/home/flexnetos/.local/share/yazelix/configs/zellij/config.kdl",
+            "proven": true
+          }
+        },
+        {
+          "relationship": "zellij-process",
+          "proven": true,
+          "relevant_processes": [
+            "3563183 3563032 zellij          zellij --config-dir /home/flexnetos/.local/share/yazelix/configs/zellij options --default-cwd /home/flexnetos --default-layout /home/flexnetos/.local/share/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl --default-shell /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/shells/posix/yazelix_nu.sh",
+            "3563187    4021 zellij          /nix/store/3i0aizr76i6pih3z4mnwd7j0675ibvw9-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/implacable-diplodocus"
+          ]
+        },
+        {
+          "relationship": "zellij-session",
+          "proven": true,
+          "output": "\u001b[32;1mcircular-pigeon\u001b[m [Created \u001b[35;1m10days 1h 3m 36s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1ma\u001b[m [Created \u001b[35;1m10days 44m 58s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mtremendous-cymbal\u001b[m [Created \u001b[35;1m9days 21h 45m 28s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mlikable-iguanadon\u001b[m [Created \u001b[35;1m9days 20h 56m 59s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mvitreous-lake\u001b[m [Created \u001b[35;1m9days 19h 44m 16s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mhopeful-stegosaurus\u001b[m [Created \u001b[35;1m9days 19h 40m 19s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mjoyous-cactus\u001b[m [Created \u001b[35;1m9days 19h 32m 51s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1msincere-lake\u001b[m [Created \u001b[35;1m9days 19h 1m 37s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1merudite-aardvark\u001b[m [Created \u001b[35;1m8days 19h 5m 16s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mcurious-panda\u001b[m [Created \u001b[35;1m8days 18h 43m 41s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1madventurous-zebra\u001b[m [Created \u001b[35;1m8days 18h 36m 2s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mundulating-diplodocus\u001b[m [Created \u001b[35;1m8days 17h 14m 13s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mundulating-cowbell\u001b[m [Created \u001b[35;1m8days 14h 20m 3s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mremarkable-cactus\u001b[m [Created \u001b[35;1m8days 14h 19m 32s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mfabulous-tomato\u001b[m [Created \u001b[35;1m8days 9h 27m 33s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mpolite-mountain\u001b[m [Created \u001b[35;1m8days 8h 46m 21s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mnautical-ocelot\u001b[m [Created \u001b[35;1m7days 23h 19m 15s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mexquisite-capsicum\u001b[m [Created \u001b[35;1m6days 23h 54m 27s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mcubic-cuckoo\u001b[m [Created \u001b[35;1m6days 18h 5m 52s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1msparkling-duck\u001b[m [Created \u001b[35;1m5days 5h 26m 48s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mzippy-duck\u001b[m [Created \u001b[35;1m4days 15h 57m 58s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mcharming-cymbal\u001b[m [Created \u001b[35;1m4days 15h 49m 9s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mcircular-peach\u001b[m [Created \u001b[35;1m4days 14h 58m 53s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mchatty-pheasant\u001b[m [Created \u001b[35;1m4days 14h 33m 35s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mpolished-ukulele\u001b[m [Created \u001b[35;1m4days 12h 11m 2s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1minventive-ukulele\u001b[m [Created \u001b[35;1m4days 11h 40m 31s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1moblong-rustacean\u001b[m [Created \u001b[35;1m4days 11h 34m 30s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mexcellent-iguanadon\u001b[m [Created \u001b[35;1m4days 5h 4m 52s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mfabulous-xylophone\u001b[m [Created \u001b[35;1m4days 3h 33m 8s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1madamant-mountain\u001b[m [Created \u001b[35;1m3days 19h 46m 53s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mdelighted-capsicum\u001b[m [Created \u001b[35;1m3days 19h 19m 31s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1msplendid-lemon\u001b[m [Created \u001b[35;1m3days 19h 13m 29s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mrusty-mouse\u001b[m [Created \u001b[35;1m3days 18h 56m 40s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mrectangular-lemon\u001b[m [Created \u001b[35;1m3days 18h 55m 33s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mverdant-cuckoo\u001b[m [Created \u001b[35;1m2days 15h 21m 51s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mbrave-tiger\u001b[m [Created \u001b[35;1m2days 15h 21m 33s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1munflappable-weasel\u001b[m [Created \u001b[35;1m2days 15h 21m 21s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1madept-donkey\u001b[m [Created \u001b[35;1m2days 7h 32m 7s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mlikable-river\u001b[m [Created \u001b[35;1m1day 6h 9m 56s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1moblong-brachiosaur\u001b[m [Created \u001b[35;1m19h 14m 10s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mgregarious-newt\u001b[m [Created \u001b[35;1m10h 43m 42s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mawesome-echidna\u001b[m [Created \u001b[35;1m10h 38m 20s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1moblong-weasel\u001b[m [Created \u001b[35;1m9h 36m 13s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mstellar-rustacean\u001b[m [Created \u001b[35;1m9h 30m 33s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1moblong-sitar\u001b[m [Created \u001b[35;1m1h 41m 1s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mcubic-diplodocus\u001b[m [Created \u001b[35;1m1h 37m 37s\u001b[m ago] (\u001b[31;1mEXITED\u001b[m - attach to resurrect)\n\u001b[32;1mimplacable-diplodocus\u001b[m [Created \u001b[35;1m1h 23m 50s\u001b[m ago] (current)\n"
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-004",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "Generated Nushell state is consumed by live Nushell processes under Yazelix; this proves initialized Nushell scope, not the broader LifeOS claim.",
+      "evidence": [
+        {
+          "relationship": "initializer-owner",
+          "proven": true,
+          "profile_layout": {
+            "path": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+            "proven": true
+          },
+          "source_layout": {
+            "path": "/home/flexnetos/meta/src/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+            "proven": true
+          }
+        },
+        {
+          "relationship": "generated-nushell-runtime",
+          "proven": true,
+          "path": "/home/flexnetos/.local/share/yazelix/generated/nushell/config.nu"
+        },
+        {
+          "relationship": "nushell-process",
+          "proven": true,
+          "relevant_processes": [
+            "3563290 3563283 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3563324 3563321 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3610072 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3610778 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3662018 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu",
+            "3662916 3563187 nu              /nix/store/m1ck3fxm1wp17n8jgfpcvpx1x9y9rwpf-lifeos-foundation-yzx/libexec/nu --login --env-config /dev/null --config /home/flexnetos/.local/share/yazelix/generated/nushell/config.nu"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-011",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "No reproducible end-to-end swarm event-to-render benchmark defines or proves the claimed real-time UI status behavior.",
+      "evidence": [
+        {
+          "relationship": "performance-search",
+          "proven": true,
+          "command": "rg -n -i benchmark|p50|p95|p99|latency|real.time|freshness src src-tauri crates --glob !**/AGENTS.md",
+          "exit_status": 0,
+          "matches": [
+            "src/data/types.ts:251:  latencyMs: number;",
+            "src-tauri/src/lib.rs:309:    // take the small one-shot latency hit (≈200ms) so the widget shows a real",
+            "src/components/IoTView.vue:36:const avgLatency = computed(() => {",
+            "src/components/IoTView.vue:37:  const on = onlineDevices.value.filter((d) => d.latencyMs > 0);",
+            "src/components/IoTView.vue:39:  return Math.round(on.reduce((n, d) => n + d.latencyMs, 0) / on.length);",
+            "src/components/IoTView.vue:42:const latencyStatus = computed(() => {",
+            "src/components/IoTView.vue:43:  const ms = avgLatency.value;",
+            "src/components/IoTView.vue:153:              <!-- Latency -->",
+            "src/components/IoTView.vue:154:              <span class=\"iot-device-latency\" aria-label=\"Latency\">",
+            "src/components/IoTView.vue:155:                {{ device.online && device.latencyMs > 0 ? `${device.latencyMs} ms` : '—' }}",
+            "src/components/IoTView.vue:215:          <!-- Latency card -->",
+            "src/components/IoTView.vue:216:          <section class=\"iot-rail-card\" aria-label=\"Average latency\">",
+            "src/components/IoTView.vue:217:            <h2 class=\"iot-rail-head\">Latency</h2>",
+            "src/components/IoTView.vue:218:            <div class=\"iot-latency-row\">",
+            "src/components/IoTView.vue:219:              <span class=\"iot-latency-value\">{{ avgLatency > 0 ? `${avgLatency} ms` : '—' }}</span>",
+            "src/components/IoTView.vue:220:              <span :class=\"['iot-latency-pill', `iot-latency-pill--${latencyStatus.tone}`]\">",
+            "src/components/IoTView.vue:221:                {{ latencyStatus.label }}",
+            "src/components/IoTView.vue:224:            <p class=\"iot-latency-sub\">Average across {{ onlineCount }} online devices</p>"
+          ],
+          "note": "Generic test or performance terms are not an end-to-end swarm status benchmark."
+        },
+        {
+          "relationship": "workload-and-slo",
+          "proven": false,
+          "missing": [
+            "freshness-budget",
+            "event-rate",
+            "workload-definition",
+            "hardware",
+            "transport",
+            "disconnect-and-stale-policy"
+          ]
+        },
+        {
+          "relationship": "benchmark-result",
+          "proven": false,
+          "missing": [
+            "event-to-render-p50",
+            "event-to-render-p95",
+            "event-to-render-p99",
+            "stale-detection-measurement"
+          ]
+        }
+      ]
+    }
+  ]
+}

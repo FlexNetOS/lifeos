@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-11T10:42:21Z",
+  "generated_at": "2026-07-11T21:27:02Z",
   "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
-  "task_count": 157,
+  "task_count": 158,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-11T10:42:21Z",
+    "generated_at": "2026-07-11T21:27:02Z",
     "format": "csv",
     "path": "planning-spine-v0/generated/task_graph.source.csv",
-    "row_count": 157,
+    "row_count": 158,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -9643,6 +9643,81 @@
         "product implementation",
         "secrets/**",
         "treating dirty concurrent nu_plugin work as canonical"
+      ]
+    },
+    {
+      "task_id": "NBVERIFY-004",
+      "source_row_number": 159,
+      "phase": "0-north-star-graph",
+      "title": "NotebookLM source 004 truth-tested against installed LifeOS and Yazelix boundaries",
+      "owner_agent": "LifeOS Planning Spine / Runtime Kernel / QA Agent",
+      "goal": "Truth-test all fourteen NBSOURCE-004 claims one at a time against profile-owned installed runtime evidence, canonical LifeOS/Yazelix source paths, reproducible behavior and performance tests, and explicit owner decisions without treating the source description as current implementation.",
+      "simulation_required": false,
+      "execution_cell": "proof-cell",
+      "verification_gate": "All fourteen claims close exactly once as verified, qualified, refuted, or explicit owner-decision pending; installed claims use the active profile frontdoor; runtime and source boundaries remain distinct; UDS/shared-redb authority is not conflated; performance claims use reproducible workload evidence; missing citations remain unresolved; normalization, planning verification, and diff checks pass.",
+      "rollback_plan": "Restore the archived pre-source-004 planning state /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T214537Z-lifeos-before-notebooklm-source-004.tar.gz (SHA-256 3519fb0bbfdafbad11d8f0effdecdbdbeca66ff3b7b31f5e0d41e024765c2792); remove only NBVERIFY-004 rows and artifacts after preserving failure evidence.",
+      "status": "draft",
+      "proof_uri": "proof_records/NBVERIFY-004.proof.json",
+      "next_action": "Begin the research -> surface -> plan -> red test loop for SWARM-CLAIM-001 through SWARM-CLAIM-014; keep the HY3 authenticated-generation gate explicit.",
+      "source_columns": {
+        "task_id": "NBVERIFY-004",
+        "parent_id": "NBVERIFY-003; NBSOURCE-004",
+        "phase": "0-north-star-graph",
+        "title": "NotebookLM source 004 truth-tested against installed LifeOS and Yazelix boundaries",
+        "owner_agent": "LifeOS Planning Spine / Runtime Kernel / QA Agent",
+        "goal": "Truth-test all fourteen NBSOURCE-004 claims one at a time against profile-owned installed runtime evidence, canonical LifeOS/Yazelix source paths, reproducible behavior and performance tests, and explicit owner decisions without treating the source description as current implementation.",
+        "inputs": "NBSOURCE-004; NBVERIFY-001 revision 2; NBVERIFY-002; NBVERIFY-003; current LifeOS source; active /home/flexnetos/.nix-profile/bin/yzx; generated Yazelix runtime as proof only; exact retained NotebookLM fulltext",
+        "target_artifacts": "generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json; generated/notebooklm_claim_verification/NBVERIFY-004.source-receipt.json; generated/notebooklm_claim_verification/NBVERIFY-004.truth-matrix.csv; proof_records/NBVERIFY-004.proof.json",
+        "allowed_paths": "planning-spine-v0/generated/**; planning-spine-v0/proof_records/**; planning-spine-v0/state/**",
+        "blocked_paths": "profile or launcher mutation; generated runtime edits; agent, redb, database, socket, UI, model, or product mutation; fabricated runtime or benchmark proof; invented citations; processing NBSOURCE-005; secrets/**; nu_plugin or envctl mutation",
+        "simulation_required": "FALSE",
+        "execution_cell": "proof-cell",
+        "verification_gate": "All fourteen claims close exactly once as verified, qualified, refuted, or explicit owner-decision pending; installed claims use the active profile frontdoor; runtime and source boundaries remain distinct; UDS/shared-redb authority is not conflated; performance claims use reproducible workload evidence; missing citations remain unresolved; normalization, planning verification, and diff checks pass.",
+        "rollback_plan": "Restore the archived pre-source-004 planning state /home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260710T214537Z-lifeos-before-notebooklm-source-004.tar.gz (SHA-256 3519fb0bbfdafbad11d8f0effdecdbdbeca66ff3b7b31f5e0d41e024765c2792); remove only NBVERIFY-004 rows and artifacts after preserving failure evidence.",
+        "status": "Draft",
+        "proof_uri": "proof_records/NBVERIFY-004.proof.json",
+        "next_action": "Begin the research -> surface -> plan -> red test loop for SWARM-CLAIM-001 through SWARM-CLAIM-014; keep the HY3 authenticated-generation gate explicit."
+      },
+      "parent_ids": [
+        "NBVERIFY-003",
+        "NBSOURCE-004"
+      ],
+      "inputs": [
+        "NBSOURCE-004",
+        "NBVERIFY-001 revision 2",
+        "NBVERIFY-002",
+        "NBVERIFY-003",
+        "current LifeOS source",
+        "active /home/flexnetos/.nix-profile/bin/yzx",
+        "generated Yazelix runtime as proof only",
+        "exact retained NotebookLM fulltext"
+      ],
+      "target_artifacts": [
+        "generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-004.source-receipt.json",
+        "generated/notebooklm_claim_verification/NBVERIFY-004.truth-matrix.csv",
+        "proof_records/NBVERIFY-004.proof.json"
+      ],
+      "allowed_paths": [
+        "planning-spine-v0/generated/**",
+        "planning-spine-v0/proof_records/**",
+        "planning-spine-v0/state/**"
+      ],
+      "blocked_paths": [
+        "profile or launcher mutation",
+        "generated runtime edits",
+        "agent",
+        "redb",
+        "database",
+        "socket",
+        "UI",
+        "model",
+        "or product mutation",
+        "fabricated runtime or benchmark proof",
+        "invented citations",
+        "processing NBSOURCE-005",
+        "secrets/**",
+        "nu_plugin or envctl mutation"
       ]
     }
   ]

@@ -1,0 +1,70 @@
+{
+  "artifact_paths": [
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-003.local-evidence.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-003.source-receipt.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-003.truth-matrix.csv",
+    "planning-spine-v0/proof_records/NBVERIFY-001-v2.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-002-v2.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-030-032.proof.json",
+    "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-RUNTIME-001.node-authority-proof.raw.json",
+    "planning-spine-v0/proof_records/NBVERIFY-003.proof.json",
+    "planning-spine-v0/proof_records/NBVERIFY-003-v2.proof.json",
+    "/home/flexnetos/meta/var/lib/codex-runtime-gate/archives/20260711T104100Z-lifeos-nbverify-003-before-local-truth-integration.tar.gz"
+  ],
+  "checksums": {
+    "NBVERIFY-001-v2.proof.json": "226cbbb879a8c1ab7299d3530b5867b240a7910ca2244fca6097f7cea60ea6dc",
+    "NBVERIFY-002-v2.proof.json": "db78b6409c7018d10e824b1797ce917cfea0c22ddcc41e2e62cf73d0fcdc1cb0",
+    "NBVERIFY-030-032.proof.json": "bbdfae34fb95839ef20ac2c702bb228c018d1fd427d6f0f6c136078974325ea7",
+    "NBVERIFY-RUNTIME-001.node-authority-proof.raw.json": "abac0d64ab8feb406ac66f979c9626bdb2656ff88c11eab09101d286af9d059d",
+    "20260711T104100Z-lifeos-nbverify-003-before-local-truth-integration.tar.gz": "6ebe4d526d8b9812b17bd1e0d6a42e648d4d592e25de1b13f92105fbafc33e87"
+  },
+  "gate_result": {
+    "correction_scope_only": true,
+    "prior_revision_preserved": true,
+    "claim_verdicts_unchanged": true,
+    "claims": 10,
+    "verified": 2,
+    "qualified": 5,
+    "refuted": 3,
+    "queued": 0,
+    "direct_parent_proof": "planning-spine-v0/proof_records/NBVERIFY-002-v2.proof.json",
+    "reused_authority": "planning-spine-v0/proof_records/NBVERIFY-001-v2.proof.json",
+    "messagepack_evidence": "planning-spine-v0/proof_records/NBVERIFY-030-032.proof.json",
+    "nu_plugin_envctl_findings_unchanged": true,
+    "normalization_errors": 0,
+    "task_count": 157,
+    "task_status": "Complete",
+    "ready_count": 0,
+    "planning_spine_verify_passed": true,
+    "git_diff_check_passed": true
+  },
+  "live_commands": [
+    {
+      "command": "NBVERIFY-002-v2 corrected parent proof",
+      "exit_status": 0,
+      "purpose": "Consume the corrected preceding verification row in task-graph order."
+    },
+    {
+      "command": "NBVERIFY-001-v2 real root Bun/N-API proof",
+      "exit_status": 0,
+      "purpose": "Use the real repository package authority for the directly listed runtime boundary."
+    },
+    {
+      "command": "NBVERIFY-030-032 installed MessagePack wire proof and benchmark",
+      "exit_status": 0,
+      "purpose": "Preserve protocol and performance evidence unchanged."
+    },
+    {
+      "command": "bun run planning-spine:verify && git diff --check",
+      "exit_status": 0,
+      "purpose": "Validate the corrected proof chain."
+    }
+  ],
+  "observed_at": "2026-07-11T21:28:11Z",
+  "proof_summary": "Append-only correction of NBVERIFY-003 authority order: all ten existing claim verdicts and nu_plugin/envctl findings remain unchanged, while this revision consumes NBVERIFY-002 revision 2, NBVERIFY-001 revision 2, and the existing MessagePack proof in explicit task-graph order.",
+  "revision": 2,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "pass",
+  "task_id": "NBVERIFY-003",
+  "verification_gate": "NBVERIFY-002 revision 2 is consumed before this revision; NBVERIFY-001 revision 2 is the package authority; MessagePack evidence remains unchanged; all ten existing classifications remain unchanged; no temporary package authority is used."
+}

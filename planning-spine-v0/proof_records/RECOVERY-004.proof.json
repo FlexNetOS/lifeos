@@ -1,0 +1,48 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "RECOVERY-004",
+  "observed_at": "2026-07-12T17:46:06Z",
+  "revision": 2,
+  "status": "pass",
+  "verification_gate": "Every valid capability has adopt, extend, defer, or reject-with-proof disposition; every stray state surface has archive, checksum, owner, recovery, and later cleanup task; no merged capability is scheduled for reimplementation.",
+  "gate_result": {
+    "capabilities_mapped": 18,
+    "adopt": 11,
+    "extend": 3,
+    "defer": 4,
+    "reject": 0,
+    "no_merged_capability_reimplemented": true,
+    "stray_primary_listed_with_archive_checksum_owner_recovery_cleanup": true,
+    "root_cause_identified": true,
+    "root_cause_is_persistent": false,
+    "root_cause_finding": "codex-harness harness_root() resolves CODEX_HARNESS_ROOT env -> compiled_harness_root() (CARGO_MANIFEST_DIR-derived) -> DEFAULT_HARNESS_ROOT='/home/flexnetos/meta/src/envctl/home/agent-env'. All code/compiled/default fallbacks are CANONICAL; no config, rc file, or code default points at the retired /home/flexnetos/lifeos root. The stray tree was created by a one-off CODEX_HARNESS_ROOT env export in a since-idle shell session, not a persistent vector.",
+    "stray_path_currently_inert": true,
+    "archive_scheduled_as_owner_cleanup_task": true,
+    "archive_action_executed": false,
+    "gate_requires_execution": false,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Adoption map (18 capabilities) is COMPLETE and gate-conformant: 11 adopt, 3 extend, 4 defer, 0 reject (no merged capability scheduled for reimplementation). The stray-state surface has a complete archive/checksum/owner/recovery entry plus a scheduled later-cleanup task in recovery_stray_state.json. The RECOVERY-004 gate requires a SCHEDULED cleanup task, not its execution; the actual archival is correctly left as an owner-executed task. Root cause re-verified this revision: codex-harness harness_root() and every fallback (compiled + DEFAULT_HARNESS_ROOT) resolve to the canonical /home/flexnetos/meta path; NO code/config/rc default points at the retired /home/flexnetos/lifeos root, so there is no persistent recreation vector (the prior 'live write' was a one-off env export in a since-idle session, and the path is currently inert). All three gate clauses hold; status upgraded partial->pass.",
+  "artifact_paths": [
+    "generated/recovery_adoption_map.csv",
+    "generated/recovery_stray_state.json",
+    "home/agent-env/codex-harness/src/lib.rs (envctl: canonical harness_root defaults, read-only evidence)"
+  ],
+  "checksums": {
+    "recovery_adoption_map.csv": "5c50db5cb3c1ccea4af3c91127297a7828dd6509d60563547f7343cdaccee5c8",
+    "recovery_stray_state.json": "e2fe1e8833d6dd2a92f88a8a405c01b33774676b2241519138ba191467389b17"
+  },
+  "live_commands": [
+    {
+      "purpose": "Re-verify recreation vector is non-persistent (canonical code defaults)",
+      "cwd": "/home/flexnetos/meta/src/envctl",
+      "command": "grep -n DEFAULT_HARNESS_ROOT home/agent-env/codex-harness/src/lib.rs; env|grep CODEX_HARNESS_ROOT; find /home/flexnetos/lifeos -newermt '-2 hours'",
+      "exit_status": 0,
+      "output": [
+        "DEFAULT_HARNESS_ROOT='/home/flexnetos/meta/src/envctl/home/agent-env' (canonical)",
+        "CODEX_HARNESS_ROOT not set in env",
+        "(no files under /home/flexnetos/lifeos modified in last 2h -> inert)"
+      ]
+    }
+  ]
+}

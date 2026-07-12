@@ -1,0 +1,41 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-002",
+  "observed_at": "2026-07-12T17:20:29Z",
+  "revision": 3,
+  "status": "pass",
+  "verification_gate": "Authority and capability assignments resolve machine-readably; no agent has unlimited authority; approval and escalation gates are explicit and proven.",
+  "gate_result": {
+    "agent_example_validates": true,
+    "role_example_validates": true,
+    "capability_example_validates": true,
+    "no_unlimited_authority": true,
+    "agent_boundary_rules_present": true,
+    "role_requires_escalation_field": true,
+    "role_example_declares_escalation": true,
+    "verifier_cannot_execute": true,
+    "agent_schema_requires_authority_scope": true
+  },
+  "proof_summary": "Authority and capability assignments resolve machine-readably: agent/role/capability examples validate; the executor agent carries a bounded 'cecca-delegated' authority scope (no unlimited authority); Role.escalation_to is a required, populated field; and the verifier agent's boundary rules explicitly forbid executing the task it verifies.",
+  "artifact_paths": [
+    "planning-spine-v0/02_AUTHORITY_GRAPH.md",
+    "planning-spine-v0/examples/agent.json",
+    "planning-spine-v0/examples/verifier-agent.json",
+    "planning-spine-v0/examples/role.json"
+  ],
+  "checksums": {
+    "02_AUTHORITY_GRAPH.md": "2fbe6d5bda8d51bba5169c9f881fa995b047d777e4e0b480ea5adaed40bafcec"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-002",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

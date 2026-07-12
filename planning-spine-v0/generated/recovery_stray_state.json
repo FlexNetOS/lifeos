@@ -1,0 +1,85 @@
+{
+  "schema": "lifeos-planning-spine.recovery-stray-state.v0",
+  "task_id": "RECOVERY-004",
+  "generated_at": "2026-07-12T16:36:15Z",
+  "policy": "ARCHIVE LIST ONLY \u2014 this lane performs NO move/delete/cleanup (archive-first, read-only ownership).",
+  "primary_stray_surface": {
+    "path": "/home/flexnetos/lifeos/src/envctl",
+    "full_stray_root": "/home/flexnetos/lifeos",
+    "created": "2026-07-11T02:13Z (re-created)",
+    "last_write_observed": "2026-07-12T04:35Z (harness.jsonl, cwd=/home/flexnetos/meta/src/envctl)",
+    "violates": "STRUCTURE-001 / STRUCTURE-006 'absent /home/flexnetos/lifeos' clause (both already-passed gates)",
+    "contents": "codex-harness/{ledger/{counters,harness,model_router,decisions}.jsonl, state/model-router/last-route.json}",
+    "checksum_manifest": [
+      {
+        "path": "/home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness/ledger/counters.jsonl",
+        "sha256": "f0d84c2c7846b7257e0bd49e2c0c62db5f026c1cc621259960d552b05737a670",
+        "size": 44928,
+        "mtime": "2026-07-12T04:34:54Z"
+      },
+      {
+        "path": "/home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness/ledger/harness.jsonl",
+        "sha256": "565f49505ceaa043ae61c42843592cfee0db1d77bc84a87324cd6f2bdd3b882b",
+        "size": 106039,
+        "mtime": "2026-07-12T04:35:14Z"
+      },
+      {
+        "path": "/home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness/ledger/model_router.jsonl",
+        "sha256": "1abb379792b8a7cf506003c044fe22ba8fbc0d7a73e942b3a4126b90dce4bae2",
+        "size": 1063,
+        "mtime": "2026-07-11T07:13:02Z"
+      },
+      {
+        "path": "/home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness/ledger/decisions.jsonl",
+        "sha256": "4ceb32e749457e8aac8748348ae45a3bc15836997564278dff18a53723a8c0e0",
+        "size": 87453,
+        "mtime": "2026-07-12T04:34:54Z"
+      },
+      {
+        "path": "/home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness/state/model-router/last-route.json",
+        "sha256": "6328b0dadb403f015b2a31b8250a9182892a83b64574aa35b66a36888ebb0da7",
+        "size": 990,
+        "mtime": "2026-07-11T07:13:02Z"
+      }
+    ],
+    "checksum_manifest_sha256": "799e8648be45ce446434c6d714c8e6790e22f0a799721391732d5584a9d1372b",
+    "owner": "envctl codex-harness maintainer (envctl repo is READ-ONLY to this lane)",
+    "root_cause": "codex-harness resolves ledger_dir() via harness_root() (crates .../codex-harness/src/lib.rs:112-148): order = env CODEX_HARNESS_ROOT -> compiled_harness_root() -> DEFAULT_HARNESS_ROOT. DEFAULT_HARNESS_ROOT is correctly '/home/flexnetos/meta/src/envctl/home/agent-env' (lib.rs:18) and the old-path Cargo.toml is ABSENT so compiled_harness_root()'s .exists() check fails to lifeos. Live ledger writes still land at the lifeos path with cwd=meta, which is only reachable when the hook launch environment EXPORTS CODEX_HARNESS_ROOT=/home/flexnetos/lifeos/src/envctl/home/agent-env (a stale env var inherited by the codex-harness hook process, not any static file under .codex/.config/rc \u2014 grep of configs/hooks/profiles found no static setter, so it is exported at runtime by the codex session launcher/agent-env projection that predates the STRUCTURE relocation). archive.jsonl seq 99-107 record a prior 'pre-fix CODEX_HARNESS_ROOT normalization' attempt, confirming the env-var vector; the residual export remains. The test full_access_contract.rs:239 asserts the harness must NOT contain '/home/flexnetos/lifeos/src/envctl' \u2014 now violated at runtime.",
+    "fix_owner_action": "Unset/repoint CODEX_HARNESS_ROOT to /home/flexnetos/meta/src/envctl/home/agent-env in the codex/claude hook launch environment (session launcher / agent-env projection), rebuild codex-harness from the canonical meta path to purge stale env!(CARGO_MANIFEST_DIR) build artifacts in target/, then archive + remove the stray tree.",
+    "recovery": "Archive-first per meta-destructive-commands: tar the tree to var/lib/codex-runtime-gate/archives/<UTC>-stray-lifeos-envctl.tar.gz with the checksum_manifest above; restore from that archive if any ledger line is later needed.",
+    "cleanup_task": "PENDING (owner-executed): (1) repoint CODEX_HARNESS_ROOT; (2) rebuild codex-harness from meta; (3) archive /home/flexnetos/lifeos with checksum; (4) rm -rf /home/flexnetos/lifeos; (5) re-run STRUCTURE-006 name-consumer verification to reconfirm 'absent /home/flexnetos/lifeos'. This lane MUST NOT move/delete (read-only ownership) and cannot quiesce the still-active recreator \u2014 see blocker.",
+    "action_status": "listed-not-executed (archive+cleanup pending owner; recreating env var still active)"
+  },
+  "secondary_stray_surfaces": [
+    {
+      "path": "/home/flexnetos/lifeos (parent of primary)",
+      "note": "Same stray tree; whole /home/flexnetos/lifeos is the resurrected root. Its ONLY live content is the codex-harness ledger/state above.",
+      "action_status": "covered by primary archive"
+    },
+    {
+      "path": "nu_plugin/crates/codedb_rust_static/src/lib.rs",
+      "note": "Uncommitted worktree diff (+43/-7, adds fixture_workspace_roots_are_reserved_and_collision_free / fixture-race test). Blocks any nu_plugin reseal/receipt (generator+validator refuse dirty worktree). Owner: nu_plugin maintainer \u2014 commit or revert.",
+      "action_status": "listed (out of this lane's ownership)"
+    },
+    {
+      "path": "/home/flexnetos/meta/src/envctl (worktree)",
+      "note": "envctl worktree reported dirty (~264 porcelain entries at head d47ca72). Contaminates cross-repo product-proof claims until clean. Owner: envctl maintainer.",
+      "action_status": "listed (envctl read-only to this lane)"
+    },
+    {
+      "path": "/home/flexnetos/{worktrees,workspace,archive,scripts,nix-yazelix-audit-20260703T025233,GoogleDrive-lifeos}",
+      "note": "Top-level non-dot dirs outside the meta workspace tree. Candidate stray/legacy trees NOT deep-investigated this pass (outside the named RECOVERY-004 scope). Owner triage recommended: characterize (git? symlink? cache?), then archive/keep decision.",
+      "action_status": "listed-for-owner-triage"
+    },
+    {
+      "path": "/home/flexnetos/meta/src/lifeos/{.claude.tar.xz,.codex.tar.xz}",
+      "note": "Untracked archive blobs in the lifeos repo working tree (git status). Evidence snapshots; owner decides keep vs archive.",
+      "action_status": "listed"
+    }
+  ],
+  "pending_owner_actions": [
+    "Repoint stale CODEX_HARNESS_ROOT env export to the canonical meta path and rebuild codex-harness from meta (root cause of recreation).",
+    "Archive+checksum then remove /home/flexnetos/lifeos; re-run STRUCTURE-006 verification.",
+    "Commit/revert nu_plugin codedb_rust_static/src/lib.rs uncommitted diff; clean envctl worktree."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-027",
+  "observed_at": "2026-07-12T16:34:28Z",
+  "revision": 1,
+  "status": "partial",
+  "verification_gate": "meta exec -- verify/status runs across two or more peer repos; release-please dry-run produces expected tags; install-via-profile proven from nix-profile paths.",
+  "gate_result": {
+    "meta_exec_across_two_or_more_peers": true,
+    "install_via_profile_from_nix_profile_proven": true,
+    "meta_mcp_registers_tools": true,
+    "meta_mcp_tool_count": 29,
+    "release_please_dry_run_ran": false,
+    "release_please_installed": false,
+    "product_execution_performed": true
+  },
+  "proof_summary": "Two of the three gate elements PASS. (1) `meta exec` runs across >=2 peer repos: `meta --include handoff,lifeos exec -- echo ok` returned ok for both, and `meta --include handoff,rusty-idd-unified,lifeos exec -- git rev-parse --abbrev-ref HEAD` returned real per-repo branches (handoff=develop, lifeos=main). `meta git status` additionally runs the status surface across the whole fleet. (2) install-via-profile is proven from nix-profile paths: `meta` and `git-kb` in /home/flexnetos/.nix-profile/bin are symlinks into /nix/store/...-lifeos-foundation-yzx, i.e. installed via the nix profile. The meta_mcp control surface was driven over stdio JSON-RPC: initialize returned serverInfo meta-mcp/0.1.0 and tools/list returned 29 meta_* tools (>= the 28 the row tracks; superset upgrade), including meta_exec, meta_git_status, meta_snapshot_*. The remaining element -- release-please dry-run producing expected tags -- was NOT run: release-please is not installed on this host (see blocker).",
+  "blockers": [
+    {
+      "id": "LPS-027-B1-release-please",
+      "gate": "release-please dry-run produces expected tags",
+      "detail": "release-please is not installed (`release-please` -> command not found; no npx wrapper available). The config exists at /home/flexnetos/meta/release-please-config.json and /home/flexnetos/meta/.release-please-manifest.json, but the tool to run the dry-run is absent.",
+      "owner_action": "Install release-please (npm i -g release-please, or add to the nix toolchain), then run `release-please --dry-run` against the meta config and confirm the expected tags. This is read-only (dry-run) and can be closed without a commit."
+    }
+  ],
+  "artifact_paths": [
+    "/home/flexnetos/meta/release-please-config.json",
+    "/home/flexnetos/meta/.release-please-manifest.json",
+    "planning-spine-v0/proof_records/LPS-027.proof.json"
+  ],
+  "checksums": {
+    "meta_mcp_version": "meta-mcp 0.1.0"
+  },
+  "live_commands": [
+    {"purpose": "meta exec across two peers", "cwd": "/home/flexnetos/meta", "command": "meta --include handoff,lifeos exec -- echo ok", "exit_status": 0, "output": ["ok handoff: ok", "ok lifeos: ok", "2 commands complete"]},
+    {"purpose": "meta exec real read-only cross-repo command", "cwd": "/home/flexnetos/meta", "command": "meta --include handoff,rusty-idd-unified,lifeos exec -- git rev-parse --abbrev-ref HEAD", "exit_status": 0, "output": ["handoff: develop", "lifeos: main", "2 commands complete"]},
+    {"purpose": "install-via-profile from nix-profile paths", "cwd": "/home/flexnetos/meta", "command": "ls -la /home/flexnetos/.nix-profile/bin/{meta,git-kb}", "exit_status": 0, "output": ["meta -> /nix/store/nbig4g1a5whaxvpk2y4diw9ysbsdf1kr-lifeos-foundation-yzx/bin/meta", "git-kb -> /nix/store/nbig4g1a5whaxvpk2y4diw9ysbsdf1kr-lifeos-foundation-yzx/bin/git-kb"]},
+    {"purpose": "meta-mcp registration (28 tools tracked)", "cwd": "/home/flexnetos/meta", "command": "meta-mcp (initialize + tools/list over stdio JSON-RPC)", "exit_status": 0, "output": ["serverInfo meta-mcp/0.1.0", "tools count=29", "incl meta_exec, meta_git_status, meta_snapshot_create/list/restore"]},
+    {"purpose": "release-please availability", "cwd": "/home/flexnetos/meta", "command": "release-please --version", "exit_status": 127, "output": ["release-please: command not found"]}
+  ]
+}

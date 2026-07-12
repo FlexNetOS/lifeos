@@ -1,0 +1,38 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "RECOVERY-001",
+  "observed_at": "2026-07-12T16:36:15Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every discovered task source has a stable URI, task count, status vocabulary, authority classification, proof surface, and checksum; archived copies are evidence only; no prior task is silently omitted.",
+  "gate_result": {
+    "tables_sealed": 16,
+    "nu_plugin_csvs_sealed": 8,
+    "envctl_package_graphs_sealed": 3,
+    "handoff_surfaces_sealed": 6,
+    "every_table_has_uri_count_vocab_authority_proof_checksum": true,
+    "archived_copies_are_evidence_only": true,
+    "no_prior_task_omitted": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Sealed 16 prior task tables (8 nu_plugin execution CSVs, envctl migration-package task_graph.csv + issue-414/task_graph.csv + status_report.json projection, and envctl .handoff task-card collection + loop/ledger/delivery surfaces). Each has URI, row count, status vocabulary, authority class, proof surface, and sha256. The package status projection's 80-complete claim vs the CSV's 76-pending is captured as the RECOVERY-003 conflict, not silently reconciled.",
+  "artifact_paths": [
+    "generated/recovery_task_table_receipts.json"
+  ],
+  "checksums": {
+    "recovery_task_table_receipts.json": "b138da328facf81a063bb628fa080e2693593aa3c88c5e1963c7f9e4bcd3a8ea"
+  },
+  "live_commands": [
+    {
+      "purpose": "Recompute + verify every sealed sha256 and coverage",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python validate_recovery.py (RECOVERY-001 section)",
+      "exit_status": 0,
+      "output": [
+        "tables_sealed=16",
+        "all sha256 match recomputed",
+        "nu execution CSVs all sealed"
+      ]
+    }
+  ]
+}

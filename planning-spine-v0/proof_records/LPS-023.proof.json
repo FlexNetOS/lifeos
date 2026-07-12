@@ -1,0 +1,95 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-023",
+  "observed_at": "2026-07-12T16:34:28Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "git-kb doctor passes; board/ready/context return live data; MCP server registers in Claude Code proven by a tool call; no secret values printed.",
+  "gate_result": {
+    "git_kb_doctor_exit_zero": true,
+    "git_kb_doctor_checks_passed": 7,
+    "git_kb_doctor_warnings": 1,
+    "board_returns_live_data": true,
+    "ready_returns_scored_task": true,
+    "context_returns_bootstrap_bundle": true,
+    "config_toml_user_section_present": true,
+    "mcp_server_initialize_ok": true,
+    "mcp_tools_list_count": 49,
+    "mcp_tool_call_kb_board_isError": false,
+    "no_secret_values_printed": true,
+    "product_execution_performed": true
+  },
+  "proof_summary": "Exercised the GitKB planning plane from the meta root (/home/flexnetos/meta) against the live .kb store. `git-kb doctor` exits 0 with 7 checks passed (the single warning is a missing [repos] section, not the gated [user] section). `board`, `ready`, and `context` all return live data (16 draft / 83 completed, a scored ready task tasks/meta-diff-claude-to-codex-wiring @76.4, and a JSON bootstrap bundle). config.toml has a [user] section (name=drdave-flexnteos, email present). The `git-kb mcp` server was driven over stdio JSON-RPC: initialize returned serverInfo gitkb/0.2.12, tools/list returned 49 kb_* tools, and a live tools/call of kb_board returned real board content with isError=false. No secret values were printed by any command; [auth.api_keys] key values were not read.",
+  "artifact_paths": [
+    "/home/flexnetos/meta/.kb/config.toml",
+    "planning-spine-v0/proof_records/LPS-023.proof.json"
+  ],
+  "checksums": {
+    "git_kb_version": "git-kb 0.2.12"
+  },
+  "live_commands": [
+    {
+      "purpose": "GitKB doctor diagnostics",
+      "cwd": "/home/flexnetos/meta",
+      "command": "git-kb doctor",
+      "exit_status": 0,
+      "output": [
+        "warn  No [repos] section in .kb/config.toml",
+        "ok    2 code symbols indexed across 111 files",
+        "ok    Code index is fresh (< 24 hours old)",
+        "ok    SQLite projection matches the canonical file store",
+        "ok    Workspace checkout baselines match canonical source hashes",
+        "1 warning, 7 checks passed."
+      ]
+    },
+    {
+      "purpose": "Board returns live data",
+      "cwd": "/home/flexnetos/meta",
+      "command": "git-kb --log-format json board",
+      "exit_status": 0,
+      "output": [
+        "DRAFT (16) | ACTIVE (0) | BLOCKED (0) | COMPLETED (83)"
+      ]
+    },
+    {
+      "purpose": "Ready dispatch selection",
+      "cwd": "/home/flexnetos/meta",
+      "command": "git-kb ready",
+      "exit_status": 0,
+      "output": [
+        "tasks/meta-diff-claude-to-codex-wiring  Extract Claude integration and diff missing Codex wiring  (score: 76.4)"
+      ]
+    },
+    {
+      "purpose": "Context bootstrap bundle",
+      "cwd": "/home/flexnetos/meta",
+      "command": "git-kb context",
+      "exit_status": 0,
+      "output": [
+        "{ board: { columns: [ { label: draft, items: [...] } ] } }"
+      ]
+    },
+    {
+      "purpose": "Confirm config.toml [user] section present",
+      "cwd": "/home/flexnetos/meta",
+      "command": "grep -nE '^\\[user\\]|name|email' .kb/config.toml",
+      "exit_status": 0,
+      "output": [
+        "[user]",
+        "name = \"drdave-flexnteos\"",
+        "email present"
+      ]
+    },
+    {
+      "purpose": "MCP server registration proven by a tool call (stdio JSON-RPC)",
+      "cwd": "/home/flexnetos/meta",
+      "command": "git-kb mcp -f  (initialize + notifications/initialized + tools/list + tools/call kb_board)",
+      "exit_status": 0,
+      "output": [
+        "initialize serverInfo={name:gitkb, title:GitKB Knowledge Base, version:0.2.12}",
+        "tools/list count=49",
+        "tools/call kb_board isError=false content_len=23323"
+      ]
+    }
+  ]
+}

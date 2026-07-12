@@ -1,0 +1,35 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-010",
+  "observed_at": "2026-07-12T17:20:29Z",
+  "revision": 3,
+  "status": "pass",
+  "verification_gate": "RFC scope, immutable base, mutable overlay, promotion gate, and explicit preconditions are documented and proof-backed without implementation.",
+  "gate_result": {
+    "rfc_present": true,
+    "declares_rfc_only_scope": true,
+    "immutable_base_documented": true,
+    "mutable_overlay_documented": true,
+    "promotion_gate_and_preconditions_documented": true,
+    "not_implemented": true
+  },
+  "proof_summary": "RFC-002 is preserved as RFC-only and cannot execute before the governed spine is stable: it declares RFC/not-part-of-v0 status, holds the v0 JSON Schema contracts immutable (Out of Scope: replacing them), specifies the mutable brainpack overlay it 'would bundle', and gates adoption behind an explicit trigger/precondition (only after v0 is stable and proof-led execution is routine).",
+  "artifact_paths": [
+    "planning-spine-v0/rfcs/RFC-002_COMPILED_AGENT_BRAINPACK.md"
+  ],
+  "checksums": {
+    "RFC-002": "a1c655428afad6d081994659ac6cc32f5f04ef4231ffc02c095843794f489b5d"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-010",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

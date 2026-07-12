@@ -1,0 +1,75 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-024",
+  "observed_at": "2026-07-12T16:34:28Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "hf task mint --from-kb produces an execution unit traceable to a KB task; the seam stays one-way with no execution-to-KB mutation; proof recorded.",
+  "gate_result": {
+    "hf_release_build_exit_zero": true,
+    "hf_task_mint_exit_zero": true,
+    "minted_card_written": true,
+    "correlation_id_equals_kb_slug": true,
+    "seam_one_way_kb_status_unchanged": true,
+    "seam_one_way_kb_workspace_unchanged": true,
+    "artifact_cleaned_per_rollback": true,
+    "product_execution_performed": true
+  },
+  "proof_summary": "Built the handoff `hf` binary in release (cargo build --release -p hf, exit 0). Ran the ADR-0003 one-way GitKB->execution seam: `hf task mint --from-kb tasks/meta-diff-claude-to-codex-wiring` from the meta root minted a handoff.task.v1 card KBTASK-META-DIFF-CLAUDE-TO-CODEX-WIRING into .handoff/tasks/ [LOCAL plane]. The card is traceable to its source KB task: correlation_id == kb_ref == the KB slug (verified by parsing the card JSON). The seam is one-way: the mint only invokes `git-kb show <slug>` (read-only); after minting, the source KB task status was still `draft` and `git-kb status` reported the same two pre-existing workspace changes (no new KB mutation from the execution side). Per the row rollback plan (no KB or handoff history mutation), the minted card (sha256 0916ca04...) was removed and the empty .handoff dir cleaned up, leaving no history change.",
+  "artifact_paths": [
+    "/home/flexnetos/meta/src/handoff/hf/src/kb.rs",
+    "/home/flexnetos/meta/src/handoff/target/release/hf",
+    "planning-spine-v0/proof_records/LPS-024.proof.json"
+  ],
+  "checksums": {
+    "hf_release_binary_sha256": "5183ca7d3ea57b29057833a3fa344d1fc48019a21e6c2d6ecbd02d4cd4a69bb9",
+    "minted_card_sha256": "0916ca04a7b718902bfa97e2293e2325b44c9fa1155972f1f6dfc4ffd00baa05"
+  },
+  "live_commands": [
+    {
+      "purpose": "Build hf release binary",
+      "cwd": "/home/flexnetos/meta/src/handoff",
+      "command": "cargo build --release -p hf",
+      "exit_status": 0,
+      "output": ["Finished `release` profile [optimized] target(s)"]
+    },
+    {
+      "purpose": "Mint an execution unit from a KB task (planning -> execution seam)",
+      "cwd": "/home/flexnetos/meta",
+      "command": "hf task mint --from-kb tasks/meta-diff-claude-to-codex-wiring",
+      "exit_status": 0,
+      "output": [
+        "hf task mint: KBTASK-META-DIFF-CLAUDE-TO-CODEX-WIRING minted from kb tasks/meta-diff-claude-to-codex-wiring (correlation_id = kb_ref = tasks/meta-diff-claude-to-codex-wiring)",
+        "wrote card to .handoff/tasks [LOCAL]"
+      ]
+    },
+    {
+      "purpose": "Confirm card traceability (correlation_id == KB slug)",
+      "cwd": "/home/flexnetos/meta",
+      "command": "python3 -c 'json parse .handoff/tasks/KBTASK-*.task.json'",
+      "exit_status": 0,
+      "output": [
+        "id=KBTASK-META-DIFF-CLAUDE-TO-CODEX-WIRING",
+        "correlation_id=tasks/meta-diff-claude-to-codex-wiring",
+        "kb_ref trace ==slug: True"
+      ]
+    },
+    {
+      "purpose": "Confirm seam is one-way (no execution->KB mutation)",
+      "cwd": "/home/flexnetos/meta",
+      "command": "git-kb show tasks/meta-diff-claude-to-codex-wiring | grep status ; git-kb status --json",
+      "exit_status": 0,
+      "output": [
+        "status: draft  (unchanged)",
+        "clean=False changes=['install-claude-code-via-yazelix-nix-owner-path','tasks/lifeos-real-bun-native-napi-receipt']  (same two pre-existing changes; mint added none)"
+      ]
+    },
+    {
+      "purpose": "Rollback per row: remove minted artifact, no history mutation",
+      "cwd": "/home/flexnetos/meta",
+      "command": "rm -f .handoff/tasks/KBTASK-META-DIFF-CLAUDE-TO-CODEX-WIRING.task.json && rmdir .handoff/tasks .handoff",
+      "exit_status": 0,
+      "output": ["artifact cleaned; .handoff removed"]
+    }
+  ]
+}

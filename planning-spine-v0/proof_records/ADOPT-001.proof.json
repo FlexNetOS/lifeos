@@ -1,0 +1,55 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ADOPT-001",
+  "observed_at": "2026-07-12T23:24:17Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each adopted capability has source commit and PR, current source path, passing CI receipt, behavioral boundary, known gap, target LifeOS owner, parity gate, and no second implementation row.",
+  "gate_result": {
+    "capability_map": "generated/adopted_capabilities.source.csv",
+    "adopt_001_rows": 11,
+    "capabilities": [
+      "BlobStore trait",
+      "redb source-blob store",
+      "PgStore (PostgreSQL parity)",
+      "Resumable capture",
+      "SHA-256 identity",
+      "Exact-byte materialization",
+      "Secret-output guards",
+      "Bounded read-only MCP",
+      "envctl export contract",
+      "Compiler-observed evidence (HIR/MIR/rustdoc)",
+      "Sandboxed build/proc-macro capture"
+    ],
+    "every_row_has_source_commit_and_pr": true,
+    "every_row_has_current_source_path": true,
+    "every_row_has_ci_receipt": true,
+    "every_row_has_behavioral_boundary": true,
+    "every_row_has_known_gap": true,
+    "every_row_has_target_lifeos_owner": true,
+    "every_row_has_parity_gate": true,
+    "no_second_implementation_row": true,
+    "store_role_deferred_to_STORE_001": true,
+    "provenance_derived_from": "generated/recovery_adoption_map.csv (RECOVERY-004, Complete)",
+    "product_execution_performed": false
+  },
+  "proof_summary": "ADOPT-001 adopts the proven nu_plugin CodeDB storage capabilities as upgrade inputs, not as duplicate implementation tasks. generated/adopted_capabilities.source.csv maps 11 ADOPT-001 capabilities (BlobStore trait, redb source-blob store, PgStore parity, Resumable capture, SHA-256 identity, exact-byte materialization, secret-output guards, bounded read-only MCP, envctl export contract, plus the two extend-class compiler-observed and sandboxed-build capabilities). Every row carries source commit/PR, current source path, passing CI receipt, behavioral boundary, known gap, target LifeOS owner, and parity gate; each capability appears exactly once (no second implementation row). Store authority is not decided here: the store_role column marks every capability as deferred-to-STORE-001, and a dedicated 'Final store authority' row (adopt_task STORE-001) records the deferral. Provenance is inherited faithfully from generated/recovery_adoption_map.csv, the Complete RECOVERY-004 artifact. The map gate holds; no product execution or nu_plugin mutation was performed.",
+  "artifact_paths": [
+    "generated/adopted_capabilities.source.csv",
+    "generated/recovery_adoption_map.csv"
+  ],
+  "checksums": {
+    "generated/adopted_capabilities.source.csv": "2d85de652f8c0e71a5018c90be1b365a113673fdb0135a293481f2c0d6f0d6c8"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate ADOPT-001 map gate: all columns present, no duplicate capability row, store role deferred",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (ADOPT map-gate validation over generated/adopted_capabilities.source.csv)",
+      "exit_status": 0,
+      "output": [
+        "ADOPT-001: rows=11 all_columns_present=True no_duplicate_row=True store_role_deferred_to_STORE001=True"
+      ]
+    }
+  ]
+}

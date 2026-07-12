@@ -1,0 +1,93 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "GRAPH-004",
+  "observed_at": "2026-07-12T23:24:17Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Lifecycle fixtures prove Draft, blocked, Ready, running, Complete, and rolled-back projection; next_ready_task_id is null while the global coverage gate is closed.",
+  "gate_result": {
+    "gate_added_to": "scripts/update-task-graph-status.py (lifecycle_state projection + --coverage-gate)",
+    "tdd_baseline": "HEAD update-task-graph-status.py lumps every non-complete task into ready_task_ids and sets next_ready_task_id to a Draft task (LC-DRAFT in the fixture; LIFEOS-000 on the real graph).",
+    "lifecycle_projection": {
+      "LC-DRAFT": "draft",
+      "LC-BLOCKED": "blocked",
+      "LC-READY": "ready",
+      "LC-RUNNING": "running",
+      "LC-COMPLETE": "complete",
+      "LC-ROLLBACK": "rolled-back"
+    },
+    "draft_is_non_executable": true,
+    "blocked_stays_blocked": true,
+    "ready_requires_all_gates": true,
+    "proof_backed_task_becomes_complete": true,
+    "proof_failure_reopens_as_rolled_back": true,
+    "no_non_complete_task_mislabeled_ready": true,
+    "next_ready_task_id_null_while_coverage_gate_closed": true,
+    "next_ready_task_id_surfaces_when_coverage_gate_open": "LC-READY",
+    "real_graph_result": "pass",
+    "real_graph_forbidden_update_count": 0,
+    "real_graph_next_ready_task_id": null,
+    "real_graph_ready_count": 0,
+    "real_graph_lifecycle_counts": {"complete": 112, "draft": 82, "running": 1, "rolled-back": 1, "blocked": 0, "ready": 0, "simulated": 0},
+    "real_graph_rolled_back_task_ids": ["LPS-025"],
+    "change_is_additive": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "GRAPH-004 corrects task lifecycle projection in the status projector. TDD baseline: the pre-change HEAD projector mislabels Draft/blocked/running/rolled-back tasks as ready (ready_task_ids=[LC-DRAFT, LC-BLOCKED, LC-READY, LC-RUNNING, LC-ROLLBACK]) and selects the Draft task LC-DRAFT as next_ready_task_id. The fix derives a canonical lifecycle_state per task: proof is authoritative (a passing ledger entry projects Complete, a failing/rolled-back entry reopens the task as rolled-back per 08_EXECUTION_GATES rule 5), otherwise the source status governs. The lifecycle fixture (generated/fixtures/lifecycle/) proves all six states project correctly: LC-DRAFT->draft, LC-BLOCKED->blocked, LC-READY->ready, LC-RUNNING->running, LC-COMPLETE->complete (ledger pass), LC-ROLLBACK->rolled-back (ledger fail). Only genuinely ready tasks enter ready_task_ids, so no non-complete task is mislabeled ready. next_ready_task_id is null while the global coverage gate is closed (the fail-closed default) and surfaces LC-READY only when --coverage-gate open. On the real 196-task graph the new projector keeps result=pass with 0 forbidden updates, reports next_ready_task_id=null and ready_count=0 (fail-closed, replacing the incorrect LIFEOS-000), and correctly reclassifies LPS-025 as rolled-back because its only ledger entry is a genuine fail. The change is additive: existing fields are preserved and lifecycle_state, lifecycle_counts, global_coverage_gate, and the per-state id lists are new. No product execution was performed.",
+  "artifact_paths": [
+    "scripts/update-task-graph-status.py",
+    "generated/fixtures/lifecycle/lifecycle.normalized.json",
+    "generated/fixtures/lifecycle/lifecycle.ledger.jsonl"
+  ],
+  "checksums": {
+    "scripts/update-task-graph-status.py": "f11c375d9d39632532525e90406e90cd7a990a977999841b30d3736a16c33770",
+    "generated/fixtures/lifecycle/lifecycle.normalized.json": "dc0f2bdb1e58a3248b2a4a07d756688018b9915b600ea858ce9378b793f58727",
+    "generated/fixtures/lifecycle/lifecycle.ledger.jsonl": "21184f28db3d87521e6fb8d4a8e8925618272b66ea548497d47875d9663f61c8"
+  },
+  "live_commands": [
+    {
+      "purpose": "TDD baseline: pre-change projector mislabels Draft as ready and picks a Draft as next_ready",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (HEAD update-task-graph-status.py) generated/fixtures/lifecycle/lifecycle.normalized.json --ledger generated/fixtures/lifecycle/lifecycle.ledger.jsonl",
+      "exit_status": 0,
+      "output": [
+        "next_ready_task_id: LC-DRAFT",
+        "ready_task_ids: ['LC-DRAFT', 'LC-BLOCKED', 'LC-READY', 'LC-RUNNING', 'LC-ROLLBACK']"
+      ]
+    },
+    {
+      "purpose": "New projector, coverage gate closed (default): six lifecycle states correct, next_ready null",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 scripts/update-task-graph-status.py generated/fixtures/lifecycle/lifecycle.normalized.json --ledger generated/fixtures/lifecycle/lifecycle.ledger.jsonl",
+      "exit_status": 0,
+      "output": [
+        "global_coverage_gate: closed",
+        "next_ready_task_id: None",
+        "ready_task_ids: ['LC-READY']",
+        "complete_task_ids: ['LC-COMPLETE']",
+        "rolled_back_task_ids: ['LC-ROLLBACK']",
+        "draft_task_ids: ['LC-DRAFT']  blocked_task_ids: ['LC-BLOCKED']  running_task_ids: ['LC-RUNNING']",
+        "per-task lifecycle: {'LC-DRAFT': 'draft', 'LC-BLOCKED': 'blocked', 'LC-READY': 'ready', 'LC-RUNNING': 'running', 'LC-COMPLETE': 'complete', 'LC-ROLLBACK': 'rolled-back'}",
+        "result: pass"
+      ]
+    },
+    {
+      "purpose": "New projector, coverage gate open: only the genuinely ready task surfaces",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 scripts/update-task-graph-status.py generated/fixtures/lifecycle/lifecycle.normalized.json --ledger generated/fixtures/lifecycle/lifecycle.ledger.jsonl --coverage-gate open",
+      "exit_status": 0,
+      "output": ["global_coverage_gate: open", "next_ready_task_id: LC-READY", "ready_task_ids: ['LC-READY']"]
+    },
+    {
+      "purpose": "Real graph stays valid: result pass, 0 forbidden, next_ready null while gate closed",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 scripts/update-task-graph-status.py generated/task_graph.normalized.json --ledger proof_records/proof_ledger.jsonl -o /tmp/real-status-newcode.json",
+      "exit_status": 0,
+      "output": [
+        "result: pass | forbidden: 0",
+        "global_coverage_gate: closed  next_ready_task_id: None  ready_count: 0",
+        "lifecycle_counts: complete=112 draft=82 running=1 rolled-back=1 (LPS-025 has a genuine fail ledger entry)"
+      ]
+    }
+  ]
+}

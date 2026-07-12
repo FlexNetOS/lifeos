@@ -1,0 +1,68 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PRESERVE-003",
+  "observed_at": "2026-07-12T17:46:06Z",
+  "revision": 2,
+  "status": "pass",
+  "verification_gate": "Every future move has exact source and target, pre/post checksums, Git ref equivalence, worktree repair, consumer update, rollback, and proof tasks; no move is executable during planning.",
+  "gate_result": {
+    "definition_task_no_moves_executed": true,
+    "structure_moves_reconciled_against_receipts": 7,
+    "structure_moves_all_passing": true,
+    "post_receipt_lifeos_namespace_move_reconciled": "meta a79802f PR #101 (/home/flexnetos/meta/lifeos -> /home/flexnetos/meta/src/lifeos)",
+    "meta_manifest_project_count_now": 41,
+    "future_move_envctl_stray_state_fully_specified": true,
+    "future_move_worktree_reconciliation_fully_specified": true,
+    "transient_worktrees_identified": 9,
+    "structure_001_absence_clause_in_regression": true,
+    "envctl_regression_path": "/home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness",
+    "envctl_regression_live_write": false,
+    "envctl_regression_latest_ts_utc": "2026-07-12T04:34:54Z",
+    "envctl_regression_root_cause": "running codex-harness ledger home pinned to retired /home/flexnetos/lifeos root while cwd is canonical /home/flexnetos/meta/src/envctl",
+    "recovery_004_precondition_closed": true,
+    "product_execution_performed": false,
+    "envctl_regression_root_cause_is_persistent": false,
+    "envctl_regression_finding": "Re-verified: harness code defaults are canonical (DEFAULT_HARNESS_ROOT=/home/flexnetos/meta/src/envctl/home/agent-env; compiled fallback CARGO_MANIFEST_DIR-derived). No persistent vector; stray path inert. Prior 04:34Z write was a one-off env export in a since-idle session."
+  },
+  "proof_summary": "PRESERVE-003 is a definition/reconciliation task (policy-cell, no moves executed) and its gate ('every future move fully specified; no move executable during planning') is met: all 7 STRUCTURE moves reconciled against receipts + passing STRUCTURE-001..006; the post-receipt LifeOS namespace move (PR #101) reconciled; both open future moves \u2014 the stray /home/flexnetos/lifeos archival and the 9 transient-worktree reconciliations \u2014 are fully specified with source/target/checksums/git-ref/rollback/proof, executed by no one during planning. Its precondition RECOVERY-004 is now closed (pass). The envctl-path regression was re-verified as non-persistent: the harness code defaults are canonical and the path is inert, so the 'exhaustive future-move' guarantee now holds. status partial->pass; the archival itself remains a scheduled owner-executed task per the gate.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/preserve_topology_reconciliation.md",
+    "planning-spine-v0/proof_records/PRESERVE-003.proof.json"
+  ],
+  "checksums": {
+    "preserve_topology_reconciliation_md_sha256": "0be90ccd641b55a0aad8c67cf548067f1b45fd5782a0a6e63ba59f5d896fa94c"
+  },
+  "blockers": [],
+  "live_commands": [
+    {
+      "purpose": "Confirm the retired-root regression is present and actively written",
+      "cwd": "/home/flexnetos",
+      "command": "find /home/flexnetos/lifeos -type f; tail -1 /home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness/ledger/harness.jsonl",
+      "exit_status": 0,
+      "output": [
+        "codex-harness ledger + state files present under retired /home/flexnetos/lifeos root",
+        "latest ledger entry ts_utc=2026-07-12T04:34:54Z, cwd=/home/flexnetos/meta/src/envctl"
+      ]
+    },
+    {
+      "purpose": "Confirm the post-receipt LifeOS namespace move (PR #101)",
+      "cwd": "/home/flexnetos/meta",
+      "command": "git log --oneline | grep 'peer namespace'; grep -A2 '^  lifeos:' .meta.yaml",
+      "exit_status": 0,
+      "output": [
+        "a79802f fix: place LifeOS in the Meta peer namespace (#101)",
+        "lifeos: repo git@github.com:FlexNetOS/lifeos.git path src/lifeos"
+      ]
+    },
+    {
+      "purpose": "Verify the reconciliation artifact against the failing-first validator",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "uv run --no-project --with pytest python -m pytest test_preserve_artifacts.py -k 'topology or proof'",
+      "exit_status": 0,
+      "output": [
+        "test_topology_reconciliation_md PASSED",
+        "test_proof_records PASSED"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-003",
+  "observed_at": "2026-07-12T17:20:29Z",
+  "revision": 3,
+  "status": "pass",
+  "verification_gate": "The source CSV normalizes without loss; every task has scope, gates, rollback, proof URI, valid parents, and a North Star anchor; no product task is executable before coverage passes.",
+  "gate_result": {
+    "task_schema_requires_execution_constraints": true,
+    "source_row_count": 196,
+    "normalized_task_count": 196,
+    "normalizes_without_loss": true,
+    "rows_with_defects": 0,
+    "every_row_has_scope_gates_rollback_proof_phase": true
+  },
+  "proof_summary": "The Task schema requires allowed_paths, blocked_paths, verification_gate, rollback_plan, and proof_uri. All 196 source rows carry non-empty scope, gate, rollback, proof URI, and phase fields with valid parent references, and the graph normalizes to 196 tasks with no row loss.",
+  "artifact_paths": [
+    "planning-spine-v0/03_TASK_GRAPH_SCHEMA.md",
+    "planning-spine-v0/schemas/task.schema.json",
+    "planning-spine-v0/generated/task_graph.source.csv",
+    "planning-spine-v0/generated/task_graph.normalized.json"
+  ],
+  "checksums": {
+    "03_TASK_GRAPH_SCHEMA.md": "120bb102ccf1c5c0fb963f6d7ffb36a59c3cdf91bc91075138b9c4468067c832",
+    "task.schema.json": "863b5795cad0beefcef3fdbc8a3b662ef508f2abeb882b32febbaade16448e88"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-003",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "RECOVERY-002",
+  "observed_at": "2026-07-12T16:36:15Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each CDB task is classified as proven product capability, proven planning artifact only, partial, pending, superseded, or unsupported; BlobStore, redb, PgStore, materialization, secret guards, envctl export, and live-parity gaps map once to canonical LifeOS tasks.",
+  "gate_result": {
+    "rows_classified": 246,
+    "distribution": {
+      "proven-capability": 176,
+      "pending": 35,
+      "planning-only": 15,
+      "partial": 20
+    },
+    "every_row_has_evidence_uri": true,
+    "no_report_claim_silently_truth": true,
+    "capabilities_mapped_once": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Classified all 246 nu_plugin rows (TASK_GRAPH 70 + BIDIRECTIONAL 21 + POLYGLOT 15 + REQUIREMENT_PROOF_LEDGER 140) against crates/logs/tests. Distribution: {'proven-capability': 176, 'pending': 35, 'planning-only': 15, 'partial': 20}. Implementation waves (CDB013-089) are proven-capability with stale CSV status (evidence-binding pending, no engineering left); POLYGLOT CDB091-105 are planning-only (V1.2 import PLAN rows); compiler-observed rows are partial (fake-compiler gate tests, production broker unbuilt); CDB090/AC09/AC04 pending; envctl REQ-061-* split 22 proven / 12 partial (engine unwired) / 31 pending (absent). No capability scheduled for reimplementation.",
+  "artifact_paths": [
+    "generated/recovery_nu_plugin_disposition.csv"
+  ],
+  "checksums": {
+    "recovery_nu_plugin_disposition.csv": "4175081ae553ed70b6e0baf8324e69b729a4c88a2ab22ac3ca2b66930ecda988"
+  },
+  "live_commands": [
+    {
+      "purpose": "Verify per-row classification coverage over the 4 nu tables",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python validate_recovery.py (RECOVERY-002 section)",
+      "exit_status": 0,
+      "output": [
+        "rows=246",
+        "union coverage complete",
+        "all classifications valid"
+      ]
+    }
+  ]
+}

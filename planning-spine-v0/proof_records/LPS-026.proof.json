@@ -1,0 +1,38 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-026",
+  "observed_at": "2026-07-12T16:34:28Z",
+  "revision": 1,
+  "status": "partial",
+  "verification_gate": "meta git cuts a branch from origin/main and opens a PR to develop with checks; no long-lived-branch force-push or rebase; superset upgrade-only respected.",
+  "gate_result": {
+    "meta_installed_via_nix_profile": true,
+    "meta_project_list_ok": true,
+    "meta_git_status_across_fleet_ok": true,
+    "meta_git_surface_functional_read_only": true,
+    "branch_cut_from_origin_main": false,
+    "pr_opened_to_develop_with_checks": false,
+    "no_long_lived_branch_force_push_or_rebase": true,
+    "product_execution_performed": true
+  },
+  "proof_summary": "The meta_git_cli fleet git surface is installed and functional read-only. `meta project list` enumerates the full fleet (30+ peer repos: agent, beads_rust, envctl, handoff, lifeos, meta_git_cli, meta_git_lib, ...). `meta git status` runs across every peer and reports per-repo branch/tracking/dirty state (e.g. meta on main up-to-date with one modified .kb/config.toml; agent on codex/... clean; handoff, beads_rust, ccboard clean). This proves the branch/PR surface is wired and safe to drive. The write half of the gate -- cutting a feature branch from origin/main and OPENING A PR to develop with checks -- was NOT executed: this lane is read-only and explicitly forbidden from creating branches/PRs (see remaining/blocker). No long-lived-branch force-push or rebase was performed (none attempted).",
+  "blockers": [
+    {
+      "id": "LPS-026-B1-pr-flow",
+      "gate": "meta git cuts a branch from origin/main and opens a PR to develop with checks",
+      "detail": "Requires a real write flow (branch creation + push + PR open + CI checks) against fleet remotes. This lane is READ-ONLY and forbidden from creating branches or PRs; it also may not commit anywhere. The surface is proven functional (project list + git status across the fleet), but the PR-cutting gate needs a commit/PR-authorized session.",
+      "owner_action": "In a commit-authorized session: `meta git checkout -b <feature> origin/main` across the scoped peers, push, open a PR targeting develop (never main directly; develop->main is fast-forward only per git-topology), and confirm checks. Abandon the test branch/PR per the row rollback plan."
+    }
+  ],
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/LPS-026.proof.json"
+  ],
+  "checksums": {
+    "meta_version": "meta 0.2.22"
+  },
+  "live_commands": [
+    {"purpose": "install-via-profile: meta is a nix-profile symlink", "cwd": "/home/flexnetos/meta", "command": "ls -la /home/flexnetos/.nix-profile/bin/meta", "exit_status": 0, "output": ["meta -> /nix/store/nbig4g1a5whaxvpk2y4diw9ysbsdf1kr-lifeos-foundation-yzx/bin/meta"]},
+    {"purpose": "fleet enumeration", "cwd": "/home/flexnetos/meta", "command": "meta project list", "exit_status": 0, "output": [". (git@github.com:FlexNetOS/meta.git)", "handoff (src/handoff)", "lifeos (src/lifeos)", "meta_git_cli (meta_git_cli)", "meta_git_lib (meta_git_lib)", "... 30+ peers"]},
+    {"purpose": "fleet git surface read-only", "cwd": "/home/flexnetos/meta", "command": "meta git status", "exit_status": 0, "output": ["ok . (meta): On branch main, up to date with origin/main; modified .kb/config.toml", "ok agent: clean", "ok handoff: clean", "ok beads_rust: clean"]}
+  ]
+}

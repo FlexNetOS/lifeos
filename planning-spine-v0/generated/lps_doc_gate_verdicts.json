@@ -1,0 +1,184 @@
+{
+  "observed_at": "2026-07-12T17:20:29Z",
+  "verdicts": {
+    "LPS-000": {
+      "status": "pass",
+      "verification_gate": "North Star and package layout exist, remain mutually consistent, and are checksum-backed by a passing proof record.",
+      "gate_result": {
+        "north_star_doc_present": true,
+        "readme_present": true,
+        "north_star_declares_v0_rfc_postv0": true,
+        "readme_declares_v0_and_rfc": true,
+        "checksum_backed": true
+      }
+    },
+    "LPS-001": {
+      "status": "pass",
+      "verification_gate": "Every required object has a valid schema and example; relationships resolve; proof records the verified checksums and commands.",
+      "gate_result": {
+        "all_examples_validate": true,
+        "v0_object_count": 13,
+        "validated_object_count": 13,
+        "every_v0_object_has_valid_schema_and_example": true,
+        "object_model_doc_present": true
+      }
+    },
+    "LPS-002": {
+      "status": "pass",
+      "verification_gate": "Authority and capability assignments resolve machine-readably; no agent has unlimited authority; approval and escalation gates are explicit and proven.",
+      "gate_result": {
+        "agent_example_validates": true,
+        "role_example_validates": true,
+        "capability_example_validates": true,
+        "no_unlimited_authority": true,
+        "agent_boundary_rules_present": true,
+        "role_requires_escalation_field": true,
+        "role_example_declares_escalation": true,
+        "verifier_cannot_execute": true,
+        "agent_schema_requires_authority_scope": true
+      }
+    },
+    "LPS-003": {
+      "status": "pass",
+      "verification_gate": "The source CSV normalizes without loss; every task has scope, gates, rollback, proof URI, valid parents, and a North Star anchor; no product task is executable before coverage passes.",
+      "gate_result": {
+        "task_schema_requires_execution_constraints": true,
+        "source_row_count": 196,
+        "normalized_task_count": 196,
+        "normalizes_without_loss": true,
+        "rows_with_defects": 0,
+        "every_row_has_scope_gates_rollback_proof_phase": true
+      }
+    },
+    "LPS-004": {
+      "status": "pass",
+      "verification_gate": "WorldSeed schema and example validate; baseline, constraints, seed, and rollback boundaries are explicit and checksum-backed.",
+      "gate_result": {
+        "worldseed_schema_and_example_validate": true,
+        "baseline_snapshot_explicit": true,
+        "constraints_field_present": true,
+        "seed_identity_present": true,
+        "simulator_version_present": true,
+        "non_mutation_contract_documented": true
+      }
+    },
+    "LPS-005": {
+      "status": "pass",
+      "verification_gate": "SimulationReport validates, emits machine-readable constraint updates, preserves failed-world evidence, and cannot mark tasks complete.",
+      "gate_result": {
+        "simulation_report_schema_and_example_validate": true,
+        "emits_constraint_updates": true,
+        "preserves_evidence": true,
+        "status_enum_has_no_complete": true,
+        "status_enum_supports_failed_world": true,
+        "cannot_mark_task_complete": true
+      }
+    },
+    "LPS-006": {
+      "status": "pass",
+      "verification_gate": "Cell schema and example validate; mutation, network, snapshot, rollback, and promotion boundaries are explicit and proven.",
+      "gate_result": {
+        "cell_schema_and_example_validate": true,
+        "mutation_boundary_explicit": true,
+        "promotion_gate_explicit": true,
+        "network_denied_by_default_explicit": true,
+        "snapshot_boundary_explicit": true,
+        "rollback_field_present_in_cell": true,
+        "missing_enumerated_boundaries": []
+      }
+    },
+    "LPS-007": {
+      "status": "pass",
+      "verification_gate": "Proof schema validates; executor and verifier authority are distinct; append-only lineage, checksums, rollback points, and failed checks are preserved.",
+      "gate_result": {
+        "proof_record_schema_validates": true,
+        "result_enum_supports_failed_checks": true,
+        "ledger_entry_count": 146,
+        "append_only_sequence_monotonic": true,
+        "every_entry_checksum_backed": true,
+        "executor_verifier_distinct": true,
+        "authority_integrity_report_result": "pass"
+      }
+    },
+    "LPS-008": {
+      "status": "pass",
+      "verification_gate": "The connected bundle resolves intent, authority, task, simulation, cell, proof, decision, action, and artifact with no missing edge or paper completion.",
+      "gate_result": {
+        "bundle_scope_is_v0": true,
+        "bundle_order_matches_required_chain": true,
+        "objects_resolve_and_validate": true,
+        "resolve_errors": [],
+        "cross_object_edges": [
+          {
+            "edge": "intent_to_goal",
+            "result": "pass"
+          },
+          {
+            "edge": "task_to_worldseed",
+            "result": "pass"
+          },
+          {
+            "edge": "worldseed_to_simulation_report",
+            "result": "pass"
+          },
+          {
+            "edge": "task_to_cell",
+            "result": "pass"
+          },
+          {
+            "edge": "cell_to_proof",
+            "result": "pass"
+          },
+          {
+            "edge": "proof_to_decision",
+            "result": "pass"
+          },
+          {
+            "edge": "decision_to_action",
+            "result": "pass"
+          },
+          {
+            "edge": "action_to_artifact",
+            "result": "pass"
+          }
+        ],
+        "all_edges_pass": true,
+        "shipped_bundle_report_result": "pass"
+      }
+    },
+    "LPS-009": {
+      "status": "pass",
+      "verification_gate": "All required transitions have fail-closed machine-readable gates; spend, legal, credentials, production, physical action, and irreversible work require human approval.",
+      "gate_result": {
+        "gates_yaml_present": true,
+        "execution_gates_doc_present": true,
+        "transition_matrix_documented": true,
+        "human_approval_gate_documented": true,
+        "missing_gate_requirements": []
+      }
+    },
+    "LPS-010": {
+      "status": "pass",
+      "verification_gate": "RFC scope, immutable base, mutable overlay, promotion gate, and explicit preconditions are documented and proof-backed without implementation.",
+      "gate_result": {
+        "rfc_present": true,
+        "declares_rfc_only_scope": true,
+        "immutable_base_documented": true,
+        "mutable_overlay_documented": true,
+        "promotion_gate_and_preconditions_documented": true,
+        "not_implemented": true
+      }
+    },
+    "LPS-011": {
+      "status": "pass",
+      "verification_gate": "Every open question has an owner, unblock condition, bounded decision task, rollback or deferral rule, and North Star anchor; no contradiction is silently resolved.",
+      "gate_result": {
+        "question_count": 6,
+        "owned_by_decision_row_count": 6,
+        "all_questions_have_bounded_decision_row": true,
+        "questions_without_decision_row": [],
+        "questions_without_decision_row_or_deferral": []
+      }
+    }
+  }
+}

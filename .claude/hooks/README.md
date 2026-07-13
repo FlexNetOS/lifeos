@@ -40,6 +40,7 @@ Remove the `Stop` block from `.claude/settings.json`, or delete `.claude/hooks/s
 ### Force a manual entry
 
 ```bash
-echo '{"session_id":"manual-test","cwd":"/home/drdave/repos/ubuntu-lifeos","transcript_path":"<path-to-jsonl>"}' \
-  | node /home/drdave/repos/ubuntu-lifeos/.claude/hooks/session-log.mjs
+repo_root="$(git rev-parse --show-toplevel)"
+echo "{\"session_id\":\"manual-test\",\"cwd\":\"$repo_root\",\"transcript_path\":\"<path-to-jsonl>\"}" \
+  | node "$repo_root/.claude/hooks/session-log.mjs"
 ```

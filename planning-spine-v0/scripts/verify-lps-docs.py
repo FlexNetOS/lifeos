@@ -586,13 +586,17 @@ def gate_lps_006() -> tuple[str, dict, str, list[str], dict]:
         "cell.json": sha256_file("examples/cell.json"),
         "cell.schema.json": sha256_file("schemas/cell.schema.json"),
     }
-    summary = (
-        "Cell schema and example validate; mutation boundaries (allowed_paths/blocked_paths) and a "
-        "promotion gate (verification_gate 'proof gate must pass before success') are explicit. "
-        "However the LPS-006 gate also requires explicit network-denied-by-default, snapshot, and "
-        "rollback boundaries, and none of these are represented in the cell schema, the cell "
-        "example, or 05_HERMETIC_CELL_CONTRACT.md. Gate does not fully hold."
-    )
+    if status == "pass":
+        summary = (
+            "Cell schema and example validate; allowed/blocked mutation paths, proof-gated promotion, "
+            "network-denied-by-default behavior, a required pre-execution snapshot, and rollback are "
+            "explicit. Every enumerated LPS-006 boundary holds."
+        )
+    else:
+        summary = (
+            "The hermetic-cell contract is blocked because these required boundaries are missing: "
+            + "; ".join(missing)
+        )
     return status, checks, summary, [
         "planning-spine-v0/05_HERMETIC_CELL_CONTRACT.md",
         "planning-spine-v0/examples/cell.json",
@@ -738,13 +742,14 @@ def gate_lps_009() -> tuple[str, dict, str, list[str], dict]:
     checks["missing_gate_requirements"] = missing
     status = "pass" if not missing else "blocked"
     checksums = {"08_EXECUTION_GATES.md": sha256_file("08_EXECUTION_GATES.md")}
-    summary = (
-        "08_EXECUTION_GATES.md documents a fail-closed authority/simulation/cell/proof/decision "
-        "transition matrix. But the LPS-009 gate additionally requires (a) the named machine-readable "
-        "schemas/gates.yaml artifact, which does not exist, and (b) an explicit human-approval gate "
-        "for spend, legal, credentials, production, physical action, and irreversible work, which the "
-        "doc does not define. Gate does not fully hold."
-    )
+    if status == "pass":
+        summary = (
+            "08_EXECUTION_GATES.md and schemas/gates.yaml encode fail-closed authority, simulation, "
+            "cell, proof, and decision transitions. Spend, legal, credentials, production mutation, "
+            "physical action, and irreversible work all require explicit human approval."
+        )
+    else:
+        summary = "The execution-gate contract is blocked: " + "; ".join(missing)
     return status, checks, summary, [
         "planning-spine-v0/08_EXECUTION_GATES.md",
     ], checksums
@@ -797,15 +802,18 @@ def gate_lps_011(crosswalk: dict) -> tuple[str, dict, str, list[str], dict]:
     }
     status = "pass" if crosswalk["all_questions_have_decision_row"] else "blocked"
     checksums = {"09_OPEN_QUESTIONS.md": sha256_file("09_OPEN_QUESTIONS.md")}
-    summary = (
-        f"Crosswalked all {crosswalk['question_count']} open questions in 09_OPEN_QUESTIONS.md to the "
-        f"task graph. {crosswalk['owned_by_decision_row_count']} have a bounded owning DECISION row. "
-        f"The gate requires every open question to be converted into an owned, gated task-graph "
-        f"decision row; that conversion has not happened, so the gate does not hold. RFC-Q1/RFC-Q2 "
-        f"have related proof-boundary rows (LPS-005, LPS-010) that only preserve the current deferral, "
-        f"and RFC-Q3 (proof-URI addressing) has neither an owning decision row nor a documented "
-        f"deferral rule. Adding decision rows is outside this lane's file ownership."
-    )
+    if status == "pass":
+        summary = (
+            f"Crosswalked all {crosswalk['question_count']} open questions in 09_OPEN_QUESTIONS.md to "
+            f"the task graph. All {crosswalk['owned_by_decision_row_count']} have bounded owning "
+            "DECISION rows with explicit rollback or deferral rules; no question is silently resolved."
+        )
+    else:
+        summary = (
+            f"The open-question ownership gate is blocked. Unowned questions: "
+            f"{', '.join(question['id'] for question in unowned) or 'none'}; questions without an "
+            f"owning row or deferral: {', '.join(question['id'] for question in no_deferral) or 'none'}."
+        )
     return status, checks, summary, [
         "planning-spine-v0/09_OPEN_QUESTIONS.md",
         "planning-spine-v0/generated/lps_doc_open_questions_map.json",

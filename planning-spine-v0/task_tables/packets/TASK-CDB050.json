@@ -1,0 +1,89 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/flake.nix",
+    "src/nu_plugin/packaging/codedb_runtime_tool.nix",
+    "src/nu_plugin/docs/CODEDB_YAZELIX_RUNTIME_TOOL.md",
+    "src/nu_plugin/tests/test_runtime_tool_contract.py",
+    "src/nu_plugin/logs/CDB050-runtime-tool.log"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB050",
+    "decision": null,
+    "intent_lock_digest": "blake3:5621b61c5b165f5c40552ef3de3129eca8270569e4cce613faf6efd3f80d2bb4",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB051",
+    "TASK-CDB054",
+    "TASK-CDB061"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB050",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB050",
+  "depends_on": [
+    "TASK-CDB049",
+    "TASK-CDB030"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "plugin/CLI packaged",
+    "deterministic": true,
+    "verification_command": "runtime tool metadata and `codedb --version` smoke pass"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/research/nushell_yazelix_cross_reference_report.md"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:5621b61c5b165f5c40552ef3de3129eca8270569e4cce613faf6efd3f80d2bb4"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:9db05f31ec01ebaff59b778674fa7e9c1f3409e139a08adf4e3626eb3b044813",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB050",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB050"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB050 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/nu_plugin_codedb runtime package"
+  ],
+  "task_id": "TASK-CDB050",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB050"
+}

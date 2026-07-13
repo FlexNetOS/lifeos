@@ -1,0 +1,139 @@
+{
+  "policy": "The reference workflow is a design contract; its task statuses and proofs are never imported as LifeOS completion.",
+  "reference": "../envctl-db-nu-plugin-migration-automation-package/execution-framework",
+  "schema": "lifeos.reference-workflow-gap-matrix.v1",
+  "surfaces": [
+    {
+      "implementation": "source_manifest.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "source_manifest"
+    },
+    {
+      "implementation": "canonical/task_graph.normalized.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "normalized_graph"
+    },
+    {
+      "implementation": "manifests/execution_manifest.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "execution_manifest"
+    },
+    {
+      "implementation": "packets/TASK-CDB000.json..TASK-CDB105.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "execution_packets"
+    },
+    {
+      "implementation": "control/dispatch_plan.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "dependency_dispatch"
+    },
+    {
+      "implementation": "control/approval_queue.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "human_approval"
+    },
+    {
+      "implementation": "control/lease_registry.json + acquireTaskLease/releaseTaskLease",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "atomic_leases"
+    },
+    {
+      "implementation": "ledgers/events.jsonl + appendRuntimeEvent",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "append_only_events"
+    },
+    {
+      "implementation": "ledgers/proofs.jsonl + appendProofRecord",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "append_only_proofs"
+    },
+    {
+      "implementation": "recovery/checkpoint_catalog.json + recordCheckpoint",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "checkpoints"
+    },
+    {
+      "implementation": "recovery/replay_plan.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "replay"
+    },
+    {
+      "implementation": "recovery/rollback_plan.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "rollback"
+    },
+    {
+      "implementation": "receipts/artifact_manifest.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "receipts"
+    },
+    {
+      "implementation": "receipts/completeness_report.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "completeness"
+    },
+    {
+      "implementation": "workflow/reference_namespaces.json",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "reference_graph_namespaces"
+    },
+    {
+      "implementation": "workflow/mandatory_capabilities.json + workflow/mandatory_capabilities.csv",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "mandatory_capabilities"
+    },
+    {
+      "implementation": "workflow/mandatory_language_inventory.json + workflow/mandatory_language_inventory.csv",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "mandatory_language_reverse_coverage"
+    },
+    {
+      "implementation": "visuals/task_graph.mmd",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "mermaid_visual"
+    },
+    {
+      "implementation": "visuals/task_graph.dot",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "graphviz_dot_visual"
+    },
+    {
+      "implementation": "visuals/dashboard.txt",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "tui_dashboard"
+    },
+    {
+      "implementation": "visuals/event_stream.ndjson",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "live_event_stream"
+    },
+    {
+      "implementation": "visuals/task_graph.html + visuals/task_graph.wiki.md",
+      "implementation_status": "implemented",
+      "requirement": "mandatory",
+      "surface": "static_html_wiki"
+    }
+  ]
+}

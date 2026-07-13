@@ -1,0 +1,83 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/logs/CDB025-build-static.log"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB025",
+    "decision": null,
+    "intent_lock_digest": "blake3:2f592cdaadd6ce980a89e56656d124cb8db7120c15e92cce16e75b59bd0d6cbe",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB027",
+    "TASK-CDB033"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB025",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB025",
+  "depends_on": [
+    "TASK-CDB022"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "build scripts detected",
+    "deterministic": true,
+    "verification_command": "build script fixture emits static rows/gaps"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:2f592cdaadd6ce980a89e56656d124cb8db7120c15e92cce16e75b59bd0d6cbe"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:5ac937c9e56ff7d53612d2d4586ae1228c098b5b8d1588a38cdc93da6917d779",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB025",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB025"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB025 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/build_scripts",
+    "src/nu_plugin/capture_gaps"
+  ],
+  "task_id": "TASK-CDB025",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB025"
+}

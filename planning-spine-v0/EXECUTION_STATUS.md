@@ -9,7 +9,7 @@ actions that unblock the remainder. Authoritative machine state:
 
 | Surface | Start | Now |
 |---|---|---|
-| planning-spine task graph complete | 44 / 190 | **117 / 196** |
+| planning-spine task graph complete | 44 / 190 | **123 / 249** (196 → 249: +18 foundation families, see below) |
 | nu_plugin requirement-proof ledger — evidence verified | 2 / 140 | **140 / 140** (local-release receipt validated end-to-end) |
 | nu_plugin requirement-proof ledger — verified+complete | 2 / 140 | **140 / 140** |
 | nu_plugin TASK_GRAPH complete | 19 / 70 | **66 / 70** |
@@ -47,6 +47,29 @@ actions that unblock the remainder. Authoritative machine state:
   main nu_plugin (c9c5573); temp-scratch collision fixes were already on main convergently.
 - The correction projection itself passes with zero forbidden updates. This statement is
   limited to correction integrity; it does not reinstate the invalidated completion claims.
+
+### 2026-07-13 — foundation families added (18 families, +53 tasks → 249)
+
+The prior 196-task graph proved the machine can be *built and reasoned about* but
+systematically omitted the operational / release-engineering / security-governance
+foundation the Architecture Blueprint and the migration package (`art-100..129`)
+enumerate. Those families are now tracked in the single canonical graph as
+**v0-blocking** work — additive-only, fresh non-colliding task ids, all `Draft`,
+each with a real verification gate and rollback plan, **no fabricated proofs**:
+
+- `13-supply-chain` (7): SBOM, SIGN — SBOM/CVE/license/pinning; artifact signing + SLSA provenance.
+- `14-contracts` (10): APIVER, XCTX, SLA — API/IPC + DB-schema versioning; cross-context anti-corruption; error taxonomy + latency budgets.
+- `15-seams` (12): OBSV, FLAG, TEST, DR — observability; feature flags; product test harness; PostgreSQL backup/restore + DR drill.
+- `16-ops-governance` (24): CICD, QUOTA, THREAT, RBAC, PRIV, COMPLY, INCIDENT, SAFETY, DOCGOV — CI/CD + lint/static-analysis; rate-limit/spend; threat model + disclosure + pentest; actor RBAC; privacy/erasure; financial-legal compliance; incident runbooks; agent-safety kill-switch/override/escalation; ADR + CLA governance.
+
+Structural closure was re-checked over 249 tasks (dependencies resolve, no cycles,
+31/31 phases decomposed — all pass); `LPS-003` re-verified append-only (rev 3 → 4:
+"all 249 source rows carry non-empty scope, gate, rollback, proof URI, and phase
+fields"). The `GRAPH-001` / `GRAPH-005` / `RELEASE-001` closure/acceptance proofs
+remain **invalidated / owner-ratification-gated** from the correction above and are
+*not* re-asserted here over the larger graph — that owner decision now spans 249
+tasks. The release gate stays honestly fail-closed. Live projection: **123 Complete,
+124 Draft, 1 Running, 1 Rolled Back across 249**, global coverage gate closed.
 
 The remaining 7 non-evidence-verified ledger rows all reduce to **one thing: a real
 signed release** (a clean commit → `generate_requirement_proof_receipt.py` detached

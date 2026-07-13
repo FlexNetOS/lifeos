@@ -82,7 +82,7 @@ not enter the canonical LifeOS task or proof namespaces.
 
 | Namespace | Exact lookup | Authority boundary |
 |---|---|---|
-| Canonical LifeOS tasks | `by_task_id` | Exactly the 196 task-graph rows; proof-derived lifecycle applies. |
+| Canonical LifeOS tasks | `by_task_id` | Exactly the 249 task-graph rows; proof-derived lifecycle applies. |
 | Imported WorkOrders | `by_work_order_id` | `TASK-CDB000..105`; local status remains `review`, source status is provenance only. |
 | Mandatory capabilities | `by_mandatory_capability_id` | `CAP-MIG-001..028`; mandatory review scope, never a completion claim. |
 

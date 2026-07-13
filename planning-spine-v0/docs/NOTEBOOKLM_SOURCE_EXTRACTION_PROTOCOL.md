@@ -1,3 +1,26 @@
+---
+id: lifeos.planning-spine.notebooklm-source-extraction-protocol
+title: NotebookLM Source Extraction Protocol
+description: Fail-closed provenance, claim normalization, evidence, task mapping, and proof rules for NotebookLM material.
+type: protocol
+status: active
+lifecycle: maintained
+created: 2026-07-10
+updated: 2026-07-12
+aliases:
+  - NotebookLM extraction protocol
+  - NotebookLM provenance protocol
+tags:
+  - lifeos
+  - notebooklm
+  - provenance
+  - verification
+related:
+  - "[[planning-spine-v0/navigation/README]]"
+  - "[[planning-spine-v0/1.0_VISION/Notebooklm/README]]"
+  - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
+---
+
 # NotebookLM Source Extraction Protocol
 
 ## Rule

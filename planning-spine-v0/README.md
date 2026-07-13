@@ -1,9 +1,34 @@
+---
+id: lifeos.planning-spine.v0
+title: LifeOS Planning Spine v0
+description: Buildable architecture, task, authority, simulation, and proof contract for the first LifeOS execution spine.
+type: planning-contract
+status: active
+lifecycle: maintained
+created: 2026-07-03
+updated: 2026-07-12
+aliases:
+  - LifeOS planning spine
+  - Planning spine v0
+tags:
+  - lifeos
+  - planning-spine
+  - execution
+  - proof
+related:
+  - "[[planning-spine-v0/navigation/README]]"
+  - "[[planning-spine-v0/00_NORTH_STAR]]"
+  - "[[planning-spine-v0/1.0_VISION/README]]"
+---
+
 # LifeOS Planning Spine v0
 
 This package converts the `lifeos-planning-spine v0` source brief into a buildable architecture contract for the first LifeOS execution spine.
 
 ## Agent Quick Navigation
 
+- Instant task, claim, proof, topic, and file recall:
+  [`navigation/README.md`](./navigation/README.md) · [[planning-spine-v0/navigation/README]]
 - Vision index: [`1.0_VISION/README.md`](./1.0_VISION/README.md) ·
   [[planning-spine-v0/1.0_VISION/README]]
 - Blueprint compatibility and session-course audit:
@@ -51,22 +76,28 @@ Preserved operating assumptions:
 
 | Path | Purpose |
 |---|---|
-| `00_NORTH_STAR.md` | Product and control-plane aim |
-| `01_OBJECT_MODEL.md` | Core entities and relationships |
-| `02_AUTHORITY_GRAPH.md` | Delegation and decision boundaries |
-| `03_TASK_GRAPH_SCHEMA.md` | Task graph semantics and constraints |
-| `04_WORLDSEED_SCHEMA.md` | DevWorld simulation seed contract |
-| `05_HERMETIC_CELL_CONTRACT.md` | Execution cell runtime boundary |
-| `06_PROOF_LEDGER.md` | Proof recording and completion rules |
-| `07_MVP_VERTICAL_SLICE.md` | End-to-end MVP flow |
-| `08_EXECUTION_GATES.md` | Required gates before progress/completion |
-| `09_OPEN_QUESTIONS.md` | Explicit unresolved decisions |
+| [`navigation/README.md`](./navigation/README.md) | Human agent start page and query examples for the deterministic graph |
+| [`navigation/source.json`](./navigation/source.json) | Authored semantic routes, authority/lifecycle vocabulary, strict links, and structured adapters |
+| [`navigation/schemas/index.json`](./navigation/schemas/index.json) | Schema registry for the graph, compact index, and validation report |
+| [`00_NORTH_STAR.md`](./00_NORTH_STAR.md) | Product and control-plane aim |
+| [`01_OBJECT_MODEL.md`](./01_OBJECT_MODEL.md) | Core entities and relationships |
+| [`02_AUTHORITY_GRAPH.md`](./02_AUTHORITY_GRAPH.md) | Delegation and decision boundaries |
+| [`03_TASK_GRAPH_SCHEMA.md`](./03_TASK_GRAPH_SCHEMA.md) | Task graph semantics and constraints |
+| [`04_WORLDSEED_SCHEMA.md`](./04_WORLDSEED_SCHEMA.md) | DevWorld simulation seed contract |
+| [`05_HERMETIC_CELL_CONTRACT.md`](./05_HERMETIC_CELL_CONTRACT.md) | Execution cell runtime boundary |
+| [`06_PROOF_LEDGER.md`](./06_PROOF_LEDGER.md) | Proof recording and completion rules |
+| [`07_MVP_VERTICAL_SLICE.md`](./07_MVP_VERTICAL_SLICE.md) | End-to-end MVP flow |
+| [`08_EXECUTION_GATES.md`](./08_EXECUTION_GATES.md) | Required gates before progress/completion |
+| [`09_OPEN_QUESTIONS.md`](./09_OPEN_QUESTIONS.md) | Explicit unresolved decisions |
 | `1.0_VISION/README.md` | Agent-oriented vision, authority, and evidence navigation |
 | `1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md` | Blueprint-to-CodeDB compatibility review and concurrent landing audit |
 | `1.0_VISION/Notebooklm/README.md` | Exact-byte raw artifact catalog and provenance boundary |
 | `1.0_VISION/Notebooklm/artifacts.meta.json` | Machine-readable artifact hashes, sizes, types, and lineage gaps |
 | `1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md` | Built/planned ecosystem ownership map |
 | `1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md` | Meta coordination and portability boundaries |
+| [`navigation/generated/navigation_graph.json`](./navigation/generated/navigation_graph.json) | Full deterministic file/entity graph with typed edges and backlinks |
+| [`navigation/generated/navigation_index.json`](./navigation/generated/navigation_index.json) | Compact task/claim/source/path/alias/tag/topic lookup index |
+| [`navigation/generated/navigation.validation_report.json`](./navigation/generated/navigation.validation_report.json) | Connectivity, metadata, link, ledger, and inventory verdict |
 | `rfcs/` | Post-v0 and proposal surfaces |
 | `schemas/` | JSON Schema contracts |
 | `examples/` | Valid example instances for every schema |
@@ -79,14 +110,24 @@ Preserved operating assumptions:
 Run:
 
 ```bash
+bun run planning-spine:navigation:query -- "STORE-001"
+bun run planning-spine:navigation:explain -- "claim:REDB-CLAIM-002"
+bun run planning-spine:navigation:check
 bun run planning-spine:verify
 ```
+
+The navigation commands require a full repository checkout. The proof-bound
+LPS-018 execution bundle intentionally excludes the repository-wide navigation
+subtree and continues to use its own manifest and validation contract.
 
 That frontdoor is Bun-backed in this repo; it does not require a standalone `node` binary on the host.
 
 That verifier checks:
 
 - all required package files exist,
+- the committed agent-navigation graph/index/report are deterministic and
+  current, every included resource has rich metadata, every node is reachable,
+  and task/claim/source lookup keys resolve,
 - every required schema exists,
 - every schema declares required fields,
 - `Task` requires `allowed_paths`, `blocked_paths`, `verification_gate`, `rollback_plan`, and `proof_uri`,

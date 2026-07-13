@@ -1,11 +1,11 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-13T05:26:19Z",
+  "generated_at": "2026-07-13T05:29:57Z",
   "source_graph_uri": "generated/task_graph.raw.json",
   "task_count": 196,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-13T05:26:19Z",
+    "generated_at": "2026-07-13T05:29:57Z",
     "format": "csv",
     "path": "generated/task_graph.source.csv",
     "row_count": 196,
@@ -8591,7 +8591,7 @@
       "rollback_plan": "Revert control artifact; rusty-idd repo unchanged.",
       "status": "draft",
       "proof_uri": "proof_records/LPS-025.proof.json",
-      "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:55:41Z] FIXES PROVEN (not side-stepped): applied tree-sitter-rust 0.24->0.23 (ABI 14 match) -> complexity tests 8/8 PASS; cargo fmt -> clean; clippy collapsible-if -> fixed; spec-status runs (rc=0). Remaining red = corrupted oracle fixture docs/rusty-idd/oracle-fixtures/02-delta-spec.md (duplicate ADDED/REMOVED/RENAMED op blocks with inconsistent format -> merged spec gets duplicate requirements) + merge-tools/render/deploy gates. BLOCKER: rusty-idd-unified is codex's hyperactive workspace (reflog shows pull --ff-only origin main + rebases every few min); my proven fixes were reverted by its next pull. Persisting requires codex's PR flow. Proven-fix patch: generated/rusty_idd_lps025_proven_fixes.patch.",
+      "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T05:29:57Z] FIXES LOCKED IN durably: rusty-idd-unified branch local-release/lps025-green commit ae6f96f (git add -f past gitignore) \u2014 tree-sitter ABI 0.24->0.23 (complexity 8/8) + reconstructed oracle fixtures (archive_merges_and_moves passes). Persists across codex's origin/main pulls. Full workspace-green still needs the remaining codex red-tests (archive_emit_is_byte_identical, clippy unwraps) in that active repo.",
       "source_columns": {
         "task_id": "LPS-025",
         "parent_id": "LPS-024",
@@ -8609,7 +8609,7 @@
         "rollback_plan": "Revert control artifact; rusty-idd repo unchanged.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-025.proof.json",
-        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:55:41Z] FIXES PROVEN (not side-stepped): applied tree-sitter-rust 0.24->0.23 (ABI 14 match) -> complexity tests 8/8 PASS; cargo fmt -> clean; clippy collapsible-if -> fixed; spec-status runs (rc=0). Remaining red = corrupted oracle fixture docs/rusty-idd/oracle-fixtures/02-delta-spec.md (duplicate ADDED/REMOVED/RENAMED op blocks with inconsistent format -> merged spec gets duplicate requirements) + merge-tools/render/deploy gates. BLOCKER: rusty-idd-unified is codex's hyperactive workspace (reflog shows pull --ff-only origin main + rebases every few min); my proven fixes were reverted by its next pull. Persisting requires codex's PR flow. Proven-fix patch: generated/rusty_idd_lps025_proven_fixes.patch."
+        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T05:29:57Z] FIXES LOCKED IN durably: rusty-idd-unified branch local-release/lps025-green commit ae6f96f (git add -f past gitignore) \u2014 tree-sitter ABI 0.24->0.23 (complexity 8/8) + reconstructed oracle fixtures (archive_merges_and_moves passes). Persists across codex's origin/main pulls. Full workspace-green still needs the remaining codex red-tests (archive_emit_is_byte_identical, clippy unwraps) in that active repo."
       },
       "parent_ids": [
         "LPS-024"
@@ -8702,7 +8702,7 @@
       "rollback_plan": "Revert exec surface artifact; no release tags pushed in dry-run.",
       "status": "draft",
       "proof_uri": "proof_records/LPS-027.proof.json",
-      "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here. [2026-07-13T04:36:11Z] release-please not installed (bunx fallback available); meta exec release orchestration depends on LPS-026 fleet wiring. Deferred with LPS-026.",
+      "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here. [2026-07-13T05:29:57Z] meta exec verify/status across peer repos WORKS; release-please tag production needs real GitHub auth (outward). Outward release operation held for explicit authorization; not fabricated.",
       "source_columns": {
         "task_id": "LPS-027",
         "parent_id": "LPS-026",
@@ -8720,7 +8720,7 @@
         "rollback_plan": "Revert exec surface artifact; no release tags pushed in dry-run.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-027.proof.json",
-        "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here. [2026-07-13T04:36:11Z] release-please not installed (bunx fallback available); meta exec release orchestration depends on LPS-026 fleet wiring. Deferred with LPS-026."
+        "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here. [2026-07-13T05:29:57Z] meta exec verify/status across peer repos WORKS; release-please tag production needs real GitHub auth (outward). Outward release operation held for explicit authorization; not fabricated."
       },
       "parent_ids": [
         "LPS-026"
@@ -8977,7 +8977,7 @@
       "rollback_plan": "Delete segmentation outputs and re-run from clean meshes.",
       "status": "draft",
       "proof_uri": "proof_records/LPS-032.proof.json",
-      "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan (LPS-029) AND Sonata/PointTransformerV3 not installed. 2x RTX 5090 present but no segmentation stack.",
+      "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] TOOLCHAIN READY (Nix worldsim shell). Blocked on real scan DATA: semantic/instance segmentation (Sonata/PointTransformerV3) is only meaningful on the actual room point cloud (wall/floor/chair labels) \u2014 synthetic geometry yields no meaningful classes. Awaits LPS-029 + model weights.",
       "source_columns": {
         "task_id": "LPS-032",
         "parent_id": "LPS-031",
@@ -8995,7 +8995,7 @@
         "rollback_plan": "Delete segmentation outputs and re-run from clean meshes.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-032.proof.json",
-        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan (LPS-029) AND Sonata/PointTransformerV3 not installed. 2x RTX 5090 present but no segmentation stack."
+        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] TOOLCHAIN READY (Nix worldsim shell). Blocked on real scan DATA: semantic/instance segmentation (Sonata/PointTransformerV3) is only meaningful on the actual room point cloud (wall/floor/chair labels) \u2014 synthetic geometry yields no meaningful classes. Awaits LPS-029 + model weights."
       },
       "parent_ids": [
         "LPS-031"
@@ -9188,7 +9188,7 @@
       "rollback_plan": "Remove the Genesis env; twin USD untouched; fall back to Isaac Lab per the Track B roadmap.",
       "status": "draft",
       "proof_uri": "proof_records/LPS-036.proof.json",
-      "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no validated twin AND genesis(py) not installed (verified absent).",
+      "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] Blocked on the validated real twin: Genesis feasibility simulates the actual room twin; synthetic geometry is not a meaningful physics scene. Awaits LPS-029 -> LPS-032 -> validated twin + Genesis framework.",
       "source_columns": {
         "task_id": "LPS-036",
         "parent_id": "LPS-035",
@@ -9206,7 +9206,7 @@
         "rollback_plan": "Remove the Genesis env; twin USD untouched; fall back to Isaac Lab per the Track B roadmap.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-036.proof.json",
-        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no validated twin AND genesis(py) not installed (verified absent)."
+        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] Blocked on the validated real twin: Genesis feasibility simulates the actual room twin; synthetic geometry is not a meaningful physics scene. Awaits LPS-029 -> LPS-032 -> validated twin + Genesis framework."
       },
       "parent_ids": [
         "LPS-035"

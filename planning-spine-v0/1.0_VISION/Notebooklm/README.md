@@ -21,6 +21,7 @@ tags:
   - source-provenance
   - raw-artifacts
 related:
+  - "[[planning-spine-v0/navigation/README]]"
   - "[[planning-spine-v0/1.0_VISION/README]]"
   - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
   - "[[planning-spine-v0/docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL]]"

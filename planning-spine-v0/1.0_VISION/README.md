@@ -28,6 +28,7 @@ tags:
   - navigation
   - gitkb
 related:
+  - "[[planning-spine-v0/navigation/README]]"
   - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
   - "[[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]]"
   - "[[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]]"
@@ -60,7 +61,8 @@ an explicit owner record; it does not become current-state proof.
 
 | Need | Canonical entrypoint | Wiki link |
 |---|---|---|
-| Repository operating contract | [`AGENTS.md`](../../AGENTS.md) | [[AGENTS]] |
+| Instant planning-spine graph recall | [Agent Navigation](../navigation/README.md) | [[planning-spine-v0/navigation/README]] |
+| Repository operating contract | [`AGENTS.md`](../../AGENTS.md) | [[./AGENTS]] |
 | Planning-spine contract | [`planning-spine-v0/README.md`](../README.md) | [[planning-spine-v0/README]] |
 | Blueprint compatibility and corrections | [Architecture Blueprint Compatibility](./ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |
 | Raw NotebookLM artifact catalog | [NotebookLM Artifact Catalog](./Notebooklm/README.md) | [[planning-spine-v0/1.0_VISION/Notebooklm/README]] |
@@ -140,6 +142,8 @@ when refreshing the index is itself in scope.
 
 ## Agent retrieval rules
 
+- Query the committed repository-native index first when the identifier or
+  filename is unknown: `bun run planning-spine:navigation:query -- "<terms>"`.
 - Search before building: use `rg` for exact local text and GitKB only after
   checking branch/index health.
 - Treat NotebookLM files as source artifacts; follow normalized claim and proof

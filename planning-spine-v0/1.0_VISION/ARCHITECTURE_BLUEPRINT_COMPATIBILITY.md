@@ -46,6 +46,7 @@ tags:
   - source-provenance
   - agent-navigation
 related:
+  - "[[planning-spine-v0/navigation/README]]"
   - "[[planning-spine-v0/1.0_VISION/README]]"
   - "[[planning-spine-v0/1.0_VISION/Notebooklm/README]]"
   - "[[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]]"

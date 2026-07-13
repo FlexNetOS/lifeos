@@ -1,3 +1,27 @@
+---
+id: lifeos.vision.foundation-meta-portability-model
+title: Meta Portability and Bootstrap Model
+description: Evidence-cited model of Meta coordination, portable runtime ownership, bootstrap boundaries, and cycle escape paths.
+type: architecture-cross-reference
+status: verified-with-gaps
+lifecycle: maintained
+created: 2026-07-08
+updated: 2026-07-12
+aliases:
+  - Foundation portability model
+  - Meta bootstrap model
+tags:
+  - lifeos
+  - foundation
+  - portability
+  - meta
+related:
+  - "[[planning-spine-v0/navigation/README]]"
+  - "[[planning-spine-v0/1.0_VISION/README]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]]"
+  - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
+---
+
 # FOUNDATION — meta's Portability & Bootstrap Model (the escape from the cycle trap)
 
 > **Why this document exists.** This is the *foundation the whole LifeOS vision sits on.* TEAS

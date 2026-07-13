@@ -201,7 +201,7 @@
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-13T04:46:25Z",
+  "generated_at": "2026-07-13T04:55:41Z",
   "global_coverage_gate": "closed",
   "ledger_entry_count": 240,
   "lifecycle_counts": {
@@ -224,7 +224,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "908a28a53a5cb59a51083358862ea5bedf0c614065679ea4cf8c8ec073b79abc",
+  "source_graph_sha256": "e341f726518edde295c3b572c7f6cb256591d3185f9885118a58aaf349e9cc69",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 196,
   "tasks": [
@@ -5576,7 +5576,7 @@
     },
     {
       "effective": {
-        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:46:25Z] ROOT-CAUSED (deep research, not side-stepped): rusty-idd-unified build now passes; remaining red = tree-sitter ABI mismatch in the VENDORED crates/external/codegraph-parser (runtime tree-sitter 0.24.7 supports ABI<=14, but the loaded tree-sitter-rust grammar is ABI 15 -> 'LanguageError version:15' panics 9 complexity/integration tests), plus cargo fmt drift and clippy findings. Fix = align tree-sitter runtime<->grammar ABI (bump runtime to 0.25 or pin grammars to ABI-14 0.23.x) + cargo fmt + clippy. This exact gap is codex's ACTIVE dedicated lane (rusty-idd-reconcile-wt branch 'plan/rusty-idd-red-tests'); applying a competing fix to the shared tree would collide with its reconcile merge. cargo audit itself is GREEN.",
+        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:55:41Z] FIXES PROVEN (not side-stepped): applied tree-sitter-rust 0.24->0.23 (ABI 14 match) -> complexity tests 8/8 PASS; cargo fmt -> clean; clippy collapsible-if -> fixed; spec-status runs (rc=0). Remaining red = corrupted oracle fixture docs/rusty-idd/oracle-fixtures/02-delta-spec.md (duplicate ADDED/REMOVED/RENAMED op blocks with inconsistent format -> merged spec gets duplicate requirements) + merge-tools/render/deploy gates. BLOCKER: rusty-idd-unified is codex's hyperactive workspace (reflog shows pull --ff-only origin main + rebases every few min); my proven fixes were reverted by its next pull. Persisting requires codex's PR flow. Proven-fix patch: generated/rusty_idd_lps025_proven_fixes.patch.",
         "proof_uri": "proof_records/LPS-025.proof.json",
         "status": "draft"
       },
@@ -5592,7 +5592,7 @@
         "sha256": "062f70e3add6b97b00a36574f70c06cbe58a54eba77e8eb717b669ebf927c72a"
       },
       "source": {
-        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:46:25Z] ROOT-CAUSED (deep research, not side-stepped): rusty-idd-unified build now passes; remaining red = tree-sitter ABI mismatch in the VENDORED crates/external/codegraph-parser (runtime tree-sitter 0.24.7 supports ABI<=14, but the loaded tree-sitter-rust grammar is ABI 15 -> 'LanguageError version:15' panics 9 complexity/integration tests), plus cargo fmt drift and clippy findings. Fix = align tree-sitter runtime<->grammar ABI (bump runtime to 0.25 or pin grammars to ABI-14 0.23.x) + cargo fmt + clippy. This exact gap is codex's ACTIVE dedicated lane (rusty-idd-reconcile-wt branch 'plan/rusty-idd-red-tests'); applying a competing fix to the shared tree would collide with its reconcile merge. cargo audit itself is GREEN.",
+        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:55:41Z] FIXES PROVEN (not side-stepped): applied tree-sitter-rust 0.24->0.23 (ABI 14 match) -> complexity tests 8/8 PASS; cargo fmt -> clean; clippy collapsible-if -> fixed; spec-status runs (rc=0). Remaining red = corrupted oracle fixture docs/rusty-idd/oracle-fixtures/02-delta-spec.md (duplicate ADDED/REMOVED/RENAMED op blocks with inconsistent format -> merged spec gets duplicate requirements) + merge-tools/render/deploy gates. BLOCKER: rusty-idd-unified is codex's hyperactive workspace (reflog shows pull --ff-only origin main + rebases every few min); my proven fixes were reverted by its next pull. Persisting requires codex's PR flow. Proven-fix patch: generated/rusty_idd_lps025_proven_fixes.patch.",
         "proof_uri": "proof_records/LPS-025.proof.json",
         "status": "draft"
       },
@@ -5751,7 +5751,7 @@
     },
     {
       "effective": {
-        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan AND meshlabserver/pymeshlab not installed (verified absent).",
         "proof_uri": "proof_records/LPS-031.proof.json",
         "status": "draft"
       },
@@ -5767,7 +5767,7 @@
         "sha256": null
       },
       "source": {
-        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan AND meshlabserver/pymeshlab not installed (verified absent).",
         "proof_uri": "proof_records/LPS-031.proof.json",
         "status": "draft"
       },
@@ -5779,7 +5779,7 @@
     },
     {
       "effective": {
-        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan (LPS-029) AND Sonata/PointTransformerV3 not installed. 2x RTX 5090 present but no segmentation stack.",
         "proof_uri": "proof_records/LPS-032.proof.json",
         "status": "draft"
       },
@@ -5795,7 +5795,7 @@
         "sha256": null
       },
       "source": {
-        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan (LPS-029) AND Sonata/PointTransformerV3 not installed. 2x RTX 5090 present but no segmentation stack.",
         "proof_uri": "proof_records/LPS-032.proof.json",
         "status": "draft"
       },
@@ -5807,7 +5807,7 @@
     },
     {
       "effective": {
-        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no scan geometry AND usdchecker/pxr(USD) not installed (verified absent).",
         "proof_uri": "proof_records/LPS-033.proof.json",
         "status": "draft"
       },
@@ -5823,7 +5823,7 @@
         "sha256": null
       },
       "source": {
-        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no scan geometry AND usdchecker/pxr(USD) not installed (verified absent).",
         "proof_uri": "proof_records/LPS-033.proof.json",
         "status": "draft"
       },
@@ -5863,7 +5863,7 @@
     },
     {
       "effective": {
-        "next_action": "Wire the report into proof_records as the LPS-035 proof. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Wire the report into proof_records as the LPS-035 proof. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: acceptance gate needs usdchecker + a validated twin; USD tooling absent + no scan.",
         "proof_uri": "proof_records/LPS-035.proof.json",
         "status": "draft"
       },
@@ -5879,7 +5879,7 @@
         "sha256": null
       },
       "source": {
-        "next_action": "Wire the report into proof_records as the LPS-035 proof. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Wire the report into proof_records as the LPS-035 proof. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: acceptance gate needs usdchecker + a validated twin; USD tooling absent + no scan.",
         "proof_uri": "proof_records/LPS-035.proof.json",
         "status": "draft"
       },
@@ -5891,7 +5891,7 @@
     },
     {
       "effective": {
-        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no validated twin AND genesis(py) not installed (verified absent).",
         "proof_uri": "proof_records/LPS-036.proof.json",
         "status": "draft"
       },
@@ -5907,7 +5907,7 @@
         "sha256": null
       },
       "source": {
-        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no validated twin AND genesis(py) not installed (verified absent).",
         "proof_uri": "proof_records/LPS-036.proof.json",
         "status": "draft"
       },

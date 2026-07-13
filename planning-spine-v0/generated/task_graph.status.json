@@ -196,7 +196,60 @@
     "DECIDE-003",
     "DECIDE-004",
     "DECIDE-005",
-    "DECIDE-006"
+    "DECIDE-006",
+    "SBOM-001",
+    "SBOM-002",
+    "SBOM-003",
+    "SBOM-004",
+    "SIGN-001",
+    "SIGN-002",
+    "SIGN-003",
+    "APIVER-001",
+    "APIVER-002",
+    "APIVER-003",
+    "APIVER-004",
+    "XCTX-001",
+    "XCTX-002",
+    "XCTX-003",
+    "SLA-001",
+    "SLA-002",
+    "SLA-003",
+    "OBSV-001",
+    "OBSV-002",
+    "OBSV-003",
+    "OBSV-004",
+    "FLAG-001",
+    "FLAG-002",
+    "TEST-001",
+    "TEST-002",
+    "TEST-003",
+    "DR-001",
+    "DR-002",
+    "DR-003",
+    "CICD-001",
+    "CICD-002",
+    "CICD-003",
+    "CICD-004",
+    "QUOTA-001",
+    "QUOTA-002",
+    "QUOTA-003",
+    "THREAT-001",
+    "THREAT-002",
+    "THREAT-003",
+    "RBAC-001",
+    "RBAC-002",
+    "RBAC-003",
+    "PRIV-001",
+    "PRIV-002",
+    "COMPLY-001",
+    "COMPLY-002",
+    "INCIDENT-001",
+    "INCIDENT-002",
+    "SAFETY-001",
+    "SAFETY-002",
+    "SAFETY-003",
+    "DOCGOV-001",
+    "DOCGOV-002"
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
@@ -272,18 +325,18 @@
     "DECIDE-005",
     "DECIDE-006"
   ],
-  "ledger_entry_count": 322,
+  "ledger_entry_count": 323,
   "lifecycle_counts": {
     "blocked": 0,
     "complete": 123,
-    "draft": 71,
+    "draft": 124,
     "ready": 0,
     "rolled-back": 1,
     "running": 1,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "ad09fae06aafe396680fbeb7f6e297ca0d21792d9e7c4b51a8b8110beafea581",
+  "proof_ledger_sha256": "1fd8a11387d51daf78c1ea606dbd0f8dbfd467fe69d6aad4eb297da4e998fb50",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [],
   "result": "pass",
@@ -295,9 +348,9 @@
   ],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "476a783d003ff78e562ffb0f03eae36e3a7161500a390b366d8e81b8aea007e7",
+  "source_graph_sha256": "b1c1ffa340bc01571a4df3e46ddcffb22cc4afc970544c8d794702520f7b001e",
   "source_graph_uri": "generated/task_graph.normalized.json",
-  "task_count": 196,
+  "task_count": 249,
   "tasks": [
     {
       "effective": {
@@ -5094,10 +5147,10 @@
       "phase": "1-schema",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": 150,
-        "observed_at": "2026-07-12T17:20:29Z",
-        "revision": "3",
-        "sha256": "732a08762793fe062adca0ef4ec32d787c6eaa0487649043fcdb232c8b93315f",
+        "ledger_line_number": 323,
+        "observed_at": "2026-07-13T17:51:04Z",
+        "revision": "4",
+        "sha256": "bf4a3d41889e25576c95a869a861c4791f9dc481448f8685b8e6f1cfaa3c87ea",
         "status": "pass"
       },
       "source": {
@@ -8463,6 +8516,1596 @@
           "to": "planning-spine-v0/proof_records/corrections/architecture-blueprint-owner-ratification-2026-07-13/DECIDE-006-v2.proof.json"
         }
       }
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "13-supply-chain",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 198,
+      "task_id": "SBOM-001",
+      "title": "Generate a deterministic SBOM for the shipped closure",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SBOM-001"
+      ],
+      "phase": "13-supply-chain",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 199,
+      "task_id": "SBOM-002",
+      "title": "CVE-scan the SBOM against a pinned advisory feed",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SBOM-001"
+      ],
+      "phase": "13-supply-chain",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 200,
+      "task_id": "SBOM-003",
+      "title": "License-compliance audit against an allowlist",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-004.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SBOM-001"
+      ],
+      "phase": "13-supply-chain",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SBOM-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 201,
+      "task_id": "SBOM-004",
+      "title": "Dependency pinning and reproducibility policy",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SIGN-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "13-supply-chain",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SIGN-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 202,
+      "task_id": "SIGN-001",
+      "title": "Sign every distributable",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SIGN-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SIGN-001"
+      ],
+      "phase": "13-supply-chain",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SIGN-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 203,
+      "task_id": "SIGN-002",
+      "title": "SLSA/in-toto provenance attestation",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SIGN-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SIGN-001"
+      ],
+      "phase": "13-supply-chain",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SIGN-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 204,
+      "task_id": "SIGN-003",
+      "title": "Offline release-verification runbook",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 205,
+      "task_id": "APIVER-001",
+      "title": "Semver + deprecation policy for the Rust-native surface",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "APIVER-001"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 206,
+      "task_id": "APIVER-002",
+      "title": "Breaking-change compatibility check",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "APIVER-001"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 207,
+      "task_id": "APIVER-003",
+      "title": "PostgreSQL schema-migration versioning + N-1 compat",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-004.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "APIVER-001"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/APIVER-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 208,
+      "task_id": "APIVER-004",
+      "title": "Contract/version registry with deprecation windows",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/XCTX-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/XCTX-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 209,
+      "task_id": "XCTX-001",
+      "title": "Enumerate cross-context boundaries from .meta",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/XCTX-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "XCTX-001"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/XCTX-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 210,
+      "task_id": "XCTX-002",
+      "title": "Schema-validated data contracts per boundary",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/XCTX-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "XCTX-001"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/XCTX-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 211,
+      "task_id": "XCTX-003",
+      "title": "Anti-corruption translation layers",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SLA-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SLA-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 212,
+      "task_id": "SLA-001",
+      "title": "Canonical error-code taxonomy",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SLA-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SLA-001"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SLA-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 213,
+      "task_id": "SLA-002",
+      "title": "Per-seam latency/throughput budgets",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SLA-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SLA-001"
+      ],
+      "phase": "14-contracts",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SLA-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 214,
+      "task_id": "SLA-003",
+      "title": "Measured p99 vs budget",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 215,
+      "task_id": "OBSV-001",
+      "title": "Structured logging seam",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "OBSV-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 216,
+      "task_id": "OBSV-002",
+      "title": "Metrics seam",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "OBSV-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 217,
+      "task_id": "OBSV-003",
+      "title": "Distributed tracing seam",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-004.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "OBSV-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/OBSV-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 218,
+      "task_id": "OBSV-004",
+      "title": "Log/metric/trace correlation + dashboards + alerts",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/FLAG-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/FLAG-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 219,
+      "task_id": "FLAG-001",
+      "title": "Feature-flag mechanism + registry",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/FLAG-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "FLAG-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/FLAG-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 220,
+      "task_id": "FLAG-002",
+      "title": "Runtime toggle without redeploy",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/TEST-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/TEST-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 221,
+      "task_id": "TEST-001",
+      "title": "Product-code test harness + fixtures",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/TEST-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "TEST-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/TEST-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 222,
+      "task_id": "TEST-002",
+      "title": "Coverage floor recorded",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/TEST-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "TEST-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/TEST-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 223,
+      "task_id": "TEST-003",
+      "title": "CI-enforced coverage regression gate",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DR-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DR-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 224,
+      "task_id": "DR-001",
+      "title": "Scheduled backup + PITR for the authority store",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DR-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "DR-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DR-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 225,
+      "task_id": "DR-002",
+      "title": "DR restore drill to a fresh instance",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DR-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "DR-001"
+      ],
+      "phase": "15-seams",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DR-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 226,
+      "task_id": "DR-003",
+      "title": "RPO/RTO measured + restore runbook",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 227,
+      "task_id": "CICD-001",
+      "title": "CI runs build+test+proof gates on every PR",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "CICD-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 228,
+      "task_id": "CICD-002",
+      "title": "rustfmt/clippy + JS/TS lint enforced",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "CICD-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 229,
+      "task_id": "CICD-003",
+      "title": "Static analysis / CodeQL in CI",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-004.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "CICD-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/CICD-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 230,
+      "task_id": "CICD-004",
+      "title": "Profiling entrypoint + flamegraph",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/QUOTA-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/QUOTA-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 231,
+      "task_id": "QUOTA-001",
+      "title": "Rate-limit / concurrency control for the fleet",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/QUOTA-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "QUOTA-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/QUOTA-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 232,
+      "task_id": "QUOTA-002",
+      "title": "Compute-spend budget + alarm",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/QUOTA-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "QUOTA-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/QUOTA-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 233,
+      "task_id": "QUOTA-003",
+      "title": "Per-principal quota accounting",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/THREAT-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/THREAT-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 234,
+      "task_id": "THREAT-001",
+      "title": "STRIDE threat model",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/THREAT-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "THREAT-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/THREAT-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 235,
+      "task_id": "THREAT-002",
+      "title": "Vulnerability-disclosure policy",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/THREAT-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "THREAT-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/THREAT-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 236,
+      "task_id": "THREAT-003",
+      "title": "Pentest / security-review checklist",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/RBAC-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/RBAC-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 237,
+      "task_id": "RBAC-001",
+      "title": "Principal + capability model",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/RBAC-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "RBAC-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/RBAC-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 238,
+      "task_id": "RBAC-002",
+      "title": "Enforced authorization at the command boundary",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/RBAC-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "RBAC-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/RBAC-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 239,
+      "task_id": "RBAC-003",
+      "title": "Capability audit trail",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/PRIV-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/PRIV-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 240,
+      "task_id": "PRIV-001",
+      "title": "Per-data-class retention/deletion policy",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/PRIV-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "PRIV-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/PRIV-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 241,
+      "task_id": "PRIV-002",
+      "title": "Right-to-erasure across all stores",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/COMPLY-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/COMPLY-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 242,
+      "task_id": "COMPLY-001",
+      "title": "Applicable-controls declaration (financial+legal MVP1)",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/COMPLY-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "COMPLY-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/COMPLY-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 243,
+      "task_id": "COMPLY-002",
+      "title": "Governed-transaction control proof",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/INCIDENT-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/INCIDENT-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 244,
+      "task_id": "INCIDENT-001",
+      "title": "Runbooks for top blast-radius failure modes",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/INCIDENT-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "INCIDENT-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/INCIDENT-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 245,
+      "task_id": "INCIDENT-002",
+      "title": "Incident drill + postmortem",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SAFETY-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SAFETY-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 246,
+      "task_id": "SAFETY-001",
+      "title": "Fleet kill-switch",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SAFETY-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SAFETY-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SAFETY-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 247,
+      "task_id": "SAFETY-002",
+      "title": "Human-override of in-flight actions",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SAFETY-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "SAFETY-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/SAFETY-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 248,
+      "task_id": "SAFETY-003",
+      "title": "Guardrail-breach escalation",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DOCGOV-001.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "LIFEOS-011"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DOCGOV-001.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 249,
+      "task_id": "DOCGOV-001",
+      "title": "ADR discipline gate",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DOCGOV-002.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "DOCGOV-001"
+      ],
+      "phase": "16-ops-governance",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Foundation family added to the canonical graph (v0-blocking); execute and prove; release stays fail-closed until done.",
+        "proof_uri": "proof_records/DOCGOV-002.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 250,
+      "task_id": "DOCGOV-002",
+      "title": "OSS contribution + CLA/DCO governance",
+      "updated_fields": [],
+      "updates": {}
     }
   ],
   "update_policy": {

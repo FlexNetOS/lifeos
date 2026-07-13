@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-13T04:36:29Z",
+  "generated_at": "2026-07-13T04:46:25Z",
   "source": {
     "format": "csv",
     "path": "generated/task_graph.source.csv",
@@ -3280,7 +3280,7 @@
         "rollback_plan": "Revert control artifact; rusty-idd repo unchanged.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-025.proof.json",
-        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:36:11Z] cargo audit now GREEN (0 vulns), but rusty-idd-unified build fails (rusty-idd-cli compile error + 9 codegraph-parser test failures + fmt). Blocked on a clean rusty-idd build (concurrent work in rusty-idd-reconcile-wt). Not completable without a green build; not fabricated."
+        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:46:25Z] ROOT-CAUSED (deep research, not side-stepped): rusty-idd-unified build now passes; remaining red = tree-sitter ABI mismatch in the VENDORED crates/external/codegraph-parser (runtime tree-sitter 0.24.7 supports ABI<=14, but the loaded tree-sitter-rust grammar is ABI 15 -> 'LanguageError version:15' panics 9 complexity/integration tests), plus cargo fmt drift and clippy findings. Fix = align tree-sitter runtime<->grammar ABI (bump runtime to 0.25 or pin grammars to ABI-14 0.23.x) + cargo fmt + clippy. This exact gap is codex's ACTIVE dedicated lane (rusty-idd-reconcile-wt branch 'plan/rusty-idd-red-tests'); applying a competing fix to the shared tree would collide with its reconcile merge. cargo audit itself is GREEN."
       }
     },
     {

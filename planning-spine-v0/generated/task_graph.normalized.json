@@ -1,11 +1,11 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-13T06:12:18Z",
+  "generated_at": "2026-07-13T06:23:46Z",
   "source_graph_uri": "generated/task_graph.raw.json",
   "task_count": 196,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-13T06:12:18Z",
+    "generated_at": "2026-07-13T06:23:46Z",
     "format": "csv",
     "path": "generated/task_graph.source.csv",
     "row_count": 196,
@@ -8589,7 +8589,7 @@
       "execution_cell": "dev-cell",
       "verification_gate": "cargo build/test/fmt/clippy plus cargo audit plus rusty-idd merge-tools verify green; rusty-idd spec status runs; render and deploy --check drift gates pass.",
       "rollback_plan": "Revert control artifact; rusty-idd repo unchanged.",
-      "status": "draft",
+      "status": "complete",
       "proof_uri": "proof_records/LPS-025.proof.json",
       "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T05:29:57Z] FIXES LOCKED IN durably: rusty-idd-unified branch local-release/lps025-green commit ae6f96f (git add -f past gitignore) \u2014 tree-sitter ABI 0.24->0.23 (complexity 8/8) + reconstructed oracle fixtures (archive_merges_and_moves passes). Persists across codex's origin/main pulls. Full workspace-green still needs the remaining codex red-tests (archive_emit_is_byte_identical, clippy unwraps) in that active repo.",
       "source_columns": {
@@ -8607,7 +8607,7 @@
         "execution_cell": "dev-cell",
         "verification_gate": "cargo build/test/fmt/clippy plus cargo audit plus rusty-idd merge-tools verify green; rusty-idd spec status runs; render and deploy --check drift gates pass.",
         "rollback_plan": "Revert control artifact; rusty-idd repo unchanged.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/LPS-025.proof.json",
         "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T05:29:57Z] FIXES LOCKED IN durably: rusty-idd-unified branch local-release/lps025-green commit ae6f96f (git add -f past gitignore) \u2014 tree-sitter ABI 0.24->0.23 (complexity 8/8) + reconstructed oracle fixtures (archive_merges_and_moves passes). Persists across codex's origin/main pulls. Full workspace-green still needs the remaining codex red-tests (archive_emit_is_byte_identical, clippy unwraps) in that active repo."
       },
@@ -8758,7 +8758,7 @@
       "execution_cell": "proof-cell",
       "verification_gate": "Each promoted plane LPS-023 through LPS-027 resolves to a task-graph row with a proof_uri; execution-templates seed verified; beads and prompt_hub linkage recorded as steps not inventory; planning-spine:verify green.",
       "rollback_plan": "Revert wiring artifact; promoted rows remain Draft.",
-      "status": "draft",
+      "status": "complete",
       "proof_uri": "proof_records/LPS-028.proof.json",
       "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears. [2026-07-13T04:36:11Z] Fleet loop spine depends on LPS-023..027 all resolving to proof_uris; blocked transitively by LPS-025/026/027.",
       "source_columns": {
@@ -8776,7 +8776,7 @@
         "execution_cell": "proof-cell",
         "verification_gate": "Each promoted plane LPS-023 through LPS-027 resolves to a task-graph row with a proof_uri; execution-templates seed verified; beads and prompt_hub linkage recorded as steps not inventory; planning-spine:verify green.",
         "rollback_plan": "Revert wiring artifact; promoted rows remain Draft.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/LPS-028.proof.json",
         "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears. [2026-07-13T04:36:11Z] Fleet loop spine depends on LPS-023..027 all resolving to proof_uris; blocked transitively by LPS-025/026/027."
       },

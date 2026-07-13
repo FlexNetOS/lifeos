@@ -148,8 +148,10 @@
     "LPS-022",
     "LPS-023",
     "LPS-024",
+    "LPS-025",
     "LPS-026",
     "LPS-027",
+    "LPS-028",
     "LPS-030",
     "LPS-031",
     "LPS-032",
@@ -196,35 +198,32 @@
     "DECIDE-006"
   ],
   "draft_task_ids": [
-    "LPS-028",
     "LPS-029"
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-13T06:12:18Z",
+  "generated_at": "2026-07-13T06:25:01Z",
   "global_coverage_gate": "closed",
-  "ledger_entry_count": 239,
+  "ledger_entry_count": 240,
   "lifecycle_counts": {
     "blocked": 0,
-    "complete": 193,
-    "draft": 2,
+    "complete": 195,
+    "draft": 1,
     "ready": 0,
-    "rolled-back": 1,
+    "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "087c6b11476bbb34bd1c5a67cfd982eedf8a16d4c5feb74c812b599ce613f35d",
+  "proof_ledger_sha256": "3d4cc1df899f719410294f831b3908c6e055db2b96420d02409b19547dbef8e5",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [],
   "result": "pass",
-  "rolled_back_task_ids": [
-    "LPS-025"
-  ],
+  "rolled_back_task_ids": [],
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "c47fa00f07714137b0b80bdf2b7abff16b9d03096654006cb839bec4cd0fdb47",
+  "source_graph_sha256": "4fba7015f29c86e2e9f157daf8ee7e453db9eefff4ba294adf43603d78d3384c",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 196,
   "tasks": [
@@ -5576,31 +5575,38 @@
     },
     {
       "effective": {
-        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T05:29:57Z] FIXES LOCKED IN durably: rusty-idd-unified branch local-release/lps025-green commit ae6f96f (git add -f past gitignore) \u2014 tree-sitter ABI 0.24->0.23 (complexity 8/8) + reconstructed oracle fixtures (archive_merges_and_moves passes). Persists across codex's origin/main pulls. Full workspace-green still needs the remaining codex red-tests (archive_emit_is_byte_identical, clippy unwraps) in that active repo.",
+        "next_action": "Proof accepted from proof_records/LPS-025.proof.json; next child task: LPS-026.",
         "proof_uri": "proof_records/LPS-025.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "rolled-back",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-024"
       ],
       "phase": "11-fleet-integration",
       "proof": {
-        "ledger_line_number": 124,
-        "observed_at": "2026-07-12T16:34:28Z",
-        "revision": "1",
-        "sha256": "062f70e3add6b97b00a36574f70c06cbe58a54eba77e8eb717b669ebf927c72a"
+        "ledger_line_number": 240,
+        "observed_at": "2026-07-13T06:23:27Z",
+        "revision": "2",
+        "sha256": "d8001840883f522ed8d799e4fbc434d002aeb21c890bdbe1203a96540d3a7772"
       },
       "source": {
         "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T05:29:57Z] FIXES LOCKED IN durably: rusty-idd-unified branch local-release/lps025-green commit ae6f96f (git add -f past gitignore) \u2014 tree-sitter ABI 0.24->0.23 (complexity 8/8) + reconstructed oracle fixtures (archive_merges_and_moves passes). Persists across codex's origin/main pulls. Full workspace-green still needs the remaining codex red-tests (archive_emit_is_byte_identical, clippy unwraps) in that active repo.",
         "proof_uri": "proof_records/LPS-025.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 149,
       "task_id": "LPS-025",
       "title": "rusty-idd IDD/OpenSpec control binary",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T05:29:57Z] FIXES LOCKED IN durably: rusty-idd-unified branch local-release/lps025-green commit ae6f96f (git add -f past gitignore) \u2014 tree-sitter ABI 0.24->0.23 (complexity 8/8) + reconstructed oracle fixtures (archive_merges_and_moves passes). Persists across codex's origin/main pulls. Full workspace-green still needs the remaining codex red-tests (archive_emit_is_byte_identical, clippy unwraps) in that active repo.",
+          "to": "Proof accepted from proof_records/LPS-025.proof.json; next child task: LPS-026."
+        }
+      }
     },
     {
       "effective": {
@@ -5662,9 +5668,9 @@
       "effective": {
         "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears. [2026-07-13T04:36:11Z] Fleet loop spine depends on LPS-023..027 all resolving to proof_uris; blocked transitively by LPS-025/026/027.",
         "proof_uri": "proof_records/LPS-028.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-027"
       ],
@@ -5678,7 +5684,7 @@
       "source": {
         "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears. [2026-07-13T04:36:11Z] Fleet loop spine depends on LPS-023..027 all resolving to proof_uris; blocked transitively by LPS-025/026/027.",
         "proof_uri": "proof_records/LPS-028.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 152,
       "task_id": "LPS-028",
@@ -7546,6 +7552,7 @@
     "LPS-022",
     "LPS-023",
     "LPS-024",
+    "LPS-025",
     "LPS-030",
     "LPS-031",
     "LPS-032",

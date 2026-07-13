@@ -1,14 +1,14 @@
 ---
 id: lifeos.planning-spine.envctl-db-nu-plugin-migration-security-review
 title: envctl DB + nu_plugin Migration Package Security Review
-description: Value-free classification and exact-fingerprint disposition of credential-shaped content in the immutable migration reference package and its deterministic projections.
+description: Value-free classification and exact-fingerprint disposition of credential-shaped content in the manifest-bound migration reference package and its deterministic projections.
 type: security-review
 status: verified
 lifecycle: maintained
 created: 2026-07-13
 updated: 2026-07-13
 authority:
-  package_bytes: immutable-reference
+  package_bytes: manifest-bound-hardened-reference
   secret_disposition: reviewed-false-positive
   wildcard_exclusions_permitted: false
 scanner:
@@ -44,7 +44,7 @@ related:
 
 # envctl DB + nu_plugin Migration Package Security Review
 
-This review closes the credential-safety boundary for the exact-byte
+This review closes the credential-safety boundary for the manifest-bound
 [migration reference package](./envctl-db-nu-plugin-migration-automation-package/README.md) ·
 [[planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/README]]
 and the deterministic task/navigation projections derived from it. Candidate
@@ -76,13 +76,26 @@ There are no rule-wide or path-wide exclusions. The repository-root
 fingerprints. A new candidate, a moved candidate, or a changed line receives a
 new fingerprint and remains visible to the scanner.
 
-## Immutability and authority
+## Hardening and authority
 
-The security review does not rewrite or remove source-package bytes. That is
-required because the package manifest and landing receipt bind the complete
-reference payload. The package remains reference-only: its logs, approvals,
-proofs, and status claims do not acquire LifeOS execution or completion
-authority merely because their credential fixtures are safe to retain.
+The landing receipt preserves the pre-adaptation source identity separately
+from the current hardened copy. Audited security or integrity fixes may update
+the current copy only when the complete package manifest, landing receipt, and
+deterministic navigation outputs are refreshed together. Historical proof
+records remain unchanged because they bind the execution that originally
+produced them.
+
+The configuration-inventory generator follows that rule. Its verification
+object contains a policy field named `secret_values_captured` whose value is
+always `false`; CodeQL nevertheless treated the broad JSON console dump as a
+sensitive logging path. The generator now writes only an allowlisted console
+receipt containing `task_id`, constant pass/fail `status`, and a
+package-relative `report` path. Detailed verification remains in its bounded
+artifact files and no secret values are captured.
+
+The package remains reference-only: its logs, approvals, proofs, and status
+claims do not acquire LifeOS execution or completion authority merely because
+their credential fixtures are safe to retain or their tooling is hardened.
 
 Secret-aware persistence and redaction remain mandatory under
 [`CAP-MIG-011`](./task_tables/workflow/mandatory_capabilities.json) ·

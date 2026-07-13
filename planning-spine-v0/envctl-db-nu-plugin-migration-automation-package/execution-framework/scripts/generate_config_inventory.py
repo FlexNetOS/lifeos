@@ -608,8 +608,26 @@ def main() -> int:
         "run VER-300_UNIT_VALIDATION",
     )
     append_proof(proof)
-    print(json.dumps(verification, indent=2, sort_keys=False))
-    return 0 if verification["status"] == "passed" else 1
+    if verification["status"] == "passed":
+        console_result = {
+            "task_id": TASK_ID,
+            "status": "passed",
+            "report": package_rel(report_path),
+        }
+        exit_code = 0
+    else:
+        console_result = {
+            "task_id": TASK_ID,
+            "status": "failed",
+            "report": package_rel(report_path),
+        }
+        exit_code = 1
+
+    # The full verification report stays on disk. Console output is deliberately
+    # limited to non-sensitive run metadata so configuration names and paths do
+    # not leak into CI or agent logs.
+    print(json.dumps(console_result, indent=2, sort_keys=False))
+    return exit_code
 
 
 if __name__ == "__main__":

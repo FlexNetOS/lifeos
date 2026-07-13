@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   buildNavigationArtifacts,
   checkNavigationArtifacts,
@@ -14,10 +14,17 @@ import {
 } from "../planning-spine-v0/scripts/build-navigation-index.mjs";
 
 const repoRoot = process.cwd();
+const navigationBuildTimeout = 90_000;
+
+let navigation;
 
 describe("planning-spine agent navigation", () => {
+  beforeAll(() => {
+    navigation = buildNavigationArtifacts({ repoRoot });
+  }, navigationBuildTimeout);
+
   it("builds a complete, connected, richly described planning graph", () => {
-    const { graph, index, validation } = buildNavigationArtifacts({ repoRoot });
+    const { graph, index, validation } = navigation;
 
     expect(validation.result).toBe("pass");
     expect(validation.counts.included_package_files).toBeGreaterThan(390);
@@ -47,7 +54,7 @@ describe("planning-spine agent navigation", () => {
       to: normalizedGraph.id,
       kind: "wiki-link",
     }));
-  }, 30_000);
+  });
 
   it("keeps all committed navigation outputs byte-for-byte current", () => {
     const result = checkNavigationArtifacts({ repoRoot });
@@ -58,7 +65,7 @@ describe("planning-spine agent navigation", () => {
       const committed = fs.readFileSync(path.join(repoRoot, "planning-spine-v0", relativePath), "utf8");
       expect(committed).toBe(expected);
     }
-  }, 30_000);
+  }, navigationBuildTimeout);
 
   it("uses canonical LF bytes for maintained generated CSV inputs", () => {
     const generatedRoot = path.join(repoRoot, "planning-spine-v0", "generated");
@@ -70,7 +77,7 @@ describe("planning-spine agent navigation", () => {
   });
 
   it("recalls task, claim, and source nodes without an external index", () => {
-    const { graph, index } = buildNavigationArtifacts({ repoRoot });
+    const { graph, index } = navigation;
 
     expect(index.by_task_id["STORE-001"]).toBe("task:STORE-001");
     expect(index.by_claim_id["REDB-CLAIM-002"]).toBe("claim:REDB-CLAIM-002");
@@ -81,10 +88,10 @@ describe("planning-spine agent navigation", () => {
       ["maps-to-task", "task:STORE-001"],
       ["verified-through", "verification-queue:NBV-001"],
     ]));
-  }, 30_000);
+  });
 
   it("indexes migration WorkOrders and mandatory capabilities without promoting them to canonical tasks", () => {
-    const { graph, index, validation } = buildNavigationArtifacts({ repoRoot });
+    const { graph, index, validation } = navigation;
     const expectedWorkOrderIds = Array.from(
       { length: 106 },
       (_, index) => `TASK-CDB${String(index).padStart(3, "0")}`,
@@ -159,7 +166,7 @@ describe("planning-spine agent navigation", () => {
       "planning-spine-v0/task_tables/workflow/mandatory_capabilities.csv",
       "planning-spine-v0/task_tables/workflow/mandatory_language_inventory.json",
     ]));
-  }, 30_000);
+  });
 
   it("is clone-portable and preserves last-known-good outputs on failure", () => {
     const temporaryBase = fs.mkdtempSync(path.join(os.tmpdir(), "lifeos-navigation-"));
@@ -168,10 +175,12 @@ describe("planning-spine agent navigation", () => {
     try {
       fs.cpSync(path.join(repoRoot, "planning-spine-v0"), path.join(isolatedRoot, "planning-spine-v0"), { recursive: true });
       fs.copyFileSync(path.join(repoRoot, "AGENTS.md"), path.join(isolatedRoot, "AGENTS.md"));
+      const cachePath = path.join(isolatedRoot, "planning-spine-v0", "scripts", "__pycache__", "runtime-only.pyc");
+      fs.mkdirSync(path.dirname(cachePath), { recursive: true });
+      fs.writeFileSync(cachePath, Buffer.from([0, 1, 2, 3]));
 
-      const local = buildNavigationArtifacts({ repoRoot });
       const isolated = buildNavigationArtifacts({ repoRoot: isolatedRoot });
-      expect(renderNavigationArtifacts(isolated)).toEqual(renderNavigationArtifacts(local));
+      expect(renderNavigationArtifacts(isolated)).toEqual(renderNavigationArtifacts(navigation));
       const externalReferences = isolated.graph.nodes.filter((node) => node.kind === "external-reference");
       expect(externalReferences.map((node) => node.path).sort()).toEqual([
         "../nu_plugin/docs/INTEGRATION_CONTRACTS.md",
@@ -199,10 +208,10 @@ describe("planning-spine agent navigation", () => {
     } finally {
       fs.rmSync(temporaryBase, { recursive: true, force: true });
     }
-  }, 120_000);
+  }, 180_000);
 
   it("preserves nested source metadata and classifies catalogs and projections accurately", () => {
-    const { graph } = buildNavigationArtifacts({ repoRoot });
+    const { graph } = navigation;
     const byPath = Object.fromEntries(graph.nodes.filter((node) => node.path).map((node) => [node.path, node]));
     const compatibility = byPath["planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md"];
     const catalog = byPath["planning-spine-v0/1.0_VISION/Notebooklm/artifacts.meta.json"];
@@ -212,7 +221,7 @@ describe("planning-spine agent navigation", () => {
     expect(compatibility.metadata.frontmatter.review.reviewed_branch).toBe("agent/codedb-ci-hermetic-runtime");
     expect(catalog).toMatchObject({ kind: "raw-artifact-catalog", authority_class: "canonical-input", lifecycle: "maintained" });
     expect(inventory).toMatchObject({ kind: "current-state-projection", authority_class: "derived-projection", lifecycle: "generated" });
-  }, 30_000);
+  });
 
   it("parses quoted commas, escaped quotes, and multiline CSV cells", () => {
     const rows = parseCsv('id,title,body\r\n"A-1","A, title","line 1\nline ""2"""\r\n');

@@ -71,7 +71,9 @@ Wiki routes: [[planning-spine-v0/envctl-db-nu-plugin-migration-automation-packag
 The value-free [security review](./ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md) ·
 [[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW]] binds the
 complete staged credential scan to exact reviewed fingerprints. It preserves
-package bytes and permits no rule-wide or path-wide secret-scan exclusion.
+the pre-adaptation receipt, binds every current hardened package byte through
+the refreshed manifest, and permits no rule-wide or path-wide secret-scan
+exclusion.
 
 ## Truth and authority boundary
 
@@ -116,8 +118,8 @@ planning spine; it does not rewrite the historical values.
 | Last source commit touching the package | `c0d672ce59a642e5f1362fd72d5f7ac03f7da083` | preserved as lineage |
 | Total files | `891` | root manifest declares `891` source files, excluding itself and runtime caches |
 | Correct root-manifest coverage | `890` | `891` source entries after landing-hardening files were added |
-| Root manifest SHA-256 | `57c09c926ab1bc14c2fda7d3ea0d73e85c16c6d597620432573a44acdec2925e` | `e61468e095933c8b04c011b4cb3694a239a3bc043f3e39ea506a74d56b339bf6` |
-| Payload SHA-256 | `f854659b111204be3c76f1a632c9165cac9a41cd5a6049475ce1ba66fb5ea767` | manifest-entry payload index: `f81cc0fdeef30a971ac5cb43dba42c16075bba75f737145d1156dc5e4a57d4a9` |
+| Root manifest SHA-256 | `57c09c926ab1bc14c2fda7d3ea0d73e85c16c6d597620432573a44acdec2925e` | `5c7616c712653de1c73d5af372548a51eb22b9f7272b1643640175e0d8d8ba01` |
+| Payload SHA-256 | `f854659b111204be3c76f1a632c9165cac9a41cd5a6049475ce1ba66fb5ea767` | manifest-entry payload index: `34381ea9bfba19082b227539fbab3531f887a694b3e4a66e000026d3b337ba7f` |
 | Unlisted source files | `157` | `0` under the hardened manifest contract |
 | Listed byte/hash drift | `101` | `0` under the hardened manifest contract |
 

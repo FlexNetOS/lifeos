@@ -544,10 +544,16 @@ export function buildNavigationArtifacts(options = {}) {
   const excludedExisting = [];
   const includedFiles = [];
   const selfExcludedOutputs = new Set(Object.values(source.outputs));
+  const isRuntimeArtifact = (packagePath) => (
+    /(?:^|\/)(?:__pycache__|\.pytest_cache)(?:\/|$)/.test(packagePath)
+    || /\.(?:py[co]|pid)$/.test(packagePath)
+  );
   for (const absolutePath of allAbsoluteFiles) {
     const packagePath = slash(path.relative(pkgRoot, absolutePath));
     if (matchesAny(packagePath, source.excluded_paths)) {
-      if (!selfExcludedOutputs.has(packagePath)) excludedExisting.push(packagePath);
+      if (!selfExcludedOutputs.has(packagePath) && !isRuntimeArtifact(packagePath)) {
+        excludedExisting.push(packagePath);
+      }
     }
     else includedFiles.push({ absolutePath, packagePath });
   }
@@ -1415,8 +1421,6 @@ export function buildNavigationArtifacts(options = {}) {
   if (historicalTaskIds.size) {
     warnings.push(`${historicalTaskIds.size} explicit historical proof subject(s) are absent from the current task graph and retained as historical-task nodes.`);
   }
-  const cacheArtifacts = excludedExisting.filter((item) => /(?:__pycache__|\.py[co]$|\.pid$|\.pytest_cache)/.test(item));
-  if (cacheArtifacts.length) warnings.push(`${cacheArtifacts.length} local cache/process artifact(s) were excluded from navigation.`);
   warnings.push("GitNexus and GitKB are supplemental projections, never planning authority; verify each tool's repository and worktree identity before using its results.");
 
   const sortedNodes = [...nodes.values()].sort((left, right) => left.id.localeCompare(right.id));

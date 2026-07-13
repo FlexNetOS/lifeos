@@ -121,4 +121,22 @@ describe("envctl DB + nu_plugin package landing", () => {
     expect(planningReadme).toContain("./ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md");
     expect(visionReadme).toContain("../ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md");
   });
+
+  it("keeps configuration inventory details out of CI and agent console logs", async () => {
+    const generator = await text(
+      "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/scripts/generate_config_inventory.py",
+    );
+    const consoleBlock = generator.slice(
+      generator.indexOf('if verification["status"] == "passed":'),
+      generator.indexOf('\n\nif __name__ == "__main__":'),
+    );
+    const consoleKeys = new Set(
+      [...consoleBlock.matchAll(/^\s+"([a-z_]+)":/gm)].map((match) => match[1]),
+    );
+
+    expect(generator).not.toContain("print(json.dumps(verification");
+    expect(generator.match(/\bprint\(/g)).toEqual(["print("]);
+    expect(consoleBlock).toContain("print(json.dumps(console_result, indent=2, sort_keys=False))");
+    expect(consoleKeys).toEqual(new Set(["task_id", "status", "report"]));
+  });
 });

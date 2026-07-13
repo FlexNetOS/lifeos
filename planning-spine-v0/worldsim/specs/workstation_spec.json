@@ -1,0 +1,60 @@
+{
+  "schema_version": "lifeos-worldsim.manufacturer-spec-twin.v0",
+  "note": "Known manufactured hardware modeled from manufacturer specifications rather than LiDAR scanned. Dimensions in metres (metersPerUnit=1.0), upAxis=Z. Each component is a ground-truth semantic instance (class + instance_id) — no ML segmentation needed for known hardware; the room walls/floor still come from the LPS-029 scan. Masses from manufacturer/representative figures (kg).",
+  "components": [
+    {
+      "instance_id": "gpu_01",
+      "semantic_class": "gpu",
+      "manufacturer": "NVIDIA",
+      "model": "GeForce RTX 5090 Founders Edition",
+      "dimensions_m": [0.304, 0.137, 0.048],
+      "mass_kg": 2.0,
+      "position_m": [0.0, 0.0, 0.20],
+      "source": "NVIDIA RTX 5090 FE spec (304x137mm, 2-slot); 2x present per nvidia-smi"
+    },
+    {
+      "instance_id": "gpu_02",
+      "semantic_class": "gpu",
+      "manufacturer": "NVIDIA",
+      "model": "GeForce RTX 5090 Founders Edition",
+      "dimensions_m": [0.304, 0.137, 0.048],
+      "mass_kg": 2.0,
+      "position_m": [0.0, 0.06, 0.14],
+      "source": "NVIDIA RTX 5090 FE spec"
+    },
+    {
+      "instance_id": "case_01",
+      "semantic_class": "pc_case",
+      "manufacturer": "generic-ATX-mid-tower",
+      "model": "ATX mid-tower (representative)",
+      "dimensions_m": [0.480, 0.210, 0.450],
+      "mass_kg": 12.0,
+      "position_m": [0.0, 0.0, 0.225],
+      "source": "representative ATX mid-tower envelope; replace with owner's exact case model"
+    },
+    {
+      "instance_id": "monitor_01",
+      "semantic_class": "monitor",
+      "manufacturer": "generic-27in",
+      "model": "27-inch 16:9 monitor (representative)",
+      "dimensions_m": [0.610, 0.050, 0.365],
+      "mass_kg": 5.0,
+      "position_m": [0.0, 0.55, 0.75],
+      "source": "27in 16:9 panel envelope; replace with owner's exact monitor model"
+    },
+    {
+      "instance_id": "desk_01",
+      "semantic_class": "desk",
+      "manufacturer": "generic",
+      "model": "standard desk (representative)",
+      "dimensions_m": [1.400, 0.700, 0.030],
+      "mass_kg": 30.0,
+      "position_m": [0.0, 0.30, 0.735],
+      "source": "standard desk surface 1400x700mm at 750mm height; replace with owner's exact desk"
+    }
+  ],
+  "room_from_scan": {
+    "note": "Walls, floor, and ceiling come from the LPS-029 LiDAR scan (irregular geometry manufacturers do not publish). Static structure.",
+    "provisional_floor_m": [4.0, 4.0]
+  }
+}

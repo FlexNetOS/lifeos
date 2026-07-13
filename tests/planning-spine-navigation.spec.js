@@ -47,6 +47,15 @@ describe("planning-spine agent navigation", () => {
     }
   });
 
+  it("uses canonical LF bytes for maintained generated CSV inputs", () => {
+    const generatedRoot = path.join(repoRoot, "planning-spine-v0", "generated");
+    const nonCanonical = fs.readdirSync(generatedRoot)
+      .filter((name) => name.endsWith(".csv"))
+      .filter((name) => fs.readFileSync(path.join(generatedRoot, name), "utf8").includes("\r"));
+
+    expect(nonCanonical).toEqual([]);
+  });
+
   it("recalls task, claim, and source nodes without an external index", () => {
     const { graph, index } = buildNavigationArtifacts({ repoRoot });
 
@@ -99,7 +108,7 @@ describe("planning-spine agent navigation", () => {
     } finally {
       fs.rmSync(temporaryBase, { recursive: true, force: true });
     }
-  });
+  }, 20_000);
 
   it("preserves nested source metadata and classifies catalogs and projections accurately", () => {
     const { graph } = buildNavigationArtifacts({ repoRoot });

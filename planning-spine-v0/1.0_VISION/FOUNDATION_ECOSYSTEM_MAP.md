@@ -1,3 +1,27 @@
+---
+id: lifeos.vision.foundation-ecosystem-map
+title: LifeOS Foundation Ecosystem Map
+description: Evidence-cited built-versus-planned ownership map for Meta coordination, consolidation, vault, and RuVector OS surfaces.
+type: architecture-cross-reference
+status: verified-with-gaps
+lifecycle: maintained
+created: 2026-07-08
+updated: 2026-07-12
+aliases:
+  - Foundation ecosystem map
+  - LifeOS ownership map
+tags:
+  - lifeos
+  - foundation
+  - ecosystem
+  - ownership
+related:
+  - "[[planning-spine-v0/navigation/README]]"
+  - "[[planning-spine-v0/1.0_VISION/README]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]]"
+  - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
+---
+
 # FOUNDATION — LifeOS Ecosystem Map (coordination fabric, consolidation engine, vault, ruvector OS)
 
 > Companion to `FOUNDATION_META_PORTABILITY_MODEL.md`. Surfaced 2026-07-08 via a 5-agent read-only

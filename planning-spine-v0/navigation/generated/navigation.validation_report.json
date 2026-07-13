@@ -1,0 +1,165 @@
+{
+  "schema_version": "lifeos-planning-spine.navigation-validation.v0",
+  "source_path": "planning-spine-v0/navigation/source.json",
+  "source_sha256": "bf4a78f445afdd31f6c6210dd7951487425805d577300b603b70b05ff5e4ea02",
+  "inventory_sha256": "4d8abef6ec8accc7325d1924ea65bc1d50fcaea7489a9b19d9600764f0be912e",
+  "result": "pass",
+  "deterministic": true,
+  "generated_at": null,
+  "counts": {
+    "included_package_files": 397,
+    "repository_local_link_targets": 1,
+    "external_link_targets": 4,
+    "nodes": 1921,
+    "edges": 17710,
+    "tasks": 196,
+    "historical_tasks": 6,
+    "notebooklm_sources": 32,
+    "claims": 396,
+    "verification_queue_items": 396,
+    "evidence_records": 135,
+    "proof_ledger_entries": 165,
+    "semantic_routes": 12,
+    "unresolved_links": 0,
+    "strict_unresolved_links": 0,
+    "excluded_existing_paths": 0
+  },
+  "kind_counts": {
+    "adopted-capability": 19,
+    "architecture-cross-reference": 3,
+    "architecture-depth": 20,
+    "authority-contract": 4,
+    "canonical-source-table": 10,
+    "captured-source": 32,
+    "claim": 396,
+    "claim-evidence": 135,
+    "current-state-gap": 45,
+    "current-state-projection": 5,
+    "directory": 34,
+    "example": 17,
+    "execution-tool": 12,
+    "external-reference": 4,
+    "gate-contract": 1,
+    "generated-navigation-output": 3,
+    "generated-projection": 60,
+    "generated-report": 6,
+    "historical-task": 6,
+    "hub": 8,
+    "navigation-index": 2,
+    "navigation-source": 1,
+    "notebooklm-source": 32,
+    "operating-contract": 1,
+    "planning-contract": 12,
+    "planning-spine": 1,
+    "proof-ledger": 1,
+    "proof-ledger-entry": 165,
+    "proof-record": 134,
+    "protocol-or-runbook": 3,
+    "raw-artifact": 4,
+    "raw-artifact-catalog": 1,
+    "raw-composite-report": 1,
+    "raw-data-table": 3,
+    "resource": 1,
+    "rfc": 2,
+    "schema": 18,
+    "semantic-route": 12,
+    "simulation-environment": 2,
+    "simulation-runbook": 1,
+    "source-artifact-catalog": 1,
+    "structured-resource": 3,
+    "task": 196,
+    "task-conflict": 42,
+    "test-fixture": 19,
+    "verification-evidence": 28,
+    "verification-queue-item": 396,
+    "vision-anchor": 5,
+    "vision-artifact": 7,
+    "vision-input": 7
+  },
+  "authority_counts": {
+    "architecture-input": 24,
+    "canonical-input": 1143,
+    "derived-projection": 116,
+    "exact-evidence": 533,
+    "example-or-fixture": 36,
+    "execution-tooling": 14,
+    "external-reference": 4,
+    "maintained-contract": 50,
+    "operating-contract": 1
+  },
+  "checks": [
+    {
+      "name": "strict_links_resolve",
+      "result": "pass",
+      "observed": 0
+    },
+    {
+      "name": "external_references_are_explicitly_allowlisted",
+      "result": "pass",
+      "observed": 4,
+      "expected": 4
+    },
+    {
+      "name": "task_status_projection_covers_canonical_tasks",
+      "result": "pass",
+      "observed": 196,
+      "expected": 196
+    },
+    {
+      "name": "task_parents_resolve",
+      "result": "pass",
+      "observed": 196
+    },
+    {
+      "name": "ledger_uris_and_latest_digests_resolve",
+      "result": "pass",
+      "observed": 165
+    },
+    {
+      "name": "required_artifacts_are_hash_bound_and_cross_referenced",
+      "result": "pass",
+      "observed": 1
+    },
+    {
+      "name": "semantic_routes_have_entrypoints_and_resources",
+      "result": "pass",
+      "observed": 12
+    },
+    {
+      "name": "every_node_has_rich_metadata",
+      "result": "pass",
+      "observed": 1921
+    },
+    {
+      "name": "all_nodes_reachable_from_root",
+      "result": "pass",
+      "observed": 0
+    },
+    {
+      "name": "every_included_file_has_one_node",
+      "result": "pass",
+      "observed": 397,
+      "expected": 397
+    },
+    {
+      "name": "generated_artifacts_match_declared_schemas",
+      "result": "pass",
+      "observed": 3
+    }
+  ],
+  "historical_task_ids": [
+    "CAP-001",
+    "IDD-UNIFY-000",
+    "IDD-UNIFY-001",
+    "IDD-UNIFY-002",
+    "OPS-001",
+    "WEAVE-001"
+  ],
+  "excluded_existing_paths": [],
+  "unresolved_links": [],
+  "warnings": [
+    "6 explicit historical proof subject(s) are absent from the current task graph and retained as historical-task nodes.",
+    "GitNexus and GitKB are optional projections, never planning authority; verify each tool's repository and worktree identity before using its results."
+  ],
+  "errors": []
+}

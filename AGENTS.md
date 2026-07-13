@@ -130,6 +130,24 @@ Use `bun` for npm-compatible package management and JS execution, and `bunx`
 for npx-compatible package execution. Tauri's `beforeDevCommand` /
 `beforeBuildCommand` already point at `bun run dev` / `bun run build`.
 
+## Planning-spine instant recall
+
+Start planning work at `planning-spine-v0/navigation/README.md`. The committed graph
+is repository-native and remains usable when GitKB or GitNexus is absent,
+stale, or pointed at another checkout.
+
+```bash
+bun run planning-spine:navigation:query -- "STORE-001"
+bun run planning-spine:navigation:query -- "redb PostgreSQL authority"
+bun run planning-spine:navigation:explain -- "claim:REDB-CLAIM-002"
+bun run planning-spine:navigation:check
+```
+
+The generated graph is a navigation projection, not a new authority source.
+Canonical task inputs, exact proof history, maintained contracts, and raw
+architecture inputs retain the authority order documented in
+`planning-spine-v0/navigation/README.md`.
+
 ## Verification commands
 
 ```bash

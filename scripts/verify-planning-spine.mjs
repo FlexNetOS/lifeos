@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import {
+  checkNavigationArtifacts,
+  validateNavigationArtifactSchemas
+} from "../planning-spine-v0/scripts/build-navigation-index.mjs";
 
 const repoRoot = process.cwd();
 const pkgRoot = path.join(repoRoot, "planning-spine-v0");
@@ -34,6 +38,8 @@ const authorityIntegrityReport = {
 
 const requiredDocs = [
   "README.md",
+  "navigation/README.md",
+  "navigation/source.json",
   "00_NORTH_STAR.md",
   "01_OBJECT_MODEL.md",
   "02_AUTHORITY_GRAPH.md",
@@ -48,6 +54,13 @@ const requiredDocs = [
   "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
   "1.0_VISION/Notebooklm/README.md",
   "1.0_VISION/Notebooklm/artifacts.meta.json",
+  "navigation/generated/navigation_graph.json",
+  "navigation/generated/navigation_index.json",
+  "navigation/generated/navigation.validation_report.json",
+  "navigation/schemas/index.json",
+  "navigation/schemas/navigation-graph.schema.json",
+  "navigation/schemas/navigation-index.schema.json",
+  "navigation/schemas/navigation-validation.schema.json",
   "rfcs/RFC-001_DEVWORLD_MIROFISH_ADAPTER.md",
   "rfcs/RFC-002_COMPILED_AGENT_BRAINPACK.md"
 ];
@@ -342,6 +355,54 @@ function verifyVisionNavigationLinks() {
       assertInside(repoRoot, resolved, `Wiki link in ${relativeDoc}`);
       assert(fs.existsSync(resolved), `Broken wiki link in ${relativeDoc}: ${target}`);
     }
+  }
+}
+
+function verifyAgentNavigationGraph() {
+  recordCheck("agent_navigation_graph_is_current_connected_and_queryable");
+  const result = checkNavigationArtifacts({ repoRoot });
+  assert(result.ok, `Agent navigation graph drifted: ${result.drift.join("; ")}`);
+
+  const { graph, index, validation } = result.artifacts;
+  assert(validation.result === "pass", "Agent navigation validation must pass");
+  assert(validation.counts.included_package_files > 0, "Agent navigation must index package files");
+  assert(validation.counts.strict_unresolved_links === 0, "Agent navigation has unresolved gated links");
+  assert(validation.counts.unresolved_links === 0, "Agent navigation has unresolved local links");
+  assert(validation.checks.every((check) => check.result === "pass"), "Every agent navigation validation check must pass");
+  assert(graph.nodes.some((node) => node.id === graph.root_node_id), "Agent navigation root node must resolve");
+  assert(graph.nodes.length === Object.keys(index.records).length, "Graph nodes and compact index records must stay one-to-one");
+  assert(index.entrypoints.every((entrypoint) => entrypoint.node_id), "Every agent navigation entrypoint must resolve");
+  assert(index.by_task_id["STORE-001"] === "task:STORE-001", "STORE-001 must be directly retrievable by task id");
+  assert(index.by_claim_id["REDB-CLAIM-002"] === "claim:REDB-CLAIM-002", "REDB-CLAIM-002 must be directly retrievable by claim id");
+  assert(index.by_source_id["NBSOURCE-001"] === "source:NBSOURCE-001", "NBSOURCE-001 must be directly retrievable by source id");
+
+  recordCheck("navigation_outputs_satisfy_declared_schemas");
+  const schemaValidation = validateNavigationArtifactSchemas(result.artifacts);
+  assert(schemaValidation.ok, `Navigation schema validation failed: ${schemaValidation.errors.join("; ")}`);
+
+  recordCheck("notebooklm_blueprint_is_hash_bound_and_cross_referenced");
+  const blueprintPath = "planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md";
+  const compatibilityPath = "planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md";
+  const blueprintSha256 = "014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827";
+  const blueprintNodeId = index.by_path[blueprintPath];
+  const compatibilityNodeId = index.by_path[compatibilityPath];
+  const rawArtifactNodeId = "raw-artifact:lifeos.vision.notebooklm.architecture-blueprint";
+  const blueprintNode = graph.nodes.find((node) => node.id === blueprintNodeId);
+  const compatibilityNode = graph.nodes.find((node) => node.id === compatibilityNodeId);
+  assert(blueprintNode?.content?.sha256 === blueprintSha256, "Blueprint file node must preserve the cataloged SHA-256");
+  assert(
+    compatibilityNode?.metadata?.frontmatter?.source_artifact?.sha256 === blueprintSha256,
+    "Blueprint compatibility frontmatter must preserve the source SHA-256"
+  );
+  assert(
+    graph.edges.some((edge) => edge.from === rawArtifactNodeId && edge.to === blueprintNodeId && edge.kind === "identifies-bytes"),
+    "Raw Blueprint artifact must identify its exact file node"
+  );
+  for (const linkKind of ["markdown-link", "wiki-link"]) {
+    assert(
+      graph.edges.some((edge) => edge.from === compatibilityNodeId && edge.to === blueprintNodeId && edge.kind === linkKind),
+      `Blueprint compatibility must retain its ${linkKind}`
+    );
   }
 }
 
@@ -695,6 +756,7 @@ try {
   verifyDocs();
   verifyVisionArtifactCatalog();
   verifyVisionNavigationLinks();
+  verifyAgentNavigationGraph();
   verifySchemas();
   verifyExamples();
   verifyMvpConstraints();

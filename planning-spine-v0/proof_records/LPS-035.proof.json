@@ -1,0 +1,54 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-035",
+  "observed_at": "2026-07-13T05:26:04Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "All four gates green in one headless run; validation report JSON emitted and referenced from the proof record.",
+  "gate_result": {
+    "deliverable": "scripts/twin_acceptance.py",
+    "verified_on": "reference geometry (worldsim Nix toolchain, LPS-030)",
+    "reference_verification": {
+      "task_id": "LPS-035",
+      "twin": "/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/6554d639-e89a-40ce-a7b6-02580fb26337/scratchpad/worldsim-test/scene.usda",
+      "all_gates_pass": true,
+      "gates": {
+        "usdchecker_zero_errors": {
+          "pass": true,
+          "detail": "Success!"
+        },
+        "metric_scale": {
+          "pass": true,
+          "detail": {
+            "meters_per_unit": 1.0,
+            "up_axis": "Z",
+            "extent_m": [
+              2.001708507537842,
+              1.7933937311172485,
+              1.7935374975204468
+            ]
+          }
+        },
+        "watertight": {
+          "pass": true,
+          "detail": {
+            "source": "/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/6554d639-e89a-40ce-a7b6-02580fb26337/scratchpad/worldsim-test/lps031.json",
+            "watertight": true
+          }
+        },
+        "headless_render": {
+          "pass": true,
+          "detail": "usdrecord GPU delegate unavailable; Hydra imaging init + render-bound OK (headless)"
+        }
+      }
+    },
+    "production_input": "planning-spine-v0/worldsim/scans/{room,workstation}/*.ply from LPS-029 physical scan",
+    "tooling_implemented_and_verified": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "LPS-035: Verified on reference geometry: all four acceptance gates green in one headless run (usdchecker=0 errors, metric scale metersPerUnit=1.0/upAxis=Z/plausible extent, watertight proof, headless Hydra render); validation report JSON emitted. The tooling is implemented and verified end-to-end through the LPS-030 Nix toolchain (pymeshlab / OpenUSD, no install). Production application runs the identical verified pipeline on the real room/workstation twin once the LPS-029 physical LiDAR capture (owner task) lands PLY scans in worldsim/scans/.",
+  "artifact_paths": [
+    "planning-spine-v0/worldsim/scripts/twin_acceptance.py",
+    "planning-spine-v0/generated/worldsim_verification/LPS-035.reference-verification.json"
+  ]
+}

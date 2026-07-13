@@ -1,0 +1,68 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-008",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "A selected database version deterministically reconstructs paths, bytes, metadata, ordering, permissions, and module relationships; repeated projections are byte-identical; projection output is disposable and traceable to database identities.",
+  "gate_result": {
+    "selected_database_version": {
+      "satisfied": true,
+      "selector_keys": ["production_branch_id", "version_snapshot_id", "status_predicate (status='production')"],
+      "determinism_rule": "selection is by explicit pinned identity, never mutable 'latest'; a selector resolves to a fixed immutable row set",
+      "source": "Architecture Blueprint materialization step 1 (final production branch); Context Matrix row 25 (module_path metadata, production branch ID)"
+    },
+    "deterministically_reconstructs": {
+      "facets_defined": ["paths", "bytes", "metadata", "ordering", "permissions", "module relationships"],
+      "facet_count": 6,
+      "every_named_gate_facet_assigned_owner_and_verification": true,
+      "paths": "module_path metadata -> directory hierarchy; verified by sorted path-set hash equality",
+      "bytes": "ordered raw_code blocks -> exact-byte concatenation; verified by composed BlobStore SHA-256 equality (Exact-byte materialization, ADOPT-001 PR#16)",
+      "metadata": "module_path/language/status columns; verified by captured_metadata_json_projection_is_stable (SHA-256 identity, ADOPT-001 PR#14)",
+      "ordering": "stored block ordinal + canonical file/dir enumeration; verified by whole-tree byte-stream equality",
+      "permissions": "stored file-mode + symlink-limit metadata; verified by materialization_paths.rs fail-closed mode/symlink checks",
+      "module_relationships": "module_path hierarchy + causal dependency edges -> compilable module graph; verified by relationship-graph hash equality and downstream musl compile"
+    },
+    "repeated_projections_byte_identical": {
+      "satisfied": true,
+      "rule": "two projections of the same pinned version, on any conforming host, produce a byte-identical output tree",
+      "verification_method": "project pinned version twice into disposable targets; assert whole-tree SHA-256 workspace identity equality",
+      "evidence_primitive": "SHA-256 identity / workspace_identity parity (ADOPT-001 PR#14, CDB106 green)"
+    },
+    "projection_output_disposable": {
+      "satisfied": true,
+      "rule": "output holds no authority; deletable with zero loss; regenerated wholesale from the pinned database version",
+      "manual_edit_policy": "manual edits to generated output are not merged and do not survive re-projection (goal: 'no manual edits to generated output')",
+      "recovery_source": "re-projection from PostgreSQL"
+    },
+    "traceable_to_database_identities": {
+      "satisfied": true,
+      "manifest_maps_each_file_to": ["output_path", "production_branch_id", "version_snapshot_id", "module_path", "ordered_block_content_hashes", "file_mode", "composed_file_sha256"],
+      "verification_method": "recompute composed SHA-256 per file from ordered block hashes; assert equal to on-disk hash and that every hash resolves to a real PostgreSQL/BlobStore row",
+      "evidence_primitive": "envctl export contract (ADOPT-001 PR#19, CDB035) + Cryptographic Witness Chain lineage (Architecture Blueprint section 6)"
+    },
+    "no_reverse_ownership_ambiguity": {
+      "satisfied": true,
+      "authority_direction": "PostgreSQL (canonical) -> filesystem (derived); one direction only",
+      "engine_never": ["writes durable state back to PostgreSQL from output", "treats output files as source of truth", "becomes a second durable owner"],
+      "store_001_invariant": "single durable writer preserved; projection is a read path, not a durable owner"
+    },
+    "store_001_alignment": {
+      "governing_state_class": "derived projections (materialized source directories for musl compilation, exported release trees)",
+      "canonical_owner": "PostgreSQL (source of truth) projected by envctl / CodeDB materialization",
+      "write_authority": "envctl projection (read-only from PostgreSQL)",
+      "sync_direction": "PostgreSQL -> envctl materialize -> filesystem (forward-only, derived)"
+    },
+    "pipeline_stages_defined": ["Query", "Map", "Concatenate", "Dump"],
+    "decomposition_targets_defined": ["query", "projection", "metadata", "determinism", "cleanup"],
+    "open_dependencies_recorded": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-008 defines envctl as the deterministic, read-only, forward-only projection engine that reconstructs a selected PostgreSQL branch and pinned version into a clean, disposable directory. generated/envctl_materialization_plan.json binds a pinned selection contract (production_branch_id + version_snapshot_id + status='production') to the blueprint's four-stage pipeline (Query -> Map -> Concatenate -> Dump) and assigns every facet the gate enumerates exactly once with a database source, a pure reconstruction rule, and a verification check: paths from module_path metadata, bytes from ordered raw_code blocks via exact-byte concatenation, metadata from module_path/language/status columns, ordering from stored block ordinals plus canonical enumeration, permissions from stored file-mode and symlink-limit metadata, and module relationships from the module_path hierarchy plus causal dependency edges. Byte-identical repeat projection is established by a whole-tree SHA-256 workspace-identity comparison; disposability by delete-and-re-project with unchanged canonical rows and a manual-edit-discard policy; traceability by a projection manifest mapping every emitted file to its branch/version/module_path and ordered content-addressed block hashes. Authority is one-directional: PostgreSQL is canonical, the projected directory is derived, so there is no reverse ownership edge and generated output is never source, aligning with STORE-001's derived-projections class (write_authority = envctl projection read-only from PostgreSQL; recovery_source = re-projection) and its single-durable-writer invariant. Every assignment is grounded in the Architecture Blueprint materialization steps, the Context Matrix rows for materialization and ingestion, and the adopted proven capabilities Exact-byte materialization (PR#16), SHA-256 identity (PR#14), envctl export contract (PR#19), and BlobStore (PR#13/#14). The live re-projection parity run against a provisioned PostgreSQL and cross-OS permission parity are recorded as open dependencies. No product execution, no live materialization, and no database write were performed.",
+  "artifact_paths": [
+    "generated/envctl_materialization_plan.json",
+    "generated/task_families/POSTGRES-008.json",
+    "proof_records/POSTGRES-008.proof.json"
+  ],
+  "product_execution_performed": false
+}

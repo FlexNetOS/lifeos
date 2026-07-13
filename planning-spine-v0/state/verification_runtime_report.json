@@ -1,20 +1,22 @@
 {
   "command": "bun run planning-spine:verify",
-  "cwd": "/home/flexnetos/meta/src/lifeos",
-  "pkg_root": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+  "cwd": ".",
+  "pkg_root": "planning-spine-v0",
   "executable": "/nix/store/xklcw145lqbfc06l175q790m17yxqia1-bun-1.3.14/bin/bun",
   "runtime": {
     "name": "bun",
     "version": "1.3.14",
     "argv": [
       "/nix/store/xklcw145lqbfc06l175q790m17yxqia1-bun-1.3.14/bin/bun",
-      "/home/flexnetos/meta/src/lifeos/scripts/verify-planning-spine.mjs"
+      "scripts/verify-planning-spine.mjs"
     ]
   },
   "lifecycle_event": "planning-spine:verify",
-  "observed_at": "2026-07-12T19:00:40.515Z",
+  "observed_at": "2026-07-13T04:46:25.000Z",
   "performed_checks": [
     "required_docs_exist",
+    "vision_artifact_catalog_matches_exact_bytes",
+    "vision_navigation_links_resolve",
     "schemas_define_required_fields",
     "task_schema_requires_execution_constraints",
     "examples_satisfy_schemas",

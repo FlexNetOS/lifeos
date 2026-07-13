@@ -1,0 +1,52 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-007",
+  "title": "LifeOS direct database control surface defined",
+  "status": "defined",
+  "owner": "LifeOS Product / Runtime Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the LifeOS Mission Control path that reads, directs, and advances the canonical PostgreSQL state through local UDS and redb-backed low-latency views, so every visible state and command maps to a canonical database identity, explicit authority, a UDS request/response contract, labeled freshness, a witness-chain audit event, a rollback, and an enumerated non-hidden filesystem path — with no HTTP and no flat-file control-plane detour.",
+  "work_items": [
+    {
+      "id": "POSTGRES-007-A",
+      "surface": "Read path (NS-CLARITY): 10 visible Mission Control states",
+      "owner": "LifeOS Product / Runtime Agent",
+      "decision": "Enumerate RS-01..RS-10 (swarm live status, database-hosted codebase, semantic/hybrid search, COW branch tree, ATAS future timelines, MinCut integrity, witness-chain audit trail, RuvLTRA routing telemetry, ingestion status, materialization status); each renders from a canonical PostgreSQL identity or an explicitly-labeled redb-live/transient-derived view with read-provenance lineage."
+    },
+    {
+      "id": "POSTGRES-007-B",
+      "surface": "Command path (NS-DIRECTION + NS-PROGRESS): 8 directives",
+      "owner": "LifeOS Product / Runtime Agent",
+      "decision": "Enumerate CS-01..CS-08 (semantic edit, commit/merge, discard, dispatch/route, sever/isolate, ingest/index, materialize/release, simulate/forecast); each names exactly one authority, targets a canonical database identity, and carries a SHAKE256 witness-chain audit event and a defined rollback."
+    },
+    {
+      "id": "POSTGRES-007-C",
+      "surface": "UDS transport contract (no HTTP, no flat file)",
+      "owner": "LifeOS Product / Runtime Agent",
+      "decision": "Define two channels: a MessagePack-framed control UDS (SOCK_STREAM, request {method,params,request_id} / response {result|error,audit_ref}) served by the envctl runtime bridge, and a read-only zero-copy redb mmap for microsecond live views. Forbid any HTTP/REST listener and any flat-file control-plane spool."
+    },
+    {
+      "id": "POSTGRES-007-D",
+      "surface": "Freshness + authority model",
+      "owner": "LifeOS Product / Runtime Agent",
+      "decision": "Adopt three labeled freshness tiers (redb-live microseconds, postgres-canonical milliseconds, transient-derived) and require every surface to name exactly one authoritative owner, keeping LifeOS a reader + command issuer only per the STORE-001 single-durable-writer and forward-only-sync invariants."
+    },
+    {
+      "id": "POSTGRES-007-E",
+      "surface": "Filesystem-write enumeration (no hidden path)",
+      "owner": "LifeOS Product / Runtime Agent",
+      "decision": "Enumerate all three reachable filesystem writes and classify each non-hidden: the derived/disposable envctl CS-07 projection, the agent-written read-only redb runtime file, and the transitional non-canonical Tauri UI view-state whitelist (verified in src/lib/persistence.ts). Establish CS-07 projection as the sole sanctioned LifeOS-triggered filesystem write."
+    },
+    {
+      "id": "POSTGRES-007-F",
+      "surface": "Gate simulation + proof",
+      "owner": "LifeOS Product / Runtime Agent",
+      "decision": "Run a live gate-check over the plan JSON asserting all seven gate fields on every state and command, no_http, no_flat_file, filesystem writes enumerated non-hidden, and a witness-chain audit on every command; record the exit-0 result and STORE-001 alignment in proof_records/POSTGRES-007.proof.json."
+    }
+  ],
+  "inputs": ["POSTGRES-003", "POSTGRES-006", "STORE-001", "NS-CLARITY", "NS-DIRECTION", "NS-PROGRESS", "Architecture Blueprint - LifeOS Core Foundation.md", "Architecture Context Matrix (Table 1)"],
+  "target_artifacts": ["generated/task_families/POSTGRES-007.json", "generated/lifeos_uds_database_surface_plan.json", "proof_records/POSTGRES-007.proof.json"],
+  "next_action": "Decompose read, command, status, audit, and recovery paths into bounded vertical slices after graph closure; refine canonical_identity field/table names once POSTGRES-003 and POSTGRES-006 plans materialize.",
+  "completion_gate": "generated/lifeos_uds_database_surface_plan.json enumerates every visible state and command with canonical database identity, explicit authority, UDS request/response contract, freshness semantics, audit event, rollback, and an enumerated non-hidden filesystem write path; POSTGRES-007.proof.json records the passing gate simulation with product_execution_performed false.",
+  "product_execution_performed": false
+}

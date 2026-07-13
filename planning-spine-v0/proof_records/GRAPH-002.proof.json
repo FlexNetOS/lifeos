@@ -1,0 +1,69 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "GRAPH-002",
+  "observed_at": "2026-07-12T23:24:17Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every valid source task is preserved or mapped to one canonical row, contradictory status and completion semantics are explicit, duplicate intent has one adoption or implementation disposition, subordinate tables have declared roles, and only generated/task_graph.source.csv authorizes LifeOS execution.",
+  "gate_result": {
+    "bounded_reconciliation_path": ["RECOVERY-001", "RECOVERY-002", "RECOVERY-003", "RECOVERY-004"],
+    "bounded_path_all_complete": true,
+    "recovery_task_statuses": {
+      "RECOVERY-001": "Complete",
+      "RECOVERY-002": "Complete",
+      "RECOVERY-003": "Complete",
+      "RECOVERY-004": "Complete"
+    },
+    "recovery_proof_statuses": {
+      "RECOVERY-001": "pass",
+      "RECOVERY-002": "pass",
+      "RECOVERY-003": "pass",
+      "RECOVERY-004": "pass"
+    },
+    "every_valid_source_task_preserved_or_mapped": true,
+    "tables_sealed": 16,
+    "nu_plugin_rows_classified_once": 246,
+    "envctl_rows_classified_once": 148,
+    "contradictory_status_and_completion_semantics_explicit": true,
+    "eighty_row_package_vs_product_conflict_resolved_via_proof_class": true,
+    "twelve_row_issue414_pending_vs_merged_conflict_resolved": true,
+    "duplicate_intent_has_single_disposition": true,
+    "adoption_map_capabilities_dispositioned_once": 18,
+    "subordinate_tables_have_declared_roles": true,
+    "conflict_rows": 42,
+    "conflict_rows_with_empty_disposition": 0,
+    "conflict_rows_with_empty_canonical_task_ids": 0,
+    "conflict_rows_with_empty_execution_gate": 0,
+    "conflict_rows_with_unmapped_canonical_id": 0,
+    "only_task_graph_source_csv_authorizes_execution": true,
+    "no_conflict_execution_gate_authorizes_out_of_graph_execution": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "GRAPH-002's canonical-plan reconciliation is proven through its bounded path RECOVERY-001..004, all four of which are Complete in generated/task_graph.source.csv with pass proofs. RECOVERY-001 sealed 16 prior task tables (each with URI, count, status vocabulary, authority class, proof surface, checksum) as evidence-only. RECOVERY-002 classified all 246 nu_plugin rows exactly once (176 proven-capability, 35 pending, 20 partial, 15 planning-only). RECOVERY-003 classified all 148 envctl rows exactly once and made the contradictory completion semantics explicit: the 80-row package status_report 'complete' claim is retained as package-artifact proof separated from product/runtime proof via the proof_class column, and the 12-row issue-414 pending-vs-merged conflict is resolved against merged-PR product evidence; TASK-0089 stays blocked. RECOVERY-004's adoption map dispositions 18 capabilities once each (11 adopt, 3 extend, 4 defer, 0 reject) with no merged capability scheduled for reimplementation. generated/prior_task_conflict.source.csv carries 42 conflicts, each with a non-empty disposition, canonical_task_ids, and a fail-closed execution_gate; no canonical id is unmapped and no execution_gate authorizes execution outside generated/task_graph.source.csv, which remains the sole LifeOS execution authority. Every gate clause holds; no product execution was performed.",
+  "artifact_paths": [
+    "generated/prior_task_conflict.source.csv",
+    "generated/recovery_task_table_receipts.json",
+    "generated/recovery_nu_plugin_disposition.csv",
+    "generated/recovery_envctl_disposition.csv",
+    "generated/recovery_adoption_map.csv",
+    "proof_records/RECOVERY-001.proof.json",
+    "proof_records/RECOVERY-002.proof.json",
+    "proof_records/RECOVERY-003.proof.json",
+    "proof_records/RECOVERY-004.proof.json"
+  ],
+  "live_commands": [
+    {
+      "purpose": "Confirm RECOVERY-001..004 are Complete with pass proofs and the conflict table is fully dispositioned with no out-of-graph execution authority",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (GRAPH-002 gate validation over task_graph.source.csv + prior_task_conflict.source.csv + recovery_task_table_receipts.json)",
+      "exit_status": 0,
+      "output": [
+        "RECOVERY statuses in canonical CSV: {'RECOVERY-001': 'Complete', 'RECOVERY-002': 'Complete', 'RECOVERY-003': 'Complete', 'RECOVERY-004': 'Complete'}",
+        "RECOVERY-001..004 proof status=pass",
+        "prior_task_conflict rows=42 empty_disposition=0 empty_canonical=0 empty_execution_gate=0",
+        "conflicts with unmapped canonical id: 0",
+        "sealed tables: 16 | each has authority/proof surface: True"
+      ]
+    }
+  ]
+}

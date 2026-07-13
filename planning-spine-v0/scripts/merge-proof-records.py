@@ -8,9 +8,10 @@ import hashlib
 import json
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now
 
 
 LEDGER_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.v0"
@@ -36,10 +37,6 @@ class LedgerRecord:
     task_id: str
     revision: str
     proof_sha256: str
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def sha256_file(path: Path) -> str:

@@ -1,0 +1,107 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-007",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every visible LifeOS state and command maps to canonical database identities, explicit authority, UDS request and response contracts, freshness semantics, audit events, rollback, and no hidden filesystem write path.",
+  "gate_result": {
+    "design_artifact": "generated/lifeos_uds_database_surface_plan.json",
+    "visible_state_count": 10,
+    "command_count": 8,
+    "visible_states": [
+      "RS-01 Swarm live status",
+      "RS-02 Database-hosted codebase",
+      "RS-03 Semantic/hybrid search",
+      "RS-04 COW branch tree",
+      "RS-05 Future timelines (ATAS)",
+      "RS-06 Swarm integrity (MinCut)",
+      "RS-07 Witness-chain audit trail",
+      "RS-08 Routing/provider telemetry",
+      "RS-09 Ingestion pipeline status",
+      "RS-10 Materialization/projection status"
+    ],
+    "commands": [
+      "CS-01 Semantic edit",
+      "CS-02 Commit/merge branch",
+      "CS-03 Discard/rollback branch",
+      "CS-04 Dispatch/route task",
+      "CS-05 Sever/isolate agent",
+      "CS-06 Ingest/index workspace",
+      "CS-07 Materialize/release",
+      "CS-08 Simulate/forecast"
+    ],
+    "clause_canonical_database_identities": {
+      "satisfied": true,
+      "value": "All 18 surfaces name a canonical identity: durable reads/edits key to PostgreSQL codebase_table / cow_branch / witness_chain / routing_policy rows; live views (RS-01, RS-09) read redb keys that forward-flush to PostgreSQL; transient-derived surfaces (RS-05, RS-06 cuts, CS-08) are explicitly marked non-authoritative until COW commit."
+    },
+    "clause_explicit_authority": {
+      "satisfied": true,
+      "value": "Each surface names exactly one authoritative owner: PostgreSQL+RuVector (RS-02/03/04/07/10, CS-01/02/03/07), redb-per-node then envctl flush (RS-01/09, CS-06), Ruflo/RuvLTRA (RS-08/CS-04), RuVector MinCut (RS-06/CS-05), ATAS runtime (RS-05/CS-08). LifeOS is reader + issuer only, never a second durable writer — STORE-001 single-writer invariant honored."
+    },
+    "clause_uds_request_response_contracts": {
+      "satisfied": true,
+      "value": "Two channels defined: control-uds (SOCK_STREAM at ${XDG_RUNTIME_DIR}/lifeos/control.sock, length-prefixed MessagePack {method,params,request_id} -> {result|error,audit_ref}) and redb-mmap (read-only zero-copy). Every surface carries a uds_contract with a named method (e.g. codebase.query, codebase.edit, branch.commit, ingest.run, materialize.run, atas.simulate) or an mmap region plus control fallback. No HTTP/REST listener exists."
+    },
+    "clause_freshness_semantics": {
+      "satisfied": true,
+      "value": "Three labeled tiers: redb-live (microseconds, unsettled), postgres-canonical (milliseconds, ACID, read-your-writes), transient-derived (per-cycle, non-canonical until commit). Every read carries its tier so a forecast (RS-05) or unsettled swarm view (RS-01) is never mistaken for canonical truth; grounded in the Blueprint latency table."
+    },
+    "clause_audit_events": {
+      "satisfied": true,
+      "value": "Every command emits a SHAKE256 witness-chain audit event rooted in a PostgreSQL source vector (edits lacking a causal edge are rejected via Causal Graph Verification); every read carries a read-provenance descriptor (source tier + branch_id/snapshot_lsn/source_vector_id) so rendered state is traceable."
+    },
+    "clause_rollback": {
+      "satisfied": true,
+      "value": "Every command defines a rollback: COW branch discard (CS-01/CS-08), PostgreSQL PITR (CS-01/CS-02/CS-06), discard-is-the-rollback with PITR recovery window (CS-03), task cancel (CS-04), reinstate/reverse routing override (CS-05), idempotent delete+re-project (CS-07). Reads are non-mutating with nothing to roll back."
+    },
+    "clause_no_hidden_filesystem_write_path": {
+      "satisfied": true,
+      "value": "All 3 reachable filesystem writes enumerated and classified non-hidden: (1) envctl CS-07 projection output — derived, disposable, re-projectable; (2) redb runtime file — written by agents not LifeOS, read-only mmap from the surface; (3) current transitional Tauri UI view-state whitelist (activeId, wsCollapsed, sectionByWs, aiAvatarHidden, aiChatOpen, avatarPos, aiProvider, teamOrder, sectionOrder, itemOrder) — non-canonical disposable UI ergonomics. No flat-file control-plane detour, no HTTP."
+    },
+    "north_star_binding": {
+      "NS-CLARITY": "reads RS-01..RS-10 (see/understand the whole)",
+      "NS-DIRECTION": "commands CS-01/03/04/05/08 (direct as one system)",
+      "NS-PROGRESS": "forward-only advance CS-02/06/07 (advance every domain without fragmenting)"
+    },
+    "store_001_alignment": {
+      "single_durable_writer": "LifeOS is reader + issuer; PostgreSQL owns every durable mutation via envctl/agent writer path",
+      "forward_only_sync": "high-frequency directives buffer in redb, flush redb -> envctl -> PostgreSQL; no undirected dual-write",
+      "redb_is_transient_view": "LifeOS memory-maps redb read-only for microsecond status; canonical truth re-read from PostgreSQL",
+      "no_sidecar": "RS-03 semantic reads served by RuVector as a native PostgreSQL extension over the same UDS path",
+      "provenance_preserved": "command audit events carry SHAKE256 witness chains rooted in PostgreSQL source vectors"
+    },
+    "simulation": {
+      "gate_check_passed": true,
+      "states_all_gate_fields": true,
+      "commands_all_gate_fields": true,
+      "no_http": true,
+      "no_flat_file_control_plane": true,
+      "filesystem_writes_enumerated_and_non_hidden": true,
+      "command_audit_witness_chain_present": true
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-007 defines the LifeOS Mission Control direct database control surface as generated/lifeos_uds_database_surface_plan.json, enumerating 10 visible states (RS-01 swarm live status, RS-02 database-hosted codebase, RS-03 semantic/hybrid search, RS-04 COW branch tree, RS-05 ATAS future timelines, RS-06 MinCut integrity, RS-07 witness-chain audit trail, RS-08 RuvLTRA routing telemetry, RS-09 ingestion pipeline status, RS-10 materialization status) and 8 commands (CS-01 semantic edit, CS-02 commit/merge, CS-03 discard, CS-04 dispatch/route, CS-05 sever/isolate, CS-06 ingest/index, CS-07 materialize/release, CS-08 simulate/forecast). Every one of the 18 surfaces carries all seven gate fields: a canonical database identity (PostgreSQL codebase_table / cow_branch / witness_chain / routing_policy rows, or an explicitly-labeled redb-live/transient-derived view), exactly one explicit authority (PostgreSQL+RuVector, redb-then-envctl-flush, Ruflo/RuvLTRA, MinCut, or ATAS), a UDS request/response contract over a MessagePack control socket or read-only redb mmap (no HTTP/REST anywhere), a labeled freshness tier (redb-live microseconds / postgres-canonical milliseconds / transient-derived), an audit event (SHAKE256 witness chain rooted in a PostgreSQL source vector for commands; read-provenance lineage for reads), a defined rollback (COW discard, PostgreSQL PITR, policy-version restore, or idempotent re-projection), and an enumerated filesystem-write classification. All three reachable filesystem write paths are enumerated and shown non-hidden: the derived/disposable envctl CS-07 projection, the agent-written read-only redb runtime file, and the transitional non-canonical Tauri UI view-state whitelist verified in src/lib/persistence.ts. The surface maps NS-CLARITY to the read set, NS-DIRECTION to the command set, and NS-PROGRESS to the forward-only advance commands, and honors every STORE-001 invariant (single durable writer, forward-only sync, redb-as-transient-view, no sidecar, provenance preserved). A live gate-check simulation over the plan JSON confirmed states=10 and commands=8 with all seven gate fields present, no_http and no_flat_file true, all filesystem writes enumerated and non-hidden, and a witness-chain audit event on every command. No UI, socket, database, or runtime state was changed; product_execution_performed is false.",
+  "artifact_paths": [
+    "generated/lifeos_uds_database_surface_plan.json",
+    "generated/task_families/POSTGRES-007.json"
+  ],
+  "checksums": {
+    "generated/lifeos_uds_database_surface_plan.json": "f91ac748ce33f5aeb8de1bc96238273060eabf57c1564276102817de82ee4e81"
+  },
+  "live_commands": [
+    {
+      "purpose": "Simulate the POSTGRES-007 verification gate: every visible state and command carries all seven gate fields (canonical identity, authority, UDS contract, freshness, audit event, rollback, filesystem write path); no HTTP; no flat-file control plane; all filesystem writes enumerated non-hidden; witness-chain audit on every command.",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (gate-field + no-http + no-flat-file + fs-enumeration + witness-chain validation over generated/lifeos_uds_database_surface_plan.json)",
+      "exit_status": 0,
+      "output": [
+        "RESULT states=10 all_gate_fields=True | cmds=8 all_gate_fields=True | anchored=True | no_http=True no_flat_file=True | fs_enumerated_non_hidden=True (3 paths) | cmd_audit_witnesschain=True",
+        "POSTGRES-007 GATE: PASS"
+      ]
+    }
+  ],
+  "rollback_plan": "Restore the prior control-surface plan; no UI, socket, database, or runtime state changes during planning. No prior control-surface plan existed (first materialization), so rollback = delete generated/lifeos_uds_database_surface_plan.json and the two POSTGRES-007 records.",
+  "product_execution_performed": false
+}

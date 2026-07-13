@@ -1,0 +1,73 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-006",
+  "title": "redb and AgentDB runtime boundaries defined",
+  "status": "defined",
+  "owner": "LifeOS Memory / Runtime Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the runtime mechanics of the two non-canonical tiers STORE-001 already assigned — redb as the transient high-frequency tier (buffering, deduplication, application-level WAL, ordered/idempotent/restartable/observable flush, per-role crash recovery) and AgentDB (.rvf) as portable, witness-bound per-agent cognition (MicroLoRA, SONA, FastGRNN, learning traces, witness facts, agent lifecycle) — so that neither store can silently become competing PostgreSQL macro authority.",
+  "decision_artifact": "generated/runtime_store_boundary_plan.json",
+  "work_items": [
+    {
+      "id": "POSTGRES-006-A",
+      "surface": "redb ingestion / high-frequency write buffer (REDB-RT-01)",
+      "owner": "envctl bridge (single forward writer) over redb buffer",
+      "decision": "transient durable-until-acked buffer; SHA-256 content identity; forward-only nu_plugin -> redb -> envctl -> PostgreSQL; drained in monotonic sequence; commit-once dedup at PostgreSQL; re-parsable source on loss"
+    },
+    {
+      "id": "POSTGRES-006-B",
+      "surface": "redb embedding deduplication cache (REDB-RT-02)",
+      "owner": "embedding pipeline (single writer)",
+      "decision": "disposable cache keyed by BLAKE3(content+model+version+config); miss recomputes deterministically; never authority; derived from canonical PostgreSQL semantic-vector rows"
+    },
+    {
+      "id": "POSTGRES-006-C",
+      "surface": "redb application-level WAL / outbox (REDB-RT-03)",
+      "owner": "outbox worker (single writer)",
+      "decision": "durable-until-acked buffer, explicitly NOT PostgreSQL's WAL; monotonic sequence + per-operation idempotency key; FIFO replay with at-most-once apply on reconnect; subordinate to PostgreSQL; protocol defined, not yet built"
+    },
+    {
+      "id": "POSTGRES-006-D",
+      "surface": "redb high-frequency agent scratchpad (REDB-RT-04)",
+      "owner": "owning agent runtime (single writer per scratchpad)",
+      "decision": "transient/session-scoped; agent-local key; discardable on crash; only envctl-curated significant states flush forward one-way; raw traces never replayed as authority"
+    },
+    {
+      "id": "POSTGRES-006-E",
+      "surface": "redb high-speed geometry engine (REDB-RT-05)",
+      "owner": "in-process math primitive",
+      "decision": "stateless zero-copy f32 cosine-distance accelerator; NO SQL / secondary index / native vector-search logic; authoritative semantic search stays in PostgreSQL + RuVector (No-Sidecar)"
+    },
+    {
+      "id": "POSTGRES-006-F",
+      "surface": "redb shared UI state view over UDS (REDB-RT-06)",
+      "owner": "LifeOS UI (read-only) over agent-written redb",
+      "decision": "read-only projection; UDS control path; must not become a dual-writer over agent state; view is disposable and re-read on restart"
+    },
+    {
+      "id": "POSTGRES-006-G",
+      "surface": "AgentDB (.rvf) cognition — MicroLoRA, SONA, FastGRNN, learning traces, witness facts, agent lifecycle (AGENTDB-01..06)",
+      "owner": "AgentDB per agent (non-authoritative for shared macro-state)",
+      "decision": "portable single-file cognitive container hot-swappable across ruvllm nodes and regenerable from base model + history; every promoted fact SHAKE256 witness-bound + causal-edge-rooted in PostgreSQL source vectors; macro_authority 'none' for every entity"
+    },
+    {
+      "id": "POSTGRES-006-H",
+      "surface": "durable-today redb uses PGREDB-001 (CodeDB source_blobs) and PGREDB-002 (envctl migration_db)",
+      "owner": "governed by STORE-001-C, not by this family",
+      "decision": "referenced, NOT reclassified — migrate to PostgreSQL only via the BlobStore SHA-256 parity cutover after a green live parity run; not silently promoted to transient nor frozen as durable"
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-006-A",
+    "POSTGRES-006-B",
+    "POSTGRES-006-C",
+    "POSTGRES-006-D",
+    "POSTGRES-006-E",
+    "POSTGRES-006-F",
+    "POSTGRES-006-G",
+    "POSTGRES-006-H"
+  ],
+  "completion_gate": "Buffer flush is ordered, idempotent, restartable, and observable; AgentDB identities and learning state are portable and witness-bound; neither store can silently become competing macro state — with every redb runtime role and every .rvf cognition entity assigned exactly once in generated/runtime_store_boundary_plan.json and POSTGRES-006.proof.json recording zero live redb/.rvf/PostgreSQL mutation.",
+  "depends_on": ["STORE-001", "POSTGRES-001", "POSTGRES-005"],
+  "next_action": "Break buffering, cognition, routing, learning, and recovery into separate small implementation tasks after graph closure (per task_graph next_action)."
+}

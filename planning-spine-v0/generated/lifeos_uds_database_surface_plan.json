@@ -1,0 +1,514 @@
+{
+  "schema_version": "lifeos-planning-spine.uds-database-surface-plan.v0",
+  "task_id": "POSTGRES-007",
+  "title": "LifeOS direct database control surface defined",
+  "decided_at": "2026-07-13T03:47:08Z",
+  "owner": "LifeOS Product / Runtime Agent",
+  "phase": "2-postgres-foundation",
+  "goal": "Define the LifeOS Mission Control path that reads, directs, and advances the canonical PostgreSQL state through local UDS and redb-backed low-latency views without HTTP or flat-file control-plane detours.",
+  "verification_gate": "Every visible LifeOS state and command maps to canonical database identities, explicit authority, UDS request and response contracts, freshness semantics, audit events, rollback, and no hidden filesystem write path.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json",
+    "generated/north_star_coverage.source.csv"
+  ],
+  "source_anchors": {
+    "lifeos_is_mission_control": "Architecture Context Matrix row 1 (RuVector/Postgres): 'LifeOS provides the Mission Control UI to the Postgres-hosted codebase.'",
+    "uds_not_http": "Blueprint 'LifeOS Unix Domain Sockets (UDS) via Yazelix (Zellij)': 'LifeOS avoids using standard HTTP/REST ... Instead, it connects directly via Unix Domain Sockets (UDS) or by reading the shared redb state files.'",
+    "lifeos_reads_redb_via_uds": "Architecture Context Matrix row 3 (redb): 'LifeOS reads redb files via UDS for real-time agent status.'",
+    "envctl_uds_to_lifeos": "Architecture Context Matrix row 10 (envctl + nu_plugin): 'Communicates with LifeOS via UDS for UI rendering.'",
+    "bun_ffi_mmap": "Blueprint 7. 'Bun/Bunx: ... FFI provides zero-network overhead, allowing the UI to read the same memory-mapped redb files used by the agents.'",
+    "msgpack_no_json": "Blueprint 5. 'nu_plugin_ruvector: Streams tables into memory using a native MessagePack-based protocol to avoid JSON serialization bottlenecks.'",
+    "semantic_edit_sql_update": "Blueprint: 'agents use standard SQL combined with RuVector hybrid search (ORDER BY semantic_embedding <->) ... uses standard SQL UPDATE statements to rewrite the code directly within those specific database rows.'",
+    "cow_branching": "Blueprint 5/2: 'clones the current codebase state into isolated staging branches ... Once automated tests confirm a branch is mathematically stable ... merged into the main trunk. If a branch fails, the database simply rolls it back.'",
+    "mincut": "Blueprint 6: 'RuVector MinCut ... severs that agent's connection in milliseconds, isolating the failure.'",
+    "witness_chains": "Blueprint 6: 'Cryptographic Witness Chains (SHAKE256): Every code snippet or decision is linked to a cryptographic audit trail originating from a verified source vector.'",
+    "envctl_projection": "Blueprint: 'envctl queries PostgreSQL for the final production branch ... uses module_path metadata ... concatenates raw_code blocks ... dumps this clean directory into your Nix or Yazelix build environment.'",
+    "ruflo_human_in_loop": "Architecture Context Matrix row 6/16 (Ruflo): 'Interfaces with LifeOS for human-in-the-loop control.'",
+    "atas_timelines": "Blueprint 4: 'Future Timelines consisting of: Projected Git Diffs ... Resource Burn ... Complexity Spikes ... Failure Nodes.'",
+    "latency_tiers": "Blueprint 1 table: redb 'Microseconds (In-process)' / PostgreSQL+RuVector 'Milliseconds (Network/IPC)'; Persistence 'Process Life-cycle / Local Disk' vs 'Enterprise ACID / PITR Recovery'.",
+    "pitr_recovery": "Blueprint 1 table: PostgreSQL+RuVector persistence = 'Enterprise ACID / PITR Recovery'."
+  },
+  "keystone_alignment": {
+    "keystone": "STORE-001 (generated/store_relationship_decision.json)",
+    "honored_invariants": [
+      "Single durable writer: PostgreSQL owns every durable macro-state class exactly once; LifeOS Mission Control is a reader and a command issuer, never a second durable writer.",
+      "Forward-only sync: LifeOS-issued directives that touch high-frequency state land in redb and are flushed redb -> envctl -> PostgreSQL; LifeOS never establishes an undirected redb<->PostgreSQL dual-write.",
+      "redb is the transient high-frequency VIEW tier, not a control-plane authority: LifeOS memory-maps redb read-only for microsecond live status; canonical settled truth is re-read from PostgreSQL.",
+      "No sidecar: every semantic/vector read the surface renders is served by RuVector as a native PostgreSQL extension via the same UDS path, not a separate vector service.",
+      "Provenance preserved: every command's audit event carries the SHAKE256 witness chain rooted in a PostgreSQL source vector."
+    ]
+  },
+  "transport": {
+    "no_http_rest": {
+      "value": true,
+      "rationale": "Blueprint explicitly forbids HTTP/REST between LifeOS and the runtime; the surface exposes no HTTP listener and issues no HTTP request.",
+      "source": "source_anchors.uds_not_http"
+    },
+    "no_flat_file_control_plane": {
+      "value": true,
+      "rationale": "No directive is spooled to, and no visible state is sourced from, a flat control-plane file. Commands travel over the control UDS to the canonical database; live views are memory-mapped redb reads (a transient view, not a control-plane file).",
+      "source": "goal + source_anchors.uds_not_http"
+    },
+    "control_uds": {
+      "kind": "SOCK_STREAM Unix Domain Socket",
+      "proposed_socket_path": "${XDG_RUNTIME_DIR}/lifeos/control.sock",
+      "server": "envctl runtime bridge (single canonical writer path into PostgreSQL)",
+      "client": "LifeOS Mission Control UI (Bun/Tauri host)",
+      "encoding": "MessagePack request/response frames (never JSON text on the wire)",
+      "framing": "length-prefixed MessagePack; each request carries {method, params, request_id}; each response carries {request_id, result | error, audit_ref}",
+      "method_registry": "the union of every visible_states[].uds_contract.method and command_surfaces[].uds_contract.method defined below",
+      "source": "source_anchors.envctl_uds_to_lifeos + source_anchors.msgpack_no_json"
+    },
+    "shared_state_channel": {
+      "kind": "read-only memory-mapped redb file (zero-copy)",
+      "proposed_path": "${XDG_DATA_HOME}/lifeos/runtime/swarm.redb",
+      "access": "LifeOS opens the same redb file the agents write, mmap read-only; agents are the sole writers, LifeOS never writes this file",
+      "purpose": "microsecond-latency live views (swarm status, ingestion buffer depth) that would bottleneck if round-tripped to PostgreSQL",
+      "settled_truth": "significant states are flushed forward by envctl and re-read canonically from PostgreSQL; the redb view is never treated as durable authority",
+      "source": "source_anchors.lifeos_reads_redb_via_uds + source_anchors.bun_ffi_mmap"
+    }
+  },
+  "freshness_model": {
+    "tiers": [
+      {
+        "tier": "redb-live",
+        "meaning": "In-process microsecond view read via mmap; unsettled, may be superseded or rolled back; last-writer-wins per key.",
+        "staleness_bound": "microseconds (memory-mapped, zero-copy)",
+        "authority": "non-authoritative view of transient high-frequency state owned by redb per STORE-001",
+        "source": "source_anchors.latency_tiers"
+      },
+      {
+        "tier": "postgres-canonical",
+        "meaning": "ACID-consistent snapshot served over the control UDS; the settled, durable truth.",
+        "staleness_bound": "milliseconds (IPC/native-extension call), read-your-writes after a committed command",
+        "authority": "PostgreSQL + RuVector single durable owner",
+        "source": "source_anchors.latency_tiers + source_anchors.pitr_recovery"
+      },
+      {
+        "tier": "transient-derived",
+        "meaning": "Ensemble simulations, MinCut graph states, routing decisions: computed on demand, non-authoritative, discarded unless a COW branch is committed.",
+        "staleness_bound": "per-simulation-cycle; never persisted as truth until committed to the main trunk",
+        "authority": "no durable owner until commit; ATAS/MinCut/RuvLTRA runtime",
+        "source": "source_anchors.atas_timelines + source_anchors.mincut"
+      }
+    ]
+  },
+  "filesystem_write_paths": {
+    "assertion": "Every filesystem write reachable from the LifeOS Mission Control surface is enumerated here; none is a hidden control-plane detour.",
+    "enumerated": [
+      {
+        "path_class": "envctl projection output (PostgreSQL -> filesystem)",
+        "trigger": "explicit CS-07 Materialize/Release command only",
+        "classification": "derived + disposable; deterministically re-projectable from PostgreSQL rows via module_path metadata; never a source of truth",
+        "hidden": false,
+        "source": "source_anchors.envctl_projection"
+      },
+      {
+        "path_class": "redb runtime file (${XDG_DATA_HOME}/lifeos/runtime/swarm.redb)",
+        "trigger": "written by agents, NOT by LifeOS; LifeOS access is read-only mmap",
+        "classification": "transient high-frequency tier per STORE-001; process-lifecycle; forward-flushed to PostgreSQL; not a LifeOS write path",
+        "hidden": false,
+        "source": "STORE-001 transient-class assignment + source_anchors.lifeos_reads_redb_via_uds"
+      },
+      {
+        "path_class": "current LifeOS local UI view-state (transitional Tauri persistence whitelist)",
+        "trigger": "debounced UI ergonomics writes in the current product (src/lib/persistence.ts LIFEOS_PERSIST_KEYS)",
+        "keys": ["activeId", "wsCollapsed", "sectionByWs", "aiAvatarHidden", "aiChatOpen", "avatarPos", "aiProvider", "teamOrder", "sectionOrder", "itemOrder"],
+        "classification": "non-canonical, disposable UI ergonomics only; explicitly whitelisted (never domain truth); in the intended architecture domain state moves to PostgreSQL-via-UDS while this local cache stays a disposable view",
+        "hidden": false,
+        "source": "verified in src/lib/persistence.ts + LifeOS CLAUDE.md persistence contract"
+      }
+    ]
+  },
+  "visible_states": [
+    {
+      "id": "RS-01",
+      "surface": "Swarm live status",
+      "what_david_sees": "Real-time agent thoughts, terminal traces, heartbeats, and per-agent state flags of the running swarm.",
+      "canonical_identity": "agent_id + thought/trace keys; transient in redb, forward-flushed to PostgreSQL as settled cognitive states (significant-state rows keyed by agent_id + cycle_id)",
+      "authority": "redb (per node) for the live view; PostgreSQL for settled/significant states flushed by envctl (STORE-001 transient-class)",
+      "uds_contract": {
+        "channel": "redb-mmap",
+        "map_region": "swarm.redb status table (zero-copy read)",
+        "control_fallback": {"method": "swarm.status.snapshot", "params": {"agent_ids": "optional[]"}, "response": {"agents": [{"agent_id": "", "state": "", "last_cycle_id": "", "settled": "bool"}]}}
+      },
+      "freshness": "redb-live (microseconds) for the running view; postgres-canonical for settled history",
+      "audit_event": "read-provenance: each snapshot response carries source = {redb-mmap | postgres} and last_flush_cycle_id so the operator sees settled-vs-unsettled lineage",
+      "rollback": "non-mutating read; nothing to roll back; unsettled entries are superseded by the next canonical flush (canonical re-read reconciles)",
+      "filesystem_write_path": "none (read-only mmap)",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.lifeos_reads_redb_via_uds"
+    },
+    {
+      "id": "RS-02",
+      "surface": "Database-hosted codebase",
+      "what_david_sees": "Functions, structs, AST fragments, and code rows of the OS-as-database with module_path and status.",
+      "canonical_identity": "codebase_table rows: (row_id, module_path, raw_code, language, status, semantic_embedding, causal_dependency_edges)",
+      "authority": "PostgreSQL + RuVector (single durable owner of durable relational macro-state, STORE-001)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "codebase.query",
+        "params": {"filter": {"language": "optional", "status": "optional", "module_path_prefix": "optional"}, "limit": "int"},
+        "response": {"rows": [{"row_id": "", "module_path": "", "raw_code": "", "status": "", "branch_id": ""}]}
+      },
+      "freshness": "postgres-canonical (milliseconds), ACID snapshot",
+      "audit_event": "read-provenance: query returns branch_id + snapshot_lsn so every rendered row is traceable to a PostgreSQL point-in-time",
+      "rollback": "non-mutating read; PITR-consistent snapshot; no local write to reverse",
+      "filesystem_write_path": "none",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.lifeos_is_mission_control"
+    },
+    {
+      "id": "RS-03",
+      "surface": "Semantic / hybrid search results",
+      "what_david_sees": "Top-k semantically relevant functions for a query, ranked by vector distance combined with relational filters.",
+      "canonical_identity": "codebase_table rows ordered by (semantic_embedding <-> :target_vector) under relational predicates",
+      "authority": "PostgreSQL + RuVector native extension (No-Sidecar; STORE-001 semantic-class)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "codebase.semantic_search",
+        "params": {"query_text | query_vector": "", "filter": {"language": "", "status": ""}, "k": "int"},
+        "response": {"matches": [{"row_id": "", "module_path": "", "distance": "f32"}]}
+      },
+      "freshness": "postgres-canonical (milliseconds); embeddings from all-MiniLM-L6-v2 committed during envctl bridge",
+      "audit_event": "read-provenance: each match carries source_vector_id enabling witness-chain lineage back to ingestion",
+      "rollback": "non-mutating read; nothing to roll back",
+      "filesystem_write_path": "none",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.semantic_edit_sql_update"
+    },
+    {
+      "id": "RS-04",
+      "surface": "COW branch tree",
+      "what_david_sees": "The main trunk plus every isolated staging branch, its parent, agent owner, and merge/rollback state.",
+      "canonical_identity": "cow_branch rows: (branch_id, parent_branch_id, agent_state_id, esn_score, status[staging|merged|discarded])",
+      "authority": "PostgreSQL (COW branches live inside the database; STORE-001 durable-class)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "branch.tree",
+        "params": {"root": "optional branch_id"},
+        "response": {"branches": [{"branch_id": "", "parent_branch_id": "", "status": "", "esn_score": "f32"}]}
+      },
+      "freshness": "postgres-canonical (milliseconds)",
+      "audit_event": "read-provenance: branch rows carry created_by_command_id linking to the CS-* audit event that opened them",
+      "rollback": "non-mutating read",
+      "filesystem_write_path": "none",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.cow_branching"
+    },
+    {
+      "id": "RS-05",
+      "surface": "Future timelines (ATAS forecast)",
+      "what_david_sees": "Projected git diffs, resource burn, complexity spikes, and failure nodes for simulated branches up to 100 steps ahead.",
+      "canonical_identity": "non-authoritative simulation rows keyed by (sim_id, branch_id, step): {state_diff, resource_burn, complexity_spike, failure_node}",
+      "authority": "ATAS runtime (transient-derived); no durable owner until a branch is committed to the trunk",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "atas.timeline.read",
+        "params": {"sim_id": ""},
+        "response": {"timelines": [{"branch_id": "", "steps": [{"step": "int", "state_diff": "", "resource_burn": "", "failure_node": "bool"}]}]}
+      },
+      "freshness": "transient-derived (per-simulation-cycle); explicitly non-canonical",
+      "audit_event": "read-provenance: response marks authority=transient-derived and sim_id so the operator never mistakes a forecast for committed truth",
+      "rollback": "non-mutating read; simulations are discarded unless CS-02 commits the winning branch",
+      "filesystem_write_path": "none",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.atas_timelines"
+    },
+    {
+      "id": "RS-06",
+      "surface": "Swarm integrity (MinCut)",
+      "what_david_sees": "The live dependency graph with weakest-link cuts and any agent nodes MinCut has severed.",
+      "canonical_identity": "dependency graph over PostgreSQL dependency tables + transient severed-node set (agent_id, cut_weight)",
+      "authority": "RuVector MinCut runtime over PostgreSQL dependency tables (graph is canonical; severed-set is transient-derived)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "mincut.state",
+        "params": {},
+        "response": {"severed": [{"agent_id": "", "cut_weight": "f32", "since_cycle": ""}], "graph_rev": ""}
+      },
+      "freshness": "transient-derived for cuts (subpolynomial live updates); postgres-canonical for the underlying dependency edges",
+      "audit_event": "read-provenance: each severed entry carries the causal-edge id that failed verification",
+      "rollback": "non-mutating read; a reroute is reversible at CS-05 (graph state, not a stored mutation)",
+      "filesystem_write_path": "none",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.mincut"
+    },
+    {
+      "id": "RS-07",
+      "surface": "Witness-chain audit trail",
+      "what_david_sees": "The SHAKE256 provenance chain binding each code edit / agent decision to its verified source vector.",
+      "canonical_identity": "witness_chain rows: (event_id, shake256_root, source_vector_id, subject_row_id, actor)",
+      "authority": "PostgreSQL (source vectors + chains) with AgentDB-rooted agent decisions (STORE-001 durable + per-agent classes)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "audit.witness_chain",
+        "params": {"subject_row_id | event_id": ""},
+        "response": {"chain": [{"event_id": "", "shake256_root": "", "source_vector_id": "", "actor": ""}]}
+      },
+      "freshness": "postgres-canonical (append-only, immutable once written)",
+      "audit_event": "self-describing: this surface IS the audit trail; reads are logged with the requesting actor",
+      "rollback": "non-mutating read; chains are append-only and never rewritten",
+      "filesystem_write_path": "none",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.witness_chains"
+    },
+    {
+      "id": "RS-08",
+      "surface": "Routing / provider telemetry",
+      "what_david_sees": "RuvLTRA proportional-intelligence routing: task complexity, chosen model tier (local ruvllm vs Claude Opus/GPT-4), cost/complexity metrics.",
+      "canonical_identity": "routing_policy rows (policy_id, tier_rules) in PostgreSQL meta-analytics + transient per-task routing decisions (task_id, model_id, complexity_score)",
+      "authority": "Ruflo / RuvLTRA (routing policies are canonical in PostgreSQL; live decisions are transient-derived); Ruflo interfaces with LifeOS for human-in-the-loop control",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "routing.telemetry",
+        "params": {"window": "optional"},
+        "response": {"policy_id": "", "decisions": [{"task_id": "", "model_id": "", "complexity_score": "f32"}]}
+      },
+      "freshness": "postgres-canonical for policies; transient-derived for live decisions",
+      "audit_event": "read-provenance: decisions carry policy_id + resolved_at so routing is explainable",
+      "rollback": "non-mutating read; policy changes are governed by CS-04-adjacent policy versioning",
+      "filesystem_write_path": "none",
+      "north_star": "NS-CLARITY",
+      "source_anchor": "source_anchors.ruflo_human_in_loop"
+    },
+    {
+      "id": "RS-09",
+      "surface": "Ingestion pipeline status",
+      "what_david_sees": "redb buffer depth, BLAKE3 dedup cache hit rate, and envctl bridge progress (blocks pulled / embedded / committed to PostgreSQL).",
+      "canonical_identity": "redb buffer counters (transient) + PostgreSQL commit counters (ingested_blocks_committed, dedup_cache_hits)",
+      "authority": "nu_plugin/redb for buffer view; PostgreSQL for committed counts; envctl is the forward bridge (STORE-001 forward-only sync)",
+      "uds_contract": {
+        "channel": "redb-mmap",
+        "map_region": "swarm.redb ingest counters (zero-copy)",
+        "control_fallback": {"method": "ingest.status", "params": {}, "response": {"buffer_depth": "int", "committed": "int", "dedup_hits": "int"}}
+      },
+      "freshness": "redb-live (microseconds) for buffer depth; postgres-canonical for committed totals",
+      "audit_event": "read-provenance: committed counts tie to envctl flush_cycle_id",
+      "rollback": "non-mutating read; buffered-not-committed blocks are transient and discardable",
+      "filesystem_write_path": "none (read-only)",
+      "north_star": "NS-PROGRESS",
+      "source_anchor": "source_anchors.msgpack_no_json"
+    },
+    {
+      "id": "RS-10",
+      "surface": "Materialization / projection status",
+      "what_david_sees": "The current production branch, its module_path directory map, and the last envctl projection result (target build env, byte-parity status).",
+      "canonical_identity": "PostgreSQL production branch (branch_id, is_production) + module_path metadata rows; the projected directory is derived output",
+      "authority": "PostgreSQL for the branch + metadata; envctl projection engine (read-only from PostgreSQL) for the derived tree (STORE-001 derived-projection class)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "materialize.status",
+        "params": {},
+        "response": {"production_branch_id": "", "module_paths": "int", "last_projection": {"target": "", "parity": "bool"}}
+      },
+      "freshness": "postgres-canonical for branch/metadata; derived output reflects the last CS-07 run",
+      "audit_event": "read-provenance: last_projection carries the CS-07 command_id and SHA identity of the projected tree",
+      "rollback": "non-mutating read; the derived tree is re-projectable",
+      "filesystem_write_path": "reads only; the projected tree itself is written solely by CS-07 (enumerated, derived, disposable)",
+      "north_star": "NS-PROGRESS",
+      "source_anchor": "source_anchors.envctl_projection"
+    }
+  ],
+  "command_surfaces": [
+    {
+      "id": "CS-01",
+      "command": "Semantic edit (locate + rewrite function)",
+      "what_david_directs": "Find a function by meaning and rewrite its row inside an isolated COW branch.",
+      "canonical_identity": "target codebase_table.row_id resolved via semantic_embedding <-> :target_vector; edit applied as SQL UPDATE within cow_branch.branch_id",
+      "authority": "PostgreSQL is the single durable writer; the edit is issued over the control UDS and applied by the agent/envctl writer path (STORE-001 single-writer invariant) — LifeOS never writes PostgreSQL directly",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "codebase.edit",
+        "params": {"branch_id": "", "row_id": "", "new_raw_code": "", "intent": ""},
+        "response": {"command_id": "", "branch_id": "", "row_id": "", "audit_ref": "shake256_root"}
+      },
+      "freshness": "ack immediate over UDS; effect is postgres-canonical and read-your-writes on branch_id after commit of the UPDATE",
+      "audit_event": "SHAKE256 witness-chain event bound to the source_vector_id of the target row; rejected if no causal edge / historical root exists (Causal Graph Verification)",
+      "rollback": "discard the COW branch (CS-03) before merge; after merge, PostgreSQL PITR restores the prior trunk state",
+      "filesystem_write_path": "none (writes are database rows, not files)",
+      "north_star": "NS-DIRECTION",
+      "source_anchor": "source_anchors.semantic_edit_sql_update"
+    },
+    {
+      "id": "CS-02",
+      "command": "Commit / merge branch",
+      "what_david_directs": "Promote a verified staging branch into the main trunk, advancing canonical state.",
+      "canonical_identity": "cow_branch.branch_id (staging) merged into is_production trunk; produces new trunk revision",
+      "authority": "PostgreSQL (COW merge inside the database); gated by MinCut integrity + ESN stability before merge (STORE-001 durable-class)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "branch.commit",
+        "params": {"branch_id": "", "require_green": true},
+        "response": {"command_id": "", "trunk_revision": "", "audit_ref": ""}
+      },
+      "freshness": "postgres-canonical; trunk_revision becomes the new read-your-writes baseline for RS-02/RS-04/RS-10",
+      "audit_event": "SHAKE256 witness event linking the merged rows to their source vectors; merge refused if any row lacks a causal edge",
+      "rollback": "PostgreSQL PITR to the pre-merge revision; the discarded staging branch remains recoverable until GC",
+      "filesystem_write_path": "none",
+      "north_star": "NS-PROGRESS",
+      "source_anchor": "source_anchors.cow_branching"
+    },
+    {
+      "id": "CS-03",
+      "command": "Discard / rollback branch",
+      "what_david_directs": "Abandon a failing staging branch so its edits never touch the trunk.",
+      "canonical_identity": "cow_branch.branch_id status -> discarded",
+      "authority": "PostgreSQL (branch rollback is a native database operation)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "branch.discard",
+        "params": {"branch_id": "", "reason": ""},
+        "response": {"command_id": "", "branch_id": "", "status": "discarded", "audit_ref": ""}
+      },
+      "freshness": "postgres-canonical; branch disappears from RS-04 immediately after commit of the status change",
+      "audit_event": "SHAKE256 witness event recording the discard reason and the actor",
+      "rollback": "the discard is itself the rollback; a mistakenly discarded branch is recoverable from PostgreSQL PITR until GC",
+      "filesystem_write_path": "none",
+      "north_star": "NS-DIRECTION",
+      "source_anchor": "source_anchors.cow_branching"
+    },
+    {
+      "id": "CS-04",
+      "command": "Dispatch / route task",
+      "what_david_directs": "Direct the swarm: assign a task and let RuvLTRA route it to the correct model tier, human-in-the-loop.",
+      "canonical_identity": "task row (task_id, intent, target_scope) + routing decision (model_id, tier) recorded in PostgreSQL meta-analytics; live queue buffered in redb",
+      "authority": "Ruflo / RuvLTRA orchestrator; canonical task + policy in PostgreSQL, transient dispatch buffered in redb then flushed forward (STORE-001 forward-only)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "swarm.dispatch",
+        "params": {"intent": "", "target_scope": "", "max_tier": "optional"},
+        "response": {"command_id": "", "task_id": "", "routed_model_id": "", "audit_ref": ""}
+      },
+      "freshness": "ack immediate; canonical task row postgres-canonical after flush; live progress visible via RS-01/RS-08",
+      "audit_event": "SHAKE256 witness event binding the dispatch to the requesting actor and resolved policy_id",
+      "rollback": "cancel the task (idempotent stop); no durable trunk mutation occurs from dispatch alone; buffered dispatch is transient",
+      "filesystem_write_path": "none",
+      "north_star": "NS-DIRECTION",
+      "source_anchor": "source_anchors.ruflo_human_in_loop"
+    },
+    {
+      "id": "CS-05",
+      "command": "Sever / isolate agent",
+      "what_david_directs": "Manually trigger MinCut to isolate a hallucinating or drifting agent from the swarm graph.",
+      "canonical_identity": "severed-node entry (agent_id) over the PostgreSQL dependency graph; routing override in the live graph",
+      "authority": "RuVector MinCut (deterministic isolation); the cut is applied to the transient routing graph, the decision is journaled to PostgreSQL",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "mincut.sever",
+        "params": {"agent_id": "", "reason": ""},
+        "response": {"command_id": "", "agent_id": "", "severed": true, "audit_ref": ""}
+      },
+      "freshness": "transient-derived effect (milliseconds) on the live graph; the decision journal is postgres-canonical",
+      "audit_event": "SHAKE256 witness event recording the sever, actor, and the weak-link cut_weight",
+      "rollback": "reinstate the agent (reverse routing override); the cut is graph state, reversible without data loss",
+      "filesystem_write_path": "none",
+      "north_star": "NS-DIRECTION",
+      "source_anchor": "source_anchors.mincut"
+    },
+    {
+      "id": "CS-06",
+      "command": "Ingest / index workspace",
+      "what_david_directs": "Trigger the three-pillar ingestion of a workspace path into the database-hosted codebase.",
+      "canonical_identity": "new/updated codebase_table rows keyed by module_path + BLAKE3 content hash; buffered in redb, embedded, committed to PostgreSQL",
+      "authority": "nu_plugin (parse) -> redb (buffer) -> envctl (embed + commit) -> PostgreSQL; forward-only, PostgreSQL is the sole durable writer (STORE-001 forward-only + single-writer)",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "ingest.run",
+        "params": {"workspace_path": "", "language": "optional"},
+        "response": {"command_id": "", "buffered": "int", "committed": "int", "audit_ref": ""}
+      },
+      "freshness": "buffer depth redb-live during the run; committed rows postgres-canonical after envctl flush",
+      "audit_event": "SHAKE256 witness event per committed block, rooted in the ingested source text hash",
+      "rollback": "uncommitted buffered blocks are transient (discardable); committed rows revert via PostgreSQL PITR to the pre-ingest revision",
+      "filesystem_write_path": "reads the workspace source; writes only redb buffer (transient) then PostgreSQL rows — no derived control-plane file",
+      "north_star": "NS-PROGRESS",
+      "source_anchor": "source_anchors.msgpack_no_json"
+    },
+    {
+      "id": "CS-07",
+      "command": "Materialize / release",
+      "what_david_directs": "Project the production branch out of PostgreSQL into a clean directory for Nix/Yazelix compilation.",
+      "canonical_identity": "PostgreSQL production branch (branch_id) + module_path metadata -> derived filesystem tree",
+      "authority": "envctl projection engine, read-only from PostgreSQL (STORE-001 derived-projection class); the filesystem output is derived and disposable",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "materialize.run",
+        "params": {"branch_id": "", "target_dir": ""},
+        "response": {"command_id": "", "target_dir": "", "sha_identity": "", "parity": "bool", "audit_ref": ""}
+      },
+      "freshness": "postgres-canonical source read; output is a deterministic snapshot of that read",
+      "audit_event": "SHAKE256 witness event recording the projected tree's SHA identity vs the source rows (byte-parity)",
+      "rollback": "delete + re-project (idempotent, deterministic); no canonical state is mutated by projection",
+      "filesystem_write_path": "enumerated + explicit: the ONLY sanctioned LifeOS-triggered filesystem write; derived, disposable, re-projectable — not hidden, not a control-plane detour",
+      "north_star": "NS-PROGRESS",
+      "source_anchor": "source_anchors.envctl_projection"
+    },
+    {
+      "id": "CS-08",
+      "command": "Simulate / forecast",
+      "what_david_directs": "Run an ATAS ensemble simulation to forecast timelines before committing any branch.",
+      "canonical_identity": "simulation set (sim_id) over cloned COW staging branches; results are transient rows (never trunk truth until CS-02)",
+      "authority": "ATAS runtime over isolated COW staging branches (transient-derived); no durable owner until a winning branch is committed",
+      "uds_contract": {
+        "channel": "control-uds",
+        "method": "atas.simulate",
+        "params": {"base_branch_id": "", "steps": "int", "ensemble_size": "int"},
+        "response": {"command_id": "", "sim_id": "", "branch_ids": [], "audit_ref": ""}
+      },
+      "freshness": "transient-derived; results readable via RS-05, discarded unless promoted",
+      "audit_event": "SHAKE256 witness event recording the sim_id, base branch, and actor",
+      "rollback": "discard all staging branches spawned by the sim (CS-03 per branch); simulation writes nothing durable",
+      "filesystem_write_path": "none",
+      "north_star": "NS-DIRECTION",
+      "source_anchor": "source_anchors.atas_timelines"
+    }
+  ],
+  "north_star_binding": {
+    "NS-CLARITY": {
+      "statement": "David can see and understand the whole.",
+      "satisfied_by": ["RS-01", "RS-02", "RS-03", "RS-04", "RS-05", "RS-06", "RS-07", "RS-08", "RS-09", "RS-10"],
+      "how": "every visible state renders from a canonical database identity (or an explicitly-marked transient view), with lineage back to PostgreSQL"
+    },
+    "NS-DIRECTION": {
+      "statement": "David can direct it as one system.",
+      "satisfied_by": ["CS-01", "CS-03", "CS-04", "CS-05", "CS-08"],
+      "how": "every directive routes over the single control UDS into the canonical database / orchestrator with explicit authority and a witness-chain audit event"
+    },
+    "NS-PROGRESS": {
+      "statement": "LifeOS advances every domain without fragmenting the whole.",
+      "satisfied_by": ["CS-02", "CS-06", "CS-07"],
+      "how": "advancement flows forward-only (ingest, commit, materialize) through PostgreSQL as the single durable owner; no side-channel or flat-file detour can fragment the truth"
+    }
+  },
+  "invariants": [
+    "No HTTP/REST: the Mission Control surface exposes no HTTP listener and issues no HTTP request; all control traffic is UDS + MessagePack (source: uds_not_http, msgpack_no_json).",
+    "No flat-file control-plane detour: no directive is spooled to a flat file and no visible state is sourced from one; redb reads are transient views, not control-plane files.",
+    "Single durable writer: LifeOS is a reader + command issuer only; every durable mutation lands in PostgreSQL via the envctl/agent writer path (STORE-001).",
+    "Forward-only sync: high-frequency directives buffer in redb and flush redb -> envctl -> PostgreSQL; no undirected redb<->PostgreSQL dual-write.",
+    "Explicit authority per surface: every visible_states[] and command_surfaces[] entry names exactly one authoritative owner.",
+    "Freshness is always labeled: every read carries its tier (redb-live | postgres-canonical | transient-derived) so a forecast or unsettled view is never mistaken for canonical truth.",
+    "Every command emits a SHAKE256 witness-chain audit event rooted in a PostgreSQL source vector; edits lacking a causal edge are rejected.",
+    "Every command has a defined rollback (COW discard, PITR, policy-version restore, or idempotent re-projection).",
+    "Every filesystem write reachable from the surface is enumerated and classified non-hidden; the sole sanctioned LifeOS-triggered write is the derived, disposable CS-07 projection."
+  ],
+  "coverage_assertion": {
+    "visible_state_count": 10,
+    "command_count": 8,
+    "gate_fields_per_state": ["canonical_identity", "authority", "uds_contract", "freshness", "audit_event", "rollback", "filesystem_write_path"],
+    "gate_fields_per_command": ["canonical_identity", "authority", "uds_contract", "freshness", "audit_event", "rollback", "filesystem_write_path"],
+    "every_state_has_all_gate_fields": true,
+    "every_command_has_all_gate_fields": true,
+    "no_http": true,
+    "no_flat_file_control_plane": true,
+    "every_filesystem_write_enumerated_and_non_hidden": true
+  },
+  "open_dependencies": [
+    "Upstream POSTGRES-003 (control-plane schema plan) and POSTGRES-006 (redb/AgentDB runtime boundary plan) are not yet materialized; canonical_identity field/table names here are the intended shapes and are refined once those plans land.",
+    "Live RuVector-in-PostgreSQL extension activation is not yet locally proven (STORE-001 open dependency); RS-03 semantic reads run over the proven Bun-loaded ruvector path until the native extension is green.",
+    "The control UDS server and redb-mmap reader are product-implementation surfaces (POSTGRES-007 defines the contract only; product execution is out of scope for this planning task)."
+  ],
+  "product_execution_performed": false
+}

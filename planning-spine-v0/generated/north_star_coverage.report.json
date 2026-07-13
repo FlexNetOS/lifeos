@@ -1,0 +1,85 @@
+{
+  "schema_version": "lifeos-planning-spine.coverage-gate-report.v0",
+  "generated_at": "2026-07-12T23:19:12Z",
+  "result": "fail",
+  "task_count": 196,
+  "anchor_count": 5,
+  "owner_execution_approval": "closed",
+  "failed_checks": [
+    "coverage_complete",
+    "tasks_anchored",
+    "owner_opened_execution"
+  ],
+  "checks": [
+    {
+      "name": "coverage_complete",
+      "result": "fail",
+      "detail": "every North Star anchor must be coverage- and decomposition-complete",
+      "offending": [
+        "NS-CLARITY",
+        "NS-DIRECTION",
+        "NS-EXTENSION",
+        "NS-PROGRESS",
+        "NS-WHOLE"
+      ]
+    },
+    {
+      "name": "dependencies_resolve",
+      "result": "pass",
+      "detail": "every parent_id must reference a task in the graph",
+      "offending": []
+    },
+    {
+      "name": "no_dependency_cycles",
+      "result": "pass",
+      "detail": "the dependency graph must be acyclic",
+      "offending": []
+    },
+    {
+      "name": "phases_decomposed",
+      "result": "pass",
+      "detail": "no declared phase may be empty and no task may sit in an undeclared phase",
+      "offending": []
+    },
+    {
+      "name": "tasks_anchored",
+      "result": "fail",
+      "detail": "every task must be anchored to a North Star outcome",
+      "offending": [
+        "COMPANY-001",
+        "COMPANY-002",
+        "CONSOLIDATE-001",
+        "CONSOLIDATE-002",
+        "CONSOLIDATE-003",
+        "DECIDE-001",
+        "DECIDE-002",
+        "DECIDE-003",
+        "DECIDE-004",
+        "DECIDE-005",
+        "DECIDE-006",
+        "DEVELOP-001",
+        "EXPERIENCE-001",
+        "EXPERIENCE-002",
+        "EXPERIENCE-003",
+        "FOUNDATION-001",
+        "FOUNDATION-002",
+        "FOUNDATION-003",
+        "GRAPH-001",
+        "GRAPH-002",
+        "GRAPH-003",
+        "GRAPH-004",
+        "GRAPH-005",
+        "HOME-001",
+        "HOME-002"
+      ]
+    },
+    {
+      "name": "owner_opened_execution",
+      "result": "fail",
+      "detail": "the owner must explicitly open execution",
+      "offending": [
+        "closed"
+      ]
+    }
+  ]
+}

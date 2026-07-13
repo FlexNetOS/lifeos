@@ -1,0 +1,9 @@
+# Raw NotebookLM exports are immutable evidence. Preserve exact line endings and
+# do not treat source-owned Markdown hard breaks or CSV CRLF bytes as patch
+# whitespace errors. Maintained companion documents remain under normal checks.
+"planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md" -text -whitespace
+planning-spine-v0/1.0_VISION/Notebooklm/*.csv -text -whitespace
+
+# Maintained planning projections are normalized; raw NotebookLM exports above
+# remain byte-preserved evidence with their source-owned CRLF endings.
+planning-spine-v0/generated/*.csv text eol=lf

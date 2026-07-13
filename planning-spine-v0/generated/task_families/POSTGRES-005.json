@@ -1,0 +1,69 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-005",
+  "title": "RuVector embedding and semantic database editing defined",
+  "status": "defined",
+  "owner": "LifeOS Data Agent / RuVector Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define embedding generation, hybrid retrieval, semantic SQL edits, content-addressed code blocks, copy-on-write branches, temporal alternatives, MinCut isolation, witness chains, and deterministic merge selection inside PostgreSQL plus RuVector, assigning every semantic-edit entity exactly once with owner, lifetime, sync edge, and recovery under the STORE-001 authority model, without computing embeddings, writing vectors, merging branches, or overwriting source.",
+  "decision_artifact": "generated/ruvector_semantic_edit_plan.json",
+  "work_items": [
+    {
+      "id": "POSTGRES-005-A",
+      "surface": "embedding generation + model/vector provenance",
+      "owner": "PostgreSQL + RuVector (store) / envctl (compute) / committed model pin (provenance)",
+      "decision": "local all-MiniLM-L6-v2 (384-dim, Candle/ORT) computes vectors during the envctl bridge and commits them to PostgreSQL; the database only stores and measures. Every vector is bound to an embedding_model_pin (model id, weights_sha256, dim, metric) so re-embedding reproduces the identical vector. redb serves the BLAKE3 dedup cache as a transient tier.",
+      "decision_at": "2026-07-13T03:47:08Z"
+    },
+    {
+      "id": "POSTGRES-005-B",
+      "surface": "hybrid retrieval",
+      "owner": "PostgreSQL + RuVector (native extension, No-Sidecar)",
+      "decision": "retrieval is standard SQL combining a relational predicate (language, status) with vector nearest-neighbour (ORDER BY semantic_embedding <-> [target] LIMIT k), BM25 keyword search, and FastGRNN pre-filter, executed in-database; redb performs f32 distance math only as a cache with no SQL/secondary index/native vector logic.",
+      "decision_at": "2026-07-13T03:47:08Z"
+    },
+    {
+      "id": "POSTGRES-005-C",
+      "surface": "content-addressed code blocks + semantic SQL edits",
+      "owner": "PostgreSQL (canonical durable owner)",
+      "decision": "code blocks are SHA-256 content-addressed (ADOPT-001 BlobStore contract) with raw_code, AST fragment, module_path, and causal edges; edits are standard SQL UPDATEs applied only inside COW branch rows, producing a new content hash, re-embedding, and refreshed causal edges. No main-trunk-direct edit and no source-file overwrite.",
+      "decision_at": "2026-07-13T03:47:08Z"
+    },
+    {
+      "id": "POSTGRES-005-D",
+      "surface": "copy-on-write branches + temporal alternatives + scoring",
+      "owner": "PostgreSQL (COW branching) / ATAS + ESN (simulation, non-authoritative)",
+      "decision": "concurrent edits are isolated in MVCC COW staging branches cloned from the main trunk; ATAS/ESN simulate parallel timelines (state diffs, resource burn, complexity spikes, failure nodes) up to 100 steps and score each by mathematical stability (cosine similarity, strange-attractor bounds); timelines are transient/derived and never durable authority.",
+      "decision_at": "2026-07-13T03:47:08Z"
+    },
+    {
+      "id": "POSTGRES-005-E",
+      "surface": "MinCut isolation + witness chains + causal verification",
+      "owner": "PostgreSQL + RuVector (integrity) / AgentDB (per-agent witness facts, rooted in PostgreSQL)",
+      "decision": "RuVector MinCut (O(n^{o(1)})) severs hallucinating agent clusters in real time; every claim/edit must carry a SHAKE256 witness chain rooted in a PostgreSQL source vector and pass Causal Graph Verification (a historical causal edge must exist), or it is rejected before it can merge.",
+      "decision_at": "2026-07-13T03:47:08Z"
+    },
+    {
+      "id": "POSTGRES-005-F",
+      "surface": "deterministic merge gates + rollback + source reconstruction",
+      "owner": "PostgreSQL (deterministic commit + PITR) / redb (WAL) / envctl (projection)",
+      "decision": "merge gate = tests pass AND witness rooted AND MinCut/causal integrity intact AND ESN-selected winning timeline; the merge commits already-computed winning branch rows to the trunk (the model is never asked to redo the work). Failed branches roll back; PostgreSQL PITR + redb application-level WAL recover state; envctl re-projects byte-exact source from module_path. Autonomous merge is blocked in this planning cell; a later executor performs a gated, non-autonomous commit.",
+      "decision_at": "2026-07-13T03:47:08Z"
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-005-A",
+    "POSTGRES-005-B",
+    "POSTGRES-005-C",
+    "POSTGRES-005-D",
+    "POSTGRES-005-E",
+    "POSTGRES-005-F"
+  ],
+  "decomposition_targets": ["retrieval", "edit", "branch", "integrity", "merge"],
+  "completion_gate": "generated/ruvector_semantic_edit_plan.json assigns every semantic-edit entity exactly once with owner, lifetime, sync edge, recovery, and PostgreSQL/redb/CodeDB relationship; all ten verification-gate clauses (model+vector provenance, reproducible embedding, hybrid search, branch isolation, concurrent edits, temporal scoring, witness-bound decisions, deterministic merge gates, rollback, source reconstruction) map to concrete contracts grounded in the Architecture Blueprint and STORE-001; POSTGRES-005.proof.json records zero product execution (no embeddings, no writes, no merge, no source overwrite).",
+  "grounded_in": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json"
+  ]
+}

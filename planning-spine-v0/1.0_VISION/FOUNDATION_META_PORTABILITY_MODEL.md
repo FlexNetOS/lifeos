@@ -9,6 +9,11 @@
 >
 > App = **lifeos**. Org = **FlexNetOS** (the pre-existing org from the ElementArk conglomerate design).
 > Surfaced 2026-07-08 by deep read of `src/meta` + `src/envctl`; every claim carries `file:line`.
+>
+> Navigation: [Vision index](./README.md) ·
+> [Blueprint compatibility](./ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) ·
+> [[planning-spine-v0/1.0_VISION/README]] ·
+> [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]
 
 ---
 

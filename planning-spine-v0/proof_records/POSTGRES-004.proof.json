@@ -1,0 +1,79 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-004",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every user-space class has a bounded collector, exclusion policy, stable identity, content and metadata checksum, ordering contract, checkpoint, exactly-once behavior, failure recovery, and lossless reconstruction test.",
+  "gate_result": {
+    "ingestion_plan": "generated/user_space_ingestion_plan.json",
+    "user_space_class_count": 13,
+    "user_space_classes": [
+      "USI-C01 files",
+      "USI-C02 directories",
+      "USI-C03 code modules",
+      "USI-C04 configuration",
+      "USI-C05 planning tables",
+      "USI-C06 communications",
+      "USI-C07 application state",
+      "USI-C08 media and blob references",
+      "USI-C09 identities",
+      "USI-C10 permissions",
+      "USI-C11 history",
+      "USI-C12 relationships",
+      "USI-C13 domain records"
+    ],
+    "class_set_source": "POSTGRES-002 gate enumeration (files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, domain records) — the approved user-space model this ingestion feeds.",
+    "every_class_has_bounded_collector": true,
+    "bounded_collector_evidence": "13 named collectors COL-files, COL-dirs, COL-code-ast, COL-config, COL-planning, COL-comms, COL-appstate, COL-media, COL-identities, COL-permissions, COL-history, COL-edges, COL-domain — each with explicit surface + bounds (root allow-list, max-depth, byte cap, mount/symlink boundaries).",
+    "every_class_has_exclusion_policy": true,
+    "exclusion_policy_evidence": "Per-class exclusion plus global exclusion: credential values, raw secrets, keyring material, blocked_paths, and generated exhaust (napi-rs/wasm-pack/node_modules/target) are never collected; secret positions recorded as references only (STORE-001 external-secret class).",
+    "every_class_has_stable_identity": true,
+    "stable_identity_evidence": "Content-addressed SHA-256 identity throughout: files/blobs = (content_sha256, logical_path); code = (module_path, symbol) + raw_code SHA-256; history = git oid; relationships = triple hash; identities = principal URN. BLAKE3 keys the redb dedup cache (blueprint).",
+    "every_class_has_content_and_metadata_checksum": true,
+    "content_and_metadata_checksum_evidence": "Each class defines BOTH a content_checksum (SHA-256 of canonical bytes / Merkle over children for directories / git bundle SHA for history) and a separate metadata_checksum (SHA-256 over the canonical metadata tuple: size/mode/uid/gid/mtime/ctime/device/inode and class-specific fields).",
+    "every_class_has_ordering_contract": true,
+    "ordering_contract_evidence": "Total order per class: lexicographic path (files/dirs/config/media), file-then-AST-document order (code), primary-key (planning/domain), thread+timestamp+sequence (communications), git topological (history), (src,edge_type,dst) triple order (relationships), (identity_domain,natural_key) (identities), entity order (permissions) — guarantees byte-identical repeated projection.",
+    "every_class_has_checkpoint": true,
+    "checkpoint_evidence": "Per-class cursor + resume skip-set persisted in the envctl migration_db (targets/runs/run_events/approvals/checkpoints/rollbacks — PGREDB-002; ADOPT-001 resumable capture); an interrupted run resumes from the last committed checkpoint.",
+    "every_class_has_exactly_once_behavior": true,
+    "exactly_once_evidence": "SHA-256 content-addressed identity + idempotent upsert keyed on identity + BLAKE3 dedup cache (skip recompute) + resume skip-set (skip re-collection) => any number of retries produces exactly one canonical staged record per source entity.",
+    "every_class_has_failure_recovery": true,
+    "failure_recovery_evidence": "Resume from checkpoint; redb ACID re-open recovers the buffer; envctl replay re-derives committed state; re-read/re-hash from the read-only working tree fills gaps (PGREDB-001); PostgreSQL PITR covers committed staging (STORE-001); git history restores from the archived bundle + recorded oid (PRESERVE-001).",
+    "every_class_has_lossless_reconstruction_test": true,
+    "lossless_reconstruction_test_evidence": "Per class, envctl projects staged records to a scratch target and asserts content_sha256 parity + metadata tuple equality + declared ordering against the archive-first oracle (PRESERVE-001); code classes additionally assert AST-concatenation byte-exact file reconstruction via module_path (blueprint 4-step materialization); blobstore_parity SHA-256 symmetry proves blob classes.",
+    "goal_requirements_satisfied": {
+      "archive_first_no_source_change": "scope_boundary.no_source_mutation + global_invariants.archive_first_read_only — collectors are read-only; only the archive root and redb buffer are written.",
+      "nushell_ast_parsing": "USI-C03 COL-code-ast uses the Nushell parser / nu_plugin CodeDB to produce AST blocks (functions/structs/dependencies) streamed via MessagePack (blueprint Three Pillars; NBSOURCE-030 INGEST-CLAIM-001/003).",
+      "non_text_metadata": "USI-C08 COL-media records non-text metadata sidecar (MIME, byte_size, dimensions) without decoding content; bytes content-addressed by SHA-256.",
+      "content_hashes": "global_invariants.single_content_identity (SHA-256) + BLAKE3 dedup cache.",
+      "ordering": "global_invariants.deterministic_ordering + per-class ordering_contract.",
+      "provenance": "cross_cutting_contracts.provenance_model — source_path, collector_id, collection_run_id, collected_at, content_sha256, metadata_sha256, source lineage (ADOPT-001; STORE-001 'Provenance preserved').",
+      "restartable_checkpoints": "cross_cutting_contracts.checkpoint_protocol (envctl migration_db cursor + resume skip-set)."
+    },
+    "store_001_alignment": "Ingestion writes land in the redb transient staging buffer first (redb's intended terminal role), then envctl forward-only bridges to PostgreSQL staging (canonical durable owner); envctl is not a second authority (AUTH-CLAIM-001 refuted). Staging is pre-cutover: no existing durable redb class (CodeDB source_blobs PGREDB-001, envctl migration_db PGREDB-002) is silently reclassified; any move off redb-durable happens only later via the verified BlobStore SHA-256 parity cutover (POSTGRES-010). Content-addressed identity and provenance honor STORE-001 invariants 'Single durable writer', 'Forward-only sync', 'Verified cutover', and 'Provenance preserved'.",
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-004 defines archive-first, read-only collectors and lossless staging-ingestion contracts for the entire user-space in generated/user_space_ingestion_plan.json. The plan enumerates the exact 13-class user-space set approved by the POSTGRES-002 gate — files (USI-C01), directories (USI-C02), code modules (USI-C03), configuration (USI-C04), planning tables (USI-C05), communications (USI-C06), application state (USI-C07), media and blob references (USI-C08), identities (USI-C09), permissions (USI-C10), history (USI-C11), relationships (USI-C12), domain records (USI-C13) — and assigns every one of them all nine gate attributes: a named bounded collector (COL-*), an exclusion policy, a content-addressed stable identity, BOTH a content checksum and a separate metadata checksum, a deterministic total-order ordering contract, a restartable envctl-migration_db checkpoint, exactly-once behavior via SHA-256 identity + BLAKE3 dedup + resume skip-set, per-class failure recovery, and a byte-exact lossless reconstruction test against the archive-first oracle. Code modules are parsed to ASTs by the Nushell parser / nu_plugin CodeDB and reconstructed via module_path; media carries non-text metadata with byte-exact SHA-256 identity; history is captured as an all-refs git bundle (PRESERVE-001 pattern) restorable from bundle + recorded oid. The whole pipeline realizes the blueprint Three Pillars (Nushell parser -> nu_plugin -> redb buffer -> envctl bridge -> PostgreSQL) under the STORE-001 tiered authority model: redb is the transient staging buffer, PostgreSQL + RuVector is the canonical durable destination, envctl is the forward-only bridge, and staging is strictly pre-cutover so no durable redb class (PGREDB-001/002) is silently reclassified. All collectors are read-only with credential values and raw secrets excluded (references only); zero source mutation and no product execution were performed.",
+  "artifact_paths": [
+    "generated/user_space_ingestion_plan.json",
+    "generated/task_families/POSTGRES-004.json",
+    "proof_records/POSTGRES-004.proof.json"
+  ],
+  "checksums": {
+    "generated/user_space_ingestion_plan.json": "b05fa9f4c1262f6bd677088c3d65bd4e3b37f128f0e7eb2063677040f9b65d6f"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate POSTGRES-004 gate: all 13 user-space classes present and each carries the 9 required gate fields",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (assert len(user_space_classes)==13 and every class has bounded_collector, exclusion_policy, stable_identity, content_checksum, metadata_checksum, ordering_contract, checkpoint, exactly_once, failure_recovery, lossless_reconstruction_test)",
+      "exit_status": 0,
+      "output": [
+        "classes: 13",
+        "all classes have 9 gate fields:  True"
+      ]
+    }
+  ],
+  "product_execution_performed": false
+}

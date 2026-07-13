@@ -1,0 +1,83 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "COMPANY-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every company object and workflow has an owner, authority path, bounded decision, approval, evidence, rollback or non-action rule, and no agent can self-authorize.",
+  "gate_result": {
+    "governance_contract": "generated/task_families/COMPANY-001.json",
+    "company_object_universe": [
+      "COMPANY-001-A Company identity (Element Ark Holdings frame)",
+      "COMPANY-001-B Authority (the authority graph)",
+      "COMPANY-001-C Priorities (max 3 active; 1-8 sequence)",
+      "COMPANY-001-D Projects",
+      "COMPANY-001-E Departments",
+      "COMPANY-001-F Roles (role/agent/capability bindings)",
+      "COMPANY-001-G Decisions",
+      "COMPANY-001-H Budgets (Resource Burn envelopes)",
+      "COMPANY-001-I Risk (simulation constraints + failure-learning chain)",
+      "COMPANY-001-J Compliance (constitutional enforcement + anti-bluffing)",
+      "COMPANY-001-K Proof workflows (§18 proof pipeline)"
+    ],
+    "universe_source": "Enumerated 1:1 from the COMPANY-001 goal noun set 'identity, authority, priorities, projects, departments, roles, decisions, budgets, risk, compliance, and proof workflows' — 11 governed objects/workflows, each assigned exactly once.",
+    "every_object_assigned_exactly_once": true,
+    "per_clause_coverage": {
+      "owner": "present for all 11 — a single accountable node named for each (David for identity/budget-final; David/Constitution for authority; NOA/CECCA for priorities/departments; CECCA for projects-delegation/roles/decisions; simulator_agent+Runtime Kernel for risk; Runtime Kernel+David for compliance; verifier_agent+flexnetos_runner for proof).",
+      "authority_path": "present for all 11 — each traces the canonical chain David -> Constitution -> Board -> NOA/CECCA -> Executives -> Departments -> Workers -> Tools (Master Plan §1), resolved through the 02_AUTHORITY_GRAPH.md v0 narrow graph with delegates_to/escalates_to/verifies/constrains edges.",
+      "bounded_decision": "present for all 11 — each decision is scoped (e.g., <=3 active priorities; projects must link >=1 priority and carry gates; budgets are forecast-only Resource Burn; decisions carry unblock+rollback; simulation emits constraints not advice).",
+      "approval": "present for all 11 — each names its approver and the automatic Needs-Human-Approval triggers (spend/legal/external/production/account/credential/trading/irreversible) per Execution gates §11; David is terminal.",
+      "evidence": "present for all 11 — each names a concrete evidence surface (Master Plan §1.5, 02_AUTHORITY_GRAPH.md invariants, task_graph.source.csv proof_uri, CAP-001 proof, authority_integrity_report.json, ATAS Resource Burn, SHAKE256 witness chains, proof_ledger.jsonl).",
+      "rollback_or_non_action": "present for all 11 — each states either a rollback (restore prior plan/graph/assignment; ProofRecord rollback_point) or an explicit NON-ACTION rule (no entity creation, no spend, no legal commitment, no operational department, discard failed COW branch)."
+    },
+    "no_agent_can_self_authorize": {
+      "satisfied": true,
+      "how": "Each of the 11 objects carries a self_authorization_prevented clause, and the family records five cross_cutting_invariants. Every completion or escalation crosses a boundary to a higher authority (CECCA -> NOA -> David) or to an independent verifier_agent. Root invariants: a task cannot self-verify completion (02_AUTHORITY_GRAPH.md invariant 4); no agent receives unlimited authority (Master Plan §1); the CEO agent may propose/prioritize/delegate but may not execute raw shell commands directly and David is final human authority (Constitution §6); recommendation may not bypass proof (invariant 6).",
+      "boundary_examples": [
+        "Identity/company frame: David-only; NOA/CECCA subordinate to LifeOS and David.",
+        "Priorities: no agent adds a 4th active priority or self-elevates work without David.",
+        "Projects: a project cannot self-verify; requires verifier_agent + resolved proof_uri.",
+        "Roles: an agent cannot grant itself a role/capability; missing capability escalates to CECCA then NOA.",
+        "Budgets: no agent authorizes spend (Constitution hard gate); forecast-only until David approves.",
+        "Risk: simulation output may not execute directly nor rewrite baseline (RFC-001); MinCut severs hallucinating agents.",
+        "Compliance: a claim without a witness-chain/causal root is rejected — bluffed self-certification is mathematically impossible.",
+        "Proof: a task cannot self-verify; a separate verifier_agent gates completion."
+      ]
+    },
+    "v0_boundary_respected": "Full company hierarchy and agent ecology are post-v0 (RFC) per 00_NORTH_STAR.md and Master Plan §2; departments/roles are defined as governance contracts, not instantiated. Explicit deferrals (full org chart, department staffing, generalized multi-company delegation) are honored (07_MVP_VERTICAL_SLICE.md).",
+    "store_001_alignment": {
+      "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+      "durable_company_records": "Every durable company macro-state record (identity, authority graph, approved priorities, project rows, department/role/capability bindings, decision ledger, budget/Resource-Burn ledger, risk Scoped-Lessons/Guardrails, compliance witness-chain references, proof-ledger references) is owned canonically by PostgreSQL + RuVector (STORE-001 'durable relational macro-state').",
+      "transient_governance_state": "redb holds only transient arbitration/simulation scratch (transient tier); never a second durable writer.",
+      "per_agent_cognition": "AgentDB (.rvf) holds NOA/CECCA/executive/worker cognition (MicroLoRA + SONA), non-authoritative for shared company truth, witnessed by SHAKE256 chains rooted in PostgreSQL source vectors.",
+      "secrets": "OS keyring holds budget/compliance credentials; PostgreSQL stores references/provenance only; redb never holds secrets.",
+      "invariant_parallel": "STORE-001 single-durable-writer (PostgreSQL owns every durable class exactly once) mirrors the governance invariant that no agent self-authorizes: durable company truth has exactly one canonical writer, just as every governed object has exactly one accountable approver."
+    },
+    "non_action_verification": {
+      "organizational_action": "none (definition-only)",
+      "spend": "none (budgets are forecast-only Resource Burn envelopes)",
+      "legal_commitment": "none (blocked_paths honored)",
+      "account_creation": "none",
+      "product_implementation": "none",
+      "secrets_touched": "none"
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "COMPANY-001 defines the LifeOS-native company governance and operating model for Element Ark Holdings as a definition-only task family. generated/task_families/COMPANY-001.json enumerates the complete governed universe — eleven company objects and workflows drawn 1:1 from the task goal: (A) company identity (Element Ark Holdings conglomerate frame, David as Owner/Founder/Human Principal, MVP1 financial+legal), (B) authority (the David -> Constitution -> Board -> NOA/CECCA -> Executives -> Departments -> Workers -> Tools chain, operationalized by the 02_AUTHORITY_GRAPH.md v0 narrow graph), (C) priorities (max 3 active, 1-8 Master Plan sequence), (D) projects (priority-linked, gate-bearing, verifier-gated), (E) departments (chartered mandates, full org chart deferred post-v0), (F) roles (CECCA-bound agent+capability, authority-integrity checked), (G) decisions (bounded, unblock+rollback, CEO-proposes-not-executes), (H) budgets (forecast-only Resource Burn envelopes, David-only spend), (I) risk (ATAS/simulation constraints and the Raw-Event -> Failure-Capsule -> Causal-Map -> Scoped-Lesson -> Guardrail -> Instinct chain, MinCut isolation), (J) compliance (Runtime-Kernel constitutional enforcement plus SHAKE256 witness-chain anti-bluffing), and (K) proof workflows (the §18 pipeline, append-only proof_ledger.jsonl, verifier-gated completion). Each object is assigned exactly once the full gate clause set: a single accountable owner, an explicit authority path rooted in David, a bounded decision, an approval gate with the §11 Needs-Human-Approval triggers, a concrete evidence surface, and a rollback-or-non-action rule. The gate's terminal clause — no agent can self-authorize — is satisfied per-object via self_authorization_prevented clauses and backstopped by five cross-cutting invariants (task cannot self-verify; no unlimited authority; CEO agent proposes/delegates but does not execute; David is final human authority; recommendation may not bypass proof). Store authority aligns with the STORE-001 keystone: durable company records are PostgreSQL+RuVector canonical, transient arbitration/simulation state is redb, per-agent cognition is AgentDB (.rvf), secrets stay in the OS keyring — and STORE-001's single-durable-writer invariant mirrors the single-accountable-approver governance invariant. No organizational action, spend, legal commitment, account creation, product implementation, or secret access was performed; this is planning definition only, held within the phase-7 policy-cell boundary.",
+  "artifact_paths": [
+    "generated/task_families/COMPANY-001.json",
+    "proof_records/COMPANY-001.proof.json"
+  ],
+  "provenance_derived_from": [
+    "1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md",
+    "02_AUTHORITY_GRAPH.md",
+    "00_NORTH_STAR.md",
+    "07_MVP_VERTICAL_SLICE.md",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/task_families/DECIDE-001.json",
+    "generated/task_graph.source.csv (COMPANY-001 row)"
+  ],
+  "product_execution_performed": false
+}

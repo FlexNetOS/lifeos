@@ -1,0 +1,98 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LIVING-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every cadence has observed inputs, bounded decisions, stale-data handling, owner escalation, proof, rollback or non-action, and no hidden mutation.",
+  "gate_result": {
+    "cadence_family_artifact": "generated/task_families/LIVING-001.json",
+    "cadence_set_enumerated_from_goal": [
+      "Daily Pulse",
+      "Weekly Sync",
+      "Quarterly Refactor",
+      "health audit",
+      "drift audit",
+      "security audit",
+      "provenance audit",
+      "capability audit",
+      "cost audit",
+      "authority audit"
+    ],
+    "cadence_count": 10,
+    "time_cadences": 3,
+    "domain_audits": 7,
+    "every_cadence_has_observed_inputs": {
+      "satisfied": true,
+      "min_inputs_per_cadence": 3,
+      "detail": "Each of the 10 work_items lists >=3 named observed_inputs traceable to a Blueprint section, the Context Matrix, STORE-001, ADOPT-001, or an existing reconciled evidence file (heartbeat_lane_a/b, p0_priority_report, verification_runtime_report, mvp_bundle_report, authority_integrity_report, adopted_capabilities.source.csv)."
+    },
+    "every_cadence_has_bounded_decisions": {
+      "satisfied": true,
+      "detail": "Each work_item enumerates a finite 3-value decision set of the form {intact/healthy, observed, escalate}; none emits an open-ended action.",
+      "examples": {
+        "Daily Pulse": ["pulse-healthy", "pulse-degraded-observed", "pulse-escalate"],
+        "Authority audit": ["authority-intact", "authority-boundary-warning-observed", "authority-violation-escalate"]
+      }
+    },
+    "every_cadence_has_stale_data_handling": {
+      "satisfied": true,
+      "detail": "Each work_item defines explicit stale-input behavior: Daily Pulse treats redb-WAL buffered state as non-canonical; Weekly Sync flags cutover-pending without auto-cutover; Quarterly Refactor re-seeds ESN initial conditions; Health reports degraded when db_health unreachable; Drift re-anchors rather than silently promotes a baseline; Security treats unwitnessed claims as untrusted; Provenance flags orphaned blobs; Capability treats stale parity receipts as unverified; Cost falls back to the conservative forecast bound; Authority re-checks separation each run."
+    },
+    "every_cadence_has_owner_escalation": {
+      "satisfied": true,
+      "escalation_owner": "LifeOS Governance Agent -> David",
+      "detail": "Each work_item names the LifeOS Governance Agent as the raising owner and David as the human escalation target for the specific threshold (MinCut sever, parity drift, irreversible refactor, PITR gap, spiral-out-of-bounds, secret exposure, orphaned durable data, downgrade/duplicate, budget exhaustion, single-writer violation)."
+    },
+    "every_cadence_has_proof": {
+      "satisfied": true,
+      "proof_sink": "proof_records/proof_ledger.jsonl",
+      "detail": "Each cadence is defined as proof-producing: it appends a typed proof-ledger record (heartbeat, weekly-sync, quarterly-refactor, health, drift, security, provenance, capability, cost, authority), consistent with the existing OPS-001 ops-heartbeat.v0 lineage."
+    },
+    "every_cadence_has_rollback_or_non_action": {
+      "satisfied": true,
+      "default_mode": "non-action",
+      "rollback_plan": "Restore the archived operations plan; no production state is changed.",
+      "detail": "All 10 cadences default to non-action (observation only). Health and Cost may emit a bounded RECOMMENDATION (db_migrate / RuvLTRA re-route) but never execute it; Quarterly Refactor additionally discards every simulated COW branch. Rollback is the archived-operations-plan restore for all cadences."
+    },
+    "every_cadence_has_no_hidden_mutation": {
+      "satisfied": true,
+      "detail": "Every work_item asserts read-only observation with writes confined to generated/** and proof_records/**; no cadence performs production mutation, autonomous remediation, external action, or touches secrets/** (blocked_paths from the LIVING-001 task row are honored for all 10 cadences).",
+      "blocked_paths_honored": ["production mutation", "autonomous remediation", "external action", "secrets/**"]
+    },
+    "seven_clause_coverage_matrix_complete": true,
+    "store_001_alignment": {
+      "single_durable_writer": "Daily Pulse and Weekly Sync never treat redb buffered/WAL state as canonical; Authority audit re-verifies PostgreSQL is the single durable writer of every macro-state class and that redb is never a second durable writer.",
+      "forward_only_sync": "Weekly Sync observes redb -> envctl -> PostgreSQL forward-only flush; it never dual-writes.",
+      "verified_cutover": "Weekly Sync flags any redb-durable class as cutover-pending and requires a green blobstore_parity.rs run before cutover; it never auto-cuts over.",
+      "no_sidecar": "Health/Drift/Security cadences observe RuVector operating as a native PostgreSQL extension, not a sidecar.",
+      "provenance_preserved": "Provenance audit checks that every durable class keeps its SHA-256 identity and source commit/PR lineage (adopted_capabilities.source.csv)."
+    },
+    "existing_evidence_reconciled": {
+      "heartbeat": ["state/heartbeat_lane_a.json", "connector_state/heartbeat_lane_b.json"],
+      "priority_work": ["capability_state/p0_priority_report.json"],
+      "verification": ["state/verification_runtime_report.json"],
+      "authority": ["state/authority_integrity_report.json"],
+      "capability_scope": ["state/mvp_bundle_report.json"],
+      "capability_lineage": ["generated/adopted_capabilities.source.csv"],
+      "note": "The task next_action ('Reconcile existing heartbeat and priority work as evidence, then decompose bounded audit loops') is satisfied: existing OPS-001 heartbeat and CAP-001 priority surfaces are cited as observed inputs, and the observation loop is decomposed into 10 bounded cadences."
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "LIVING-001 defines the LIFEOS-012 living-system observation layer as exactly ten proof-producing governance operations enumerated verbatim from the task goal: three time cadences (Daily Pulse over the redb scratchpad + MinCut swarm graph via UDS; Weekly Sync over the envctl redb->embed->PostgreSQL forward flush and BlobStore SHA-256 parity; Quarterly Refactor over ATAS/ESN forecasts across COW-isolated staging branches) and seven domain audits (health over db_health and the verification runtime; drift over ATAS boundary constraints, MinCut, and Causal Graph coverage; security over SHAKE256 Witness Chains and secret-output guards; provenance over SHA-256 content identity and commit/PR lineage; capability over the ADOPT-001 map and STORE-001 six state-class assignments owned exactly once; cost over ATAS resource-burn and RuvLTRA routing tiers; authority over the STORE-001 single-durable-writer invariants and verifier/executor separation). Every one of the ten carries all seven gate clauses: >=3 named observed inputs, a finite 3-value bounded decision set, explicit stale-data handling that never treats transient redb/WAL state or a stale baseline as canonical, escalation from the LifeOS Governance Agent to David, a proof-ledger record, a non-action default (with only Health and Cost emitting non-executing recommendations and Quarterly Refactor discarding its COW branches) plus the archived-operations-plan rollback, and a no-hidden-mutation assertion confining writes to generated/** and proof_records/** while honoring the blocked_paths (production mutation, autonomous remediation, external action, secrets/**). Every observed input traces to the Architecture Blueprint, the Architecture Context Matrix, STORE-001, ADOPT-001, or an already-materialized evidence file in the package. This is a definition-only planning artifact: no cadence was run, no production state was mutated, and no autonomous remediation was performed.",
+  "artifact_paths": [
+    "generated/task_families/LIVING-001.json",
+    "proof_records/LIVING-001.proof.json"
+  ],
+  "live_commands": [
+    {
+      "purpose": "Validate LIVING-001 cadence family gate: 10 cadences present, each carrying all 7 required clauses, non-empty",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (LIVING gate validation over generated/task_families/LIVING-001.json)",
+      "exit_status": 0,
+      "output": [
+        "LIVING-001: cadences=10 time=3 domain=7 all_seven_clauses_present=True all_clauses_nonempty=True valid_json=True"
+      ]
+    }
+  ]
+}

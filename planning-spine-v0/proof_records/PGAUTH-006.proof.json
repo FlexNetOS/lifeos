@@ -1,0 +1,114 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PGAUTH-006",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The matrix covers every recorded state family exactly once, resolves all overlaps and gaps, makes each synchronization edge directional and idempotent, names identity and recovery authorities, contains no unresolved dual-write path, and keeps every execution target Draft while the global graph gate is closed.",
+  "gate_result": {
+    "clause_1_covers_every_recorded_state_family_exactly_once": {
+      "satisfied": true,
+      "recorded_families_reconciled": {
+        "pgauth_closure_matrix_families": ["durable", "transient-redb", "cognitive", "projected", "external"],
+        "pgauth_redb_usage_inventory_rows": ["PGREDB-001", "PGREDB-002", "PGREDB-003", "PGREDB-004", "PGREDB-005", "PGREDB-006", "PGREDB-007"],
+        "store_001_canonical_classes": 6
+      },
+      "matrix_rows": 13,
+      "macro_class_rows": ["PGAUTH-006-M1 durable-relational->PostgreSQL+RuVector", "PGAUTH-006-M2 semantic-vector->PostgreSQL+RuVector(No-Sidecar)", "PGAUTH-006-M3 transient->redb", "PGAUTH-006-M4 cognitive->AgentDB(.rvf)", "PGAUTH-006-M5 projected->PostgreSQL-source/envctl-materializer", "PGAUTH-006-M6 external->OS-keyring+committed-pins"],
+      "redb_usage_rows": ["PGAUTH-006-R1 PGREDB-001->M1(target)", "PGAUTH-006-R2 PGREDB-002->M3-runtime+M1-audit", "PGAUTH-006-R3 PGREDB-003->M3", "PGAUTH-006-R4 PGREDB-004->M3(derived from M2)", "PGAUTH-006-R5 PGREDB-005->M3(subordinate to M1)", "PGAUTH-006-R6 PGREDB-006->M3-buffer/M1-authority", "PGAUTH-006-R7 PGREDB-007->M5-read-view over M3"],
+      "single_assignment_check": "13 unique work-item ids; the 'durable' closure family splits into the two owners STORE-001 names separately (M1 relational, M2 semantic); the transient family expands into the seven individually-resolved PGREDB rows so no redb use is double-counted or dropped"
+    },
+    "clause_2_resolves_all_overlaps_and_gaps": {
+      "satisfied": true,
+      "central_contradiction_PGREDB_006": "The source's transient-buffer framing vs CodeDB's verified durable-default is resolved (PGAUTH-006-R6) by binding the row to the R1 verified BlobStore SHA-256 parity cutover: redb's transient-forward-buffer role is realized only as the durable class migrates to PostgreSQL under parity, never by assumption",
+      "durable_today_PGREDB_001": "Decided as TRANSITIONAL (PGAUTH-006-R1): target owner PostgreSQL via codedb_store_pg::PgStore under one SHA-256 identity; not silently reclassified",
+      "durable_today_PGREDB_002": "Decided (PGAUTH-006-R2): transient runtime store + one-way promotion of settled audit history to PostgreSQL; preserved, not erased",
+      "durable_split": "'durable' overlap between relational and semantic resolved by assigning both to PostgreSQL+RuVector with the semantic index explicitly derived from versioned source rows (M2), never an independent authority",
+      "gap_none_remaining": "All five parent contracts (PGAUTH-001..005) and all seven PGREDB rows are assigned; no 'pending STORE-001' cell remains open"
+    },
+    "clause_3_each_synchronization_edge_directional_and_idempotent": {
+      "satisfied": true,
+      "directional": "Every edge is forward-only: redb->envctl->PostgreSQL (M1/M3/R1..R6), local-embed->PostgreSQL (M2), AgentDB->PostgreSQL one-way promotion (M4), PostgreSQL->envctl->filesystem (M5/R7), external->inbound ingestion (M6)",
+      "idempotency_mechanisms": {
+        "M1_R1_R6": "SHA-256 content-addressed identity (re-commit no-op)",
+        "M2": "(content+model+version) key upsert; reproducible re-embedding",
+        "M3_R3": "content-identity dedup on flush; disposable",
+        "R4": "BLAKE3(content+model+version+config) key; deterministic recompute on miss",
+        "R5": "monotonic sequence + operation idempotency key = at-most-once apply",
+        "M4": "SHAKE256 witness-chain identity",
+        "M5_R7": "deterministic byte-exact re-projection (identical SHA-256)",
+        "M6_R2": "external / envctl run-event identity reference (update-in-place)"
+      }
+    },
+    "clause_4_names_identity_and_recovery_authorities": {
+      "satisfied": true,
+      "every_row_has_identity_boundary": true,
+      "every_row_has_recovery_source": true,
+      "recovery_authorities": {
+        "durable_and_semantic": "PostgreSQL PITR (+ reproducible re-embedding)",
+        "transient": "redb local disk (process-lifecycle); disposable classes recompute; outbox replays to PostgreSQL",
+        "cognitive": "AgentDB .rvf file; regenerable from base model + training history",
+        "projected": "re-projection from PostgreSQL",
+        "external": "OS keyring + committed pins; fail-closed re-solicit/re-retrieve",
+        "codedb_blobs": "redb file + working tree today; PostgreSQL PITR after verified cutover",
+        "envctl_migration": "redb file + envctl replay engine (runtime); PostgreSQL PITR (promoted audit)"
+      }
+    },
+    "clause_5_no_unresolved_dual_write_path": {
+      "satisfied": true,
+      "single_durable_writer": "PostgreSQL+RuVector owns every durable macro-state class exactly once; redb never becomes a second durable writer for a PostgreSQL-owned class (STORE-001 invariant 1)",
+      "subordinates_named": "outbox (R5) and CodeDB blob store (R1/R6) are subordinate/transitional to PostgreSQL; envctl (R2) is not the synchronizing durable writer of macro-history (AUTH-CLAIM-001 refuted); the UI shared-redb view (R7) is read-only and never a dual-writer",
+      "verified_cutover_guard": "a class leaves redb-durable only after a green live blobstore_parity.rs run against a disposable PostgreSQL; never by assumption",
+      "contested_row_closed": "PGREDB-006 is no longer an unresolved dual-write path; it is bound to the R1 verified cutover"
+    },
+    "clause_6_every_execution_target_stays_draft_while_global_graph_gate_closed": {
+      "satisfied": true,
+      "execution_target_statuses_from_task_graph_source_csv": {
+        "POSTGRES-001": "Draft",
+        "POSTGRES-002": "Draft",
+        "PGAUTH-001": "Draft",
+        "PGAUTH-002": "Draft",
+        "PGAUTH-003": "Draft",
+        "PGAUTH-004": "Draft",
+        "PGAUTH-005": "Draft",
+        "PGAUTH-006": "Draft"
+      },
+      "no_status_promotion_performed": true,
+      "planning_only": "This task produced planning artifacts (task families + matrix + proof); no live database, schema, or runtime state was created or mutated"
+    },
+    "store_001_alignment": {
+      "keystone": "generated/store_relationship_decision.json (STORE-001, adopt-intended-tiered-architecture)",
+      "assignment_map": "M1<-assignment 1 (durable relational -> PostgreSQL), M2<-assignment 2 (semantic/vector -> PostgreSQL+RuVector No-Sidecar), M3<-assignment 3 (transient -> redb), M4<-assignment 4 (per-agent cognition -> AgentDB), M5<-assignment 5 (derived projections -> PostgreSQL/envctl), M6<-assignment 6 (external-secret -> keyring+pins)",
+      "invariants_honored": ["single durable writer", "forward-only sync", "verified cutover", "no sidecar", "provenance preserved"],
+      "upgrades_not_downgrades": "Honored by the migration MECHANISM (SHA-256 BlobStore parity), not by freezing redb as durable; PGREDB-001/002/006 durable uses are preserved via verified cutover / forward promotion, not erased"
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "PGAUTH-006 closes the state-ownership synchronization and recovery matrix by reconciling the five parent authority contracts (PGAUTH-001 durable, PGAUTH-002 redb inventory, PGAUTH-003 cognitive, PGAUTH-004 projected, PGAUTH-005 external) and the seven concrete redb usage rows (PGREDB-001..007) into 13 single-assignment rows aligned to STORE-001's six canonical classes. The six macro classes assign durable relational macro-state and semantic/vector state to PostgreSQL+RuVector (M1, M2 native No-Sidecar), the transient high-frequency tier to redb (M3), per-agent cognition to AgentDB .rvf (M4), derived projections to PostgreSQL source projected by envctl (M5), and external/secret authority to the OS keyring plus committed pins (M6). The seven redb rows are each decided rather than erased: CodeDB source_blobs (R1/PGREDB-001, durable today) migrate to PostgreSQL-canonical via the already-implemented codedb_store_pg::PgStore under one SHA-256 identity; envctl migration_db (R2/PGREDB-002, durable today) is a transient runtime store whose settled audit history promotes one-way to PostgreSQL; agent scratchpad (R3), embedding cache (R4, derived from M2 via BLAKE3), and the application-level WAL/outbox (R5, subordinate to PostgreSQL via monotonic sequence + idempotency key) stay transient in redb; the CONTESTED ingestion-buffer row (R6/PGREDB-006) is resolved by binding it to the R1 verified BlobStore SHA-256 parity cutover so redb's transient-buffer role is realized only as the durable class moves to PostgreSQL, never by assumption; and the shared-redb UI view (R7/PGREDB-007) is a read-only projection over the transient agent tier, never a second writable authority. Every synchronization edge is forward-only and made idempotent by SHA-256, BLAKE3, SHAKE256 witness chains, monotonic-sequence idempotency keys, or deterministic byte-exact re-projection; every row names an identity boundary and a recovery source (PostgreSQL PITR, redb local disk, AgentDB .rvf regeneration, re-projection, keyring re-solicit); and no unresolved dual-write path remains because PostgreSQL is the single durable writer and all buffers/stores/views are explicitly subordinate, transitional, or read-only under the verified-cutover guard. All eight execution targets (POSTGRES-001/002 and PGAUTH-001..006) remain Draft in generated/task_graph.source.csv; no product execution, live database, schema, or runtime mutation was performed.",
+  "artifact_paths": [
+    "generated/task_families/PGAUTH-006.json",
+    "generated/task_families/POSTGRES-001.json",
+    "proof_records/PGAUTH-006.proof.json"
+  ],
+  "checksums": {
+    "generated/task_families/PGAUTH-006.json": "aaf3b59a6aad76178bb6740d434360ef8c0f92aa9f0ca3ebae37fbf6e2358e23",
+    "generated/task_families/POSTGRES-001.json": "a3f3adeba7861d24d310121d3daba89c61b77d057c9cb611ed117e733717b193"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate PGAUTH-006 matrix gate: exactly-once coverage (13 rows = 6 macro + 7 redb, unique ids), every row carries sync_edge/idempotency/identity_boundary/recovery_source/forbidden_dual_write, all rows closed, and all eight execution targets remain Draft",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (matrix-gate validation over generated/task_families/PGAUTH-006.json and generated/task_graph.source.csv)",
+      "exit_status": 0,
+      "output": [
+        "macro classes: 6 (M1..M6); redb rows: 7 (R1..R7); unique work-item ids: True total 13",
+        "all rows: sync_edge+idempotency+identity_boundary+recovery+forbidden_dual_write present: True",
+        "non-closed rows: []",
+        "execution target statuses all Draft: True (POSTGRES-001/002, PGAUTH-001..006)"
+      ]
+    }
+  ],
+  "store_001_alignment": "generated/store_relationship_decision.json — matrix rows M1..M6 map one-to-one onto STORE-001 state_class_assignments 1..6; the durable/transient/cognitive/projected/external families of pgauth_closure_matrix.csv are subsumed; upgrades-not-downgrades is honored by the SHA-256 BlobStore parity migration mechanism, not by freezing redb as durable.",
+  "product_execution_performed": false,
+  "rollback_plan": "Restore the prior task-graph revision and retain this matrix as evidence; no live state changes occurred during planning."
+}

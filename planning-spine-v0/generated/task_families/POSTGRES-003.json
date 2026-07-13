@@ -1,0 +1,70 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-003",
+  "title": "Planning and control tables made database-native",
+  "status": "defined",
+  "owner": "LifeOS Planning Spine / LifeOS Data Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the PostgreSQL-native control plane so every planning question is a SQL query and every accepted answer is an UPDATE to a database row, with the committed CSV, JSON, and Markdown surfaces becoming deterministic, byte-identical, lossless projections. Assign a database owner and a deterministic projection contract to every current control-plane column, relation, proof URI, lifecycle transition, North Star anchor, and source provenance, under STORE-001 (PostgreSQL canonical, envctl projection, redb transient only).",
+  "work_items": [
+    {
+      "id": "POSTGRES-003-A",
+      "surface": "Control-plane columns -> owning PostgreSQL columns (17 task_graph columns + 8 coverage columns + proof/family/registry fields)",
+      "owner": "task_node + ordinal child tables (task_dependency, task_input, task_target_artifact, task_allowed_path, task_blocked_path) and ns_anchor + anchor_coverage",
+      "decision": "Every column gets exactly one owning table.column. Verbatim free-text columns (goal, verification_gate, rollback_plan, owner_agent, required_outcome) stored as-is; '; '-delimited columns (parent_id, inputs, target_artifacts, allowed_paths, blocked_paths, phase_task_ids) normalized into ordinal child tables so re-serialization is byte-identical; simulation_required stored boolean and projected as 'TRUE'/'FALSE'. Only status, proof_uri, next_action are mutable (mirrors task_graph.status.json update_policy)."
+    },
+    {
+      "id": "POSTGRES-003-B",
+      "surface": "Control-plane relations -> PostgreSQL tables (task graph, coverage, proof records, proof ledger, task families, source registry, adopted capabilities, store decision)",
+      "owner": "23 owning tables enumerated in generated/postgres_control_plane_schema_plan.json (database_schema.tables)",
+      "decision": "PostgreSQL owns each relation exactly once (STORE-001 invariant 1). No redb or CodeDB durable authority; redb is at most a transient ingest buffer, CodeDB is the parser path only."
+    },
+    {
+      "id": "POSTGRES-003-C",
+      "surface": "Proof URIs -> proof_record / proof_ledger_entry ownership",
+      "owner": "proof_record (task_id, revision) + proof_ledger_entry (sequence, proof_sha256)",
+      "decision": "Every proof_uri resolving to proof_records/*.proof.json has a proof_record row and a proof_ledger_entry whose proof_sha256 pins content identity; source-extract proof_uris (NBSTATED family) are owned by the source relation. Dangling proof_uri is a projection-validation failure."
+    },
+    {
+      "id": "POSTGRES-003-D",
+      "surface": "Lifecycle transitions -> lifecycle_state + lifecycle_transition state machine",
+      "owner": "lifecycle_state (7 states), lifecycle_transition (10 edges), task_status_event (append-only audit)",
+      "decision": "Seven canonical states (draft, ready, running, simulated, complete, blocked, rolled-back) from status.json.lifecycle_counts; the coarse authored status {Draft, Running, Complete} maps deterministically to the fine derived lifecycle_state. Transitions recorded append-only in task_status_event and proof_ledger_entry; proof history is never rewritten."
+    },
+    {
+      "id": "POSTGRES-003-E",
+      "surface": "North Star anchors -> ns_anchor + anchor_coverage",
+      "owner": "ns_anchor (5 immutable anchors) + anchor_coverage (anchor->task causal edges)",
+      "decision": "All five anchors (NS-EXTENSION, NS-WHOLE, NS-CLARITY, NS-DIRECTION, NS-PROGRESS) owned as insert-once rows; anchor_id and required_outcome frozen (NORTH_STAR.md lock 2026-07-10); coverage_status / decomposition_status / execution_gate are derivations from anchor_coverage + task lifecycle."
+    },
+    {
+      "id": "POSTGRES-003-F",
+      "surface": "Source provenance -> source / source_claim / claim_evidence / adopted_capability / store_decision",
+      "owner": "source (32 NotebookLM objects, content_sha256), adopted_capability (19 CodeDB capabilities, commit/PR/CI/parity_gate), store_decision + store_class_assignment + store_invariant",
+      "decision": "SHA-256 content identity and source commit/PR lineage preserved (STORE-001 invariant 5); a provenance projection is valid only if recomputed hash equals stored identity."
+    },
+    {
+      "id": "POSTGRES-003-G",
+      "surface": "Deterministic projection contracts -> projection_contract + projection_run",
+      "owner": "projection_contract (per-file: target, query, ordering key, serialization, expected sha256, round-trip test) + projection_run (materialization audit)",
+      "decision": "Each committed control-plane file (task_graph.source.csv, task_graph.normalized.json, task_graph.status.json, north_star_coverage.source.csv/.control.json, proof_ledger.jsonl, proof_records/*.json, task_families/*.json, source/adopted-capabilities CSVs, store_relationship_decision.json) regenerates via envctl as a byte-identical, round-trippable projection. A projection that is not byte-identical AND round-trippable is rejected as information loss."
+    },
+    {
+      "id": "POSTGRES-003-H",
+      "surface": "Cutover safety -> keep committed CSV/ledger canonical until POSTGRES-010",
+      "owner": "POSTGRES-010 (whole user-space parity recovery and authority cutover)",
+      "decision": "This is a planning artifact only; no live PostgreSQL was created or mutated. The committed generated/task_graph.source.csv and proof_records/proof_ledger.jsonl remain the editable authority until POSTGRES-010 proves parity and performs one explicit verified switch. Next: split one bounded migration task per control-plane table."
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-003-A",
+    "POSTGRES-003-B",
+    "POSTGRES-003-C",
+    "POSTGRES-003-D",
+    "POSTGRES-003-E",
+    "POSTGRES-003-F",
+    "POSTGRES-003-G",
+    "POSTGRES-003-H"
+  ],
+  "completion_gate": "Every current control-plane column, relation, proof URI, lifecycle transition, North Star anchor, and source provenance has a database owner and a deterministic projection contract with no information loss, recorded in generated/postgres_control_plane_schema_plan.json, with the committed CSV remaining canonical until POSTGRES-010 proves cutover."
+}

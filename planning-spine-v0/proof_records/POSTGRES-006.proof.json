@@ -1,0 +1,58 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-006",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Buffer flush is ordered, idempotent, restartable, and observable; AgentDB identities and learning state are portable and witness-bound; neither store can silently become competing macro state.",
+  "gate_result": {
+    "design_artifact": "generated/runtime_store_boundary_plan.json",
+    "task_family": "generated/task_families/POSTGRES-006.json",
+    "derived_from_keystone": "generated/store_relationship_decision.json (STORE-001-B transient tier; STORE-001-D per-agent cognition)",
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "clause_1_buffer_flush": {
+      "ordered": "monotonic per-buffer sequence number assigned at enqueue; envctl drains strictly ascending so parser/operation order is preserved into PostgreSQL (buffer_flush_protocol.ordered)",
+      "idempotent": "content-addressed identity (SHA-256 blob for REDB-RT-01 ingestion; per-operation idempotency key for REDB-RT-03 outbox; BLAKE3 model-bound key for REDB-RT-02 cache) against a commit-once PostgreSQL destination — a crash between apply-and-ack cannot duplicate a durable row",
+      "restartable": "redb single-file ACID + MVCC re-open recovers last committed buffer state; flush worker resumes from last acked sequence via a resume skip-set; unacked entries replay in order",
+      "observable": "buffer occupancy / outbox depth, drain / replay lag, per-entry flush receipt, poison-record count, cache hit/miss ratio, backpressure / capacity-remaining, scratchpad write latency",
+      "roles_covered": ["REDB-RT-01 ingestion buffer", "REDB-RT-03 application-level WAL/outbox", "REDB-RT-04 curated scratchpad flush"],
+      "satisfied": true
+    },
+    "clause_2_agentdb_portable_and_witness_bound": {
+      "portable": ".rvf is a self-contained single-file cognitive container, hot-swappable across any ruvllm node hosting the same frozen base model, regenerable from base model + history; 50+ agents = 50 portable .rvf files on one base-model footprint",
+      "witness_bound": "AGENTDB-05 Cryptographic Witness Chains (SHAKE256) + Causal Graph Verification (GNN causal edges) root every promoted fact/decision in a PostgreSQL source vector; unrooted (hallucinated) claims are rejected; AGENTDB-06 identity is anchored to that chain",
+      "entities_assigned": ["AGENTDB-01 MicroLoRA adapters", "AGENTDB-02 SONA policy matrix", "AGENTDB-03 FastGRNN routing graph", "AGENTDB-04 learning traces", "AGENTDB-05 witness facts", "AGENTDB-06 agent identity + lifecycle"],
+      "learning_state_covered": ["SONA policy matrix (AGENTDB-02)", "learning traces (AGENTDB-04)"],
+      "satisfied": true
+    },
+    "clause_3_no_competing_macro_state": {
+      "redb_side": "every one of the 6 redb runtime roles carries a non_competition field: transient/derived, forward-only flush, no second durable writer; REDB-RT-05 geometry engine has NO SQL / secondary index / native vector logic so it cannot own semantic authority",
+      "agentdb_side": "every .rvf entity has macro_authority 'none'; only witness-verified/curated states flow one-way to PostgreSQL; the container is never canonical",
+      "no_silent_reclassification": "PGREDB-001 (CodeDB source_blobs) and PGREDB-002 (envctl migration_db) are DURABLE-today uses referenced-not-reclassified — they migrate only via STORE-001-C verified BlobStore SHA-256 parity cutover, neither silently promoted to transient nor frozen as durable",
+      "single_durable_writer": "PostgreSQL (inherited STORE-001 invariant 0); forward-only sync, no dual-write (inherited invariant 1)",
+      "satisfied": true
+    },
+    "redb_runtime_roles_assigned_exactly_once": 6,
+    "agentdb_cognition_entities_assigned_exactly_once": 6,
+    "durable_today_uses_referenced_not_reclassified": 2,
+    "every_role_has_owner_lifetime_sync_edge_recovery_and_non_competition": true,
+    "store_001_alignment": "POSTGRES-006 defines only the runtime mechanics of STORE-001-B (redb transient tier) and STORE-001-D (AgentDB cognition); it inherits STORE-001's single-durable-writer and forward-only invariants and does not re-decide any macro-state owner",
+    "open_dependencies": [
+      "ordered/idempotent redb->PostgreSQL outbox protocol DEFINED not yet built (PGREDB-005)",
+      "microsecond scratchpad write-latency claim UNVERIFIED (RUVPG-CLAIM-018)",
+      "NotebookLM 'nu_plugin buffers into redb' framing contradicts current code (PGREDB-006); intended buffer is a build target",
+      "live blobstore_parity.rs green run vs disposable PostgreSQL is the PGREDB-001 cutover proof (governed by STORE-001-C)"
+    ],
+    "product_execution_performed": false,
+    "no_live_mutation": "no redb file, no .rvf file, no PostgreSQL row, and no model was written, trained, flushed, or migrated"
+  },
+  "proof_summary": "POSTGRES-006 defines the runtime boundaries of the two non-canonical tiers STORE-001 already assigned, without duplicating PostgreSQL macro authority. generated/runtime_store_boundary_plan.json enumerates six redb transient runtime roles — REDB-RT-01 high-frequency ingestion buffer, REDB-RT-02 BLAKE3 embedding deduplication cache, REDB-RT-03 application-level WAL/outbox, REDB-RT-04 agent scratchpad, REDB-RT-05 stateless f32 geometry engine, and REDB-RT-06 read-only UDS UI view — each assigned exactly once with owner, lifetime, identity, forward-only sync edge, crash recovery, and an explicit non-competition guarantee. Gate clause 1 is satisfied by the buffer_flush_protocol: flush is ordered (monotonic per-buffer sequence drained ascending), idempotent (SHA-256 blob / per-operation idempotency-key / BLAKE3 model-bound cache key against a commit-once PostgreSQL destination), restartable (redb ACID re-open + resume skip-set replays unacked entries in order), and observable (depth, replay lag, per-entry receipts, poison-record count, hit/miss ratio). Gate clause 2 is satisfied by agentdb_cognition: all six .rvf entities (MicroLoRA adapters, SONA policy matrix, FastGRNN routing graph, learning traces, witness facts, agent identity/lifecycle) are portable (self-contained single-file container hot-swappable across ruvllm nodes and regenerable from base model + history) and witness-bound (SHAKE256 Cryptographic Witness Chains + Causal Graph Verification root every promoted fact in a PostgreSQL source vector, rejecting hallucinations). Gate clause 3 is satisfied because every redb role and every .rvf entity is non-authoritative and flushes forward-only, and the two DURABLE-today redb uses (PGREDB-001 CodeDB source_blobs, PGREDB-002 envctl migration_db) are referenced-not-reclassified — they move to PostgreSQL only via STORE-001-C's verified BlobStore SHA-256 parity cutover, so neither store is silently promoted to durable nor silently demoted to transient, and PostgreSQL remains the single durable writer per the inherited STORE-001 invariants. Every assignment traces to the Architecture Blueprint (redb geometry engine / scratchpad / WAL / dedup cache; .rvf cognitive container; witness chains), the Architecture Context Matrix (PostgreSQL+RuVector = Canonical state, redb = Temporary/derived state), STORE-001 (store_relationship_decision.json), and the pgauth_redb_usage_inventory (PGREDB-001..007). No product execution, model training, or live redb/.rvf/PostgreSQL mutation was performed.",
+  "artifact_paths": [
+    "generated/runtime_store_boundary_plan.json",
+    "generated/task_families/POSTGRES-006.json"
+  ],
+  "checksums": {
+    "generated/runtime_store_boundary_plan.json": "1c33f9b5e08b0d45e16ccd9e64890d42fbe39d288f8c35198dc84c32a8b19b8a",
+    "generated/task_families/POSTGRES-006.json": "db410e89e7a0dfbe5332a7bc47d594cb0fff8aaf00d982704588d550281f83a1"
+  }
+}

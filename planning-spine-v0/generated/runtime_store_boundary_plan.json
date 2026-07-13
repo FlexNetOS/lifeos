@@ -1,0 +1,263 @@
+{
+  "schema_version": "lifeos-planning-spine.runtime-store-boundary-plan.v0",
+  "task_id": "POSTGRES-006",
+  "title": "redb and AgentDB runtime boundaries defined",
+  "decided_at": "2026-07-13T03:47:08Z",
+  "owner": "LifeOS Memory / Runtime Agent",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/pgauth_redb_usage_inventory.csv (PGREDB-001..007)",
+    "NBSOURCE-001 Technical Report: The Architectural Role of Redb in High-Frequency Agentic Systems",
+    "NBSOURCE-002 Edge Orchestration with High-Frequency Buffering",
+    "NBSOURCE-003 Architecting Nushell Plugin Integration with Redb and PostgreSQL",
+    "NBSOURCE-007 Cognitive Evolution: Redb Versus AgentDB Architecture",
+    "NBSOURCE-010 Edge Node Deployment and Agent Swarm Initialization",
+    "NBSOURCE-013 Modular Intelligence: The Ruvnet AgentDB Framework",
+    "NBSOURCE-015 Orchestrating Vector Ingestion and Embedding Workflows",
+    "NBSOURCE-019 Proportional Intelligence and Task Routing in RuvLTRA",
+    "NBSOURCE-025 Ruflo Meta-Harness: Adaptive Routing and Swarm Coordination",
+    "NBSOURCE-028 The Mathematical Guardrail: Cryptographic Witness Chains"
+  ],
+  "scope": {
+    "in_scope": "The runtime mechanics of the two non-canonical tiers STORE-001 already assigned: redb as the transient high-frequency tier (STORE-001-B) and AgentDB (.rvf) as per-agent non-authoritative cognition (STORE-001-D). Defines buffering, deduplication, application-level WAL, ordered/idempotent/restartable/observable flush, and per-role crash recovery for redb; and .rvf cognition (MicroLoRA, SONA, FastGRNN, learning traces, witness facts) plus agent lifecycle and portability for AgentDB.",
+    "out_of_scope": "Assigning durable macro-state ownership (settled by STORE-001: PostgreSQL + RuVector is the single durable writer). The two DURABLE-today redb uses PGREDB-001 (CodeDB source_blobs) and PGREDB-002 (envctl migration_db) are NOT reclassified here; they migrate to PostgreSQL only under STORE-001-C via the BlobStore SHA-256 parity cutover, one verified swap at a time. This plan neither promotes those to transient nor freezes them as durable; it references them so nothing is silently reclassified.",
+    "product_execution_performed": false,
+    "no_live_mutation": "No redb file, no .rvf file, no PostgreSQL row, and no model is written, trained, or migrated by this planning artifact."
+  },
+  "inherits_from_STORE_001": {
+    "STORE-001-B": "transient high-frequency state (thoughts, traces, WAL, dedup cache, geometry math) -> redb; forward-only flush to PostgreSQL via envctl; never a second durable writer",
+    "STORE-001-D": "per-agent cognition (.rvf) -> AgentDB; non-authoritative for shared macro-state; witnessed by SHAKE256 chains rooted in PostgreSQL",
+    "single_durable_writer_invariant": "PostgreSQL owns every durable macro-state class exactly once; redb never becomes a second durable writer for a PostgreSQL-owned class (store_relationship_decision.json invariants[0])",
+    "forward_only_invariant": "redb -> envctl(embed) -> PostgreSQL; no undirected redb<->PostgreSQL dual-write (store_relationship_decision.json invariants[1])"
+  },
+
+  "redb_runtime_roles": [
+    {
+      "role_id": "REDB-RT-01",
+      "redb_use": "High-frequency ingestion / write buffer — nu_plugin-parsed AST blocks and agent-produced records land in redb at microsecond latency before the envctl bridge commits them to PostgreSQL",
+      "source_class": "STORE-001-B (transient high-frequency)",
+      "inventory_ref": "PGREDB-006 (ingestion buffer), PGREDB-003 (high-frequency writes)",
+      "lifetime": "transient — occupancy is bounded by flush cadence; an entry lives only until envctl acks its commit to PostgreSQL",
+      "durability_class": "buffer (durable-until-acked, then reclaimable); NOT a macro-authority",
+      "identity": "SHA-256 content hash of the buffered block (shared identity with the PostgreSQL destination row, so a re-buffer of the same block is the same record)",
+      "sync_edge": "nu_plugin -> redb buffer -> envctl(embed) -> PostgreSQL (forward-only); envctl is the only writer that moves buffered blocks forward",
+      "flush_ordering": "monotonic per-buffer sequence number assigned at write; envctl drains in ascending sequence so causal/parser order is preserved into PostgreSQL",
+      "idempotency": "PostgreSQL upsert is content-addressed on the SHA-256 identity (commit-once); replaying an already-acked block is a no-op — the destination dedups, so a double-drain cannot create a duplicate row",
+      "restartability": "redb single-file ACID + MVCC; on crash, re-open recovers the last committed buffer state, and envctl resumes draining from the last acked sequence using a resume skip-set — unacked blocks replay in order",
+      "observability": "buffer occupancy (depth), ingestion throughput, drain (replay) lag, per-block flush receipt, poison-block count",
+      "crash_recovery": "recover committed buffer entries from the redb file and replay unacked ones to PostgreSQL; a lost pre-commit write is re-derivable by re-parsing the working tree (nu_plugin is deterministic over source)",
+      "non_competition": "the buffer holds no authority — PostgreSQL is the destination of record; on total buffer loss the source is re-parsable, so redb can never become the durable owner of ingested code",
+      "notebooklm_conflict_note": "NBSOURCE-003/030 frame nu_plugin as buffering INTO redb; PGREDB-006 records that the current nu_plugin does NOT buffer to redb and CodeDB uses redb durably today. This role defines the INTENDED buffer mechanism (STORE-001-B) and does not assert the current plugin already implements it; the durable-today CodeDB blob path is PGREDB-001 under STORE-001-C, not this transient role.",
+      "evidence": ["Blueprint §5 Three Pillars of Ingestion", "NBSOURCE-003", "NBSOURCE-030", "PGREDB-006", "PGREDB-003"]
+    },
+    {
+      "role_id": "REDB-RT-02",
+      "redb_use": "Embedding deduplication cache — BLAKE3 hash of a text block keys a stored vector so all-MiniLM-L6-v2 inference never runs twice on identical content",
+      "source_class": "STORE-001-B (dedup cache)",
+      "inventory_ref": "PGREDB-004 (embedding cache)",
+      "lifetime": "cache-lifetime (evictable); a miss is always safe",
+      "durability_class": "disposable cache — never authority",
+      "identity": "BLAKE3 hash of (content + model + model_version + inference_config); the key binds the cached vector to the exact model that produced it so a model change invalidates rather than silently reuses",
+      "sync_edge": "canonical input -> cache entry (write on miss); read-only on hit; the cached vector is committed to PostgreSQL by envctl exactly as if freshly computed",
+      "flush_ordering": "n/a — the cache is a read-through accelerator on the ingestion path (REDB-RT-01); ordering is governed by the buffer it accelerates, not by the cache",
+      "idempotency": "inherently idempotent — a hit returns the same vector for the same key; a miss recomputes deterministically; no destructive write",
+      "restartability": "safe to discard on crash; a cold cache degrades to full inference (correct, only slower); entries recompute on demand",
+      "observability": "cache hit/miss ratio, entry count, inference-avoided count",
+      "crash_recovery": "recompute from source input + model on the next miss; no recovery source required (disposable by definition)",
+      "non_competition": "the cache is derived from canonical source rows (the PostgreSQL semantic-vector class); it stores a reproducible function of already-owned data and can never be a competing authority",
+      "evidence": ["Blueprint 'Inference Deduplication Cache' (BLAKE3, cache hit/miss)", "NBSOURCE-015", "PGREDB-004"]
+    },
+    {
+      "role_id": "REDB-RT-03",
+      "redb_use": "Application-level Write-Ahead Log / outbox — during PostgreSQL latency spikes or outages redb retains outgoing PG operations until connectivity returns, keeping the edge node functional",
+      "source_class": "STORE-001-B (WAL)",
+      "inventory_ref": "PGREDB-005 (application-level WAL / outbox)",
+      "lifetime": "durable-until-flushed (bounded), then discarded after ack",
+      "durability_class": "durable-until-acked buffer — explicitly NOT PostgreSQL's WAL and NOT an authority",
+      "identity": "monotonic sequence key + per-operation idempotency key",
+      "sync_edge": "local op -> redb outbox -> replay to PostgreSQL with ack on reconnect (forward-only); retry + dedup on replay",
+      "flush_ordering": "strict FIFO by monotonic sequence — the outbox replays operations in the exact order they were enqueued so PostgreSQL sees a causally consistent stream",
+      "idempotency": "each operation carries an idempotency key; on reconnect the replay dedups against already-applied keys so a retried operation applies at most once (protocol defined here; not yet built — see open_dependencies)",
+      "restartability": "on crash, replay unacked entries from the redb file in sequence order; the idempotency key prevents double-apply for any operation that was applied but not yet acked",
+      "observability": "outbox depth, replay lag, poison-record (un-appliable operation) count, backpressure / capacity-remaining signal",
+      "crash_recovery": "redb file replay -> PostgreSQL; PostgreSQL is the destination authority; a bounded outbox with backpressure prevents unbounded growth during a long outage",
+      "non_competition": "the outbox is subordinate to PostgreSQL — it holds writes DESTINED for PG, never a competing copy of PG-owned truth; envctl is NOT the synchronizing durable writer (AUTH-CLAIM-001 refuted); PostgreSQL remains canonical",
+      "evidence": ["Blueprint 'Resilient Application-Level WAL'", "NBSOURCE-002", "PGREDB-005"]
+    },
+    {
+      "role_id": "REDB-RT-04",
+      "redb_use": "High-frequency agent scratchpad — per-agent transient thoughts, terminal traces, intermediate logs, and state flags logged without network lag",
+      "source_class": "STORE-001-B (thoughts/traces)",
+      "inventory_ref": "PGREDB-003 (agent scratchpad)",
+      "lifetime": "transient / session-scoped (ephemeral)",
+      "durability_class": "transient — no retention/promotion authority; only settled/significant states are curated forward",
+      "identity": "agent-local key (Log ID / Agent ID / timestamp); NOT a shared macro identity",
+      "sync_edge": "scratchpad -> optional curated flush of only 'significant' cognitive states -> PostgreSQL macro-state (forward-only); the raw stream is never wholesale-persisted",
+      "flush_ordering": "when curated states are flushed they use the REDB-RT-03 outbox contract (sequence-ordered); the raw scratchpad itself has no ordering obligation because it is discardable",
+      "idempotency": "curated flushes carry the outbox idempotency key; the raw scratchpad is write-mostly and needs no dedup because it is never replayed as authority",
+      "restartability": "safe to discard on crash (transient by definition); the agent recomputes working state from its context; no replay of raw traces",
+      "observability": "scratchpad write latency (blueprint's microsecond claim is UNVERIFIED — RUVPG-CLAIM-018), write rate, per-agent occupancy",
+      "crash_recovery": "none required — the scratchpad is disposable; the agent re-creates it; only already-flushed significant states persist in PostgreSQL",
+      "non_competition": "the scratchpad is local to one agent and holds no shared authority; only envctl-curated significant states reach PostgreSQL, and those are subordinate one-way flushes, so the scratchpad cannot become competing macro-state",
+      "evidence": ["Blueprint 'Local AI Scratchpad & High-Frequency Write Buffer'", "NBSOURCE-001", "NBSOURCE-002", "PGREDB-003"]
+    },
+    {
+      "role_id": "REDB-RT-05",
+      "redb_use": "High-speed geometry engine — zero-copy f32 distance math (cosine similarity) over cached vectors using SIMD; a local math accelerator, not a search index",
+      "source_class": "STORE-001-B (geometry math)",
+      "inventory_ref": "STORE-001 role_of_others (redb performs f32 distance math only as a cache)",
+      "lifetime": "compute-scoped; operates over vectors already held by REDB-RT-02 / passed in",
+      "durability_class": "compute accelerator — holds no state of record",
+      "identity": "n/a (operates on vector arrays; no persistent identity of its own)",
+      "sync_edge": "no forward edge — it is a read-side math primitive; authoritative hybrid/semantic search lives in PostgreSQL + RuVector (native extension, No-Sidecar)",
+      "flush_ordering": "n/a",
+      "idempotency": "pure function — same inputs yield same distance; no writes",
+      "restartability": "stateless; nothing to recover",
+      "observability": "distance-op throughput; SIMD utilization",
+      "crash_recovery": "none required (stateless compute)",
+      "non_competition": "redb has NO SQL, NO secondary index, and NO native vector-search logic (REDB-CLAIM-008/009/010 refuted, 013 qualified); it measures distances but cannot own semantic/knowledge-graph authority, which is PostgreSQL + RuVector's exclusively",
+      "evidence": ["Blueprint §2 'redb: The High-Speed Geometry Engine'", "NBSOURCE-001 §2 Geometry Engine", "store_relationship_decision.json semantic-class role_of_others"]
+    },
+    {
+      "role_id": "REDB-RT-06",
+      "redb_use": "Shared UI state view — LifeOS reads the same memory-mapped redb file agents write, over UDS, to render real-time swarm status without overlapping state",
+      "source_class": "STORE-001-B (transient view surface)",
+      "inventory_ref": "PGREDB-007 (shared redb state for UI)",
+      "lifetime": "as-durable-as the underlying transient state it mirrors (no independent lifetime)",
+      "durability_class": "read-only projection — must not create a second writable authority",
+      "identity": "shared file path + table identity (read handle only)",
+      "sync_edge": "agents write; LifeOS reads (multi-reader). The UI is read-only over redb; the interactive control path is UDS, never a UI write-back into agent state",
+      "flush_ordering": "n/a — the UI observes; it does not enqueue flushes",
+      "idempotency": "reads are idempotent by nature; the UI performs no writes",
+      "restartability": "the view is disposable; on restart LifeOS re-reads the current redb state; underlying agent state recovers per its own role",
+      "observability": "UI render latency, view staleness",
+      "crash_recovery": "re-read from the canonical agent/redb state; the view holds no authority to recover",
+      "non_competition": "the UI is a READER only; it must not become a dual-writer over agent state; its data class is disjoint from CodeDB blobs and from PostgreSQL macro-state",
+      "evidence": ["Blueprint 'LifeOS Unix Domain Sockets (UDS) via Yazelix'", "NBSOURCE-012", "PGREDB-007"]
+    }
+  ],
+
+  "durable_today_redb_uses_referenced_not_reclassified": [
+    {
+      "inventory_ref": "PGREDB-001",
+      "redb_use": "CodeDB source_blobs — content-addressed captured file bytes via codedb_store_redb (durable DEFAULT store today)",
+      "runtime_disposition": "OUT OF TRANSIENT SCOPE. This is a durable macro-state authority governed by STORE-001-C: it migrates to PostgreSQL per class via codedb_store_pg::PgStore under one SHA-256 identity, proven by blobstore_parity.rs, only after a green live parity run. POSTGRES-006 does NOT reclassify it to a transient buffer (doing so would erase a durable use).",
+      "why_referenced": "Clause 3 of the gate — 'neither store can silently become competing macro state' — is honored in both directions: redb is not silently promoted to durable, and this existing durable use is not silently demoted to transient."
+    },
+    {
+      "inventory_ref": "PGREDB-002",
+      "redb_use": "envctl migration_db — replayable migration/orchestration state (targets, runs, run_events, approvals, checkpoints, rollbacks) in redb",
+      "runtime_disposition": "OUT OF TRANSIENT SCOPE. Separate durable redb owner from CodeDB; if PostgreSQL becomes canonical migration-history authority, run history is promoted one-way to PG audit tables or cut over per-class, never erased by assumption.",
+      "why_referenced": "Prevents a silent reclassification of envctl's durable runtime store; its disposition is a decision, not an assumption (REDB-CLAIM-020 qualified)."
+    }
+  ],
+
+  "buffer_flush_protocol": {
+    "applies_to": ["REDB-RT-01", "REDB-RT-03", "REDB-RT-04 (curated flushes only)"],
+    "ordered": {
+      "mechanism": "every buffered/outbox entry gets a monotonic per-buffer sequence number at enqueue; envctl drains strictly in ascending sequence",
+      "guarantee": "PostgreSQL receives buffered blocks and outbox operations in causal enqueue order; parser order and operation order are preserved into the durable store"
+    },
+    "idempotent": {
+      "mechanism": "content-addressed identity (SHA-256 blob hash for ingestion; per-operation idempotency key for the outbox; BLAKE3 model-bound key for the cache) plus a commit-once destination (PostgreSQL content-addressed upsert / applied-key dedup)",
+      "guarantee": "replaying an already-applied entry is a no-op; a crash between apply-and-ack cannot create a duplicate durable row"
+    },
+    "restartable": {
+      "mechanism": "redb single-file ACID + MVCC re-open recovers the last committed buffer state; the flush worker resumes from the last acked sequence via a resume skip-set; unacked entries replay in order",
+      "guarantee": "flush is crash-safe and resumable from the exact interruption point without operator intervention"
+    },
+    "observable": {
+      "signals": ["buffer occupancy / outbox depth", "drain / replay lag", "per-entry flush receipt", "poison-record count", "cache hit/miss ratio", "backpressure / capacity-remaining", "scratchpad write latency"],
+      "guarantee": "every flush pathway exposes depth, lag, per-entry receipts, and failure (poison) counts so flush health is measurable, not inferred"
+    },
+    "grounding": "Blueprint 'envctl periodically flushes settled execution trees ... only significant cognitive states are persisted'; PGREDB-005 ('monotonic sequence key + operation idempotency key', 'replay unacked entries in order; idempotency prevents double-apply'); STORE-001 forward-only invariant."
+  },
+
+  "agentdb_cognition": {
+    "container": ".rvf (RuVector Format) — serverless single-file 'save-game cartridge' hosted on a frozen foundation model by ruvllm; 50+ agents run on one base model's footprint",
+    "authority": "non-authoritative for shared macro-state (STORE-001-D); provenance links every promoted fact back to the PostgreSQL knowledge graph",
+    "entities": [
+      {
+        "entity_id": "AGENTDB-01",
+        "name": "MicroLoRA adapters",
+        "description": "small (rank 1/2) parameter-delta adapters that hot-swap into the frozen base model in <1ms to change the agent's persona/skill set",
+        "portability": "self-contained inside the single .rvf file; hot-swappable across any ruvllm node hosting the same frozen base model; install-in-place",
+        "witness_binding": "the adapter's provenance (base model id + training/source lineage) is recorded; skills it asserts must trace to witnessed facts, not free-invented capability",
+        "recovery": "regenerable from base model + training history (STORE-001-D restore)",
+        "macro_authority": "none — an adapter changes local inference behavior only; it never writes durable shared truth"
+      },
+      {
+        "entity_id": "AGENTDB-02",
+        "name": "SONA policy matrix (learning state)",
+        "description": "Self-Optimizing Neural Architecture policy matrix / RL weights (Thompson Sampling, Q-Learning, PPO) that adjust ranking patterns and success thresholds after successes/failures",
+        "portability": "travels inside the .rvf; a copied .rvf carries the agent's learned policy intact to another edge node",
+        "witness_binding": "policy updates are driven by learning traces (AGENTDB-04) whose outcomes are witness-bound; a policy shift has a causal root in recorded experience",
+        "recovery": "regenerable by replaying learning traces from the base model + history",
+        "macro_authority": "none — the policy steers this agent's choices; it is not shared canonical state"
+      },
+      {
+        "entity_id": "AGENTDB-03",
+        "name": "FastGRNN routing graph",
+        "description": "GNN-based lightweight graph of the agent's memory that pre-filters the optimal context for the LLM before generation",
+        "portability": "part of the .rvf cognitive container; portable with the agent",
+        "witness_binding": "the routing graph's edges reference source vectors that live in / trace to the PostgreSQL knowledge graph via causal edges",
+        "recovery": "rebuildable from the agent's witnessed memory and PostgreSQL-rooted source vectors",
+        "macro_authority": "none — a pre-filter over context; holds no durable shared truth"
+      },
+      {
+        "entity_id": "AGENTDB-04",
+        "name": "Learning traces (success/failure history)",
+        "description": "recorded outcomes of agent actions/terminal commands that SONA consumes to steer away from repeated failure",
+        "portability": "stored in the .rvf; portable with the agent; the shared/significant subset may flush one-way to PostgreSQL telemetry",
+        "witness_binding": "each trace is an experienced event; when a trace informs a macro-level claim it must carry a witness chain to its source",
+        "recovery": "the raw per-agent trace is agent-local; the promoted subset recovers from PostgreSQL",
+        "macro_authority": "none for the raw trace; only curated/significant states flush forward one-way (never dual-write)"
+      },
+      {
+        "entity_id": "AGENTDB-05",
+        "name": "Witness facts (SHAKE256-bound decisions)",
+        "description": "every fact, code snippet, or decision an agent stores is bound to a SHAKE256 cryptographic audit trail linking it to the original source vector; hallucinations lacking a historical root are rejected",
+        "portability": "the witness chain travels with the fact inside the .rvf and remains verifiable anywhere because its root is a PostgreSQL source vector",
+        "witness_binding": "this IS the witness-binding mechanism — Cryptographic Witness Chains (SHAKE256) + Causal Graph Verification (GNN causal edges) make it mathematically impossible to promote a fact without a verified root",
+        "recovery": "re-verifiable against PostgreSQL source vectors; a fact whose root is gone is (correctly) rejected",
+        "macro_authority": "a witness fact may inform PostgreSQL only after passing verification; it does not itself own macro-state — PostgreSQL records the verified result"
+      },
+      {
+        "entity_id": "AGENTDB-06",
+        "name": "Agent identity and lifecycle",
+        "description": "the agent's stable identity (Agent ID + .rvf path + adapter weights) and lifecycle: spawn (swarm initialization), hot-swap onto ruvllm, checkpoint, and retire",
+        "portability": "identity is the .rvf file itself — moving the file moves the agent; a swarm of 50 unique agents = 50 portable .rvf files over one base model",
+        "witness_binding": "identity is anchored by the witness chains rooted in PostgreSQL source vectors; an agent cannot forge a lineage it did not earn",
+        "recovery": "an agent is reconstructable from base model + .rvf (adapters + SONA + traces + witness chains); lifecycle events (spawn/checkpoint/retire) are auditable",
+        "macro_authority": "none — the agent is a portable cognitive container; shared truth lives in PostgreSQL, not in the agent"
+      }
+    ],
+    "grounding": "Blueprint §2 (.rvf container), §3 (.rvf cognitive components), §6 (witness chains); NBSOURCE-007, NBSOURCE-010, NBSOURCE-013, NBSOURCE-028; Architecture Context Matrix rows 4, 13, 28; store_relationship_decision.json per-agent-cognition class."
+  },
+
+  "gate_clause_mapping": {
+    "clause_1_buffer_flush_ordered_idempotent_restartable_observable": "buffer_flush_protocol defines all four properties with concrete mechanisms (monotonic sequence ordering; content-addressed + idempotency-key dedup against a commit-once PostgreSQL destination; redb ACID re-open + resume skip-set restart; depth/lag/receipt/poison observability). Applies to REDB-RT-01 (ingestion buffer), REDB-RT-03 (WAL/outbox), and REDB-RT-04 curated flushes.",
+    "clause_2_agentdb_identities_portable_and_witness_bound": "agentdb_cognition defines all six .rvf entities as portable (self-contained single-file container, hot-swappable across ruvllm nodes, regenerable from base model + history) and witness-bound (AGENTDB-05 SHAKE256 Cryptographic Witness Chains + Causal Graph Verification rooted in PostgreSQL source vectors govern every promoted fact; identity AGENTDB-06 is anchored to that chain).",
+    "clause_3_neither_store_competing_macro_state": "every redb_runtime_role carries a non_competition field proving it holds no durable authority and flushes forward-only; the two durable-today uses (PGREDB-001/002) are referenced, not silently reclassified in either direction (durable_today_redb_uses_referenced_not_reclassified); every AgentDB entity's macro_authority is 'none' and only witnessed/curated states flow one-way to PostgreSQL; the STORE-001 single-durable-writer and forward-only invariants are inherited."
+  },
+
+  "invariants": [
+    "redb runtime roles are transient/derived: none is a second durable writer for a PostgreSQL-owned class (inherits STORE-001 invariant 0).",
+    "Flush is forward-only: redb -> envctl -> PostgreSQL; no undirected dual-write (inherits STORE-001 invariant 1).",
+    "Flush is ordered (monotonic sequence), idempotent (content/operation-key dedup against a commit-once destination), restartable (ACID re-open + resume skip-set), and observable (depth/lag/receipt/poison signals).",
+    "AgentDB (.rvf) is non-authoritative: every cognition entity has macro_authority 'none'; only witness-verified facts reach PostgreSQL.",
+    "Witness binding is mandatory for promotion: a fact/decision reaches macro-state only with a SHAKE256 chain + causal edge rooted in a PostgreSQL source vector (unrooted claims are rejected).",
+    "No silent reclassification: PGREDB-001/002 durable-today uses migrate only via STORE-001-C verified cutover, never by assumption; redb transient roles are never silently promoted to durable."
+  ],
+
+  "unblocks": ["POSTGRES-007", "FOUNDATION-001", "LIFEOS-002"],
+  "depends_on": ["STORE-001", "POSTGRES-001", "POSTGRES-005"],
+  "open_dependencies": [
+    "The ordered/idempotent redb->PostgreSQL outage (outbox) protocol is DEFINED here but NOT yet implemented; capacity/backpressure/poison handling need a live build+test before REDB-RT-03 is product-proven (PGREDB-005).",
+    "The microsecond scratchpad write-latency claim (REDB-RT-04 observability) is UNVERIFIED (RUVPG-CLAIM-018) and must be measured against a real redb, not assumed.",
+    "The NotebookLM 'nu_plugin buffers into redb' framing (REDB-RT-01) contradicts current code where the plugin does not buffer to redb (PGREDB-006); the intended buffer is a build target, not a claim of current behavior.",
+    "Live blobstore_parity.rs green run against a disposable PostgreSQL is the cutover proof for PGREDB-001 (governed by STORE-001-C, not by this plan)."
+  ]
+}

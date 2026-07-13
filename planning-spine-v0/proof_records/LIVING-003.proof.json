@@ -1,0 +1,150 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LIVING-003",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Acceptance proves bounded autonomy, explicit authority, capability gain, failure learning, reversible promotion, auditability, human stop, and recovery while preserving the North Star.",
+  "gate_result": {
+    "task_family": "generated/task_families/LIVING-003.json",
+    "entity_universe": {
+      "operation_capabilities": ["OP-1 recommend", "OP-2 plan", "OP-3 simulate", "OP-4 execute-within-authority", "OP-5 learn", "OP-6 improve-continuously"],
+      "acceptance_dimensions": ["DIM-1 bounded autonomy", "DIM-2 explicit authority", "DIM-3 capability gain", "DIM-4 failure learning", "DIM-5 reversible promotion", "DIM-6 auditability", "DIM-7 human stop", "DIM-8 recovery", "DIM-9 North Star preservation"],
+      "forbidden_expansions": ["FBD-1 self-authorized expansion", "FBD-2 hidden mutation", "FBD-3 capability loss"],
+      "total_work_items": 9,
+      "every_acceptance_dimension_assigned_exactly_once": true,
+      "every_operation_capability_bounded": true,
+      "every_forbidden_expansion_blocked": true
+    },
+    "clause_bounded_autonomy": {
+      "satisfied": true,
+      "work_item": "LIVING-003-A",
+      "owner": "Governance Board / Runtime Kernel",
+      "mechanism": "Runtime rule pipeline (identity -> policy -> memory -> simulation -> execution -> proof -> rollback); one bounded execution_packets/<TASK_ID>.json per action (§18 three-surface rule); typed cell (doc/sim/dev/proof/policy/release) with network denied by default, read-only FS except writable_paths, no mutation without snapshot.",
+      "evidence": "Scope is supplied by the authority graph + packet, never minted by the agent; proof cites the packet id and cell type.",
+      "blocks": "FBD-1 self-authorized expansion",
+      "tiered_relationship": "PostgreSQL owns the scoping authority macro-state; redb is a transient in-cell scratchpad, never a scope authority; AgentDB non-authoritative for shared scope."
+    },
+    "clause_explicit_authority": {
+      "satisfied": true,
+      "work_item": "LIVING-003-B",
+      "owner": "Governance Board / NOA(CECCA); David final human authority",
+      "mechanism": "Authority graph David -> Constitution -> Board -> NOA/CECCA -> Executives -> Departments -> Workers -> Tools; delegates_to/escalates_to/verifies/constrains edges per object; CEO agent may propose/delegate but NOT execute raw shell (Constitution §6); §11 automatic Needs-Human-Approval for spend/legal/external/production-mutation/account-creation/credential-handling/trading/physical-home-automation/irreversible.",
+      "evidence": "Authority-graph edges resolve; §11 gate classification present; no raw-shell path for the CEO agent.",
+      "blocks": "FBD-1 self-authorized expansion",
+      "tiered_relationship": "PostgreSQL owns durable authority/permission/provenance rows; raw secrets stay in the keyring (STORE-001), never redb or PostgreSQL raw."
+    },
+    "clause_capability_gain": {
+      "satisfied": true,
+      "work_item": "LIVING-003-C",
+      "owner": "QA Agent / LifeOS Memory Agent",
+      "mechanism": "Doctrine law 3 (every completed or failed action improves future execution); each action emits a proof record (success) or Failure Capsule (failure); no capability leaves redb-durable except via the STORE-001 verified BlobStore SHA-256 parity cutover under one preserved identity; upgrades-not-downgrades enforced by the migration mechanism, not by freezing redb.",
+      "evidence": "STORE-001 invariant 'provenance / SHA-256 identity preserved'; adopted_capabilities.source.csv maps each capability exactly once, no second-implementation row (ADOPT-001).",
+      "blocks": "FBD-3 capability loss",
+      "tiered_relationship": "PostgreSQL canonical durable owner preserves migrated capability under one SHA-256 identity; AgentDB SONA turns failures into improved policy; redb transient loss is capability-neutral."
+    },
+    "clause_failure_learning": {
+      "satisfied": true,
+      "work_item": "LIVING-003-D",
+      "owner": "LifeOS Memory Agent / Governance Board",
+      "mechanism": "Failure-learning chain Raw Event -> Failure Capsule -> Causal Map -> Scoped Lesson -> Guardrail -> Instinct (Master Plan §1.5); LIVING-002 gate (source evidence, causal scope, simulation, regression tests, human authority where required, reversible promotion, monitoring, automatic rollback on failed proof); every lesson bound to a SHAKE256 witness chain rooted in a verified PostgreSQL source vector; Causal Graph Verification (GNN) rejects rootless claims; SONA adjusts only from observed successes/failures.",
+      "evidence": "Witness-chain root exists; causal edge present; ATAS failure nodes grounded in observed past failure rates; a failed world is learned-from but never promoted.",
+      "blocks": "FBD-2 hidden mutation and FBD-1 self-authorized expansion",
+      "tiered_relationship": "AgentDB owns the per-agent lesson (non-authoritative); PostgreSQL owns the witnessed root and any promoted guardrail; redb buffers transient failure traces only."
+    },
+    "clause_reversible_promotion": {
+      "satisfied": true,
+      "work_item": "LIVING-003-E",
+      "owner": "Governance Board / Release authority (release-cell)",
+      "mechanism": "Cell ladder simulation -> dev-cell -> proof-cell -> release-cell; COW branching; merge to PostgreSQL trunk ONLY after the explicit gate stack (MinCut not-severed, Causal Graph Verification, SHAKE256 witness chain, ATAS/ESN stability, RuvLTRA escalation, LifeOS human-in-the-loop); no production mutation without snapshot (Constitution §6); failed branch deterministically rolled back and discarded; baseline restorable by PostgreSQL PITR + COW rollback.",
+      "evidence": "Promotion ladder + gate stack recorded; snapshot precedes mutation; rollback path present; no autonomous promotion.",
+      "blocks": "FBD-3 capability loss and FBD-2 hidden mutation",
+      "tiered_relationship": "PostgreSQL COW trunk is the promotion target and baseline authority; redb subordinate forward-only WAL, never a second baseline; redb-durable -> PostgreSQL reclassification gated by STORE-001 verified SHA-256 cutover."
+    },
+    "clause_auditability": {
+      "satisfied": true,
+      "work_item": "LIVING-003-F",
+      "owner": "Governance Board / QA Agent (proof-ledger authority)",
+      "mechanism": "Doctrine law 1 (no invisible mutation) + law 4 (proof is completion) + Constitution §6 (no hidden mutation, no completion without proof); every action writes proof_records/<TASK_ID>.proof.json appended to proof_ledger.jsonl (§18 loop); three-surface rule (CSV human / JSON packet agent / proof JSON reality); every durable edit bound to a SHAKE256 witness chain and passing Causal Graph Verification.",
+      "evidence": "Append-only proof ledger; witness-chain coverage for durable edits; three-surface separation intact; no paper execution.",
+      "blocks": "FBD-2 hidden mutation",
+      "tiered_relationship": "PostgreSQL is the canonical PITR-recoverable audit substrate (witness roots, causal edges, provenance); redb -> envctl -> PostgreSQL sync is forward-only and auditable at flush, no undirected dual-write."
+    },
+    "clause_human_stop": {
+      "satisfied": true,
+      "work_item": "LIVING-003-G",
+      "owner": "David (final human authority) / Board (ccboard veto) / Runtime Kernel (RuVector MinCut)",
+      "mechanism": "Constitution §6 (David final authority; CEO may not execute raw shell) + §11 automatic Needs-Human-Approval (fail-closed when approval absent); Board/ccboard veto surface can refuse/halt before promotion; RuVector MinCut deterministically severs a drifting agent in subpolynomial O(n^{o(1)}) time without restarting the swarm.",
+      "evidence": "§11 stop points enumerated per action class; veto surface present; MinCut isolation path defined; approval fails closed.",
+      "blocks": "FBD-1 self-authorized expansion and FBD-2 hidden mutation",
+      "tiered_relationship": "PostgreSQL holds the durable approval/veto decision state and the dependency graph MinCut monitors; redb/AgentDB cannot override a recorded human stop."
+    },
+    "clause_recovery": {
+      "satisfied": true,
+      "work_item": "LIVING-003-H",
+      "owner": "Runtime Kernel / LifeOS Data Agent",
+      "mechanism": "Reversibility (doctrine law 2) + no production mutation without snapshot (Constitution §6) + STORE-001 recovery sources: PostgreSQL PITR for durable+semantic macro-state (with reproducible re-embedding), deterministic COW rollback of un-merged branches, redb subordinate application-level WAL forward-replay-with-ack on reconnect, deterministic re-projection of derived musl source trees, AgentDB .rvf regeneration from base model + witnessed history, keyring for secrets.",
+      "evidence": "Each STORE-001 state class has a named recovery source; every task carries a rollback_plan; redb never becomes a durable authority.",
+      "blocks": "FBD-3 capability loss",
+      "tiered_relationship": "Mirrors the STORE-001 recovery_source column exactly across PostgreSQL / redb / AgentDB / derived projections / keyring."
+    },
+    "clause_preserving_the_north_star": {
+      "satisfied": true,
+      "work_item": "LIVING-003-I",
+      "owner": "Governance Board (North Star custodian) / NOA(CECCA)",
+      "mechanism": "Binds Master Plan §1 North Star verbatim ('LifeOS is the ... operating environment. It is not the CEO. ... environment, runtime spine, memory substrate, policy layer, and execution surface'; anchor the North Star, think small, act small) and 00_NORTH_STAR.md v0 (hard execution boundaries over soft autonomy; constraint propagation over improvisation; proof before completion; recommendation from verified state; refusal to become a broad agent platform / simulation playground / full-autonomy stack); acceptance fails CLOSED (RELEASE-001 doctrine) unless every DIM-1..DIM-8 holds and the sum equals the North Star.",
+      "evidence": "Canonical path intent -> authority graph -> task graph -> DevWorld simulation -> hermetic cell -> proof ledger -> next-action recommendation preserved end to end; v0 refusal list honored; acceptance fail-closed.",
+      "blocks": "FBD-1, FBD-2, and FBD-3 in aggregate",
+      "tiered_relationship": "Preserves the STORE-001 authority model as the substrate (PostgreSQL canonical, redb transient, AgentDB non-authoritative, verified cutover only)."
+    },
+    "operation_capability_coverage": {
+      "OP-1_recommend": ["LIVING-003-A", "LIVING-003-B", "LIVING-003-F", "LIVING-003-I"],
+      "OP-2_plan": ["LIVING-003-A", "LIVING-003-F", "LIVING-003-I"],
+      "OP-3_simulate": ["LIVING-003-A", "LIVING-003-D", "LIVING-003-E", "LIVING-003-F"],
+      "OP-4_execute_within_authority": ["LIVING-003-A", "LIVING-003-B", "LIVING-003-E", "LIVING-003-G", "LIVING-003-H"],
+      "OP-5_learn": ["LIVING-003-C", "LIVING-003-D", "LIVING-003-F", "LIVING-003-H"],
+      "OP-6_improve_continuously": ["LIVING-003-C", "LIVING-003-D", "LIVING-003-E", "LIVING-003-G", "LIVING-003-I"]
+    },
+    "forbidden_expansion_coverage": {
+      "FBD-1_self_authorized_expansion": ["LIVING-003-A", "LIVING-003-B", "LIVING-003-D", "LIVING-003-G", "LIVING-003-I"],
+      "FBD-2_hidden_mutation": ["LIVING-003-D", "LIVING-003-E", "LIVING-003-F", "LIVING-003-G", "LIVING-003-I"],
+      "FBD-3_capability_loss": ["LIVING-003-C", "LIVING-003-E", "LIVING-003-H", "LIVING-003-I"]
+    },
+    "inputs_consumed": {
+      "LIVING-001": "cadence/observation audits feed DIM-3 + DIM-6",
+      "LIVING-002": "failure-learning + proven-world promotion feed DIM-4 + DIM-5",
+      "RELEASE-001": "North Star acceptance + fail-closed doctrine feed DIM-9",
+      "runtime_rule": "Master Plan §1 (no unlimited authority) feeds DIM-1 + DIM-2"
+    },
+    "store_001_alignment": {
+      "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+      "invariants_honored": ["single durable writer = PostgreSQL", "forward-only redb -> envctl -> PostgreSQL", "verified cutover only (blobstore_parity.rs SHA-256)", "no sidecar (RuVector native extension)", "provenance / SHA-256 identity preserved"]
+    },
+    "blocked_paths_respected": {
+      "autonomous_production_mutation": "none — acceptance definition only",
+      "irreversible_action": "none — every dimension is reversible/recoverable by construction",
+      "authority_change": "none — the authority graph is referenced, not modified",
+      "release": "none performed",
+      "secret_access": "none — secrets referenced by class only, never read/written",
+      "autonomous_operation_enabled": false
+    },
+    "simulation_only_proof_cell": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "LIVING-003 defines the upgrade-only autonomous-operation acceptance family, decomposing the eight gate acceptance dimensions plus North Star preservation into nine work items (LIVING-003-A..I) and assigning each exactly once an owner, proof mechanism, observed-evidence source, and tiered-architecture relationship under the settled STORE-001 model. It first enumerates the real X set the gate governs: the six autonomous operation capabilities (recommend, plan, simulate, execute-within-authority, learn, improve-continuously) and the three forbidden expansions (self-authorized expansion, hidden mutation, capability loss). Bounded autonomy (A) binds the Master Plan §1 runtime rule so every action passes the identity->policy->memory->simulation->execution->proof->rollback pipeline inside one bounded packet and a network-denied typed cell, with scope minted by the authority graph, not the agent. Explicit authority (B) binds the authority graph David->Constitution->Board->NOA/CECCA->Executives->Departments->Workers->Tools, keeps the CEO agent from executing raw shell, and forces §11 Needs-Human-Approval for spend/legal/external/production/irreversible actions. Capability gain (C) binds doctrine law 3 and the STORE-001 verified BlobStore SHA-256 cutover so every completed or failed action improves future execution and no capability is silently lost. Failure learning (D) binds the Raw Event->Failure Capsule->Causal Map->Scoped Lesson->Guardrail->Instinct chain and LIVING-002, keeping every lesson proof-derived via SHAKE256 witness chains rooted in verified PostgreSQL vectors and Causal Graph Verification. Reversible promotion (E) binds the simulation->dev-cell->proof-cell->release-cell ladder and gated COW merge so nothing reaches the PostgreSQL trunk without the full gate stack and every promotion is reversible by PITR + COW rollback. Auditability (F) binds Integrity, no-paper-execution, the append-only proof ledger, the three-surface rule, and witness chains so nothing mutates invisibly. Human stop (G) binds Constitution §6 (David final authority; no raw shell for the CEO), §11 fail-closed approval, the Board/ccboard veto, and RuVector MinCut subpolynomial isolation. Recovery (H) mirrors the STORE-001 recovery_source column exactly (PostgreSQL PITR, COW rollback, redb forward-only WAL replay, re-projection, .rvf regeneration, keyring). North Star preservation (I) binds both North Star statements and the RELEASE-001 fail-closed doctrine, keeping the canonical intent->authority->task->simulation->cell->proof->recommendation path and refusing drift into a broad-autonomy platform. Every acceptance dimension is assigned exactly once, every operation capability is bounded, and every forbidden expansion is blocked; each assignment traces to the Master Plan, the North Star doc, the Architecture Blueprint, the Context Matrix, or STORE-001. This is acceptance definition only in the proof-cell — no autonomous operation is enabled and no product execution, authority change, release, secret access, or baseline mutation was performed.",
+  "artifact_paths": [
+    "generated/task_families/LIVING-003.json",
+    "proof_records/LIVING-003.proof.json"
+  ],
+  "provenance_derived_from": [
+    "1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md (§1 runtime rule, 6-law doctrine, Constitution §6, authority graph; §1.5 failure-learning chain + simulation doctrine; §2 cell types + §11 gates + §18 loop)",
+    "00_NORTH_STAR.md (v0 mission + refusals + canonical path)",
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/task_families/INTEL-003.json",
+    "generated/task_families/COMPANY-001.json"
+  ],
+  "rollback_plan": "Restore the archived living-system acceptance plan; no autonomous operation is enabled and no config, secret, model, authority, or baseline is changed.",
+  "product_execution_performed": false
+}

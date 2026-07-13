@@ -7,9 +7,10 @@ import argparse
 import json
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now
 
 
 PACKET_SCHEMA_VERSION = "lifeos-planning-spine.execution-packet.v0"
@@ -35,10 +36,6 @@ class ValidationIssue:
 
     def to_json(self) -> dict[str, str]:
         return {"field": self.field, "message": self.message}
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def load_packet(path: Path) -> tuple[dict[str, Any] | None, list[ValidationIssue]]:

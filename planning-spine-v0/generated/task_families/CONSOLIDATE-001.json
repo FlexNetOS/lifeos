@@ -1,0 +1,147 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "CONSOLIDATE-001",
+  "title": "LifeOS target bounded-context architecture defined",
+  "status": "defined",
+  "owner": "LifeOS Consolidation Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the single-application Rust bounded contexts, their stable published contracts, canonical data ownership, policy/anti-corruption seams, and the capability destination that receives every preserved peer capability \u2014 each mapped to exactly one context and contract, with an acyclic context map, single-owner ledger, and explicit migration order.",
+  "work_items": [
+    {
+      "id": "CONSOLIDATE-001-BC-PERSIST",
+      "surface": "Canonical Persistence & Semantic Knowledge Graph [Global Database (PostgreSQL + RuVector, No-Sidecar)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {CanonicalStore, HybridSearch, KnowledgeGraph}; owns STORE-001 durable relational macro-state (identities, histories, permissions, provenance, module_path, code AST/rows, causal edges); semantic / vector / knowledge-graph state (embeddings, hybrid search indexes, GNN causal edges). Receives peer capabilities: meta-ruvector. Depends on: none (root)."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-INGEST",
+      "surface": "Code Ingestion & High-Frequency Buffer [Ingestion & Buffering (Nushell parser -> redb buffer; nu_plugin CodeDB)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {IngestPipeline, BlobStore, ScratchpadBuffer}; owns STORE-001 transient high-frequency state (agent thoughts, terminal traces, intermediate logs, BLAKE3 dedup hashes, application-level WAL) [redb canonical]. Receives peer capabilities: nu_plugin. Depends on: none (root)."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-BRIDGE",
+      "surface": "Forward-Only Bridge, Migration & Materialization [The Bridge (envctl): redb -> embed -> PostgreSQL; PostgreSQL -> filesystem projection]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {ForwardBridge, Projection, MigrationEngine}; owns STORE-001 derived projections (materialized source directories for musl compilation, exported release trees). Receives peer capabilities: envctl. Depends on: BC-INGEST, BC-PERSIST, BC-SECRET."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-COGNITION",
+      "surface": "Edge Agent Runtime & Cognition [Edge Inference (ruvllm console + AgentDB .rvf cartridge)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {AgentRuntime, CognitiveContainer}; owns STORE-001 per-agent cognition (MicroLoRA adapters, SONA policy matrices, RL weights) [AgentDB .rvf]. Receives peer capabilities: harness-agent-rs, hermes-agent, harness_hub. Depends on: BC-PERSIST, BC-COMPUTE."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-ORCHESTRATION",
+      "surface": "Swarm Orchestration, Routing & Temporal Prediction [Swarm Orchestration & Prediction (Ruflo meta-harness, RuvLTRA, ATAS/ESN)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {SwarmRouter, TemporalForecast, TaskRunner}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: flexnetos_runner, ruflo, teri. Depends on: BC-COGNITION, BC-PERSIST, BC-COMPUTE, BC-INTEGRITY."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-INTEGRITY",
+      "surface": "Swarm Defense, Policy & Merge Seams [Defense & Verification (MinCut, COW branching, Cryptographic Witness Chains)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {PolicyGuard, SwarmImmuneSystem, WitnessChain, MergeGate}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: rusty-idd, agent. Depends on: BC-PERSIST."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-GOVERNANCE",
+      "surface": "Governance, Task & Prompt Substrate [Control-plane task substrate (beads / handoff / prompt registry)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {TaskSubstrate, HandoffSeam, PromptRegistry}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: handoff, beads_rust, prompt_hub. Depends on: BC-PERSIST, BC-SECRET."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-EVIDENCE",
+      "surface": "Source Evidence Ingestion [Source-of-truth evidence pipeline (NotebookLM extraction)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {SourceEvidencePipeline}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: notebooklm-py. Depends on: none (root)."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-CONTROL-PLANE",
+      "surface": "Meta Multi-Repo Control Plane [gitkb/meta orchestrator (workspace isolation, meta exec, plugin protocol)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {MetaOrchestrator, PluginProtocol, LoopEngine}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: loop_lib, meta_plugin_protocol, grit, icm, meta-plugins. Depends on: BC-FOUNDATION."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-FOUNDATION",
+      "surface": "Toolchain, Build & Portable Release [Build Environment (Yazelix/Zellij/Nushell + Nix musl static)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {ToolchainEnv, PortableBuild, BuildCoordinator}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: yazelix, weave, yazelix-helix, yazelix-terminal-support, yazelix-yazi-assets. Depends on: BC-BRIDGE."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-COMPUTE",
+      "surface": "Hardware & GPU Compute Substrate [Edge inference hardware substrate (GPU / RTX 5090 fleet)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {GpuComputeSeam, HardwareInventory}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: cuda-oxide, meta-hardware. Depends on: none (root)."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-HOME-NETWORK",
+      "surface": "Home & Network Domain [LifeOS home workspace domain]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {NetworkControl}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: network-control. Depends on: BC-PERSIST."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-DEVEX",
+      "surface": "Developer Experience & Read Tooling [Developer tooling / read surfaces]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {ReadOnlyViewer, TokenProxy}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: beads_viewer, ccboard, rtk-tokenkill. Depends on: BC-GOVERNANCE."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-SECRET",
+      "surface": "Secret & Provenance Authority [External secret authority (OS keyring + secretd + vault)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {SecretAuthority}; owns STORE-001 external-secret / provenance authority (API keys, attestation bundles, source pins). Receives peer capabilities: vault_hub. Depends on: none (root)."
+    },
+    {
+      "id": "CONSOLIDATE-001-BC-UI-PRESENTATION",
+      "surface": "LifeOS Presentation & UDS Shell (consolidation host) [LifeOS UI / Unix Domain Sockets (the Vue3+Tauri host receiving all peers)]",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Publish contracts {PresentationShell, UDSClient}; owns no durable macro-state (references BC-PERSIST). Receives peer capabilities: (host sink \u2014 receives via UDS/IPC). Depends on: BC-INGEST, BC-PERSIST, BC-ORCHESTRATION, BC-GOVERNANCE, BC-COGNITION."
+    },
+    {
+      "id": "CONSOLIDATE-001-CONTEXT-MAP",
+      "surface": "Context map (dependency edges + acyclicity)",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Edges are customer->supplier (depends-on-contract-of). Kahn topological sort emits all 15 contexts => ACYCLIC (no dependency cycles). Suppliers-first order recorded in capability_merge_matrix.json context_map.topological_order_suppliers_first."
+    },
+    {
+      "id": "CONSOLIDATE-001-SINGLE-OWNER",
+      "surface": "Single-owner ledger (no duplicate owners)",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "Each STORE-001 durable state class has exactly one owning context: relational+semantic->BC-PERSIST, transient->BC-INGEST, per-agent cognition->BC-COGNITION, derived projections->BC-BRIDGE, external secret->BC-SECRET. Single-durable-writer invariant preserved; no class has two owners."
+    },
+    {
+      "id": "CONSOLIDATE-001-ACL-SEAMS",
+      "surface": "Anti-corruption / policy seams",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "12 anti-corruption seams (ACL-01..ACL-12) enumerated for every foreign model/runtime: redb-transitional-blobstore, RuVector-native, node (ruflo/hermes), Claude-Code guard (policy seam), CUDA FFI, MPL Helix, external secrets, subordinate libSQL, meta plugin protocol, beads store, Python notebooklm. Each names owning context + wrap mechanism + grounded source."
+    },
+    {
+      "id": "CONSOLIDATE-001-MIGRATION-ORDER",
+      "surface": "Migration order (merge waves)",
+      "owner": "LifeOS Consolidation Agent",
+      "decision": "6 waves: wave-0 data spine (PERSIST/INGEST/BRIDGE/SECRET) under STORE-001 verified-cutover; wave-1 compute+cognition; wave-2 integrity/orchestration/governance; wave-3 foundation/control/evidence; wave-4 presentation/devex/home; wave-5 worktree reconciliation per PRESERVE-003. Order respects the acyclic topological order (suppliers before consumers)."
+    }
+  ],
+  "execution_order": [
+    "CONSOLIDATE-001-BC-PERSIST",
+    "CONSOLIDATE-001-BC-INGEST",
+    "CONSOLIDATE-001-BC-BRIDGE",
+    "CONSOLIDATE-001-BC-COGNITION",
+    "CONSOLIDATE-001-BC-ORCHESTRATION",
+    "CONSOLIDATE-001-BC-INTEGRITY",
+    "CONSOLIDATE-001-BC-GOVERNANCE",
+    "CONSOLIDATE-001-BC-EVIDENCE",
+    "CONSOLIDATE-001-BC-CONTROL-PLANE",
+    "CONSOLIDATE-001-BC-FOUNDATION",
+    "CONSOLIDATE-001-BC-COMPUTE",
+    "CONSOLIDATE-001-BC-HOME-NETWORK",
+    "CONSOLIDATE-001-BC-DEVEX",
+    "CONSOLIDATE-001-BC-SECRET",
+    "CONSOLIDATE-001-BC-UI-PRESENTATION",
+    "CONSOLIDATE-001-CONTEXT-MAP",
+    "CONSOLIDATE-001-SINGLE-OWNER",
+    "CONSOLIDATE-001-ACL-SEAMS",
+    "CONSOLIDATE-001-MIGRATION-ORDER"
+  ],
+  "completion_gate": "Every preserved capability (32 independent + 1 host + 9 worktree reconciliations = 42 peers) maps to exactly one bounded context and contract in capability_merge_matrix.json; the 15-context map is acyclic; the single-owner ledger shows no duplicate owner; 12 anti-corruption seams and a 6-wave migration order are explicit; proof at proof_records/CONSOLIDATE-001.proof.json."
+}

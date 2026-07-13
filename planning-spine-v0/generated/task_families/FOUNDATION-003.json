@@ -1,0 +1,172 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "FOUNDATION-003",
+  "title": "Foundation runtime reproducibility and shadow retirement plan defined",
+  "status": "defined",
+  "owner": "Runtime Kernel / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the source-to-package-to-profile-to-generated-runtime proof tasks and the archive-first retirement of every active shadow owner so that the Yazelix plus Nix foundation package (FOUNDATION-001) is the sole runtime the LifeOS product resolves, generated runtime state is deterministically reproducible, every runtime consumer is migrated onto the intended profile, and no capability is lost. This family only decomposes and gates the proof work; it performs no profile upgrade, launcher mutation, generated-runtime edit, or shadow deletion (blocked_paths honored), consistent with the archive-first, read-only ownership policy proven in RECOVERY-004 and PRESERVE-001.",
+  "inputs": [
+    "FOUNDATION-001 (single Yazelix plus Nix foundation package plan)",
+    "FOUNDATION-002 (Rust-native application and governed Lua build plan)",
+    "runtime consumer inventory (PRESERVE-001-D active consumers)",
+    "Yazelix ownership contract (FOUNDATION_META_PORTABILITY_MODEL.md; state/nix_surface_report.json nix_profile_active)"
+  ],
+  "intended_profile_package": {
+    "name": "Yazelix plus Nix foundation profile",
+    "aliases": ["lifeos-foundation-yzx", "yazelix_flexnetos_foundation"],
+    "source_owner": "FlexNetOS/yazelix (originalUrl path:/home/flexnetos/FlexNetOS/src/yazelix)",
+    "defining_task": "FOUNDATION-001",
+    "observed_generations": [
+      "/nix/store/q6k6lpircs2a66mxxhdzq9bkywj7wpvm-yazelix-flexnetos-foundation (2026-07-03 nix profile active)",
+      "/nix/store/66llanvj1g9qbcvbj8c674jc595ri2rr-lifeos-foundation-yzx (2026-07-12 git-kb frontdoor toolbin)"
+    ],
+    "evidence": "state/nix_surface_report.json runtime_frontdoor_update.nix_profile_active; 1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md GitKB navigation contract"
+  },
+  "runtime_frontdoor_map": [
+    {
+      "frontdoor": "codex",
+      "intended_resolution": "/home/flexnetos/.local/bin/codex -> ~/.nix-profile/bin/codex -> /nix/store/gh9ccwvjxnv0lhi8h6xc1ganabadrpqi-codex-cli-0.143.0-alpha.35/bin/codex",
+      "provided_by": "Yazelix plus Nix foundation profile (nix-profile generation)",
+      "active_shadow": "/nix/store/iv68194hlnmc7msgpksss6nag4c56gya-yazelix-flexnetos-foundation/toolbin/codex (codex-cli 0.143.0-alpha.34) currently wins on interactive-shell PATH",
+      "retirement_item": "FOUNDATION-003-D",
+      "evidence": "state/nix_surface_report.json runtime_frontdoor_update.ambient_codex/clean_frontdoor_codex"
+    },
+    {
+      "frontdoor": "git-kb",
+      "intended_resolution": "/nix/store/66llanvj1g9qbcvbj8c674jc595ri2rr-lifeos-foundation-yzx/toolbin/git-kb -> /nix/store/g7lf0fnjxm22ijnvwcx38c7drkql4wnn-git-kb-0.2.12/bin/git-kb",
+      "provided_by": "Yazelix plus Nix foundation profile (profile_owner lifeos-foundation-yzx)",
+      "active_shadow": "none observed; frontdoor already resolves to the intended profile",
+      "retirement_item": null,
+      "evidence": "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md GitKB navigation and index contract"
+    },
+    {
+      "frontdoor": "yzx (Yazelix v17.9), envctl 0.1.0, meta 0.2.22 (+ meta-git/meta-mcp/meta-project/meta-release/meta-rust), bun 1.3.14 (+ bunx), nu 0.112.2, git 2.54.0, python3 3.14.4",
+      "intended_resolution": "resolved from the Yazelix plus Nix foundation profile and the canonical envctl-root frontdoor $META_ROOT/usr/bin (/home/flexnetos/meta/usr/bin)",
+      "provided_by": "Yazelix plus Nix foundation profile + envctl Phase-4 install (install.rs frontdoor wrappers under $META_ROOT/usr/bin)",
+      "active_shadow": "legacy workspace overlay /home/flexnetos/FlexNetOS/usr/bin (13 entries) competes for these names",
+      "retirement_item": "FOUNDATION-003-E",
+      "evidence": "state/nix_surface_report.json runtime_frontdoor_update.tool_versions; state/usr_surface_report.json workspace_usr_overlay; FOUNDATION_META_PORTABILITY_MODEL.md §8.2"
+    },
+    {
+      "frontdoor": "node, cargo, rustc, yazelix command name, usr nu, usr xclip, usr wl-copy",
+      "intended_resolution": "must be provided by the Yazelix plus Nix foundation profile (currently absent from ambient PATH and /usr/bin)",
+      "provided_by": "Yazelix plus Nix foundation profile (FOUNDATION-001 sole-provider mandate)",
+      "active_shadow": "none (gap: not yet provided by any frontdoor) -> proof task FOUNDATION-003-B must make them resolve to the intended profile",
+      "retirement_item": null,
+      "evidence": "state/nix_surface_report.json missing_ambient_or_usr_tools; state/usr_surface_report.json usr_surface_update.missing"
+    }
+  ],
+  "reproducibility_proof_chain": {
+    "chain": "source -> package -> profile -> generated-runtime",
+    "source": "Pinned Yazelix source (path:/home/flexnetos/FlexNetOS/src/yazelix) + each peer's own rust-toolchain.toml pin + per-crate Cargo.lock + recorded rustc/cargo/target-triple/lockfile-hash provenance ledger (manifests/provenance.json).",
+    "package": "Deterministic Nix build of the foundation package yielding a content-addressed /nix/store/...-lifeos-foundation-yzx path; a pinned root flake.nix + flake.lock is REQUIRED because state/nix_surface_report.json records root_flake flake.nix=missing, flake.lock=missing (reproducibility gap FOUNDATION-003-A must close).",
+    "profile": "A nix-profile generation that pins the package store path; frontdoors (~/.local/bin, ~/.nix-profile/bin, toolbin, $META_ROOT/usr/bin) all resolve to that one generation.",
+    "generated_runtime": "The materialized runtime = envctl projection (PostgreSQL rows -> filesystem via module_path metadata, forward-only, read-only from PostgreSQL) plus the Nix static musl build (x86_64-unknown-linux-musl) producing the portable install-in-place prefix. Reproducible means: identical pinned source + pins -> identical store hash -> identical frontdoor resolution -> byte-identical re-projection.",
+    "verification": "bun scripts/verify-planning-spine.mjs (result pass, observed 2026-07-13T03:52:13Z, state/verification_runtime_report.json) + deterministic-rebuild digest equality + nix-profile-generation pin check + git-kb doctor.",
+    "store_001_class": "derived projections (materialized source directories for musl compilation, exported release trees) -> canonical_owner PostgreSQL, projection is read-only and regenerated deterministically from module_path; the runtime/profile layer is derived/build, never a durable authority."
+  },
+  "work_items": [
+    {
+      "id": "FOUNDATION-003-A",
+      "surface": "source -> package proof (reproducibility, gate clause 2)",
+      "owner": "Runtime Kernel / Yazelix source owner (FOUNDATION-001)",
+      "decision": "Pin the foundation package from source: add and lock a root flake.nix + flake.lock (currently missing per state/nix_surface_report.json.root_flake) plus each peer's rust-toolchain.toml and Cargo.lock, and record rustc/cargo/target-triple/lockfile-hash/binary-checksums into manifests/provenance.json. Proof = a second Nix build from the same pins yields the same content-addressed /nix/store/...-lifeos-foundation-yzx hash. No profile upgrade is performed; this task only defines the pinned-input proof gate."
+    },
+    {
+      "id": "FOUNDATION-003-B",
+      "surface": "package -> profile frontdoor proof (gate clause 1)",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Prove every enumerated runtime frontdoor (codex, git-kb, yzx, envctl, meta + meta-*, bun/bunx, nu, git, python3, and the currently-missing node/cargo/rustc/yazelix/usr nu/usr xclip/usr wl-copy) resolves under a clean env (env -i with workspace usr/bin + ~/.local/bin + ~/.nix-profile/bin) to the intended Yazelix plus Nix foundation profile generation and NOT to any ambient shadow. Concrete acceptance: codex resolves to codex-cli-0.143.0-alpha.35 (not the toolbin alpha.34), git-kb to git-kb-0.2.12 via the lifeos-foundation-yzx toolbin, and the seven missing tools become profile-provided. Read-only resolution capture only; no launcher mutation."
+    },
+    {
+      "id": "FOUNDATION-003-C",
+      "surface": "profile -> generated-runtime reproducibility proof (gate clause 2)",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Prove the generated runtime is reproducible: envctl projection (PostgreSQL -> filesystem via module_path) plus the Nix static musl build (x86_64-unknown-linux-musl) rebuild byte-identically from the pinned generation, verified by digest equality, a pinned nix-profile generation, and the passing planning-spine verifier receipt (bun scripts/verify-planning-spine.mjs, pass, state/verification_runtime_report.json). STORE-001: the projection is the derived-projections class (PostgreSQL canonical, projection read-only) so reproducibility never reclassifies any store. No generated-runtime edit is performed."
+    },
+    {
+      "id": "FOUNDATION-003-D",
+      "surface": "shadow: ambient toolbin codex alpha.34 (archive-first, gate clause 4)",
+      "owner": "Runtime Kernel / QA Agent (archive lane, read-only)",
+      "decision": "Archive-first retire the interactive-shell PATH shadow /nix/store/iv68194hlnmc7msgpksss6nag4c56gya-yazelix-flexnetos-foundation/toolbin/codex (codex-cli 0.143.0-alpha.34) that currently shadows the repaired alpha.35 profile/local frontdoor. Retirement = re-order PATH so the intended profile wins (defined here, not executed); the shadow store path is archived by checksum manifest and never deleted (nix store paths are immutable evidence). Archive-list-only per RECOVERY-004 policy."
+    },
+    {
+      "id": "FOUNDATION-003-E",
+      "surface": "shadow: legacy /home/flexnetos/FlexNetOS/usr/bin overlay (archive-first, gate clause 4)",
+      "owner": "envctl root owner (Phase-4 install) / Runtime Kernel",
+      "decision": "Archive-first retire the legacy workspace overlay /home/flexnetos/FlexNetOS/usr/bin (13 frontdoor entries: agent, archive, bun, bunx, git-kb, kache-rustc-wrapper, loop, meta, meta-git, meta-mcp, meta-project, meta-release, meta-rust) in favor of the canonical envctl-root frontdoor $META_ROOT/usr/bin (/home/flexnetos/meta/usr/bin) whose wrappers target $META_ROOT/var/lib/envctl/repos/<slug>/ (install.rs). Capture a checksum manifest of the 13 entries before any PATH change; no deletion, capability preserved because the same 13 names are re-provided by the canonical frontdoor."
+    },
+    {
+      "id": "FOUNDATION-003-F",
+      "surface": "shadow: legacy $META_ROOT/.toolchains rustup bridge (archive-first, gate clause 4)",
+      "owner": "envctl root owner / Runtime Kernel",
+      "decision": "Archive-first retire the legacy $META_ROOT/.toolchains compatibility bridge (where rustup nightly installs today; layout.rs:924 'compatibility .toolchains must not be materialized as canonical layout', portability-model gap G4) once envctl root relocation lands the toolchain under the canonical $META_ROOT prefix. Archive the bridge contents by manifest; retire the bridge path only after the canonical toolchain frontdoor is proven (FOUNDATION-003-B), never by assumption."
+    },
+    {
+      "id": "FOUNDATION-003-G",
+      "surface": "shadow: stray /home/flexnetos/lifeos codex-harness ledger + stale CODEX_HARNESS_ROOT env (archive-first, gate clause 4)",
+      "owner": "envctl codex-harness maintainer (envctl repo READ-ONLY to this lane)",
+      "decision": "Archive-first retire the stray runtime frontdoor at /home/flexnetos/lifeos/src/envctl/home/agent-env/codex-harness, whose live ledger writes are reachable only when the hook launch environment exports the stale CODEX_HARNESS_ROOT=/home/flexnetos/lifeos/src/envctl/home/agent-env (root cause per RECOVERY-004; DEFAULT_HARNESS_ROOT already correctly points at /home/flexnetos/meta/src/envctl/home/agent-env). Retirement = unset the stale env var so ledger_dir() resolves to the canonical meta root; the stray ledger files are archived by the RECOVERY-004 checksum manifest (checksum_manifest_sha256 799e8648...), never deleted."
+    },
+    {
+      "id": "FOUNDATION-003-H",
+      "surface": "shadow: parent /home/flexnetos/lifeos control-plane residue (keep-archived, gate clause 4)",
+      "owner": "Governance Board / Runtime Kernel",
+      "decision": "Confirm the parent-control-plane shadows (AGENTS.md, WORKSPACE_LAYOUT.md, empty intercepting GitKB, malformed .git marker, historical runtime/control roots from CUR-011) remain archived, not deleted, under the meta-authority-relocation archive root /home/flexnetos/.local/state/meta/archives/20260710T224253Z-meta-authority-relocation (PRESERVE-001.proof, manifest ab12117a..., unarchived_destructive_actions 0). No new mutation; historical evidence is retained as required by the upgrade-only, archive-first charter."
+    },
+    {
+      "id": "FOUNDATION-003-I",
+      "surface": "runtime consumer migration (gate clause 3)",
+      "owner": "owning config or profile repository (per PRESERVE-001-D)",
+      "decision": "Migrate every runtime consumer to resolve the intended profile: (C1) home + Codex AGENTS chain, (C2) Codex GitKB MCP GITKB_ROOT, (C3) GTK bookmarks + desktop-entry launchers, (C4) shell + systemd environment (PATH ordering + exported env incl. CODEX_HARNESS_ROOT), (C5) profile source URLs + runtime frontdoors, (C6) absolute-path references + live process cwd/exe references. Each consumer's prior input is archived first, then retargeted to the Yazelix plus Nix foundation profile / canonical $META_ROOT frontdoor; only affected consumers restart. Capability preserved because every retargeted name is re-provided by the intended profile."
+    },
+    {
+      "id": "FOUNDATION-003-J",
+      "surface": "rollback proof (gate clause 5)",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Prove rollback restores the prior generation without capability loss: capture a meta git snapshot (multi-repo transactional checkpoint) before any change; rollback = nix profile rollback to the prior pinned generation + restore of the archived runtime plan + re-pin of the prior frontdoor order, leaving the active runtime unchanged per the family rollback_plan 'Restore the archived runtime plan; active runtime remains unchanged.' Because retirement is archive-first (no deletion) and blocked_paths forbid mutation, the prior generation is always restorable from the snapshot + archive."
+    }
+  ],
+  "consumer_migration": {
+    "source_inventory": "PRESERVE-001-D active consumers",
+    "classes": [
+      "home and Codex AGENTS chain",
+      "Codex GitKB MCP GITKB_ROOT",
+      "GTK bookmarks and desktop entries (launchers)",
+      "shell and systemd environment (PATH ordering, exported env vars incl. CODEX_HARNESS_ROOT)",
+      "profile source URLs and runtime frontdoors",
+      "absolute path references and live process cwd/exe references"
+    ],
+    "policy": "archive owner input first, retarget to the intended profile, restart only affected consumers"
+  },
+  "shadow_retirement_ledger": {
+    "policy": "ARCHIVE-FIRST, read-only ownership: no move/delete/cleanup; a shadow leaves the frontdoor only after its intended replacement is proven, and its bytes are retained under a checksum manifest (RECOVERY-004 / PRESERVE-001 charter).",
+    "shadows": [
+      "FOUNDATION-003-D ambient toolbin codex alpha.34",
+      "FOUNDATION-003-E legacy /home/flexnetos/FlexNetOS/usr/bin overlay",
+      "FOUNDATION-003-F legacy $META_ROOT/.toolchains rustup bridge",
+      "FOUNDATION-003-G stray /home/flexnetos/lifeos codex-harness ledger + stale CODEX_HARNESS_ROOT env",
+      "FOUNDATION-003-H parent /home/flexnetos/lifeos control-plane residue (keep-archived)"
+    ]
+  },
+  "rollback_contract": {
+    "mechanism": "meta git snapshot (multi-repo checkpoint) + nix profile rollback to prior generation + archived-runtime-plan restore",
+    "rollback_plan": "Restore the archived runtime plan; active runtime remains unchanged.",
+    "guarantee": "prior generation always restorable because retirement is archive-first (no deletion) and blocked_paths forbid profile upgrade / launcher mutation / generated-runtime edits / shadow deletion"
+  },
+  "store_001_alignment": "The runtime/profile/generated-runtime layer is the STORE-001 'derived projections' class: PostgreSQL is the canonical source of truth, envctl projection is read-only and deterministically regenerable from module_path, redb stays transient, and AgentDB stays per-agent cognition. This family reclassifies no store; it only makes the derived runtime layer resolve to one intended profile and archives shadows without loss.",
+  "execution_order": [
+    "FOUNDATION-003-A",
+    "FOUNDATION-003-B",
+    "FOUNDATION-003-C",
+    "FOUNDATION-003-D",
+    "FOUNDATION-003-E",
+    "FOUNDATION-003-F",
+    "FOUNDATION-003-G",
+    "FOUNDATION-003-H",
+    "FOUNDATION-003-I",
+    "FOUNDATION-003-J"
+  ],
+  "completion_gate": "Every runtime frontdoor resolves to the intended profile package, generated state is reproducible, consumers are migrated, shadows are archived, and rollback restores the prior generation."
+}

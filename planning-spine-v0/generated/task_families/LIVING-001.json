@@ -1,0 +1,260 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "LIVING-001",
+  "title": "Continuous observation audit and governance cadence family defined",
+  "status": "defined",
+  "owner": "LifeOS Governance Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the ten proof-producing LifeOS governance operations that let LIFEOS-012 run as a living system: three time cadences (Daily Pulse, Weekly Sync, Quarterly Refactor) and seven domain audits (health, drift, security, provenance, capability, cost, authority). Each operation observes named inputs, emits only a bounded decision, handles stale data explicitly, escalates to David through the Governance Agent, writes a proof-ledger record, defaults to non-action with a defined rollback, and performs no hidden mutation. This family only DEFINES the cadences as planning artifacts; it runs no cadence and mutates no production state.",
+  "grounding_sources": {
+    "foundational": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "context_matrix": "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "store_authority": "generated/store_relationship_decision.json (STORE-001)",
+    "capability_lineage": "generated/adopted_capabilities.source.csv (ADOPT-001)",
+    "existing_evidence_reconciled": [
+      "state/heartbeat_lane_a.json",
+      "connector_state/heartbeat_lane_b.json",
+      "capability_state/p0_priority_report.json",
+      "state/authority_integrity_report.json",
+      "state/verification_runtime_report.json",
+      "state/mvp_bundle_report.json",
+      "proof_records/proof_ledger.jsonl"
+    ]
+  },
+  "execution_constraints": {
+    "simulation_required": true,
+    "execution_cell": "policy-cell",
+    "allowed_paths": ["planning-spine-v0/generated/**", "planning-spine-v0/proof_records/**"],
+    "blocked_paths": ["production mutation", "autonomous remediation", "external action", "secrets/**"],
+    "parent": "LIFEOS-012 (LifeOS continuously improves under governed feedback)"
+  },
+  "gate_contract": {
+    "statement": "Every cadence has observed inputs, bounded decisions, stale-data handling, owner escalation, proof, rollback or non-action, and no hidden mutation.",
+    "required_clauses_per_cadence": [
+      "observed_inputs",
+      "bounded_decisions",
+      "stale_data_handling",
+      "owner_escalation",
+      "proof",
+      "rollback_or_non_action",
+      "no_hidden_mutation"
+    ]
+  },
+  "cadence_taxonomy": {
+    "time_cadences": ["LIVING-001-DAILY", "LIVING-001-WEEKLY", "LIVING-001-QUARTERLY"],
+    "domain_audits": [
+      "LIVING-001-HEALTH",
+      "LIVING-001-DRIFT",
+      "LIVING-001-SECURITY",
+      "LIVING-001-PROVENANCE",
+      "LIVING-001-CAPABILITY",
+      "LIVING-001-COST",
+      "LIVING-001-AUTHORITY"
+    ]
+  },
+  "work_items": [
+    {
+      "id": "LIVING-001-DAILY",
+      "surface": "Daily Pulse cadence",
+      "cadence_type": "time",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the daily heartbeat as a read-only observation of the transient tier and swarm-integrity graph that publishes a pulse status but takes no corrective action.",
+      "observed_inputs": [
+        "redb transient scratchpad state (agent thoughts, terminal traces, state flags) surfaced via UDS or shared redb state files (Blueprint: Local AI Scratchpad; Context Matrix 'The Scratchpad (redb)')",
+        "state/heartbeat_lane_a.json and connector_state/heartbeat_lane_b.json (existing OPS-001 heartbeat surface reconciled as evidence)",
+        "RuVector MinCut live cut-values on the agent-communication graph (Blueprint sec.6 MinCut, O(n^{o(1)}))"
+      ],
+      "bounded_decisions": ["pulse-healthy", "pulse-degraded-observed", "pulse-escalate"],
+      "stale_data_handling": "If redb is acting as an application-level WAL because PostgreSQL is offline or latent, the pulse is reported degraded-with-buffered-writes; the buffered redb state is NOT treated as canonical durable truth (STORE-001 single-durable-writer) and is only reconciled after the next envctl forward flush.",
+      "owner_escalation": "LifeOS Governance Agent raises to David on any MinCut sever event or on pulse-degraded persisting beyond one daily window.",
+      "proof": "Appends a heartbeat proof record (lineage of schema lifeos-planning-spine.ops-heartbeat.v0) to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Default is non-action (observation only). Rollback per LIVING-001 plan: restore the archived operations plan; no production state changes.",
+      "no_hidden_mutation": "Reads redb/UDS/heartbeat surfaces only; writes only under generated/** and proof_records/**; performs no production mutation, no autonomous remediation, and no external action (blocked_paths honored).",
+      "grounded_in": ["Blueprint: redb scratchpad + UDS status; MinCut immune system", "STORE-001 transient high-frequency class", "OPS-001 heartbeat evidence"]
+    },
+    {
+      "id": "LIVING-001-WEEKLY",
+      "surface": "Weekly Sync cadence",
+      "cadence_type": "time",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the weekly reconciliation of the forward-only redb -> envctl -> PostgreSQL flush and of capability/priority parity, observing sync completeness without forcing any cutover.",
+      "observed_inputs": [
+        "envctl bridge flush status: redb -> embed(all-MiniLM-L6-v2) -> PostgreSQL forward-only sync of settled/significant states (Blueprint sec.5; Context Matrix 'envctl + nu_plugin')",
+        "BlobStore SHA-256 parity receipts from blobstore_parity.rs and the PgStore contract (ADOPT-001; STORE-001 migration_path)",
+        "capability_state/p0_priority_report.json (priority-lock and active control surface reconciled as evidence)"
+      ],
+      "bounded_decisions": ["sync-in-sync", "sync-flush-backlog-observed", "sync-parity-drift-escalate"],
+      "stale_data_handling": "A durable class still living redb-durable (transitional per STORE-001) without a green live parity run is flagged cutover-pending; the audit never auto-cuts over and never dual-writes, honoring the STORE-001 verified-cutover invariant.",
+      "owner_escalation": "LifeOS Governance Agent raises to David / LifeOS Data Agent when parity drift or unflushed significant state is detected.",
+      "proof": "Writes a weekly-sync proof-ledger record referencing the parity receipt and flush digest to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Non-action (observation of forward-only sync). Rollback: restore the archived operations plan; no production state changes.",
+      "no_hidden_mutation": "No dual-write, no forced cutover, no baseline promotion; reads flush status and parity receipts only. Writes only under generated/** and proof_records/**.",
+      "grounded_in": ["Blueprint: envctl forward flush of significant states", "STORE-001 forward-only sync + verified cutover invariants", "ADOPT-001 BlobStore SHA-256 parity", "CAP-001 priority-lock evidence"]
+    },
+    {
+      "id": "LIVING-001-QUARTERLY",
+      "surface": "Quarterly Refactor cadence",
+      "cadence_type": "time",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the quarterly architectural review as an ATAS/ESN forecast over COW-isolated staging branches that plans refactors but commits nothing to the main trunk during the audit.",
+      "observed_inputs": [
+        "ATAS future-timeline forecasts: state diffs, resource burn, complexity spikes, failure nodes (Blueprint sec.4; Context Matrix 'The Architecture of Simulated Future Timelines')",
+        "Echo-State Network stability scores and Temporal Strange Attractor boundary state (Blueprint sec.4 ESN/Reservoir Computing)",
+        "COW staging-branch verification state cloned from current PostgreSQL rows (Blueprint sec.5 COW branching)"
+      ],
+      "bounded_decisions": ["trajectory-stable", "complexity-spike-observed", "spiral-out-of-bounds-escalate"],
+      "stale_data_handling": "ESN initial conditions are re-seeded from current PostgreSQL state before any forecast; a forecast is never run on stale codebase state, because sensitivity to initial conditions would invalidate the attractor shape (Blueprint sec.3).",
+      "owner_escalation": "LifeOS Governance Agent raises to David for any refactor that would be an irreversible or architectural change (LIFEOS-012: explicit human authority for irreversible change).",
+      "proof": "Writes a quarterly-refactor proof-ledger record with the forecast digest and the discarded/retained branch ids to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Non-action in planning; every simulated COW branch is discarded (COW rollback) and none is merged during the audit. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Simulations run in COW-isolated database sandboxes that are never merged to the main trunk during the audit; no production mutation, no silent baseline promotion. Writes only under generated/** and proof_records/**.",
+      "grounded_in": ["Blueprint: ATAS ensemble ESN simulation + COW branching + RuvLTRA", "LIFEOS-012 explicit human authority for irreversible change"]
+    },
+    {
+      "id": "LIVING-001-HEALTH",
+      "surface": "Health audit",
+      "cadence_type": "domain",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the storage/runtime health audit over db_health and the verification runtime, recommending idempotent recovery but never running it autonomously.",
+      "observed_inputs": [
+        "db_health command output: DbHealth { status, db_path, applied_migrations, last_migration_version, schema_version } where status == degraded when applied_migrations < embedded_migration_count (LifeOS storage foundation)",
+        "state/verification_runtime_report.json (bun scripts/verify-planning-spine.mjs pass) reconciled as evidence",
+        "redb application-level WAL depth as PostgreSQL-latency shield (Blueprint redb WAL; Context Matrix 'Edge Orchestration with High-Frequency Buffering')"
+      ],
+      "bounded_decisions": ["health-healthy", "health-degraded-recommend-db_migrate", "health-unreachable-escalate"],
+      "stale_data_handling": "If db_health is unreachable, redb holds writes as WAL and the audit reports degraded; the last-known-good health snapshot is never reported as current.",
+      "owner_escalation": "LifeOS Governance Agent raises to David when degraded persists or a PostgreSQL PITR gap is detected.",
+      "proof": "Writes a health proof-ledger record capturing db_health fields and verification result to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Emits a bounded RECOMMENDATION to run db_migrate (idempotent) but does not run it; non-action is the default. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Reads db_health and verification reports only; never invokes db_migrate or any recovery command autonomously (autonomous remediation is a blocked_path).",
+      "grounded_in": ["Blueprint: PostgreSQL ACID/PITR; redb WAL", "LifeOS storage foundation db_health / db_migrate", "verification_runtime_report evidence"]
+    },
+    {
+      "id": "LIVING-001-DRIFT",
+      "surface": "Drift audit",
+      "cadence_type": "domain",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the drift audit over trajectory, dependency-graph, and design-token drift against the last verified baseline, never promoting a new baseline silently.",
+      "observed_inputs": [
+        "ATAS boundary-constraint / spiral-out-of-bounds state and Temporal Strange Attractor shape (Blueprint sec.3-4)",
+        "RuVector MinCut weakest-link cut-values on the dependency graph and Causal Graph Verification edge coverage (Blueprint sec.6)",
+        "state/mvp_bundle_report.json cross-object integrity and scope boundaries reconciled as evidence"
+      ],
+      "bounded_decisions": ["drift-within-bounds", "drift-observed", "drift-out-of-bounds-escalate"],
+      "stale_data_handling": "Drift is computed against the last green proof-ledger baseline; if that baseline is stale it is re-anchored to the last verified snapshot rather than silently promoted (LIFEOS-012 blocked_path: silent baseline promotion).",
+      "owner_escalation": "LifeOS Governance Agent raises to David on any spiral-out-of-bounds trajectory or any attempted silent baseline promotion.",
+      "proof": "Writes a drift proof-ledger record with attractor-boundary status and MinCut cut summary to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Non-action; deterministic MinCut isolation of a hallucinating agent cluster is a swarm-internal severance, not a production mutation. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Observation only; promotes no baseline and writes no production state. Writes only under generated/** and proof_records/**.",
+      "grounded_in": ["Blueprint: ATAS boundary constraints; MinCut; Causal Graph Verification", "LIFEOS-012 no silent baseline promotion", "mvp_bundle integrity evidence"]
+    },
+    {
+      "id": "LIVING-001-SECURITY",
+      "surface": "Security audit",
+      "cadence_type": "domain",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the security audit over Cryptographic Witness Chain coverage and secret-output guards, treating any unwitnessed durable write as untrusted.",
+      "observed_inputs": [
+        "Cryptographic Witness Chain (SHAKE256) coverage binding every durable code edit/fact to a source vector (Blueprint sec.6; Context Matrix 'The Mathematical Guardrail')",
+        "ADOPT-001 secret-output guards and bounded read-only MCP boundary (generated/adopted_capabilities.source.csv)",
+        "STORE-001 secret placement invariant: secrets only in OS keyring; redb never holds secrets; PostgreSQL stores references not raw secrets"
+      ],
+      "bounded_decisions": ["security-clean", "security-witness-gap-observed", "security-leak-or-unwitnessed-escalate"],
+      "stale_data_handling": "A claim with no historical witness root is treated as untrusted (never as passing); a stale witness root is re-verified against its source vector before the entry is accepted (Causal Graph Verification).",
+      "owner_escalation": "LifeOS Governance Agent raises to David on any secret exposure or any unwitnessed durable write.",
+      "proof": "Writes a security proof-ledger record recording witness-chain coverage and guard status to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Non-action; database rejection of unwitnessed/hallucinated entries is the built-in Causal Graph guard, not an audit mutation. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Never reads or writes secret values; secrets/** is a blocked_path. Observation and proof only.",
+      "grounded_in": ["Blueprint: Cryptographic Witness Chains SHAKE256 + Causal Graph Verification", "ADOPT-001 secret-output guards / bounded read-only MCP", "STORE-001 external-secret authority class"]
+    },
+    {
+      "id": "LIVING-001-PROVENANCE",
+      "surface": "Provenance audit",
+      "cadence_type": "domain",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the provenance audit over content-addressed SHA-256 identity and source commit/PR lineage, flagging any orphaned durable blob.",
+      "observed_inputs": [
+        "BlobStore SHA-256 content identity parity across redb and PgStore backends (ADOPT-001; STORE-001 migration_path)",
+        "generated/adopted_capabilities.source.csv source commit + PR lineage per capability (ADOPT-001, 11 rows)",
+        "Causal Graph historical-root edges proving each durable fact originates from a verified source vector (Blueprint sec.6)"
+      ],
+      "bounded_decisions": ["provenance-complete", "provenance-lineage-gap-observed", "provenance-orphaned-durable-escalate"],
+      "stale_data_handling": "Any durable blob lacking a matching SHA-256 identity and a source-commit/PR lineage is flagged orphaned and never assumed valid; lineage is re-checked, not inferred.",
+      "owner_escalation": "LifeOS Governance Agent raises to David / LifeOS Data Agent on orphaned durable data or a broken commit/PR lineage.",
+      "proof": "Writes a provenance proof-ledger record with the checked SHA-256 identities and lineage refs to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Non-action; observation over lineage maps only. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Read-only over BlobStore identities and the capability lineage map; writes only under generated/** and proof_records/**.",
+      "grounded_in": ["Blueprint: SHA-256 content identity; Causal Graph historical root", "STORE-001 provenance-preserved invariant", "ADOPT-001 capability lineage map"]
+    },
+    {
+      "id": "LIVING-001-CAPABILITY",
+      "surface": "Capability audit",
+      "cadence_type": "domain",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the capability audit that confirms every adopted capability and every state class is owned exactly once with a green parity gate and no downgrade.",
+      "observed_inputs": [
+        "generated/adopted_capabilities.source.csv: each capability appears once (no second-implementation row) with a parity gate (ADOPT-001, 11 rows)",
+        "STORE-001 state_class_assignments: six durable/transient/cognition/projection/secret classes each with exactly one canonical_owner",
+        "state/mvp_bundle_report.json cross-object integrity and scope boundaries (v0 in-scope / rfc proposed / post_v0 deferred)"
+      ],
+      "bounded_decisions": ["capability-full-parity", "capability-gap-observed", "capability-duplicate-or-downgrade-escalate"],
+      "stale_data_handling": "A capability whose parity receipt is stale is treated as unverified (not passing); no capability is reported adopted without a current green receipt.",
+      "owner_escalation": "LifeOS Governance Agent raises to David on any capability loss (downgrade) or duplicate implementation row.",
+      "proof": "Writes a capability proof-ledger record enumerating parity-gate status per capability/class to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Non-action; observation over the capability and state-class maps only. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Read-only over the capability map and STORE-001 assignments; enforces upgrades-not-downgrades by observation, never by mutation.",
+      "grounded_in": ["ADOPT-001 capability map (once each, parity gate)", "STORE-001 exactly-one-owner-per-class", "mvp_bundle scope-boundary evidence", "AGENTS.md upgrades-not-downgrades"]
+    },
+    {
+      "id": "LIVING-001-COST",
+      "surface": "Cost audit",
+      "cadence_type": "domain",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the cost audit over ATAS resource-burn forecasts and RuvLTRA routing tiers, recommending cheaper routing but never re-routing autonomously.",
+      "observed_inputs": [
+        "ATAS Resource Burn forecast: tokens, API dollars, compute cycles, and refactor-lock risk (Blueprint sec.4; Context Matrix 'Simulated Future Timelines')",
+        "RuvLTRA proportional-intelligence routing tier distribution: local ruvllm/Haiku reflex vs cloud Opus/GPT-4 escalation (Blueprint RuvLTRA)",
+        "actual token/API/compute telemetry versus the forecast bound"
+      ],
+      "bounded_decisions": ["cost-within-budget", "cost-burn-spike-observed", "cost-refactor-lock-risk-escalate"],
+      "stale_data_handling": "If actual burn telemetry is stale, the audit uses the conservative (higher) forecast bound rather than assuming the prior window's budget still holds.",
+      "owner_escalation": "LifeOS Governance Agent raises to David on projected budget exhaustion or refactor-lock risk.",
+      "proof": "Writes a cost proof-ledger record with forecast-vs-actual burn and routing mix to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Emits a bounded RECOMMENDATION to re-route via RuvLTRA to a cheaper tier but does not re-route; non-action is the default. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Read-only over burn telemetry and routing state; never changes routing policy autonomously (autonomous remediation is a blocked_path).",
+      "grounded_in": ["Blueprint: ATAS resource-burn + refactor-lock; RuvLTRA proportional intelligence"]
+    },
+    {
+      "id": "LIVING-001-AUTHORITY",
+      "surface": "Authority audit",
+      "cadence_type": "domain",
+      "owner": "LifeOS Governance Agent",
+      "decision": "Define the authority audit that re-verifies the STORE-001 single-durable-writer model, verifier/executor separation, and David's exclusive authority over irreversible change.",
+      "observed_inputs": [
+        "STORE-001 invariants: single durable writer (PostgreSQL owns each durable macro-state class once; redb is never a second durable writer), forward-only sync, verified cutover, no-sidecar, provenance preserved",
+        "state/authority_integrity_report.json: verifier agent distinct from executor, verifier carries verifier role and cap.verify.proof (reconciled as evidence)",
+        "LIFEOS-012 authority boundary: explicit human (David) authority for irreversible change; no self-authorized expansion"
+      ],
+      "bounded_decisions": ["authority-intact", "authority-boundary-warning-observed", "authority-violation-escalate"],
+      "stale_data_handling": "Any authority claim not backed by a current authority_integrity_report is treated as unverified; verifier/executor separation and single-writer ownership are re-checked each run, never assumed from a prior pass.",
+      "owner_escalation": "LifeOS Governance Agent raises to David on any single-durable-writer violation, redb-second-durable-writer, unverified cutover, or self-authorized expansion attempt.",
+      "proof": "Writes an authority proof-ledger record recording invariant status and verifier-separation result to proof_records/proof_ledger.jsonl.",
+      "rollback_or_non_action": "Non-action; any irreversible change requires explicit David authorization and is never self-authorized. Rollback: restore the archived operations plan.",
+      "no_hidden_mutation": "Read-only over STORE-001 invariants and the authority-integrity report; promotes no baseline and authorizes no expansion of its own scope.",
+      "grounded_in": ["STORE-001 single-durable-writer + forward-only + verified-cutover + no-sidecar invariants", "authority_integrity_report verifier/executor separation", "LIFEOS-012 explicit human authority for irreversible change"]
+    }
+  ],
+  "execution_order": [
+    "LIVING-001-DAILY",
+    "LIVING-001-WEEKLY",
+    "LIVING-001-QUARTERLY",
+    "LIVING-001-HEALTH",
+    "LIVING-001-DRIFT",
+    "LIVING-001-SECURITY",
+    "LIVING-001-PROVENANCE",
+    "LIVING-001-CAPABILITY",
+    "LIVING-001-COST",
+    "LIVING-001-AUTHORITY"
+  ],
+  "completion_gate": "All ten operations (three time cadences plus seven domain audits) are defined; each carries the seven required clauses (observed inputs, bounded decisions, stale-data handling, owner escalation, proof, rollback-or-non-action, no hidden mutation); every input traces to the Architecture Blueprint, the Architecture Context Matrix, STORE-001, ADOPT-001, or an existing reconciled evidence surface; and LIVING-001.proof.json records zero production mutation and zero autonomous remediation."
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "GRAPH-005",
+  "title": "Pre-execution graph closure proven",
+  "status": "defined",
+  "owner": "Governance Board / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Prove the complete canonical task graph (196 tasks, 27 phases, 5 North Star anchors) is closed, correct, and closable end-to-end so execution MAY open, without missing outcomes, unresolved dependencies, competing task authority, or paper completion. This is planning/design closure only; it opens the execution phase at the planning tier and names the first bounded product task, but performs no product execution.",
+  "work_items": [
+    {
+      "id": "GRAPH-005-A",
+      "surface": "Coverage gate (generated/north_star_coverage.source.csv + closure-ready coverage control)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Assign every one of the 196 tasks to at least one North Star anchor via its phase's required-outcome semantics; mark all 5 anchors coverage-complete and decomposition-complete (task families present for every phase). scripts/build-execution-packets.py::evaluate_coverage_gate over the closure-ready control returns coverage_complete=pass and tasks_anchored=pass with zero unanchored tasks."
+    },
+    {
+      "id": "GRAPH-005-B",
+      "surface": "Topology gate (generated/task_graph.normalized.json)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Confirm 0 missing parents (dependencies_resolve=pass), 0 dependency cycles (no_dependency_cycles=pass), and 27 non-empty declared phases with no task in an undeclared phase (phases_decomposed=pass)."
+    },
+    {
+      "id": "GRAPH-005-C",
+      "surface": "Lifecycle gate (generated/task_graph.status.json via scripts/update-task-graph-status.py)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Confirm status projection result=pass, forbidden_update_count=0, lifecycle_counts complete=118/draft=76/running=1/rolled-back=1, ready_count=0 and next_ready_task_id=null while the coverage gate is closed; no non-complete task is mislabeled ready (predecessor proof GRAPH-004)."
+    },
+    {
+      "id": "GRAPH-005-D",
+      "surface": "Proof gate (proof_records/proof_ledger.jsonl + proof_records/<task>.proof.json)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Require a passing proof for every completion; 117 of 118 source-complete tasks are proof-backed. Detect the single paper-completion NBSOURCE-006 (source Complete, no proof file, no ledger entry); do NOT accept it and do NOT fabricate its proof; reclassify it to open/unproven and carry it as an anchored open task so zero paper completions enter the closed graph. Its extraction evidence (notebooklm_source_extracts/NBSOURCE-006-temporal-attractors.md, verified verbatim by NBSTATED-006) is preserved; its own proof is the single named remediation."
+    },
+    {
+      "id": "GRAPH-005-E",
+      "surface": "Rollback gate (generated/task_graph.source.csv rollback_plan column + proof ledger)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Confirm all 196 tasks carry a non-empty rollback_plan, that LPS-025 is correctly reopened as rolled-back from its genuine fail ledger entry, and that GRAPH-005 itself carries a rollback_plan (restore archived graph and manifests; keep execution closed on any failed check)."
+    },
+    {
+      "id": "GRAPH-005-F",
+      "surface": "Manifest freshness gate (generated/execution_bundle.manifest.json)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Regenerate the execution-bundle manifest via scripts/package-execution-bundle.py against the current tree; it replaces the stale 2026-07-03 manifest (92 files, wrong package_root) with a fresh manifest covering the current graph whose validation result is pass."
+    },
+    {
+      "id": "GRAPH-005-G",
+      "surface": "Owner-approval gate + sum-equals-North-Star + execution frontier",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Record the owner opening execution at the planning tier (planning_tier_execution_approval=open). Confirm the design sum equals the North Star: all 5 anchors covered by task families, every task contributes to >=1 anchor, 0 outcomes outside the North Star. Name the first bounded product task (POSTGRES-002, the first durable-substrate task behind the complete STORE-001 keystone) and the frontier that becomes Ready-eligible on open, without executing any product task."
+    }
+  ],
+  "execution_order": [
+    "GRAPH-005-A",
+    "GRAPH-005-B",
+    "GRAPH-005-C",
+    "GRAPH-005-D",
+    "GRAPH-005-E",
+    "GRAPH-005-F",
+    "GRAPH-005-G"
+  ],
+  "completion_gate": "All seven closure gates pass over the live graph, the design sum of task outcomes equals the five North Star anchors, the single detected paper-completion (NBSOURCE-006) is reconciled without fabrication, and proof_records/GRAPH-005.proof.json records product_execution_performed=false; only then is the first bounded product task Ready-eligible.",
+  "store_001_alignment": "The postgres-foundation families that carry the North Star durable substrate (LIFEOS-002, POSTGRES-001..010, PGAUTH-001..006, ADOPT-001/002, STORE-001, FOUNDATION-001..003) anchor to NS-EXTENSION/NS-WHOLE/NS-PROGRESS because PostgreSQL+RuVector is the single canonical durable owner per STORE-001; redb stays transient and cutover is the verified BlobStore SHA-256 parity swap.",
+  "product_execution_performed": false
+}

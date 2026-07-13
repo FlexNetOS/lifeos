@@ -1,0 +1,177 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "COMPANY-001",
+  "title": "Company governance and operating model task family defined",
+  "status": "defined",
+  "owner": "LifeOS Governance Agent (NOA / CECCA) under David (final human authority)",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the LifeOS-native company operating model for Element Ark Holdings — its identity, authority, priorities, projects, departments, roles, decisions, budgets, risk, compliance, and proof workflows — assigning every company object and workflow a single accountable owner, an explicit authority path rooted in David as final human authority, a bounded decision, an approval gate, an evidence requirement, and a rollback-or-non-action rule, such that no agent can self-authorize. This task performs governance definition only; it instantiates no organization, no spend, no legal commitment, no account, and no product implementation.",
+  "authority_frame": {
+    "final_human_authority": "David (Owner / Founder / Human Principal of Element Ark Holdings) — no agent outranks this layer.",
+    "canonical_chain": "David -> Constitution -> Board -> NOA/CECCA -> Executives -> Departments -> Workers -> Tools (Master Plan Consolidated v1 §1). Lower agents execute more; higher agents decide more and touch systems less.",
+    "v0_operational_graph": "02_AUTHORITY_GRAPH.md narrow v0 graph: LifeOS runtime hosts NOA; NOA delegates operational authority to CECCA; CECCA delegates planning/simulation/execution/verification to planner_agent/simulator_agent/executor_agent/verifier_agent. Edges: delegates_to, escalates_to, verifies, constrains.",
+    "roles": "NOA = product/personality name of the CEO agent (accountable for top-level direction); CECCA = internal CEO-agent role/class that arbitrates authority and escalation; LifeOS = the environment/runtime spine, not the CEO (00_NORTH_STAR.md).",
+    "resolution_rule": "Resolve the object's required role -> resolve the active agent assigned to that role -> confirm the agent holds the required capability set -> if capability or authority is missing, escalate to CECCA -> if CECCA cannot safely resolve scope, escalate to NOA -> David is terminal (02_AUTHORITY_GRAPH.md Authority Resolution)."
+  },
+  "work_items": [
+    {
+      "id": "COMPANY-001-A",
+      "surface": "Company identity — Element Ark Holdings frame (ArkForge, ArkEnergy, ArkFab, DeFlex, iGuard Nexus, FlexNetOS, LifePodOS)",
+      "owner": "David (Owner / Founder / Human Principal)",
+      "authority_path": "David -> Constitution -> Board -> NOA/CECCA. Identity is the root of the chain; NOA/CECCA may reference but not redefine it.",
+      "bounded_decision": "Name and scope the company frame and its subsidiaries as a LifeOS-native planning identity; MVP1 domain = financial + legal, self-sustained growth as a bounded mandate, not a single metric (Master Plan §1.5).",
+      "approval": "David alone (final human authority).",
+      "evidence": "Master Plan Consolidated v1 §1.5 pristine baseline (ROOT doc, no RUN STATE); this task family records the Element Ark frame with subsidiary list and MVP1 domain.",
+      "rollback_or_non_action": "NON-ACTION rule: no real-world legal entity is created, registered, renamed, or altered; identity is a planning frame only. Rollback = restore the prior archived company plan (task rollback_plan).",
+      "self_authorization_prevented": "No agent may declare or alter company identity; NOA/CECCA are hosted by and subordinate to LifeOS and to David.",
+      "decision": "Adopt Element Ark Holdings as the definition-only company identity under David's sole authority; changing it is a David-only, non-real-world act."
+    },
+    {
+      "id": "COMPANY-001-B",
+      "surface": "Authority — the governing authority graph itself",
+      "owner": "David at the root; Constitution as the immutable law layer; CECCA as internal arbitration role",
+      "authority_path": "David -> Constitution -> Board -> NOA/CECCA -> Executives -> Departments -> Workers -> Tools (Master Plan §1), resolved operationally through the 02_AUTHORITY_GRAPH.md v0 narrow graph.",
+      "bounded_decision": "Fix who may decide, delegate, execute, and verify each planning object via delegates_to / escalates_to / verifies / constrains edges; no agent receives unlimited authority (Master Plan §1 runtime rule).",
+      "approval": "Changes to the authority graph require David; Vision/Values and Constitution are immutable outside Annual Review (RULES.md §2, Constitution §6).",
+      "evidence": "02_AUTHORITY_GRAPH.md invariants 1-6; MVP slice state/authority_integrity_report.json proving verifier authority resolves to explicit agent, role, and capability objects (07_MVP_VERTICAL_SLICE.md).",
+      "rollback_or_non_action": "Restore the prior authority graph; a task cannot be executed by an agent lacking the required capability (invariant 3).",
+      "self_authorization_prevented": "Invariants 1, 2, 4: NOA remains the top strategic agent but does not outrank David; CECCA is a role, not a separate company layer; a task cannot self-verify. Missing capability escalates to CECCA then NOA.",
+      "decision": "The authority graph is owned by David/Constitution and operationalized by NOA/CECCA; it is the substrate every other object binds to, and no node self-elevates."
+    },
+    {
+      "id": "COMPANY-001-C",
+      "surface": "Priorities — the active priority set (max 3) and the 1-8 priority sequence",
+      "owner": "NOA/CECCA proposes; David approves the active priority set",
+      "authority_path": "Executives/Departments propose candidate priorities -> NOA/CECCA arbitrate -> David approves. Every Project must link to >= 1 Priority.",
+      "bounded_decision": "Select at most 3 active Priorities (RULES.md §2); order the 1-8 priority sequence (Planning Spine v0 -> Mirofish planning adapter -> hermetic cell runner -> Hermes -> Odysseus/UI -> Meta GitHub -> company hierarchy expansion -> home automation, Master Plan §1.5).",
+      "approval": "David approves the active priority set; Vision/Values immutable outside Annual Review (RULES.md §2).",
+      "evidence": "Master Plan §1.5 priority sequence; CAP-001 priority lock (proof_records/CAP-001.proof.json).",
+      "rollback_or_non_action": "Revert to the prior approved priority set; stale > 14 days -> BACKLOG or delete (RULES.md §4).",
+      "self_authorization_prevented": "No agent may add a fourth active priority or elevate its own work to Priority status without David; One-In-One-Out governs new opportunities (RULES.md §4).",
+      "decision": "Priorities are capped at 3 active, ordered by the Master Plan sequence, proposed by NOA/CECCA and approved by David; agents cannot self-prioritize."
+    },
+    {
+      "id": "COMPANY-001-D",
+      "surface": "Projects — governed units of work (named as completed states)",
+      "owner": "CECCA delegates each project to an assigned executive/department agent; that agent is the single project owner",
+      "authority_path": "CECCA -> Executive -> Department -> Worker (delegates_to), with escalation back up on scope conflict.",
+      "bounded_decision": "Create/activate a project only when it links to >= 1 Priority and carries allowed_paths, blocked_paths, verification_gate, rollback_plan, and proof_uri; statuses limited to [BACKLOG]/[ACTIVE]/[BLOCKED]/[DONE — verification required] (RULES.md §2, §3; Task schema, Master Plan §2).",
+      "approval": "CECCA activates a project; David/Needs-Human-Approval for any project touching spend, legal, external real-world action, or production mutation (Execution gates §11).",
+      "evidence": "Task-graph rows in generated/task_graph.source.csv (system-of-record); every row needs proof_uri or the build fails (RULES.md §7).",
+      "rollback_or_non_action": "Restore the prior project plan; no production mutation without snapshot (Constitution §6); no real-world project execution during planning.",
+      "self_authorization_prevented": "A project cannot self-verify completion (invariant 4); it requires a verifier_agent and a resolved proof_uri.",
+      "decision": "Every project binds to a Priority, is delegated by CECCA to one accountable agent, and completes only through an external verifier and proof — never by self-declaration."
+    },
+    {
+      "id": "COMPANY-001-E",
+      "surface": "Departments — organizational mandate boundaries",
+      "owner": "NOA/CECCA own department mandates; Hermes is the institutional-memory builder/operator of the org (Master Plan §1.5 system roles)",
+      "authority_path": "David -> NOA/CECCA -> Executives -> Departments. Departments hold delegated mandate but touch systems less than the workers below them (Master Plan §1).",
+      "bounded_decision": "Define department boundaries and mandates as a planning frame; the full org chart is DEFINED but post-v0 (RFC) — v0 refuses a full enterprise hierarchy (00_NORTH_STAR.md v0/RFC/post-v0 boundary; Master Plan §2 'Company objects defined but post-v0').",
+      "approval": "David/NOA to create or charter a department mandate; no operational department is instantiated in v0.",
+      "evidence": "Master Plan §1 authority graph and §1.5 system roles (Hermes builds/operates the org); North Star boundary table marking full company hierarchy post-v0.",
+      "rollback_or_non_action": "NON-ACTION: no operational department is created, staffed, or funded in v0; this is definition-only. Rollback = restore the archived company plan.",
+      "self_authorization_prevented": "No agent may create, charter, or staff a department without NOA plus David; departments cannot self-authorize their own scope or headcount.",
+      "decision": "Departments are chartered as bounded mandates by NOA/CECCA under David and remain definition-only (full org chart deferred post-v0); none self-instantiates."
+    },
+    {
+      "id": "COMPANY-001-F",
+      "surface": "Roles — role/agent/capability bindings",
+      "owner": "CECCA binds roles to agents and capability sets under David",
+      "authority_path": "A role resolves to an agent that must hold the required capability set (02_AUTHORITY_GRAPH.md Authority Resolution); CECCA -> NOA -> David on escalation.",
+      "bounded_decision": "Bind each Role (e.g., cecca, planner, simulator, executor, verifier) to an active Agent plus a Capability set; a task cannot be executed by an agent lacking the required capability (invariant 3).",
+      "approval": "CECCA assigns roles; David for any role that touches spend, legal, credential handling, or trading (Execution gates §11).",
+      "evidence": "Role and Capability v0 schema objects (Master Plan §2 object model); state/authority_integrity_report.json proving verifier authority resolves to explicit agent, role, and capability (07_MVP_VERTICAL_SLICE.md).",
+      "rollback_or_non_action": "Revoke the role binding and restore the prior assignment; NON-ACTION where a capability is missing (escalate rather than execute).",
+      "self_authorization_prevented": "An agent cannot grant itself a role or capability; a missing capability escalates to CECCA then NOA (Authority Resolution steps 4-5).",
+      "decision": "Roles are CECCA-assigned agent+capability bindings validated by an authority-integrity check; agents cannot self-assign roles or capabilities."
+    },
+    {
+      "id": "COMPANY-001-G",
+      "surface": "Decisions — bounded Decision objects resolving RFCs and scope questions",
+      "owner": "The resolving authority: David for strategic decisions; CECCA for operational arbitration",
+      "authority_path": "Decision requested -> resolve required role -> active agent -> escalate to CECCA -> NOA -> David (terminal), matching the DECIDE-00X family pattern.",
+      "bounded_decision": "Each Decision is bounded and records a decision statement, an unblock_condition, and a deferral_rollback_rule (pattern: generated/task_families/DECIDE-001.json).",
+      "approval": "Authority appropriate to the decision class; automatic Needs-Human-Approval for spend, legal, external real-world action, production mutation, account creation, credential handling, trading, or anything irreversible (Execution gates §11).",
+      "evidence": "Decision objects recorded in 09_OPEN_QUESTIONS.md#recorded-decisions; the corresponding proof record.",
+      "rollback_or_non_action": "The deferral_rollback_rule reverts any dependent task to its prior bounded surface; no decision executes real-world state during planning.",
+      "self_authorization_prevented": "The CEO agent may propose, prioritize, and delegate but may not execute raw shell commands directly (Constitution §6); recommendation may not bypass proof requirements (invariant 6).",
+      "decision": "Decisions are bounded, escalation-resolved, and carry an unblock + rollback rule; the CEO agent proposes and delegates but never self-executes or self-approves an irreversible act."
+    },
+    {
+      "id": "COMPANY-001-H",
+      "surface": "Budgets — resource envelopes and spend authority (Resource Burn)",
+      "owner": "David holds final spend authority; CECCA proposes the bounded resource envelope",
+      "authority_path": "Agent request -> CECCA (proposes envelope) -> David (approves any real spend). No unauthorized spend (Constitution §6).",
+      "bounded_decision": "Define a bounded Resource Burn envelope per project/simulation — a mathematical forecast of tokens, API dollars, and compute cycles (Architecture Blueprint ATAS future-timeline Resource Burn) — to prevent refactor-lock where a project exhausts its budget mid-migration.",
+      "approval": "David approves any real spend; spend automatically triggers Needs-Human-Approval (Execution gates §11).",
+      "evidence": "ATAS Resource Burn forecast (Architecture Blueprint §4 / Future Timeline components); proof that no real spend was performed (task blocked_paths: spend).",
+      "rollback_or_non_action": "NON-ACTION: no real spend occurs in planning; the envelope is a forecast, not a disbursement. Rollback = restore the prior plan.",
+      "self_authorization_prevented": "No agent authorizes spend; unauthorized spend is a hard Constitution gate and the budget object is forecast-only until David approves.",
+      "decision": "Budgets are forecast-only Resource Burn envelopes proposed by CECCA and disbursed only on David's approval; no agent self-authorizes spend."
+    },
+    {
+      "id": "COMPANY-001-I",
+      "surface": "Risk — failure prediction, simulation constraints, and the failure-learning chain",
+      "owner": "simulator_agent / ATAS forecasts risk; the Runtime Kernel enforces guardrails",
+      "authority_path": "simulator_agent constrains the executor_agent (constrains edge) and escalates out-of-bounds trajectories to CECCA/NOA; simulation may constrain but may not directly complete a task (invariant 5).",
+      "bounded_decision": "Run ensemble ATAS/Echo-State-Network simulations, identify Failure Nodes and out-of-bounds trajectories, and emit machine-readable constraints that patch the task graph as constraints, not advice (Master Plan §2; Architecture Blueprint §4).",
+      "approval": "High-risk (trajectory spiraling out of bounds) escalates to CECCA/NOA before any execution; MinCut isolates a hallucinating agent deterministically.",
+      "evidence": "SimulationReport constraints; failure capsules; RuVector MinCut isolation; state/mvp_bundle_report.json cross-object linkage (07_MVP_VERTICAL_SLICE.md).",
+      "rollback_or_non_action": "Failure-learning chain: Raw Event -> Failure Capsule -> Causal Map -> Scoped Lesson -> Guardrail -> Instinct; preserve the gold world, learn from every failed world, promote only proven worlds, never let a failed world become the baseline (Master Plan §1.5 simulation doctrine). Discard the failed COW branch.",
+      "self_authorization_prevented": "Simulation output may not execute directly nor rewrite baseline state (RFC-001); MinCut severs an agent that begins hallucinating corrupted logic (Architecture Blueprint §6).",
+      "decision": "Risk is owned by simulation/ATAS as constraints and by the Runtime Kernel as guardrails; failed worlds become lessons, never baselines, and no simulation self-promotes into execution."
+    },
+    {
+      "id": "COMPANY-001-J",
+      "surface": "Compliance — legal/constitutional constraint enforcement and anti-bluffing",
+      "owner": "Runtime Kernel enforces law (identity, permissions, memory, audit, rollback, policy); David for any legal commitment",
+      "authority_path": "Any legal or compliance-affecting action -> automatic Needs-Human-Approval -> David. The CEO Agent goal is to advance Element Ark according to the North Star and legal constraints (lifeos-planning-spine v0.md).",
+      "bounded_decision": "Enforce the Constitution (No hidden mutation, No unauthorized spend, No legal bypass, No real-world execution without authority, No optimization against human welfare, No production mutation without snapshot, No completion without proof); bind every claim to a verifiable root (MVP1 domain = financial + legal).",
+      "approval": "David for any legal commitment; automatic Needs-Human-Approval for legal and external real-world action (Execution gates §11).",
+      "evidence": "Cryptographic Witness Chains (SHAKE256) and Causal Graph Verification rejecting any claim lacking a historical root (Architecture Blueprint §6); Constitution §6.",
+      "rollback_or_non_action": "NON-ACTION: no legal commitment is made during planning (task blocked_paths: legal commitment); any hallucinated or unrooted claim is rejected by the graph.",
+      "self_authorization_prevented": "No agent bypasses legal constraints or self-attests compliance; a claim without a causal edge/witness-chain root is rejected — making bluffed compliance mathematically impossible.",
+      "decision": "Compliance is Runtime-Kernel-enforced against the Constitution and witness-chain-rooted; legal commitments are David-only and non-action in planning, and no agent self-certifies."
+    },
+    {
+      "id": "COMPANY-001-K",
+      "surface": "Proof workflows — the §18 proof pipeline and proof ledger",
+      "owner": "verifier_agent validates proof and completion; flexnetos_runner executes build/proof/release",
+      "authority_path": "executor_agent produces the proof -> verifier_agent verifies (verifies edge) and can block task completion until proof exists (02_AUTHORITY_GRAPH.md v0 chain).",
+      "bounded_decision": "A task completes only when its proof_uri resolves and every gate clause passes; §18 loop: task graph (CSV) -> execution packets -> proof_records/<TASK_ID>.proof.json -> merge-proof-records (append-only proof_ledger.jsonl) -> update-task-graph-status (Master Plan §2).",
+      "approval": "verifier_agent accepts or rejects completion; three-surface rule keeps CSV = human control, JSON packets = agent control, proof JSON = reality control.",
+      "evidence": "proof_ledger.jsonl (append-only); ProofRecord schema (git_head_before/after, diff_summary, checksums, failed_checks, rollback_point, verifier_agent); this very proof record (proof_records/COMPANY-001.proof.json).",
+      "rollback_or_non_action": "Every ProofRecord carries a rollback_point; no paper execution — documents are not completion, proof is completion; no trust in docs over observed runtime (Master Plan §1 core doctrine).",
+      "self_authorization_prevented": "A task cannot self-verify completion (invariant 4); proof requires a separate verifier_agent; recommendation may not bypass proof (invariant 6).",
+      "decision": "Proof workflows are the reality control plane: a separate verifier and a resolved proof_uri gate every completion, and no task self-verifies or substitutes documents for proof."
+    }
+  ],
+  "cross_cutting_invariants": [
+    "No agent can self-authorize: every object's completion or escalation crosses a boundary to a higher authority (CECCA -> NOA -> David) or to an independent verifier_agent; a task cannot self-verify (02_AUTHORITY_GRAPH.md invariant 4).",
+    "David is the final human authority; no agent outranks that layer (Constitution §6).",
+    "The CEO agent may propose, prioritize, and delegate — it may not execute raw shell commands directly (Constitution §6).",
+    "No hidden mutation, no unauthorized spend, no legal bypass, no real-world execution without authority, no production mutation without snapshot, no completion without proof (Constitution §6).",
+    "No paper execution: documents are not completion; proof is completion (Master Plan §1 core doctrine)."
+  ],
+  "store_001_alignment": {
+    "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture) — generated/store_relationship_decision.json.",
+    "durable_company_records_owner": "PostgreSQL + RuVector is the single canonical durable owner of every durable company macro-state record: the company identity record, authority graph, approved priority set, project rows, department/role/capability bindings, decision ledger, budget/Resource-Burn ledger, risk Scoped-Lessons/Guardrails, compliance witness-chain references + causal edges, and proof-ledger references (STORE-001 class 'durable relational macro-state: identities, histories, permissions, provenance').",
+    "transient_governance_state_owner": "redb holds only transient high-frequency governance state (in-flight arbitration thoughts, ATAS ensemble scratch, high-frequency signals); it is the STORE-001 transient tier and never a second durable writer.",
+    "per_agent_cognition_owner": "AgentDB (.rvf) holds NOA/CECCA/executive/worker per-agent cognition (MicroLoRA + SONA policy); non-authoritative for shared company macro-state, witnessed by SHAKE256 chains rooted in PostgreSQL source vectors.",
+    "secret_authority": "OS keyring holds budget/wallet and compliance credentials; PostgreSQL stores references/provenance only, never raw secrets; redb never holds secrets (task blocked_paths: secrets/**).",
+    "sync_and_invariant": "Forward-only redb -> envctl -> PostgreSQL; single durable writer = PostgreSQL; verified cutover only. The single-durable-writer invariant mirrors the governance invariant that no agent self-authorizes — durable company truth has exactly one canonical writer, just as every decision has exactly one accountable approver."
+  },
+  "v0_boundary_note": "Per 00_NORTH_STAR.md and Master Plan §2, the full company hierarchy and agent ecology are post-v0 (RFC); Company objects are defined but not instantiated in v0. COMPANY-001 defines the governance contract (owners, authority paths, bounds, approvals, evidence, rollback/non-action, no-self-authorization) and instantiates no organization. Full org-chart, department staffing, and generalized multi-company delegation are explicit deferrals (07_MVP_VERTICAL_SLICE.md).",
+  "non_action_guarantee": "No organizational action, no spend, no legal commitment, no account creation, and no product implementation are performed (task blocked_paths). This is planning definition only; product_execution_performed = false.",
+  "completion_gate": "Every company object and workflow has an owner, authority path, bounded decision, approval, evidence, rollback or non-action rule, and no agent can self-authorize.",
+  "provenance_derived_from": [
+    "1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md (§1 North Star & Operating Doctrine, §1.5 Company & Capability Frame, §2 Architecture / §18 pipeline)",
+    "02_AUTHORITY_GRAPH.md (core nodes, edges, v0 authority chain, invariants, authority resolution)",
+    "00_NORTH_STAR.md (operating roles, v0/RFC/post-v0 boundary)",
+    "07_MVP_VERTICAL_SLICE.md (authority-integrity and mvp-bundle proof surfaces, explicit deferrals)",
+    "generated/store_relationship_decision.json (STORE-001 keystone decision)",
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md (ATAS Resource Burn, MinCut, Witness Chains, tiered memory)",
+    "generated/task_families/DECIDE-001.json (bounded Decision pattern)"
+  ]
+}

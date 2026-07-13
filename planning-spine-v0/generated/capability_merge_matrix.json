@@ -1,0 +1,1547 @@
+{
+  "schema_version": "lifeos-planning-spine.capability-merge-matrix.v0",
+  "task_id": "CONSOLIDATE-001",
+  "parent_task": "LIFEOS-004",
+  "generated_at": "2026-07-13T03:47:08Z",
+  "owner": "LifeOS Consolidation Agent",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "generated/preserve_capability_provenance.json (PRESERVE-002)",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/adopted_capabilities.source.csv (ADOPT-001/002)"
+  ],
+  "objective": "Define the single-application Rust bounded contexts, their stable published contracts, canonical data ownership, policy/anti-corruption seams, and the capability destination that receives every preserved peer capability \u2014 each mapped to exactly one context and contract, with an acyclic context map, single-owner ledger, and explicit migration order.",
+  "product_execution_performed": false,
+  "store_001_alignment": {
+    "adopted_authority_model": "adopt-intended-tiered-architecture",
+    "data_owning_contexts_match_store_001": true,
+    "note": "The five data-owning contexts (BC-PERSIST, BC-INGEST, BC-BRIDGE, BC-COGNITION, BC-SECRET) reproduce STORE-001's state-class assignments exactly; all other contexts own no durable macro-state and reference BC-PERSIST \u2014 preserving the single-durable-writer invariant."
+  },
+  "bounded_contexts": [
+    {
+      "id": "BC-PERSIST",
+      "name": "Canonical Persistence & Semantic Knowledge Graph",
+      "blueprint_layer": "Global Database (PostgreSQL + RuVector, No-Sidecar)",
+      "responsibility": "Single canonical durable owner of relational macro-state and semantic/vector/knowledge-graph state; hosts RuVector as a native PostgreSQL extension (No Sidecar).",
+      "store_001_state_classes_owned": [
+        "durable relational macro-state (identities, histories, permissions, provenance, module_path, code AST/rows, causal edges)",
+        "semantic / vector / knowledge-graph state (embeddings, hybrid search indexes, GNN causal edges)"
+      ],
+      "canonical_data_owner": "PostgreSQL + RuVector",
+      "published_contracts": [
+        "CanonicalStore",
+        "HybridSearch",
+        "KnowledgeGraph"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "BC-INGEST",
+      "name": "Code Ingestion & High-Frequency Buffer",
+      "blueprint_layer": "Ingestion & Buffering (Nushell parser -> redb buffer; nu_plugin CodeDB)",
+      "responsibility": "Parse the workspace into AST blocks (Nushell) and buffer them at microsecond latency into redb; owns the transient high-frequency tier and the content-addressed BlobStore capture path.",
+      "store_001_state_classes_owned": [
+        "transient high-frequency state (agent thoughts, terminal traces, intermediate logs, BLAKE3 dedup hashes, application-level WAL) [redb canonical]"
+      ],
+      "canonical_data_owner": "redb (transient tier only); durable blobs are transitional and cut over to BC-PERSIST via verified BlobStore SHA-256 parity",
+      "published_contracts": [
+        "IngestPipeline",
+        "BlobStore",
+        "ScratchpadBuffer"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "BC-BRIDGE",
+      "name": "Forward-Only Bridge, Migration & Materialization",
+      "blueprint_layer": "The Bridge (envctl): redb -> embed -> PostgreSQL; PostgreSQL -> filesystem projection",
+      "responsibility": "Forward-only synchronization of settled redb state into PostgreSQL (embedding via all-MiniLM-L6-v2), replayable migrations, and projection of database-hosted code back to a filesystem directory for musl builds; owns derived projections.",
+      "store_001_state_classes_owned": [
+        "derived projections (materialized source directories for musl compilation, exported release trees)"
+      ],
+      "canonical_data_owner": "envctl (projection is read-only from PostgreSQL; bridge is the single forward writer path \u2014 never a second durable authority)",
+      "published_contracts": [
+        "ForwardBridge",
+        "Projection",
+        "MigrationEngine"
+      ],
+      "depends_on": [
+        "BC-INGEST",
+        "BC-PERSIST",
+        "BC-SECRET"
+      ]
+    },
+    {
+      "id": "BC-COGNITION",
+      "name": "Edge Agent Runtime & Cognition",
+      "blueprint_layer": "Edge Inference (ruvllm console + AgentDB .rvf cartridge)",
+      "responsibility": "Host the frozen foundation model in shared memory (ruvllm) and hot-swap per-agent .rvf cognitive containers (MicroLoRA/SONA/FastGRNN); owns per-agent active cognition.",
+      "store_001_state_classes_owned": [
+        "per-agent cognition (MicroLoRA adapters, SONA policy matrices, RL weights) [AgentDB .rvf]"
+      ],
+      "canonical_data_owner": "AgentDB (.rvf) per agent \u2014 non-authoritative for shared macro-state; witnessed by SHAKE256 chains rooted in PostgreSQL source vectors",
+      "published_contracts": [
+        "AgentRuntime",
+        "CognitiveContainer"
+      ],
+      "depends_on": [
+        "BC-PERSIST",
+        "BC-COMPUTE"
+      ]
+    },
+    {
+      "id": "BC-ORCHESTRATION",
+      "name": "Swarm Orchestration, Routing & Temporal Prediction",
+      "blueprint_layer": "Swarm Orchestration & Prediction (Ruflo meta-harness, RuvLTRA, ATAS/ESN)",
+      "responsibility": "Route tasks by Proportional Intelligence (RuvLTRA), run ensemble Temporal-Strange-Attractor forecasts (ATAS/ESN), and coordinate the agent swarm and task runner.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 reads codebase/swarm state from BC-PERSIST; transient routing/simulation state is BC-INGEST scratchpad",
+      "published_contracts": [
+        "SwarmRouter",
+        "TemporalForecast",
+        "TaskRunner"
+      ],
+      "depends_on": [
+        "BC-COGNITION",
+        "BC-PERSIST",
+        "BC-COMPUTE",
+        "BC-INTEGRITY"
+      ]
+    },
+    {
+      "id": "BC-INTEGRITY",
+      "name": "Swarm Defense, Policy & Merge Seams",
+      "blueprint_layer": "Defense & Verification (MinCut, COW branching, Cryptographic Witness Chains)",
+      "responsibility": "Enforce policy (PreToolUse denial / agent guard), swarm immune system (MinCut), truth verification (SHAKE256 witness chains / causal-graph), and merge gates (inverse-dependency verification). This is the policy / anti-corruption enforcement context.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 monitors the dependency graph and provenance stored in BC-PERSIST; emits typed policy/merge verdicts only",
+      "published_contracts": [
+        "PolicyGuard",
+        "SwarmImmuneSystem",
+        "WitnessChain",
+        "MergeGate"
+      ],
+      "depends_on": [
+        "BC-PERSIST"
+      ]
+    },
+    {
+      "id": "BC-GOVERNANCE",
+      "name": "Governance, Task & Prompt Substrate",
+      "blueprint_layer": "Control-plane task substrate (beads / handoff / prompt registry)",
+      "responsibility": "Agent-first issue/bead tracking, one-way task handoff from the knowledge base, and prompt registry; a subordinate substrate that references PostgreSQL provenance and never becomes a second durable macro-state writer.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "subordinate stores (beads SQLite/JSONL, prompt registry); references BC-PERSIST provenance; macro-state authority stays in BC-PERSIST",
+      "published_contracts": [
+        "TaskSubstrate",
+        "HandoffSeam",
+        "PromptRegistry"
+      ],
+      "depends_on": [
+        "BC-PERSIST",
+        "BC-SECRET"
+      ]
+    },
+    {
+      "id": "BC-EVIDENCE",
+      "name": "Source Evidence Ingestion",
+      "blueprint_layer": "Source-of-truth evidence pipeline (NotebookLM extraction)",
+      "responsibility": "Download and extract NotebookLM source material into the evidence corpus that grounds planning claims; an offline producer wrapped behind a process boundary (foreign Python runtime).",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 writes evidence files consumed downstream by ingestion/verification",
+      "published_contracts": [
+        "SourceEvidencePipeline"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "BC-CONTROL-PLANE",
+      "name": "Meta Multi-Repo Control Plane",
+      "blueprint_layer": "gitkb/meta orchestrator (workspace isolation, meta exec, plugin protocol)",
+      "responsibility": "Orchestrate cross-repo operations, run commands across directories (loop engine), and route typed subprocess plugins over MessagePack; isolates machine-generated exhaust from clean Rust during build.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 orchestration/protocol only",
+      "published_contracts": [
+        "MetaOrchestrator",
+        "PluginProtocol",
+        "LoopEngine"
+      ],
+      "depends_on": [
+        "BC-FOUNDATION"
+      ]
+    },
+    {
+      "id": "BC-FOUNDATION",
+      "name": "Toolchain, Build & Portable Release",
+      "blueprint_layer": "Build Environment (Yazelix/Zellij/Nushell + Nix musl static)",
+      "responsibility": "Provide the Yazelix workspace toolchain and deterministic static musl compilation of the materialized code into portable install-in-place binaries; coordinate builds.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 consumes the materialized projection from BC-BRIDGE to compile release artifacts",
+      "published_contracts": [
+        "ToolchainEnv",
+        "PortableBuild",
+        "BuildCoordinator"
+      ],
+      "depends_on": [
+        "BC-BRIDGE"
+      ]
+    },
+    {
+      "id": "BC-COMPUTE",
+      "name": "Hardware & GPU Compute Substrate",
+      "blueprint_layer": "Edge inference hardware substrate (GPU / RTX 5090 fleet)",
+      "responsibility": "Expose GPU compute (CUDA driver-API bindings) behind a safe compute trait and maintain hardware inventory facts for edge-inference placement.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 hardware/compute substrate; inventory facts only",
+      "published_contracts": [
+        "GpuComputeSeam",
+        "HardwareInventory"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "BC-HOME-NETWORK",
+      "name": "Home & Network Domain",
+      "blueprint_layer": "LifeOS home workspace domain",
+      "responsibility": "HomeLab network control for the LifeOS `home` workspace; durable home/network state is persisted to the canonical store, not held in a local durable authority.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 home/network state persists to BC-PERSIST (single durable writer)",
+      "published_contracts": [
+        "NetworkControl"
+      ],
+      "depends_on": [
+        "BC-PERSIST"
+      ]
+    },
+    {
+      "id": "BC-DEVEX",
+      "name": "Developer Experience & Read Tooling",
+      "blueprint_layer": "Developer tooling / read surfaces",
+      "responsibility": "Read-only developer surfaces: bead viewer, Claude Code board/session TUI, and a token-minimizing CLI proxy; consume upstream contracts without owning durable state.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 read-only projections over BC-GOVERNANCE / session state",
+      "published_contracts": [
+        "ReadOnlyViewer",
+        "TokenProxy"
+      ],
+      "depends_on": [
+        "BC-GOVERNANCE"
+      ]
+    },
+    {
+      "id": "BC-SECRET",
+      "name": "Secret & Provenance Authority",
+      "blueprint_layer": "External secret authority (OS keyring + secretd + vault)",
+      "responsibility": "Hold API keys, attestation bundles, and source pins in the OS keyring / external vault; LifeOS core holds references only. redb never holds secrets; PostgreSQL stores provenance references, never raw secrets.",
+      "store_001_state_classes_owned": [
+        "external-secret / provenance authority (API keys, attestation bundles, source pins)"
+      ],
+      "canonical_data_owner": "OS keyring + committed source pins (unchanged)",
+      "published_contracts": [
+        "SecretAuthority"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "BC-UI-PRESENTATION",
+      "name": "LifeOS Presentation & UDS Shell (consolidation host)",
+      "blueprint_layer": "LifeOS UI / Unix Domain Sockets (the Vue3+Tauri host receiving all peers)",
+      "responsibility": "The single-application host: Vue3+Vite+Pinia+Tauri2 presentation shell that renders swarm/agent status by reading the same memory-mapped redb state and PostgreSQL via UDS/IPC (read-only sink). This is the consolidation target that receives every peer capability.",
+      "store_001_state_classes_owned": [],
+      "canonical_data_owner": "none durable \u2014 read-only UDS/IPC client over BC-INGEST (redb), BC-PERSIST, BC-ORCHESTRATION, BC-GOVERNANCE, BC-COGNITION",
+      "published_contracts": [
+        "PresentationShell",
+        "UDSClient"
+      ],
+      "depends_on": [
+        "BC-INGEST",
+        "BC-PERSIST",
+        "BC-ORCHESTRATION",
+        "BC-GOVERNANCE",
+        "BC-COGNITION"
+      ]
+    }
+  ],
+  "context_map": {
+    "edge_semantics": "edge from->to means 'from' depends on / consumes the published contract of 'to' (customer -> supplier).",
+    "edges": [
+      {
+        "from": "BC-BRIDGE",
+        "to": "BC-INGEST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-BRIDGE",
+        "to": "BC-PERSIST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-BRIDGE",
+        "to": "BC-SECRET",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-COGNITION",
+        "to": "BC-PERSIST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-COGNITION",
+        "to": "BC-COMPUTE",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-ORCHESTRATION",
+        "to": "BC-COGNITION",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-ORCHESTRATION",
+        "to": "BC-PERSIST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-ORCHESTRATION",
+        "to": "BC-COMPUTE",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-ORCHESTRATION",
+        "to": "BC-INTEGRITY",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-INTEGRITY",
+        "to": "BC-PERSIST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-GOVERNANCE",
+        "to": "BC-PERSIST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-GOVERNANCE",
+        "to": "BC-SECRET",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-CONTROL-PLANE",
+        "to": "BC-FOUNDATION",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-FOUNDATION",
+        "to": "BC-BRIDGE",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-HOME-NETWORK",
+        "to": "BC-PERSIST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-DEVEX",
+        "to": "BC-GOVERNANCE",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-UI-PRESENTATION",
+        "to": "BC-INGEST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-UI-PRESENTATION",
+        "to": "BC-PERSIST",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-UI-PRESENTATION",
+        "to": "BC-ORCHESTRATION",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-UI-PRESENTATION",
+        "to": "BC-GOVERNANCE",
+        "relation": "depends-on-contract-of"
+      },
+      {
+        "from": "BC-UI-PRESENTATION",
+        "to": "BC-COGNITION",
+        "relation": "depends-on-contract-of"
+      }
+    ],
+    "topological_order_suppliers_first": [
+      "BC-COMPUTE",
+      "BC-EVIDENCE",
+      "BC-INGEST",
+      "BC-PERSIST",
+      "BC-COGNITION",
+      "BC-HOME-NETWORK",
+      "BC-INTEGRITY",
+      "BC-ORCHESTRATION",
+      "BC-SECRET",
+      "BC-BRIDGE",
+      "BC-FOUNDATION",
+      "BC-CONTROL-PLANE",
+      "BC-GOVERNANCE",
+      "BC-DEVEX",
+      "BC-UI-PRESENTATION"
+    ],
+    "acyclic": true,
+    "cycle_check_method": "Kahn topological sort; acyclic iff every node is emitted."
+  },
+  "single_owner_ledger": [
+    {
+      "state_class": "durable relational macro-state",
+      "sole_owner": "BC-PERSIST",
+      "owner_store": "PostgreSQL + RuVector"
+    },
+    {
+      "state_class": "semantic / vector / knowledge-graph state",
+      "sole_owner": "BC-PERSIST",
+      "owner_store": "PostgreSQL + RuVector (native, No-Sidecar)"
+    },
+    {
+      "state_class": "transient high-frequency state",
+      "sole_owner": "BC-INGEST",
+      "owner_store": "redb"
+    },
+    {
+      "state_class": "per-agent cognition",
+      "sole_owner": "BC-COGNITION",
+      "owner_store": "AgentDB (.rvf)"
+    },
+    {
+      "state_class": "derived projections",
+      "sole_owner": "BC-BRIDGE",
+      "owner_store": "envctl (read-only from PostgreSQL)"
+    },
+    {
+      "state_class": "external-secret / provenance authority",
+      "sole_owner": "BC-SECRET",
+      "owner_store": "OS keyring + committed source pins"
+    }
+  ],
+  "capability_assignments": [
+    {
+      "capability_id": "nu_plugin",
+      "capability_boundary": "Nushell CodeDB plugin: redb + PgStore blob stores, BlobStore parity, fail-closed, MCP.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/nu_plugin",
+        "remote_origin_url": "git@github.com:FlexNetOS/nu_plugin.git",
+        "head_commit": "d7cc4d830a5f8c1c51ac6850062b7066b5bbb9d2",
+        "branch": "master",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-INGEST",
+      "target_contract": "BlobStore",
+      "data_ownership": "Owns the redb transient high-frequency buffer (STORE-001 class: transient, redb-canonical) and the CodeDB parser/capture path; its durable source-blob store is TRANSITIONAL and cuts over redb->PostgreSQL via the BlobStore SHA-256 content-addressed parity contract, one verified swap at a time. No second durable writer.",
+      "store_001_relationship": "Owns the redb transient high-frequency buffer (STORE-001 class: transient, redb-canonical) and the CodeDB parser/capture path; its durable source-blob store is TRANSITIONAL and cuts over redb->PostgreSQL via the BlobStore SHA-256 content-addressed parity contract, one verified swap at a time. No second durable writer.",
+      "anti_corruption_seam": "ACL-01",
+      "dependency_edges": "-> lifeos ADOPT-001 / STORE-001 (redb & PostgreSQL CodeDB); POSTGRES-004",
+      "migration_wave": "wave-0-data-spine",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "meta-ruvector",
+      "capability_boundary": "Neuromorphic vector search engine (spiking NN + HNSW) \u2014 RuVector core.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/meta-ruvector",
+        "remote_origin_url": "git@github.com:FlexNetOS/meta-ruvector.git",
+        "head_commit": "b2e06780868c68aa53fe0169eeb577f2086b390c",
+        "branch": "fix/security-audit-advisories",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-PERSIST",
+      "target_contract": "HybridSearch",
+      "data_ownership": "RuVector native PostgreSQL extension: canonical owner of semantic/vector/knowledge-graph state (STORE-001 class: semantic). No Sidecar; full cutover waits on live RuVector-in-PostgreSQL extension activation per STORE-001 open dependency.",
+      "store_001_relationship": "RuVector native PostgreSQL extension: canonical owner of semantic/vector/knowledge-graph state (STORE-001 class: semantic). No Sidecar; full cutover waits on live RuVector-in-PostgreSQL extension activation per STORE-001 open dependency.",
+      "anti_corruption_seam": "ACL-02",
+      "dependency_edges": "-> lifeos POSTGRES-005 RuVector semantics; PGAUTH cognition",
+      "migration_wave": "wave-0-data-spine",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "envctl",
+      "capability_boundary": "Env/secret control plane: secretd/secretctl, migration engine, libSQL/redb store.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/envctl",
+        "remote_origin_url": "git@github.com:FlexNetOS/envctl.git",
+        "head_commit": "d47ca72c2e0069f67e3cf3488c2f9685cd895140",
+        "branch": "master",
+        "git_kind": "clone",
+        "license": "MIT OR Apache-2.0"
+      },
+      "target_bounded_context": "BC-BRIDGE",
+      "target_contract": "ForwardBridge",
+      "data_ownership": "Forward-only bridge writer (redb->embed->PostgreSQL) and projection engine (PostgreSQL->filesystem); owns derived projections (STORE-001 class: derived projections). Its secret sub-plane surfaces to BC-SECRET; its remote libSQL store is subordinate to PostgreSQL (deferred to STORE-001). Never a second durable authority.",
+      "store_001_relationship": "Forward-only bridge writer (redb->embed->PostgreSQL) and projection engine (PostgreSQL->filesystem); owns derived projections (STORE-001 class: derived projections). Its secret sub-plane surfaces to BC-SECRET; its remote libSQL store is subordinate to PostgreSQL (deferred to STORE-001). Never a second durable authority.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> lifeos ADOPT-002 / POSTGRES-007 (materialization+secrets); STORE-001",
+      "migration_wave": "wave-0-data-spine",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "handoff",
+      "capability_boundary": "Handoff (`hf`) capability seam \u2014 task mint from KB, one-way handoff.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/handoff",
+        "remote_origin_url": "git@github.com:FlexNetOS/handoff.git",
+        "head_commit": "1012c1bc0ccf5d00079080c8769c69ac0b28b096",
+        "branch": "develop",
+        "git_kind": "clone",
+        "license": "Apache-2.0 OR MIT"
+      },
+      "target_bounded_context": "BC-GOVERNANCE",
+      "target_contract": "HandoffSeam",
+      "data_ownership": "One-way task-mint handoff from the knowledge base; subordinate, references BC-PERSIST provenance; not a durable macro-state writer.",
+      "store_001_relationship": "One-way task-mint handoff from the knowledge base; subordinate, references BC-PERSIST provenance; not a durable macro-state writer.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> lifeos LPS-024 hf seam; depends on git-kb/meta",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "loop_lib",
+      "capability_boundary": "Core loop engine library \u2014 runs commands across directories (meta exec substrate).",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/loop_lib",
+        "remote_origin_url": "git@github.com:FlexNetOS/loop_lib.git",
+        "head_commit": "6e79836387d15ac5849e73e7bb869c6077953d90",
+        "branch": "origin-sync",
+        "git_kind": "clone",
+        "license": "UNKNOWN (no LICENSE file \u2014 flag before adoption)"
+      },
+      "target_bounded_context": "BC-CONTROL-PLANE",
+      "target_contract": "LoopEngine",
+      "data_ownership": "Command-execution engine across directories (meta exec substrate); no durable state ownership.",
+      "store_001_relationship": "Command-execution engine across directories (meta exec substrate); no durable state ownership.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> meta CLI fleet (LPS-026/027); command execution",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "meta_plugin_protocol",
+      "capability_boundary": "Shared plugin protocol types for meta subprocess plugins.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/meta_plugin_protocol",
+        "remote_origin_url": "git@github.com:FlexNetOS/meta_plugin_protocol.git",
+        "head_commit": "22c5e61f3af55dfdc17e10900a24644c7f3f799a",
+        "branch": "HEAD",
+        "git_kind": "clone",
+        "license": "UNKNOWN (no LICENSE file \u2014 flag before adoption)"
+      },
+      "target_bounded_context": "BC-CONTROL-PLANE",
+      "target_contract": "PluginProtocol",
+      "data_ownership": "Shared MessagePack subprocess plugin protocol types; process-boundary isolation; no durable state ownership.",
+      "store_001_relationship": "Shared MessagePack subprocess plugin protocol types; process-boundary isolation; no durable state ownership.",
+      "anti_corruption_seam": "ACL-10",
+      "dependency_edges": "-> meta CLI fleet protocol (LPS-026/027)",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "notebooklm-py",
+      "capability_boundary": "NotebookLM Python CLI \u2014 source download/extraction pipeline.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/notebooklm-py",
+        "remote_origin_url": "git@github.com:FlexNetOS/notebooklm-py.git",
+        "head_commit": "26226a707345709d72a96fcf76342a9487a9afc6",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-EVIDENCE",
+      "target_contract": "SourceEvidencePipeline",
+      "data_ownership": "Offline NotebookLM source download/extraction; foreign Python runtime wrapped behind a process boundary; writes evidence files, owns no durable macro-state.",
+      "store_001_relationship": "Offline NotebookLM source download/extraction; foreign Python runtime wrapped behind a process boundary; writes evidence files, owns no durable macro-state.",
+      "anti_corruption_seam": "ACL-12",
+      "dependency_edges": "-> lifeos NBSOURCE-*/NBVERIFY-* evidence pipeline",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "uv run --no-project --with pytest python -m pytest  =>  pytest: 0 failed",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `uv run --no-project --with pytest python -m pytest` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "beads_rust",
+      "capability_boundary": "Agent-first issue tracker (SQLite + JSONL) \u2014 bead/issue substrate.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/beads_rust",
+        "remote_origin_url": "git@github.com:FlexNetOS/beads_rust.git",
+        "head_commit": "2498339168b8e88d641e8ae1664843fc69740012",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-GOVERNANCE",
+      "target_contract": "TaskSubstrate",
+      "data_ownership": "Agent-first issue/bead tracker (SQLite + JSONL); subordinate substrate referencing BC-PERSIST provenance; not a durable macro-state writer.",
+      "store_001_relationship": "Agent-first issue/bead tracker (SQLite + JSONL); subordinate substrate referencing BC-PERSIST provenance; not a durable macro-state writer.",
+      "anti_corruption_seam": "ACL-11",
+      "dependency_edges": "-> LPS-028 beads linkage; LIVING-* task substrate",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "prompt_hub",
+      "capability_boundary": "PromptHub \u2014 prompt registry/store.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/prompt_hub",
+        "remote_origin_url": "git@github.com:FlexNetOS/prompt_hub.git",
+        "head_commit": "101abbba0433f663cd845c8155d62b474025683e",
+        "branch": "fix/audit-crossbeam-quickxml",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-GOVERNANCE",
+      "target_contract": "PromptRegistry",
+      "data_ownership": "Prompt registry/store; subordinate substrate; references BC-PERSIST; no durable macro-state authority.",
+      "store_001_relationship": "Prompt registry/store; subordinate substrate; references BC-PERSIST; no durable macro-state authority.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> lifeos LPS-028 prompt_hub linkage",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "rusty-idd",
+      "capability_boundary": "rusty-idd \u2014 inverse dependency / merge-tools gates.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/rusty-idd",
+        "remote_origin_url": "git@github.com:FlexNetOS/rusty-idd.git",
+        "head_commit": "041771a7199fb4f6611468a4eabb7fbba8111909",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-INTEGRITY",
+      "target_contract": "MergeGate",
+      "data_ownership": "Inverse-dependency / merge-tools verification gates; reads BC-PERSIST dependency graph, emits merge verdicts; owns no durable state.",
+      "store_001_relationship": "Inverse-dependency / merge-tools verification gates; reads BC-PERSIST dependency graph, emits merge verdicts; owns no durable state.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> lifeos LPS-025 rusty-idd gates; merge-tools verify",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "yazelix",
+      "capability_boundary": "Yazelix v17.9 \u2014 Yazi+Zellij+Helix Nix foundation environment.",
+      "adoption_status": "accepted-core",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/yazelix",
+        "remote_origin_url": "git@github.com:FlexNetOS/yazelix.git",
+        "head_commit": "a361a123fe7e1f0f8d1159b6629d23af73df72ee",
+        "branch": "develop",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-FOUNDATION",
+      "target_contract": "ToolchainEnv",
+      "data_ownership": "Yazi+Zellij+Helix Nix foundation environment; consumes materialized projection from BC-BRIDGE to build; owns no durable state.",
+      "store_001_relationship": "Yazi+Zellij+Helix Nix foundation environment; consumes materialized projection from BC-BRIDGE to build; owns no durable state.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> lifeos FOUNDATION-001 toolchain (Yazelix+Nix)",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "nix flake check  =>  nix flake check exits 0",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `nix flake check` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "agent",
+      "capability_boundary": "Claude Code agent guard/score toolkit (PreToolUse denial, meta agent guard).",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/agent",
+        "remote_origin_url": "git@github.com:FlexNetOS/agent.git",
+        "head_commit": "c2261154ad24a928b2bde1e72967ba69aace2ebb",
+        "branch": "pr10",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-INTEGRITY",
+      "target_contract": "PolicyGuard",
+      "data_ownership": "Claude Code agent guard/score toolkit (PreToolUse denial); external Claude Code hook model wrapped behind a typed policy-verdict adapter. Policy seam; owns no durable state.",
+      "store_001_relationship": "Claude Code agent guard/score toolkit (PreToolUse denial); external Claude Code hook model wrapped behind a typed policy-verdict adapter. Policy seam; owns no durable state.",
+      "anti_corruption_seam": "ACL-05",
+      "dependency_edges": "-> meta fleet agent-guard hooks; governs destructive-command policy",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "beads_viewer",
+      "capability_boundary": "Beads Viewer (bv) \u2014 read UI over beads_rust store.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/beads_viewer",
+        "remote_origin_url": "git@github.com:FlexNetOS/beads_viewer.git",
+        "head_commit": "89fb7f96287ffd67810ee79f2dd6c1fad2d24340",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-DEVEX",
+      "target_contract": "ReadOnlyViewer",
+      "data_ownership": "Read UI over the beads store; consumes BC-GOVERNANCE TaskSubstrate contract; read-only, no durable ownership.",
+      "store_001_relationship": "Read UI over the beads store; consumes BC-GOVERNANCE TaskSubstrate contract; read-only, no durable ownership.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> beads_rust (viewer); LPS-028",
+      "migration_wave": "wave-4-presentation-devex",
+      "parity_gate": "nix flake check  =>  nix flake check exits 0",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `nix flake check` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "ccboard",
+      "capability_boundary": "Claude Code board / session TUI utility.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/ccboard",
+        "remote_origin_url": "git@github.com:FlexNetOS/ccboard.git",
+        "head_commit": "f127e8a948bdd98ed57abff6759b715dfa345f1a",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-DEVEX",
+      "target_contract": "ReadOnlyViewer",
+      "data_ownership": "Claude Code board/session TUI; read-only developer surface; no durable ownership.",
+      "store_001_relationship": "Claude Code board/session TUI; read-only developer surface; no durable ownership.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> developer tooling; no direct LifeOS store edge",
+      "migration_wave": "wave-4-presentation-devex",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "cuda-oxide",
+      "capability_boundary": "Rust CUDA driver-API bindings \u2014 GPU compute seam.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/cuda-oxide",
+        "remote_origin_url": "git@github.com:FlexNetOS/cuda-oxide.git",
+        "head_commit": "9e44a007285173bfd33a42f65f47ae2f8c5f3dfc",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-COMPUTE",
+      "target_contract": "GpuComputeSeam",
+      "data_ownership": "Rust CUDA driver-API bindings; unsafe FFI isolated behind a safe compute trait (GPU driver types never escape); no durable state.",
+      "store_001_relationship": "Rust CUDA driver-API bindings; unsafe FFI isolated behind a safe compute trait (GPU driver types never escape); no durable state.",
+      "anti_corruption_seam": "ACL-06",
+      "dependency_edges": "-> INTEL-* GPU substrate (2x RTX 5090); worldsim compute",
+      "migration_wave": "wave-1-cognition-compute",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "flexnetos_runner",
+      "capability_boundary": "FlexNetOS task/agent runner (kache shim, meta-prefix routing).",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/flexnetos_runner",
+        "remote_origin_url": "git@github.com:FlexNetOS/flexnetos_runner.git",
+        "head_commit": "3ccf00f862736b9d97b1695adaec015f0b5375b6",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-ORCHESTRATION",
+      "target_contract": "TaskRunner",
+      "data_ownership": "FlexNetOS task/agent runner (kache shim, meta-prefix routing); transient execution/routing state only; reads BC-PERSIST, owns no durable state.",
+      "store_001_relationship": "FlexNetOS task/agent runner (kache shim, meta-prefix routing); transient execution/routing state only; reads BC-PERSIST, owns no durable state.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> meta fleet execution runner; LPS-026/027",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "grit",
+      "capability_boundary": "Coordination layer for parallel AI agents on top of git.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/grit",
+        "remote_origin_url": "git@github.com:FlexNetOS/grit.git",
+        "head_commit": "89d8addd170f408d1d82860c39096929375bd2ce",
+        "branch": "master",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-CONTROL-PLANE",
+      "target_contract": "MetaOrchestrator",
+      "data_ownership": "Coordination layer for parallel AI agents on top of git (worktree/PR orchestration); no durable state ownership.",
+      "store_001_relationship": "Coordination layer for parallel AI agents on top of git (worktree/PR orchestration); no durable state ownership.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> meta worktree/PR orchestration; LPS-026",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "harness-agent-rs",
+      "capability_boundary": "Rust harness-agent runtime.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/harness-agent-rs",
+        "remote_origin_url": "git@github.com:FlexNetOS/harness-agent-rs.git",
+        "head_commit": "0f13c1d76ec024df1fce2c9e85f28ca925536125",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-COGNITION",
+      "target_contract": "AgentRuntime",
+      "data_ownership": "Rust harness-agent runtime hosting agent execution atop the ruvllm console; per-agent cognition on AgentDB .rvf (STORE-001 class: per-agent cognition), non-authoritative for macro-state.",
+      "store_001_relationship": "Rust harness-agent runtime hosting agent execution atop the ruvllm console; per-agent cognition on AgentDB .rvf (STORE-001 class: per-agent cognition), non-authoritative for macro-state.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> agent-env harness runtime; RECOVERY-003 envctl adjacency",
+      "migration_wave": "wave-1-cognition-compute",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "hermes-agent",
+      "capability_boundary": "Hermes agent (node+python) messaging/agent service.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/hermes-agent",
+        "remote_origin_url": "git@github.com:FlexNetOS/hermes-agent.git",
+        "head_commit": "4e9341a7111467fe04862edd7c902fc0fda0e656",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-COGNITION",
+      "target_contract": "AgentRuntime",
+      "data_ownership": "Hermes agent messaging service (node+python); foreign runtime wrapped behind a message-bus adapter into the agent-runtime contract; non-authoritative for macro-state.",
+      "store_001_relationship": "Hermes agent messaging service (node+python); foreign runtime wrapped behind a message-bus adapter into the agent-runtime contract; non-authoritative for macro-state.",
+      "anti_corruption_seam": "ACL-04",
+      "dependency_edges": "-> agent messaging layer; no direct LifeOS store edge",
+      "migration_wave": "wave-1-cognition-compute",
+      "parity_gate": "uv run --no-project --with pytest python -m pytest  =>  pytest: 0 failed",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `uv run --no-project --with pytest python -m pytest` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "icm",
+      "capability_boundary": "ICM Rust service.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/icm",
+        "remote_origin_url": "git@github.com:FlexNetOS/icm.git",
+        "head_commit": "1ae86fa0ffeb9d72d3202c0b55978d2f60229e98",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-CONTROL-PLANE",
+      "target_contract": "MetaOrchestrator",
+      "data_ownership": "ICM Rust service in the meta fleet; orchestration/service surface; no durable macro-state ownership (RECOVERY disposition preserved).",
+      "store_001_relationship": "ICM Rust service in the meta fleet; orchestration/service surface; no durable macro-state ownership (RECOVERY disposition preserved).",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> meta fleet service; disposition pending RECOVERY",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "meta-plugins",
+      "capability_boundary": "Meta subprocess plugin marketplace/routing.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/meta-plugins",
+        "remote_origin_url": "git@github.com:FlexNetOS/meta-plugins.git",
+        "head_commit": "fec132b78b5a961f81bab7bf057611775185328b",
+        "branch": "codex/codex-marketplace-routing-20260703",
+        "git_kind": "clone",
+        "license": "UNKNOWN (no LICENSE file \u2014 flag before adoption)"
+      },
+      "target_bounded_context": "BC-CONTROL-PLANE",
+      "target_contract": "PluginProtocol",
+      "data_ownership": "Meta subprocess plugin marketplace/routing; external plugin processes wrapped behind the MessagePack plugin protocol boundary; no durable state.",
+      "store_001_relationship": "Meta subprocess plugin marketplace/routing; external plugin processes wrapped behind the MessagePack plugin protocol boundary; no durable state.",
+      "anti_corruption_seam": "ACL-10",
+      "dependency_edges": "-> meta CLI fleet plugins (LPS-026/027)",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "git fsck --full && git status --porcelain  =>  git fsck clean; working tree matches recorded baseline (no build system detected)",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `git fsck --full && git status --porcelain` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "network-control",
+      "capability_boundary": "HomeLab network control (rust+nu).",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/network-control",
+        "remote_origin_url": "git@github.com:FlexNetOS/network-control.git",
+        "head_commit": "5e4b7f7300e4a6c4159a1a252864c3fecd3ed404",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-HOME-NETWORK",
+      "target_contract": "NetworkControl",
+      "data_ownership": "HomeLab network control (rust+nu) for the LifeOS home workspace; durable state persists to BC-PERSIST (single durable writer), no local durable authority.",
+      "store_001_relationship": "HomeLab network control (rust+nu) for the LifeOS home workspace; durable state persists to BC-PERSIST (single durable writer), no local durable authority.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> HOME-* network domain; no direct store edge",
+      "migration_wave": "wave-4-presentation-devex",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "rtk-tokenkill",
+      "capability_boundary": "Rust Token Killer \u2014 CLI proxy minimizing LLM token consumption.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/rtk-tokenkill",
+        "remote_origin_url": "https://github.com/FlexNetOS/rtk-tokenkill.git",
+        "head_commit": "e9d7b2754699bff47b6cb831f6a5c8f9e69844a4",
+        "branch": "codex/register-gitkb-scaffold",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-DEVEX",
+      "target_contract": "TokenProxy",
+      "data_ownership": "Rust Token Killer CLI proxy; developer tooling; no durable state ownership.",
+      "store_001_relationship": "Rust Token Killer CLI proxy; developer tooling; no durable state ownership.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> developer tooling (rtk); meta workflow",
+      "migration_wave": "wave-4-presentation-devex",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "ruflo",
+      "capability_boundary": "Ruflo (node) workflow tool.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/ruflo",
+        "remote_origin_url": "git@github.com:FlexNetOS/ruflo.git",
+        "head_commit": "11b9768870c60c3cdb8f071ad5e1cdc01747d09e",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MIT"
+      },
+      "target_bounded_context": "BC-ORCHESTRATION",
+      "target_contract": "SwarmRouter",
+      "data_ownership": "Ruflo (node) workflow tool; foreign node runtime wrapped behind a subprocess/IPC adapter into the SwarmRouter contract; transient orchestration state only.",
+      "store_001_relationship": "Ruflo (node) workflow tool; foreign node runtime wrapped behind a subprocess/IPC adapter into the SwarmRouter contract; transient orchestration state only.",
+      "anti_corruption_seam": "ACL-03",
+      "dependency_edges": "-> workflow tooling; disposition pending RECOVERY",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "bun install && bun test  =>  test suite: 0 failed",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `bun install && bun test` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "teri",
+      "capability_boundary": "Teri \u2014 Rust-native swarm-intelligence prediction engine.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/teri",
+        "remote_origin_url": "https://github.com/FlexNetOS/teri.git",
+        "head_commit": "059ac955624339a56a7d4ef12028530beab8c4d5",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "LICENSE (present; SPDX unresolved)"
+      },
+      "target_bounded_context": "BC-ORCHESTRATION",
+      "target_contract": "TemporalForecast",
+      "data_ownership": "Rust-native swarm-intelligence prediction engine (ATAS/ESN Temporal Strange Attractors); reads BC-PERSIST codebase state as the ESN initial condition; owns transient simulation state only.",
+      "store_001_relationship": "Rust-native swarm-intelligence prediction engine (ATAS/ESN Temporal Strange Attractors); reads BC-PERSIST codebase state as the ESN initial condition; owns transient simulation state only.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> INTEL-* prediction substrate; no direct store edge",
+      "migration_wave": "wave-2-orchestration-governance",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "weave",
+      "capability_boundary": "Weave \u2014 Rust build/coordination tool.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/weave",
+        "remote_origin_url": "git@github.com:FlexNetOS/weave.git",
+        "head_commit": "29b2f913177fceba1bb7059db8023a33cd5aedd6",
+        "branch": "master",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-FOUNDATION",
+      "target_contract": "BuildCoordinator",
+      "data_ownership": "Rust build/coordination tool; consumes BC-BRIDGE projection to compile; no durable state ownership.",
+      "store_001_relationship": "Rust build/coordination tool; consumes BC-BRIDGE projection to compile; no durable state ownership.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> meta build orchestration; LPS-026",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "yazelix-helix",
+      "capability_boundary": "Yazelix Helix fork (MPL-2.0).",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/yazelix-helix",
+        "remote_origin_url": "https://github.com/FlexNetOS/yazelix-helix.git",
+        "head_commit": "c2819ed223c5e8909a3568af193ded22d495cbbc",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "MPL-2.0"
+      },
+      "target_bounded_context": "BC-FOUNDATION",
+      "target_contract": "ToolchainEnv",
+      "data_ownership": "Yazelix Helix editor fork (MPL-2.0); license-isolated behind a process boundary (MPL code not linked into the core binary); no durable state.",
+      "store_001_relationship": "Yazelix Helix editor fork (MPL-2.0); license-isolated behind a process boundary (MPL code not linked into the core binary); no durable state.",
+      "anti_corruption_seam": "ACL-07",
+      "dependency_edges": "-> yazelix foundation (editor); FOUNDATION-001",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "yazelix-terminal-support",
+      "capability_boundary": "Yazelix terminal-support metadata (ids/labels/capabilities).",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/yazelix-terminal-support",
+        "remote_origin_url": "git@github.com:FlexNetOS/yazelix-terminal-support.git",
+        "head_commit": "6ab751a75d60482584d1fa898f72500fbdb8356c",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-FOUNDATION",
+      "target_contract": "ToolchainEnv",
+      "data_ownership": "Yazelix terminal-support metadata (ids/labels/capabilities); build-time toolchain data; no durable state.",
+      "store_001_relationship": "Yazelix terminal-support metadata (ids/labels/capabilities); build-time toolchain data; no durable state.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> yazelix foundation (terminal detect); FOUNDATION-001",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "yazelix-yazi-assets",
+      "capability_boundary": "Reusable Yazi assets + deterministic config-pack renderer for Yazelix.",
+      "adoption_status": "candidate",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/yazelix-yazi-assets",
+        "remote_origin_url": "git@github.com:FlexNetOS/yazelix-yazi-assets.git",
+        "head_commit": "bd53b59159125f9c186e3766ff5c2a07005c26be",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "Apache-2.0"
+      },
+      "target_bounded_context": "BC-FOUNDATION",
+      "target_contract": "ToolchainEnv",
+      "data_ownership": "Reusable Yazi assets + deterministic config-pack renderer for Yazelix; build-time toolchain data; no durable state.",
+      "store_001_relationship": "Reusable Yazi assets + deterministic config-pack renderer for Yazelix; build-time toolchain data; no durable state.",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> yazelix foundation (yazi assets); FOUNDATION-001",
+      "migration_wave": "wave-3-foundation-control",
+      "parity_gate": "cargo test --all  =>  cargo test: `test result: ok` (0 failed) on all crates",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `cargo test --all` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "harness_hub",
+      "capability_boundary": "Harness hub registry/config aggregation (no build system detected).",
+      "adoption_status": "infra-support",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/harness_hub",
+        "remote_origin_url": "git@github.com:FlexNetOS/harness_hub.git",
+        "head_commit": "0ed1e22443bb1abc0f02b6a9c9370e3a2c384fd7",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "UNKNOWN (no LICENSE file \u2014 flag before adoption)"
+      },
+      "target_bounded_context": "BC-COGNITION",
+      "target_contract": "AgentRuntime",
+      "data_ownership": "Harness hub registry/config aggregation for the agent runtime; registry facts, no durable macro-state ownership (license UNKNOWN \u2014 flagged before adoption).",
+      "store_001_relationship": "Harness hub registry/config aggregation for the agent runtime; registry facts, no durable macro-state ownership (license UNKNOWN \u2014 flagged before adoption).",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> harness registry; RECOVERY disposition pending",
+      "migration_wave": "wave-1-cognition-compute",
+      "parity_gate": "git fsck --full && git status --porcelain  =>  git fsck clean; working tree matches recorded baseline (no build system detected)",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `git fsck --full && git status --porcelain` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "meta-hardware",
+      "capability_boundary": "Meta hardware inventory/metadata (no build system detected).",
+      "adoption_status": "infra-support",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/meta-hardware",
+        "remote_origin_url": "git@github.com:FlexNetOS/meta-hardware.git",
+        "head_commit": "9fb636eb86a8c8334fc7f7e1a47071b075cb27cc",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "UNKNOWN (no LICENSE file \u2014 flag before adoption)"
+      },
+      "target_bounded_context": "BC-COMPUTE",
+      "target_contract": "HardwareInventory",
+      "data_ownership": "Meta hardware inventory/metadata (RTX 5090 fleet facts) for edge-inference placement; inventory only, no durable macro-state (license UNKNOWN \u2014 flagged).",
+      "store_001_relationship": "Meta hardware inventory/metadata (RTX 5090 fleet facts) for edge-inference placement; inventory only, no durable macro-state (license UNKNOWN \u2014 flagged).",
+      "anti_corruption_seam": null,
+      "dependency_edges": "-> INTEL/CONSOLIDATE hardware inventory; RTX 5090 fleet facts",
+      "migration_wave": "wave-1-cognition-compute",
+      "parity_gate": "git fsck --full && git status --porcelain  =>  git fsck clean; working tree matches recorded baseline (no build system detected)",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `git fsck --full && git status --porcelain` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    },
+    {
+      "capability_id": "vault_hub",
+      "capability_boundary": "Vault hub \u2014 secret vault aggregation (no build system detected).",
+      "adoption_status": "infra-support",
+      "is_independent_capability": true,
+      "source_provenance": {
+        "repo_path": "/home/flexnetos/meta/src/vault_hub",
+        "remote_origin_url": "git@github.com:FlexNetOS/vault_hub.git",
+        "head_commit": "92434bb8018c8ae8fc1fae2817d874e10762f651",
+        "branch": "main",
+        "git_kind": "clone",
+        "license": "UNKNOWN (no LICENSE file \u2014 flag before adoption)"
+      },
+      "target_bounded_context": "BC-SECRET",
+      "target_contract": "SecretAuthority",
+      "data_ownership": "Secret vault aggregation; external secret authority (STORE-001 class: external-secret). PostgreSQL stores references only, never raw secrets; redb never holds secrets (license UNKNOWN \u2014 flagged).",
+      "store_001_relationship": "Secret vault aggregation; external secret authority (STORE-001 class: external-secret). PostgreSQL stores references only, never raw secrets; redb never holds secrets (license UNKNOWN \u2014 flagged).",
+      "anti_corruption_seam": "ACL-08",
+      "dependency_edges": "-> envctl/secrets adjacency; RECOVERY disposition pending",
+      "migration_wave": "wave-0-data-spine",
+      "parity_gate": "git fsck --full && git status --porcelain  =>  git fsck clean; working tree matches recorded baseline (no build system detected)",
+      "no_loss_parity_gate": "adopt-in-place at pinned HEAD; parity = `git fsck --full && git status --porcelain` green before AND after any move; upgrade-only (North Star) \u2014 no capability removed, no downgrade.",
+      "rollback": "Restore peer to pinned HEAD at its recorded source path; re-run parity command; adopt-in-place is reversible (no source mutated during planning).",
+      "proof_task": "CONSOLIDATE-001 (this) -> per-context architecture-decision task (next_action); adoption executed under LIFEOS-004 with peer parity green before AND after."
+    }
+  ],
+  "consolidation_target_host": {
+    "capability_id": "lifeos",
+    "capability_boundary": "LifeOS product (Vue3+Vite+Pinia+Tauri2) \u2014 the consolidation TARGET receiving peer capabilities; owns planning-spine-v0.",
+    "adoption_status": "consolidation-target",
+    "is_independent_capability": false,
+    "role": "consolidation-target-host",
+    "source_provenance": {
+      "repo_path": "/home/flexnetos/meta/src/lifeos",
+      "remote_origin_url": "git@github.com:FlexNetOS/lifeos.git",
+      "head_commit": "5b0af355c855c501558a996398251410291e44c7",
+      "branch": "main",
+      "git_kind": "clone",
+      "license": "UNKNOWN (no LICENSE file \u2014 flag before adoption)"
+    },
+    "target_bounded_context": "BC-UI-PRESENTATION",
+    "target_contract": "PresentationShell",
+    "data_ownership": "none durable \u2014 the host shell reads via UDS/IPC (redb + PostgreSQL); it is the RECEIVER of every peer capability, not itself a peer capability being merged.",
+    "anti_corruption_seam": null,
+    "migration_wave": "wave-4-presentation-devex",
+    "note": "lifeos is the single-application consolidation TARGET/container. It is enumerated for completeness but is not counted among the peer capabilities being merged (it is where they land)."
+  },
+  "worktree_reconciliations": [
+    {
+      "worktree_id": "flexnetos_runner-kache-shim-wt",
+      "parent_capability": "flexnetos_runner",
+      "inherits_bounded_context": "BC-ORCHESTRATION",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "kache-shim-stable-path",
+      "head_commit": "a3c796fd6934d0cb619a3e0be2ebe32553940ac0"
+    },
+    {
+      "worktree_id": "flexnetos_runner-meta-prefix-wt",
+      "parent_capability": "flexnetos_runner",
+      "inherits_bounded_context": "BC-ORCHESTRATION",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "fix/runner-meta-prefix",
+      "head_commit": "a843cd3469a6826ce86b7cca1ef038f2b757aa98"
+    },
+    {
+      "worktree_id": "meta-ruvector-qat-wt",
+      "parent_capability": "meta-ruvector",
+      "inherits_bounded_context": "BC-PERSIST",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "codex-ruvllm-qat-graft",
+      "head_commit": "b12d0b33a46f8c0fa67b71e572dd4a8999aaccea"
+    },
+    {
+      "worktree_id": "meta-ruvector-router-wt",
+      "parent_capability": "meta-ruvector",
+      "inherits_bounded_context": "BC-PERSIST",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "codex-ruvltra-router",
+      "head_commit": "c2cfe161d54481f8d7e9b8f0e934ae042bdaa60c"
+    },
+    {
+      "worktree_id": "mrv-95-sync",
+      "parent_capability": "meta-ruvector",
+      "inherits_bounded_context": "BC-PERSIST",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "sync/upstream-ruvnet-main",
+      "head_commit": "aa78e16742c333717ef72f30a65eec2c4befa744"
+    },
+    {
+      "worktree_id": "mrv-ci-fix",
+      "parent_capability": "meta-ruvector",
+      "inherits_bounded_context": "BC-PERSIST",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "ci/fix-workspace-checks",
+      "head_commit": "5e087ae86446015256b6399a35824a4fcad5d247"
+    },
+    {
+      "worktree_id": "mrv-reconcile-wt",
+      "parent_capability": "meta-ruvector",
+      "inherits_bounded_context": "BC-PERSIST",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "chore/reconcile-session-work",
+      "head_commit": "78ca3d6301526465a6ba5f97418311ceb3fcb84c"
+    },
+    {
+      "worktree_id": "rusty-idd-reconcile-wt",
+      "parent_capability": "rusty-idd",
+      "inherits_bounded_context": "BC-INTEGRITY",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "plan/rusty-idd-red-tests",
+      "head_commit": "7f991d7e7619c52e61cfd2f6776c8d6742742388"
+    },
+    {
+      "worktree_id": "weave-build-audit",
+      "parent_capability": "weave",
+      "inherits_bounded_context": "BC-FOUNDATION",
+      "is_independent_capability": false,
+      "disposition": "reconcile-to-parent (merge upstream or archive) per PRESERVE-003; NOT adopted as an independent capability and NOT a second owner.",
+      "branch": "audit/toolchain-comms-20260711",
+      "head_commit": "29b2f913177fceba1bb7059db8023a33cd5aedd6"
+    }
+  ],
+  "anti_corruption_seams": [
+    {
+      "id": "ACL-01",
+      "owning_context": "BC-INGEST",
+      "foreign_model": "redb durable source-blob store (transitional)",
+      "wrap_mechanism": "BlobStore trait with SHA-256 content-addressed identity; redb-durable is TRANSITIONAL and migrates to PostgreSQL only via a green live blobstore_parity.rs run \u2014 never by assumption (STORE-001 verified-cutover invariant).",
+      "grounded_source": "STORE-001 state_class_assignments[0].migration_path + invariants[Verified cutover]; ADOPT-001 BlobStore trait"
+    },
+    {
+      "id": "ACL-02",
+      "owning_context": "BC-PERSIST",
+      "foreign_model": "RuVector engine (neuromorphic vector/GNN)",
+      "wrap_mechanism": "RuVector runs as a NATIVE PostgreSQL extension (No Sidecar); f32 distance math never leaks a second vector database. Full cutover gated on live RuVector-in-PostgreSQL extension activation.",
+      "grounded_source": "Blueprint 'No Sidecar' / Trojan Horse; STORE-001 invariant[No sidecar] + open_dependencies[0]"
+    },
+    {
+      "id": "ACL-03",
+      "owning_context": "BC-ORCHESTRATION",
+      "foreign_model": "ruflo Node.js workflow runtime",
+      "wrap_mechanism": "Subprocess/IPC adapter translating node workflow events into the Rust SwarmRouter contract; node types never enter the core.",
+      "grounded_source": "PRESERVE-002 peer ruflo (node); Blueprint Ruflo meta-harness"
+    },
+    {
+      "id": "ACL-04",
+      "owning_context": "BC-COGNITION",
+      "foreign_model": "hermes-agent node+python messaging",
+      "wrap_mechanism": "Message-bus adapter translating hermes messages into the AgentRuntime contract at a process boundary; foreign runtime types never enter the core.",
+      "grounded_source": "PRESERVE-002 peer hermes-agent (node+python)"
+    },
+    {
+      "id": "ACL-05",
+      "owning_context": "BC-INTEGRITY",
+      "foreign_model": "Claude Code PreToolUse hook payloads (agent guard)",
+      "wrap_mechanism": "Policy adapter that converts external hook payloads into typed policy verdicts (allow/deny); external hook schema never enters the domain model. This is the policy seam.",
+      "grounded_source": "PRESERVE-002 peer agent (Claude Code agent guard); Blueprint Defense & Verification"
+    },
+    {
+      "id": "ACL-06",
+      "owning_context": "BC-COMPUTE",
+      "foreign_model": "CUDA driver-API (unsafe FFI)",
+      "wrap_mechanism": "Unsafe FFI isolated behind a safe GpuComputeSeam trait; raw CUDA driver types never escape the seam.",
+      "grounded_source": "PRESERVE-002 peer cuda-oxide; Blueprint Edge Inference hardware"
+    },
+    {
+      "id": "ACL-07",
+      "owning_context": "BC-FOUNDATION",
+      "foreign_model": "yazelix-helix editor fork (MPL-2.0)",
+      "wrap_mechanism": "License + process boundary: the MPL-2.0 editor runs as an external process and is NOT statically linked into the LifeOS core binary, keeping license obligations isolated.",
+      "grounded_source": "PRESERVE-002 peer yazelix-helix (MPL-2.0)"
+    },
+    {
+      "id": "ACL-08",
+      "owning_context": "BC-SECRET",
+      "foreign_model": "external secret provisioning (secretd/secretctl, vault)",
+      "wrap_mechanism": "Secret authority stays external (OS keyring / vault); LifeOS core holds references only, never raw secrets. redb never holds secrets; PostgreSQL stores provenance references only.",
+      "grounded_source": "STORE-001 state_class_assignments[5]; ADOPT-002 secrets engine"
+    },
+    {
+      "id": "ACL-09",
+      "owning_context": "BC-BRIDGE",
+      "foreign_model": "envctl remote libSQL store",
+      "wrap_mechanism": "Wrapped behind CanonicalStore as SUBORDINATE to PostgreSQL; never a second durable writer; final store role deferred to STORE-001.",
+      "grounded_source": "adopted_capabilities.source.csv 'Remote libSQL store' (ADOPT-002, deferred-to-STORE-001); STORE-001 single-durable-writer invariant"
+    },
+    {
+      "id": "ACL-10",
+      "owning_context": "BC-CONTROL-PLANE",
+      "foreign_model": "meta subprocess plugins (machine-generated exhaust)",
+      "wrap_mechanism": "Typed MessagePack plugin protocol at a subprocess boundary; gitkb/meta isolates napi-rs/wasm exhaust from clean Rust core.",
+      "grounded_source": "Blueprint gitkb/meta 'Dirty Repo' isolation + MessagePack protocol; PRESERVE-002 meta-plugins/meta_plugin_protocol"
+    },
+    {
+      "id": "ACL-11",
+      "owning_context": "BC-GOVERNANCE",
+      "foreign_model": "beads_rust SQLite/JSONL tracker store",
+      "wrap_mechanism": "Repository adapter: beads is a SUBORDINATE substrate referencing PostgreSQL provenance; it is not a second durable macro-state writer.",
+      "grounded_source": "PRESERVE-002 peer beads_rust; STORE-001 single-durable-writer invariant"
+    },
+    {
+      "id": "ACL-12",
+      "owning_context": "BC-EVIDENCE",
+      "foreign_model": "notebooklm-py Python runtime",
+      "wrap_mechanism": "Offline process-boundary CLI wrapper; JSON/file handoff; no Python types enter the Rust core.",
+      "grounded_source": "PRESERVE-002 peer notebooklm-py (Python)"
+    }
+  ],
+  "migration_order": [
+    {
+      "wave": "wave-0-data-spine",
+      "contexts": [
+        "BC-PERSIST",
+        "BC-INGEST",
+        "BC-BRIDGE",
+        "BC-SECRET"
+      ],
+      "capabilities": [
+        "meta-ruvector",
+        "nu_plugin",
+        "envctl",
+        "vault_hub"
+      ],
+      "rationale": "Land the STORE-001 data spine first: PostgreSQL+RuVector canonical owner, redb transient buffer, envctl forward bridge/projection, and the external secret authority the bridge depends on. Any redb-durable class moves to PostgreSQL ONLY via a green live blobstore_parity.rs run (verified-cutover invariant).",
+      "gate": "STORE-001 invariants hold: single durable writer, forward-only sync, verified cutover, no sidecar, provenance preserved."
+    },
+    {
+      "wave": "wave-1-cognition-compute",
+      "contexts": [
+        "BC-COMPUTE",
+        "BC-COGNITION"
+      ],
+      "capabilities": [
+        "cuda-oxide",
+        "meta-hardware",
+        "harness-agent-rs",
+        "hermes-agent",
+        "harness_hub"
+      ],
+      "rationale": "Bring up the compute substrate (GPU seam + hardware inventory) then the edge agent runtime (ruvllm console + AgentDB .rvf), which depend only on BC-PERSIST and BC-COMPUTE.",
+      "gate": "AgentDB cognition non-authoritative; witnessed by SHAKE256 chains rooted in PostgreSQL; GPU FFI isolated behind the compute trait."
+    },
+    {
+      "wave": "wave-2-orchestration-governance",
+      "contexts": [
+        "BC-INTEGRITY",
+        "BC-ORCHESTRATION",
+        "BC-GOVERNANCE"
+      ],
+      "capabilities": [
+        "agent",
+        "rusty-idd",
+        "ruflo",
+        "teri",
+        "flexnetos_runner",
+        "beads_rust",
+        "handoff",
+        "prompt_hub"
+      ],
+      "rationale": "Integrity/policy seams before the swarm they govern (ORCHESTRATION depends-on INTEGRITY); governance substrate alongside. All depend only on already-landed roots.",
+      "gate": "Policy verdicts typed; MinCut/witness-chain enforced; governance substrate subordinate to BC-PERSIST provenance."
+    },
+    {
+      "wave": "wave-3-foundation-control",
+      "contexts": [
+        "BC-FOUNDATION",
+        "BC-CONTROL-PLANE",
+        "BC-EVIDENCE"
+      ],
+      "capabilities": [
+        "yazelix",
+        "yazelix-helix",
+        "yazelix-terminal-support",
+        "yazelix-yazi-assets",
+        "weave",
+        "loop_lib",
+        "meta_plugin_protocol",
+        "meta-plugins",
+        "grit",
+        "icm",
+        "notebooklm-py"
+      ],
+      "rationale": "Foundation build (consumes BC-BRIDGE projection) then the control plane (consumes BC-FOUNDATION); the offline evidence pipeline lands here as an isolated producer.",
+      "gate": "Static musl portable build from materialized projection; plugin/protocol + evidence at process boundaries."
+    },
+    {
+      "wave": "wave-4-presentation-devex",
+      "contexts": [
+        "BC-UI-PRESENTATION",
+        "BC-DEVEX",
+        "BC-HOME-NETWORK"
+      ],
+      "capabilities": [
+        "lifeos (host)",
+        "ccboard",
+        "rtk-tokenkill",
+        "beads_viewer",
+        "network-control"
+      ],
+      "rationale": "Wire the presentation sink (reads everything via UDS/IPC), read-only devex surfaces, and the home/network domain last \u2014 pure consumers with no upstream dependents.",
+      "gate": "Read-only UDS/IPC; no durable ownership introduced; home/network state persists to BC-PERSIST."
+    },
+    {
+      "wave": "wave-5-reconcile",
+      "contexts": [
+        "(worktree parents)"
+      ],
+      "capabilities": [
+        "flexnetos_runner-kache-shim-wt",
+        "flexnetos_runner-meta-prefix-wt",
+        "meta-ruvector-qat-wt",
+        "meta-ruvector-router-wt",
+        "mrv-95-sync",
+        "mrv-ci-fix",
+        "mrv-reconcile-wt",
+        "rusty-idd-reconcile-wt",
+        "weave-build-audit"
+      ],
+      "rationale": "Reconcile the 9 transient worktrees into their parent capabilities per PRESERVE-003 (merge upstream or archive). They are NOT adopted as independent capabilities and NEVER become second owners.",
+      "gate": "PRESERVE-003 topology-transition gate: exact source/target, pre/post checksums, git-ref equivalence, worktree repair, rollback."
+    }
+  ],
+  "coverage": {
+    "peer_count_total": 42,
+    "independent_capabilities_mapped": 32,
+    "worktrees_reconciled_to_parent": 9,
+    "consolidation_target_host": 1,
+    "sum_equals_total": true,
+    "every_independent_capability_mapped_exactly_once": true,
+    "no_capability_ownerless": true,
+    "no_capability_dropped": true,
+    "no_duplicate_owner": true,
+    "bounded_context_count": 15,
+    "anti_corruption_seam_count": 12,
+    "context_map_acyclic": true
+  }
+}

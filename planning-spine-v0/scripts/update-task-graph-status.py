@@ -7,9 +7,10 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now
 
 
 NORMALIZED_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.normalized.v0"
@@ -17,14 +18,30 @@ STATUS_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.status.v0"
 LEDGER_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.v0"
 ALLOWED_UPDATED_FIELDS = {"status", "proof_uri", "next_action"}
 PASSING_PROOF_STATUSES = {"complete", "pass", "passed"}
+ROLLBACK_LEDGER_STATUSES = {"fail", "failed", "rolled-back", "rolled_back", "rollback", "reject", "rejected"}
+# Canonical lifecycle states, ordered from non-executable to terminal.
+LIFECYCLE_STATES = ("draft", "blocked", "ready", "simulated", "running", "complete", "rolled-back")
+# Only a genuinely ready task is executable; draft/blocked/running/rolled-back are not.
+EXECUTABLE_LIFECYCLE = "ready"
+SOURCE_STATUS_LIFECYCLE = {
+    "draft": "draft",
+    "blocked": "blocked",
+    "ready": "ready",
+    "simulated": "simulated",
+    "running": "running",
+    "complete": "complete",
+    "completed": "complete",
+    "done": "complete",
+    "pass": "complete",
+    "passed": "complete",
+    "rolled-back": "rolled-back",
+    "rolled_back": "rolled-back",
+    "rollback": "rolled-back",
+}
 
 
 class StatusError(Exception):
     pass
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def sha256_file(path: Path) -> str:
@@ -134,6 +151,24 @@ def passing_status(status: Any) -> bool:
     return isinstance(status, str) and status.strip().lower() in PASSING_PROOF_STATUSES
 
 
+def lifecycle_state(source_status: str, ledger_entry: dict[str, Any] | None) -> str:
+    """Project a task's canonical lifecycle state from its source status and latest proof.
+
+    Proof is authoritative: a passing ledger entry projects Complete; a failing or
+    rolled-back ledger entry reopens the task as rolled-back (08_EXECUTION_GATES rule 5).
+    Absent a ledger entry, the source status governs. A task is executable-ready only
+    when it projects exactly ``ready``.
+    """
+    if ledger_entry is not None:
+        ledger_status = str(ledger_entry.get("status", "")).strip().lower()
+        if ledger_status in PASSING_PROOF_STATUSES:
+            return "complete"
+        if ledger_status in ROLLBACK_LEDGER_STATUSES:
+            return "rolled-back"
+    normalized = str(source_status).strip().lower()
+    return SOURCE_STATUS_LIFECYCLE.get(normalized, normalized or "unknown")
+
+
 def next_action_for(task_id: str, ledger_entry: dict[str, Any], children: dict[str, list[str]]) -> str:
     proof_uri = str(ledger_entry.get("proof_uri", "")).strip()
     child_ids = children.get(task_id, [])
@@ -142,18 +177,25 @@ def next_action_for(task_id: str, ledger_entry: dict[str, Any], children: dict[s
     return f"Proof accepted from {proof_uri}; no child task is declared in this graph."
 
 
-def status_projection(graph_path: Path, ledger_path: Path) -> dict[str, Any]:
+def status_projection(
+    graph_path: Path,
+    ledger_path: Path,
+    global_coverage_gate: str = "closed",
+) -> dict[str, Any]:
     graph = load_normalized_graph(graph_path)
     ledger_entries, latest_by_task = load_latest_ledger(ledger_path)
     tasks: list[dict[str, Any]] = graph["tasks"]
     children = child_index(tasks)
     generated_at = utc_now()
+    coverage_gate = str(global_coverage_gate).strip().lower()
+    coverage_gate_open = coverage_gate == "open"
 
     status_tasks: list[dict[str, Any]] = []
     forbidden_updates: list[dict[str, Any]] = []
     updated_task_ids: list[str] = []
     complete_task_ids: list[str] = []
     ready_task_ids: list[str] = []
+    lifecycle_buckets: dict[str, list[str]] = {state: [] for state in LIFECYCLE_STATES}
 
     for task in tasks:
         task_id = str(task.get("task_id", "")).strip()
@@ -196,9 +238,12 @@ def status_projection(graph_path: Path, ledger_path: Path) -> dict[str, Any]:
 
         if changes:
             updated_task_ids.append(task_id)
-        if effective_status == "complete":
+
+        lifecycle = lifecycle_state(source_status, ledger_entry)
+        lifecycle_buckets.setdefault(lifecycle, []).append(task_id)
+        if lifecycle == "complete":
             complete_task_ids.append(task_id)
-        else:
+        if lifecycle == EXECUTABLE_LIFECYCLE:
             ready_task_ids.append(task_id)
 
         status_tasks.append(
@@ -208,6 +253,7 @@ def status_projection(graph_path: Path, ledger_path: Path) -> dict[str, Any]:
                 "title": task.get("title", ""),
                 "phase": task.get("phase", ""),
                 "parent_ids": task.get("parent_ids", []),
+                "lifecycle_state": lifecycle,
                 "source": {
                     "status": source_status,
                     "proof_uri": source_proof_uri,
@@ -244,10 +290,17 @@ def status_projection(graph_path: Path, ledger_path: Path) -> dict[str, Any]:
         "result": "pass" if not forbidden_updates else "fail",
         "task_count": len(tasks),
         "ledger_entry_count": len(ledger_entries),
+        "global_coverage_gate": "open" if coverage_gate_open else "closed",
         "updated_task_ids": updated_task_ids,
         "complete_task_ids": complete_task_ids,
         "ready_task_ids": ready_task_ids,
-        "next_ready_task_id": ready_task_ids[0] if ready_task_ids else None,
+        "next_ready_task_id": ready_task_ids[0] if (ready_task_ids and coverage_gate_open) else None,
+        "lifecycle_counts": {state: len(lifecycle_buckets.get(state, [])) for state in LIFECYCLE_STATES},
+        "draft_task_ids": lifecycle_buckets.get("draft", []),
+        "blocked_task_ids": lifecycle_buckets.get("blocked", []),
+        "running_task_ids": lifecycle_buckets.get("running", []),
+        "simulated_task_ids": lifecycle_buckets.get("simulated", []),
+        "rolled_back_task_ids": lifecycle_buckets.get("rolled-back", []),
         "forbidden_update_count": len(forbidden_updates),
         "forbidden_updates": forbidden_updates,
         "tasks": status_tasks,
@@ -282,10 +335,19 @@ def main() -> int:
         default=Path("generated/task_graph.status.json"),
         help="Generated status projection JSON",
     )
+    parser.add_argument(
+        "--coverage-gate",
+        choices=("open", "closed"),
+        default="closed",
+        help=(
+            "Global North Star coverage gate. Fail-closed by default: while closed, "
+            "next_ready_task_id is null even if ready tasks exist."
+        ),
+    )
     args = parser.parse_args()
 
     try:
-        status = status_projection(args.normalized_json, args.ledger)
+        status = status_projection(args.normalized_json, args.ledger, args.coverage_gate)
     except StatusError as error:
         print(f"update-task-graph-status: error: {error}", file=sys.stderr)
         return 1

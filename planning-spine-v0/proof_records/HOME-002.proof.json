@@ -1,0 +1,102 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "HOME-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each service has read-only baseline, constraints, simulation, approval thresholds, safe failure, manual override, rollback, proof, and no autonomous physical action.",
+  "gate_result": {
+    "task_family": "generated/task_families/HOME-002.json",
+    "service_count": 11,
+    "services": ["energy", "gas", "storage", "water", "food", "irrigation", "appliances", "media", "network", "security", "maintenance"],
+    "work_item_count": 11,
+    "gate_clauses_per_service": 9,
+    "gate_clauses": ["read_only_baseline", "constraints", "simulation", "approval_thresholds", "safe_failure", "manual_override", "rollback", "proof", "no_autonomous_physical_action"],
+    "every_service_has_all_nine_clauses": true,
+    "every_work_item_has_owner_and_decision": true,
+    "service_clause_matrix": {
+      "energy": {"work_item": "HOME-002-A", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "gas": {"work_item": "HOME-002-B", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "storage": {"work_item": "HOME-002-C", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "water": {"work_item": "HOME-002-D", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "food": {"work_item": "HOME-002-E", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "irrigation": {"work_item": "HOME-002-F", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "appliances": {"work_item": "HOME-002-G", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "media": {"work_item": "HOME-002-H", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "network": {"work_item": "HOME-002-I", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "security": {"work_item": "HOME-002-J", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true},
+      "maintenance": {"work_item": "HOME-002-K", "read_only_baseline": true, "constraints": true, "simulation": true, "approval_thresholds": true, "safe_failure": true, "manual_override": true, "rollback": true, "proof": true, "no_autonomous_physical_action": true}
+    },
+    "clause_mechanisms": {
+      "read_only_baseline": {
+        "satisfied_for_all_11": true,
+        "value": "Every service draws its baseline from the HOME-001 verified twin: high-frequency device telemetry buffers transiently in redb and is forward-flushed by envctl into canonical PostgreSQL twin history (STORE-001 state-classes 1-3). Establishing a baseline reads only and mutates no device or network in any of the 11 services."
+      },
+      "constraints": {
+        "satisfied_for_all_11": true,
+        "value": "Each service encodes its own safety/regulatory/comfort/budget bounds as PostgreSQL knowledge-graph rows enforced by Causal Graph Verification (anti-bluffing): energy=code/ampacity/SoC/tariff; gas=leak/CO/pressure/combustion code; storage=reserve min/max & chemistry; water=leak/pressure/freeze/municipal; food=expiry/pantry/dietary-allergen; irrigation=runtime/soil/drought/freeze; appliances=manufacturer/thermostat/duty-cycle/energy; media=content/parental/quiet-hours/bandwidth; network=topology/segmentation/QoS; security=life-safety fail-safe/fail-secure & camera privacy; maintenance=service intervals/failure thresholds/budget."
+      },
+      "simulation": {
+        "satisfied_for_all_11": true,
+        "value": "Every workflow is simulated against the digital twin FIRST via ATAS Echo-State-Network ensembles + COW staging branches, forecasting Future Timelines (state diffs, resource burn, failure nodes); Temporal Strange Attractors catch an unsafe 'out-of-bounds' trajectory (gas leak, water continuous-flow, security locked-egress) before any real action. 'Simulate and commit', never 'guess and test'."
+      },
+      "approval_thresholds": {
+        "satisfied_for_all_11": true,
+        "value": "RuvLTRA Proportional Intelligence routes by impact: advisory/reversible proposals clear a light tier; every irreversible, safety-critical, spend, utility, or network proposal is above threshold and requires explicit human approval. For gas, water, network, and security the actuation threshold is permanently human-gated (never crossed by an agent)."
+      },
+      "safe_failure": {
+        "satisfied_for_all_11": true,
+        "value": "RuVector MinCut deterministically severs a drifting/hallucinating service agent in subpolynomial time O(n^{o(1)}) without a swarm restart; hardware holds fail-safe defaults (gas/water valves fail in place, irrigation valves fail closed, thermostat safe default, security egress fail-safe per code / perimeter fail-secure); redb-as-WAL keeps the edge functional during PostgreSQL outage; on uncertainty every service degrades to observe-only."
+      },
+      "manual_override": {
+        "satisfied_for_all_11": true,
+        "value": "The human is always authoritative via LifeOS Mission Control over UDS (reading the same memory-mapped redb state agents write); manual override is immediate and supersedes any agent proposal in every service, and physical manual controls (breaker panel, gas/water shutoff, keys) remain human-held. Agent authority is delegated and revocable (STORE-001 subordinate)."
+      },
+      "rollback": {
+        "satisfied_for_all_11": true,
+        "value": "A rejected/failed timeline is COW-discarded (never merged to the main trunk, so no dirty-repository state); the task-level rollback is the recorded plan — restore the archived home-service plan with no service or device state changed (matches the HOME-002 rollback_plan column)."
+      },
+      "proof": {
+        "satisfied_for_all_11": true,
+        "value": "Every recommendation (and any future human-approved action) is bound to a SHAKE256 Cryptographic Witness Chain rooted in a real twin source vector (telemetry), so a device state, alert, or dependency cannot be bluffed and a real one cannot be silently dropped; Causal Graph Verification rejects any claim without a historical root."
+      },
+      "no_autonomous_physical_action": {
+        "satisfied_for_all_11": true,
+        "value": "No service actuates hardware, spends, mutates a utility, changes the network, or accesses a credential autonomously. blocked_paths (physical control; purchase; utility mutation; network mutation; credential access; product implementation) are total for this phase; gas and security are the strictest instances (never actuate a gas valve; never autonomously unlock a door or arm/disarm). Every physical effect is human-gated and deferred to HOME-003."
+      }
+    },
+    "no_autonomous_physical_action_invariant": {
+      "satisfied": true,
+      "value": "The family-wide safety invariant holds across all 11 services and is the governing_constraint of the task family. This is a planning/definition artifact: zero physical, financial, utility, or network effects were produced. Life-safety egress fail-safe (security) is a code-mandated hardware behavior, not an autonomous agent action."
+    },
+    "store_001_alignment": {
+      "keystone": "STORE-001 (generated/store_relationship_decision.json)",
+      "single_durable_writer_postgresql": true,
+      "forward_only_telemetry_sync_via_envctl": true,
+      "no_sidecar_ruvector_native_extension": true,
+      "provenance_shake256_rooted_in_twin_source_vectors": true,
+      "no_new_durable_authority_introduced_by_home_services": true,
+      "no_home_service_is_a_second_durable_writer_or_independent_control_plane": true
+    },
+    "home_twin_dependency": {
+      "parent": "HOME-001",
+      "value": "Defined against the HOME-001 verified home twin (read-only observation, no physical mutation). HOME-001's task family/proof are not yet produced; this family binds to the HOME-001 CSV contract (goal + gate) and inherits the twin when HOME-001 completes.",
+      "recorded_as_open_dependency": true
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "HOME-002 defines the home resource-service and media workflow families as one task family of 11 governed work items (HOME-002-A energy, -B gas, -C storage, -D water, -E food, -F irrigation, -G appliances, -H media, -I network, -J security, -K maintenance) over the HOME-001 verified home twin, each carrying all nine gate clauses. Every service establishes a read-only baseline from the twin (redb telemetry buffer forward-flushed via envctl into canonical PostgreSQL, STORE-001 state-classes 1-3); encodes its own PostgreSQL/Causal-Graph constraints (electrical code and SoC for energy; leak/CO/combustion code for gas; reserve min/max for storage; leak/pressure/freeze for water; expiry/dietary for food; runtime/soil/drought for irrigation; manufacturer/thermostat bounds for appliances; content/parental/quiet-hours for media; topology/segmentation/QoS for network; life-safety fail-safe/fail-secure and camera privacy for security; service intervals and failure thresholds for maintenance); simulates against the twin first via ATAS ESN ensembles, COW staging branches, and Temporal Strange Attractor out-of-bounds detection; routes approval by RuvLTRA Proportional Intelligence so every irreversible/safety/spend/utility/network action is above threshold and human-gated; fails safe via MinCut deterministic severing plus fail-safe hardware defaults and redb-WAL edge resilience; keeps the human authoritative through Mission Control manual override; rolls back by COW-discard of rejected timelines and restore of the archived home-service plan with no device state changed; proves every recommendation with SHAKE256 Cryptographic Witness Chains rooted in real twin telemetry vectors plus Causal Graph Verification; and performs NO autonomous physical action — gas never actuates a valve and security never autonomously unlocks a door, the two strictest instances of the family-wide invariant. The gate holds: each of the 11 services maps to exactly one work item bearing all 9 clauses, every work item names an owner and a decision, the no-autonomous-physical-action safety invariant holds across all 11, and every assignment traces to the Architecture Blueprint (§1-2 tiered memory, §4 ATAS/RuvLTRA, §6 MinCut/Witness Chains), the Architecture Context Matrix, STORE-001, and the HOME-001 twin contract. This is a planning artifact only — no physical control, purchase, utility mutation, network mutation, or credential access was performed.",
+  "artifact_paths": [
+    "generated/task_families/HOME-002.json",
+    "proof_records/HOME-002.proof.json"
+  ],
+  "grounding_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md (§1 tiered memory/No-Sidecar, §2 AgentDB, §4 ATAS ESN/Temporal Strange Attractors/RuvLTRA, §5 COW branching, §6 RuVector MinCut/SHAKE256 Cryptographic Witness Chains/Causal Graph Verification, UDS/Mission Control section)",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv (rows 1-3 storage tiers, 6-8/15/16/21/23-24 ATAS/RuvLTRA/MinCut, 18 Witness Chains)",
+    "generated/store_relationship_decision.json (STORE-001 keystone: single durable writer, forward-only telemetry sync, no sidecar, provenance preserved, delegated/revocable subordinate authority)",
+    "generated/task_graph.source.csv (HOME-002 goal, verification_gate, blocked_paths, rollback_plan, next_action; parent HOME-001 verified-twin contract; child HOME-003 human-gated execution)",
+    "PERSONAL-001 / PERSONAL-002 privacy-boundary inheritance for food dietary and media family/parental policy (personal substrate input)"
+  ],
+  "rollback_plan": "Restore the archived home-service plan; no service or device state is changed.",
+  "product_execution_performed": false
+}

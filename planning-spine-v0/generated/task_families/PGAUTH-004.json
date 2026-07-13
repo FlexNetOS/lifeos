@@ -1,0 +1,129 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "PGAUTH-004",
+  "title": "Derived projection authority contract bounded",
+  "status": "defined",
+  "owner": "envctl Agent / Runtime Kernel",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Bound every derived-projection state class -- flat files, generated directories, build inputs, runtime materializations, reports, exports, and caches -- as a disposable or preserved projection with one-way provenance from canonical state (PostgreSQL+RuVector rows, or the intended profile package for the generated runtime). Each class declares its canonical source identity, selected branch and version, deterministic materializer, checksum and metadata contract, permitted edit surface, cleanup rule, and a proof that the projection output can never become a competing writable owner. This is the class-by-class refinement of STORE-001's 'derived projections' assignment (PostgreSQL as source of truth, projected by envctl / CodeDB materialization, write authority read-only, sync PostgreSQL -> filesystem forward-only, recovery by re-projection).",
+  "grounding": {
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "keystone_decision": "generated/store_relationship_decision.json (STORE-001, state_class_assignments[4] 'derived projections')",
+    "supporting_sources": [
+      "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv (rows 9,16,20,25 materialization/export/musl; row 3,17 caches)",
+      "task PGAUTH-001 (durable macro-state authority = PostgreSQL canonical rows this projects from)",
+      "task POSTGRES-008 (envctl database-to-directory materialization: deterministic, byte-identical, disposable)",
+      "task FOUNDATION-003 (source -> package -> profile -> generated runtime; archive-first shadow retirement; Yazelix input-output-frontdoor ownership contract)"
+    ]
+  },
+  "projection_classes_bounded": "flat files; generated directories; build inputs; runtime materializations; reports; exports; caches",
+  "work_items": [
+    {
+      "id": "PGAUTH-004-A",
+      "surface": "Flat files -- materialized source and config files (.rs, .toml, .nu) concatenated from canonical PostgreSQL raw_code blocks",
+      "owner": "PostgreSQL codebase rows (canonical source); envctl is the read-only projection writer",
+      "decision": "disposable derived projection",
+      "canonical_source_identity": "PostgreSQL codebase_table rows for the production branch (raw_code, module_path, language, status='production'); each block carries its SHA-256 content identity under the BlobStore parity contract",
+      "selected_branch_and_version": "envctl queries the final production branch at its pinned version (Blueprint Materialization step 1); the branch/version id is recorded on the projection",
+      "deterministic_materializer": "envctl concatenation (Blueprint Materialization step 3 / POSTGRES-008): raw_code blocks joined in stored order into a complete standard file",
+      "checksum_and_metadata_contract": "exact-byte materialization under one SHA-256 identity (ADOPT-001 'Exact-byte materialization'); repeated projection of the same version is byte-identical (POSTGRES-008 gate)",
+      "permitted_edit_surface": "read-only; a source change is applied to the canonical row via SQL UPDATE and re-projected -- the flat file is never hand-edited",
+      "cleanup_rule": "disposable; delete freely, regenerate by re-projection from PostgreSQL (STORE-001 recovery = re-projection)",
+      "non_competing_owner_proof": "envctl write authority is read-only-from-PostgreSQL (STORE-001 derived-projections class); no reverse-sync path exists; blocked_paths forbid reverse synchronization into canonical state and generated-runtime hand-edit"
+    },
+    {
+      "id": "PGAUTH-004-B",
+      "surface": "Generated directories -- the reconstructed module_path directory tree envctl builds in memory and dumps",
+      "owner": "PostgreSQL module_path metadata (canonical source); envctl is the read-only projection writer",
+      "decision": "disposable derived projection",
+      "canonical_source_identity": "PostgreSQL module_path metadata for the selected production branch (Blueprint Materialization step 2)",
+      "selected_branch_and_version": "same production branch/version selected in PGAUTH-004-A; directory structure is a function of that version's module_path rows",
+      "deterministic_materializer": "envctl directory reconstruction (Blueprint step 2 / POSTGRES-008): module_path metadata -> in-memory directory map -> dumped tree",
+      "checksum_and_metadata_contract": "paths, byte content, ordering, permissions, and module relationships are deterministically reconstructed; repeated projection is byte-identical (POSTGRES-008 gate)",
+      "permitted_edit_surface": "read-only; structural changes are made to canonical module_path rows, then re-projected -- the generated tree is never hand-edited",
+      "cleanup_rule": "disposable; regenerable in full by re-projection",
+      "non_competing_owner_proof": "the directory is a memory-then-disk projection of canonical metadata with no write path back; STORE-001 sync_direction is PostgreSQL -> envctl materialize -> filesystem (forward-only, derived)"
+    },
+    {
+      "id": "PGAUTH-004-C",
+      "surface": "Build inputs -- the materialized source tree handed to the Nix / Yazelix build environment for compilation",
+      "owner": "PostgreSQL production rows + committed Nix/source pins (canonical inputs); envctl is the read-only projection writer",
+      "decision": "disposable derived projection",
+      "canonical_source_identity": "the PGAUTH-004-A/B projection (which traces to PostgreSQL production rows) plus pinned build inputs (committed source pins, unchanged per STORE-001 external-secret/provenance class)",
+      "selected_branch_and_version": "the same production branch/version, resolved by the envctl export/release command before compilation",
+      "deterministic_materializer": "envctl dump into the Nix/Yazelix build environment (Blueprint Materialization step 4); the compilation-input closure",
+      "checksum_and_metadata_contract": "build input is the checksummed materialized tree plus pinned inputs; identical version + identical pins -> identical build input",
+      "permitted_edit_surface": "read-only and consumed by the compiler; the build never writes back into the source tree or canonical rows",
+      "cleanup_rule": "disposable; discarded after the build and regenerable by re-projection",
+      "non_competing_owner_proof": "build inputs are consume-only compiler feedstock; they have no synchronization edge into PostgreSQL, so they cannot become an authority (STORE-001 forward-only invariant)"
+    },
+    {
+      "id": "PGAUTH-004-D",
+      "surface": "Runtime materializations -- generated runtime profile and the launched portable folder (LifeOS UI + Yazelix/Zellij/Nushell env) reached through the runtime frontdoor",
+      "owner": "the intended profile package (canonical source resolved source -> package -> profile per FOUNDATION-003); Yazelix input-output-frontdoor projects it",
+      "decision": "disposable derived projection (regenerable from the profile package)",
+      "canonical_source_identity": "the intended profile package that the runtime frontdoor resolves to (FOUNDATION-003: 'every runtime frontdoor resolves to the intended profile package')",
+      "selected_branch_and_version": "the released profile package version/pin selected at launch",
+      "deterministic_materializer": "profile -> generated-runtime materialization (FOUNDATION-003) driven through the Yazelix input-output-frontdoor initialization sequence",
+      "checksum_and_metadata_contract": "generated runtime state is reproducible from the profile package (FOUNDATION-003 gate: 'generated state is reproducible')",
+      "permitted_edit_surface": "read-only generated runtime; blocked_paths forbid generated-runtime hand-edit and profile mutation -- changes are made to the profile source and re-materialized",
+      "cleanup_rule": "disposable; regenerable from the profile package; superseded shadow owners are archived-first, never deleted (FOUNDATION-003 archive-first retirement)",
+      "non_competing_owner_proof": "the generated runtime is a frontdoor projection of the profile package with no reverse write to the profile or to canonical state; FOUNDATION-003 rollback restores the prior generation, confirming the projection is disposable and non-authoritative"
+    },
+    {
+      "id": "PGAUTH-004-E",
+      "surface": "Reports -- ATAS simulated future timelines (projected git diffs, resource burn, complexity spikes, failure nodes), db_health/status reports, and evidence/proof receipts",
+      "owner": "PostgreSQL current codebase state + agent failure history (ATAS canonical input); observed run evidence for receipts",
+      "decision": "transient simulations disposable; evidence/proof receipts preserved as non-authoritative audit records",
+      "canonical_source_identity": "PostgreSQL codebase state and agent failure-rate history used as the ESN initial condition (Blueprint ATAS section); for receipts, the observed revision/state they attest to",
+      "selected_branch_and_version": "the codebase state/branch used as the ESN initial condition, or the observed revision recorded on the receipt",
+      "deterministic_materializer": "ATAS Echo-State-Network ensemble simulation (Blueprint: parallel ESN instances forecasting up to 100 steps) for timelines; receipt emission for evidence records",
+      "checksum_and_metadata_contract": "each report records the canonical source-state identity it was derived from; simulations are forecasts (state diffs / resource burn / failure nodes), never commits",
+      "permitted_edit_surface": "read-only; a winning ATAS timeline enters canonical state only by merging its COW branch into the main trunk -- a PostgreSQL operation -- never by editing the report",
+      "cleanup_rule": "transient simulations disposable; proof receipts and audit reports preserved as non-authoritative evidence",
+      "non_competing_owner_proof": "reports are forecasts/observations with no write path to canonical state; the commit mechanism is COW-branch merge inside PostgreSQL (Blueprint COW branching), so the report itself can never become a writable owner"
+    },
+    {
+      "id": "PGAUTH-004-F",
+      "surface": "Exports -- release/export trees: envctl export output, musl static binaries, and the portable 'install-in-place' folder / AppImage",
+      "owner": "PostgreSQL production branch (via the materialized build input) + pinned Nix/musl inputs (canonical inputs); envctl export + Nix are the read-only projection writers",
+      "decision": "preserved projection (shipped release retained) but non-authoritative and regenerable; intermediate /nix/store closure disposable",
+      "canonical_source_identity": "the PGAUTH-004-C build input (tracing to PostgreSQL production rows) plus pinned Nix/musl inputs",
+      "selected_branch_and_version": "the release branch/version selected by the envctl export/release command (Blueprint: 'issue an export or release command using envctl')",
+      "deterministic_materializer": "envctl export -> Nix static musl compilation against x86_64-unknown-linux-musl (Blueprint Portability section; Context Matrix rows 9,20)",
+      "checksum_and_metadata_contract": "the release artifact carries a content checksum and is regenerable from the same PostgreSQL version + pinned inputs; static musl bundling eliminates /nix/store RPATHs so the artifact is self-contained",
+      "permitted_edit_surface": "read-only immutable artifact; a correction requires a new canonical version and a fresh re-export -- artifacts are never patched in place",
+      "cleanup_rule": "shipped release preserved (retained, non-authoritative); the intermediate /nix/store build closure is disposable",
+      "non_competing_owner_proof": "an exported artifact is a terminal read projection with no synchronization edge back into PostgreSQL; provenance is strictly one-way (STORE-001 forward-only), so it cannot become a competing owner"
+    },
+    {
+      "id": "PGAUTH-004-G",
+      "surface": "Caches -- derived read-through caches: the redb BLAKE3 dedup / semantic / embedding cache (content-hash -> vector)",
+      "owner": "PostgreSQL+RuVector canonical semantic_embedding is the authority; redb owns only the transient cache STORAGE (STORE-001-B / PGAUTH-002), not the value's authority",
+      "decision": "disposable derived projection (read-through cache of canonical embeddings)",
+      "canonical_source_identity": "the canonical semantic_embedding stored in PostgreSQL+RuVector; the cache key is the BLAKE3 hash of the source text block (Blueprint dedup cache logic)",
+      "selected_branch_and_version": "cache entries are keyed by content hash, not by branch; the authoritative vector version always lives in PostgreSQL",
+      "deterministic_materializer": "cache miss -> all-MiniLM-L6-v2 re-embedding inside the bare-metal Rust binary (Blueprint ingestion; Context Matrix row 17); reproducible for identical content",
+      "checksum_and_metadata_contract": "BLAKE3 content-hash identity (Blueprint); a cache value equals the canonical embedding computed for that exact content block",
+      "permitted_edit_surface": "read-only cache; a vector is never authored independently of a canonical embedding -- envctl computes the embedding during the bridge and commits it to PostgreSQL",
+      "cleanup_rule": "disposable; on cache loss the vector is deterministically re-embedded (STORE-001 semantic-class recovery: reproducible re-embedding)",
+      "non_competing_owner_proof": "the cached vector is never the authority -- the PostgreSQL embedding is; storage ownership is deferred to redb's transient tier without reclassification (STORE-001 invariant: 'redb never becomes a second durable writer for a PostgreSQL-owned class'); the cache is a forward-only derivation"
+    }
+  ],
+  "classification": {
+    "disposable": ["PGAUTH-004-A", "PGAUTH-004-B", "PGAUTH-004-C", "PGAUTH-004-D", "PGAUTH-004-G"],
+    "preserved_non_authoritative": ["PGAUTH-004-E (proof/evidence receipts)", "PGAUTH-004-F (shipped release artifacts)"]
+  },
+  "invariants": [
+    "One-way provenance: every projection derives forward from canonical state (PostgreSQL+RuVector rows, or the intended profile package for the generated runtime); there is no reverse synchronization into canonical state.",
+    "Read-only projection writer: envctl (and Nix and ATAS) write projections but read only from canonical sources; the projection is never itself a writable owner.",
+    "Deterministic and reproducible: repeated materialization of one selected version is byte-identical (POSTGRES-008); disposable projections recover by re-projection, preserved projections stay non-authoritative and regenerable.",
+    "Edits go upstream: any change to projected content is applied to the canonical row (SQL UPDATE) or the profile source and then re-projected -- generated output is never hand-edited.",
+    "No competing owner: each projection class carries an explicit non-competing-owner proof; STORE-001's single durable writer (PostgreSQL) and forward-only sync are preserved end to end."
+  ],
+  "completion_gate": "Every projected state class declares its canonical source identity, selected branch and version, deterministic materializer, checksum and metadata contract, permitted edit surface, cleanup rule, and proof that projection output cannot become a competing writable owner.",
+  "product_execution_performed": false,
+  "rollback_plan": "Restore the prior task-graph revision; no projections, generated runtime, profiles, databases, or user-space sources change during planning.",
+  "corrects": null,
+  "unblocks": ["PGAUTH-006"]
+}

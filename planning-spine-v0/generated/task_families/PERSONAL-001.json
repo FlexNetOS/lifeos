@@ -1,0 +1,438 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "PERSONAL-001",
+  "title": "Personal identity privacy and data ownership family defined",
+  "status": "defined",
+  "owner": "LifeOS Privacy Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "parent": "LIFEOS-008",
+  "inputs": [
+    "LIFEOS-008 (personal capability list: identity, privacy, memory, planning, health, finance, legal, files, calendar, contacts, communications)",
+    "INTEL-001 (governed data-substrate classes: hot/warm/cold memory, relational, vector, graph, embedded-ledger, artifact, identity, provenance)",
+    "STORE-001 keystone store-authority decision (generated/store_relationship_decision.json)",
+    "Existing personal app surfaces (data.js: personal workspace sections + Settings/Profile panels)",
+    "Architecture Blueprint - LifeOS Core Foundation.md (foundational source of truth)"
+  ],
+  "objective": "Assign every personal LifeOS data class exactly one user-controlled ownership, consent gate, storage tier, encryption boundary, access rule, retention tier, export/sharing path, provenance mechanism, deletion authority, backup, recovery source, and proof task, on the STORE-001 tiered authority model (PostgreSQL+RuVector canonical durable, redb transient, AgentDB per-agent cognition, OS keyring for secrets, envctl forward-only bridge/projection), such that no personal data crosses a boundary silently.",
+  "grounding_note": "Local-first == the canonical durable owner (PostgreSQL+RuVector) runs on the user's own edge node under the 'No Sidecar' / install-in-place musl model in the Blueprint; personal data therefore never requires a network hop off-device to be authoritative. Every storage assignment below is the personal-domain instantiation of a STORE-001 state class; no new store or authority is invented and no class is assigned two durable owners.",
+  "store_001_alignment": {
+    "keystone": "STORE-001 adopt-intended-tiered-architecture",
+    "invariants_inherited": [
+      "Single durable writer: PostgreSQL owns each durable personal class exactly once; redb is never a second durable writer.",
+      "Forward-only sync: redb -> envctl(embed) -> PostgreSQL; no undirected redb<->PostgreSQL dual-write.",
+      "Verified cutover: a class leaves redb-durable only after a green blobstore_parity.rs (SHA-256 identity) run; never by assumption.",
+      "No sidecar: RuVector runs as a native PostgreSQL extension; no separate vector DB holds personal semantics.",
+      "Provenance preserved: SHA-256/SHAKE256 identity + source lineage on every durable class."
+    ],
+    "state_class_mapping": {
+      "durable relational macro-state": ["PERSONAL-DC-01", "PERSONAL-DC-03", "PERSONAL-DC-04", "PERSONAL-DC-05", "PERSONAL-DC-06", "PERSONAL-DC-07", "PERSONAL-DC-08", "PERSONAL-DC-10", "PERSONAL-DC-12"],
+      "semantic / vector / knowledge-graph state": ["PERSONAL-DC-03", "PERSONAL-DC-08", "PERSONAL-DC-10"],
+      "transient high-frequency state (redb)": ["PERSONAL-DC-03", "PERSONAL-DC-04", "PERSONAL-DC-07", "PERSONAL-DC-09", "PERSONAL-DC-10", "PERSONAL-DC-11"],
+      "per-agent cognition (AgentDB .rvf)": ["PERSONAL-DC-01", "PERSONAL-DC-11"],
+      "derived projections (envctl)": ["PERSONAL-DC-06"],
+      "external-secret / provenance authority (OS keyring)": ["PERSONAL-DC-02", "PERSONAL-DC-10", "PERSONAL-DC-12"]
+    },
+    "mapping_note": "A class may touch several tiers (e.g. health raw samples in redb, settled records in PostgreSQL, embeddings in RuVector) but has exactly ONE canonical durable owner named in its work_item; multi-tier presence is the intended STORE-001 pipeline, not divided authority."
+  },
+  "personal_data_classes_enumerated": [
+    "PERSONAL-DC-01 Identity & profile",
+    "PERSONAL-DC-02 Credentials & secrets",
+    "PERSONAL-DC-03 Health data",
+    "PERSONAL-DC-04 Finance & wallet ledger",
+    "PERSONAL-DC-05 Legal & estate documents",
+    "PERSONAL-DC-06 Personal files / vault",
+    "PERSONAL-DC-07 Calendar & planning",
+    "PERSONAL-DC-08 Contacts & relationship graph",
+    "PERSONAL-DC-09 Family presence & shared hub",
+    "PERSONAL-DC-10 Social & communications",
+    "PERSONAL-DC-11 Personal agent cognition & chat memory",
+    "PERSONAL-DC-12 Provenance, consent & egress ledger"
+  ],
+  "work_items": [
+    {
+      "id": "PERSONAL-DC-01",
+      "class": "Identity & profile",
+      "surface": "data.js profile/Profile (Account alex@lifeos.ai, avatar & display name, language & region) + hubs Identity model (values / habits / preferences, line 328)",
+      "capability": "identity",
+      "owner": {
+        "user_authority": "user is sovereign owner of their identity record",
+        "store_owner": "PostgreSQL + RuVector (canonical durable identity record)",
+        "write_authority": "PostgreSQL single durable writer; user-initiated edits only"
+      },
+      "decision": "Canonical identity (legal/display name, contact handle, avatar ref, locale) is a durable relational macro-state row owned once by PostgreSQL; the learned values/habits/preferences model is per-agent cognition in AgentDB (.rvf), non-authoritative and witnessed back to the PostgreSQL identity source vector.",
+      "consent": "Identity record created only by explicit user action; no field is inferred and persisted without an on-record consent grant logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "durable relational macro-state (canonical) + per-agent cognition (derived)",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "transient_role": "AgentDB .rvf holds the derived preference model; never a durable authority for the identity of record",
+        "lifetime": "durable (identity record) / process-and-training lifecycle (agent model)"
+      },
+      "encryption": "At rest on the user's local edge PostgreSQL under keys held in the OS keyring (STORE-001 external-secret authority); no raw identity secret stored in PostgreSQL columns.",
+      "access": "User + explicitly authorized personal agents; MinCut isolates any agent that drifts before it can read identity rows.",
+      "retention": "Retained for account lifetime; superseded fields versioned, not silently overwritten; agent preference model expires with the agent .rvf.",
+      "provenance": "module_path/row lineage in PostgreSQL; agent preference claims bound to SHAKE256 witness chains rooted in the identity source vector (Causal Graph Verification rejects unrooted preference edits).",
+      "export_sharing": "Export only via envctl projection to a user-requested file; sharing a profile field requires an explicit consent grant recorded in PERSONAL-DC-12.",
+      "deletion_authority": "User; PostgreSQL DELETE plus AgentDB .rvf discard; deletion event tombstoned in PERSONAL-DC-12 (provenance of deletion preserved, data not).",
+      "backup": "PostgreSQL PITR (local edge); agent model regenerable from base model + training history.",
+      "recovery": "PostgreSQL PITR restore of the identity row; agent preference model re-derived.",
+      "egress_control": "No silent egress: identity leaves the device only through a witnessed, consented envctl edge; agent model stays in the local .rvf.",
+      "sync_edge": "user edit -> PostgreSQL (durable); PostgreSQL identity vector -> AgentDB derives preference model (forward-only, non-authoritative)",
+      "proof_task": ["PERSONAL-001-PT-OWNERSHIP", "PERSONAL-001-PT-CONSENT", "PERSONAL-001-PT-EGRESS"]
+    },
+    {
+      "id": "PERSONAL-DC-02",
+      "class": "Credentials & secrets",
+      "surface": "data.js profile Logins & passwords (password vault, passkeys, two-factor, active sessions) + Secrets & keys (API keys, SSH keys, PGP keys, SSL certificates)",
+      "capability": "identity / privacy",
+      "owner": {
+        "user_authority": "user is sole owner and rotation authority for every secret",
+        "store_owner": "OS keyring (STORE-001 external-secret/provenance authority, unchanged)",
+        "write_authority": "OS keyring only"
+      },
+      "decision": "Raw secrets live ONLY in the OS keyring; PostgreSQL holds non-secret references/provenance (service name, key id, last-rotated, session device) and NEVER the secret material; redb NEVER holds secrets.",
+      "consent": "Secret stored on explicit user entry/import; use of a secret by any agent requires a per-use consent scope logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "external-secret / provenance authority",
+        "canonical_owner": "OS keyring",
+        "transient_role": "none; redb and PostgreSQL are barred from holding raw secrets",
+        "lifetime": "until rotated or revoked by the user"
+      },
+      "encryption": "OS keyring native encryption (service 'lifeos'); PostgreSQL stores only references, so no plaintext secret ever reaches the durable relational tier.",
+      "access": "User + narrowly scoped agent grants; active-session list is user-revocable; MinCut severs any agent requesting out-of-scope secrets.",
+      "retention": "Retained until user rotation/revocation; revoked secrets removed from keyring and tombstoned (reference only) in PERSONAL-DC-12.",
+      "provenance": "Committed source pins + keyring account references; STORE-001 external-secret class migration_path = none.",
+      "export_sharing": "Secrets are non-exportable by default; any share is an explicit, witnessed, user-authorized keyring action, never a bulk export.",
+      "deletion_authority": "User; keyring delete + reference tombstone; no PITR retention of secret material (secrets never entered PITR scope).",
+      "backup": "User-controlled keyring backup only; LifeOS does not replicate secrets into PostgreSQL PITR.",
+      "recovery": "OS keyring + committed source pins.",
+      "egress_control": "Hard boundary: secrets never leave the keyring into PostgreSQL, redb, projections, embeddings, or the network; this is the strongest no-silent-egress class.",
+      "sync_edge": "n/a (isolated authority); only non-secret provenance references flow keyring -> PostgreSQL",
+      "proof_task": ["PERSONAL-001-PT-SECRET-ISOLATION", "PERSONAL-001-PT-ENCRYPTION", "PERSONAL-001-PT-EGRESS"]
+    },
+    {
+      "id": "PERSONAL-DC-03",
+      "class": "Health data",
+      "surface": "data.js personal Health (Sleep / Activity / Heart, view: health) + HealthView + personal Files pf-health (lab-results.pdf) + aggregator health score 92",
+      "capability": "health",
+      "owner": {
+        "user_authority": "user owns all biometric and clinical data",
+        "store_owner": "PostgreSQL + RuVector (settled records + artifacts + trend embeddings)",
+        "write_authority": "PostgreSQL single durable writer; redb buffers raw samples pre-flush"
+      },
+      "decision": "High-frequency biometric samples land in redb as transient buffer; envctl flushes settled/aggregated health states forward to PostgreSQL (canonical durable); lab-result artifacts are content-addressed blobs (SHA-256) in PostgreSQL BlobStore; health-trend semantics are RuVector embeddings in PostgreSQL.",
+      "consent": "Sensor ingestion and clinical-record storage each require an explicit health-data consent grant; withdrawal stops ingestion and is logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "transient high-frequency (redb raw samples) -> durable relational + artifact + semantic (PostgreSQL+RuVector)",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "transient_role": "redb high-frequency sample buffer + BLAKE3 dedup cache; process-lifecycle only",
+        "lifetime": "raw samples transient (redb); settled records durable (PostgreSQL PITR)"
+      },
+      "encryption": "PostgreSQL at rest on local edge under keyring-held keys; redb sample buffer is a local memory-mapped file never networked; lab-result blobs encrypted at rest.",
+      "access": "User + explicitly authorized care/coach agents; MinCut isolation guards clinical rows.",
+      "retention": "Raw samples retained only until aggregated then dropped from redb; settled clinical records retained per user-set retention tier with PITR; artifacts retained until user deletes.",
+      "provenance": "SHA-256 identity on lab-result blobs (BlobStore parity contract); row lineage + source device provenance on samples.",
+      "export_sharing": "Export to a clinician is an explicit envctl projection of selected records/artifacts under a consent grant; no automatic upstream sharing.",
+      "deletion_authority": "User; PostgreSQL DELETE of records + blob removal; redb transient loss is by-definition; deletion tombstoned in PERSONAL-DC-12.",
+      "backup": "PostgreSQL PITR (records + artifacts); redb samples not backed up (transient by design).",
+      "recovery": "PostgreSQL PITR + reproducible re-embedding of trends; raw samples not recoverable (transient).",
+      "egress_control": "No silent egress: biometric data reaches PostgreSQL only via the forward-only envctl flush; leaves the device only via a witnessed, consented projection.",
+      "sync_edge": "sensors -> redb buffer (BLAKE3 dedup) -> envctl(embed) -> PostgreSQL+RuVector (forward-only)",
+      "proof_task": ["PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-RETENTION", "PERSONAL-001-PT-RECOVERY", "PERSONAL-001-PT-CONSENT"]
+    },
+    {
+      "id": "PERSONAL-DC-04",
+      "class": "Finance & wallet ledger",
+      "surface": "data.js personal Finance (Net worth, Cash flow) + Wallet (Chase Checking $12,450.32, Cards) + personal Files pf-finance (budget-2026.json, receipts.json)",
+      "capability": "finance",
+      "owner": {
+        "user_authority": "user owns all financial records and balances",
+        "store_owner": "PostgreSQL (ACID relational ledger) + BlobStore artifacts",
+        "write_authority": "PostgreSQL single durable writer (ACID is required for money)"
+      },
+      "decision": "The financial ledger (balances, transactions, net-worth history) is a durable ACID relational class owned once by PostgreSQL (INTEL-001 embedded-ledger class); budget/receipt artifacts are SHA-256 content-addressed blobs; rate-limited balance polls buffer transiently in redb and flush forward.",
+      "consent": "Account linking and balance polling require explicit user consent; each linked institution credential is a PERSONAL-DC-02 keyring secret, not a ledger column.",
+      "storage": {
+        "tier": "durable relational (ACID ledger) + artifact; transient poll buffer in redb",
+        "canonical_owner": "PostgreSQL",
+        "transient_role": "redb buffers high-frequency balance polls / provider responses before forward flush",
+        "lifetime": "durable ledger (PITR); transient poll cache (redb)"
+      },
+      "encryption": "PostgreSQL at rest under keyring-held keys; institution credentials isolated in keyring (PERSONAL-DC-02); no bank credential in the ledger tier.",
+      "access": "User + explicitly authorized finance agents (Finance Bench); MinCut guards ledger rows against drifting agents.",
+      "retention": "Ledger retained per user retention tier with full PITR history (financial audit needs durability); transient polls dropped after flush.",
+      "provenance": "SHA-256 on artifacts; append-with-history ledger lineage; every automated transaction categorization is a witnessed edit (SHAKE256).",
+      "export_sharing": "Export (e.g. tax package) is an explicit envctl projection under consent; no automatic third-party transmission.",
+      "deletion_authority": "User; PostgreSQL DELETE / archival with tombstone in PERSONAL-DC-12; ACID guarantees no partial-state loss.",
+      "backup": "PostgreSQL PITR (local edge); artifacts in BlobStore.",
+      "recovery": "PostgreSQL PITR restore of the ledger to any point in time.",
+      "egress_control": "No silent egress: balances reach PostgreSQL only via forward-only envctl flush; institution tokens never leave the keyring; export is witnessed.",
+      "sync_edge": "provider poll -> redb buffer -> envctl -> PostgreSQL ledger (forward-only)",
+      "proof_task": ["PERSONAL-001-PT-OWNERSHIP", "PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-RECOVERY", "PERSONAL-001-PT-SECRET-ISOLATION"]
+    },
+    {
+      "id": "PERSONAL-DC-05",
+      "class": "Legal & estate documents",
+      "surface": "data.js personal Legal (Will & estate, Insurance auto-renews Aug)",
+      "capability": "legal",
+      "owner": {
+        "user_authority": "user owns all legal/estate documents",
+        "store_owner": "PostgreSQL (durable relational) + BlobStore (SHA-256 documents)",
+        "write_authority": "PostgreSQL single durable writer"
+      },
+      "decision": "Legal document metadata (type, status, renewal date, parties) is durable relational state in PostgreSQL; the documents themselves are tamper-evident SHA-256 content-addressed blobs (BlobStore parity), witnessed by SHAKE256 chains so a legal document cannot be silently altered.",
+      "consent": "Documents stored on explicit user upload; sharing with an executor/attorney requires an explicit, scoped consent grant logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "durable relational + artifact",
+        "canonical_owner": "PostgreSQL",
+        "transient_role": "none (legal data is never transient-authoritative)",
+        "lifetime": "durable, long-horizon retention (PITR)"
+      },
+      "encryption": "PostgreSQL + blob at rest under keyring-held keys; local-first, never off-device without a witnessed export.",
+      "access": "User + explicitly named agents/parties; MinCut isolation; access events witnessed.",
+      "retention": "Long-horizon retention set by the user; superseded versions kept as content-addressed history, not overwritten.",
+      "provenance": "SHA-256 document identity + SHAKE256 witness chain (tamper evidence) + source pin; Causal Graph Verification rejects unrooted edits.",
+      "export_sharing": "Export to an authorized party is an explicit witnessed envctl projection under a scoped, revocable consent grant.",
+      "deletion_authority": "User; PostgreSQL DELETE + blob removal + PERSONAL-DC-12 tombstone; version history retained until user purges.",
+      "backup": "PostgreSQL PITR + BlobStore content-addressed copies.",
+      "recovery": "PostgreSQL PITR + re-materialization of the exact bytes by SHA-256 (exact-byte materialization capability).",
+      "egress_control": "No silent egress: legal documents leave only via a witnessed, consented projection; tamper attempts fail witness-chain verification.",
+      "sync_edge": "user upload -> PostgreSQL + BlobStore (durable, witnessed); no reverse authority",
+      "proof_task": ["PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-PROVENANCE", "PERSONAL-001-PT-RECOVERY", "PERSONAL-001-PT-EGRESS"]
+    },
+    {
+      "id": "PERSONAL-DC-06",
+      "class": "Personal files / vault",
+      "surface": "data.js personal Files (Browse files, view: files, 5 folders / 12 recent) + files.personal (pf-finance, pf-health folders; resume.pdf, receipts.json)",
+      "capability": "files",
+      "owner": {
+        "user_authority": "user owns the personal file vault",
+        "store_owner": "PostgreSQL BlobStore (canonical content) with envctl filesystem projection (derived view)",
+        "write_authority": "PostgreSQL single durable writer; envctl projects read-only to filesystem"
+      },
+      "decision": "File content is canonical as SHA-256 content-addressed blobs in PostgreSQL BlobStore (ADOPT-001 exact-byte materialization); the browsable/downloadable filesystem view is a DERIVED, disposable envctl projection (STORE-001 derived-projections class), regenerated deterministically from module_path metadata.",
+      "consent": "Files stored on explicit user action; the projection is local and consent-gated; no file is projected to a shared location without a grant logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "durable artifact (canonical) + derived projection (disposable)",
+        "canonical_owner": "PostgreSQL BlobStore",
+        "transient_role": "envctl filesystem projection is derived and disposable, never a second authority",
+        "lifetime": "durable content (PITR); projection is regenerable-on-demand"
+      },
+      "encryption": "Blobs at rest under keyring-held keys; projections written only into the FS scope $APPDATA/lifeos/* (locked Tauri scope), never outside.",
+      "access": "User + explicitly authorized agents; projection confined to the locked FS scope; MinCut isolation.",
+      "retention": "Content retained per user retention tier; projections are ephemeral and re-projected on demand.",
+      "provenance": "SHA-256 content identity + module_path lineage; every file traceable to its source commit/upload.",
+      "export_sharing": "Export/download is an explicit envctl projection under consent; no background sync out of the FS scope.",
+      "deletion_authority": "User; PostgreSQL blob delete + projection cleanup + PERSONAL-DC-12 tombstone.",
+      "backup": "PostgreSQL PITR / BlobStore; projections not backed up (re-projectable).",
+      "recovery": "Re-projection from PostgreSQL by SHA-256 (exact-byte materialization); PITR for the content store.",
+      "egress_control": "No silent egress: the only filesystem exit is the envctl projection into the locked $APPDATA/lifeos scope; anything leaving that scope requires a witnessed, consented action.",
+      "sync_edge": "user upload -> PostgreSQL BlobStore (durable); PostgreSQL -> envctl materialize -> filesystem (forward-only, derived)",
+      "proof_task": ["PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-PROVENANCE", "PERSONAL-001-PT-EGRESS", "PERSONAL-001-PT-RECOVERY"]
+    },
+    {
+      "id": "PERSONAL-DC-07",
+      "class": "Calendar & planning",
+      "surface": "data.js personal Calendar (Soccer pickup, Reading hour, view: calendar) + calendar aggregator + planning tasks",
+      "capability": "planning / calendar",
+      "owner": {
+        "user_authority": "user owns their calendar and plans",
+        "store_owner": "PostgreSQL (durable relational events + tasks)",
+        "write_authority": "PostgreSQL single durable writer; redb buffers reminder fire state"
+      },
+      "decision": "Events, tasks and plans are durable relational rows owned once by PostgreSQL; high-frequency reminder/notification fire state (imminent alerts, dismiss flags) is transient in redb and never a durable authority.",
+      "consent": "Calendar sources connected on explicit user consent; cross-workspace aggregation is a local read, not an external share.",
+      "storage": {
+        "tier": "durable relational (events/tasks); transient high-frequency (reminder state in redb)",
+        "canonical_owner": "PostgreSQL",
+        "transient_role": "redb holds notification/reminder fire flags (process-lifecycle)",
+        "lifetime": "durable events (PITR); transient reminder state (redb)"
+      },
+      "encryption": "PostgreSQL at rest under keyring-held keys; redb reminder buffer local-only.",
+      "access": "User + authorized planning agents; shared-event visibility is per-event and consent-scoped; MinCut isolation.",
+      "retention": "Events retained per user retention tier; past events archivable; reminder flags dropped after fire.",
+      "provenance": "Row lineage + source-calendar provenance; imported events keep their origin reference.",
+      "export_sharing": "Publishing/sharing an event requires an explicit consent grant logged to PERSONAL-DC-12; no default outbound publish.",
+      "deletion_authority": "User; PostgreSQL DELETE + PERSONAL-DC-12 tombstone; redb reminder state transient.",
+      "backup": "PostgreSQL PITR; reminder state not backed up (transient).",
+      "recovery": "PostgreSQL PITR restore of events/tasks.",
+      "egress_control": "No silent egress: calendar data stays in PostgreSQL; any external publish is witnessed and consented.",
+      "sync_edge": "user/import -> PostgreSQL (durable); reminder fire -> redb (transient); no reverse authority",
+      "proof_task": ["PERSONAL-001-PT-OWNERSHIP", "PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-EGRESS"]
+    },
+    {
+      "id": "PERSONAL-DC-08",
+      "class": "Contacts & relationship graph",
+      "surface": "data.js personal Contacts (view: contacts, 18 people) + contacts.personal (GP Dr. Amara Diallo, school contact) + hubs contacts + contacts aggregator",
+      "capability": "contacts",
+      "owner": {
+        "user_authority": "user owns their contacts and relationship graph",
+        "store_owner": "PostgreSQL + RuVector (relational records + GNN relationship edges + semantic search)",
+        "write_authority": "PostgreSQL single durable writer"
+      },
+      "decision": "Contact records are durable relational rows in PostgreSQL; the relationship/knowledge graph (who-relates-to-whom, causal edges) and semantic contact search are RuVector GNN + vector state native in PostgreSQL (No Sidecar); no separate contact/vector store.",
+      "consent": "Contacts imported on explicit user consent; enrichment (linking a contact across channels) is a witnessed local operation, not an external lookup, unless the user grants it.",
+      "storage": {
+        "tier": "durable relational + semantic/graph (RuVector)",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "transient_role": "redb may cache f32 distance math for semantic search only (no authority)",
+        "lifetime": "durable (PITR); embeddings reproducible"
+      },
+      "encryption": "PostgreSQL at rest under keyring-held keys; contact channel credentials (if any) isolated in keyring (PERSONAL-DC-02).",
+      "access": "User + authorized agents; MinCut isolation; relationship-graph reads are access-logged for sensitive contacts.",
+      "retention": "Retained per user retention tier; deletable per-contact.",
+      "provenance": "Row lineage + source-import provenance; graph edges are witnessed (Causal Graph Verification) so no fabricated relationship persists.",
+      "export_sharing": "Sharing a contact/vCard is an explicit consented, witnessed export; no bulk contact upload by default.",
+      "deletion_authority": "User; per-contact PostgreSQL DELETE + graph-edge removal + PERSONAL-DC-12 tombstone.",
+      "backup": "PostgreSQL PITR; embeddings/graph reproducible.",
+      "recovery": "PostgreSQL PITR + reproducible re-embedding/re-graphing.",
+      "egress_control": "No silent egress: contacts and relationship edges stay in PostgreSQL; any export is witnessed and consented; RuVector stays in-DB (no sidecar exfiltration surface).",
+      "sync_edge": "import/user -> PostgreSQL (durable) -> RuVector embed/graph in-DB (forward-only)",
+      "proof_task": ["PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-PROVENANCE", "PERSONAL-001-PT-EGRESS"]
+    },
+    {
+      "id": "PERSONAL-DC-09",
+      "class": "Family presence & shared hub",
+      "surface": "data.js personal Family (Partner 'At home · Nearby', Kids 'At school · Safe zone', Parents 'Boston · 3:30 PM', Family hub shared calendar + tasks)",
+      "capability": "identity / privacy / planning (shared)",
+      "owner": {
+        "user_authority": "user + co-owning family members share authority; presence is multi-party data",
+        "store_owner": "redb (transient presence buffer) -> PostgreSQL (settled shared-hub records)",
+        "write_authority": "redb per-device for raw presence; PostgreSQL single durable writer for settled shared records"
+      },
+      "decision": "Raw presence/location updates (partner nearby, kid at school, parent locale) are transient high-frequency state in redb (STORE-001 transient class) - location is transient by nature; only SETTLED, significant states (safe-zone entry/exit events, shared-hub calendar/tasks) are flushed forward to PostgreSQL as durable multi-party records under multi-party consent.",
+      "consent": "Presence sharing requires explicit multi-party consent (each tracked member, guardians for minors); revocation by any party stops that member's sharing and is logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "transient high-frequency (redb presence) -> durable relational (PostgreSQL shared-hub records)",
+        "canonical_owner": "redb for raw presence stream (terminal transient role); PostgreSQL for settled shared records",
+        "transient_role": "redb is the intended terminal owner of the raw location stream (never durable macro-state)",
+        "lifetime": "raw presence transient (redb, process-lifecycle); settled events durable (PostgreSQL)"
+      },
+      "encryption": "redb presence buffer is a local memory-mapped file never networked off the edge node; settled records at rest in PostgreSQL under keyring-held keys.",
+      "access": "Only consented family members + explicitly authorized agents; minors' location gated behind guardian consent; MinCut isolates any agent probing presence out of scope.",
+      "retention": "Raw presence NOT retained (transient by definition - drops with the process); only settled safe-zone/hub events persist per retention tier.",
+      "provenance": "Settled events carry device/source provenance; shared-hub edits witnessed.",
+      "export_sharing": "Presence never auto-shares beyond consented family; external sharing is barred without an explicit witnessed grant.",
+      "deletion_authority": "Each member is deletion authority for their own presence; PostgreSQL DELETE of settled records + tombstone; raw stream is transient.",
+      "backup": "Only settled shared records in PostgreSQL PITR; raw presence not backed up.",
+      "recovery": "PostgreSQL PITR for settled records; raw presence not recoverable (transient by design).",
+      "egress_control": "No silent egress: raw location stays in local redb and is never flushed wholesale; only consented, settled, significant events cross to PostgreSQL; minors' data has the strictest boundary.",
+      "sync_edge": "device presence -> redb (transient) -> envctl flush of settled events -> PostgreSQL (forward-only, multi-party consented)",
+      "proof_task": ["PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-CONSENT", "PERSONAL-001-PT-RETENTION", "PERSONAL-001-PT-EGRESS"]
+    },
+    {
+      "id": "PERSONAL-DC-10",
+      "class": "Social & communications",
+      "surface": "data.js personal Social Media (4 accounts linked, Mentions) + media Socials + communications threads/messages",
+      "capability": "communications",
+      "owner": {
+        "user_authority": "user owns their messages, threads and social records",
+        "store_owner": "PostgreSQL + RuVector (durable message/thread records + semantic search); OS keyring (account link tokens)",
+        "write_authority": "PostgreSQL single durable writer for records; keyring for link tokens"
+      },
+      "decision": "Message/thread records and social posts are durable relational + semantic state in PostgreSQL+RuVector; social-account OAuth/link tokens are keyring secrets (PERSONAL-DC-02), never message columns; high-frequency mention/notification streams buffer transiently in redb and flush forward.",
+      "consent": "Account linking and message ingestion require explicit user consent per account; each linked account credential is a keyring secret; revocation logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "durable relational + semantic (records) + external-secret (link tokens) + transient (mention stream)",
+        "canonical_owner": "PostgreSQL + RuVector (records); OS keyring (tokens)",
+        "transient_role": "redb buffers high-frequency mention/notification stream (no authority)",
+        "lifetime": "durable records (PITR); tokens until revoked; mention stream transient"
+      },
+      "encryption": "PostgreSQL at rest under keyring-held keys; link tokens isolated in keyring; redb mention buffer local-only.",
+      "access": "User + authorized comms agents; MinCut isolation; per-thread access scoping.",
+      "retention": "Messages retained per user retention tier; tokens until revoked; mention stream dropped after flush.",
+      "provenance": "Row lineage + source-account provenance; automated replies/classifications witnessed (SHAKE256).",
+      "export_sharing": "Export of a thread is an explicit consented, witnessed projection; no re-posting or forwarding without a grant.",
+      "deletion_authority": "User; PostgreSQL DELETE of records + keyring token revoke + PERSONAL-DC-12 tombstone.",
+      "backup": "PostgreSQL PITR (records); tokens user-managed in keyring.",
+      "recovery": "PostgreSQL PITR + reproducible re-embedding; tokens re-authorized by the user.",
+      "egress_control": "No silent egress: outbound posts/messages require an explicit, witnessed, consented send; tokens never leave the keyring; ingestion is forward-only.",
+      "sync_edge": "provider -> redb mention buffer -> envctl -> PostgreSQL records; tokens keyring-isolated (forward-only)",
+      "proof_task": ["PERSONAL-001-PT-STORAGE-TIER", "PERSONAL-001-PT-SECRET-ISOLATION", "PERSONAL-001-PT-EGRESS", "PERSONAL-001-PT-CONSENT"]
+    },
+    {
+      "id": "PERSONAL-DC-11",
+      "class": "Personal agent cognition & chat memory",
+      "surface": "src App.vue AIAvatar + stores/lifeos sendAiMessage / aiMessages + hubs Identity model (agent-learned) + AgentDB .rvf",
+      "capability": "memory (active cognition)",
+      "owner": {
+        "user_authority": "user owns the agent and may reset/delete its cognition",
+        "store_owner": "AgentDB (.rvf) per-agent (non-authoritative active cognition)",
+        "write_authority": "AgentDB per agent (self-contained); no durable macro-state authority"
+      },
+      "decision": "The personal agent's learned cognition (MicroLoRA adapters, SONA policy) is per-agent AgentDB (.rvf) - non-authoritative, witnessed by SHAKE256 chains rooted in PostgreSQL source vectors; live chat memory (aiMessages) is EPHEMERAL and is explicitly EXCLUDED from persistence (CLAUDE.md whitelist: aiMessages excluded to avoid replaying stale chat).",
+      "consent": "Agent learning-on-user-data requires an explicit consent grant; chat is ephemeral by default; persisting any conversational memory is opt-in and logged to PERSONAL-DC-12.",
+      "storage": {
+        "tier": "per-agent cognition (AgentDB .rvf) + ephemeral chat (no persistence)",
+        "canonical_owner": "AgentDB (.rvf)",
+        "transient_role": "redb may scratchpad agent thoughts (transient); chat buffer is in-memory only",
+        "lifetime": "agent/training lifecycle (.rvf); chat is session-ephemeral"
+      },
+      "encryption": "AgentDB .rvf is a single local file; witness chains bind claims to PostgreSQL source vectors; no chat persisted to disk.",
+      "access": "The owning agent + user; MinCut severs a hallucinating agent's cognition from the shared graph.",
+      "retention": "Cognition retained in the .rvf until reset; chat NOT retained (excluded from LIFEOS_PERSIST_KEYS).",
+      "provenance": "SHAKE256 Cryptographic Witness Chains root every learned claim in a real PostgreSQL source vector; Causal Graph Verification rejects hallucinated (unrooted) memory.",
+      "export_sharing": "Agent cognition is local to the .rvf; sharing/exporting an agent is an explicit user action; chat cannot leak because it is never persisted.",
+      "deletion_authority": "User; discard/reset the .rvf; chat clears on session end; deletion of a persisted-memory opt-in tombstoned in PERSONAL-DC-12.",
+      "backup": "AgentDB .rvf regenerable from base model + training history; chat not backed up (ephemeral).",
+      "recovery": "Re-derive the .rvf from the base model + PostgreSQL-rooted history; chat not recoverable (by design).",
+      "egress_control": "No silent egress: cognition stays in the local .rvf; unwitnessed (hallucinated) claims are rejected at write; ephemeral chat cannot leave because it is never stored or synced.",
+      "sync_edge": "PostgreSQL source vectors -> AgentDB derives cognition (forward-only, witnessed, non-authoritative); chat: in-memory only, no sync",
+      "proof_task": ["PERSONAL-001-PT-PROVENANCE", "PERSONAL-001-PT-EPHEMERAL-CHAT", "PERSONAL-001-PT-EGRESS"]
+    },
+    {
+      "id": "PERSONAL-DC-12",
+      "class": "Provenance, consent & egress ledger",
+      "surface": "Cross-cutting: consent grants/revocations, access events, egress/share events, deletion tombstones for all PERSONAL-DC-01..11 (INTEL-001 provenance class; embedded-ledger)",
+      "capability": "privacy / provenance",
+      "owner": {
+        "user_authority": "user owns and can read the full audit of their own data",
+        "store_owner": "PostgreSQL (durable append-only ledger) with OS keyring source pins",
+        "write_authority": "PostgreSQL single durable writer; append-only, witnessed"
+      },
+      "decision": "A durable append-only provenance/consent/egress ledger in PostgreSQL records every consent grant/revocation, access, cross-boundary movement, and deletion tombstone for all other classes; each entry is bound to a SHAKE256 witness chain and Causal Graph edge. This ledger is the enforcement substrate for 'no data leaves its boundary silently'.",
+      "consent": "The ledger itself is user-readable; recording an event is mandatory (not optional) for any consent/access/egress/deletion on any other class.",
+      "storage": {
+        "tier": "durable relational append-only (embedded-ledger) + provenance authority",
+        "canonical_owner": "PostgreSQL",
+        "transient_role": "none (the ledger is the durable source of audit truth)",
+        "lifetime": "durable, long-horizon (PITR); append-only, never silently mutated"
+      },
+      "encryption": "PostgreSQL at rest under keyring-held keys; witness roots + source pins committed.",
+      "access": "User (full read of own audit) + governance/privacy agent; entries tamper-evident.",
+      "retention": "Retained long-horizon per user retention tier; append-only so history is complete; deletion tombstones outlive the deleted data (provenance-of-deletion preserved).",
+      "provenance": "Self-witnessing: every entry SHAKE256-chained + Causal-Graph-verified; no entry without a real root.",
+      "export_sharing": "User may export their own audit trail via a witnessed envctl projection; the ledger is never shared externally by default.",
+      "deletion_authority": "Append-only: entries are not deleted; a correction is a new witnessed entry (integrity of the audit trail is preserved).",
+      "backup": "PostgreSQL PITR (local edge).",
+      "recovery": "PostgreSQL PITR restore of the full ledger.",
+      "egress_control": "This class IS the no-silent-egress mechanism: because every cross-boundary movement of every other class must write a witnessed ledger entry here first, no personal data can cross a boundary without leaving an immutable, user-visible trace.",
+      "sync_edge": "every consent/access/egress/deletion on DC-01..11 -> append-only PostgreSQL ledger (forward-only, witnessed)",
+      "proof_task": ["PERSONAL-001-PT-EGRESS", "PERSONAL-001-PT-PROVENANCE", "PERSONAL-001-PT-CONSENT"]
+    }
+  ],
+  "family_invariants": [
+    "User sovereignty: for every class the user is the ownership, consent, sharing, and deletion authority; the STORE-001 store_owner is the technical durable custodian, not the rights-holder.",
+    "Single durable owner: each class names exactly one canonical durable owner (PostgreSQL, OS keyring, AgentDB, or - for the raw presence stream - redb as its intended terminal transient role); no class has two durable writers.",
+    "Secrets never co-mingle: raw credentials/keys/tokens live ONLY in the OS keyring; PostgreSQL and redb are barred from holding secret material (PERSONAL-DC-02, and the token portions of DC-04/DC-10).",
+    "Forward-only sync: transient (redb) -> envctl(embed) -> durable (PostgreSQL); no undirected dual-write; derived filesystem projections are read-only from PostgreSQL.",
+    "No silent egress: every consent, access, cross-boundary movement, and deletion is a mandatory witnessed entry in the PERSONAL-DC-12 ledger; nothing crosses a boundary without a user-visible, tamper-evident trace.",
+    "No sidecar: personal semantics/graph (health trends, contact relationships, message search) live in RuVector inside PostgreSQL - there is no external vector store to exfiltrate from.",
+    "Provenance preserved: SHA-256 (artifacts/blobs) and SHAKE256 (witness chains) identity plus source lineage on every durable class; Causal Graph Verification rejects unrooted (hallucinated) edits.",
+    "Verified cutover: any personal class currently on redb-durable moves to PostgreSQL only after a green blobstore_parity.rs (SHA-256 identity) run for that class; never by assumption (STORE-001).",
+    "Transient means transient: raw presence/location and raw biometric samples are not backed up or recoverable by design - only settled, significant, consented states persist."
+  ],
+  "proof_tasks": [
+    {"id": "PERSONAL-001-PT-OWNERSHIP", "asserts": "Each of the 12 classes names exactly one canonical durable owner and one user authority; no class has two durable writers.", "method": "schema check over work_items[].owner + store_001_alignment.state_class_mapping"},
+    {"id": "PERSONAL-001-PT-CONSENT", "asserts": "Every class has an explicit consent gate; multi-party classes (DC-09) require multi-party consent; ingestion/sharing without a consent grant is barred.", "method": "assert work_items[].consent non-empty and DC-09 multi-party"},
+    {"id": "PERSONAL-001-PT-STORAGE-TIER", "asserts": "Every class maps to a STORE-001 state class with a named canonical owner + transient role + lifetime.", "method": "assert each class id appears in store_001_alignment.state_class_mapping"},
+    {"id": "PERSONAL-001-PT-ENCRYPTION", "asserts": "Every class has an at-rest boundary with key custody in the OS keyring; secrets never reach PostgreSQL/redb plaintext.", "method": "assert work_items[].encryption non-empty and DC-02 keyring-only"},
+    {"id": "PERSONAL-001-PT-RETENTION", "asserts": "Every class has a retention tier; transient (redb) classes explicitly do not persist raw streams.", "method": "assert work_items[].retention non-empty; DC-03/DC-09 raw-stream transient"},
+    {"id": "PERSONAL-001-PT-RECOVERY", "asserts": "Every durable class has a recovery source (PostgreSQL PITR / keyring / regenerable); transient classes declare non-recoverable-by-design.", "method": "assert work_items[].recovery + backup non-empty"},
+    {"id": "PERSONAL-001-PT-EGRESS", "asserts": "No class can cross a boundary without a witnessed PERSONAL-DC-12 ledger entry; no sidecar; secrets never egress.", "method": "assert work_items[].egress_control non-empty and DC-12 is the enforcing substrate"},
+    {"id": "PERSONAL-001-PT-SECRET-ISOLATION", "asserts": "Raw secrets/tokens live only in the OS keyring; PostgreSQL/redb hold references only.", "method": "assert DC-02 canonical_owner==keyring and DC-04/DC-10 token isolation"},
+    {"id": "PERSONAL-001-PT-PROVENANCE", "asserts": "Every durable class carries SHA-256/SHAKE256 identity + source lineage; unrooted edits are rejected.", "method": "assert work_items[].provenance references witness/SHA identity"},
+    {"id": "PERSONAL-001-PT-EPHEMERAL-CHAT", "asserts": "Live chat (aiMessages) is excluded from persistence and cannot leak.", "method": "assert DC-11 chat excluded from LIFEOS_PERSIST_KEYS"}
+  ],
+  "next_action": "Decompose each PERSONAL-DC into domain workflows (health, finance, legal, files, calendar, contacts, family, comms) only after this class contract is proof-passed.",
+  "completion_gate": "Every personal data class (PERSONAL-DC-01..12) has explicit ownership, consent, storage, encryption, access, retention, export, recovery, and a proof task; no data leaves its boundary silently (enforced by the PERSONAL-DC-12 witnessed egress ledger); PERSONAL-001.proof.json records product_execution_performed=false and STORE-001 alignment."
+}

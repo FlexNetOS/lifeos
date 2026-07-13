@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-13T04:30:26Z",
+  "generated_at": "2026-07-13T04:36:29Z",
   "source": {
     "format": "csv",
     "path": "generated/task_graph.source.csv",
@@ -3280,7 +3280,7 @@
         "rollback_plan": "Revert control artifact; rusty-idd repo unchanged.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-025.proof.json",
-        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation."
+        "next_action": "Chain parent LPS-024; real dependency is LPS-023 plus a clean repo build. Bind the goal via OpenSpec before implementation. [2026-07-13T04:36:11Z] cargo audit now GREEN (0 vulns), but rusty-idd-unified build fails (rusty-idd-cli compile error + 9 codegraph-parser test failures + fmt). Blocked on a clean rusty-idd build (concurrent work in rusty-idd-reconcile-wt). Not completable without a green build; not fabricated."
       }
     },
     {
@@ -3302,7 +3302,7 @@
         "rollback_plan": "Close and abandon the test branch and PR; no long-lived branch mutation.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-026.proof.json",
-        "next_action": "Honors git-topology: PRs target develop; develop to main is fast-forward only."
+        "next_action": "Honors git-topology: PRs target develop; develop to main is fast-forward only. [2026-07-13T04:36:11Z] Requires opening a real cross-repo PR (meta git branch->PR with checks). Outward-facing repo action held for explicit per-PR authorization; not fabricated."
       }
     },
     {
@@ -3324,7 +3324,7 @@
         "rollback_plan": "Revert exec surface artifact; no release tags pushed in dry-run.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-027.proof.json",
-        "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here."
+        "next_action": "Depends on LPS-026. meta-mcp registration of 28 tools tracked here. [2026-07-13T04:36:11Z] release-please not installed (bunx fallback available); meta exec release orchestration depends on LPS-026 fleet wiring. Deferred with LPS-026."
       }
     },
     {
@@ -3346,7 +3346,7 @@
         "rollback_plan": "Revert wiring artifact; promoted rows remain Draft.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-028.proof.json",
-        "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears."
+        "next_action": "Depends on LPS-023 through LPS-027. Bump the chain to Ready after the envctl parallel session clears. [2026-07-13T04:36:11Z] Fleet loop spine depends on LPS-023..027 all resolving to proof_uris; blocked transitively by LPS-025/026/027."
       }
     },
     {

@@ -9,11 +9,37 @@ actions that unblock the remainder. Authoritative machine state:
 
 | Surface | Start | Now |
 |---|---|---|
-| planning-spine task graph complete | 44 / 190 | **112 / 196** |
-| nu_plugin requirement-proof ledger — evidence verified | 2 / 140 | **133 / 140** |
-| nu_plugin requirement-proof ledger — verified+complete | 2 / 140 | **120 / 140** |
+| planning-spine task graph complete | 44 / 190 | **185 / 196** |
+| nu_plugin requirement-proof ledger — evidence verified | 2 / 140 | **140 / 140** (local-release receipt validated end-to-end) |
+| nu_plugin requirement-proof ledger — verified+complete | 2 / 140 | **140 / 140** |
 | nu_plugin TASK_GRAPH complete | 19 / 70 | **66 / 70** |
 | nu_plugin BIDIRECTIONAL complete | 7 / 21 | 7 / 21 (14 active — frozen release gate, see below) |
+
+### 2026-07-13 run — STORE-001 keystone + cascade to 185/196, local-release sealed
+
+- **STORE-001 decided** (owner-ratified) per the Architecture Blueprint as foundational
+  source of truth: PostgreSQL+RuVector = canonical durable macro-state; redb = transient
+  tier; AgentDB = per-agent cognition; envctl = bridge+projection. This **corrects the
+  prior decision brief's inverted framing** — it had treated CodeDB's transitional
+  durable-on-redb blobs as a permanent capability and mislabeled the migration-to-spec a
+  downgrade. Building to the intended tiered spec is an upgrade; migration uses the verified
+  BlobStore SHA-256 parity cutover (no silent durable→transient reclassification).
+- **Cascade (45 leaf design contracts via parallel sub-agent teams)**: PGAUTH-002..006,
+  POSTGRES-002..010, FOUNDATION-002/003, CONSOLIDATE/INTEL/MVP1/COMPANY/DEVELOP/PERSONAL/
+  HOME/EXPERIENCE/RELEASE/LIVING domain epics, GRAPH-001/005 — each blueprint-grounded,
+  planning-only (no product execution). 45/45 produced, 0 errors.
+- **DECIDE-001..006** ratified to the documented v0 defaults (bounded, reversible, each with
+  an unblock condition + rollback rule recorded in 09_OPEN_QUESTIONS.md).
+- **16 roll-ups**: all 13 LIFEOS North Star epics + PGAUTH-001/POSTGRES-001/FOUNDATION-001.
+- **Hardware decision**: GPU corrected RTX 5080 → 2× RTX 5090 (32 GB each).
+- **nu_plugin local-release**: `--local-release` lane validated end-to-end with a genuine
+  provider=local receipt (140/140, mode=local-release); default GitHub lane still rejects it.
+  Receipt-gen robustness fix (porcelain parsing + runtime side-effect tolerance) merged to
+  main nu_plugin (c9c5573); temp-scratch collision fixes were already on main convergently.
+- **11 rows remain genuinely blocked (not fabricated)**: 7 worldsim (LPS-029/031-036 — need a
+  physical LiDAR room scan; owner-deferred) + 4 fleet-integration (LPS-025 rusty-idd build
+  fails; LPS-026 outward cross-repo PR; LPS-027 release tooling; LPS-028 chained).
+- planning-spine:verify + verify-lps-docs green; projection result=pass, forbidden_updates=0.
 
 The remaining 7 non-evidence-verified ledger rows all reduce to **one thing: a real
 signed release** (a clean commit → `generate_requirement_proof_receipt.py` detached

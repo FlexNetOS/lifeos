@@ -203,7 +203,7 @@
   "forbidden_updates": [],
   "generated_at": "2026-07-13T04:46:25Z",
   "global_coverage_gate": "closed",
-  "ledger_entry_count": 217,
+  "ledger_entry_count": 240,
   "lifecycle_counts": {
     "blocked": 0,
     "complete": 185,
@@ -214,7 +214,7 @@
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "84988838cdcf11d5b2b2e13ccf0fb283ea60178c209bd9a366a84276e01895c3",
+  "proof_ledger_sha256": "61b69981cb911f1903b1ea2fbb5a9e03520a3086f481aa480730533bed237a02",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [],
   "result": "pass",
@@ -1510,7 +1510,7 @@
     },
     {
       "effective": {
-        "next_action": "Iterate scan -> evaluate -> add/refine phases until the graph coverage gate passes; do not execute product work.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-000.proof.json; next child task: LIFEOS-001.",
         "proof_uri": "proof_records/LIFEOS-000.proof.json",
         "status": "complete"
       },
@@ -1518,10 +1518,10 @@
       "parent_ids": [],
       "phase": "0-north-star-graph",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 220,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "57b9a5f28610342ec8e51287b0cac46ee7e16d5592dde77ac491a96ee25655c2"
       },
       "source": {
         "next_action": "Iterate scan -> evaluate -> add/refine phases until the graph coverage gate passes; do not execute product work.",
@@ -1531,12 +1531,19 @@
       "source_row_number": 34,
       "task_id": "LIFEOS-000",
       "title": "North Star execution graph completed",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Iterate scan -> evaluate -> add/refine phases until the graph coverage gate passes; do not execute product work.",
+          "to": "Proof accepted from proof_records/LIFEOS-000.proof.json; next child task: LIFEOS-001."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose preservation into one bounded task per repository/state surface.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-001.proof.json; next child task: PRESERVE-001.",
         "proof_uri": "proof_records/LIFEOS-001.proof.json",
         "status": "complete"
       },
@@ -1546,10 +1553,10 @@
       ],
       "phase": "1-preservation",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 221,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "d07e805b492961557f8d9e00cd622445870c3336803c44760070b12f14bf9377"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose preservation into one bounded task per repository/state surface.",
@@ -1559,12 +1566,19 @@
       "source_row_number": 35,
       "task_id": "LIFEOS-001",
       "title": "All valid existing work preserved for consolidation",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose preservation into one bounded task per repository/state surface.",
+          "to": "Proof accepted from proof_records/LIFEOS-001.proof.json; next child task: PRESERVE-001."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "POSTGRES-001 now has bounded authority targets; keep every child Draft and next decompose POSTGRES-002 by entity family and relationship boundary.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-002.proof.json; next child task: POSTGRES-001.",
         "proof_uri": "proof_records/LIFEOS-002.proof.json",
         "status": "complete"
       },
@@ -1574,10 +1588,10 @@
       ],
       "phase": "2-postgres-foundation",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 222,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "4231f6abf858c1689ca3c95af6dfe87837d7edccd3ec9abdc21942b488c42b01"
       },
       "source": {
         "next_action": "POSTGRES-001 now has bounded authority targets; keep every child Draft and next decompose POSTGRES-002 by entity family and relationship boundary.",
@@ -1587,12 +1601,19 @@
       "source_row_number": 36,
       "task_id": "LIFEOS-002",
       "title": "PostgreSQL-first user-space foundation proven",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "POSTGRES-001 now has bounded authority targets; keep every child Draft and next decompose POSTGRES-002 by entity family and relationship boundary.",
+          "to": "Proof accepted from proof_records/LIFEOS-002.proof.json; next child task: POSTGRES-001."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Reconcile existing LPS and TEAS rows beneath this phase only after PostgreSQL authority cutover and full North Star coverage pass.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-003.proof.json; next child task: LIFEOS-004.",
         "proof_uri": "proof_records/LIFEOS-003.proof.json",
         "status": "complete"
       },
@@ -1602,10 +1623,10 @@
       ],
       "phase": "3-governed-execution",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 223,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "2ae47510d2e2dc1bd6212b5252d696d63952e718a163d0fa2ab446f237f097be"
       },
       "source": {
         "next_action": "Reconcile existing LPS and TEAS rows beneath this phase only after PostgreSQL authority cutover and full North Star coverage pass.",
@@ -1615,12 +1636,19 @@
       "source_row_number": 37,
       "task_id": "LIFEOS-003",
       "title": "Governed intent-to-proof execution spine completed",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Reconcile existing LPS and TEAS rows beneath this phase only after PostgreSQL authority cutover and full North Star coverage pass.",
+          "to": "Proof accepted from proof_records/LIFEOS-003.proof.json; next child task: LIFEOS-004."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose consolidation by capability and dependency order.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-004.proof.json; next child task: LIFEOS-005.",
         "proof_uri": "proof_records/LIFEOS-004.proof.json",
         "status": "complete"
       },
@@ -1630,10 +1658,10 @@
       ],
       "phase": "4-physical-consolidation",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 224,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "b53b2ae4a48a7eb34f5f3b9f7f80ca07300f4a543020066473da72597409472d"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose consolidation by capability and dependency order.",
@@ -1643,12 +1671,19 @@
       "source_row_number": 38,
       "task_id": "LIFEOS-004",
       "title": "Peer capabilities physically consolidated into LifeOS",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose consolidation by capability and dependency order.",
+          "to": "Proof accepted from proof_records/LIFEOS-004.proof.json; next child task: LIFEOS-005."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose each substrate capability behind authority and simulation gates.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-005.proof.json; next child task: LIFEOS-006.",
         "proof_uri": "proof_records/LIFEOS-005.proof.json",
         "status": "complete"
       },
@@ -1658,10 +1693,10 @@
       ],
       "phase": "5-intelligence-substrate",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 225,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "424eefd4ad6b8fb75f4f09298e501bafff5f63350700e7e60e101d04f25b3e7b"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose each substrate capability behind authority and simulation gates.",
@@ -1671,12 +1706,19 @@
       "source_row_number": 39,
       "task_id": "LIFEOS-005",
       "title": "Unified memory compute network and learning substrate integrated",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose each substrate capability behind authority and simulation gates.",
+          "to": "Proof accepted from proof_records/LIFEOS-005.proof.json; next child task: LIFEOS-006."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose the smallest financial and legal vertical slices.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-006.proof.json; next child task: LIFEOS-007.",
         "proof_uri": "proof_records/LIFEOS-006.proof.json",
         "status": "complete"
       },
@@ -1686,10 +1728,10 @@
       ],
       "phase": "6-mvp1-financial-legal",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 226,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "ee644806c9a614ebc27ad11b83986f32e8efa3213b364363681f0e2f67c5175b"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose the smallest financial and legal vertical slices.",
@@ -1699,12 +1741,19 @@
       "source_row_number": 40,
       "task_id": "LIFEOS-006",
       "title": "Financial and legal MVP1 operating domain completed",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose the smallest financial and legal vertical slices.",
+          "to": "Proof accepted from proof_records/LIFEOS-006.proof.json; next child task: LIFEOS-007."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose company and development capabilities into bounded vertical slices.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-007.proof.json; next child task: LIFEOS-010.",
         "proof_uri": "proof_records/LIFEOS-007.proof.json",
         "status": "complete"
       },
@@ -1714,10 +1763,10 @@
       ],
       "phase": "7-company-development",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 227,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "b249fadc3f4547718311aadf1677c6700a4e19387e5bfc85b78b85a4dddeb276"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose company and development capabilities into bounded vertical slices.",
@@ -1727,12 +1776,19 @@
       "source_row_number": 41,
       "task_id": "LIFEOS-007",
       "title": "Company and development operating environments consolidated",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose company and development capabilities into bounded vertical slices.",
+          "to": "Proof accepted from proof_records/LIFEOS-007.proof.json; next child task: LIFEOS-010."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose personal capabilities into bounded user-controlled slices.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-008.proof.json; next child task: LIFEOS-010.",
         "proof_uri": "proof_records/LIFEOS-008.proof.json",
         "status": "complete"
       },
@@ -1742,10 +1798,10 @@
       ],
       "phase": "8-personal",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 228,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "79747e9aabfe86b04c88c9c80b49e6929f61751ddabac94df94ea342226f0c26"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose personal capabilities into bounded user-controlled slices.",
@@ -1755,12 +1811,19 @@
       "source_row_number": 42,
       "task_id": "LIFEOS-008",
       "title": "Personal operating environment consolidated",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose personal capabilities into bounded user-controlled slices.",
+          "to": "Proof accepted from proof_records/LIFEOS-008.proof.json; next child task: LIFEOS-010."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose home capabilities from read-only observation toward gated physical control.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-009.proof.json; next child task: LIFEOS-010.",
         "proof_uri": "proof_records/LIFEOS-009.proof.json",
         "status": "complete"
       },
@@ -1770,10 +1833,10 @@
       ],
       "phase": "9-home",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 229,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "d5d60dc04b502697164ee3816b42a262a3609362cd4738fc5a3c9abe5bb9b720"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose home capabilities from read-only observation toward gated physical control.",
@@ -1783,12 +1846,19 @@
       "source_row_number": 43,
       "task_id": "LIFEOS-009",
       "title": "Home operating environment consolidated",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose home capabilities from read-only observation toward gated physical control.",
+          "to": "Proof accepted from proof_records/LIFEOS-009.proof.json; next child task: LIFEOS-010."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose interfaces only after their underlying domain workflows are proven.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-010.proof.json; next child task: LIFEOS-011.",
         "proof_uri": "proof_records/LIFEOS-010.proof.json",
         "status": "complete"
       },
@@ -1800,10 +1870,10 @@
       ],
       "phase": "10-experience",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 230,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "6e5a1b8967a8d21df4eb97ebcf1c7bf293e1732f4030a33698e85b69f9c43160"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose interfaces only after their underlying domain workflows are proven.",
@@ -1813,12 +1883,19 @@
       "source_row_number": 44,
       "task_id": "LIFEOS-010",
       "title": "Coherent LifeOS experience delivered across user interfaces",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose interfaces only after their underlying domain workflows are proven.",
+          "to": "Proof accepted from proof_records/LIFEOS-010.proof.json; next child task: LIFEOS-011."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After all child task graphs are complete and proven, decompose release and acceptance into bounded gates.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-011.proof.json; next child task: LIFEOS-012.",
         "proof_uri": "proof_records/LIFEOS-011.proof.json",
         "status": "complete"
       },
@@ -1828,10 +1905,10 @@
       ],
       "phase": "11-system-proof-release",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 231,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "cefa6d563d0e93c2d5cc633da6c3d91beea71cf664a4ed7386aa855db8bacb0b"
       },
       "source": {
         "next_action": "After all child task graphs are complete and proven, decompose release and acceptance into bounded gates.",
@@ -1841,12 +1918,19 @@
       "source_row_number": 45,
       "task_id": "LIFEOS-011",
       "title": "Whole LifeOS product proven and reproducibly released",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After all child task graphs are complete and proven, decompose release and acceptance into bounded gates.",
+          "to": "Proof accepted from proof_records/LIFEOS-011.proof.json; next child task: LIFEOS-012."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After full graph coverage passes, decompose continuous operation into bounded observation, learning, promotion, and rollback tasks.",
+        "next_action": "Proof accepted from proof_records/LIFEOS-012.proof.json; next child task: LIVING-001.",
         "proof_uri": "proof_records/LIFEOS-012.proof.json",
         "status": "complete"
       },
@@ -1856,10 +1940,10 @@
       ],
       "phase": "12-living-system",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 232,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "c3d159ba17eb0416c1280edf351e862341f97643ea7c4545f9c209b25430a5c7"
       },
       "source": {
         "next_action": "After full graph coverage passes, decompose continuous operation into bounded observation, learning, promotion, and rollback tasks.",
@@ -1869,8 +1953,15 @@
       "source_row_number": 46,
       "task_id": "LIFEOS-012",
       "title": "LifeOS continuously improves under governed feedback",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After full graph coverage passes, decompose continuous operation into bounded observation, learning, promotion, and rollback tasks.",
+          "to": "Proof accepted from proof_records/LIFEOS-012.proof.json; next child task: LIVING-001."
+        }
+      }
     },
     {
       "effective": {
@@ -2335,7 +2426,7 @@
     },
     {
       "effective": {
-        "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006, prior capability adoption, and STORE-001; keep all targets Draft until owner discussion closes the store relationship.",
+        "next_action": "Proof accepted from proof_records/POSTGRES-001.proof.json; next child task: PGAUTH-001.",
         "proof_uri": "proof_records/POSTGRES-001.proof.json",
         "status": "complete"
       },
@@ -2345,10 +2436,10 @@
       ],
       "phase": "2-postgres-foundation",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 237,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "9f6c630159c0ed69bed0761b76b4399c890e81f4ca0f5f8c8aa098b6dbfabb26"
       },
       "source": {
         "next_action": "Authority work is bounded by PGAUTH-001 through PGAUTH-006, prior capability adoption, and STORE-001; keep all targets Draft until owner discussion closes the store relationship.",
@@ -2358,12 +2449,19 @@
       "source_row_number": 60,
       "task_id": "POSTGRES-001",
       "title": "PostgreSQL authority and store boundaries defined",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Authority work is bounded by PGAUTH-001 through PGAUTH-006, prior capability adoption, and STORE-001; keep all targets Draft until owner discussion closes the store relationship.",
+          "to": "Proof accepted from proof_records/POSTGRES-001.proof.json; next child task: PGAUTH-001."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "After graph closure, produce the durable-state contract from preserved planning evidence only; do not deploy schemas or write live data.",
+        "next_action": "Proof accepted from proof_records/PGAUTH-001.proof.json; next child task: PGAUTH-002.",
         "proof_uri": "proof_records/PGAUTH-001.proof.json",
         "status": "complete"
       },
@@ -2373,10 +2471,10 @@
       ],
       "phase": "2-postgres-foundation",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 236,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "79864cbb45ab2200a5a8606c7aa879fe54f327332dd1ee22ce816ed7a2ee9e04"
       },
       "source": {
         "next_action": "After graph closure, produce the durable-state contract from preserved planning evidence only; do not deploy schemas or write live data.",
@@ -2386,8 +2484,15 @@
       "source_row_number": 61,
       "task_id": "PGAUTH-001",
       "title": "Durable macro-state authority contract bounded",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After graph closure, produce the durable-state contract from preserved planning evidence only; do not deploy schemas or write live data.",
+          "to": "Proof accepted from proof_records/PGAUTH-001.proof.json; next child task: PGAUTH-002."
+        }
+      }
     },
     {
       "effective": {
@@ -2992,7 +3097,7 @@
     },
     {
       "effective": {
-        "next_action": "Decompose package ownership by capability after full graph closure.",
+        "next_action": "Proof accepted from proof_records/FOUNDATION-001.proof.json; next child task: FOUNDATION-002.",
         "proof_uri": "proof_records/FOUNDATION-001.proof.json",
         "status": "complete"
       },
@@ -3002,10 +3107,10 @@
       ],
       "phase": "2-foundation",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 218,
+        "observed_at": "2026-07-13T03:47:08Z",
+        "revision": "1",
+        "sha256": "3591d0e53944bc102de14104db837f700bd7a4e9fe1d849c1d780635197da666"
       },
       "source": {
         "next_action": "Decompose package ownership by capability after full graph closure.",
@@ -3015,8 +3120,15 @@
       "source_row_number": 79,
       "task_id": "FOUNDATION-001",
       "title": "Single Yazelix and Nix foundation package plan defined",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Decompose package ownership by capability after full graph closure.",
+          "to": "Proof accepted from proof_records/FOUNDATION-001.proof.json; next child task: FOUNDATION-002."
+        }
+      }
     },
     {
       "effective": {
@@ -4045,10 +4157,10 @@
       ],
       "phase": "0-foundation",
       "proof": {
-        "ledger_line_number": 147,
-        "observed_at": "2026-07-12T17:20:29Z",
-        "revision": "3",
-        "sha256": "49373d10333de0e66963a68103dddd1bcef0e72219483a92f4e012331f401d84"
+        "ledger_line_number": 233,
+        "observed_at": "2026-07-13T04:46:25Z",
+        "revision": "4",
+        "sha256": "161f5102460821763f55fb125b3c69db3886178d27e0c9e6c4ab90d36878a0b3"
       },
       "source": {
         "next_action": "Create a bounded proof-backfill task after the full graph coverage gate passes.",
@@ -4290,10 +4402,10 @@
       ],
       "phase": "3-execution",
       "proof": {
-        "ledger_line_number": 154,
-        "observed_at": "2026-07-12T17:20:29Z",
-        "revision": "3",
-        "sha256": "f93485d92452bff7d19b4fcef6fae2ee142c32e33087563be76c305521ceaf52"
+        "ledger_line_number": 240,
+        "observed_at": "2026-07-13T04:46:25Z",
+        "revision": "6",
+        "sha256": "b0bb90c21990607363a81994967d0f0311e0f0bdfebe58d0f126860bfdf7de08"
       },
       "source": {
         "next_action": "Create a bounded proof-ledger reconciliation task after the full graph coverage gate passes.",
@@ -4430,10 +4542,10 @@
       ],
       "phase": "7-review",
       "proof": {
-        "ledger_line_number": 158,
-        "observed_at": "2026-07-12T17:20:29Z",
-        "revision": "3",
-        "sha256": "03ded68880660e23e0a8cbef7b8a30413197b8085c55309059578816fb94bfdc"
+        "ledger_line_number": 235,
+        "observed_at": "2026-07-13T04:46:25Z",
+        "revision": "4",
+        "sha256": "219462d5f474902e5edb0d1c68681606057960b8294f2d14a83e6257a99d2e04"
       },
       "source": {
         "next_action": "After high-level coverage passes, add one bounded decision row per unresolved question before any dependent product task becomes ready.",
@@ -4984,10 +5096,10 @@
       ],
       "phase": "0-north-star-graph",
       "proof": {
-        "ledger_line_number": 185,
-        "observed_at": "2026-07-13T03:47:08Z",
-        "revision": "1",
-        "sha256": "1d06edc08b843edf17684b6ca2caf7ac5cd32c2615cee3da2ffed3f598ac4e3c"
+        "ledger_line_number": 238,
+        "observed_at": "2026-07-13T04:46:25Z",
+        "revision": "3",
+        "sha256": "5e1e788a6a07d86bd1a8a630ef3bb130be26f64537bc50c97d663b24baabfe49"
       },
       "source": {
         "next_action": "This is the final planning gate; no product execution before its proof is accepted.",
@@ -7278,6 +7390,19 @@
     "NBSTATED-030",
     "NBSTATED-031",
     "NBSTATED-032",
+    "LIFEOS-000",
+    "LIFEOS-001",
+    "LIFEOS-002",
+    "LIFEOS-003",
+    "LIFEOS-004",
+    "LIFEOS-005",
+    "LIFEOS-006",
+    "LIFEOS-007",
+    "LIFEOS-008",
+    "LIFEOS-009",
+    "LIFEOS-010",
+    "LIFEOS-011",
+    "LIFEOS-012",
     "PRESERVE-001",
     "PRESERVE-002",
     "RECOVERY-001",
@@ -7291,6 +7416,8 @@
     "STRUCTURE-004",
     "STRUCTURE-005",
     "STRUCTURE-006",
+    "POSTGRES-001",
+    "PGAUTH-001",
     "PGAUTH-002",
     "PGAUTH-003",
     "PGAUTH-004",
@@ -7308,6 +7435,7 @@
     "POSTGRES-008",
     "POSTGRES-009",
     "POSTGRES-010",
+    "FOUNDATION-001",
     "FOUNDATION-002",
     "FOUNDATION-003",
     "CONSOLIDATE-001",

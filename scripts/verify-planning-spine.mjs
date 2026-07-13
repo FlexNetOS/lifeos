@@ -142,46 +142,81 @@ function recordAuthorityCheck(name, detail, passed, context = {}) {
   assert(passed, detail);
 }
 
+function currentObservedAt() {
+  const rawEpoch = process.env.SOURCE_DATE_EPOCH;
+  if (rawEpoch === undefined) return new Date().toISOString();
+  assert(/^\d+$/.test(rawEpoch), "SOURCE_DATE_EPOCH must be a non-negative integer Unix timestamp");
+  const observedAt = new Date(Number(rawEpoch) * 1000);
+  assert(!Number.isNaN(observedAt.getTime()), "SOURCE_DATE_EPOCH is outside the supported date range");
+  return observedAt.toISOString();
+}
+
+function withoutObservedAt(report) {
+  const stable = { ...report };
+  delete stable.observed_at;
+  return stable;
+}
+
+function writeStableReport(reportPath, report) {
+  let existing = null;
+  if (fs.existsSync(reportPath)) {
+    existing = JSON.parse(fs.readFileSync(reportPath, "utf8"));
+  }
+  if (
+    existing
+    && JSON.stringify(withoutObservedAt(existing)) === JSON.stringify(withoutObservedAt(report))
+  ) {
+    report.observed_at = existing.observed_at;
+  } else {
+    report.observed_at = currentObservedAt();
+  }
+
+  const serialized = `${JSON.stringify(report, null, 2)}\n`;
+  if (!existing || fs.readFileSync(reportPath, "utf8") !== serialized) {
+    fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+    fs.writeFileSync(reportPath, serialized, "utf8");
+  }
+}
+
+function portableArg(arg) {
+  if (!path.isAbsolute(arg)) return arg;
+  const relative = path.relative(repoRoot, arg);
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative) ? relative : arg;
+}
+
 function writeRuntimeReport(result, message) {
   const report = {
     command: process.env.npm_lifecycle_event === "planning-spine:verify"
       ? "bun run planning-spine:verify"
       : `bun ${path.relative(repoRoot, process.argv[1] ?? "scripts/verify-planning-spine.mjs")}`,
-    cwd: repoRoot,
-    pkg_root: pkgRoot,
+    cwd: ".",
+    pkg_root: path.relative(repoRoot, pkgRoot),
     executable: process.execPath,
     runtime: {
       name: typeof Bun !== "undefined" ? "bun" : "node",
       version: typeof Bun !== "undefined" ? Bun.version : process.version,
-      argv: process.argv
+      argv: process.argv.map(portableArg)
     },
     lifecycle_event: process.env.npm_lifecycle_event ?? null,
-    observed_at: new Date().toISOString(),
+    observed_at: null,
     performed_checks: performedChecks,
     result,
     message
   };
 
-  fs.mkdirSync(path.dirname(runtimeReportPath), { recursive: true });
-  fs.writeFileSync(runtimeReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  writeStableReport(runtimeReportPath, report);
 }
 
 function writeMvpBundleReport(result, message) {
-  bundleReport.observed_at = new Date().toISOString();
   bundleReport.result = result;
   bundleReport.message = message;
-
-  fs.mkdirSync(path.dirname(mvpBundleReportPath), { recursive: true });
-  fs.writeFileSync(mvpBundleReportPath, `${JSON.stringify(bundleReport, null, 2)}\n`, "utf8");
+  writeStableReport(mvpBundleReportPath, bundleReport);
 }
 
 function writeAuthorityIntegrityReport(result, message) {
-  authorityIntegrityReport.observed_at = new Date().toISOString();
   authorityIntegrityReport.result = result;
   authorityIntegrityReport.message = message;
-
-  fs.mkdirSync(path.dirname(authorityIntegrityReportPath), { recursive: true });
-  fs.writeFileSync(authorityIntegrityReportPath, `${JSON.stringify(authorityIntegrityReport, null, 2)}\n`, "utf8");
+  writeStableReport(authorityIntegrityReportPath, authorityIntegrityReport);
 }
 
 function validate(schema, value, at = "$") {

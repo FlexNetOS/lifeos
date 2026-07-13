@@ -33,13 +33,15 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "tauri:icons": "cargo tauri icon public/lifeos-app-icon.png && python3 scripts/canonicalize-icns.py src-tauri/icons/icon.icns",
+    "tauri:icons:check": "python3 scripts/canonicalize-icns.py --check src-tauri/icons/icon.icns",
     "design:lint": "design.md lint DESIGN.md",
     "design:diff": "node scripts/design-diff.mjs",
     "design:export:dtcg": "design.md export --format dtcg DESIGN.md > design-system-reference/exports/tokens.json",
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md > design-system-reference/exports/tailwind.theme.json",
     "design:export": "bun run design:export:dtcg && bun run design:export:tailwind",
     "test:a11y": "vitest run --config vitest.a11y.config.ts",
-    "check": "vue-tsc --noEmit && bun run test && bun run test:a11y && bun run design:lint"
+    "check": "vue-tsc --noEmit && bun run test && bun run test:a11y && bun run design:lint && bun run tauri:icons:check"
   },
   "dependencies": {
     "@lucide/vue": "^1.16.0",

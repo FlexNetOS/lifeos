@@ -50,3 +50,12 @@ bun run tauri:build        # native installer — slow, on demand only
 - `serde@1`, `serde_json@1`
 
 <!-- MANUAL: Add notes below; this section is preserved on regeneration. -->
+
+`cargo tauri icon` 2.11 emits identical ICNS chunks in nondeterministic order.
+After regenerating from the repo root, canonicalize and verify the container:
+
+```bash
+cargo tauri icon public/lifeos-app-icon.png
+python3 scripts/canonicalize-icns.py src-tauri/icons/icon.icns
+python3 scripts/canonicalize-icns.py --check src-tauri/icons/icon.icns
+```

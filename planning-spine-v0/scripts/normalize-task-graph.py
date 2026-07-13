@@ -13,9 +13,10 @@ import json
 import re
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now
 
 
 RAW_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.raw.v0"
@@ -88,10 +89,6 @@ class ValidationError(Exception):
     def __init__(self, issue: ValidationIssue):
         super().__init__(issue.message)
         self.issue = issue
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def load_raw(path: Path) -> dict[str, Any]:

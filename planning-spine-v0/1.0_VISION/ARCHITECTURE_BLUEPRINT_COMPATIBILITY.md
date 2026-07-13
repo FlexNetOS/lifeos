@@ -183,6 +183,28 @@ The last valid committed baseline already keeps `STORE-001` Draft. This clean
 worktree intentionally lands only source artifacts, metadata, navigation, and
 the compatibility review; it does not copy the unsupported proof chain.
 
+## PR #35 additive integration resolution
+
+The audit above is a truthful snapshot of the earlier concurrent worktree. It
+does not describe the later, ordered integration of commits `7260b5a`,
+`d546125`, and `d4ee554` requested for PR #35. That later sequence supplies the
+STORE decision/proof surface and its explicit transition invariants while the
+blueprint import remains cataloged evidence rather than implementation proof.
+
+The integrated disposition is additive:
+
+| Surface | Integrated resolution |
+|---|---|
+| Raw blueprint and context CSV exports | Preserve the cataloged source bytes and incomplete-provenance boundary from `8ae8cbf`. |
+| STORE relationship and proof artifacts | Preserve the later tiered ownership decision, verified-cutover invariant, open RuVector/PostgreSQL dependencies, and no-product-mutation boundary from `7260b5a`; do not infer that the blueprint alone proves implementation. |
+| LPS proof regeneration | Keep revisions monotonic and suppress timestamp-only rewrites so a verifier run cannot reset an accepted proof revision or create nondeterministic ledger conflicts. |
+| Canonical task CSV | Normalize maintained projections to LF before regenerating raw, normalized, index, status, ledger, and package reports. Raw NotebookLM exports retain their original bytes. |
+| Runtime transients | Exclude Python bytecode and PID files from source control; they are neither blueprint evidence nor planning proof. |
+
+This resolution preserves both feature sets without treating either a stale
+generated report or the historical concurrent-worktree audit as the current
+source of authority.
+
 ## Recent change map
 
 | Commit | Compatibility effect |

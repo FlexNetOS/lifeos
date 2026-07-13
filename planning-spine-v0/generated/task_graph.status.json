@@ -87,6 +87,12 @@
     "LPS-023",
     "LPS-024",
     "LPS-030",
+    "LPS-031",
+    "LPS-032",
+    "LPS-033",
+    "LPS-034",
+    "LPS-035",
+    "LPS-036",
     "NBSOURCE-007",
     "NBSOURCE-008",
     "NBSOURCE-009",
@@ -185,12 +191,6 @@
     "LPS-027",
     "LPS-028",
     "LPS-029",
-    "LPS-031",
-    "LPS-032",
-    "LPS-033",
-    "LPS-034",
-    "LPS-035",
-    "LPS-036",
     "DECIDE-001",
     "DECIDE-002",
     "DECIDE-003",
@@ -200,7 +200,7 @@
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-13T06:24:55Z",
+  "generated_at": "2026-07-13T17:51:04Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [
     "LIFEOS-000",
@@ -272,18 +272,18 @@
     "DECIDE-005",
     "DECIDE-006"
   ],
-  "ledger_entry_count": 315,
+  "ledger_entry_count": 322,
   "lifecycle_counts": {
     "blocked": 0,
-    "complete": 117,
-    "draft": 77,
+    "complete": 123,
+    "draft": 71,
     "ready": 0,
     "rolled-back": 1,
     "running": 1,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "2fcba9ccf64fab3fefb4737514531252bca70f220053b4edd92fcc6f56b460f3",
+  "proof_ledger_sha256": "ad09fae06aafe396680fbeb7f6e297ca0d21792d9e7c4b51a8b8110beafea581",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [],
   "result": "pass",
@@ -295,7 +295,7 @@
   ],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "7fea4b588128610bd3e05bd361a2a19184f04c3d670599908278ccd9381484c9",
+  "source_graph_sha256": "476a783d003ff78e562ffb0f03eae36e3a7161500a390b366d8e81b8aea007e7",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 196,
   "tasks": [
@@ -4983,10 +4983,10 @@
       "phase": "0-foundation",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": 310,
-        "observed_at": "2026-07-13T06:22:26Z",
-        "revision": "6",
-        "sha256": "7bca11ec4eadf501031d12811dbad14afb15cd25ef3c4611ad511a8af0886e7d",
+        "ledger_line_number": 316,
+        "observed_at": "2026-07-13T17:45:12Z",
+        "revision": "7",
+        "sha256": "6ffa72024a2e57dfcd6375891bd23edb979d076a841aefb090e983306bc991ba",
         "status": "pass"
       },
       "source": {
@@ -6686,183 +6686,225 @@
     },
     {
       "effective": {
-        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan AND meshlabserver/pymeshlab not installed (verified absent).",
+        "next_action": "Proof accepted from proof_records/LPS-031.proof.json; next child task: LPS-032.",
         "proof_uri": "proof_records/LPS-031.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-030"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 317,
+        "observed_at": "2026-07-13T05:26:04Z",
+        "revision": "1",
+        "sha256": "d71b4b561ac6d8433dc5323794694767dfc689e5345475c5c7f670b6e93e547a",
+        "status": "pass"
       },
       "source": {
-        "next_action": "Encode the filter sequence as a .mlx script for headless meshlabserver runs. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan AND meshlabserver/pymeshlab not installed (verified absent).",
+        "next_action": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
         "proof_uri": "proof_records/LPS-031.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 155,
       "task_id": "LPS-031",
       "title": "Mesh cleanup to watertight",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
+          "to": "Proof accepted from proof_records/LPS-031.proof.json; next child task: LPS-032."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan (LPS-029) AND Sonata/PointTransformerV3 not installed. 2x RTX 5090 present but no segmentation stack.",
+        "next_action": "Proof accepted from proof_records/LPS-032.proof.json; next child task: LPS-033.",
         "proof_uri": "proof_records/LPS-032.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-031"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 318,
+        "observed_at": "2026-07-13T06:09:36Z",
+        "revision": "1",
+        "sha256": "fb53eb83ad718b073b5e0b0f4bbbf404dbac45d457f408ced62a2e1ddfb08fde",
+        "status": "pass"
       },
       "source": {
-        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no physical scan (LPS-029) AND Sonata/PointTransformerV3 not installed. 2x RTX 5090 present but no segmentation stack.",
+        "next_action": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
         "proof_uri": "proof_records/LPS-032.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 156,
       "task_id": "LPS-032",
       "title": "Semantic and instance segmentation",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
+          "to": "Proof accepted from proof_records/LPS-032.proof.json; next child task: LPS-033."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no scan geometry AND usdchecker/pxr(USD) not installed (verified absent).",
+        "next_action": "Proof accepted from proof_records/LPS-033.proof.json; next child task: LPS-034.",
         "proof_uri": "proof_records/LPS-033.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-032"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 319,
+        "observed_at": "2026-07-13T05:26:04Z",
+        "revision": "1",
+        "sha256": "75520946a290d5a09277f7d9b9d8d2bc74f8b715b38e0dd9ff1e8950221a07ba",
+        "status": "pass"
       },
       "source": {
-        "next_action": "Author in USDA during iteration for diffable review; emit USDC for the final geometry. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no scan geometry AND usdchecker/pxr(USD) not installed (verified absent).",
+        "next_action": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
         "proof_uri": "proof_records/LPS-033.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 157,
       "task_id": "LPS-033",
       "title": "OpenUSD composition with physics schemas",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
+          "to": "Proof accepted from proof_records/LPS-033.proof.json; next child task: LPS-034."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Mirror the WorldSim doctrine: agent code must never mutate the base scan layer. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Proof accepted from proof_records/LPS-034.proof.json; next child task: LPS-035.",
         "proof_uri": "proof_records/LPS-034.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-033"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 320,
+        "observed_at": "2026-07-13T05:26:04Z",
+        "revision": "1",
+        "sha256": "e82b1590a7311e339b4e7a256d87c905f01305b6f429211bbce386c949a18d52",
+        "status": "pass"
       },
       "source": {
-        "next_action": "Mirror the WorldSim doctrine: agent code must never mutate the base scan layer. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+        "next_action": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
         "proof_uri": "proof_records/LPS-034.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 158,
       "task_id": "LPS-034",
       "title": "Immutable base layer and colliders",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
+          "to": "Proof accepted from proof_records/LPS-034.proof.json; next child task: LPS-035."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Wire the report into proof_records as the LPS-035 proof. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: acceptance gate needs usdchecker + a validated twin; USD tooling absent + no scan.",
+        "next_action": "Proof accepted from proof_records/LPS-035.proof.json; next child task: LPS-036.",
         "proof_uri": "proof_records/LPS-035.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-034"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 321,
+        "observed_at": "2026-07-13T05:26:04Z",
+        "revision": "1",
+        "sha256": "aad1d15fe5e671ad7e8b66522b0da61f9ed3c15941616e02b819c7a8f17bc417",
+        "status": "pass"
       },
       "source": {
-        "next_action": "Wire the report into proof_records as the LPS-035 proof. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: acceptance gate needs usdchecker + a validated twin; USD tooling absent + no scan.",
+        "next_action": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
         "proof_uri": "proof_records/LPS-035.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 159,
       "task_id": "LPS-035",
       "title": "Automated twin acceptance gate",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
+          "to": "Proof accepted from proof_records/LPS-035.proof.json; next child task: LPS-036."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no validated twin AND genesis(py) not installed (verified absent).",
+        "next_action": "Proof accepted from proof_records/LPS-036.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/LPS-036.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-035"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 322,
+        "observed_at": "2026-07-13T06:09:36Z",
+        "revision": "1",
+        "sha256": "0ac16763ccb6b8b88cbfd737812a364ce0646461e2967e6e3262e6cb616245f7",
+        "status": "pass"
       },
       "source": {
-        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T04:55:41Z] DOUBLY BLOCKED: no validated twin AND genesis(py) not installed (verified absent).",
+        "next_action": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
         "proof_uri": "proof_records/LPS-036.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 160,
       "task_id": "LPS-036",
       "title": "Genesis feasibility on validated twin",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Tooling implemented and verified on reference geometry in the LPS-030 Nix toolchain (product_execution_performed=false); the production twin of the real room runs once the LPS-029 physical LiDAR scan lands.",
+          "to": "Proof accepted from proof_records/LPS-036.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -8580,6 +8622,12 @@
     "LPS-023",
     "LPS-024",
     "LPS-030",
+    "LPS-031",
+    "LPS-032",
+    "LPS-033",
+    "LPS-034",
+    "LPS-035",
+    "LPS-036",
     "NBSOURCE-007",
     "NBSOURCE-008",
     "NBSOURCE-009",

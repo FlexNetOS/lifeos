@@ -1,0 +1,255 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "RELEASE-003",
+  "title": "Secondary platform and distribution rollout family defined",
+  "status": "defined",
+  "owner": "Release Agent / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the macOS, Windows, iOS, Android, glasses, and ambient secondary-platform release tasks that may execute ONLY after the complete Ubuntu release gate (RELEASE-002) proof is accepted, each preserving identical LifeOS contracts (the EXPERIENCE-001 governed application/state/command/event/plugin/policy/data APIs), the identical STORE-001 store-authority model (PostgreSQL + RuVector canonical durable macro-state, redb transient high-frequency tier, AgentDB per-agent cognition, envctl forward-only bridge, and the device-local lifeos.db SQLite cache that never becomes a second durable authority), and identical proof authority (every platform release recomputes to passing child proofs from the proof ledger under the RELEASE-001 north-star acceptance model, fail-closed on any capability loss, owner conflict, or paper completion). Every secondary-platform task carries the eight required gates - platform parity, signing, packaging, migration, rollback, privacy, accessibility, and provenance - plus a hard precondition edge on the accepted Ubuntu proof. This family only decomposes and gates the rollout; it performs no secondary-platform build, store submission, device deployment, or release publication (blocked_paths honored), consistent with the definition-only, fail-closed policy proven in RELEASE-001 acceptance and the archive-first charter of PRESERVE-001 / FOUNDATION-003.",
+  "inputs": [
+    "RELEASE-002 (Ubuntu-first reproducible build/install/rollback family; the first release gate whose accepted proof is the precondition for every task in this family)",
+    "RELEASE-001 (North Star system acceptance model: coverage recomputed from proofs, fail-closed unless the sum equals the North Star - the proof-authority contract this family inherits unchanged)",
+    "EXPERIENCE-002 (desktop/mobile/glasses/ambient client families: bounded capabilities, shared state contract, authentication, privacy, accessibility, offline behavior, notification authority, test matrix, rollback, proof)",
+    "EXPERIENCE-001 (stable Rust-native governed application/state/command/event/plugin/policy/data APIs that replaceable presentation clients consume without owning LifeOS logic)",
+    "STORE-001 (settled store-authority model; identical across every platform)",
+    "cross-platform product requirements (Tauri 2 native shell; desktop Linux/macOS/Windows plus Tauri 2 mobile iOS/Android per src/lifeos/CLAUDE.md; database-storage-foundation lifeos.db + account.json migration)"
+  ],
+  "ubuntu_gate_precondition": {
+    "requirement": "No task in this family may enter build, package, sign, submit, deploy, or publish until proof_records/RELEASE-002.proof.json is recorded as status=pass in proof_records/proof_ledger.jsonl (the Ubuntu-first reproducible build/install/rollback gate) AND that proof is accepted under the RELEASE-001 north-star acceptance recomputation.",
+    "why_the_first_gate_is_ubuntu": "The Architecture Blueprint's portable-release strategy is Ubuntu/Linux-first: strict static compilation against x86_64-unknown-linux-musl, bundling all dependencies to eliminate /nix/store RPATH ties and produce the install-in-place prefix. RELEASE-002 proves that path (clean source build, reproducible package hash, signed provenance, isolated install, migration, runtime, rollback, disaster recovery) before any platform that cannot use musl static linking is attempted.",
+    "fail_closed_semantics": "This precondition is verified, never assumed - the same discipline STORE-001 applies to store cutover ('a class leaves redb-durable only after a green run, never by assumption'). If the RELEASE-002 proof is absent, pending, or fail, all six platform work items stay blocked; the governance gate item RELEASE-003-G owns this fail-closed check.",
+    "current_status_at_definition_time": "PENDING - proof_records/RELEASE-002.proof.json does not yet exist in the ledger (max ledger sequence 166 = STORE-001). This family therefore encodes the dependency edge and the block; it asserts no satisfied Ubuntu proof."
+  },
+  "parity_contract": {
+    "principle": "Platform parity is CONTRACT parity and AUTHORITY parity, not binary parity. Secondary platforms add new replaceable presentation shells and new build/sign/package targets; they never change LifeOS business logic, store authority, or proof authority.",
+    "identical_lifeos_contracts": "Every client consumes the same EXPERIENCE-001 governed API surfaces - application, state, command, event, plugin, policy, and data - and owns none of them. Business logic and authority stay in lifeos-core (Rust) and the Tauri shell; the Vue/native presentation layer never touches the database directly (src/lifeos/CLAUDE.md storage-foundation contract). A platform release is accepted only if all seven governed surfaces resolve identically to the Ubuntu reference.",
+    "identical_store_authority": "STORE-001 is platform-independent: PostgreSQL + RuVector is the single canonical durable owner of relational + semantic macro-state on every platform; redb stays the transient high-frequency tier (scratchpad / WAL / BLAKE3 dedup cache / geometry engine); AgentDB (.rvf) stays per-agent non-authoritative cognition; envctl stays the forward-only redb->embed->PostgreSQL bridge and PostgreSQL->filesystem projection engine. The device-local lifeos.db (SQLite, database-storage-foundation) is a per-device durable cache that flushes forward and NEVER becomes a second durable writer for a PostgreSQL-owned class - identical on macOS, Windows, iOS, Android, and every approved device.",
+    "identical_proof_authority": "Every secondary-platform release resolves to passing per-platform child proofs recomputed from proof_records/proof_ledger.jsonl under the RELEASE-001 acceptance model (coverage from proofs, detect missing/conflicting outcomes, verify rollback and provenance, fail closed unless the sum equals the North Star). No platform may 'paper-complete' or introduce an owner conflict.",
+    "known_tension_musl_is_linux_only": "The blueprint's musl static target (x86_64-unknown-linux-musl) is a Linux-only portability mechanism; it cannot produce Mach-O (macOS/iOS), PE (Windows), or Android dex/ELF artifacts. Therefore each secondary platform uses its native toolchain and bundle format and CANNOT inherit the Ubuntu binary. This is why parity is asserted at the contract/authority/proof layer (identical governed APIs, identical STORE-001 model, identical proof recomputation) rather than at the binary layer, and why the Ubuntu gate must pass first."
+  },
+  "secondary_platform_matrix": [
+    {
+      "platform": "macOS desktop",
+      "work_item": "RELEASE-003-A",
+      "targets": ["aarch64-apple-darwin", "x86_64-apple-darwin (universal2)"],
+      "shell": "Tauri 2 macOS shell (WKWebView, not webkit2gtk)",
+      "bundle": ".app + .dmg",
+      "signing_authority": "Apple Developer ID Application certificate; codesign --options runtime (hardened runtime); notarytool notarization + stapling",
+      "app_data_path": "~/Library/Application Support/lifeos (lifeos.db, vault)",
+      "secret_store": "macOS Keychain via Security framework (service 'lifeos')",
+      "not_musl": "Mach-O, links system libs / WKWebView; musl static path from RELEASE-002 does not apply"
+    },
+    {
+      "platform": "Windows desktop",
+      "work_item": "RELEASE-003-B",
+      "targets": ["x86_64-pc-windows-msvc", "aarch64-pc-windows-msvc"],
+      "shell": "Tauri 2 Windows shell (WebView2 runtime)",
+      "bundle": ".msi (WiX) and/or NSIS .exe",
+      "signing_authority": "Authenticode via signtool with OV/EV code-signing certificate, RFC-3161 timestamp; SmartScreen reputation",
+      "app_data_path": "%APPDATA%\\lifeos (lifeos.db, vault)",
+      "secret_store": "Windows Credential Manager / DPAPI (service 'lifeos')",
+      "not_musl": "PE, depends on WebView2 runtime; musl static path does not apply"
+    },
+    {
+      "platform": "iOS mobile",
+      "work_item": "RELEASE-003-C",
+      "targets": ["aarch64-apple-ios", "aarch64-apple-ios-sim"],
+      "shell": "Tauri 2 iOS shell (WKWebView) built via Xcode",
+      "bundle": ".ipa (App Store distribution)",
+      "signing_authority": "Apple Distribution certificate + provisioning profile; App Store Connect submission (BLOCKED here - definition only)",
+      "app_data_path": "app container Application Support (lifeos.db)",
+      "secret_store": "iOS Keychain",
+      "not_musl": "Mach-O for arm64 iOS; App Store review required"
+    },
+    {
+      "platform": "Android mobile",
+      "work_item": "RELEASE-003-D",
+      "targets": ["aarch64-linux-android", "armv7-linux-androideabi", "x86_64-linux-android"],
+      "shell": "Tauri 2 Android shell (Android System WebView) built via Gradle",
+      "bundle": ".aab (Play) / .apk",
+      "signing_authority": "Play App Signing + upload keystore; Play Console submission (BLOCKED here - definition only)",
+      "app_data_path": "app internal storage (scoped) (lifeos.db)",
+      "secret_store": "Android Keystore",
+      "not_musl": "Android ELF/dex via NDK; Play review required"
+    },
+    {
+      "platform": "glasses (approved device)",
+      "work_item": "RELEASE-003-E",
+      "targets": ["approved-device SDK target (allowlist-gated)"],
+      "shell": "ambient LifeOS presentation client; consumes governed APIs, reads projected LifeOS state via UDS / shared state (blueprint LifeOS-UDS contract); no durable authority on device",
+      "bundle": "approved-device application package per OEM runtime",
+      "signing_authority": "OEM/device signing per the approved-device SDK; device hardware attestation",
+      "app_data_path": "none durable on device - state is presented, not owned (PostgreSQL remains canonical)",
+      "secret_store": "no raw secrets on device; keyring/attestation references only",
+      "approval_precondition": "device must be on the approved-device allowlist (EXPERIENCE-002 'later approved' clause) before any release task"
+    },
+    {
+      "platform": "ambient client (approved device)",
+      "work_item": "RELEASE-003-F",
+      "targets": ["approved-device SDK target (allowlist-gated)"],
+      "shell": "ambient display/audio client; bounded read-mostly capabilities and bounded notification authority; presents one coherent LifeOS state via governed APIs",
+      "bundle": "approved-device application package per runtime",
+      "signing_authority": "OEM/device signing per approved-device SDK; device attestation",
+      "app_data_path": "none durable on device - state presented via governed APIs; PostgreSQL canonical",
+      "secret_store": "no raw secrets on device; keyring/attestation references only",
+      "approval_precondition": "device on approved-device allowlist; notification authority bounded per EXPERIENCE-002"
+    }
+  ],
+  "gate_contract": {
+    "note": "Each of the six platform work items (RELEASE-003-A..F) carries all eight gates below with platform-concrete values; the governance item RELEASE-003-G owns the Ubuntu-proof precondition and the proof-authority recomputation that binds them.",
+    "gates": [
+      "platform_parity - identical EXPERIENCE-001 governed APIs + identical STORE-001 store authority; presentation shell replaceable, business logic/authority outside it; parity is contract/authority parity, not binary parity",
+      "signing - platform-native code-signing authority; signing secrets from the OS keyring only (STORE-001 external-secret class), never in redb or PostgreSQL",
+      "packaging - platform-native reproducible bundle with a recorded package hash; native toolchain (Mach-O/PE/Android), not musl",
+      "migration - identical lifeos.db + account.json migration and db_health/db_migrate behavior; PostgreSQL macro-state stays canonical; no store reclassified",
+      "rollback - prior signed artifact + phased-rollout halt + data rollback via PostgreSQL PITR; honors family rollback_plan; no deployment performed",
+      "privacy - platform permission model + FS scope locked to the lifeos app-data dir + secrets in keyring only",
+      "accessibility - platform a11y API parity + the axe suite (32 assertions, 0 violations) held identical to the Ubuntu reference",
+      "provenance - signed provenance/SBOM + source pins + SHA-256 content identity + SHAKE256 witness-chain lineage rooted in PostgreSQL source vectors"
+    ]
+  },
+  "work_items": [
+    {
+      "id": "RELEASE-003-G",
+      "surface": "secondary-rollout precondition and proof-authority gate (Ubuntu-proof dependency; gate: 'every secondary platform task depends on accepted Ubuntu proof')",
+      "owner": "Governance Board / Release Agent / QA Agent",
+      "decision": "Own the fail-closed precondition for the whole family: no platform task (A..F) may build, package, sign, submit, deploy, or publish until proof_records/RELEASE-002.proof.json is status=pass in proof_records/proof_ledger.jsonl AND accepted by the RELEASE-001 north-star recomputation. Encode the dependency edge on every platform item (depends_on_accepted_ubuntu_proof) and the proof-authority contract: each platform release recomputes to passing per-platform child proofs from the ledger, fail-closed on capability loss, owner conflict, or paper completion. Also enforce the approved-device allowlist precondition for E and F. Verified, never assumed (STORE-001 cutover discipline). At definition time RELEASE-002 proof is PENDING, so this gate holds all six platform items blocked.",
+      "depends_on_accepted_ubuntu_proof": "proof_records/RELEASE-002.proof.json (status pending at definition time)",
+      "gates": {
+        "platform_parity": "Defines the parity acceptance oracle: a platform release passes only if all seven EXPERIENCE-001 governed surfaces and the STORE-001 authority model resolve identically to the Ubuntu reference.",
+        "signing": "Defines that signing secrets for every platform come from the OS keyring / secret manager and never enter redb or PostgreSQL (STORE-001 external-secret/provenance class); no secret path in blocked secrets/**.",
+        "packaging": "Defines the reproducible-package-hash requirement inherited from RELEASE-002 and re-expressed per native toolchain for each platform.",
+        "migration": "Defines that the lifeos.db + account.json migration contract (database-storage-foundation) is identical across platforms and that PostgreSQL macro-state authority is never reclassified by any platform.",
+        "rollback": "Defines the family rollback_plan as the terminal fallback: restore the archived secondary rollout plan; no build, submission, or deployment occurs.",
+        "privacy": "Defines the shared privacy floor: FS scope locked to the lifeos app-data dir, secrets in keyring only, no raw secrets on any approved device.",
+        "accessibility": "Defines that the axe suite (32 assertions, 0 violations) and the shared accessibility model are held identical to the Ubuntu reference on every platform.",
+        "provenance": "Defines the provenance/proof-authority chain: signed provenance + SBOM + SHA-256 identity + SHAKE256 witness lineage rooted in PostgreSQL, recomputed under RELEASE-001 acceptance."
+      }
+    },
+    {
+      "id": "RELEASE-003-A",
+      "surface": "macOS desktop release task (aarch64/x86_64-apple-darwin universal2; Tauri 2 WKWebView; .app + .dmg)",
+      "owner": "Release Agent / QA Agent (macOS lane)",
+      "decision": "Define the macOS release task gated on the accepted Ubuntu proof, presenting identical LifeOS contracts and store/proof authority. Definition only; no build, notarization, or distribution is performed (blocked_paths honored).",
+      "depends_on_accepted_ubuntu_proof": "proof_records/RELEASE-002.proof.json",
+      "gates": {
+        "platform_parity": "Same seven EXPERIENCE-001 governed APIs (application/state/command/event/plugin/policy/data) consumed by a replaceable Tauri WKWebView shell; identical STORE-001 model (PostgreSQL canonical, redb transient, AgentDB cognition, envctl bridge, lifeos.db device cache never a second durable writer). Parity is contract/authority parity: the macOS binary is Mach-O universal2, not the Ubuntu musl binary.",
+        "signing": "Apple Developer ID Application certificate; codesign with hardened runtime (--options runtime); notarytool notarization + stapling. Signing identity from macOS Keychain (Security framework, service 'lifeos'); never in redb/PostgreSQL.",
+        "packaging": "Tauri macOS bundle -> .app + .dmg with a recorded reproducible package hash; native aarch64/x86_64-apple-darwin toolchain, WKWebView; NOT musl static.",
+        "migration": "lifeos.db at ~/Library/Application Support/lifeos/lifeos.db; account.json one-time migration to the accounts table then rename to account.json.migrated-<RFC3339>; db_health/db_migrate identical to Ubuntu; PostgreSQL macro-state stays canonical.",
+        "rollback": "Revert to the prior notarized .dmg + pin the prior updater feed; data rollback via PostgreSQL PITR (redb transient by definition); no deployment in this task; family rollback_plan is the terminal fallback.",
+        "privacy": "macOS TCC permission prompts + App Sandbox entitlements; FS scope locked to ~/Library/Application Support/lifeos/*; secrets only in Keychain; no raw secrets persisted to any durable store.",
+        "accessibility": "VoiceOver / NSAccessibility parity; the axe suite (32 assertions, 0 violations) held identical; Lexend + JetBrains Mono with system fallback; one brand mark / one brand glow contracts preserved.",
+        "provenance": "Signed provenance + SBOM + source pins + SHA-256 content identity of the .dmg; SHAKE256 witness-chain lineage rooted in the PostgreSQL source vectors; recomputed under RELEASE-001 acceptance."
+      }
+    },
+    {
+      "id": "RELEASE-003-B",
+      "surface": "Windows desktop release task (x86_64/aarch64-pc-windows-msvc; Tauri 2 WebView2; .msi / NSIS .exe)",
+      "owner": "Release Agent / QA Agent (Windows lane)",
+      "decision": "Define the Windows release task gated on the accepted Ubuntu proof, presenting identical LifeOS contracts and store/proof authority. Definition only; no build, signing, or distribution is performed (blocked_paths honored).",
+      "depends_on_accepted_ubuntu_proof": "proof_records/RELEASE-002.proof.json",
+      "gates": {
+        "platform_parity": "Same seven EXPERIENCE-001 governed APIs consumed by a replaceable Tauri WebView2 shell; identical STORE-001 model and lifeos.db-never-a-second-durable-writer invariant. Parity is contract/authority parity: the Windows binary is PE + WebView2, not the Ubuntu musl binary.",
+        "signing": "Authenticode via signtool with an OV/EV code-signing certificate + RFC-3161 timestamp; SmartScreen reputation build-up. Signing identity from Windows Credential Manager / DPAPI (service 'lifeos'); never in redb/PostgreSQL.",
+        "packaging": "Tauri Windows bundle -> .msi (WiX) and/or NSIS .exe with a recorded reproducible package hash; native msvc toolchain, WebView2 runtime dependency; NOT musl static.",
+        "migration": "lifeos.db at %APPDATA%\\lifeos\\lifeos.db; account.json migration identical; db_health/db_migrate identical; PostgreSQL macro-state stays canonical.",
+        "rollback": "MSI transactional rollback + prior-version pin + updater feed pin; data rollback via PostgreSQL PITR; no deployment in this task; family rollback_plan terminal fallback.",
+        "privacy": "Windows capability/permission model; FS scope locked to %APPDATA%\\lifeos\\*; secrets only in Credential Manager/DPAPI; no raw secrets in durable stores.",
+        "accessibility": "Narrator / UI Automation parity; axe suite (32 assertions, 0 violations) identical; font + contrast contracts preserved.",
+        "provenance": "Authenticode signature + SBOM + source pins + SHA-256 identity of the .msi; SHAKE256 witness lineage rooted in PostgreSQL; recomputed under RELEASE-001 acceptance."
+      }
+    },
+    {
+      "id": "RELEASE-003-C",
+      "surface": "iOS mobile release task (aarch64-apple-ios; Tauri 2 iOS WKWebView; .ipa via Xcode; App Store)",
+      "owner": "Release Agent / QA Agent (iOS lane)",
+      "decision": "Define the iOS release task gated on the accepted Ubuntu proof, presenting identical LifeOS contracts and store/proof authority. Definition only; no build, signing, or App Store submission is performed (blocked_paths honored).",
+      "depends_on_accepted_ubuntu_proof": "proof_records/RELEASE-002.proof.json",
+      "gates": {
+        "platform_parity": "Same seven EXPERIENCE-001 governed APIs consumed by a replaceable Tauri iOS shell; bounded mobile capabilities per EXPERIENCE-002; identical STORE-001 model; lifeos.db in the app container is a device cache only. Parity is contract/authority parity: Mach-O arm64 iOS build.",
+        "signing": "Apple Distribution certificate + provisioning profile via App Store Connect. Signing identity from iOS Keychain; never in redb/PostgreSQL. Submission BLOCKED (definition only).",
+        "packaging": "Tauri iOS -> .ipa via Xcode with a recorded package hash; App Store review pipeline defined but not executed.",
+        "migration": "lifeos.db in the app container Application Support; account.json migration identical; db_health/db_migrate identical; PostgreSQL macro-state canonical.",
+        "rollback": "App Store Connect phased-release halt + revert to the prior approved build; data rollback via PostgreSQL PITR; no submission in this task; family rollback_plan terminal fallback.",
+        "privacy": "iOS privacy manifest (PrivacyInfo.xcprivacy) + App Tracking Transparency + runtime permission prompts; scoped app-container storage; secrets only in Keychain; no raw secrets in durable stores.",
+        "accessibility": "VoiceOver / UIAccessibility + Dynamic Type parity; axe suite equivalent (32 assertions, 0 violations) on the web layer; shared accessibility model held identical.",
+        "provenance": "App Store provenance + SBOM + source pins + SHA-256 identity of the .ipa; SHAKE256 witness lineage rooted in PostgreSQL; recomputed under RELEASE-001 acceptance."
+      }
+    },
+    {
+      "id": "RELEASE-003-D",
+      "surface": "Android mobile release task (aarch64/armv7/x86_64-linux-android; Tauri 2 Android WebView; .aab via Gradle; Play)",
+      "owner": "Release Agent / QA Agent (Android lane)",
+      "decision": "Define the Android release task gated on the accepted Ubuntu proof, presenting identical LifeOS contracts and store/proof authority. Definition only; no build, signing, or Play submission is performed (blocked_paths honored).",
+      "depends_on_accepted_ubuntu_proof": "proof_records/RELEASE-002.proof.json",
+      "gates": {
+        "platform_parity": "Same seven EXPERIENCE-001 governed APIs consumed by a replaceable Tauri Android shell; bounded mobile capabilities per EXPERIENCE-002; identical STORE-001 model; lifeos.db in internal storage is a device cache only. Parity is contract/authority parity: Android ELF via NDK.",
+        "signing": "Play App Signing + upload keystore. Keystore/secret material from the Android Keystore / OS secret store; never in redb/PostgreSQL. Submission BLOCKED (definition only).",
+        "packaging": "Tauri Android -> .aab (and .apk) via Gradle with a recorded package hash; Play review pipeline defined but not executed.",
+        "migration": "lifeos.db in scoped internal storage; account.json migration identical; db_health/db_migrate identical; PostgreSQL macro-state canonical.",
+        "rollback": "Play staged-rollout halt + revert to the prior versionCode; data rollback via PostgreSQL PITR; no submission in this task; family rollback_plan terminal fallback.",
+        "privacy": "Android runtime permissions + Data Safety declaration + scoped storage; secrets only in the Android Keystore; no raw secrets in durable stores.",
+        "accessibility": "TalkBack / AccessibilityService + font scaling parity; axe suite equivalent (32 assertions, 0 violations) on the web layer; shared accessibility model held identical.",
+        "provenance": "Play provenance + SBOM + source pins + SHA-256 identity of the .aab; SHAKE256 witness lineage rooted in PostgreSQL; recomputed under RELEASE-001 acceptance."
+      }
+    },
+    {
+      "id": "RELEASE-003-E",
+      "surface": "glasses approved-device release task (ambient LifeOS presentation client; UDS / governed-API state; allowlist-gated)",
+      "owner": "Release Agent / QA Agent (approved-device lane)",
+      "decision": "Define the glasses release task gated on BOTH the accepted Ubuntu proof AND the approved-device allowlist (EXPERIENCE-002 'later approved' clause), presenting identical LifeOS contracts and store/proof authority with no durable authority on the device. Definition only; no build or device deployment is performed (blocked_paths honored).",
+      "depends_on_accepted_ubuntu_proof": "proof_records/RELEASE-002.proof.json",
+      "gates": {
+        "platform_parity": "Presents the same LifeOS state via the EXPERIENCE-001 governed APIs and the blueprint LifeOS-UDS / shared-state read path (LifeOS reads the same memory-mapped redb state / governed API the agents write); bounded read-mostly capabilities per EXPERIENCE-002; PostgreSQL stays the canonical durable owner - the device owns no durable authority.",
+        "signing": "OEM/device signing per the approved-device SDK + device hardware attestation; no raw secrets on the device (keyring/attestation references only), never in redb/PostgreSQL.",
+        "packaging": "Approved-device application package per the OEM runtime with a recorded package hash; allowlist-gated; native device toolchain (not musl).",
+        "migration": "No local durable migration - the device presents projected state, it does not own lifeos.db macro-state; PostgreSQL remains canonical and unmodified by the device.",
+        "rollback": "Device app rollback to the prior approved image; no deployment in this task; data authority unaffected because the device is non-durable; family rollback_plan terminal fallback.",
+        "privacy": "Always-on sensor (camera/mic) minimization + on-device processing constraints + minimal bounded capability; no raw secrets on device; FS/state access mediated by governed APIs only.",
+        "accessibility": "Audio-first / caption accessibility + reduced-motion; shared accessibility model held identical to the Ubuntu reference where surfaces overlap.",
+        "provenance": "Device attestation + SBOM + source pins + SHA-256 identity of the device package; SHAKE256 witness lineage rooted in PostgreSQL; recomputed under RELEASE-001 acceptance."
+      }
+    },
+    {
+      "id": "RELEASE-003-F",
+      "surface": "ambient approved-device release task (display/audio client; bounded capabilities + bounded notification authority; allowlist-gated)",
+      "owner": "Release Agent / QA Agent (approved-device lane)",
+      "decision": "Define the ambient client release task gated on BOTH the accepted Ubuntu proof AND the approved-device allowlist, presenting one coherent LifeOS state with bounded capabilities and bounded notification authority and no durable authority on the device. Definition only; no build or device deployment is performed (blocked_paths honored).",
+      "depends_on_accepted_ubuntu_proof": "proof_records/RELEASE-002.proof.json",
+      "gates": {
+        "platform_parity": "Presents one coherent LifeOS state via the EXPERIENCE-001 governed APIs; bounded read-mostly capabilities and bounded notification authority per EXPERIENCE-002; identical STORE-001 model; the device owns no durable authority (PostgreSQL canonical).",
+        "signing": "OEM/device signing per the approved-device SDK + device attestation; no raw secrets on device; secret material stays in the keyring, never in redb/PostgreSQL.",
+        "packaging": "Approved-device application package per the runtime with a recorded package hash; allowlist-gated; native device toolchain (not musl).",
+        "migration": "No local durable migration - the client presents projected state; PostgreSQL macro-state remains canonical and unmodified by the device.",
+        "rollback": "Ambient app rollback to the prior approved image + notification-authority revocation; no deployment in this task; family rollback_plan terminal fallback.",
+        "privacy": "Minimal always-on capability + bounded notification authority + on-device presentation only; no raw secrets on device; state access mediated by governed APIs.",
+        "accessibility": "Ambient/audio accessibility + reduced-motion + high-contrast presentation; shared accessibility model held identical where surfaces overlap.",
+        "provenance": "Device attestation + SBOM + source pins + SHA-256 identity of the device package; SHAKE256 witness lineage rooted in PostgreSQL; recomputed under RELEASE-001 acceptance."
+      }
+    }
+  ],
+  "store_001_alignment": "This family reclassifies no store on any platform. STORE-001 is identical everywhere: PostgreSQL + RuVector is the single canonical durable owner of relational + semantic macro-state; redb stays the transient high-frequency tier (scratchpad / WAL / BLAKE3 dedup cache / geometry engine); AgentDB (.rvf) stays per-agent non-authoritative cognition; envctl stays the forward-only bridge and projection engine; external secrets stay in the OS keyring. The device-local lifeos.db (SQLite, database-storage-foundation) is a per-device durable cache that flushes forward and never becomes a second durable writer for a PostgreSQL-owned class. Adding a macOS/Windows/iOS/Android/approved-device presentation shell changes only the replaceable client and its build/sign/package target; the durable authority, the semantic authority, the cognition owner, and the secret owner are untouched.",
+  "rollback_contract": {
+    "mechanism": "Per-platform: prior signed/approved artifact revert + phased-rollout halt (App Store Connect / Play Console / updater feed / MSI transaction) + data rollback via PostgreSQL PITR (redb transient by definition). Family: restore the archived secondary rollout plan.",
+    "rollback_plan": "Restore the archived secondary rollout plan; no build, submission, or deployment occurs.",
+    "guarantee": "Because this family is definition-only and blocked_paths forbid secondary-platform build, store submission, device deployment, and release publication, the prior state is always restorable and no platform can strand data - durable authority remains PostgreSQL PITR-recoverable on every platform."
+  },
+  "blocked_paths_honored": [
+    "secondary-platform build",
+    "store submission",
+    "device deployment",
+    "release publication",
+    "secrets/**"
+  ],
+  "execution_order": [
+    "RELEASE-003-G",
+    "RELEASE-003-A",
+    "RELEASE-003-B",
+    "RELEASE-003-C",
+    "RELEASE-003-D",
+    "RELEASE-003-E",
+    "RELEASE-003-F"
+  ],
+  "completion_gate": "Every secondary-platform task (macOS, Windows, iOS, Android, glasses, ambient) declares a hard dependency on the accepted Ubuntu proof (RELEASE-002) and carries all eight gates - platform parity, signing, packaging, migration, rollback, privacy, accessibility, provenance - with platform-concrete values; the STORE-001 store-authority model and the EXPERIENCE-001 governed contracts are identical across platforms; proof authority is the RELEASE-001 fail-closed recomputation; and no build, submission, or deployment is performed."
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LIVING-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Learning tasks require source evidence, causal scope, simulation, regression tests, human authority where required, reversible promotion, monitoring, and automatic rollback on failed proof.",
+  "gate_result": {
+    "task_family": "generated/task_families/LIVING-002.json",
+    "chain_definition": {
+      "stages_in_order": [
+        "STAGE-1 raw event (LIVING-002-A)",
+        "STAGE-2 failure capsule (LIVING-002-B)",
+        "STAGE-3 causal map (LIVING-002-C)",
+        "STAGE-4 scoped lesson (LIVING-002-D)",
+        "STAGE-5 guardrail (LIVING-002-E)",
+        "STAGE-6 instinct (LIVING-002-F)",
+        "STAGE-7 simulation (LIVING-002-G)",
+        "STAGE-8 promotion (LIVING-002-H)",
+        "STAGE-9 monitoring (LIVING-002-I)",
+        "STAGE-10 rollback (LIVING-002-J)"
+      ],
+      "total_work_items": 10,
+      "every_stage_assigned_exactly_once": true,
+      "each_stage_has_owner_lifetime_sync_edge_recovery_and_pg_redb_agentdb_relationship": true
+    },
+    "clause_1_source_evidence": {
+      "satisfied": true,
+      "origin_stage": "LIVING-002-A raw event owned by redb transient scratchpad/WAL — the observed failed command / trace that grounds everything downstream; nothing is learned without it",
+      "witness_binding": "LIVING-002-B failure capsule binds the raw event to a SHAKE256 Cryptographic Witness Chain rooted in a verified PostgreSQL source vector; Causal Graph Verification (GNN) rejects a rootless capsule",
+      "propagated_to": ["LIVING-002-C", "LIVING-002-D", "LIVING-002-F"],
+      "no_fabricated_learning_admitted": true
+    },
+    "clause_2_causal_scope": {
+      "satisfied": true,
+      "scope_owner": "LIVING-002-C causal map owned by PostgreSQL + RuVector (GNN causal edges + causal dependency edges)",
+      "scope_rule": "the causal map is built only from causal edges that already exist in the PostgreSQL knowledge graph; a claim/edge with no historical root is rejected",
+      "lesson_bounded": "LIVING-002-D scoped lesson blast radius equals the stage-C causal edges and no wider; SONA adjusts only from observed successes/failures",
+      "instinct_inherits_scope": "LIVING-002-F instinct inherits the lesson's causal scope and cannot widen it"
+    },
+    "clause_3_simulation": {
+      "satisfied": true,
+      "stage": "LIVING-002-G",
+      "owner": "ATAS (ESN reservoir fixed + trained readout) + PostgreSQL Copy-On-Write staging branches",
+      "mechanism": "candidate guardrail (E) and instinct (F) are exercised in isolated COW sandboxes and parallel ESN ensembles (up to 100 steps ahead) before any promotion; forecasts (state diffs, resource burn, complexity spikes, failure nodes) are transient sim-only state and never write the baseline",
+      "simulation_required_flag": true,
+      "failed_worlds_discarded": true
+    },
+    "clause_4_regression_tests": {
+      "satisfied": true,
+      "in_sandbox": "LIVING-002-G runs a regression suite inside the COW sandbox so a branch is confirmed 'mathematically stable and successful' by automated tests before it can be a promotion candidate",
+      "gate_on_merge": "LIVING-002-H requires the regression suite green as an explicit merge gate; a failed regression blocks the merge",
+      "proof_ledger": "regression results are recorded as durable rows in the PostgreSQL proof ledger"
+    },
+    "clause_5_human_authority_where_required": {
+      "satisfied": true,
+      "guardrail_stage": "LIVING-002-E — a guardrail is baseline-affecting shared policy, so introducing/changing one is routed through the INTEL-003-M gate stack with LifeOS Mission Control human-in-the-loop confirmation",
+      "promotion_stage": "LIVING-002-H — LifeOS Mission Control provides human-in-the-loop confirmation for baseline-affecting promotions",
+      "autonomous_policy_change_permitted": false
+    },
+    "clause_6_reversible_promotion": {
+      "satisfied": true,
+      "guardrail_versioned": "LIVING-002-E guardrail rule is versioned in PostgreSQL and can be reverted to the prior version",
+      "promotion_reversible": "LIVING-002-H promotion is a COW merge that can be rolled back (COW rollback + PostgreSQL PITR)",
+      "rollback_is_the_reverse": "LIVING-002-J rollback is the explicit reversal of promotion",
+      "recovery_source": "PostgreSQL PITR + COW rollback of the un-proven merge"
+    },
+    "clause_7_monitoring": {
+      "satisfied": true,
+      "stage": "LIVING-002-I",
+      "monitors": [
+        "RuVector MinCut real-time immune system (continuous subpolynomial O(n^{o(1)}) dependency-graph monitoring; severs a drifting/hallucinating agent)",
+        "LIVING-001 continuous-audit cadence (Daily Pulse / health / drift / provenance) emitting bounded proof",
+        "ATAS trajectory monitoring for a run spiralling out of bounds"
+      ],
+      "observe_only_no_autonomous_remediation": true,
+      "proof_written_to": "PostgreSQL proof ledger (durable rows)"
+    },
+    "clause_8_automatic_rollback_on_failed_proof": {
+      "satisfied": true,
+      "trigger": "LIVING-002-I monitoring detects a failed proof (drift, regression, or failed continued proof)",
+      "sim_failure_discard": "LIVING-002-G — a failed simulation/regression branch is deterministically discarded before it can ever be promoted",
+      "rollback_stage": "LIVING-002-J — the promotion is automatically rolled back so the failed world cannot remain the baseline: COW rollback of the merge + PostgreSQL PITR restore to the last proven world",
+      "redb_wal_role": "subordinate forward-only application-level WAL/outbox during PostgreSQL latency/outage; never a second baseline",
+      "verified_cutover_only": "a class leaves redb-durable for PostgreSQL only via a green live blobstore_parity.rs cutover under one preserved SHA-256 identity; a failed/unverified cutover is rejected",
+      "failed_world_cannot_become_baseline": true
+    },
+    "store_001_alignment": {
+      "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+      "classes_mapped": {
+        "transient high-frequency state": "STAGE-1 raw event (redb, never durable authority) + STAGE-10 redb WAL",
+        "durable relational macro-state (histories, provenance, causal dependency edges)": "STAGE-2 durable capsule, STAGE-3 causal map edges, STAGE-5 guardrail rule, STAGE-8/10 trunk, STAGE-9 proof rows (PostgreSQL single durable owner)",
+        "semantic / vector / knowledge-graph state (GNN causal edges)": "STAGE-3 causal map (PostgreSQL + RuVector native extension, No Sidecar)",
+        "per-agent cognition (SONA / MicroLoRA / FastGRNN / RL)": "STAGE-2 signal, STAGE-4 scoped lesson, STAGE-6 instinct (AgentDB non-authoritative, witnessed by SHAKE256 chains rooted in PostgreSQL)",
+        "derived / disposable staging": "STAGE-7 COW branches + ATAS forecasts (never baseline until merged)"
+      },
+      "invariants_honored": [
+        "single durable writer = PostgreSQL",
+        "forward-only redb -> envctl -> PostgreSQL",
+        "verified cutover only (green live blobstore_parity.rs, one SHA-256 identity)",
+        "no sidecar (RuVector native PostgreSQL extension)",
+        "provenance / SHA-256 / witness-chain identity preserved"
+      ]
+    },
+    "inputs_reconciled": {
+      "LIVING-001": "STAGE-9 monitoring reuses the LIVING-001 continuous-audit cadence as the proof-producing observation layer",
+      "INTEL-003": "STAGE-8 reuses the INTEL-003-M explicit gate stack; STAGE-10 reuses the INTEL-003-N proven-world rollback + verified-cutover guard; STAGE-2/4/6 reuse the INTEL-003-K/L failure-capsule and SONA/ATAS primitives",
+      "proof_ledger": "STAGE-8 regression + STAGE-9 monitoring proofs are durable PostgreSQL rows; a failed proof there arms STAGE-10 automatic rollback"
+    },
+    "blocked_paths_respected": {
+      "model_training": "none — no adapter, LoRA, or weight is trained (STAGE-4/STAGE-6 define contracts only)",
+      "baseline_promotion": "none — STAGE-8 promotion is defined as gated, not executed",
+      "production_mutation": "none — STAGE-7 simulation and all stages are planning classification only",
+      "autonomous_policy_change": "none — every guardrail/promotion is routed through the explicit gate stack with human authority",
+      "secrets": "none touched"
+    },
+    "simulation_required": true,
+    "simulation_only_policy_cell": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "LIVING-002 defines the full failure-learning-to-proven-world-promotion chain as an ordered ten-stage pipeline, and generated/task_families/LIVING-002.json assigns each of the ten stages named in the goal exactly once (raw event, failure capsule, causal map, scoped lesson, guardrail, instinct, simulation, promotion, monitoring, rollback = LIVING-002-A..J), each with an owner, lifetime, synchronization edge, recovery source, and explicit relationship to PostgreSQL+RuVector / redb / AgentDB / CodeDB under the settled STORE-001 tiered-authority model. Every one of the eight gate clauses holds with concrete owners: source evidence is anchored at STAGE-1 (redb transient raw event) and made witness-rooted at STAGE-2 (SHAKE256 chain rooted in a verified PostgreSQL source vector, GNN rejection of rootless capsules), propagating through STAGE-3/4/6; causal scope is owned by STAGE-3 (PostgreSQL+RuVector GNN causal edges) and bounds the STAGE-4 scoped lesson and STAGE-6 instinct to exactly the mapped edges and no wider; simulation is STAGE-7 (ATAS ESN ensembles inside isolated PostgreSQL COW staging branches, simulation_required TRUE, failed worlds discarded); regression tests run in-sandbox at STAGE-7 and are a green-required merge gate at STAGE-8, recorded in the PostgreSQL proof ledger; human authority is required at STAGE-5 (guardrail policy) and STAGE-8 (LifeOS Mission Control human-in-the-loop) with autonomous policy change forbidden; reversible promotion holds because the STAGE-5 guardrail is versioned, the STAGE-8 promotion is a COW merge, and STAGE-10 is its explicit reversal; monitoring is STAGE-9 (RuVector MinCut real-time immune system + the LIVING-001 continuous-audit cadence + ATAS trajectory monitoring, observe-only, writing durable proof); and automatic rollback on failed proof is STAGE-10 (COW rollback of the merge + PostgreSQL PITR to the last proven world, with redb serving only as a subordinate forward-only WAL and any redb-durable -> PostgreSQL reclassification gated by a green blobstore_parity.rs SHA-256 cutover), so a failed world can never remain the baseline. The guardrail/instinct split is grounded in the blueprint's passive-shared (durable PostgreSQL rule enforced by MinCut/GNN/witness chains) versus active-per-agent (AgentDB SONA/MicroLoRA/FastGRNN reflex) memory distinction. Inputs are reconciled: STAGE-9 reuses the LIVING-001 cadence, STAGE-8 the INTEL-003-M gate stack, STAGE-10 the INTEL-003-N rollback contract. Every assignment traces to the Architecture Blueprint, the Architecture Context Matrix, STORE-001, or the INTEL-003/LIVING-001 inputs; this is planning classification only in the policy-cell — no model was trained, no baseline promoted, no production state mutated, no policy autonomously changed, and no secret touched.",
+  "artifact_paths": [
+    "generated/task_families/LIVING-002.json",
+    "proof_records/LIVING-002.proof.json"
+  ],
+  "provenance_derived_from": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/task_families/INTEL-003.json (failure-capsule learning, gate stack, proven-world rollback)",
+    "generated/task_graph.source.csv (LIVING-001 continuous-audit cadence input; LIVING-002 row)"
+  ],
+  "rollback_plan": "Restore the archived learning plan; no model, policy, guardrail, or baseline is changed.",
+  "product_execution_performed": false
+}

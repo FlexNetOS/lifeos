@@ -1,0 +1,166 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "INTEL-002",
+  "title": "Local intelligence compute and mesh substrate plan defined",
+  "status": "defined",
+  "owner": "LifeOS Runtime / Memory Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "parent": "INTEL-001",
+  "phase": "5-intelligence-substrate",
+  "objective": "Define governed local inference, training, GPU scheduling, distributed compute, storage, communication, and network-control tasks that serve LifeOS without independent control-plane ownership.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "keystone_decision": "generated/store_relationship_decision.json (STORE-001)",
+  "governing_constraint": "Every compute, mesh, and network capability is a governed SUBORDINATE of the LifeOS authority substrate. No inference engine, training loop, GPU scheduler, mesh node, storage tier, transport bus, or network policy owns an independent control plane. Canonical durable authority stays with PostgreSQL + RuVector (STORE-001 single-durable-writer invariant); all subordinate authority is delegated and revocable, and only forward-flushes settled state via envctl. This is the direct enforcement of the objective clause 'without independent control-plane ownership.'",
+  "capability_provenance": {
+    "local_inference": "ruvllm (Blueprint §3; Context Matrix rows 5, 27) — Crates.io ruvllm, edge Candle runtime",
+    "local_training": "AgentDB .rvf SONA/MicroLoRA (Blueprint §2, §3; Context Matrix rows 4, 13, 31); STORE-001 state-class 4",
+    "gpu_scheduling": "RuvLTRA Proportional Intelligence (Blueprint §4; Context Matrix rows 16, 21)",
+    "distributed_compute": "Ruflo meta-harness + edge mesh (Blueprint §4; Context Matrix rows 6, 16)",
+    "storage": "redb transient / PostgreSQL canonical tiers (Blueprint §1-2; STORE-001 state-classes 1-3, 5)",
+    "communication": "FlexNetOS/weave bus + Yazelix UDS + MessagePack (Blueprint 'LifeOS Unix Domain Sockets'; WEAVE-001 proof)",
+    "network_control": "LifeOS authority substrate; No-Sidecar policy (Blueprint §1; STORE-001 invariants)"
+  },
+  "work_items": [
+    {
+      "id": "INTEL-002-A",
+      "surface": "ruvllm edge inference runtime (single frozen foundation model in shared memory; MicroLoRA hot-swap slots)",
+      "owner": "LifeOS Runtime Agent (ruvllm as hosted console, not policy owner)",
+      "governs": ["local_inference", "gpu_scheduling"],
+      "gate_dimensions": ["capacity", "scheduling", "authority"],
+      "decision": "ruvllm serves LifeOS as a hosted inference console: one frozen foundation model (Llama/Qwen .gguf) resident in shared memory, with MicroLoRA adapters hot-swapped in under 1ms — capacity is fixed at 50+ unique agents on the hardware footprint of a single base model. GPU/VRAM is a governed resource budget: ruvllm does not self-scale and does not own routing policy. Scheduling is delegated to RuvLTRA Proportional Intelligence — reflex/syntax tasks stay on the local ruvllm node, architectural/security tasks escalate to cloud tiers (Claude Opus/GPT-4). ruvllm holds no control-plane authority; it executes tokens under LifeOS-governed routing.",
+      "blueprint_basis": "§3 Edge Inference: 'maintaining a single, frozen foundation model in shared memory, allowing the OS to run 50+ agents on the hardware footprint of one'; §4 RuvLTRA Complexity Routing; Context Matrix row 27 (Foundation Engine)."
+    },
+    {
+      "id": "INTEL-002-B",
+      "surface": "AgentDB (.rvf) local training / adaptation loop (SONA reinforcement learning; MicroLoRA deltas)",
+      "owner": "AgentDB (.rvf) per agent (STORE-001 state-class 4: per-agent cognition, non-authoritative)",
+      "governs": ["local_training"],
+      "gate_dimensions": ["isolation", "deterministic_proof", "authority"],
+      "decision": "Local training is per-agent, self-contained, and non-authoritative for shared macro-state. Each .rvf runs its own reinforcement loop (Thompson Sampling, Q-Learning, PPO) to adjust SONA ranking patterns and MicroLoRA deltas from its own successes/failures. Training is isolated to the single .rvf container and never mutates canonical PostgreSQL rows directly. Every learned claim carries a SHAKE256 Cryptographic Witness Chain rooted in a PostgreSQL source vector, making the trained state provable and anti-bluffing. Promotion of any learned state into shared authority is out of scope here and gated downstream (INTEL-003 promotion + proven-world rollback); a failed learning world cannot become baseline.",
+      "blueprint_basis": "§2 AgentDB '.rvf ... active reinforcement learning algorithms — Thompson Sampling, Q-Learning, and PPO'; §6 Cryptographic Witness Chains (SHAKE256); STORE-001 state-class 4 (write_authority: AgentDB per agent, provenance links to PostgreSQL)."
+    },
+    {
+      "id": "INTEL-002-C",
+      "surface": "Distributed edge-node mesh + Ruflo meta-harness coordination",
+      "owner": "LifeOS Runtime Agent (Ruflo coordinates policy under LifeOS; owns no canonical state)",
+      "governs": ["distributed_compute", "gpu_scheduling"],
+      "gate_dimensions": ["capacity", "scheduling", "authority", "failure_containment"],
+      "decision": "Mesh nodes are compute peers, not control-plane owners. Each node runs a ruvllm console plus a local redb scratchpad; per-node capacity is bounded by that node's VRAM/compute budget. Ruflo orchestrates the swarm via RuvLTRA routing and ensemble simulation, but Ruflo owns only transient routing/coordination metadata — never canonical macro-state. The mesh cannot promote state on its own: the single durable writer remains PostgreSQL (STORE-001 invariant), and node output reaches durable memory only by forward-flush through envctl. A drifting node is contained by MinCut (see INTEL-002-D) without restarting the swarm.",
+      "blueprint_basis": "§4 Swarm Orchestration; 'Ruflo meta-harness ... Proportional Intelligence'; 'run 50+ agents on the hardware footprint of one'; Context Matrix rows 6, 16 (Ruflo: canonical state = routing logic only)."
+    },
+    {
+      "id": "INTEL-002-D",
+      "surface": "Swarm isolation + failure containment (RuVector MinCut, COW branching, Causal Graph Verification)",
+      "owner": "RuVector MinCut / COW branching (governed inside PostgreSQL knowledge graph)",
+      "governs": ["distributed_compute"],
+      "gate_dimensions": ["isolation", "failure_containment", "rollback"],
+      "decision": "MinCut is the deterministic real-time immune system: operating in subpolynomial time O(n^{o(1)}), it treats agent communication and code dependencies as one graph and severs a hallucinating/drifting cluster in milliseconds, isolating the failure without a swarm restart. Concurrent edits are isolated by Copy-On-Write branching — agents work in cloned staging branches; only ESN-verified stable branches merge to the main trunk, and failed branches are discarded (never merged), giving a clean rollback with no dirty-repository state. Causal Graph Verification (GNN) rejects any claim lacking a historical root. Containment is deterministic and requires no human intervention.",
+      "blueprint_basis": "§6 'RuVector MinCut operates in subpolynomial time O(n^{o(1)}) ... isolates that cluster deterministically to prevent a cascade failure without restarting the swarm'; §5-6 COW Branching; Causal Graph Verification; Context Matrix rows 8, 15, 32."
+    },
+    {
+      "id": "INTEL-002-E",
+      "surface": "Transport + communication fabric (FlexNetOS/weave bus, Yazelix UDS, MessagePack, shared redb state files)",
+      "owner": "FlexNetOS/weave + Yazelix UDS (transport plane, governed by LifeOS)",
+      "governs": ["communication"],
+      "gate_dimensions": ["transport", "observability"],
+      "decision": "LifeOS communicates over Unix Domain Sockets and shared memory-mapped redb state files — never HTTP/REST — so the UI reads the same bytes agents write with zero overlapping state. nu_plugin streams typed records via the MessagePack protocol (zero-copy, no JSON serialization). The weave bus supplies the higher-level message primitives (tracked ask/answer/ack, fan-out, jobs, notify/delivery, presence) with a 15s heartbeat, 30s stale-presence cutoff, and 60s cleanup. Transport carries no authority: it moves data only; every durable write still lands in PostgreSQL via envctl. Live weave runtime adoption is an open dependency (WEAVE-001 clean-frontdoor blocker), recorded here, not resolved by execution.",
+      "blueprint_basis": "'LifeOS Unix Domain Sockets (UDS) via Yazelix'; §5 'MessagePack-based protocol to avoid JSON serialization'; WEAVE-001.proof.json (bus primitives + 15s/30s/60s heartbeat design; clean-frontdoor blocker)."
+    },
+    {
+      "id": "INTEL-002-F",
+      "surface": "Offline / degraded-mode behavior (redb application-level Write-Ahead Log; edge-node autonomy)",
+      "owner": "redb transient tier (STORE-001 state-class 3)",
+      "governs": ["storage", "communication"],
+      "gate_dimensions": ["offline_behavior", "transport", "rollback"],
+      "decision": "When PostgreSQL is offline or latency-spiking (e.g. during heavy GNN operations), redb acts as an ACID application-level WAL: the edge node stays fully functional, buffering thoughts, terminal traces, and state flags in microseconds with no network dependency. Offline authority is bounded to the transient class only — no durable macro-state is authored offline, and nothing written offline becomes canonical without a verified forward flush. On reconnection, envctl forward-flushes only settled/significant states into PostgreSQL; reconciliation is forward-only (never a redb↔PostgreSQL dual-write), so a discarded offline buffer is a clean rollback by definition.",
+      "blueprint_basis": "redb section: 'If Postgres ever goes offline or experiences latency, redb safely acts as an application-level Write-Ahead Log'; §4 (Redb report) 'Resilient Application-Level WAL'; STORE-001 state-class 3 (recovery: process-lifecycle; forward-only sync)."
+    },
+    {
+      "id": "INTEL-002-G",
+      "surface": "Observability plane (LifeOS Mission Control reading redb via UDS; ATAS resource/failure forecasts; db_health)",
+      "owner": "LifeOS UI / observability plane (read-only)",
+      "governs": ["communication"],
+      "gate_dimensions": ["observability", "transport"],
+      "decision": "Observability is a read-only projection: LifeOS renders live swarm status by reading the same memory-mapped redb file the agents are actively writing, preventing overlapping state. Predictive observability comes from ATAS Future Timelines — resource burn (token/API/compute forecasts), complexity spikes, and failure nodes — surfaced before code is committed. Storage-tier health is surfaced by the existing db_health command (status/db_path/applied_migrations/schema_version). The observability plane never writes canonical state; it only reads and forecasts.",
+      "blueprint_basis": "UDS section: 'render the agent swarm's status by reading the exact same memory-mapped redb file the agents are actively writing'; §4 Temporal Strange Attractors (Resource Burn, Complexity Spikes, Failure Nodes); repo db_health command."
+    },
+    {
+      "id": "INTEL-002-H",
+      "surface": "Network-control policy + authority boundary (the objective's crux: no independent control-plane ownership)",
+      "owner": "LifeOS authority substrate — PostgreSQL + RuVector canonical (STORE-001)",
+      "governs": ["network_control"],
+      "gate_dimensions": ["authority", "isolation", "network_control"],
+      "decision": "No compute/mesh/network component owns an independent control plane. Network-control policy is defined and held by the LifeOS authority substrate; ruvllm, the mesh, Ruflo, weave, and redb are governed subordinates whose authority is delegated and revocable. The single durable writer is PostgreSQL (STORE-001 invariant), and the No-Sidecar rule keeps AI/graph/vector authority inside PostgreSQL rather than in an autonomous external service. In this planning phase network mutation and peer implementation are explicitly out of scope (blocked_paths: GPU workload execution, network mutation, model download, peer implementation, secrets/**); this item defines the boundary, it does not exercise the network.",
+      "blueprint_basis": "§1 'No Sidecar' philosophy; STORE-001 invariants ('Single durable writer: PostgreSQL owns every durable macro-state class exactly once'); objective clause 'without independent control-plane ownership'; task blocked_paths."
+    },
+    {
+      "id": "INTEL-002-I",
+      "surface": "Compute-tier storage binding to STORE-001 (redb transient scratchpad ↔ PostgreSQL canonical; BlobStore parity cutover)",
+      "owner": "PostgreSQL + RuVector canonical (STORE-001); redb transient",
+      "governs": ["storage"],
+      "gate_dimensions": ["capacity", "authority", "deterministic_proof", "rollback"],
+      "decision": "The compute substrate introduces NO new durable authority; it inherits STORE-001 exactly. redb is the transient tier (scratchpad / high-frequency buffer / WAL / BLAKE3 dedup cache / geometry engine); PostgreSQL + RuVector is the canonical durable owner (ACID / PITR, relational + knowledge graph). Sync is forward-only via envctl (redb → embed → PostgreSQL). Any class currently durable-on-redb (CodeDB source blobs) migrates to PostgreSQL only through the already-implemented BlobStore SHA-256 content-addressed parity contract — one verified swap at a time, never by assumption. Capacity is tiered by latency (redb microseconds / PostgreSQL milliseconds). Cutover proof (green blobstore_parity.rs) is the deterministic evidence; an un-green parity run is the rollback boundary.",
+      "blueprint_basis": "§1-2 tiered memory table (redb process-lifecycle vs PostgreSQL enterprise ACID/PITR); STORE-001 state-classes 1-3 and invariants ('Verified cutover: a class leaves redb-durable only after a green live blobstore_parity.rs run'); ADOPT-001 BlobStore/PgStore parity provenance."
+    },
+    {
+      "id": "INTEL-002-J",
+      "surface": "Deterministic proof + rollback discipline (SHAKE256 witness chains, BlobStore parity, ESN-selected COW commit, archived-plan restore)",
+      "owner": "LifeOS Governance / verification plane",
+      "governs": ["local_training", "distributed_compute", "storage"],
+      "gate_dimensions": ["deterministic_proof", "rollback", "failure_containment"],
+      "decision": "Every compute/mesh action that touches shared state must emit deterministic proof before it counts: a SHAKE256 witness chain rooted in a real PostgreSQL source vector (anti-bluffing for facts/edits), a BlobStore SHA-256 parity match (for storage cutover), or an ESN-verified COW branch commit (for timeline selection) — the system 'never asks the AI models to do the work twice.' Rollback for this task family is exactly the recorded plan: restore the archived intelligence plan while compute and network state remain unchanged. Nothing simulated, learned, or buffered offline becomes baseline without passing an explicit proof gate; failed worlds are discarded, not promoted (handoff to INTEL-003).",
+      "blueprint_basis": "§6 Cryptographic Witness Chains (SHAKE256) + Causal Graph Verification; §5 deterministic selection via COW ('commits the successful database rows ... eliminate the risk of model failure during reproduction'); STORE-001 verified-cutover invariant; INTEL-002 rollback_plan column."
+    }
+  ],
+  "gate_dimension_coverage": {
+    "capacity": ["INTEL-002-A", "INTEL-002-C", "INTEL-002-I"],
+    "scheduling": ["INTEL-002-A", "INTEL-002-C"],
+    "isolation": ["INTEL-002-B", "INTEL-002-D", "INTEL-002-H"],
+    "transport": ["INTEL-002-E", "INTEL-002-F", "INTEL-002-G"],
+    "offline_behavior": ["INTEL-002-F"],
+    "observability": ["INTEL-002-E", "INTEL-002-G"],
+    "failure_containment": ["INTEL-002-C", "INTEL-002-D", "INTEL-002-J"],
+    "authority": ["INTEL-002-A", "INTEL-002-B", "INTEL-002-C", "INTEL-002-H", "INTEL-002-I"],
+    "rollback": ["INTEL-002-D", "INTEL-002-F", "INTEL-002-I", "INTEL-002-J"],
+    "deterministic_proof": ["INTEL-002-B", "INTEL-002-I", "INTEL-002-J"]
+  },
+  "capability_domain_coverage": {
+    "local_inference": ["INTEL-002-A"],
+    "local_training": ["INTEL-002-B", "INTEL-002-J"],
+    "gpu_scheduling": ["INTEL-002-A", "INTEL-002-C"],
+    "distributed_compute": ["INTEL-002-C", "INTEL-002-D", "INTEL-002-J"],
+    "storage": ["INTEL-002-F", "INTEL-002-I", "INTEL-002-J"],
+    "communication": ["INTEL-002-E", "INTEL-002-F", "INTEL-002-G"],
+    "network_control": ["INTEL-002-H"]
+  },
+  "store_001_alignment": {
+    "keystone": "STORE-001 (generated/store_relationship_decision.json)",
+    "inherited_invariants": [
+      "Single durable writer: PostgreSQL owns every durable macro-state class; no compute/mesh component becomes a second durable writer.",
+      "Forward-only sync: redb -> envctl -> PostgreSQL; no undirected dual-write from mesh nodes.",
+      "Verified cutover: a class leaves redb-durable only after a green blobstore_parity.rs run.",
+      "No sidecar: RuVector authority stays a native PostgreSQL extension; the mesh runs no autonomous vector database.",
+      "Provenance preserved: every migrated class keeps its SHA-256 identity and source lineage."
+    ],
+    "consequence_for_this_family": "Compute, mesh, and network subordinates never own canonical authority; they buffer, compute, transport, and forecast, then forward-flush proven state into the STORE-001 authority model."
+  },
+  "execution_order": [
+    "INTEL-002-H",
+    "INTEL-002-I",
+    "INTEL-002-A",
+    "INTEL-002-B",
+    "INTEL-002-C",
+    "INTEL-002-D",
+    "INTEL-002-E",
+    "INTEL-002-F",
+    "INTEL-002-G",
+    "INTEL-002-J"
+  ],
+  "open_dependencies": [
+    "Live weave runtime adoption blocked by WEAVE-CLEAN-FRONTDOOR-MISSING (WEAVE-001); transport item INTEL-002-E defines the contract but cannot be runtime-proven until an owned clean frontdoor exposes weave.",
+    "Live RuVector-in-PostgreSQL extension activation not yet locally proven (STORE-001 open dependency); semantic-class compute-tier storage full cutover waits on it.",
+    "Promotion of learned/simulated state to baseline is deferred to INTEL-003 (regenerative configuration, secrets brokerage, proven-world rollback)."
+  ],
+  "completion_gate": "The task family covers capacity, scheduling, isolation, transport, offline behavior, observability, failure containment, authority, rollback, and deterministic proof — each gate dimension mapped to at least one work item, each work item carrying an owner and a decision, every compute/mesh/network capability declared subordinate to the LifeOS authority substrate with no independent control-plane ownership, and INTEL-002.proof.json recording pass with product_execution_performed=false.",
+  "product_execution_performed": false
+}

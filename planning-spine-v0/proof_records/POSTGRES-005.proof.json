@@ -1,0 +1,37 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-005",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The plan covers model and vector provenance, reproducible embedding, hybrid search, branch isolation, concurrent edits, temporal scoring, witness-bound decisions, deterministic merge gates, rollback, and source reconstruction.",
+  "gate_result": {
+    "plan_artifact": "generated/ruvector_semantic_edit_plan.json",
+    "task_family": "generated/task_families/POSTGRES-005.json",
+    "entities_assigned_exactly_once": 16,
+    "every_entity_has_owner_lifetime_syncedge_recovery_relationship": true,
+    "model_and_vector_provenance": "E03 embedding_model_pin binds model_id=all-MiniLM-L6-v2, weights_sha256, embedding_dim=384, distance_metric=cosine/<->, runtime=Candle|ORT to every E02 embedding row; provenance stored as a PostgreSQL reference, raw credentials stay in the OS keyring (STORE-001 external-secret class).",
+    "reproducible_embedding": "E02+E03: deterministic inference with the pinned weights reproduces the identical vector; this is the declared recovery path (PostgreSQL PITR + reproducible re-embedding), so no single stored copy is trusted as sole authority.",
+    "hybrid_search": "E06: WHERE relational predicate (language, status) AND ORDER BY semantic_embedding <-> [target] LIMIT k, plus BM25 and FastGRNN pre-filter, executed natively by RuVector in PostgreSQL (No-Sidecar); redb performs f32 distance math only as a cache.",
+    "branch_isolation": "E07 MVCC-isolated COW staging branches cloned from the main trunk + E11 MinCut isolation of hallucinating agent clusters.",
+    "concurrent_edits": "E07+E08: each agent edits its own COW branch row; MVCC prevents overwrite; conflicts resolve at the deterministic merge rather than by clobbering.",
+    "temporal_scoring": "E09+E10: ATAS/ESN parallel timelines (state diffs, resource burn, complexity spikes, failure nodes) scored by stability (cosine similarity, strange-attractor bounds); RuvLTRA steers toward the most stable path.",
+    "witness_bound_decisions": "E12 SHAKE256 witness chain rooted in a PostgreSQL source vector + E13 causal-graph verification (GNN must find a historical causal edge); unrooted/hallucinated edits are rejected before merge.",
+    "deterministic_merge_gates": "E14 gate = tests pass AND witness rooted AND MinCut/causal integrity intact AND ESN-selected winning timeline; the merge commits already-computed winning branch rows to the trunk (the model is never re-invoked).",
+    "rollback": "E15: failed-branch discard + PostgreSQL PITR + redb application-level WAL during PostgreSQL latency/outage.",
+    "source_reconstruction": "E16: envctl projection (production branch -> module_path metadata -> byte-exact concatenation of raw_code blocks into .rs/.toml/.nu); independently, reproducible re-embedding restores semantic state.",
+    "decomposition_targets_defined": ["retrieval", "edit", "branch", "integrity", "merge"],
+    "store_001_alignment": "Semantic/vector class -> PostgreSQL+RuVector (native, No-Sidecar); durable code-block/edge class -> PostgreSQL (single writer, SHA-256 identity); transient dedup-cache/geometry/WAL -> redb (never a second durable writer); per-agent witness facts -> AgentDB rooted in PostgreSQL; derived source projection -> envctl from PostgreSQL. Matches store_relationship_decision.json state_class_assignments.",
+    "no_second_durable_writer": true,
+    "no_source_file_overwrite": true,
+    "no_autonomous_merge": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-005 defines the RuVector embedding and semantic-database-editing contract as planning artifacts only. generated/ruvector_semantic_edit_plan.json assigns all sixteen semantic-edit entities exactly once, each with a canonical owner, lifetime, sync edge, recovery source, and explicit relationship to PostgreSQL / RuVector / redb / nu_plugin CodeDB / AgentDB / envctl, grounded in the Architecture Blueprint and the STORE-001 keystone decision. Embeddings are produced by the local all-MiniLM-L6-v2 model (384-dim, Candle/ORT) during the envctl bridge and stored in PostgreSQL, which per the blueprint only stores and measures vectors; a pinned model (weights_sha256, dim, metric) makes re-embedding reproducible and is the semantic recovery path (PITR + re-embedding). Hybrid retrieval is native RuVector SQL (relational predicate + ORDER BY semantic_embedding <-> + BM25 + FastGRNN) with No-Sidecar, and redb is confined to a BLAKE3 dedup cache and f32 distance math with no SQL, secondary index, or native vector logic. Code blocks are SHA-256 content-addressed under the ADOPT-001 BlobStore contract; semantic edits are UPDATEs applied only inside MVCC copy-on-write staging branches, never on the main trunk directly and never overwriting a source file. Concurrent edits are isolated per branch; ATAS/ESN simulate and score parallel temporal timelines (state diffs, resource burn, complexity spikes, failure nodes) by mathematical stability. Integrity is enforced by RuVector MinCut (O(n^{o(1)}) real-time isolation of hallucinating clusters) and by SHAKE256 witness chains rooted in PostgreSQL source vectors plus causal-graph verification, which reject any unrooted claim. The merge is deterministic: a gate of tests + witness + MinCut/causal integrity + ESN selection commits the already-computed winning branch rows to the trunk without re-invoking the model; failed branches roll back via branch discard, PostgreSQL PITR, and redb WAL; and envctl re-projects byte-exact source from module_path metadata for reconstruction. All ten verification-gate clauses map to concrete, blueprint-grounded contracts, and the plan carries the five downstream decomposition targets (retrieval, edit, branch, integrity, merge). No embeddings were computed, no vectors or rows were written, no branch was merged, and no source file was overwritten; product_execution_performed is false and autonomous merge is blocked in this policy cell.",
+  "artifact_paths": [
+    "generated/ruvector_semantic_edit_plan.json",
+    "generated/task_families/POSTGRES-005.json",
+    "proof_records/POSTGRES-005.proof.json"
+  ],
+  "product_execution_performed": false
+}

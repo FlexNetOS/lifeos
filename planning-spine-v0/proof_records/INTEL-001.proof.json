@@ -1,0 +1,137 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "INTEL-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every data class has one owner, schema, retention tier, encryption boundary, migration path, backup, replay, rollback, and proof task; no private data is exposed.",
+  "gate_result": {
+    "governed_data_contract_artifact": "generated/task_families/INTEL-001.json (work_items INTEL-001-A .. INTEL-001-L are the governed data contract)",
+    "data_class_universe": [
+      "INTEL-001-A hot memory (tier)",
+      "INTEL-001-B warm memory (tier)",
+      "INTEL-001-C cold memory (tier)",
+      "INTEL-001-D relational (content)",
+      "INTEL-001-E vector/semantic (content)",
+      "INTEL-001-F graph/causal (content)",
+      "INTEL-001-G embedded-ledger (content)",
+      "INTEL-001-H artifact (content)",
+      "INTEL-001-I identity (content)",
+      "INTEL-001-J provenance (content)",
+      "INTEL-001-K per-agent cognition (content, completeness per STORE-001 class 4 / PGAUTH-003)",
+      "INTEL-001-L external-secret / credential authority (content, required by the encryption-boundary and no-private-data clauses; STORE-001 class 6 / PGAUTH-005)"
+    ],
+    "class_count": 12,
+    "ownership_axes_reconciled": "Two orthogonal axes keep 'one owner per class' true: tier classes (hot/warm/cold) are physical strata each owned by one engine; content classes (relational, vector, graph, embedded-ledger, artifact, identity, provenance, per-agent-cognition, external-secret) are logical entities each owned by one authority and merely resident across named tiers. Tier residency is placement, not ownership. Example: the relational class is owned solely by PostgreSQL and resident in warm+cold; it is never dual-written and never hot-durable.",
+    "clause_1_one_owner": {
+      "satisfied": true,
+      "owner_map": {
+        "hot memory": "redb",
+        "warm memory": "PostgreSQL + RuVector",
+        "cold memory": "PostgreSQL PITR archive",
+        "relational": "PostgreSQL",
+        "vector": "PostgreSQL + RuVector",
+        "graph": "PostgreSQL + RuVector",
+        "embedded-ledger": "PostgreSQL (witness-chain roots + DB-native proof ledger)",
+        "artifact": "PostgreSQL (canonical content-addressed blobs; materialized trees disposable)",
+        "identity": "PostgreSQL",
+        "provenance": "PostgreSQL + committed source pins",
+        "per-agent cognition": "AgentDB (.rvf)",
+        "external-secret": "OS keyring + committed source pins"
+      },
+      "note": "Each class names exactly one owner. PostgreSQL owning several content classes is single-ownership per class, not shared ownership of any one class; no class has two owners."
+    },
+    "clause_2_schema": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "examples": "hot=BLAKE3/agent-local keys + raw byte values; warm=SQL identities + semantic_embedding columns; relational=stable PG identities + module_path + AST rows + SHA-256 blob refs; vector=all-MiniLM-L6-v2 embeddings + hybrid-search indexes; graph=causal edges + GNN nodes/edges; embedded-ledger=SHAKE256 witness chains + append-only proof-ledger rows; artifact=SHA-256 content hash + module_path + branch/version; identity=user_id/agent_id + account records; provenance=commit/PR lineage + SHA-256 identity; per-agent cognition=.rvf agent_id + MicroLoRA/SONA/RL/FastGRNN; external-secret=local reference key + keyring service/account (never the value).",
+      "source": "Architecture Context Matrix 'Required identity keys and schema fields' column; blueprint sections 2-6; STORE-001 state_class_assignments."
+    },
+    "clause_3_retention_tier": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "mapping": "hot=microsecond process-lifecycle/local-disk (redb); warm=millisecond active ACID working set (PostgreSQL); cold=archival PITR window (PostgreSQL archive). Content classes state tier residency: relational/vector/graph/embedded-ledger/identity/provenance=warm+cold; artifact=warm+cold canonical blobs plus hot/ephemeral materialized trees; per-agent cognition=edge-local .rvf; external-secret=reference-only, no tier residency for the raw value.",
+      "source": "Blueprint tiered memory table (Latency/Use Case/Persistence rows)."
+    },
+    "clause_4_encryption_boundary": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "examples": "redb=local-disk file permissions, single-node isolation, never holds secrets; PostgreSQL classes=at-rest encryption + role-based permissions, references-not-secrets; embedded-ledger=SHAKE256 integrity, append-only; artifact=secret-output guards on exports; per-agent cognition=per-.rvf boundary, SHAKE256-witnessed; external-secret=raw secrets only in the OS keyring, brokered by envctl secretd/secretctl.",
+      "source": "STORE-001 classes 2/3/6; ADOPT-001 secret-output guards; ADOPT-002 secrets-engine."
+    },
+    "clause_5_migration_path": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "examples": "hot=none (intended terminal role); warm=redb->envctl->PostgreSQL forward-only; cold=forward archival tiering within PostgreSQL; relational + artifact=CodeDB blob cutover via green blobstore_parity.rs under one SHA-256 identity, one verified swap at a time; vector=RuVector-in-PostgreSQL activation, Bun N-API embedding path until proven; graph=reproducibly re-derived from source rows; embedded-ledger/provenance=DB-native proof/provenance tables (POSTGRES-003); per-agent cognition=none, one-way promotion to PostgreSQL; external-secret=none.",
+      "source": "STORE-001 per-class migration_path + correction_of_prior_brief; POSTGRES-001-F."
+    },
+    "clause_6_backup": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "examples": "hot=none durable (transient by design); warm/cold/relational/vector/graph/embedded-ledger/artifact/identity/provenance=PostgreSQL PITR (cold tier IS the backup substrate); provenance also dual-anchored by committed git pins; per-agent cognition=.rvf file, regenerable from base model + training history; external-secret=OS keyring + committed pins.",
+      "source": "Blueprint 'Enterprise ACID / PITR'; STORE-001 recovery_source per class."
+    },
+    "clause_7_replay": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "examples": "hot=application-level WAL/outbox replays unacked entries forward to PostgreSQL; warm/relational=WAL replay to a point in time; vector/graph=deterministic re-derivation (re-embedding / re-derive causal edges) from source rows; cold=PITR base-backup + WAL segment replay; embedded-ledger=re-verify chain from genesis root + Causal Graph Verification re-scan; artifact=exact-byte re-materialization via module_path; per-agent cognition=replay training history against base model; external-secret=fail-closed re-solicit/re-retrieve.",
+      "source": "Blueprint redb WAL, envctl materialization, witness chains; STORE-001 recovery."
+    },
+    "clause_8_rollback": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "examples": "hot=discard / redb transaction abort; warm/relational/vector/graph/identity=COW branch rollback + PITR; cold=restore prior base backup + WAL replay to point; embedded-ledger/provenance=append-only, superseded by a corrective appended entry (no destructive rollback); artifact=re-project prior branch/version + PITR for blobs; per-agent cognition=restore prior .rvf snapshot / COW on cognition; external-secret=n/a, reference re-pointed.",
+      "source": "Blueprint COW branching; STORE-001 verified-cutover invariant; ledger append-only semantics."
+    },
+    "clause_9_proof_task": {
+      "satisfied": true,
+      "present_for_all_12": true,
+      "mapping": {
+        "hot memory": "PGAUTH-002 + POSTGRES-006",
+        "warm memory": "PGAUTH-001 + POSTGRES-002 + POSTGRES-005",
+        "cold memory": "POSTGRES-010",
+        "relational": "PGAUTH-001 + POSTGRES-002",
+        "vector": "POSTGRES-005 + NBVERIFY-001",
+        "graph": "POSTGRES-002 + POSTGRES-005",
+        "embedded-ledger": "POSTGRES-003 + proof_ledger discipline",
+        "artifact": "ADOPT-001 + PGAUTH-004 + POSTGRES-008 + POSTGRES-009",
+        "identity": "POSTGRES-002 + PGAUTH-005",
+        "provenance": "ADOPT-001 + POSTGRES-003",
+        "per-agent cognition": "PGAUTH-003 + POSTGRES-006",
+        "external-secret": "PGAUTH-005 + ADOPT-002"
+      },
+      "note": "Every cited proof task exists in generated/task_graph.source.csv; PGAUTH-006 reconciles the whole ownership set into the closed synchronization-and-recovery matrix."
+    },
+    "clause_10_no_private_data_exposed": {
+      "satisfied": true,
+      "how": "Class INTEL-001-L confines raw secrets to the OS keyring; PostgreSQL stores references and provenance, never raw secrets; redb never holds secrets; envctl secretd/secretctl brokers access. Every other class stores references, SHA-256/SHAKE256 hashes, or derived content only. This planning artifact and its task family contain no credentials, API keys, tokens, or user PII — only class definitions, owner names, and task-ID references.",
+      "private_data_in_artifact": false
+    },
+    "store_001_alignment": {
+      "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+      "assignments_applied": "Hot->redb (STORE-001 class 3); warm/relational->PostgreSQL (class 1); vector/graph->PostgreSQL+RuVector No-Sidecar (class 2); artifact/projection->PostgreSQL source of truth + disposable projections (class 5); per-agent cognition->AgentDB (class 4); external-secret->OS keyring (class 6). Cold tier and embedded-ledger extend the same authority model into PITR archival and witness-chain anchoring.",
+      "invariants_honored": ["single durable writer = PostgreSQL", "forward-only redb->envctl->PostgreSQL", "verified SHA-256 parity cutover only", "No-Sidecar RuVector native extension", "provenance/SHA-256 identity preserved"],
+      "no_silent_reclassification": "The two currently redb-durable uses (CodeDB source blobs, envctl migration state) are handled as transitional under the artifact and relational classes: they migrate to PostgreSQL-canonical only via a green live blobstore_parity.rs run under one preserved SHA-256 identity, never by assumption. Building to the intended tiered spec is an upgrade, not a downgrade."
+    },
+    "open_dependencies_declared": [
+      "Live RuVector-in-PostgreSQL extension activation not yet locally proven; the vector-class full cutover waits on it (NBVERIFY-001 remainder).",
+      "Live blobstore_parity.rs green run against a disposable PostgreSQL captures the artifact/relational durable-class cutover proof (POSTGRES-010 lane).",
+      "Database-native proof/provenance tables (embedded-ledger, provenance) land under POSTGRES-003."
+    ],
+    "product_execution_performed": false
+  },
+  "proof_summary": "INTEL-001 defines the unified governed memory and data substrate as a single contract in generated/task_families/INTEL-001.json, placing all twelve LifeOS-native data classes under one owner each with every gate clause resolved. The three memory tiers are assigned by the Architecture Blueprint's tiered hierarchy: hot -> redb (microsecond, process-lifecycle, transient, never a durable writer), warm -> PostgreSQL + RuVector (millisecond ACID active working set), cold -> PostgreSQL PITR archive (base backups + WAL segments + compressed histories). The seven content classes named in the goal are assigned to their single canonical owners derived from STORE-001: relational, vector, and graph -> PostgreSQL + RuVector as the No-Sidecar native extension; embedded-ledger -> PostgreSQL anchoring SHAKE256 witness chains and the database-native proof ledger; artifact -> PostgreSQL canonical content-addressed blobs under the BlobStore SHA-256 parity contract, with materialized trees as disposable one-way projections; identity -> PostgreSQL with external providers referenced; provenance -> PostgreSQL references dual-anchored by committed source pins. Two further classes are enumerated for completeness because the gate says 'every data class' and requires an encryption boundary: per-agent cognition -> AgentDB (.rvf), non-authoritative for shared truth, and external-secret -> OS keyring, which operationalizes 'no private data is exposed' by keeping raw secrets out of every LifeOS tier. Each of the twelve classes carries one schema (from the Architecture Context Matrix identity-key column and the blueprint), one retention tier, one encryption boundary, one migration path (with the two currently redb-durable uses migrating only via a verified SHA-256 parity cutover, never silently reclassified), one backup source (PITR / .rvf / keyring), one replay rule (WAL replay, reproducible re-derivation, exact-byte re-materialization, or witness-chain re-verification), one rollback rule (COW + PITR, append-only supersession, or reference re-point), and one existing proof task from the canonical task graph. A two-axis ownership model (physical tiers vs logical content classes) keeps 'one owner per class' true even though several content classes reside in the warm and cold PostgreSQL tiers. No database, no user-space state, and no secret was read or written; this is planning classification only, grounded entirely in the Architecture Blueprint, the Architecture Context Matrix, and the STORE-001 keystone decision, and held for the downstream verified-cutover proofs.",
+  "artifact_paths": [
+    "generated/task_families/INTEL-001.json",
+    "proof_records/INTEL-001.proof.json"
+  ],
+  "provenance_derived_from": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/task_families/POSTGRES-001.json (five-family authority boundaries)",
+    "generated/adopted_capabilities.source.csv (ADOPT-001/ADOPT-002)",
+    "generated/task_graph.source.csv (INTEL-001 row + cited proof-task rows)"
+  ],
+  "product_execution_performed": false
+}

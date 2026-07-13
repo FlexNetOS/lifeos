@@ -1,0 +1,426 @@
+{
+  "schema_version": "lifeos-planning-spine.postgres-authority-cutover-plan.v0",
+  "task_id": "POSTGRES-010",
+  "title": "Whole user-space parity recovery and authority cutover plan",
+  "defined_at": "2026-07-13T03:47:08Z",
+  "owner": "Governance Board / LifeOS Data Agent / QA Agent",
+  "execution_cell": "policy-cell",
+  "product_execution_performed": false,
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json",
+    "generated/pgauth_redb_usage_inventory.csv",
+    "generated/pgauth_closure_matrix.csv",
+    "generated/north_star_coverage.source.csv"
+  ],
+  "scope_principle": "This is a DEFINITION artifact. It defines the staged migration that must prove the entire user-space is represented, reconstructable, recoverable, and operated from PostgreSQL BEFORE one explicit owner-approved authority switch retires flat files as editable authority. No source is deleted, no history is lost, no cutover is irreversible, and no production state is mutated by this task. Flat files are not destroyed at cutover: they transition from editable authority to (a) the deterministic derived projection produced by envctl from PostgreSQL rows and (b) a preserved read-only source reference retained until a separate retention approval.",
+  "store_001_alignment": {
+    "keystone_decision": "STORE-001 (generated/store_relationship_decision.json) — adopt-intended-tiered-architecture",
+    "single_durable_writer": "PostgreSQL owns every durable macro-state class exactly once; redb never becomes a second durable writer for a PostgreSQL-owned class.",
+    "forward_only_sync": "redb -> envctl(embed) -> PostgreSQL; no undirected redb<->PostgreSQL dual-write.",
+    "verified_cutover_mechanism": "A class leaves flat-file / redb-durable authority only after a green live blobstore_parity.rs run under one SHA-256 content identity (codedb_store_pg::PgStore implements the same BlobStore contract). The guardrail is 'no unverified cutover', never 'flat files stay canonical'.",
+    "upgrades_not_downgrades": "Retiring flat files as editable authority in favor of PostgreSQL is building to the intended blueprint spec; no functionality is removed because the projection path (envctl PostgreSQL -> filesystem) reproduces byte-identical source directories and the preserved source remains available until retention approval.",
+    "no_silent_reclassification": "The two current durable redb uses (PGREDB-001 CodeDB source_blobs, PGREDB-002 envctl migration_db) are migrated only through the BlobStore SHA-256 parity cutover, never by assumption; they are enumerated explicitly in the class set below."
+  },
+  "user_space_class_set": {
+    "description": "Every user-space class named in the POSTGRES-002 model gate and the STORE-001 state-class decision is assigned exactly one canonical target owner and one authority_action. Classes 1-14 currently hold flat-file (or redb-durable) editable authority and switch to PostgreSQL at the single Stage-4 switch. Classes 15-18 retain their STORE-001 owner and DO NOT switch (they are not flat-file editable authority).",
+    "switching_classes": [
+      {
+        "class_id": "USC-FILES",
+        "class": "file content bytes / captured source blobs",
+        "source_representation": "flat files on disk; today also codedb_store_redb durable blobs (PGREDB-001)",
+        "store_001_class": "durable relational macro-state (blob references)",
+        "canonical_target_owner": "PostgreSQL (BlobStore rows, content-addressed)",
+        "identity_key": "SHA-256 content hash of file bytes (byte-exact)",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "BlobStore SHA-256 parity contract (codedb_store_pg::PgStore + blobstore_parity.rs) — verified per-class swap under one content identity",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-03", "PD-11", "PD-12", "PD-10"]
+      },
+      {
+        "class_id": "USC-DIRECTORIES",
+        "class": "directory tree structure and module_path metadata",
+        "source_representation": "filesystem directory hierarchy",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL (module_path metadata rows)",
+        "identity_key": "module_path (stable directory/module identity)",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "envctl stores module_path metadata; projection reconstructs the exact directory structure (blueprint materialization step 2)",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-04", "PD-05", "PD-10"]
+      },
+      {
+        "class_id": "USC-CODE-MODULES",
+        "class": "code modules / AST fragments / raw_code rows",
+        "source_representation": "flat .rs/.toml/.nu source files",
+        "store_001_class": "durable relational macro-state + semantic/vector state",
+        "canonical_target_owner": "PostgreSQL + RuVector",
+        "identity_key": "module_path + SHA-256 of the raw_code block",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "Nushell AST parse -> redb buffer -> envctl bridge -> PostgreSQL rows (blueprint three pillars of ingestion); edits become SQL UPDATE on rows",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-03", "PD-05", "PD-08", "PD-09", "PD-10"]
+      },
+      {
+        "class_id": "USC-CONFIG",
+        "class": "configuration records",
+        "source_representation": "flat config files",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL",
+        "identity_key": "configuration key path",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "collected and ingested per POSTGRES-004 lossless ingestion contract",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-03", "PD-04", "PD-10"]
+      },
+      {
+        "class_id": "USC-PLANNING",
+        "class": "planning and control tables (task graph, North Star, architecture, decisions, provenance, proofs, status)",
+        "source_representation": "flat planning-spine files (task_graph.source.csv, proof_records/**, north_star_coverage.source.csv, task_families/**)",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL (database-native control plane per POSTGRES-003)",
+        "identity_key": "task_id / anchor_id / proof_uri / decision id",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "POSTGRES-003 database-native control tables with deterministic projection contract; every planning question queried, every accepted answer updated in the database",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-05", "PD-07", "PD-10"]
+      },
+      {
+        "class_id": "USC-COMMUNICATIONS",
+        "class": "communications and domain records",
+        "source_representation": "flat-file domain records",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL",
+        "identity_key": "domain record key",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "collected and ingested per POSTGRES-004; lossless round-trip keys per POSTGRES-002 model",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-03", "PD-04", "PD-07"]
+      },
+      {
+        "class_id": "USC-APP-STATE",
+        "class": "LifeOS application state (persisted settings and state)",
+        "source_representation": "flat-file persisted application state",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL",
+        "identity_key": "application state key",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "canonical state read/directed/advanced via the POSTGRES-007 LifeOS Mission Control UDS path",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-09", "PD-14"]
+      },
+      {
+        "class_id": "USC-MEDIA-BLOBREFS",
+        "class": "media and binary blob references",
+        "source_representation": "flat-file media/binary assets",
+        "store_001_class": "durable relational macro-state (blob references)",
+        "canonical_target_owner": "PostgreSQL (content-addressed blob references)",
+        "identity_key": "SHA-256 content hash",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "BlobStore SHA-256 parity contract (same content identity as USC-FILES)",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-03", "PD-11", "PD-12"]
+      },
+      {
+        "class_id": "USC-IDENTITIES",
+        "class": "identities",
+        "source_representation": "flat-file identity records",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL",
+        "identity_key": "stable identity id",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "stable identities defined by the POSTGRES-002 relational graph and identity model",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-06"]
+      },
+      {
+        "class_id": "USC-PERMISSIONS",
+        "class": "permissions and access control records",
+        "source_representation": "flat-file permission/ACL state",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL",
+        "identity_key": "(principal, resource) pair",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "permission records modeled per POSTGRES-002; access decisions reconstructable",
+        "parity_dimensions": ["PD-01", "PD-06", "PD-09"]
+      },
+      {
+        "class_id": "USC-HISTORY",
+        "class": "history, temporal relations, and provenance lineage",
+        "source_representation": "flat-file history (git lineage, source commit/PR provenance)",
+        "store_001_class": "durable relational macro-state (temporal + provenance)",
+        "canonical_target_owner": "PostgreSQL (temporal relations + PITR)",
+        "identity_key": "version / commit / provenance edge id",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "temporal relations per POSTGRES-002; PITR recovery per Architecture Context Matrix (PostgreSQL persistence = Enterprise ACID / PITR); source commit/PR lineage preserved (adopted_capabilities.source.csv)",
+        "parity_dimensions": ["PD-07", "PD-02", "PD-11", "PD-12"]
+      },
+      {
+        "class_id": "USC-RELATIONSHIPS",
+        "class": "relationships / graph edges / causal dependency edges",
+        "source_representation": "implicit in flat-file imports and cross-references",
+        "store_001_class": "durable relational macro-state + semantic/graph state",
+        "canonical_target_owner": "PostgreSQL + RuVector (GNN causal edges)",
+        "identity_key": "(edge type, source node, target node)",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "causal dependency edges committed alongside AST fragments and embeddings (blueprint PostgreSQL knowledge-graph)",
+        "parity_dimensions": ["PD-05", "PD-01", "PD-08"]
+      },
+      {
+        "class_id": "USC-SEMANTIC-EMBEDDINGS",
+        "class": "semantic embeddings and vectors",
+        "source_representation": "not present in flat files; derived at ingestion",
+        "store_001_class": "semantic / vector / knowledge-graph state",
+        "canonical_target_owner": "PostgreSQL + RuVector (native extension, No-Sidecar)",
+        "identity_key": "(source row identity, embedding model, model version, config)",
+        "authority_action": "switch-flat-file-to-postgresql",
+        "migration_mechanism": "embeddings produced by a local model (all-MiniLM-L6-v2) during the envctl bridge and stored in PostgreSQL; reproducible re-embedding is the recovery path",
+        "gated_on_open_dependency": "Live RuVector-in-PostgreSQL extension activation must be proven locally before this class fully cuts over (STORE-001 open dependency; NBVERIFY-001 / REDB-CLAIM-023 remainder). Until then embeddings may be produced via the proven Bun-loaded ruvector N-API path and committed to PostgreSQL.",
+        "parity_dimensions": ["PD-08", "PD-02", "PD-10"]
+      },
+      {
+        "class_id": "USC-ENVCTL-MIGRATION-STATE",
+        "class": "envctl migration/orchestration state (targets, runs, run_events, approvals, checkpoints, rollbacks)",
+        "source_representation": "redb-durable envctl migration_db today (PGREDB-002)",
+        "store_001_class": "durable relational macro-state",
+        "canonical_target_owner": "PostgreSQL audit/history tables (one-way promotion of run history)",
+        "identity_key": "envctl migration/run identifiers",
+        "authority_action": "switch-redb-durable-to-postgresql",
+        "migration_mechanism": "one-way promote run history to PostgreSQL audit tables via verified parity; envctl's replayable migration engine re-derives state on recovery",
+        "parity_dimensions": ["PD-01", "PD-02", "PD-07"]
+      }
+    ],
+    "non_switching_classes": [
+      {
+        "class_id": "USC-TRANSIENT-REDB",
+        "class": "transient high-frequency state (agent scratchpad thoughts, terminal traces, intermediate logs, BLAKE3 dedup cache, application-level WAL/outbox, shared UI read-view)",
+        "covers_inventory_rows": ["PGREDB-003", "PGREDB-004", "PGREDB-005", "PGREDB-006", "PGREDB-007"],
+        "store_001_class": "transient high-frequency state",
+        "canonical_owner": "redb",
+        "authority_action": "retain-store001-owner-no-switch",
+        "reason": "This is redb's intended terminal role (blueprint: local AI scratchpad / high-frequency write buffer / dedup cache / WAL / geometry engine). It is not flat-file editable authority; only significant states flush forward to PostgreSQL via envctl. No authority switch applies."
+      },
+      {
+        "class_id": "USC-COGNITION",
+        "class": "per-agent cognition (MicroLoRA adapters, SONA policy matrices, RL weights) in AgentDB .rvf",
+        "store_001_class": "per-agent cognition",
+        "canonical_owner": "AgentDB (.rvf)",
+        "authority_action": "retain-store001-owner-no-switch",
+        "reason": "AgentDB is the intended owner of active cognition; non-authoritative for shared macro-state and witnessed by Cryptographic Witness Chains (SHAKE256) rooted in PostgreSQL source vectors. Not flat-file authority; no switch."
+      },
+      {
+        "class_id": "USC-PROJECTIONS",
+        "class": "derived filesystem projections (materialized source directories for musl compilation, exported release trees)",
+        "store_001_class": "derived projections",
+        "canonical_owner": "PostgreSQL (source of truth) projected read-only by envctl / CodeDB materialization",
+        "authority_action": "derived-output-not-authority",
+        "reason": "After the switch, flat directories are the deterministic derived OUTPUT of envctl projection from PostgreSQL rows, regenerated from module_path metadata; they are disposable and never a competing writable owner (PGAUTH-004 invariant). This is what 'retiring flat files as editable authority while retaining projections' means."
+      },
+      {
+        "class_id": "USC-EXTERNAL-SECRETS",
+        "class": "external secrets / provenance authority (API keys, attestation bundles, source pins)",
+        "store_001_class": "external-secret / provenance authority",
+        "canonical_owner": "OS keyring + committed source pins (unchanged)",
+        "authority_action": "retain-store001-owner-no-switch",
+        "reason": "PostgreSQL stores references/provenance, never raw secrets; redb never holds secrets. Not flat-file editable authority; no switch."
+      }
+    ]
+  },
+  "parity_dimensions": [
+    {
+      "id": "PD-01",
+      "dimension": "entity_counts",
+      "gate_clause": "Entity counts ... pass",
+      "check": "For each switching class, COUNT(*) of ingested PostgreSQL rows equals the source inventory count produced by the POSTGRES-004 archive-first collectors.",
+      "evidence": "per-class count table (source inventory count vs PostgreSQL row count)",
+      "pass_criterion": "exact per-class equality across all 14 switching classes; zero missing, zero extra"
+    },
+    {
+      "id": "PD-02",
+      "dimension": "identities",
+      "gate_clause": "identities ... pass",
+      "check": "Every source stable identity (SHA-256 blob hash, module_path, row/task/anchor/proof identity, edge identity) maps to exactly one PostgreSQL identity and back (bijective).",
+      "evidence": "identity round-trip map",
+      "pass_criterion": "bijective identity map; zero orphans and zero collisions"
+    },
+    {
+      "id": "PD-03",
+      "dimension": "bytes",
+      "gate_clause": "bytes ... pass",
+      "check": "Byte-exact content parity: SHA-256 of every PostgreSQL-stored blob equals the SHA-256 of the source blob under the BlobStore parity contract.",
+      "evidence": "blobstore_parity.rs green run against a disposable PostgreSQL (STORE-001 durable-class cutover proof)",
+      "pass_criterion": "all content hashes equal; exact-byte materialization holds"
+    },
+    {
+      "id": "PD-04",
+      "dimension": "metadata",
+      "gate_clause": "metadata ... pass",
+      "check": "Non-text metadata (mode/permissions bits, timestamps, size, mime, module_path, ordering) preserved per the POSTGRES-004 content-and-metadata checksum contract.",
+      "evidence": "per-entity metadata checksum comparison",
+      "pass_criterion": "metadata checksum equal for every entity"
+    },
+    {
+      "id": "PD-05",
+      "dimension": "relationships",
+      "gate_clause": "relationships ... pass",
+      "check": "Graph edges (containment, dependency, causal) reconstructed in PostgreSQL match the source-derived edge set by endpoints and type.",
+      "evidence": "edge-set diff (source-derived vs PostgreSQL/RuVector)",
+      "pass_criterion": "edge-set equality; no dangling or invented edges (Causal Graph Verification consistent)"
+    },
+    {
+      "id": "PD-06",
+      "dimension": "permissions",
+      "gate_clause": "permissions ... pass",
+      "check": "Permission/ACL records reconstruct identical access decisions for a representative principal x resource matrix.",
+      "evidence": "access-decision diff",
+      "pass_criterion": "permission decision diff empty"
+    },
+    {
+      "id": "PD-07",
+      "dimension": "history",
+      "gate_clause": "history ... pass",
+      "check": "Temporal/provenance history preserved; PostgreSQL PITR reconstructs any prior committed state; source commit/PR lineage retained.",
+      "evidence": "history-depth comparison + a PITR restore-to-timestamp verification",
+      "pass_criterion": "history depth equals source; PITR restore reproduces the target prior state; lineage intact"
+    },
+    {
+      "id": "PD-08",
+      "dimension": "semantic_retrieval",
+      "gate_clause": "semantic retrieval ... pass",
+      "check": "RuVector hybrid search (ORDER BY semantic_embedding <->) returns the same top-k target functions as a reference query set; embeddings are reproducible.",
+      "evidence": "retrieval parity report over a fixed reference query set + reproducible re-embedding checksum",
+      "pass_criterion": "top-k retrieval parity within defined tolerance; re-embedding deterministic",
+      "gated_on_open_dependency": "Live RuVector-in-PostgreSQL extension activation (STORE-001 open dependency)"
+    },
+    {
+      "id": "PD-09",
+      "dimension": "behavior",
+      "gate_clause": "behavior ... pass",
+      "check": "Observed LifeOS behavior driven from PostgreSQL equals behavior from flat-file authority for the bounded slice (extends the POSTGRES-009 source-to-DB-to-projection-to-build-to-UDS round trip).",
+      "evidence": "behavior diff between flat-file-authoritative run and PostgreSQL-authoritative run",
+      "pass_criterion": "behavior diff empty for the bounded slice"
+    },
+    {
+      "id": "PD-10",
+      "dimension": "reconstruction",
+      "gate_clause": "reconstruction ... pass",
+      "check": "envctl projection from PostgreSQL reproduces a byte-identical source directory (POSTGRES-008 deterministic projection; repeated projections byte-identical).",
+      "evidence": "SHA-256 of projected directory tree vs source directory tree; repeat-projection determinism check",
+      "pass_criterion": "projection SHA-256 equals source; repeated projections byte-identical"
+    },
+    {
+      "id": "PD-11",
+      "dimension": "backup",
+      "gate_clause": "backup ... pass",
+      "check": "A full backup of the PostgreSQL authority (relational + vectors + provenance) is captured and checksummed before the switch.",
+      "evidence": "backup manifest with checksum",
+      "pass_criterion": "backup exists and its checksum is recorded prior to Stage 4"
+    },
+    {
+      "id": "PD-12",
+      "dimension": "restore",
+      "gate_clause": "restore ... pass",
+      "check": "Restoring from that backup into a disposable namespace yields identical database state.",
+      "evidence": "restore round-trip checksum comparison",
+      "pass_criterion": "restored-state checksum equals backup source checksum"
+    },
+    {
+      "id": "PD-13",
+      "dimension": "failback",
+      "gate_clause": "failback ... pass",
+      "check": "The rehearsed failback to preserved source authority succeeds: database writes stop and flat-file authority resumes with no data loss and both representations intact.",
+      "evidence": "failback rehearsal record on a disposable namespace",
+      "pass_criterion": "failback rehearsal green; both representations retained; zero unarchived destructive action"
+    },
+    {
+      "id": "PD-14",
+      "dimension": "observed_lifeos_operation",
+      "gate_clause": "observed LifeOS operation ... pass",
+      "check": "LifeOS Mission Control (POSTGRES-007 UDS path) reads, directs, and advances the canonical PostgreSQL state live, with audit events.",
+      "evidence": "captured UDS request/response answered from canonical DB + emitted audit event",
+      "pass_criterion": "UDS round trip answered from canonical PostgreSQL; audit event recorded; no hidden flat-file control-plane detour"
+    }
+  ],
+  "migration_stages": [
+    {
+      "id": "STAGE-1",
+      "name": "Parity decomposition",
+      "objective": "Prove every switching user-space class is represented and reconstructable in PostgreSQL.",
+      "depends_on": ["POSTGRES-002", "POSTGRES-003", "POSTGRES-004", "POSTGRES-005", "POSTGRES-008"],
+      "entry_gate": "Graph closure past POSTGRES-009; bounded round trip proven.",
+      "exit_gate": "PD-01 entity_counts, PD-02 identities, PD-03 bytes, PD-04 metadata, PD-05 relationships, PD-06 permissions, PD-07 history, PD-08 semantic_retrieval, PD-10 reconstruction all green across all switching classes.",
+      "authority_state": "flat files remain the editable authority (no switch)"
+    },
+    {
+      "id": "STAGE-2",
+      "name": "Restore rehearsal",
+      "objective": "Prove the recovery envelope before any switch.",
+      "depends_on": ["STAGE-1"],
+      "entry_gate": "Stage 1 exit gate green.",
+      "exit_gate": "PD-11 backup, PD-12 restore, PD-13 failback all green on a disposable namespace; both representations retained.",
+      "authority_state": "flat files remain the editable authority (no switch)"
+    },
+    {
+      "id": "STAGE-3",
+      "name": "Staged dual-read",
+      "objective": "Serve reads from PostgreSQL alongside flat-file authority and measure operational parity.",
+      "depends_on": ["STAGE-2"],
+      "entry_gate": "Stage 2 exit gate green.",
+      "exit_gate": "PD-09 behavior and PD-14 observed_lifeos_operation green for the bounded slice while flat files are still the editable authority.",
+      "authority_state": "flat files remain the editable authority; PostgreSQL is read-shadowed, not yet authoritative"
+    },
+    {
+      "id": "STAGE-4",
+      "name": "Explicit authority switch",
+      "objective": "Perform ONE explicit owner-approved switch of editable authority from flat files to PostgreSQL.",
+      "depends_on": ["STAGE-3"],
+      "entry_gate": "ALL 14 parity dimensions (PD-01..PD-14) green across all switching classes AND STORE-001 verified-cutover invariant satisfied (green live blobstore_parity.rs for durable classes; RuVector-in-PostgreSQL activation for the semantic class).",
+      "exit_gate": "A single explicit owner-approved authority switch is recorded; flat files become the read-only preserved source reference and the envctl-derived projection; edits now flow to PostgreSQL rows (SQL UPDATE).",
+      "authority_state": "PostgreSQL is the editable authority; flat files are preserved read-only reference + derived projection"
+    },
+    {
+      "id": "STAGE-5",
+      "name": "Retention decision",
+      "objective": "After observed-stable operation, a separate governance retention approval decides preserved-source disposition.",
+      "depends_on": ["STAGE-4"],
+      "entry_gate": "Post-switch operation observed stable via PD-14.",
+      "exit_gate": "An explicit retention approval decision is recorded; until then the preserved source is retained and never deleted.",
+      "authority_state": "PostgreSQL authoritative; preserved source retained until retention approval"
+    }
+  ],
+  "authority_switch_gate": {
+    "count": "exactly one explicit switch (Stage 4)",
+    "preconditions": [
+      "All 14 parity dimensions PD-01..PD-14 green across all switching classes",
+      "STORE-001 verified-cutover invariant satisfied: green live blobstore_parity.rs against a disposable PostgreSQL for durable classes",
+      "RuVector-in-PostgreSQL extension activation proven for the semantic-embeddings class (open dependency)",
+      "Backup (PD-11), restore (PD-12), and failback (PD-13) rehearsed",
+      "Owner (Governance Board) approval recorded"
+    ],
+    "effect": "Editable authority moves from flat files to PostgreSQL; flat files become read-only preserved reference and envctl-derived projection.",
+    "irreversibility": "none — the switch is reversible via the failback plan until retention approval retires the preserved source"
+  },
+  "retention_policy": {
+    "rule": "Preserved source remains available (read-only) until an explicit retention approval decision.",
+    "never_deleted_by_this_task": true,
+    "retention_approval_is_a_separate_governance_decision": true,
+    "until_approval": "The preserved source and the failed/superseded cutover namespaces are retained; neither representation is deleted."
+  },
+  "rollback_failback_plan": {
+    "trigger": "Any parity dimension fails, the switch is not approved, or post-switch operation is unstable.",
+    "actions": [
+      "Fail back to preserved source authority",
+      "Stop database writes",
+      "Retain the failed cutover namespace and its proof without deleting either representation"
+    ],
+    "guarantee": "No source deletion, no history loss, no irreversible cutover; both the flat-file and PostgreSQL representations survive every failure path."
+  },
+  "invariants": [
+    "One explicit authority switch only, and only after all 14 parity dimensions pass.",
+    "Single durable writer PostgreSQL; redb never becomes a competing durable writer (STORE-001).",
+    "Forward-only sync redb -> envctl -> PostgreSQL; no dual-write.",
+    "Verified cutover under one SHA-256 identity; never by assumption (BlobStore parity contract).",
+    "Preserved source retained until retention approval; never deleted by this task.",
+    "Every user-space class is assigned exactly one canonical owner and one authority_action."
+  ],
+  "open_dependencies": [
+    "Live RuVector-in-PostgreSQL extension activation is required before the semantic-embeddings class (USC-SEMANTIC-EMBEDDINGS) fully cuts over (STORE-001 open dependency; NBVERIFY-001 / REDB-CLAIM-023 remainder).",
+    "Live blobstore_parity.rs green run against a disposable PostgreSQL captures the durable-class cutover proof (STORE-001 open dependency)."
+  ],
+  "non_execution": {
+    "product_execution_performed": false,
+    "statement": "This artifact defines the staged migration only. No database was provisioned or mutated, no schema was deployed, no flat file was retired, and no authority was switched. Authority remains unchanged (next_action: keep authority unchanged)."
+  }
+}

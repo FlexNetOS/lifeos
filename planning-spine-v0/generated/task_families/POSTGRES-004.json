@@ -1,0 +1,93 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-004",
+  "title": "Complete user-space inventory and lossless ingestion defined",
+  "status": "defined",
+  "owner": "LifeOS Data Agent / envctl Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define archive-first, read-only collectors and lossless staging-ingestion contracts that inventory and import the entire user-space (files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, domain records) into staging without changing any source state, using the blueprint Three Pillars (Nushell AST parser -> nu_plugin -> redb buffer -> envctl bridge -> PostgreSQL) under the STORE-001 tiered authority model, with content and metadata content-addressing, deterministic ordering, provenance, restartable checkpoints, exactly-once behavior, failure recovery, and a per-class lossless reconstruction test.",
+  "work_items": [
+    {
+      "id": "POSTGRES-004-A",
+      "surface": "Archive-first invariant + read-only guard for all collectors",
+      "owner": "LifeOS Data Agent",
+      "decision": "All collectors open sources read-only; the only writes are to the checksummed archive root (PRESERVE-001 pattern) and the redb staging buffer. blocked_paths (live ingestion, source mutation, destructive scan, credential values, raw secrets, product implementation) are enforced by construction; no source path is written, renamed, chmod'd, or deleted."
+    },
+    {
+      "id": "POSTGRES-004-B",
+      "surface": "Read-only inventory collectors, one per entity family (USI-C01..C13)",
+      "owner": "nu_plugin CodeDB / LifeOS Data Agent",
+      "decision": "Define one bounded read-only collector per class: COL-files, COL-dirs, COL-code-ast (Nushell AST via nu_plugin), COL-config, COL-planning, COL-comms, COL-appstate, COL-media (non-text metadata), COL-identities, COL-permissions, COL-history (git bundle), COL-edges, COL-domain. Each declares surface, bounds, exclusion policy, and stable identity in user_space_ingestion_plan.json."
+    },
+    {
+      "id": "POSTGRES-004-C",
+      "surface": "Staging-ingestion contracts, one per entity family (redb buffer -> envctl bridge -> PostgreSQL staging)",
+      "owner": "envctl Agent",
+      "decision": "Define the forward-only staging path for each class: nu_plugin writes typed blocks into the redb transient buffer; envctl attaches provenance + SHA-256 identity and commits into PostgreSQL staging tables (bytes into the content-addressed BlobStore). Aligns with STORE-001 (redb transient, PostgreSQL canonical, envctl forward-only bridge, AUTH-CLAIM-001 refuted)."
+    },
+    {
+      "id": "POSTGRES-004-D",
+      "surface": "Content and metadata content-addressing",
+      "owner": "envctl Agent",
+      "decision": "Every entity gets a SHA-256 content checksum (BlobStore identity, ADOPT-001) and a separate SHA-256 metadata checksum over its canonical metadata tuple; the redb dedup cache keys on BLAKE3 (blueprint) so identical blocks are never reprocessed. One entity => one identity across retries."
+    },
+    {
+      "id": "POSTGRES-004-E",
+      "surface": "Deterministic ordering contract per class",
+      "owner": "LifeOS Data Agent",
+      "decision": "Each class declares a total order (path-lexicographic for files/dirs/config; file-then-AST-document order for code; git topological for history; primary-key for planning/domain; thread+sequence for communications; triple order for relationships) so repeated collection and repeated projection are byte-identical (feeds POSTGRES-008)."
+    },
+    {
+      "id": "POSTGRES-004-F",
+      "surface": "Restartable checkpoint + exactly-once protocol",
+      "owner": "envctl Agent",
+      "decision": "Persist a per-class cursor and a resume skip-set of committed identities in the envctl migration_db (targets/runs/run_events/approvals/checkpoints/rollbacks — PGREDB-002; ADOPT-001 resumable capture). Idempotent upsert keyed on stable identity + BLAKE3 dedup + skip-set yields exactly-once: any number of retries produces one canonical record per source entity."
+    },
+    {
+      "id": "POSTGRES-004-G",
+      "surface": "Failure recovery per class",
+      "owner": "envctl Agent",
+      "decision": "On interruption, resume from the last committed checkpoint; redb ACID re-open recovers the buffer; envctl replay re-derives committed state; re-read/re-hash from the read-only working tree fills gaps (PGREDB-001); PostgreSQL PITR covers committed staging (STORE-001 recovery_source); git history restores from the archived bundle + recorded oid (PRESERVE-001)."
+    },
+    {
+      "id": "POSTGRES-004-H",
+      "surface": "Secret exclusion and provenance",
+      "owner": "LifeOS Data Agent",
+      "decision": "Credential values and raw secrets are never collected; only references/provenance are recorded (STORE-001 external-secret class). Every staged record carries source_path, collector_id, collection_run_id, collected_at, content_sha256, metadata_sha256, and source lineage (git commit/PR where applicable)."
+    },
+    {
+      "id": "POSTGRES-004-I",
+      "surface": "Lossless reconstruction test harness (per class + global)",
+      "owner": "QA Agent / envctl Agent",
+      "decision": "For every class, envctl projects staged records to a scratch target and asserts content_sha256 parity, metadata tuple equality, and declared ordering against the archive oracle; code classes additionally assert AST-concatenation byte-exact file reconstruction via module_path. Pass condition: zero byte/metadata/ordering differences across all 13 classes before any authority claim (feeds POSTGRES-009/010)."
+    },
+    {
+      "id": "POSTGRES-004-J",
+      "surface": "Store-authority guardrail (no silent reclassification)",
+      "owner": "LifeOS Data Agent / envctl Agent",
+      "decision": "Staging is pre-authority. No existing durable redb class (CodeDB source_blobs PGREDB-001, envctl migration_db PGREDB-002) is reclassified here; any move off redb-durable happens only later via the verified BlobStore SHA-256 parity cutover (STORE-001 invariant 'Verified cutover'; POSTGRES-010). product_execution_performed = false."
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-004-A",
+    "POSTGRES-004-B",
+    "POSTGRES-004-C",
+    "POSTGRES-004-D",
+    "POSTGRES-004-E",
+    "POSTGRES-004-F",
+    "POSTGRES-004-G",
+    "POSTGRES-004-H",
+    "POSTGRES-004-I",
+    "POSTGRES-004-J"
+  ],
+  "completion_gate": "Every user-space class (13: files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, domain records) has a bounded collector, exclusion policy, stable identity, content and metadata checksum, ordering contract, checkpoint, exactly-once behavior, failure recovery, and lossless reconstruction test in generated/user_space_ingestion_plan.json, and POSTGRES-004.proof.json records zero source mutations and no product execution.",
+  "inputs": [
+    "POSTGRES-002 (user-space relational graph and identity model — class enumeration)",
+    "POSTGRES-003 (planning/control tables made database-native — planning-table collector target)",
+    "STORE-001 (store authority model)",
+    "ADOPT-001 (adopted BlobStore/SHA-256/resumable-capture/exact-byte capabilities)",
+    "NotebookLM ingestion resources (NBSOURCE-030, NBSOURCE-015)"
+  ],
+  "unblocks": ["POSTGRES-005", "POSTGRES-008", "POSTGRES-009", "POSTGRES-010"],
+  "next_action": "Decompose each of the 13 classes into an implementation-ready read-only inventory collector spec and staging-ingestion spec when POSTGRES-002/POSTGRES-003 schema plans are materialized."
+}

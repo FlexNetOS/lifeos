@@ -1,0 +1,166 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "COMPANY-002",
+  "title": "Company and development vertical acceptance plan defined",
+  "status": "defined",
+  "owner": "LifeOS Governance / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define an end-to-end acceptance trace proving that one authorized company goal becomes governed development work, a verified proof on canonical PostgreSQL state, a provenance-bearing release, an observed operating outcome, and a learned next action — with no paper completion and no external company, repository, or production mutation during planning. The acceptance flow is the governed intent-to-proof execution spine (LIFEOS-003) instantiated for the company/development vertical (COMPANY-001, DEVELOP-001) and closed with proof-derived learning (LIFEOS-005), landing every stage in the STORE-001 tiered authority model.",
+  "sources": {
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "store_authority_model": "generated/store_relationship_decision.json (STORE-001)",
+    "context_matrix": "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "input_families": {
+      "COMPANY-001": "company governance/authority — every company object has owner, authority path, bounded decision, approval, evidence, rollback/non-action rule, no agent self-authorization",
+      "DEVELOP-001": "development build/release family — source ownership, isolated work, local-first verification, CI receipts, GitHub hygiene, release provenance, installed proof, rollback, capability learning",
+      "LIFEOS-003": "governed intent-to-proof execution spine — identity, policy, task graph, simulation, hermetic execution, proof, rollback, human-approval gates, next-action derivation, proof-bearing on canonical PostgreSQL state",
+      "LIFEOS-005": "intelligence substrate — proof-derived learning, promotion of proven state only, SONA next-action"
+    }
+  },
+  "acceptance_flow_summary": "authority -> task graph -> implementation -> proof -> release -> outcome -> rollback -> learning, under two cross-cutting invariants (no paper completion; no external mutation during planning). Each of the eight stages is assigned exactly once to a single owner and a single store-authority tier drawn from STORE-001; PostgreSQL + RuVector is the single durable writer of every macro-state stage, redb holds only transient stage state, envctl is the forward-only bridge and projection engine, nu_plugin CodeDB is the ingestion path, and AgentDB (.rvf) holds non-authoritative learning.",
+  "work_items": [
+    {
+      "id": "COMPANY-002-A",
+      "gate_clause": "traces authority",
+      "surface": "Company goal authorization under David's final authority (COMPANY-001 authority graph; CECCA single internal CEO-agent per DECIDE-006)",
+      "owner": "David (final authority) via LifeOS Governance Agent / CECCA",
+      "decision": "A company goal enters the acceptance flow only as an authority record signed under David's final authority; CECCA is the single internal CEO-agent boundary and no agent self-authorizes (COMPANY-001 gate). The authority record is durable relational macro-state.",
+      "store_authority": "durable relational macro-state (identity, permission, provenance) -> PostgreSQL + RuVector, single durable writer (STORE-001 class 1)",
+      "sync_edge": "authority row written directly to PostgreSQL; no redb durable copy",
+      "recovery": "PostgreSQL PITR",
+      "evidence_kind": "signed authority + provenance row in PostgreSQL; the goal is not 'authorized' without David's sign-off",
+      "rollback": "revoke the authority record; no downstream stage proceeds; company state unchanged"
+    },
+    {
+      "id": "COMPANY-002-B",
+      "gate_clause": "traces task graph",
+      "surface": "Decomposition of the authorized goal into a bounded, proof-bearing governed task graph (LIFEOS-003 execution spine)",
+      "owner": "Governance Board / Runtime Kernel",
+      "decision": "The authorized goal is decomposed into bounded task rows with parent/child and causal dependency edges (identity -> policy -> task graph -> simulation gate); each child is bounded and proof-bearing, no unlimited agent authority. Simulation is required before any execution child runs.",
+      "store_authority": "task rows -> PostgreSQL relational macro-state (STORE-001 class 1); causal dependency edges -> PostgreSQL + RuVector GNN semantic/graph class (STORE-001 class 2, native No-Sidecar extension)",
+      "sync_edge": "task-graph rows and causal edges written to PostgreSQL; RuVector holds the GNN edges natively in-database",
+      "recovery": "PostgreSQL PITR + reproducible re-derivation of causal edges",
+      "evidence_kind": "task-graph rows with bounded scope + causal edges in PostgreSQL; simulation_required = TRUE gate present on every execution child",
+      "rollback": "restore the prior task graph; no execution-plane source is changed (LIFEOS-003 rollback)"
+    },
+    {
+      "id": "COMPANY-002-C",
+      "gate_clause": "traces implementation",
+      "surface": "Bounded development work item implemented as isolated work with local-first verification (DEVELOP-001)",
+      "owner": "LifeOS Development Agent",
+      "decision": "Implementation happens as isolated work in a Copy-On-Write staging branch inside PostgreSQL; code enters through the ingestion path Nushell parser -> nu_plugin CodeDB -> redb buffer -> envctl embed bridge -> PostgreSQL; agent thoughts and terminal traces during the edit are transient in redb; the canonical code owner is PostgreSQL and the staged rows merge to the main trunk only after green local-first verification.",
+      "store_authority": "code AST/rows -> PostgreSQL canonical (STORE-001 class 1); redb = transient high-frequency buffer/scratchpad for the edit's thoughts/traces (STORE-001 class 3); nu_plugin CodeDB = parser/ingestion path; envctl = forward-only redb -> embed -> PostgreSQL bridge",
+      "sync_edge": "forward-only redb -> envctl(embed via all-MiniLM-L6-v2) -> PostgreSQL; COW staging branch isolates the edit inside PostgreSQL; no dual-write",
+      "recovery": "discard the COW staging branch; redb transient state is transient by definition; PostgreSQL PITR for merged rows",
+      "evidence_kind": "staged code rows + local-first verification receipt (bun run test / cargo test --workspace --locked green) before merge",
+      "rollback": "discard the COW staging branch; no repository or main-trunk mutation"
+    },
+    {
+      "id": "COMPANY-002-D",
+      "gate_clause": "traces proof",
+      "surface": "Proof record produced on canonical PostgreSQL state and bound to a Cryptographic Witness Chain (LIFEOS-003 proof-bearing; blueprint anti-bluffing)",
+      "owner": "LifeOS Governance / QA Agent",
+      "decision": "A proof record carrying the edit's SHA-256 content identity is produced on canonical PostgreSQL state (single durable writer per STORE-001); the code change is bound to a SHAKE256 Cryptographic Witness Chain rooted in the source vector so the claim cannot be bluffed; RuVector MinCut severs any agent that drifts. Status 'pass' requires a populated gate_result, never a self-declared completion.",
+      "store_authority": "durable provenance/proof -> PostgreSQL canonical (STORE-001 class 1); witness chain = SHAKE256 rooted in PostgreSQL source vectors",
+      "sync_edge": "proof + witness chain committed to PostgreSQL; MinCut/Causal-Graph verification gate before acceptance",
+      "recovery": "PostgreSQL PITR + reproducible re-verification (re-run parity/CI)",
+      "evidence_kind": "proof-record row + SHAKE256 witness chain + CI receipt; gate_result with concrete per-clause values",
+      "rollback": "mark the proof failed; MinCut isolates the offending agent; no promotion without a green proof"
+    },
+    {
+      "id": "COMPANY-002-E",
+      "gate_clause": "traces release",
+      "surface": "Provenance-bearing release via envctl projection and Nix musl static build (DEVELOP-001 release provenance)",
+      "owner": "LifeOS Development Agent + Yazelix/Nix build (release phase)",
+      "decision": "A release is produced by the envctl projection engine (query PostgreSQL production branch -> module_path directory mapping -> concatenate raw_code blocks -> dump clean tree) then compiled with Nix against x86_64-unknown-linux-musl for an install-in-place static binary; the release manifest carries the SHA-256 / source-commit-and-PR lineage; the projected tree is derived and disposable and is built only from a proven branch.",
+      "store_authority": "derived projection (materialized source dir, release tree) -> envctl read-only projection FROM PostgreSQL (STORE-001 class 5, derived/disposable); PostgreSQL remains the source of truth",
+      "sync_edge": "PostgreSQL -> envctl materialize -> filesystem (forward-only, derived)",
+      "recovery": "re-projection from PostgreSQL via module_path metadata (deterministic)",
+      "evidence_kind": "release provenance manifest (source commit/PR, SHA-256 identity, musl target); release only from a green-proof branch",
+      "rollback": "discard the projected tree and release artifact; re-project the prior production branch; no published or production release occurs during planning"
+    },
+    {
+      "id": "COMPANY-002-F",
+      "gate_clause": "traces outcome",
+      "surface": "Observed operating outcome / installed proof from the released capability (DEVELOP-001 installed proof; LIFEOS-003 execution outcome)",
+      "owner": "LifeOS Governance / QA Agent + Runtime Kernel",
+      "decision": "The released capability runs and produces a measured operating outcome; high-frequency operating traces and telemetry buffer in redb as an ultra-fast scratchpad / application-level WAL, and envctl flushes only settled, significant outcome states forward into PostgreSQL; a concrete runtime signal (for example a db_health status / applied-migration count) is the recorded observed outcome.",
+      "store_authority": "transient operating traces/telemetry -> redb (STORE-001 class 3); settled significant outcome -> PostgreSQL canonical via envctl forward flush (STORE-001 class 3 sync edge)",
+      "sync_edge": "redb -> envctl flush -> PostgreSQL (only significant states persist); LifeOS UI reads live redb via UDS for real-time status",
+      "recovery": "redb local disk for live telemetry (transient by definition); PostgreSQL PITR for the settled outcome row",
+      "evidence_kind": "observed-outcome row in PostgreSQL + runtime signal (e.g. db_health status='healthy', applied_migrations == embedded count)",
+      "rollback": "transient telemetry expires; if the outcome regresses, PostgreSQL PITR restore; no production mutation during planning"
+    },
+    {
+      "id": "COMPANY-002-G",
+      "gate_clause": "traces rollback",
+      "surface": "End-to-end rollback contract leaving company, repository, and production state unchanged (COMPANY-002 rollback_plan)",
+      "owner": "LifeOS Governance / QA Agent",
+      "decision": "Any stage failure triggers a defined rollback: COW staging-branch discard (implementation), PostgreSQL PITR restore (durable macro-state), re-projection (release), and archived-plan restore (planning artifacts). No class leaves redb-durable except by a green live BlobStore SHA-256 parity cutover (STORE-001 verified-cutover invariant); there is never an unverified swap or a dual-write.",
+      "store_authority": "recovery sources per STORE-001 — PostgreSQL PITR (durable classes 1/2), redb local disk (transient class 3), envctl re-projection (derived class 5), archived acceptance plan (planning artifacts)",
+      "sync_edge": "no forward promotion on a failed stage; rollback is directional-reverse only within the owning tier; no dual-write introduced",
+      "recovery": "restore the archived acceptance plan; PITR for durable state; re-projection for derived state",
+      "evidence_kind": "a named rollback command per stage; zero unarchived destructive actions (PRESERVE-001 discipline)",
+      "rollback": "restore the archived acceptance plan itself; company, repository, and production state remain unchanged"
+    },
+    {
+      "id": "COMPANY-002-H",
+      "gate_clause": "traces learning",
+      "surface": "Learned next action promoted only from proven state (LIFEOS-005 proof-derived learning; SONA; LIFEOS-003 next-action derivation)",
+      "owner": "LifeOS Memory / Runtime Agent + Governance",
+      "decision": "The proven outcome updates per-agent cognition (SONA policy matrix / MicroLoRA success threshold) in AgentDB (.rvf) non-authoritatively; the derived next-action is promoted into the canonical PostgreSQL task graph ONLY from proven state (LIFEOS-005 'promotion of proven state only'), and the promotion is witnessed by a SHAKE256 chain rooted in PostgreSQL source vectors. A failed or unproven stage promotes no learning.",
+      "store_authority": "per-agent cognition (SONA/MicroLoRA) -> AgentDB (.rvf), non-authoritative (STORE-001 class 4); promoted next-action row -> PostgreSQL canonical (STORE-001 class 1), only from proven state",
+      "sync_edge": "AgentDB self-contained; provenance links back to the PostgreSQL knowledge graph; the promoted next-action is a forward write to PostgreSQL gated on a green proof",
+      "recovery": "AgentDB .rvf file (regenerable from base model + training history); PostgreSQL PITR for the promoted next-action row",
+      "evidence_kind": "next_action row derived from a green proof (traceable to COMPANY-002-D); no next_action promoted from a failed/unproven stage",
+      "rollback": "revert the promoted next-action row; AgentDB cognition is regenerable; the base model and knowledge graph are unchanged"
+    },
+    {
+      "id": "COMPANY-002-I",
+      "gate_clause": "no paper completion (cross-cutting invariant over A-H)",
+      "surface": "Every stage transitions to done/pass only against concrete, recoverable evidence",
+      "owner": "LifeOS Governance / QA Agent",
+      "decision": "No stage self-declares completion. A stage is 'done' only with concrete evidence: a signed authority row (A), bounded task rows + causal edges (B), a green local-first verification receipt (C), a proof-record row with a populated gate_result + SHAKE256 witness chain (D), a provenance manifest (E), an observed-outcome row (F), a named rollback command (G), and a proof-derived next-action (H). This enforces the AGENTS.md rule 'never mark done without completion evidence' and STORE-001's 'verified cutover, never by assumption'.",
+      "store_authority": "invariant asserted over all PostgreSQL-canonical stage evidence; no new store owner introduced",
+      "sync_edge": "n/a (constraint over A-H)",
+      "recovery": "n/a (constraint over A-H)",
+      "evidence_kind": "each stage in A-H names its own evidence_kind; this item asserts the union is mandatory",
+      "rollback": "any stage lacking evidence is treated as not-done and cannot advance the flow"
+    },
+    {
+      "id": "COMPANY-002-J",
+      "gate_clause": "no external mutation during planning (cross-cutting invariant over A-H)",
+      "surface": "The entire acceptance flow is a proof-cell simulation; no company, repository, or production state is mutated",
+      "owner": "LifeOS Governance / QA Agent",
+      "decision": "COMPANY-002 runs in the proof-cell with simulation_required = TRUE. blocked_paths are honored: organizational action, production deployment, release, product implementation, and secrets/** are all off-limits. The external-secret / provenance authority class stays in the OS keyring + committed pins, unchanged (STORE-001 class 6). No PostgreSQL, redb, AgentDB, repository, CI, or production runtime is written; product_execution_performed is false.",
+      "store_authority": "external-secret / provenance authority -> OS keyring + committed source pins, unchanged (STORE-001 class 6); no live tier is written",
+      "sync_edge": "n/a (planning artifacts only)",
+      "recovery": "restore the archived acceptance plan; live state was never touched",
+      "evidence_kind": "allowed_paths limited to planning-spine-v0/generated/** and planning-spine-v0/proof_records/**; only two JSON planning files are written",
+      "rollback": "restore the archived acceptance plan; company, repository, and production state remain unchanged"
+    }
+  ],
+  "reference_instance": {
+    "note": "A concrete, fully grounded instantiation of the eight-stage flow using the already-proven CodeDB BlobStore PostgreSQL parity cutover, so the plan is a real contract rather than a template. Every element traces to STORE-001, ADOPT-001, or the Architecture Blueprint. This instance is described for traceability only; it is not executed here.",
+    "company_goal": "Cut over the CodeDB source-blob durable class from redb to PostgreSQL under one SHA-256 content identity (STORE-001 migration_path for durable relational macro-state).",
+    "A_authority": "STORE-001 owner decision 'adopt-intended-tiered-architecture' (owner: David / LifeOS Data Agent / Runtime Kernel) authorizes the cutover; no agent self-authorizes.",
+    "B_task_graph": "STORE-001 unblocks PGAUTH-001..006 and POSTGRES-001 as the bounded governed decomposition; causal dependency edges recorded PostgreSQL-side.",
+    "C_implementation": "codedb_store_pg::PgStore already implements the BlobStore trait (ADOPT-001 'PgStore (PostgreSQL parity)') as isolated work; ingestion path buffers parsed AST blocks into redb before the envctl bridge.",
+    "D_proof": "blobstore_parity.rs proves SHA-256 symmetry across backends (ADOPT-001 'SHA-256 identity'); the green live parity run against a disposable PostgreSQL is the durable-class cutover proof (STORE-001 open dependency, CDB086/CDB106-AC05 lane).",
+    "E_release": "envctl export contract materializes exact-byte source (ADOPT-001 'envctl export contract' + 'Exact-byte materialization') into a clean tree for Nix musl static compilation.",
+    "F_outcome": "db_health returns status + applied_migrations against the PostgreSQL-backed store as the observed operating outcome (per the storage-layer contract in CLAUDE.md); live telemetry buffers in redb, settled state flushes to PostgreSQL.",
+    "G_rollback": "the durable class stays on redb until the parity run is green (STORE-001 invariant 'a class leaves redb-durable only after a green live blobstore_parity.rs run'); no unverified swap.",
+    "H_learning": "only after this class's proof is green does the next class cut over ('one verified swap at a time'); SONA updates the agent's success threshold non-authoritatively in AgentDB."
+  },
+  "acceptance_gate": "The acceptance plan passes when all eight flow stages (A-H) are each assigned exactly once to a single owner and a single STORE-001 store-authority tier with a defined sync edge, recovery source, evidence kind, and rollback; the two cross-cutting invariants (I no paper completion, J no external mutation) hold over A-H; PostgreSQL + RuVector is the sole durable writer of every macro-state stage; redb, envctl, nu_plugin CodeDB, and AgentDB keep their intended non-durable roles; and COMPANY-002.proof.json records zero external company, repository, or production mutation with product_execution_performed = false.",
+  "store_001_alignment": "Store-aligned, not store-neutral: the acceptance flow lands each stage in exactly one STORE-001 class — authority/task-graph/proof/promoted-learning on PostgreSQL canonical (classes 1/2), implementation edit-thoughts and operating telemetry on redb transient (class 3), non-authoritative cognition on AgentDB (class 4), release projection derived from PostgreSQL via envctl (class 5), and secrets untouched in the keyring (class 6). No stage adds a second durable writer, no stage reclassifies a class silently, and the reference-instance cutover moves off redb-durable only via the verified BlobStore SHA-256 parity contract.",
+  "simulation_boundary": {
+    "execution_cell": "proof-cell",
+    "simulation_required": true,
+    "allowed_paths": ["planning-spine-v0/generated/**", "planning-spine-v0/proof_records/**"],
+    "blocked_paths": ["organizational action", "production deployment", "release", "product implementation", "secrets/**"],
+    "product_execution_performed": false
+  },
+  "rollback_plan": "Restore the archived acceptance plan; company, repository, and production state remain unchanged.",
+  "next_action": "Decompose the smallest company-to-development proof (the reference-instance cutover) after both COMPANY-001 and DEVELOP-001 task families are bounded."
+}

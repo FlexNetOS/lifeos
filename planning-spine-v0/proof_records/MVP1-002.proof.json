@@ -1,0 +1,87 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "MVP1-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every legal workflow separates information from advice and action, requires explicit approval for commitments, preserves source documents, records provenance, and proves rollback or non-action.",
+  "gate_result": {
+    "enumerated_legal_workflows": [
+      "MVP1-002-A information",
+      "MVP1-002-B document",
+      "MVP1-002-C obligation",
+      "MVP1-002-D deadline",
+      "MVP1-002-E risk",
+      "MVP1-002-F recommendation"
+    ],
+    "workflow_count": 6,
+    "workflow_set_derivation": "The exact set (information, document, obligation, deadline, risk, recommendation) is the enumeration named in the MVP1-002 goal; every 'legal workflow' the gate references is one of these six.",
+    "clause_1_separates_information_from_advice_and_action": {
+      "satisfied": true,
+      "model": "generated/task_families/MVP1-002.json :: tier_separation_model (three hard tiers: information | advice | action; no automatic promotion)",
+      "per_workflow_tier": {
+        "MVP1-002-A information": "information",
+        "MVP1-002-B document": "information",
+        "MVP1-002-C obligation": "information (interpretation escalates to advice)",
+        "MVP1-002-D deadline": "information (prioritization/acting escalates to advice/action)",
+        "MVP1-002-E risk": "advice",
+        "MVP1-002-F recommendation": "advice producing a non-merged action-tier proposal"
+      },
+      "promotion_rule": "information->advice requires a witness-chained derivation; advice->action requires a recorded human approval + COW merge; no automatic crossing of any boundary."
+    },
+    "clause_2_requires_explicit_approval_for_commitments": {
+      "satisfied": true,
+      "commitment_capable_workflows": ["MVP1-002-F recommendation"],
+      "non_commitment_workflows": ["MVP1-002-A", "MVP1-002-B", "MVP1-002-C", "MVP1-002-D", "MVP1-002-E"],
+      "approval_gate": "A commitment materializes only as a proposal in an isolated PostgreSQL COW staging branch and becomes a commitment solely when a recorded human approval event merges that branch; absent approval the default is non-action.",
+      "human_authority": "Satisfies the MVP1-002 goal 'human authority over every commitment or external action'; the five information/advice workflows are not commitment-capable, so the invariant holds for all six."
+    },
+    "clause_3_preserves_source_documents": {
+      "satisfied": true,
+      "owner": "MVP1-002-B document workflow; PostgreSQL canonical, content-addressed by SHA-256, originals immutable",
+      "mechanism": "STORE-001 BlobStore SHA-256 content-addressed parity contract + ADOPT-001 exact-byte materialization; superseding versions are new content-addressed records, priors PITR-recoverable and never deleted",
+      "downstream_read_only": "MVP1-002-A/C/D/E/F read from, and never mutate, the preserved originals"
+    },
+    "clause_4_records_provenance": {
+      "satisfied": true,
+      "mechanism": "Cryptographic Witness Chains (SHAKE256) + Causal Graph Verification (Blueprint Section 6); every information/obligation/deadline/risk/recommendation record carries a causal edge or witness chain rooting into a preserved source document vector",
+      "anti_bluffing": "A claim with no historical root in a preserved source is rejected — advice cannot be hallucinated into legal truth",
+      "lineage": "STORE-001 invariant 'provenance preserved': SHA-256 identity + commit/PR lineage retained",
+      "provenance_state_class": "legal_state_class_assignments[9] provenance/witness record, PostgreSQL-owned, durable audit authority"
+    },
+    "clause_5_proves_rollback_or_non_action": {
+      "satisfied": true,
+      "non_action_default": "Commitment-capable outputs exist only as non-merged COW proposals; 'never merge' is non-action, 'discard branch' is rollback (Blueprint COW: a failed branch is rolled back)",
+      "task_rollback_plan": "Restore the archived legal plan; no legal document, filing, or commitment is changed",
+      "blocked_at_this_stage": ["legal commitment", "filing", "signature", "account creation", "credential access", "external action", "product implementation"]
+    },
+    "every_legal_state_class_assigned_exactly_once": {
+      "satisfied": true,
+      "state_class_count": 11,
+      "classes": [
+        "source legal document -> PostgreSQL (SHA-256 immutable)",
+        "legal information record -> PostgreSQL + RuVector",
+        "legal semantic index -> PostgreSQL + RuVector (No-Sidecar)",
+        "obligation record -> PostgreSQL + RuVector (causal edges)",
+        "deadline record -> PostgreSQL (durable) + redb (transient scan)",
+        "risk assessment -> PostgreSQL advice record (redb reasoning, AgentDB cognition)",
+        "recommendation + proposed action -> PostgreSQL COW branch (non-merged) + external authority",
+        "drafting/analysis scratchpad -> redb (transient)",
+        "per-agent legal cognition -> AgentDB (.rvf)",
+        "provenance/witness record -> PostgreSQL (durable audit)",
+        "external-authority handoff/credential reference -> external authority + OS keyring"
+      ],
+      "each_has_owner_lifetime_sync_edge_recovery": true,
+      "no_second_durable_owner": "PostgreSQL owns every durable legal macro-state class exactly once; redb never becomes a second durable writer (STORE-001 invariant)"
+    },
+    "store_001_alignment_present": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "MVP1-002 defines the smallest governed legal slice as exactly six workflows enumerated from the task goal — information (MVP1-002-A), document (B), obligation (C), deadline (D), risk (E), and recommendation (F) — and proves each clause of the gate against them. Information, document, obligation, and deadline are pinned to the information tier; risk is advice; recommendation is advice that may emit an action-tier proposal, and the three tiers are separated by a hard promotion rule (information->advice needs a SHAKE256 witness chain, advice->action needs a recorded human approval + COW merge), satisfying 'separates information from advice and action.' Only the recommendation workflow is commitment-capable, and it materializes a commitment solely as a non-merged PostgreSQL COW staging branch that requires an explicit recorded human approval to merge, satisfying 'requires explicit approval for commitments' and the goal's human authority mandate. Source documents are preserved by the STORE-001 BlobStore SHA-256 content-addressed parity contract as immutable PostgreSQL records (ADOPT-001 exact-byte materialization), and every downstream workflow reads without mutating them, satisfying 'preserves source documents.' Every derived record carries a Cryptographic Witness Chain / Causal Graph edge rooting into a preserved source vector, and rootless claims are rejected as anti-bluffing, satisfying 'records provenance.' Commitment-capable outputs prove rollback (discard the COW branch) or non-action (never merge), backed by the task rollback plan and blocked_paths, satisfying 'proves rollback or non-action.' Beyond the six workflows, eleven legal state classes are each assigned exactly once with owner, lifetime, sync edge, and recovery: durable relational + semantic classes to PostgreSQL + RuVector (No-Sidecar), transient reasoning and deadline scans to redb, per-agent cognition to AgentDB (.rvf), ingestion to nu_plugin CodeDB -> redb buffer -> envctl bridge, and external filing/credential authority to the external system + OS keyring — inheriting STORE-001 assignments 1-6 and invariants rather than inventing a new store. This is a DESIGN/DEFINITION task: no legal commitment, filing, signature, account creation, credential access, external action, or product implementation was performed.",
+  "artifact_paths": [
+    "generated/task_families/MVP1-002.json",
+    "proof_records/MVP1-002.proof.json"
+  ],
+  "store_001_alignment": "Durable legal documents/information/obligations/deadlines/risk records/approved recommendations/provenance are STORE-001 durable relational + semantic macro-state (assignments 1-2, PostgreSQL + RuVector canonical). Transient legal reasoning, deadline scans, and WAL are STORE-001 assignment 3 (redb). Per-agent legal cognition is assignment 4 (AgentDB). External filing/signing authorities and credentials are assignment 6 (external + OS keyring, unchanged). Document preservation and any future redb->PostgreSQL move follow the STORE-001 forward-only, verified-cutover, single-durable-writer invariants; no store is invented and no durable class is silently reclassified.",
+  "product_execution_performed": false
+}

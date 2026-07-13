@@ -1,0 +1,234 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "CONSOLIDATE-003",
+  "title": "Capability parity cutover and legacy retirement plan defined",
+  "status": "defined",
+  "owner": "LifeOS Consolidation Agent / Release Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "phase": "4-physical-consolidation",
+  "parent_id": "CONSOLIDATE-002",
+  "execution_cell": "release-cell",
+  "product_execution_performed": false,
+  "objective": "Define the proof-gated cutover, consumer migration, installed-runtime validation, and archive-first retirement contract that governs the standalone peer implementations (nu_plugin, envctl, meta-ruvector). A legacy peer implementation is retired only after its LifeOS-native capability reaches verified parity, its consumers are migrated, a reversible rollback is rehearsed, an archive receipt is captured, installed-runtime proof passes, and the owner accepts — and its full history remains recoverable. This is a DEFINITION artifact: no cutover, no peer deletion, no remote archival, no production mutation, and no secret access is performed here.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json",
+    "generated/adopted_capabilities.source.csv",
+    "generated/preserve_capability_provenance.json",
+    "generated/recovery_nu_plugin_disposition.csv",
+    "generated/recovery_envctl_disposition.csv",
+    "generated/postgres_authority_cutover_plan.json",
+    "generated/task_families/PRESERVE-001.json"
+  ],
+  "grounding_principle": "Retiring a standalone peer implementation is not removing a capability. The blueprint keeps nu_plugin (parser/ingestion path) and envctl (redb -> embed -> PostgreSQL bridge + PostgreSQL -> filesystem projection engine) as intended runtime roles; retirement folds each peer's proven implementation into the single-application LifeOS bounded contexts (CONSOLIDATE-001) and retires the separately-maintained peer repo AFTER the merged LifeOS-native capability reaches parity (CONSOLIDATE-002 waves). Building to the intended single-application spec is an upgrade, never a downgrade (STORE-001 owner directive).",
+  "store_001_alignment": {
+    "keystone_decision": "STORE-001 (generated/store_relationship_decision.json) — adopt-intended-tiered-architecture",
+    "single_durable_writer": "PostgreSQL + RuVector owns every durable macro-state class exactly once; retiring nu_plugin's durable redb source-blob role does not create a second durable writer.",
+    "redb_not_retired_only_its_durable_role": "The 'redb source-blob store' capability retires redb's DURABLE-blob authority for the file/blob class in favor of PostgreSQL BlobStore rows; redb itself is retained in its intended transient tier (scratchpad / WAL / BLAKE3 dedup cache / geometry engine). No silent reclassification — the swap goes through the verified BlobStore SHA-256 parity cutover, never by assumption (STORE-001 invariant).",
+    "verified_cutover_mechanism": "codedb_store_pg::PgStore implements the same BlobStore contract; a durable class leaves peer-owned redb-durable only after a green live blobstore_parity.rs run under one SHA-256 content identity against a disposable PostgreSQL.",
+    "bridge_and_parser_persist": "envctl-as-bridge and nu_plugin-as-parser are intended terminal runtime roles in the blueprint; only the standalone peer repositories are retirement units, and only after their capability is consolidated into LifeOS-native parity.",
+    "semantic_class_open_dependency": "meta-ruvector's semantic substrate cannot fully cut over until live RuVector-in-PostgreSQL native-extension activation is proven locally (STORE-001 open dependency; NBVERIFY-001 / REDB-CLAIM-023 remainder)."
+  },
+  "retirement_gate": {
+    "statement": "No legacy peer implementation is retired before ALL of RG-01..RG-06 pass for that unit, and RG-INV (history recoverable) holds. The gate is applied per retirement unit; a unit whose capability parity is not yet reachable (extend/defer/blocked capabilities) is NOT retirable and stays live.",
+    "clauses": [
+      {
+        "id": "RG-01",
+        "name": "parity",
+        "requirement": "Every constituent capability's LifeOS-native implementation reaches its declared parity gate green at LifeOS current-head, INCLUDING the STORE-001 verified-cutover proof (green live blobstore_parity.rs under one SHA-256 identity) for any durable class. No retirement before parity.",
+        "grounded_in": "adopted_capabilities.source.csv parity_gate column; STORE-001 verified-cutover invariant",
+        "evidence": "per-capability parity receipt at LifeOS HEAD (e.g. blobstore_parity.rs 13 tests, policy_and_stdio.rs 24 tests, materialization_paths.rs, test_mandatory_pg_parity.py)"
+      },
+      {
+        "id": "RG-02",
+        "name": "consumer_migration",
+        "requirement": "Every recorded consumer of the peer implementation is retargeted to the LifeOS-native capability and re-verified green; zero consumer remains bound to the peer. Migration is dependency-ordered per CONSOLIDATE-002 waves.",
+        "grounded_in": "preserve_capability_provenance.json dependency_edges (consumer map); adopted_capabilities.source.csv target_lifeos_owner",
+        "evidence": "consumer retarget diff (peer -> LifeOS-native) with each retargeted consumer's tests green"
+      },
+      {
+        "id": "RG-03",
+        "name": "rollback_rehearsal",
+        "requirement": "A reversible fallback from the LifeOS-native capability back to the peer implementation is rehearsed on a disposable namespace and passes, with no data loss and both representations intact. Retirement stays reversible until a separate governance retention decision.",
+        "grounded_in": "postgres_authority_cutover_plan.json PD-13 failback pattern; task rollback_plan ('Restore the archived cutover plan; no consumer or peer is changed.')",
+        "evidence": "failback rehearsal record on a disposable namespace; green"
+      },
+      {
+        "id": "RG-04",
+        "name": "archive_receipt",
+        "requirement": "An archive-first receipt is captured for the peer at its pinned HEAD BEFORE any retirement: a git bundle with ALL refs, plus HEAD/branches/remotes/reflogs/worktrees/status/fsck, tracked+untracked checksums, and a restore command. Local archive only — no remote archival (blocked_path).",
+        "grounded_in": "task_families/PRESERVE-001.json capture/restore contract; task blocked_paths (remote archival forbidden)",
+        "evidence": "PRESERVE-001-style archive bundle manifest with checksum + restore command, under one checksummed archive root"
+      },
+      {
+        "id": "RG-05",
+        "name": "installed_proof",
+        "requirement": "Installed-runtime validation: the LifeOS-native capability is exercised in the BUILT/INSTALLED runtime (static musl binary / installed LifeOS), not merely package or unit tests. This closes the 'package proof != product runtime proof' gap flagged in the recovery dispositions.",
+        "grounded_in": "recovery_envctl_disposition.csv ('package proof != product runtime proof; current-head runtime receipt absent'); blueprint Phase 4 musl static-binary release; postgres_authority_cutover_plan.json PD-14 observed operation",
+        "evidence": "installed-runtime receipt exercising the capability in the built LifeOS binary (e.g. envctl export/migration replay, CodeDB MCP query) with observed output"
+      },
+      {
+        "id": "RG-06",
+        "name": "owner_acceptance",
+        "requirement": "The owner (Governance Board / Release Agent) records explicit acceptance of the RG-01..RG-05 evidence bundle for the unit before retirement is authorized.",
+        "grounded_in": "task verification_gate ('owner acceptance'); owner_agent = LifeOS Consolidation Agent / Release Agent",
+        "evidence": "recorded owner acceptance decision referencing the unit's RG-01..RG-05 receipts"
+      }
+    ],
+    "invariant": {
+      "id": "RG-INV",
+      "name": "history_recoverable",
+      "requirement": "After retirement, the peer's full history remains recoverable from the RG-04 archive bundle (all refs + reflogs). No history is lost and nothing is deleted by any wave; a deleted peer branch is only ever recreated from the archived bundle and recorded commit id. Retirement is reversible until a separate governance retention approval.",
+      "grounded_in": "task verification_gate ('history remains recoverable'); PRESERVE-001 restore clause; postgres_authority_cutover_plan.json retention_policy (never_deleted_by_this_task)"
+    }
+  },
+  "retirement_units": [
+    {
+      "unit_id": "CONSOLIDATE-003-RU-NU-PLUGIN",
+      "peer_repo": "FlexNetOS/nu_plugin",
+      "peer_path": "/home/flexnetos/meta/src/nu_plugin",
+      "pinned_head": "d7cc4d830a5f8c1c51ac6850062b7066b5bbb9d2",
+      "branch": "master",
+      "worktree_state_at_inventory": "dirty:2 (must be reconciled to clean before RG-04 archive receipt)",
+      "adoption_status": "accepted-core",
+      "capability_boundary": "Nushell CodeDB plugin: BlobStore trait over redb + PgStore, fail-closed parity, resumable exact-byte capture, bounded read-only MCP.",
+      "baseline_command": "cargo test --all",
+      "baseline_evidence": "Wave-1 baseline 2026-07-12: cargo test doctests ok (0 failed); nu suite PASS (preserve_capability_provenance.json)",
+      "target_lifeos_bounded_context": "lifeos codedb store family (held for STORE-001)",
+      "consumers": "lifeos ADOPT-001 / STORE-001 (redb & PostgreSQL CodeDB); POSTGRES-004",
+      "constituent_capabilities": [
+        { "capability": "BlobStore trait", "disposition": "adopt", "lifeos_owner": "lifeos codedb store", "parity_gate": "blobstore_parity.rs (13 tests)" },
+        { "capability": "redb source-blob store", "disposition": "adopt", "lifeos_owner": "lifeos codedb store", "parity_gate": "test_redb_lifecycle.nu + STORE-001 verified BlobStore SHA-256 cutover (retires redb DURABLE role only; redb transient tier retained)" },
+        { "capability": "PgStore (PostgreSQL parity)", "disposition": "adopt", "lifeos_owner": "lifeos postgres store (POSTGRES-004/005)", "parity_gate": "test_mandatory_pg_parity.py" },
+        { "capability": "Resumable capture", "disposition": "adopt", "lifeos_owner": "lifeos codedb ingestion", "parity_gate": "captured_metadata_json_projection_is_stable" },
+        { "capability": "SHA-256 identity", "disposition": "adopt", "lifeos_owner": "lifeos codedb ingestion", "parity_gate": "captured_metadata_json_projection_is_stable" },
+        { "capability": "Exact-byte materialization", "disposition": "adopt", "lifeos_owner": "lifeos codedb materialization", "parity_gate": "materialization_paths.rs (7 tests)" },
+        { "capability": "Secret-output guards", "disposition": "adopt", "lifeos_owner": "lifeos secret boundary", "parity_gate": "test_plugin_secret_guard.nu" },
+        { "capability": "Bounded read-only MCP", "disposition": "adopt", "lifeos_owner": "lifeos codedb MCP surface", "parity_gate": "policy_and_stdio.rs (24 tests)" },
+        { "capability": "envctl export contract", "disposition": "adopt", "lifeos_owner": "lifeos envctl bridge", "parity_gate": "CDB035 export validation" },
+        { "capability": "Compiler-observed evidence (HIR/MIR/rustdoc)", "disposition": "extend", "lifeos_owner": "lifeos codedb compiler lane", "parity_gate": "compiler_observed_tests.rs", "blocks_retirement": "gate tests use FAKE rustc; production trusted compiler/build broker unbuilt — parity not yet reachable" },
+        { "capability": "Sandboxed build/proc-macro capture", "disposition": "extend", "lifeos_owner": "lifeos codedb build broker", "parity_gate": "capture_approved_fixture_build", "blocks_retirement": "positive approved-execution receipts unbound — parity partial" }
+      ],
+      "retirement_readiness": "NOT-RETIRABLE — 9 of 11 capabilities are adopt-class with declared parity gates, but the 2 extend-class capabilities have unbuilt native parity and store authority is deferred to STORE-001. Unit stays live until every constituent capability clears RG-01 at LifeOS HEAD and RG-02..RG-06 pass."
+    },
+    {
+      "unit_id": "CONSOLIDATE-003-RU-ENVCTL",
+      "peer_repo": "FlexNetOS/envctl",
+      "peer_path": "/home/flexnetos/meta/src/envctl",
+      "pinned_head": "d47ca72c2e0069f67e3cf3488c2f9685cd895140",
+      "branch": "master",
+      "worktree_state_at_inventory": "dirty:271 (must be reconciled/committed before RG-04 archive receipt — baseline integrity precondition)",
+      "adoption_status": "accepted-core",
+      "capability_boundary": "Env/secret control plane: secretd/secretctl, replayable migration engine, catalog, libSQL/redb store, envctl-db code-graph surface; the intended redb -> PostgreSQL bridge + PostgreSQL -> filesystem projection engine.",
+      "baseline_command": "cargo test --all",
+      "baseline_evidence": "baseline defined per PRESERVE-002; execution deferred to adoption gate",
+      "target_lifeos_bounded_context": "lifeos migration engine / catalog / secret authority (external) / envctl bridge / envctl-db surface",
+      "consumers": "lifeos ADOPT-002 / POSTGRES-007 (materialization+secrets); STORE-001",
+      "constituent_capabilities": [
+        { "capability": "Replayable migration engine", "disposition": "adopt", "lifeos_owner": "lifeos migration engine", "parity_gate": "envctl crates/engine tests (DbSnapshot, migration_db) + current-head runtime receipt", "known_gap": "package proof != product runtime proof (RG-05 required)" },
+        { "capability": "Catalog blob metadata", "disposition": "adopt", "lifeos_owner": "lifeos catalog", "parity_gate": "catalog tests + runtime receipt", "known_gap": "runtime receipt absent (RG-05 required)" },
+        { "capability": "Secrets engine / secretd / secretctl", "disposition": "adopt", "lifeos_owner": "lifeos secret authority (external)", "parity_gate": "secretd provisioning runbook", "note": "secrets remain OS-keyring authority per STORE-001; secrets/** is a blocked_path — no secret value is accessed by this plan" },
+        { "capability": "Remote libSQL store", "disposition": "defer", "lifeos_owner": "lifeos external store (subordinate)", "parity_gate": "STORE-001", "blocks_retirement": "deferred to STORE-001 — store role undecided" },
+        { "capability": "PostgreSQL-RuVector component", "disposition": "defer", "lifeos_owner": "lifeos postgres+ruvector (POSTGRES-005)", "parity_gate": "STORE-001 + operator unfreeze", "blocks_retirement": "BLOCKED by operator-freeze of meta-ruvector (TASK-0089, #103 disarmed) + STORE-001" },
+        { "capability": "Semantic consumer", "disposition": "defer", "lifeos_owner": "lifeos intelligence substrate (INTEL-*)", "parity_gate": "STORE-001", "blocks_retirement": "deferred to STORE-001 — runtime parity proof separate" },
+        { "capability": "envctl db code-graph surface (roots/query/refactor)", "disposition": "extend", "lifeos_owner": "lifeos envctl-db surface", "parity_gate": "db_parity.rs", "blocks_retirement": "symbols/deploy/watch unwired; impact/widgets absent — parity partial" }
+      ],
+      "retirement_readiness": "NOT-RETIRABLE — 3 adopt-class capabilities carry an unmet RG-05 installed-runtime receipt, 3 defer-class capabilities are held for STORE-001 (one additionally blocked by operator-freeze), and 1 extend-class capability is partial. The envctl bridge/projection runtime role is retained by the blueprint; only the standalone peer repo is a retirement unit, and only once all constituent capabilities clear the gate."
+    },
+    {
+      "unit_id": "CONSOLIDATE-003-RU-META-RUVECTOR",
+      "peer_repo": "FlexNetOS/meta-ruvector",
+      "peer_path": "/home/flexnetos/meta/src/meta-ruvector",
+      "pinned_head": "b2e06780868c68aa53fe0169eeb577f2086b390c",
+      "branch": "fix/security-audit-advisories",
+      "worktree_state_at_inventory": "dirty:4 (must be reconciled to clean before RG-04 archive receipt)",
+      "adoption_status": "accepted-core (operator-frozen)",
+      "capability_boundary": "Neuromorphic vector search engine (spiking NN + HNSW) — RuVector core / semantic substrate.",
+      "baseline_command": "cargo test --all",
+      "baseline_evidence": "baseline defined per PRESERVE-002; execution deferred to adoption gate",
+      "target_lifeos_bounded_context": "lifeos postgres+ruvector semantics (POSTGRES-005); PGAUTH cognition",
+      "consumers": "lifeos POSTGRES-005 RuVector semantics; envctl PostgreSQL-RuVector component / Semantic consumer",
+      "constituent_capabilities": [
+        { "capability": "RuVector semantic substrate (native PostgreSQL extension, No-Sidecar)", "disposition": "defer", "lifeos_owner": "lifeos postgres+ruvector (POSTGRES-005)", "parity_gate": "STORE-001 + live RuVector-in-PostgreSQL activation (NBVERIFY-001 / REDB-CLAIM-023 remainder)", "blocks_retirement": "operator-freeze (TASK-0089, #103 disarmed) AND semantic-class open dependency not yet proven locally" }
+      ],
+      "blueprint_retirement_target_note": "The blueprint directs pulling pure-Rust ruvector-core / ruvllm from Crates.io and using gitkb/meta to isolate the meta-ruvector 'dirty scratchpad' (napi-rs / wasm exhaust), NOT cloning/merging the whole repo. Retirement of this unit therefore means: adopt the Crates.io pure-Rust source pin as the LifeOS-native RuVector, prove RuVector-in-PostgreSQL activation, then retire the standalone meta-ruvector repo as an implementation source.",
+      "retirement_readiness": "BLOCKED — retirement requires (a) operator unfreeze, (b) live RuVector-in-PostgreSQL native-extension activation proven locally (STORE-001 open dependency), (c) Crates.io pure-Rust source pin adopted. Until all three clear RG-01, the unit is not retirable."
+    }
+  ],
+  "cutover_sequence": {
+    "principle": "Retirement is dependency-ordered and mirrors the CONSOLIDATE-002 migration waves. A wave's peer is retired only after that wave's parity proof is accepted (next_action). No unit retires while any constituent capability is extend-partial, defer-held, or operator-blocked.",
+    "order": [
+      { "wave": 1, "unit": "CONSOLIDATE-003-RU-NU-PLUGIN", "rationale": "CodeDB store/ingestion is the foundation the bridge and semantics depend on; the durable BlobStore SHA-256 parity cutover is the STORE-001 keystone proof.", "gate_before_next": "RG-01..RG-06 accepted for all nu_plugin adopt-class capabilities; extend-class capabilities either reach native parity or are explicitly carried forward unretired." },
+      { "wave": 2, "unit": "CONSOLIDATE-003-RU-ENVCTL", "rationale": "envctl bridge/migration/catalog depend on store parity proven in wave 1; secrets stay OS-keyring authority; defer-class capabilities wait on STORE-001.", "gate_before_next": "RG-01..RG-06 accepted for envctl adopt-class capabilities; defer/extend capabilities remain live until their STORE-001 / native-parity dependency clears." },
+      { "wave": 3, "unit": "CONSOLIDATE-003-RU-META-RUVECTOR", "rationale": "Semantic substrate last; blocked on RuVector-in-PostgreSQL activation and operator unfreeze.", "gate_before_next": "operator unfreeze + RuVector-in-PostgreSQL activation + Crates.io source pin before RG-01 is even evaluable." }
+    ]
+  },
+  "non_execution_boundary": {
+    "simulation_required": true,
+    "statement": "Every rehearsal (RG-03 rollback, RG-05 installed proof, parity cutover) is simulated on a disposable namespace only. This task performs NO cutover, NO peer deletion, NO remote archival, NO production mutation, and NO secret access (blocked_paths: cutover; peer deletion; remote archival; production mutation; secrets/**). allowed_paths are limited to planning-spine-v0/generated/** and planning-spine-v0/proof_records/**.",
+    "product_execution_performed": false,
+    "next_action": "Decompose cutover only after each migration wave has accepted proof."
+  },
+  "work_items": [
+    {
+      "id": "CONSOLIDATE-003-A",
+      "surface": "Retirement unit: FlexNetOS/nu_plugin (CodeDB store family) @ d7cc4d8",
+      "owner": "LifeOS Consolidation Agent / Release Agent",
+      "decision": "Define nu_plugin as retirement unit RU-NU-PLUGIN with 11 constituent capabilities (9 adopt, 2 extend) mapped to LifeOS bounded contexts; mark NOT-RETIRABLE until every capability clears RG-01 parity at LifeOS HEAD (incl. STORE-001 verified BlobStore SHA-256 durable cutover) and RG-02..RG-06 pass. redb's durable-blob role retires to PostgreSQL by verified parity; redb's transient tier is retained."
+    },
+    {
+      "id": "CONSOLIDATE-003-B",
+      "surface": "Retirement unit: FlexNetOS/envctl (bridge / migration / catalog / secrets / envctl-db) @ d47ca72",
+      "owner": "LifeOS Consolidation Agent / Release Agent",
+      "decision": "Define envctl as retirement unit RU-ENVCTL with 7 constituent capabilities (3 adopt, 3 defer, 1 extend); mark NOT-RETIRABLE. Adopt-class capabilities require the RG-05 installed-runtime receipt (closing package-proof != runtime-proof); defer-class capabilities are held for STORE-001. The envctl bridge/projection runtime role is retained (intended architecture); only the standalone peer repo is the retirement unit. Reconcile dirty:271 worktree before RG-04."
+    },
+    {
+      "id": "CONSOLIDATE-003-C",
+      "surface": "Retirement unit: FlexNetOS/meta-ruvector (RuVector semantic substrate) @ b2e0678 — operator-frozen",
+      "owner": "LifeOS Consolidation Agent / Release Agent",
+      "decision": "Define meta-ruvector as retirement unit RU-META-RUVECTOR; mark BLOCKED. Retirement requires operator unfreeze, live RuVector-in-PostgreSQL activation (STORE-001 open dependency), and Crates.io pure-Rust source-pin adoption per the blueprint's isolate-the-scratchpad directive. Not retirable until all three clear RG-01."
+    },
+    {
+      "id": "CONSOLIDATE-003-D",
+      "surface": "Six-clause proof-gated retirement gate (RG-01..RG-06 + RG-INV)",
+      "owner": "Governance Board / Release Agent",
+      "decision": "Bind retirement of every unit to RG-01 parity, RG-02 consumer migration, RG-03 rollback rehearsal, RG-04 archive receipt, RG-05 installed proof, RG-06 owner acceptance, and the RG-INV history-recoverable invariant. Each clause is grounded in a named source; a unit is retirable only when all pass."
+    },
+    {
+      "id": "CONSOLIDATE-003-E",
+      "surface": "Archive-first retirement mechanism + history recoverability (RG-04 / RG-INV)",
+      "owner": "QA Agent / Release Agent",
+      "decision": "Capture a PRESERVE-001-style archive receipt (git bundle with all refs + reflogs, checksums, restore command) at each peer's pinned HEAD BEFORE any retirement, under one checksummed archive root, local-only (no remote archival). Deleted peer branches are only ever recreated from the archived bundle and recorded commit id, so history stays recoverable and retirement stays reversible."
+    },
+    {
+      "id": "CONSOLIDATE-003-F",
+      "surface": "Dependency-ordered cutover sequence + consumer migration waves (RG-02)",
+      "owner": "LifeOS Consolidation Agent / Release Agent",
+      "decision": "Order retirement waves nu_plugin -> envctl -> meta-ruvector, mirroring CONSOLIDATE-002. Retarget every recorded consumer from peer to LifeOS-native and re-verify green before the peer is retired; no wave proceeds until the prior wave's parity proof is accepted."
+    },
+    {
+      "id": "CONSOLIDATE-003-G",
+      "surface": "Installed-runtime validation contract (RG-05)",
+      "owner": "Release Agent / QA Agent",
+      "decision": "Require the LifeOS-native capability to be exercised in the BUILT/INSTALLED runtime (static musl binary / installed LifeOS) with an observed-output receipt, not just package/unit tests — closing the 'package proof != product runtime proof' gap the recovery dispositions flag. Rehearsed on a disposable namespace only."
+    },
+    {
+      "id": "CONSOLIDATE-003-H",
+      "surface": "STORE-001 alignment guard + non-execution boundary",
+      "owner": "LifeOS Data Agent / Governance Board",
+      "decision": "Enforce the STORE-001 tiered model: PostgreSQL single durable writer, redb retains only its transient tier, verified BlobStore SHA-256 cutover for durable classes, semantic class gated on RuVector-in-PostgreSQL activation. This artifact defines only; product_execution_performed=false; no cutover/deletion/remote-archival/production-mutation/secret-access is performed."
+    }
+  ],
+  "execution_order": [
+    "CONSOLIDATE-003-D",
+    "CONSOLIDATE-003-E",
+    "CONSOLIDATE-003-A",
+    "CONSOLIDATE-003-B",
+    "CONSOLIDATE-003-C",
+    "CONSOLIDATE-003-F",
+    "CONSOLIDATE-003-G",
+    "CONSOLIDATE-003-H"
+  ],
+  "completion_gate": "No legacy peer implementation (nu_plugin, envctl, meta-ruvector) is retired before RG-01 parity, RG-02 consumer migration, RG-03 rollback rehearsal, RG-04 archive receipt, RG-05 installed proof, and RG-06 owner acceptance all pass for that unit, and RG-INV keeps its history recoverable. Every retirement unit and every constituent capability is defined exactly once, each gate clause traces to a named source, and CONSOLIDATE-003.proof.json records zero cutover, zero peer deletion, and zero destructive action."
+}

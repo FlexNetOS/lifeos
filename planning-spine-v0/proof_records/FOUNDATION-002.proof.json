@@ -1,0 +1,87 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "FOUNDATION-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The task family covers one Rust workspace owner, Lua sandbox and policy ABI, dependency audit, cached build, hermetic tests, Ubuntu-first CI, and rollback.",
+  "gate_result": {
+    "task_family": "generated/task_families/FOUNDATION-002.json",
+    "work_items_count": 8,
+    "every_gate_clause_covered_exactly_once": true,
+    "one_rust_workspace_owner": {
+      "work_item": "FOUNDATION-002-A",
+      "owner": "repository-root Cargo.toml [workspace] (resolver=2)",
+      "members": ["src-tauri", "crates/lifeos-core", "crates/lifeos-daemon"],
+      "excluded": ["firmware/esp32 (own rust-toolchain.toml, riscv32imac-unknown-none-elf)"],
+      "msrv_floor": "rust-version = 1.77 on all three members"
+    },
+    "lua_sandbox_and_policy_abi": {
+      "work_item": "FOUNDATION-002-B",
+      "dialect": "Luau via mlua (luau + vendored + send)",
+      "stripped_globals": ["io", "os", "package", "debug", "dofile", "loadfile", "load"],
+      "sandbox_call": "Lua::sandbox(true)",
+      "error_taxonomy": ["Compile", "Runtime", "Sandbox"],
+      "isolation": "one fresh PluginHost per script execution (src-tauri plugin_run)",
+      "feature_gate": "plugin-host default-off; enabled only by src-tauri",
+      "ci_assertion": "cargo test -p lifeos-core --features plugin-host asserts sandbox tests incl. stripped_globals_list_matches_doc"
+    },
+    "dependency_audit": {
+      "work_item": "FOUNDATION-002-C",
+      "tls_policy": "rustls-only; ban openssl-sys + native-tls across the graph",
+      "esp32_isolation_assertion": "cargo tree -p lifeos-core --features storage | grep openssl-sys must be empty",
+      "source_policy": "all crates from crates.io, never the meta-ruvector git monorepo",
+      "license_allowlist": "MIT OR Apache-2.0 (declared on every member)",
+      "lockfile": "Cargo.lock committed; CI runs --locked"
+    },
+    "cached_build": {
+      "work_item": "FOUNDATION-002-D",
+      "cache_strategy": "shared target/ + registry/git cache keyed on Cargo.lock hash + toolchain",
+      "dev_linker": "mold (fallback lld) via .cargo/config.toml for x86_64-unknown-linux-gnu",
+      "release_exclusion": "x86_64-unknown-linux-musl static release keeps default linker for reproducibility",
+      "new_files_only": true
+    },
+    "hermetic_tests": {
+      "work_item": "FOUNDATION-002-E",
+      "db_isolation": "storage tests use tempfile dev-dep (no fixed path, no $APPDATA)",
+      "no_network": "reqwest MCP transport behind mcp-http; not exercised in unit tests",
+      "no_system_lua": "mlua vendored",
+      "offline_command": "cargo test --workspace --locked --offline",
+      "js_hermeticity": "Vitest keeps sendAiMessage canned (no invoke()); lucide-vue-next mock-aliased"
+    },
+    "ubuntu_first_ci": {
+      "work_item": "FOUNDATION-002-F",
+      "runner": "ubuntu-latest (matches existing ci.yml)",
+      "existing_lane_preserved": "bun run check",
+      "added_lanes": [
+        "cargo test --workspace --locked",
+        "cargo check -p lifeos-core --no-default-features (storage/no_std guard)",
+        "cargo test -p lifeos-core --features plugin-host",
+        "dependency-audit gate (cargo-deny + cargo tree openssl-sys isolation)",
+        "cargo fmt --check + cargo clippy -D warnings"
+      ],
+      "other_os_scope": "macOS/Windows out of scope for v0"
+    },
+    "rollback": {
+      "work_item": "FOUNDATION-002-G",
+      "mechanism": "restore archived build plan (task-family + proof); source workspaces unchanged",
+      "reversibility": "plugin-host default-off; new .cargo/config.toml + deny.toml deletable; CI lanes appended and removable",
+      "no_mutation": "no Cargo workspace / dependency / profile / product mutation (blocked_paths honored)",
+      "data_risk": "zero; no snapshot restore required"
+    },
+    "flake_and_reproducible_dev_tasks": {
+      "work_item": "FOUNDATION-002-H",
+      "flake_contract": "pins one Rust toolchain (stable >=1.77), provides x86_64-unknown-linux-musl target, vendored-Luau prereqs + mold; DEFERS toolchain/dev-shell ownership to FOUNDATION-001 Yazelix+Nix package",
+      "reproducible_tasks": ["bun install/dev/test/build", "cargo check/test --workspace --locked/build"],
+      "materialized_here": false
+    },
+    "product_execution_performed": false,
+    "store_001_alignment": "store-neutral: no work item adds a second durable writer or reclassifies any state class; storage feature flag + no-default-features CI guard + openssl-sys ban preserve the STORE-001 tiering (PostgreSQL canonical durable, redb transient)"
+  },
+  "proof_summary": "FOUNDATION-002 defines the Rust-native application and governed Lua build plan for the consolidated LifeOS application as planning artifacts only. The task family generated/task_families/FOUNDATION-002.json enumerates 8 work items that cover each of the seven gate clauses exactly once, plus the goal's flake/linker/reproducible-dev extras. One Rust workspace owner (A): the repository-root [workspace] manifest (resolver=2) is the sole owner of members src-tauri, crates/lifeos-core, crates/lifeos-daemon and the firmware/esp32 exclusion, with a shared 1.77 MSRV floor. Lua sandbox and policy ABI (B): the governed boundary is Luau via mlua (luau/vendored/send), freezing STRIPPED_GLOBALS = [io, os, package, debug, dofile, loadfile, load], Lua::sandbox(true), the {Compile, Runtime, Sandbox} error taxonomy, one fresh PluginHost per plugin_run call, and the default-off plugin-host feature — all asserted by the existing sandbox tests. Dependency audit (C): a cargo-deny + cargo tree gate that bans openssl-sys/native-tls (rustls-only; the ESP32 `cargo tree | grep openssl-sys` isolation assertion), requires crates.io sourcing over the meta-ruvector monorepo, allowlists MIT OR Apache-2.0, and runs --locked. Cached build (D): shared target/registry cache keyed on Cargo.lock + toolchain and a mold/lld dev linker via a new .cargo/config.toml, explicitly excluded from the reproducible x86_64-unknown-linux-musl static release. Hermetic tests (E): tempfile-scoped DBs, no network (reqwest behind mcp-http), vendored Luau, `cargo test --workspace --locked --offline`, and the Vitest dual-mode canned-AI + lucide mock. Ubuntu-first CI (F): extends the existing ubuntu-latest ci.yml (bun run check) with cargo test --locked, the no-default-features storage guard, the plugin-host lane, the dependency-audit gate, and fmt/clippy — additively, removing no lane. Rollback (G): restore the archived build plan; every surface is additive and reversible and no Cargo/dependency/profile/product mutation occurs. Flake + reproducible dev tasks (H): a flake dev-shell contract pinning one toolchain and the musl target while deferring toolchain ownership to the FOUNDATION-001 Yazelix+Nix package, with bun and cargo tasks running identically in-shell and in CI. Every assignment traces to a named source (Cargo.toml, plugin.rs, ci.yml, CLAUDE.md guards, the Architecture Blueprint, and FOUNDATION-001). The plan is store-neutral and aligned with STORE-001: no second durable writer, tiering preserved via the storage feature flag and the no-default-features guard. No product code, dependency, workspace, or profile was mutated; product_execution_performed is false.",
+  "artifact_paths": [
+    "generated/task_families/FOUNDATION-002.json",
+    "proof_records/FOUNDATION-002.proof.json"
+  ],
+  "product_execution_performed": false
+}

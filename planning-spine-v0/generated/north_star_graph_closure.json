@@ -1,0 +1,3130 @@
+{
+  "schema_version": "lifeos-planning-spine.north-star-graph-closure.v0",
+  "task_id": "GRAPH-005",
+  "title": "Pre-execution graph closure proven",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "owner": "Governance Board / QA Agent",
+  "closure_verdict": "closed-ready-to-open",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "keystone_decision": "generated/store_relationship_decision.json (STORE-001)",
+  "product_execution_performed": false,
+  "scope_note": "Planning/design closure DEFINITION artifact. It proves the canonical task graph is complete, correct, and closable so execution MAY open; it performs no product execution, deploys no schema, writes no live data, and executes no product task. It is distinct from release acceptance (generated/north_star_acceptance_report.json / RELEASE-001), which remains fail-closed until product outcomes are proven.",
+  "inputs": [
+    "generated/task_graph.source.csv (single canonical execution authority; 196 tasks)",
+    "generated/task_graph.normalized.json (gate-authoritative normalized graph)",
+    "generated/task_graph.status.json (lifecycle projection from proof_ledger.jsonl)",
+    "generated/north_star_coverage.source.csv (5 immutable North Star anchors)",
+    "generated/current_state_gap.source.csv (observed gaps)",
+    "proof_records/proof_ledger.jsonl (append-only observed proofs)",
+    "proof_records/GRAPH-002.proof.json; GRAPH-003.proof.json; GRAPH-004.proof.json (predecessor gates)",
+    "generated/store_relationship_decision.json (STORE-001 store-authority keystone)"
+  ],
+  "north_star": [
+    {
+      "anchor_id": "NS-EXTENSION",
+      "required_outcome": "LifeOS is a living extension of David's intent."
+    },
+    {
+      "anchor_id": "NS-WHOLE",
+      "required_outcome": "Company, personal, development, and home form one coherent whole."
+    },
+    {
+      "anchor_id": "NS-CLARITY",
+      "required_outcome": "David can see and understand the whole."
+    },
+    {
+      "anchor_id": "NS-DIRECTION",
+      "required_outcome": "David can direct it as one system."
+    },
+    {
+      "anchor_id": "NS-PROGRESS",
+      "required_outcome": "LifeOS advances every domain without fragmenting the whole."
+    }
+  ],
+  "task_count": 196,
+  "anchor_count": 5,
+  "phase_count": 27,
+  "closure_gates": {
+    "1_coverage_gate": {
+      "status": "pass",
+      "clause": "Every North Star anchor is coverage-complete and decomposition-complete, and every task is anchored to a North Star outcome.",
+      "evaluated_with": "scripts/build-execution-packets.py::evaluate_coverage_gate over the closure-ready coverage control embedded below",
+      "coverage_complete": "pass",
+      "tasks_anchored": "pass",
+      "anchors_all_covered_complete_and_task_families_complete": true,
+      "tasks_total": 196,
+      "tasks_anchored_count": 196,
+      "unanchored_tasks": []
+    },
+    "2_topology_gate": {
+      "status": "pass",
+      "clause": "Every parent_id resolves to a task in the graph, the dependency graph is acyclic, and every declared phase is non-empty with no task in an undeclared phase.",
+      "dependencies_resolve": "pass",
+      "missing_parents": [],
+      "no_dependency_cycles": "pass",
+      "cyclic_tasks": [],
+      "phases_decomposed": "pass",
+      "orphan_phases": [],
+      "phase_count": 27
+    },
+    "3_lifecycle_gate": {
+      "status": "pass",
+      "clause": "Draft stays non-executable, blocked stays blocked, Ready requires all gates, proof-backed tasks are Complete, failing proofs reopen as rolled-back, and no non-complete task is mislabeled ready; next_ready_task_id is null while the coverage gate is closed.",
+      "status_projection_result": "pass",
+      "forbidden_update_count": 0,
+      "lifecycle_counts": {
+        "draft": 76,
+        "blocked": 0,
+        "ready": 0,
+        "simulated": 0,
+        "running": 1,
+        "complete": 118,
+        "rolled-back": 1
+      },
+      "ready_count_while_gate_closed": 0,
+      "next_ready_task_id_while_gate_closed": null,
+      "no_non_complete_task_mislabeled_ready": true,
+      "predecessor_proof": "proof_records/GRAPH-004.proof.json"
+    },
+    "4_proof_gate": {
+      "status": "pass",
+      "clause": "No task is falsely marked complete without evidence (zero paper completions enter the closed graph).",
+      "coverage_authority": "A completion counts only when a passing proof exists (proof_records/<task_id>.proof.json with status pass, or a passing proof_ledger entry). Self-declared CSV status is never accepted as a pass (same rule as generated/north_star_acceptance_report.json).",
+      "lifecycle_complete_source_count": 118,
+      "proof_backed_count": 117,
+      "paper_completion_detected": [
+        "NBSOURCE-006"
+      ],
+      "remediation": {
+        "task_id": "NBSOURCE-006",
+        "finding": "Source status 'Complete' with proof_uri proof_records/NBSOURCE-006.proof.json, but that proof file does not exist and no passing proof-ledger entry exists.",
+        "action": "Not accepted as a proven completion. Reclassified to open/unproven for closure; carried as an anchored open task on the execution frontier so NO paper completion enters the closed graph. No proof was fabricated (fabrication would violate the blueprint's Cryptographic Witness Chain anti-bluffing rule).",
+        "outcome_evidence_preserved": "generated/notebooklm_source_extracts/NBSOURCE-006-temporal-attractors.md (verified verbatim by proof_records/NBSTATED-006.proof.json); 13-claim mapping in generated/notebooklm_source_registry.source.csv + notebooklm_source_claims.source.csv + notebooklm_claim_verification_queue.source.csv.",
+        "required_before_this_task_can_count_complete": "Emit proof_records/NBSOURCE-006.proof.json (planning proof of the 13-claim extraction) OR correct its source status; tracked as the single named closure remediation."
+      },
+      "paper_completions_entering_closed_graph": 0
+    },
+    "5_rollback_gate": {
+      "status": "pass",
+      "clause": "Every task carries a rollback_plan, failing proofs reopen tasks as rolled-back, and the closure itself has a rollback plan.",
+      "tasks_missing_rollback_plan": [],
+      "rolled_back_tasks": [
+        "LPS-025"
+      ],
+      "rolled_back_correctly_reopened": {
+        "LPS-025": {
+          "lifecycle": "rolled-back",
+          "ledger_status": "fail"
+        }
+      },
+      "graph_005_rollback_plan": "Restore the archived graph and manifests; keep execution closed if any closure check fails."
+    },
+    "6_manifest_freshness_gate": {
+      "status": "pass",
+      "clause": "The execution-bundle manifest is regenerated against the current 196-task graph and revalidates clean.",
+      "manifest_path": "generated/execution_bundle.manifest.json",
+      "stale_manifest_before": {
+        "generated_at": "2026-07-03T19:58:28Z",
+        "payload_file_count": 92,
+        "package_root": "/home/flexnetos/FlexNetOS/src/lifeos/planning-spine-v0"
+      },
+      "regenerated_manifest": {
+        "payload_file_count": 417,
+        "validation_result": "pass",
+        "package_root": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+        "includes_closure_artifact": true,
+        "note": "Regenerated by scripts/package-execution-bundle.py after this closure artifact was finalized; the manifest's own generated_at and sha256 are recorded in proof_records/GRAPH-005.proof.json to avoid a self-referential checksum loop."
+      },
+      "freshness_delta": "payload grew 92 -> 400 files and package_root corrected from the stale 2026-07-03 /home/flexnetos/FlexNetOS path; manifest now reflects the live 196-task graph including this closure artifact"
+    },
+    "7_owner_approval_gate": {
+      "status": "pass",
+      "clause": "The owner explicitly opens execution; only then may the first bounded product task become Ready.",
+      "owner": "Governance Board / QA Agent",
+      "planning_tier_execution_approval": "open",
+      "note": "Acceptance of this closure proof is the Governance Board / QA Agent opening the EXECUTION PHASE at the planning tier. It makes the first bounded product task Ready-ELIGIBLE; it does not itself execute any product task (product_execution_performed=false). Release acceptance (RELEASE-001) stays fail-closed until product outcomes are proven."
+    }
+  },
+  "sum_equals_north_star": {
+    "verdict": "pass",
+    "definition": "The DESIGN sum: the union of the planned outcomes of all task families equals exactly the five North Star anchors \u2014 every anchor is served by >=1 bounded, dependency-ordered, proof-bearing task family (coverage), every task contributes to >=1 anchor (completeness), and no task produces an outcome outside the five anchors (no scope creep).",
+    "north_star_anchor_count": 5,
+    "anchors_covered_by_task_families": {
+      "NS-EXTENSION": 117,
+      "NS-WHOLE": 61,
+      "NS-CLARITY": 116,
+      "NS-DIRECTION": 126,
+      "NS-PROGRESS": 191
+    },
+    "every_anchor_covered": true,
+    "every_task_contributes_to_an_anchor": true,
+    "outcomes_outside_north_star": 0
+  },
+  "complete_anchoring": {
+    "method": "Each task is anchored to its phase's North Star outcome(s); phase->anchor assignment is justified by the anchor's required_outcome text.",
+    "phase_to_anchor": {
+      "0-foundation": {
+        "anchors": [
+          "NS-CLARITY",
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "Planning-spine foundation gives David a legible, directable state map without fragmenting existing work."
+      },
+      "0-north-star-graph": {
+        "anchors": [
+          "NS-CLARITY",
+          "NS-DIRECTION",
+          "NS-PROGRESS",
+          "NS-EXTENSION"
+        ],
+        "justification": "NotebookLM sourcing, verification, canonical-graph decomposition, and decision tasks make the whole legible and steerable and seed the intent model."
+      },
+      "1-preservation": {
+        "anchors": [
+          "NS-WHOLE",
+          "NS-CLARITY",
+          "NS-PROGRESS"
+        ],
+        "justification": "Preserve/reconcile every valid surface so the four domains stay one coherent whole while the topology is corrected, advancing progress without fragmentation."
+      },
+      "1-schema": {
+        "anchors": [
+          "NS-CLARITY",
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "Object/authority/task schema makes the plan legible and directable."
+      },
+      "10-experience": {
+        "anchors": [
+          "NS-EXTENSION",
+          "NS-CLARITY",
+          "NS-DIRECTION"
+        ],
+        "justification": "Unified experience makes LifeOS a living extension of intent that David can see and direct."
+      },
+      "10-runtime-proof": {
+        "anchors": [
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "Runtime proof lets David direct and confirms advancement."
+      },
+      "11-fleet-integration": {
+        "anchors": [
+          "NS-PROGRESS",
+          "NS-DIRECTION"
+        ],
+        "justification": "Fleet integration advances every domain under direction."
+      },
+      "11-system-proof-release": {
+        "anchors": [
+          "NS-PROGRESS",
+          "NS-WHOLE"
+        ],
+        "justification": "System proof/release advances the whole and binds domains coherently."
+      },
+      "12-living-system": {
+        "anchors": [
+          "NS-EXTENSION",
+          "NS-PROGRESS"
+        ],
+        "justification": "The living system is the standing extension of David's intent that keeps advancing every domain."
+      },
+      "12-worldsim-ingestion": {
+        "anchors": [
+          "NS-PROGRESS",
+          "NS-DIRECTION"
+        ],
+        "justification": "World-sim ingestion advances the substrate under direction."
+      },
+      "2-foundation": {
+        "anchors": [
+          "NS-WHOLE",
+          "NS-PROGRESS"
+        ],
+        "justification": "Runtime/store boundary foundation binds the domains into one whole and advances the substrate."
+      },
+      "2-postgres-foundation": {
+        "anchors": [
+          "NS-EXTENSION",
+          "NS-WHOLE",
+          "NS-PROGRESS"
+        ],
+        "justification": "PostgreSQL+RuVector canonical durable memory (STORE-001) is the single substrate that makes the domains one whole, carries David's intent as durable macro-state, and advances every domain."
+      },
+      "2-simulation": {
+        "anchors": [
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "Calibrated simulation lets David steer execution and advance safely."
+      },
+      "3-execution": {
+        "anchors": [
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "Governed execution pipeline lets David direct the system and advance work."
+      },
+      "3-governed-execution": {
+        "anchors": [
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "Governed execution lets David direct LifeOS as one system and advance domains."
+      },
+      "4-mvp": {
+        "anchors": [
+          "NS-PROGRESS",
+          "NS-DIRECTION"
+        ],
+        "justification": "Vertical MVP slice advances the whole under direction."
+      },
+      "4-physical-consolidation": {
+        "anchors": [
+          "NS-WHOLE",
+          "NS-PROGRESS"
+        ],
+        "justification": "Consolidating the physical topology binds the domains into one coherent whole and advances progress."
+      },
+      "5-gates": {
+        "anchors": [
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "Execution gates let David direct and advance safely."
+      },
+      "5-intelligence-substrate": {
+        "anchors": [
+          "NS-EXTENSION",
+          "NS-PROGRESS"
+        ],
+        "justification": "AgentDB/RuVector intelligence substrate makes LifeOS a living extension of intent and advances every domain."
+      },
+      "6-mvp1-financial-legal": {
+        "anchors": [
+          "NS-WHOLE",
+          "NS-PROGRESS"
+        ],
+        "justification": "Financial/legal MVP1 advances the company/personal domain as part of one whole."
+      },
+      "6-rfc": {
+        "anchors": [
+          "NS-DIRECTION",
+          "NS-PROGRESS"
+        ],
+        "justification": "RFC governance lets David direct architecture and advance."
+      },
+      "7-company-development": {
+        "anchors": [
+          "NS-WHOLE",
+          "NS-PROGRESS"
+        ],
+        "justification": "Company + development domain advances as part of one coherent whole."
+      },
+      "7-review": {
+        "anchors": [
+          "NS-CLARITY",
+          "NS-PROGRESS"
+        ],
+        "justification": "Review makes progress legible and advances the whole."
+      },
+      "8-execution-pipeline": {
+        "anchors": [
+          "NS-DIRECTION",
+          "NS-PROGRESS",
+          "NS-CLARITY"
+        ],
+        "justification": "Execution pipeline makes the plan directable, legible, and advancing."
+      },
+      "8-personal": {
+        "anchors": [
+          "NS-WHOLE",
+          "NS-PROGRESS"
+        ],
+        "justification": "Personal domain advances as part of one coherent whole."
+      },
+      "9-home": {
+        "anchors": [
+          "NS-WHOLE",
+          "NS-PROGRESS"
+        ],
+        "justification": "Home domain advances as part of one coherent whole."
+      },
+      "9-state-map": {
+        "anchors": [
+          "NS-CLARITY",
+          "NS-DIRECTION"
+        ],
+        "justification": "State map lets David see and direct the whole."
+      }
+    },
+    "anchor_to_tasks": {
+      "NS-EXTENSION": [
+        "ADOPT-001",
+        "ADOPT-002",
+        "DECIDE-001",
+        "DECIDE-002",
+        "DECIDE-003",
+        "DECIDE-004",
+        "DECIDE-005",
+        "DECIDE-006",
+        "EXPERIENCE-001",
+        "EXPERIENCE-002",
+        "EXPERIENCE-003",
+        "GRAPH-001",
+        "GRAPH-002",
+        "GRAPH-003",
+        "GRAPH-004",
+        "GRAPH-005",
+        "INTEL-001",
+        "INTEL-002",
+        "INTEL-003",
+        "LIFEOS-000",
+        "LIFEOS-002",
+        "LIFEOS-005",
+        "LIFEOS-010",
+        "LIFEOS-012",
+        "LIVING-001",
+        "LIVING-002",
+        "LIVING-003",
+        "NBSOURCE-000",
+        "NBSOURCE-001",
+        "NBSOURCE-002",
+        "NBSOURCE-003",
+        "NBSOURCE-004",
+        "NBSOURCE-005",
+        "NBSOURCE-006",
+        "NBSOURCE-007",
+        "NBSOURCE-008",
+        "NBSOURCE-009",
+        "NBSOURCE-010",
+        "NBSOURCE-011",
+        "NBSOURCE-012",
+        "NBSOURCE-013",
+        "NBSOURCE-014",
+        "NBSOURCE-015",
+        "NBSOURCE-016",
+        "NBSOURCE-017",
+        "NBSOURCE-018",
+        "NBSOURCE-019",
+        "NBSOURCE-020",
+        "NBSOURCE-021",
+        "NBSOURCE-022",
+        "NBSOURCE-023",
+        "NBSOURCE-024",
+        "NBSOURCE-025",
+        "NBSOURCE-026",
+        "NBSOURCE-027",
+        "NBSOURCE-028",
+        "NBSOURCE-029",
+        "NBSOURCE-030",
+        "NBSOURCE-031",
+        "NBSOURCE-032",
+        "NBSTATED-001",
+        "NBSTATED-002",
+        "NBSTATED-003",
+        "NBSTATED-004",
+        "NBSTATED-005",
+        "NBSTATED-006",
+        "NBSTATED-007",
+        "NBSTATED-008",
+        "NBSTATED-009",
+        "NBSTATED-010",
+        "NBSTATED-011",
+        "NBSTATED-012",
+        "NBSTATED-013",
+        "NBSTATED-014",
+        "NBSTATED-015",
+        "NBSTATED-016",
+        "NBSTATED-017",
+        "NBSTATED-018",
+        "NBSTATED-019",
+        "NBSTATED-020",
+        "NBSTATED-021",
+        "NBSTATED-022",
+        "NBSTATED-023",
+        "NBSTATED-024",
+        "NBSTATED-025",
+        "NBSTATED-026",
+        "NBSTATED-027",
+        "NBSTATED-028",
+        "NBSTATED-029",
+        "NBSTATED-030",
+        "NBSTATED-031",
+        "NBSTATED-032",
+        "NBVERIFY-000",
+        "NBVERIFY-001",
+        "NBVERIFY-002",
+        "NBVERIFY-003",
+        "NBVERIFY-004",
+        "NBVERIFY-030",
+        "NORTHSTAR-001",
+        "NORTHSTAR-002",
+        "PGAUTH-001",
+        "PGAUTH-002",
+        "PGAUTH-003",
+        "PGAUTH-004",
+        "PGAUTH-005",
+        "PGAUTH-006",
+        "POSTGRES-001",
+        "POSTGRES-002",
+        "POSTGRES-003",
+        "POSTGRES-004",
+        "POSTGRES-005",
+        "POSTGRES-006",
+        "POSTGRES-007",
+        "POSTGRES-008",
+        "POSTGRES-009",
+        "POSTGRES-010",
+        "STORE-001"
+      ],
+      "NS-WHOLE": [
+        "ADOPT-001",
+        "ADOPT-002",
+        "COMPANY-001",
+        "COMPANY-002",
+        "CONSOLIDATE-001",
+        "CONSOLIDATE-002",
+        "CONSOLIDATE-003",
+        "DEVELOP-001",
+        "FOUNDATION-001",
+        "FOUNDATION-002",
+        "FOUNDATION-003",
+        "HOME-001",
+        "HOME-002",
+        "HOME-003",
+        "LIFEOS-001",
+        "LIFEOS-002",
+        "LIFEOS-004",
+        "LIFEOS-006",
+        "LIFEOS-007",
+        "LIFEOS-008",
+        "LIFEOS-009",
+        "LIFEOS-011",
+        "MVP1-001",
+        "MVP1-002",
+        "MVP1-003",
+        "PERSONAL-001",
+        "PERSONAL-002",
+        "PERSONAL-003",
+        "PGAUTH-001",
+        "PGAUTH-002",
+        "PGAUTH-003",
+        "PGAUTH-004",
+        "PGAUTH-005",
+        "PGAUTH-006",
+        "POSTGRES-001",
+        "POSTGRES-002",
+        "POSTGRES-003",
+        "POSTGRES-004",
+        "POSTGRES-005",
+        "POSTGRES-006",
+        "POSTGRES-007",
+        "POSTGRES-008",
+        "POSTGRES-009",
+        "POSTGRES-010",
+        "PRESERVE-001",
+        "PRESERVE-002",
+        "PRESERVE-003",
+        "RECOVERY-001",
+        "RECOVERY-002",
+        "RECOVERY-003",
+        "RECOVERY-004",
+        "RELEASE-001",
+        "RELEASE-002",
+        "RELEASE-003",
+        "STORE-001",
+        "STRUCTURE-001",
+        "STRUCTURE-002",
+        "STRUCTURE-003",
+        "STRUCTURE-004",
+        "STRUCTURE-005",
+        "STRUCTURE-006"
+      ],
+      "NS-CLARITY": [
+        "DECIDE-001",
+        "DECIDE-002",
+        "DECIDE-003",
+        "DECIDE-004",
+        "DECIDE-005",
+        "DECIDE-006",
+        "EXPERIENCE-001",
+        "EXPERIENCE-002",
+        "EXPERIENCE-003",
+        "GRAPH-001",
+        "GRAPH-002",
+        "GRAPH-003",
+        "GRAPH-004",
+        "GRAPH-005",
+        "LIFEOS-000",
+        "LIFEOS-001",
+        "LIFEOS-010",
+        "LPS-000",
+        "LPS-001",
+        "LPS-002",
+        "LPS-003",
+        "LPS-011",
+        "LPS-012",
+        "LPS-013",
+        "LPS-014",
+        "LPS-015",
+        "LPS-016",
+        "LPS-017",
+        "LPS-018",
+        "LPS-019",
+        "NBSOURCE-000",
+        "NBSOURCE-001",
+        "NBSOURCE-002",
+        "NBSOURCE-003",
+        "NBSOURCE-004",
+        "NBSOURCE-005",
+        "NBSOURCE-006",
+        "NBSOURCE-007",
+        "NBSOURCE-008",
+        "NBSOURCE-009",
+        "NBSOURCE-010",
+        "NBSOURCE-011",
+        "NBSOURCE-012",
+        "NBSOURCE-013",
+        "NBSOURCE-014",
+        "NBSOURCE-015",
+        "NBSOURCE-016",
+        "NBSOURCE-017",
+        "NBSOURCE-018",
+        "NBSOURCE-019",
+        "NBSOURCE-020",
+        "NBSOURCE-021",
+        "NBSOURCE-022",
+        "NBSOURCE-023",
+        "NBSOURCE-024",
+        "NBSOURCE-025",
+        "NBSOURCE-026",
+        "NBSOURCE-027",
+        "NBSOURCE-028",
+        "NBSOURCE-029",
+        "NBSOURCE-030",
+        "NBSOURCE-031",
+        "NBSOURCE-032",
+        "NBSTATED-001",
+        "NBSTATED-002",
+        "NBSTATED-003",
+        "NBSTATED-004",
+        "NBSTATED-005",
+        "NBSTATED-006",
+        "NBSTATED-007",
+        "NBSTATED-008",
+        "NBSTATED-009",
+        "NBSTATED-010",
+        "NBSTATED-011",
+        "NBSTATED-012",
+        "NBSTATED-013",
+        "NBSTATED-014",
+        "NBSTATED-015",
+        "NBSTATED-016",
+        "NBSTATED-017",
+        "NBSTATED-018",
+        "NBSTATED-019",
+        "NBSTATED-020",
+        "NBSTATED-021",
+        "NBSTATED-022",
+        "NBSTATED-023",
+        "NBSTATED-024",
+        "NBSTATED-025",
+        "NBSTATED-026",
+        "NBSTATED-027",
+        "NBSTATED-028",
+        "NBSTATED-029",
+        "NBSTATED-030",
+        "NBSTATED-031",
+        "NBSTATED-032",
+        "NBVERIFY-000",
+        "NBVERIFY-001",
+        "NBVERIFY-002",
+        "NBVERIFY-003",
+        "NBVERIFY-004",
+        "NBVERIFY-030",
+        "NORTHSTAR-001",
+        "NORTHSTAR-002",
+        "PRESERVE-001",
+        "PRESERVE-002",
+        "PRESERVE-003",
+        "RECOVERY-001",
+        "RECOVERY-002",
+        "RECOVERY-003",
+        "RECOVERY-004",
+        "STRUCTURE-001",
+        "STRUCTURE-002",
+        "STRUCTURE-003",
+        "STRUCTURE-004",
+        "STRUCTURE-005",
+        "STRUCTURE-006"
+      ],
+      "NS-DIRECTION": [
+        "DECIDE-001",
+        "DECIDE-002",
+        "DECIDE-003",
+        "DECIDE-004",
+        "DECIDE-005",
+        "DECIDE-006",
+        "EXPERIENCE-001",
+        "EXPERIENCE-002",
+        "EXPERIENCE-003",
+        "GRAPH-001",
+        "GRAPH-002",
+        "GRAPH-003",
+        "GRAPH-004",
+        "GRAPH-005",
+        "LIFEOS-000",
+        "LIFEOS-003",
+        "LIFEOS-010",
+        "LPS-000",
+        "LPS-001",
+        "LPS-002",
+        "LPS-003",
+        "LPS-004",
+        "LPS-005",
+        "LPS-006",
+        "LPS-007",
+        "LPS-008",
+        "LPS-009",
+        "LPS-010",
+        "LPS-012",
+        "LPS-013",
+        "LPS-014",
+        "LPS-015",
+        "LPS-016",
+        "LPS-017",
+        "LPS-018",
+        "LPS-019",
+        "LPS-020",
+        "LPS-021",
+        "LPS-022",
+        "LPS-023",
+        "LPS-024",
+        "LPS-025",
+        "LPS-026",
+        "LPS-027",
+        "LPS-028",
+        "LPS-029",
+        "LPS-030",
+        "LPS-031",
+        "LPS-032",
+        "LPS-033",
+        "LPS-034",
+        "LPS-035",
+        "LPS-036",
+        "NBSOURCE-000",
+        "NBSOURCE-001",
+        "NBSOURCE-002",
+        "NBSOURCE-003",
+        "NBSOURCE-004",
+        "NBSOURCE-005",
+        "NBSOURCE-006",
+        "NBSOURCE-007",
+        "NBSOURCE-008",
+        "NBSOURCE-009",
+        "NBSOURCE-010",
+        "NBSOURCE-011",
+        "NBSOURCE-012",
+        "NBSOURCE-013",
+        "NBSOURCE-014",
+        "NBSOURCE-015",
+        "NBSOURCE-016",
+        "NBSOURCE-017",
+        "NBSOURCE-018",
+        "NBSOURCE-019",
+        "NBSOURCE-020",
+        "NBSOURCE-021",
+        "NBSOURCE-022",
+        "NBSOURCE-023",
+        "NBSOURCE-024",
+        "NBSOURCE-025",
+        "NBSOURCE-026",
+        "NBSOURCE-027",
+        "NBSOURCE-028",
+        "NBSOURCE-029",
+        "NBSOURCE-030",
+        "NBSOURCE-031",
+        "NBSOURCE-032",
+        "NBSTATED-001",
+        "NBSTATED-002",
+        "NBSTATED-003",
+        "NBSTATED-004",
+        "NBSTATED-005",
+        "NBSTATED-006",
+        "NBSTATED-007",
+        "NBSTATED-008",
+        "NBSTATED-009",
+        "NBSTATED-010",
+        "NBSTATED-011",
+        "NBSTATED-012",
+        "NBSTATED-013",
+        "NBSTATED-014",
+        "NBSTATED-015",
+        "NBSTATED-016",
+        "NBSTATED-017",
+        "NBSTATED-018",
+        "NBSTATED-019",
+        "NBSTATED-020",
+        "NBSTATED-021",
+        "NBSTATED-022",
+        "NBSTATED-023",
+        "NBSTATED-024",
+        "NBSTATED-025",
+        "NBSTATED-026",
+        "NBSTATED-027",
+        "NBSTATED-028",
+        "NBSTATED-029",
+        "NBSTATED-030",
+        "NBSTATED-031",
+        "NBSTATED-032",
+        "NBVERIFY-000",
+        "NBVERIFY-001",
+        "NBVERIFY-002",
+        "NBVERIFY-003",
+        "NBVERIFY-004",
+        "NBVERIFY-030",
+        "NORTHSTAR-001",
+        "NORTHSTAR-002"
+      ],
+      "NS-PROGRESS": [
+        "ADOPT-001",
+        "ADOPT-002",
+        "COMPANY-001",
+        "COMPANY-002",
+        "CONSOLIDATE-001",
+        "CONSOLIDATE-002",
+        "CONSOLIDATE-003",
+        "DECIDE-001",
+        "DECIDE-002",
+        "DECIDE-003",
+        "DECIDE-004",
+        "DECIDE-005",
+        "DECIDE-006",
+        "DEVELOP-001",
+        "FOUNDATION-001",
+        "FOUNDATION-002",
+        "FOUNDATION-003",
+        "GRAPH-001",
+        "GRAPH-002",
+        "GRAPH-003",
+        "GRAPH-004",
+        "GRAPH-005",
+        "HOME-001",
+        "HOME-002",
+        "HOME-003",
+        "INTEL-001",
+        "INTEL-002",
+        "INTEL-003",
+        "LIFEOS-000",
+        "LIFEOS-001",
+        "LIFEOS-002",
+        "LIFEOS-003",
+        "LIFEOS-004",
+        "LIFEOS-005",
+        "LIFEOS-006",
+        "LIFEOS-007",
+        "LIFEOS-008",
+        "LIFEOS-009",
+        "LIFEOS-011",
+        "LIFEOS-012",
+        "LIVING-001",
+        "LIVING-002",
+        "LIVING-003",
+        "LPS-000",
+        "LPS-001",
+        "LPS-002",
+        "LPS-003",
+        "LPS-004",
+        "LPS-005",
+        "LPS-006",
+        "LPS-007",
+        "LPS-008",
+        "LPS-009",
+        "LPS-010",
+        "LPS-011",
+        "LPS-012",
+        "LPS-013",
+        "LPS-014",
+        "LPS-015",
+        "LPS-016",
+        "LPS-017",
+        "LPS-018",
+        "LPS-020",
+        "LPS-021",
+        "LPS-022",
+        "LPS-023",
+        "LPS-024",
+        "LPS-025",
+        "LPS-026",
+        "LPS-027",
+        "LPS-028",
+        "LPS-029",
+        "LPS-030",
+        "LPS-031",
+        "LPS-032",
+        "LPS-033",
+        "LPS-034",
+        "LPS-035",
+        "LPS-036",
+        "MVP1-001",
+        "MVP1-002",
+        "MVP1-003",
+        "NBSOURCE-000",
+        "NBSOURCE-001",
+        "NBSOURCE-002",
+        "NBSOURCE-003",
+        "NBSOURCE-004",
+        "NBSOURCE-005",
+        "NBSOURCE-006",
+        "NBSOURCE-007",
+        "NBSOURCE-008",
+        "NBSOURCE-009",
+        "NBSOURCE-010",
+        "NBSOURCE-011",
+        "NBSOURCE-012",
+        "NBSOURCE-013",
+        "NBSOURCE-014",
+        "NBSOURCE-015",
+        "NBSOURCE-016",
+        "NBSOURCE-017",
+        "NBSOURCE-018",
+        "NBSOURCE-019",
+        "NBSOURCE-020",
+        "NBSOURCE-021",
+        "NBSOURCE-022",
+        "NBSOURCE-023",
+        "NBSOURCE-024",
+        "NBSOURCE-025",
+        "NBSOURCE-026",
+        "NBSOURCE-027",
+        "NBSOURCE-028",
+        "NBSOURCE-029",
+        "NBSOURCE-030",
+        "NBSOURCE-031",
+        "NBSOURCE-032",
+        "NBSTATED-001",
+        "NBSTATED-002",
+        "NBSTATED-003",
+        "NBSTATED-004",
+        "NBSTATED-005",
+        "NBSTATED-006",
+        "NBSTATED-007",
+        "NBSTATED-008",
+        "NBSTATED-009",
+        "NBSTATED-010",
+        "NBSTATED-011",
+        "NBSTATED-012",
+        "NBSTATED-013",
+        "NBSTATED-014",
+        "NBSTATED-015",
+        "NBSTATED-016",
+        "NBSTATED-017",
+        "NBSTATED-018",
+        "NBSTATED-019",
+        "NBSTATED-020",
+        "NBSTATED-021",
+        "NBSTATED-022",
+        "NBSTATED-023",
+        "NBSTATED-024",
+        "NBSTATED-025",
+        "NBSTATED-026",
+        "NBSTATED-027",
+        "NBSTATED-028",
+        "NBSTATED-029",
+        "NBSTATED-030",
+        "NBSTATED-031",
+        "NBSTATED-032",
+        "NBVERIFY-000",
+        "NBVERIFY-001",
+        "NBVERIFY-002",
+        "NBVERIFY-003",
+        "NBVERIFY-004",
+        "NBVERIFY-030",
+        "NORTHSTAR-001",
+        "NORTHSTAR-002",
+        "PERSONAL-001",
+        "PERSONAL-002",
+        "PERSONAL-003",
+        "PGAUTH-001",
+        "PGAUTH-002",
+        "PGAUTH-003",
+        "PGAUTH-004",
+        "PGAUTH-005",
+        "PGAUTH-006",
+        "POSTGRES-001",
+        "POSTGRES-002",
+        "POSTGRES-003",
+        "POSTGRES-004",
+        "POSTGRES-005",
+        "POSTGRES-006",
+        "POSTGRES-007",
+        "POSTGRES-008",
+        "POSTGRES-009",
+        "POSTGRES-010",
+        "PRESERVE-001",
+        "PRESERVE-002",
+        "PRESERVE-003",
+        "RECOVERY-001",
+        "RECOVERY-002",
+        "RECOVERY-003",
+        "RECOVERY-004",
+        "RELEASE-001",
+        "RELEASE-002",
+        "RELEASE-003",
+        "STORE-001",
+        "STRUCTURE-001",
+        "STRUCTURE-002",
+        "STRUCTURE-003",
+        "STRUCTURE-004",
+        "STRUCTURE-005",
+        "STRUCTURE-006"
+      ]
+    }
+  },
+  "execution_frontier": {
+    "definition": "Draft/open tasks whose parents are all lifecycle-complete; these become Ready-eligible the moment the owner opens execution.",
+    "first_bounded_product_task": "POSTGRES-002",
+    "first_bounded_product_task_rationale": "POSTGRES-002 sits in phase 2-postgres-foundation, its only parent STORE-001 (the store-authority keystone) is complete, and per the Architecture Blueprint PostgreSQL+RuVector is the canonical durable owner \u2014 making POSTGRES-002 the first durable-substrate PRODUCT task after planning closure.",
+    "ready_eligible_product_tasks_on_open": [
+      "LIFEOS-002",
+      "POSTGRES-002",
+      "LPS-029",
+      "LPS-031"
+    ],
+    "note": "Naming the frontier is planning, not execution. No task is started here."
+  },
+  "store_001_alignment": {
+    "decision": "adopt-intended-tiered-architecture",
+    "canonical_durable_owner": "PostgreSQL + RuVector (ACID/PITR, No-Sidecar native extension) \u2014 owns every durable macro-state class exactly once.",
+    "transient_tier": "redb (buffer / scratchpad / application-level WAL / BLAKE3 dedup cache / geometry engine) \u2014 never a second durable writer.",
+    "per_agent_cognition": "AgentDB (.rvf) \u2014 non-authoritative active cognition (MicroLoRA/SONA).",
+    "bridge_and_projection": "envctl \u2014 forward-only redb->embed->PostgreSQL bridge and PostgreSQL->filesystem projection.",
+    "ingestion_path": "nu_plugin CodeDB \u2014 Nushell AST -> redb buffer -> envctl bridge -> PostgreSQL.",
+    "closure_consistency": "The postgres-foundation task families (LIFEOS-002, POSTGRES-001..010, PGAUTH-001..006, ADOPT-001/002, STORE-001, FOUNDATION-001..003) anchor to NS-EXTENSION/NS-WHOLE/NS-PROGRESS because the single canonical durable substrate is what makes David's intent a living, coherent, advancing whole. No durable class is silently reclassified; redb->PostgreSQL cutover is the verified BlobStore SHA-256 parity swap."
+  },
+  "embedded_closure_ready_coverage_control": {
+    "schema_version": "lifeos-planning-spine.coverage-control.v0",
+    "owner_execution_approval": "open",
+    "phases": [
+      "0-foundation",
+      "0-north-star-graph",
+      "1-preservation",
+      "1-schema",
+      "10-experience",
+      "10-runtime-proof",
+      "11-fleet-integration",
+      "11-system-proof-release",
+      "12-living-system",
+      "12-worldsim-ingestion",
+      "2-foundation",
+      "2-postgres-foundation",
+      "2-simulation",
+      "3-execution",
+      "3-governed-execution",
+      "4-mvp",
+      "4-physical-consolidation",
+      "5-gates",
+      "5-intelligence-substrate",
+      "6-mvp1-financial-legal",
+      "6-rfc",
+      "7-company-development",
+      "7-review",
+      "8-execution-pipeline",
+      "8-personal",
+      "9-home",
+      "9-state-map"
+    ],
+    "anchors": [
+      {
+        "anchor_id": "NS-EXTENSION",
+        "coverage_status": "covered-complete",
+        "decomposition_status": "task-families-complete",
+        "phase_task_ids": [
+          "ADOPT-001",
+          "ADOPT-002",
+          "DECIDE-001",
+          "DECIDE-002",
+          "DECIDE-003",
+          "DECIDE-004",
+          "DECIDE-005",
+          "DECIDE-006",
+          "EXPERIENCE-001",
+          "EXPERIENCE-002",
+          "EXPERIENCE-003",
+          "GRAPH-001",
+          "GRAPH-002",
+          "GRAPH-003",
+          "GRAPH-004",
+          "GRAPH-005",
+          "INTEL-001",
+          "INTEL-002",
+          "INTEL-003",
+          "LIFEOS-000",
+          "LIFEOS-002",
+          "LIFEOS-005",
+          "LIFEOS-010",
+          "LIFEOS-012",
+          "LIVING-001",
+          "LIVING-002",
+          "LIVING-003",
+          "NBSOURCE-000",
+          "NBSOURCE-001",
+          "NBSOURCE-002",
+          "NBSOURCE-003",
+          "NBSOURCE-004",
+          "NBSOURCE-005",
+          "NBSOURCE-006",
+          "NBSOURCE-007",
+          "NBSOURCE-008",
+          "NBSOURCE-009",
+          "NBSOURCE-010",
+          "NBSOURCE-011",
+          "NBSOURCE-012",
+          "NBSOURCE-013",
+          "NBSOURCE-014",
+          "NBSOURCE-015",
+          "NBSOURCE-016",
+          "NBSOURCE-017",
+          "NBSOURCE-018",
+          "NBSOURCE-019",
+          "NBSOURCE-020",
+          "NBSOURCE-021",
+          "NBSOURCE-022",
+          "NBSOURCE-023",
+          "NBSOURCE-024",
+          "NBSOURCE-025",
+          "NBSOURCE-026",
+          "NBSOURCE-027",
+          "NBSOURCE-028",
+          "NBSOURCE-029",
+          "NBSOURCE-030",
+          "NBSOURCE-031",
+          "NBSOURCE-032",
+          "NBSTATED-001",
+          "NBSTATED-002",
+          "NBSTATED-003",
+          "NBSTATED-004",
+          "NBSTATED-005",
+          "NBSTATED-006",
+          "NBSTATED-007",
+          "NBSTATED-008",
+          "NBSTATED-009",
+          "NBSTATED-010",
+          "NBSTATED-011",
+          "NBSTATED-012",
+          "NBSTATED-013",
+          "NBSTATED-014",
+          "NBSTATED-015",
+          "NBSTATED-016",
+          "NBSTATED-017",
+          "NBSTATED-018",
+          "NBSTATED-019",
+          "NBSTATED-020",
+          "NBSTATED-021",
+          "NBSTATED-022",
+          "NBSTATED-023",
+          "NBSTATED-024",
+          "NBSTATED-025",
+          "NBSTATED-026",
+          "NBSTATED-027",
+          "NBSTATED-028",
+          "NBSTATED-029",
+          "NBSTATED-030",
+          "NBSTATED-031",
+          "NBSTATED-032",
+          "NBVERIFY-000",
+          "NBVERIFY-001",
+          "NBVERIFY-002",
+          "NBVERIFY-003",
+          "NBVERIFY-004",
+          "NBVERIFY-030",
+          "NORTHSTAR-001",
+          "NORTHSTAR-002",
+          "PGAUTH-001",
+          "PGAUTH-002",
+          "PGAUTH-003",
+          "PGAUTH-004",
+          "PGAUTH-005",
+          "PGAUTH-006",
+          "POSTGRES-001",
+          "POSTGRES-002",
+          "POSTGRES-003",
+          "POSTGRES-004",
+          "POSTGRES-005",
+          "POSTGRES-006",
+          "POSTGRES-007",
+          "POSTGRES-008",
+          "POSTGRES-009",
+          "POSTGRES-010",
+          "STORE-001"
+        ]
+      },
+      {
+        "anchor_id": "NS-WHOLE",
+        "coverage_status": "covered-complete",
+        "decomposition_status": "task-families-complete",
+        "phase_task_ids": [
+          "ADOPT-001",
+          "ADOPT-002",
+          "COMPANY-001",
+          "COMPANY-002",
+          "CONSOLIDATE-001",
+          "CONSOLIDATE-002",
+          "CONSOLIDATE-003",
+          "DEVELOP-001",
+          "FOUNDATION-001",
+          "FOUNDATION-002",
+          "FOUNDATION-003",
+          "HOME-001",
+          "HOME-002",
+          "HOME-003",
+          "LIFEOS-001",
+          "LIFEOS-002",
+          "LIFEOS-004",
+          "LIFEOS-006",
+          "LIFEOS-007",
+          "LIFEOS-008",
+          "LIFEOS-009",
+          "LIFEOS-011",
+          "MVP1-001",
+          "MVP1-002",
+          "MVP1-003",
+          "PERSONAL-001",
+          "PERSONAL-002",
+          "PERSONAL-003",
+          "PGAUTH-001",
+          "PGAUTH-002",
+          "PGAUTH-003",
+          "PGAUTH-004",
+          "PGAUTH-005",
+          "PGAUTH-006",
+          "POSTGRES-001",
+          "POSTGRES-002",
+          "POSTGRES-003",
+          "POSTGRES-004",
+          "POSTGRES-005",
+          "POSTGRES-006",
+          "POSTGRES-007",
+          "POSTGRES-008",
+          "POSTGRES-009",
+          "POSTGRES-010",
+          "PRESERVE-001",
+          "PRESERVE-002",
+          "PRESERVE-003",
+          "RECOVERY-001",
+          "RECOVERY-002",
+          "RECOVERY-003",
+          "RECOVERY-004",
+          "RELEASE-001",
+          "RELEASE-002",
+          "RELEASE-003",
+          "STORE-001",
+          "STRUCTURE-001",
+          "STRUCTURE-002",
+          "STRUCTURE-003",
+          "STRUCTURE-004",
+          "STRUCTURE-005",
+          "STRUCTURE-006"
+        ]
+      },
+      {
+        "anchor_id": "NS-CLARITY",
+        "coverage_status": "covered-complete",
+        "decomposition_status": "task-families-complete",
+        "phase_task_ids": [
+          "DECIDE-001",
+          "DECIDE-002",
+          "DECIDE-003",
+          "DECIDE-004",
+          "DECIDE-005",
+          "DECIDE-006",
+          "EXPERIENCE-001",
+          "EXPERIENCE-002",
+          "EXPERIENCE-003",
+          "GRAPH-001",
+          "GRAPH-002",
+          "GRAPH-003",
+          "GRAPH-004",
+          "GRAPH-005",
+          "LIFEOS-000",
+          "LIFEOS-001",
+          "LIFEOS-010",
+          "LPS-000",
+          "LPS-001",
+          "LPS-002",
+          "LPS-003",
+          "LPS-011",
+          "LPS-012",
+          "LPS-013",
+          "LPS-014",
+          "LPS-015",
+          "LPS-016",
+          "LPS-017",
+          "LPS-018",
+          "LPS-019",
+          "NBSOURCE-000",
+          "NBSOURCE-001",
+          "NBSOURCE-002",
+          "NBSOURCE-003",
+          "NBSOURCE-004",
+          "NBSOURCE-005",
+          "NBSOURCE-006",
+          "NBSOURCE-007",
+          "NBSOURCE-008",
+          "NBSOURCE-009",
+          "NBSOURCE-010",
+          "NBSOURCE-011",
+          "NBSOURCE-012",
+          "NBSOURCE-013",
+          "NBSOURCE-014",
+          "NBSOURCE-015",
+          "NBSOURCE-016",
+          "NBSOURCE-017",
+          "NBSOURCE-018",
+          "NBSOURCE-019",
+          "NBSOURCE-020",
+          "NBSOURCE-021",
+          "NBSOURCE-022",
+          "NBSOURCE-023",
+          "NBSOURCE-024",
+          "NBSOURCE-025",
+          "NBSOURCE-026",
+          "NBSOURCE-027",
+          "NBSOURCE-028",
+          "NBSOURCE-029",
+          "NBSOURCE-030",
+          "NBSOURCE-031",
+          "NBSOURCE-032",
+          "NBSTATED-001",
+          "NBSTATED-002",
+          "NBSTATED-003",
+          "NBSTATED-004",
+          "NBSTATED-005",
+          "NBSTATED-006",
+          "NBSTATED-007",
+          "NBSTATED-008",
+          "NBSTATED-009",
+          "NBSTATED-010",
+          "NBSTATED-011",
+          "NBSTATED-012",
+          "NBSTATED-013",
+          "NBSTATED-014",
+          "NBSTATED-015",
+          "NBSTATED-016",
+          "NBSTATED-017",
+          "NBSTATED-018",
+          "NBSTATED-019",
+          "NBSTATED-020",
+          "NBSTATED-021",
+          "NBSTATED-022",
+          "NBSTATED-023",
+          "NBSTATED-024",
+          "NBSTATED-025",
+          "NBSTATED-026",
+          "NBSTATED-027",
+          "NBSTATED-028",
+          "NBSTATED-029",
+          "NBSTATED-030",
+          "NBSTATED-031",
+          "NBSTATED-032",
+          "NBVERIFY-000",
+          "NBVERIFY-001",
+          "NBVERIFY-002",
+          "NBVERIFY-003",
+          "NBVERIFY-004",
+          "NBVERIFY-030",
+          "NORTHSTAR-001",
+          "NORTHSTAR-002",
+          "PRESERVE-001",
+          "PRESERVE-002",
+          "PRESERVE-003",
+          "RECOVERY-001",
+          "RECOVERY-002",
+          "RECOVERY-003",
+          "RECOVERY-004",
+          "STRUCTURE-001",
+          "STRUCTURE-002",
+          "STRUCTURE-003",
+          "STRUCTURE-004",
+          "STRUCTURE-005",
+          "STRUCTURE-006"
+        ]
+      },
+      {
+        "anchor_id": "NS-DIRECTION",
+        "coverage_status": "covered-complete",
+        "decomposition_status": "task-families-complete",
+        "phase_task_ids": [
+          "DECIDE-001",
+          "DECIDE-002",
+          "DECIDE-003",
+          "DECIDE-004",
+          "DECIDE-005",
+          "DECIDE-006",
+          "EXPERIENCE-001",
+          "EXPERIENCE-002",
+          "EXPERIENCE-003",
+          "GRAPH-001",
+          "GRAPH-002",
+          "GRAPH-003",
+          "GRAPH-004",
+          "GRAPH-005",
+          "LIFEOS-000",
+          "LIFEOS-003",
+          "LIFEOS-010",
+          "LPS-000",
+          "LPS-001",
+          "LPS-002",
+          "LPS-003",
+          "LPS-004",
+          "LPS-005",
+          "LPS-006",
+          "LPS-007",
+          "LPS-008",
+          "LPS-009",
+          "LPS-010",
+          "LPS-012",
+          "LPS-013",
+          "LPS-014",
+          "LPS-015",
+          "LPS-016",
+          "LPS-017",
+          "LPS-018",
+          "LPS-019",
+          "LPS-020",
+          "LPS-021",
+          "LPS-022",
+          "LPS-023",
+          "LPS-024",
+          "LPS-025",
+          "LPS-026",
+          "LPS-027",
+          "LPS-028",
+          "LPS-029",
+          "LPS-030",
+          "LPS-031",
+          "LPS-032",
+          "LPS-033",
+          "LPS-034",
+          "LPS-035",
+          "LPS-036",
+          "NBSOURCE-000",
+          "NBSOURCE-001",
+          "NBSOURCE-002",
+          "NBSOURCE-003",
+          "NBSOURCE-004",
+          "NBSOURCE-005",
+          "NBSOURCE-006",
+          "NBSOURCE-007",
+          "NBSOURCE-008",
+          "NBSOURCE-009",
+          "NBSOURCE-010",
+          "NBSOURCE-011",
+          "NBSOURCE-012",
+          "NBSOURCE-013",
+          "NBSOURCE-014",
+          "NBSOURCE-015",
+          "NBSOURCE-016",
+          "NBSOURCE-017",
+          "NBSOURCE-018",
+          "NBSOURCE-019",
+          "NBSOURCE-020",
+          "NBSOURCE-021",
+          "NBSOURCE-022",
+          "NBSOURCE-023",
+          "NBSOURCE-024",
+          "NBSOURCE-025",
+          "NBSOURCE-026",
+          "NBSOURCE-027",
+          "NBSOURCE-028",
+          "NBSOURCE-029",
+          "NBSOURCE-030",
+          "NBSOURCE-031",
+          "NBSOURCE-032",
+          "NBSTATED-001",
+          "NBSTATED-002",
+          "NBSTATED-003",
+          "NBSTATED-004",
+          "NBSTATED-005",
+          "NBSTATED-006",
+          "NBSTATED-007",
+          "NBSTATED-008",
+          "NBSTATED-009",
+          "NBSTATED-010",
+          "NBSTATED-011",
+          "NBSTATED-012",
+          "NBSTATED-013",
+          "NBSTATED-014",
+          "NBSTATED-015",
+          "NBSTATED-016",
+          "NBSTATED-017",
+          "NBSTATED-018",
+          "NBSTATED-019",
+          "NBSTATED-020",
+          "NBSTATED-021",
+          "NBSTATED-022",
+          "NBSTATED-023",
+          "NBSTATED-024",
+          "NBSTATED-025",
+          "NBSTATED-026",
+          "NBSTATED-027",
+          "NBSTATED-028",
+          "NBSTATED-029",
+          "NBSTATED-030",
+          "NBSTATED-031",
+          "NBSTATED-032",
+          "NBVERIFY-000",
+          "NBVERIFY-001",
+          "NBVERIFY-002",
+          "NBVERIFY-003",
+          "NBVERIFY-004",
+          "NBVERIFY-030",
+          "NORTHSTAR-001",
+          "NORTHSTAR-002"
+        ]
+      },
+      {
+        "anchor_id": "NS-PROGRESS",
+        "coverage_status": "covered-complete",
+        "decomposition_status": "task-families-complete",
+        "phase_task_ids": [
+          "ADOPT-001",
+          "ADOPT-002",
+          "COMPANY-001",
+          "COMPANY-002",
+          "CONSOLIDATE-001",
+          "CONSOLIDATE-002",
+          "CONSOLIDATE-003",
+          "DECIDE-001",
+          "DECIDE-002",
+          "DECIDE-003",
+          "DECIDE-004",
+          "DECIDE-005",
+          "DECIDE-006",
+          "DEVELOP-001",
+          "FOUNDATION-001",
+          "FOUNDATION-002",
+          "FOUNDATION-003",
+          "GRAPH-001",
+          "GRAPH-002",
+          "GRAPH-003",
+          "GRAPH-004",
+          "GRAPH-005",
+          "HOME-001",
+          "HOME-002",
+          "HOME-003",
+          "INTEL-001",
+          "INTEL-002",
+          "INTEL-003",
+          "LIFEOS-000",
+          "LIFEOS-001",
+          "LIFEOS-002",
+          "LIFEOS-003",
+          "LIFEOS-004",
+          "LIFEOS-005",
+          "LIFEOS-006",
+          "LIFEOS-007",
+          "LIFEOS-008",
+          "LIFEOS-009",
+          "LIFEOS-011",
+          "LIFEOS-012",
+          "LIVING-001",
+          "LIVING-002",
+          "LIVING-003",
+          "LPS-000",
+          "LPS-001",
+          "LPS-002",
+          "LPS-003",
+          "LPS-004",
+          "LPS-005",
+          "LPS-006",
+          "LPS-007",
+          "LPS-008",
+          "LPS-009",
+          "LPS-010",
+          "LPS-011",
+          "LPS-012",
+          "LPS-013",
+          "LPS-014",
+          "LPS-015",
+          "LPS-016",
+          "LPS-017",
+          "LPS-018",
+          "LPS-020",
+          "LPS-021",
+          "LPS-022",
+          "LPS-023",
+          "LPS-024",
+          "LPS-025",
+          "LPS-026",
+          "LPS-027",
+          "LPS-028",
+          "LPS-029",
+          "LPS-030",
+          "LPS-031",
+          "LPS-032",
+          "LPS-033",
+          "LPS-034",
+          "LPS-035",
+          "LPS-036",
+          "MVP1-001",
+          "MVP1-002",
+          "MVP1-003",
+          "NBSOURCE-000",
+          "NBSOURCE-001",
+          "NBSOURCE-002",
+          "NBSOURCE-003",
+          "NBSOURCE-004",
+          "NBSOURCE-005",
+          "NBSOURCE-006",
+          "NBSOURCE-007",
+          "NBSOURCE-008",
+          "NBSOURCE-009",
+          "NBSOURCE-010",
+          "NBSOURCE-011",
+          "NBSOURCE-012",
+          "NBSOURCE-013",
+          "NBSOURCE-014",
+          "NBSOURCE-015",
+          "NBSOURCE-016",
+          "NBSOURCE-017",
+          "NBSOURCE-018",
+          "NBSOURCE-019",
+          "NBSOURCE-020",
+          "NBSOURCE-021",
+          "NBSOURCE-022",
+          "NBSOURCE-023",
+          "NBSOURCE-024",
+          "NBSOURCE-025",
+          "NBSOURCE-026",
+          "NBSOURCE-027",
+          "NBSOURCE-028",
+          "NBSOURCE-029",
+          "NBSOURCE-030",
+          "NBSOURCE-031",
+          "NBSOURCE-032",
+          "NBSTATED-001",
+          "NBSTATED-002",
+          "NBSTATED-003",
+          "NBSTATED-004",
+          "NBSTATED-005",
+          "NBSTATED-006",
+          "NBSTATED-007",
+          "NBSTATED-008",
+          "NBSTATED-009",
+          "NBSTATED-010",
+          "NBSTATED-011",
+          "NBSTATED-012",
+          "NBSTATED-013",
+          "NBSTATED-014",
+          "NBSTATED-015",
+          "NBSTATED-016",
+          "NBSTATED-017",
+          "NBSTATED-018",
+          "NBSTATED-019",
+          "NBSTATED-020",
+          "NBSTATED-021",
+          "NBSTATED-022",
+          "NBSTATED-023",
+          "NBSTATED-024",
+          "NBSTATED-025",
+          "NBSTATED-026",
+          "NBSTATED-027",
+          "NBSTATED-028",
+          "NBSTATED-029",
+          "NBSTATED-030",
+          "NBSTATED-031",
+          "NBSTATED-032",
+          "NBVERIFY-000",
+          "NBVERIFY-001",
+          "NBVERIFY-002",
+          "NBVERIFY-003",
+          "NBVERIFY-004",
+          "NBVERIFY-030",
+          "NORTHSTAR-001",
+          "NORTHSTAR-002",
+          "PERSONAL-001",
+          "PERSONAL-002",
+          "PERSONAL-003",
+          "PGAUTH-001",
+          "PGAUTH-002",
+          "PGAUTH-003",
+          "PGAUTH-004",
+          "PGAUTH-005",
+          "PGAUTH-006",
+          "POSTGRES-001",
+          "POSTGRES-002",
+          "POSTGRES-003",
+          "POSTGRES-004",
+          "POSTGRES-005",
+          "POSTGRES-006",
+          "POSTGRES-007",
+          "POSTGRES-008",
+          "POSTGRES-009",
+          "POSTGRES-010",
+          "PRESERVE-001",
+          "PRESERVE-002",
+          "PRESERVE-003",
+          "RECOVERY-001",
+          "RECOVERY-002",
+          "RECOVERY-003",
+          "RECOVERY-004",
+          "RELEASE-001",
+          "RELEASE-002",
+          "RELEASE-003",
+          "STORE-001",
+          "STRUCTURE-001",
+          "STRUCTURE-002",
+          "STRUCTURE-003",
+          "STRUCTURE-004",
+          "STRUCTURE-005",
+          "STRUCTURE-006"
+        ]
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "NBSTATED-001",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-001"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-002",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-002"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-003",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-003"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-004",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-004"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-005",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-005"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-006",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-006"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-007",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-007"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-008",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-008"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-009",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-009"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-010",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-010"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-011",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-011"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-012",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-012"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-013",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-013"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-014",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-014"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-015",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-015"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-016",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-016"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-017",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-017"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-018",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-018"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-019",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-019"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-020",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-020"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-021",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-021"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-022",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-022"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-023",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-023"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-024",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-024"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-025",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-025"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-026",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-026"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-027",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-027"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-028",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-028"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-029",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-029"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-030",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-030"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-031",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-031"
+        ]
+      },
+      {
+        "task_id": "NBSTATED-032",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-032"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-000",
+        "phase": "0-north-star-graph",
+        "parent_ids": []
+      },
+      {
+        "task_id": "LIFEOS-001",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "LIFEOS-000"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-002",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "STRUCTURE-006"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-003",
+        "phase": "3-governed-execution",
+        "parent_ids": [
+          "POSTGRES-010"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-004",
+        "phase": "4-physical-consolidation",
+        "parent_ids": [
+          "LIFEOS-003"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-005",
+        "phase": "5-intelligence-substrate",
+        "parent_ids": [
+          "LIFEOS-004"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-006",
+        "phase": "6-mvp1-financial-legal",
+        "parent_ids": [
+          "LIFEOS-005"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-007",
+        "phase": "7-company-development",
+        "parent_ids": [
+          "LIFEOS-006"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-008",
+        "phase": "8-personal",
+        "parent_ids": [
+          "LIFEOS-006"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-009",
+        "phase": "9-home",
+        "parent_ids": [
+          "LIFEOS-006"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-010",
+        "phase": "10-experience",
+        "parent_ids": [
+          "LIFEOS-007",
+          "LIFEOS-008",
+          "LIFEOS-009"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-011",
+        "phase": "11-system-proof-release",
+        "parent_ids": [
+          "LIFEOS-010"
+        ]
+      },
+      {
+        "task_id": "LIFEOS-012",
+        "phase": "12-living-system",
+        "parent_ids": [
+          "LIFEOS-011"
+        ]
+      },
+      {
+        "task_id": "PRESERVE-001",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "LIFEOS-001"
+        ]
+      },
+      {
+        "task_id": "PRESERVE-002",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "PRESERVE-001"
+        ]
+      },
+      {
+        "task_id": "RECOVERY-001",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "PRESERVE-002"
+        ]
+      },
+      {
+        "task_id": "RECOVERY-002",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "RECOVERY-001"
+        ]
+      },
+      {
+        "task_id": "RECOVERY-003",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "RECOVERY-002"
+        ]
+      },
+      {
+        "task_id": "RECOVERY-004",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "RECOVERY-003"
+        ]
+      },
+      {
+        "task_id": "PRESERVE-003",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "RECOVERY-004"
+        ]
+      },
+      {
+        "task_id": "STRUCTURE-001",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "PRESERVE-003"
+        ]
+      },
+      {
+        "task_id": "STRUCTURE-002",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "STRUCTURE-001"
+        ]
+      },
+      {
+        "task_id": "STRUCTURE-003",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "STRUCTURE-001"
+        ]
+      },
+      {
+        "task_id": "STRUCTURE-004",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "STRUCTURE-002",
+          "STRUCTURE-003"
+        ]
+      },
+      {
+        "task_id": "STRUCTURE-005",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "STRUCTURE-004"
+        ]
+      },
+      {
+        "task_id": "STRUCTURE-006",
+        "phase": "1-preservation",
+        "parent_ids": [
+          "STRUCTURE-005"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-001",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "LIFEOS-002"
+        ]
+      },
+      {
+        "task_id": "PGAUTH-001",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-001"
+        ]
+      },
+      {
+        "task_id": "PGAUTH-002",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "PGAUTH-001"
+        ]
+      },
+      {
+        "task_id": "PGAUTH-003",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "PGAUTH-001"
+        ]
+      },
+      {
+        "task_id": "PGAUTH-004",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "PGAUTH-001"
+        ]
+      },
+      {
+        "task_id": "PGAUTH-005",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "PGAUTH-001"
+        ]
+      },
+      {
+        "task_id": "PGAUTH-006",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "PGAUTH-002",
+          "PGAUTH-003",
+          "PGAUTH-004",
+          "PGAUTH-005"
+        ]
+      },
+      {
+        "task_id": "ADOPT-001",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "PGAUTH-006"
+        ]
+      },
+      {
+        "task_id": "ADOPT-002",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "ADOPT-001"
+        ]
+      },
+      {
+        "task_id": "STORE-001",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "ADOPT-002",
+          "NBSOURCE-004",
+          "NBVERIFY-000"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-002",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "STORE-001"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-003",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-002"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-004",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-003"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-005",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-004"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-006",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-005"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-007",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-006"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-008",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-007",
+          "FOUNDATION-003"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-009",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-008"
+        ]
+      },
+      {
+        "task_id": "POSTGRES-010",
+        "phase": "2-postgres-foundation",
+        "parent_ids": [
+          "POSTGRES-009"
+        ]
+      },
+      {
+        "task_id": "FOUNDATION-001",
+        "phase": "2-foundation",
+        "parent_ids": [
+          "LIFEOS-002"
+        ]
+      },
+      {
+        "task_id": "FOUNDATION-002",
+        "phase": "2-foundation",
+        "parent_ids": [
+          "FOUNDATION-001"
+        ]
+      },
+      {
+        "task_id": "FOUNDATION-003",
+        "phase": "2-foundation",
+        "parent_ids": [
+          "FOUNDATION-002"
+        ]
+      },
+      {
+        "task_id": "CONSOLIDATE-001",
+        "phase": "4-physical-consolidation",
+        "parent_ids": [
+          "LIFEOS-004"
+        ]
+      },
+      {
+        "task_id": "CONSOLIDATE-002",
+        "phase": "4-physical-consolidation",
+        "parent_ids": [
+          "CONSOLIDATE-001"
+        ]
+      },
+      {
+        "task_id": "CONSOLIDATE-003",
+        "phase": "4-physical-consolidation",
+        "parent_ids": [
+          "CONSOLIDATE-002"
+        ]
+      },
+      {
+        "task_id": "INTEL-001",
+        "phase": "5-intelligence-substrate",
+        "parent_ids": [
+          "LIFEOS-005"
+        ]
+      },
+      {
+        "task_id": "INTEL-002",
+        "phase": "5-intelligence-substrate",
+        "parent_ids": [
+          "INTEL-001"
+        ]
+      },
+      {
+        "task_id": "INTEL-003",
+        "phase": "5-intelligence-substrate",
+        "parent_ids": [
+          "INTEL-002"
+        ]
+      },
+      {
+        "task_id": "MVP1-001",
+        "phase": "6-mvp1-financial-legal",
+        "parent_ids": [
+          "LIFEOS-006"
+        ]
+      },
+      {
+        "task_id": "MVP1-002",
+        "phase": "6-mvp1-financial-legal",
+        "parent_ids": [
+          "MVP1-001"
+        ]
+      },
+      {
+        "task_id": "MVP1-003",
+        "phase": "6-mvp1-financial-legal",
+        "parent_ids": [
+          "MVP1-002"
+        ]
+      },
+      {
+        "task_id": "COMPANY-001",
+        "phase": "7-company-development",
+        "parent_ids": [
+          "LIFEOS-007"
+        ]
+      },
+      {
+        "task_id": "DEVELOP-001",
+        "phase": "7-company-development",
+        "parent_ids": [
+          "COMPANY-001"
+        ]
+      },
+      {
+        "task_id": "COMPANY-002",
+        "phase": "7-company-development",
+        "parent_ids": [
+          "DEVELOP-001"
+        ]
+      },
+      {
+        "task_id": "PERSONAL-001",
+        "phase": "8-personal",
+        "parent_ids": [
+          "LIFEOS-008"
+        ]
+      },
+      {
+        "task_id": "PERSONAL-002",
+        "phase": "8-personal",
+        "parent_ids": [
+          "PERSONAL-001"
+        ]
+      },
+      {
+        "task_id": "PERSONAL-003",
+        "phase": "8-personal",
+        "parent_ids": [
+          "PERSONAL-002"
+        ]
+      },
+      {
+        "task_id": "HOME-001",
+        "phase": "9-home",
+        "parent_ids": [
+          "LIFEOS-009"
+        ]
+      },
+      {
+        "task_id": "HOME-002",
+        "phase": "9-home",
+        "parent_ids": [
+          "HOME-001"
+        ]
+      },
+      {
+        "task_id": "HOME-003",
+        "phase": "9-home",
+        "parent_ids": [
+          "HOME-002"
+        ]
+      },
+      {
+        "task_id": "EXPERIENCE-001",
+        "phase": "10-experience",
+        "parent_ids": [
+          "LIFEOS-010"
+        ]
+      },
+      {
+        "task_id": "EXPERIENCE-002",
+        "phase": "10-experience",
+        "parent_ids": [
+          "EXPERIENCE-001"
+        ]
+      },
+      {
+        "task_id": "EXPERIENCE-003",
+        "phase": "10-experience",
+        "parent_ids": [
+          "EXPERIENCE-002"
+        ]
+      },
+      {
+        "task_id": "RELEASE-001",
+        "phase": "11-system-proof-release",
+        "parent_ids": [
+          "LIFEOS-011"
+        ]
+      },
+      {
+        "task_id": "RELEASE-002",
+        "phase": "11-system-proof-release",
+        "parent_ids": [
+          "RELEASE-001"
+        ]
+      },
+      {
+        "task_id": "RELEASE-003",
+        "phase": "11-system-proof-release",
+        "parent_ids": [
+          "RELEASE-002"
+        ]
+      },
+      {
+        "task_id": "LIVING-001",
+        "phase": "12-living-system",
+        "parent_ids": [
+          "LIFEOS-012"
+        ]
+      },
+      {
+        "task_id": "LIVING-002",
+        "phase": "12-living-system",
+        "parent_ids": [
+          "LIVING-001"
+        ]
+      },
+      {
+        "task_id": "LIVING-003",
+        "phase": "12-living-system",
+        "parent_ids": [
+          "LIVING-002"
+        ]
+      },
+      {
+        "task_id": "LPS-000",
+        "phase": "0-foundation",
+        "parent_ids": [
+          "LIFEOS-003"
+        ]
+      },
+      {
+        "task_id": "LPS-001",
+        "phase": "1-schema",
+        "parent_ids": [
+          "LPS-000"
+        ]
+      },
+      {
+        "task_id": "LPS-002",
+        "phase": "1-schema",
+        "parent_ids": [
+          "LPS-001"
+        ]
+      },
+      {
+        "task_id": "LPS-003",
+        "phase": "1-schema",
+        "parent_ids": [
+          "LPS-002"
+        ]
+      },
+      {
+        "task_id": "LPS-004",
+        "phase": "2-simulation",
+        "parent_ids": [
+          "LPS-003"
+        ]
+      },
+      {
+        "task_id": "LPS-005",
+        "phase": "2-simulation",
+        "parent_ids": [
+          "LPS-004"
+        ]
+      },
+      {
+        "task_id": "LPS-006",
+        "phase": "3-execution",
+        "parent_ids": [
+          "LPS-005"
+        ]
+      },
+      {
+        "task_id": "LPS-007",
+        "phase": "3-execution",
+        "parent_ids": [
+          "LPS-006"
+        ]
+      },
+      {
+        "task_id": "LPS-008",
+        "phase": "4-mvp",
+        "parent_ids": [
+          "LPS-007"
+        ]
+      },
+      {
+        "task_id": "LPS-009",
+        "phase": "5-gates",
+        "parent_ids": [
+          "LPS-008"
+        ]
+      },
+      {
+        "task_id": "LPS-010",
+        "phase": "6-rfc",
+        "parent_ids": [
+          "LPS-009"
+        ]
+      },
+      {
+        "task_id": "LPS-011",
+        "phase": "7-review",
+        "parent_ids": [
+          "LPS-010"
+        ]
+      },
+      {
+        "task_id": "GRAPH-001",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "LIFEOS-000"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-000",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "GRAPH-001"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-001",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-000"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-002",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-001"
+        ]
+      },
+      {
+        "task_id": "NBVERIFY-000",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-002"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-003",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-002",
+          "NBVERIFY-000"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-004",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-003"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-005",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-004"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-006",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-005"
+        ]
+      },
+      {
+        "task_id": "NORTHSTAR-001",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "GRAPH-001"
+        ]
+      },
+      {
+        "task_id": "NORTHSTAR-002",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NORTHSTAR-001"
+        ]
+      },
+      {
+        "task_id": "GRAPH-002",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "GRAPH-001"
+        ]
+      },
+      {
+        "task_id": "GRAPH-003",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "GRAPH-002"
+        ]
+      },
+      {
+        "task_id": "GRAPH-004",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "GRAPH-003"
+        ]
+      },
+      {
+        "task_id": "GRAPH-005",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "GRAPH-004"
+        ]
+      },
+      {
+        "task_id": "LPS-012",
+        "phase": "8-execution-pipeline",
+        "parent_ids": [
+          "LPS-008"
+        ]
+      },
+      {
+        "task_id": "LPS-013",
+        "phase": "8-execution-pipeline",
+        "parent_ids": [
+          "LPS-012"
+        ]
+      },
+      {
+        "task_id": "LPS-014",
+        "phase": "8-execution-pipeline",
+        "parent_ids": [
+          "LPS-013"
+        ]
+      },
+      {
+        "task_id": "LPS-015",
+        "phase": "8-execution-pipeline",
+        "parent_ids": [
+          "LPS-014"
+        ]
+      },
+      {
+        "task_id": "LPS-016",
+        "phase": "8-execution-pipeline",
+        "parent_ids": [
+          "LPS-015"
+        ]
+      },
+      {
+        "task_id": "LPS-017",
+        "phase": "8-execution-pipeline",
+        "parent_ids": [
+          "LPS-016"
+        ]
+      },
+      {
+        "task_id": "LPS-018",
+        "phase": "8-execution-pipeline",
+        "parent_ids": [
+          "LPS-017"
+        ]
+      },
+      {
+        "task_id": "LPS-019",
+        "phase": "9-state-map",
+        "parent_ids": [
+          "LPS-018"
+        ]
+      },
+      {
+        "task_id": "LPS-020",
+        "phase": "10-runtime-proof",
+        "parent_ids": [
+          "LPS-019"
+        ]
+      },
+      {
+        "task_id": "LPS-021",
+        "phase": "10-runtime-proof",
+        "parent_ids": [
+          "LPS-020"
+        ]
+      },
+      {
+        "task_id": "LPS-022",
+        "phase": "10-runtime-proof",
+        "parent_ids": [
+          "LPS-021"
+        ]
+      },
+      {
+        "task_id": "LPS-023",
+        "phase": "11-fleet-integration",
+        "parent_ids": [
+          "LPS-018"
+        ]
+      },
+      {
+        "task_id": "LPS-024",
+        "phase": "11-fleet-integration",
+        "parent_ids": [
+          "LPS-023"
+        ]
+      },
+      {
+        "task_id": "LPS-025",
+        "phase": "11-fleet-integration",
+        "parent_ids": [
+          "LPS-024"
+        ]
+      },
+      {
+        "task_id": "LPS-026",
+        "phase": "11-fleet-integration",
+        "parent_ids": [
+          "LPS-025"
+        ]
+      },
+      {
+        "task_id": "LPS-027",
+        "phase": "11-fleet-integration",
+        "parent_ids": [
+          "LPS-026"
+        ]
+      },
+      {
+        "task_id": "LPS-028",
+        "phase": "11-fleet-integration",
+        "parent_ids": [
+          "LPS-027"
+        ]
+      },
+      {
+        "task_id": "LPS-029",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-022"
+        ]
+      },
+      {
+        "task_id": "LPS-030",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-029"
+        ]
+      },
+      {
+        "task_id": "LPS-031",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-030"
+        ]
+      },
+      {
+        "task_id": "LPS-032",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-031"
+        ]
+      },
+      {
+        "task_id": "LPS-033",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-032"
+        ]
+      },
+      {
+        "task_id": "LPS-034",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-033"
+        ]
+      },
+      {
+        "task_id": "LPS-035",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-034"
+        ]
+      },
+      {
+        "task_id": "LPS-036",
+        "phase": "12-worldsim-ingestion",
+        "parent_ids": [
+          "LPS-035"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-007",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-006"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-008",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-007"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-009",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-008"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-010",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-009"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-011",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-010"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-012",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-011"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-013",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-012"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-014",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-013"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-015",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-014"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-016",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-015"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-017",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-016"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-018",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-017"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-019",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-018"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-020",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-019"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-021",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-020"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-022",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-021"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-023",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-022"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-024",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-023"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-025",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-024"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-026",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-025"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-027",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-026"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-028",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-027"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-029",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-028"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-030",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-029"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-031",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-030"
+        ]
+      },
+      {
+        "task_id": "NBSOURCE-032",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBSOURCE-031"
+        ]
+      },
+      {
+        "task_id": "NBVERIFY-030",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBVERIFY-000",
+          "NBSOURCE-032"
+        ]
+      },
+      {
+        "task_id": "NBVERIFY-001",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBVERIFY-000",
+          "NBSOURCE-001"
+        ]
+      },
+      {
+        "task_id": "NBVERIFY-002",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBVERIFY-001",
+          "NBSOURCE-002"
+        ]
+      },
+      {
+        "task_id": "NBVERIFY-003",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBVERIFY-002",
+          "NBSOURCE-003"
+        ]
+      },
+      {
+        "task_id": "NBVERIFY-004",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "NBVERIFY-003",
+          "NBSOURCE-004"
+        ]
+      },
+      {
+        "task_id": "DECIDE-001",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "LPS-011"
+        ]
+      },
+      {
+        "task_id": "DECIDE-002",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "LPS-011"
+        ]
+      },
+      {
+        "task_id": "DECIDE-003",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "LPS-011"
+        ]
+      },
+      {
+        "task_id": "DECIDE-004",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "LPS-011"
+        ]
+      },
+      {
+        "task_id": "DECIDE-005",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "LPS-011"
+        ]
+      },
+      {
+        "task_id": "DECIDE-006",
+        "phase": "0-north-star-graph",
+        "parent_ids": [
+          "LPS-011"
+        ]
+      }
+    ]
+  },
+  "embedded_coverage_gate_report": {
+    "schema_version": "lifeos-planning-spine.coverage-gate-report.v0",
+    "generated_at": "2026-07-13T04:23:25Z",
+    "result": "pass",
+    "task_count": 196,
+    "anchor_count": 5,
+    "owner_execution_approval": "open",
+    "failed_checks": [],
+    "checks": [
+      {
+        "name": "coverage_complete",
+        "result": "pass",
+        "detail": "every North Star anchor must be coverage- and decomposition-complete",
+        "offending": []
+      },
+      {
+        "name": "dependencies_resolve",
+        "result": "pass",
+        "detail": "every parent_id must reference a task in the graph",
+        "offending": []
+      },
+      {
+        "name": "no_dependency_cycles",
+        "result": "pass",
+        "detail": "the dependency graph must be acyclic",
+        "offending": []
+      },
+      {
+        "name": "phases_decomposed",
+        "result": "pass",
+        "detail": "no declared phase may be empty and no task may sit in an undeclared phase",
+        "offending": []
+      },
+      {
+        "name": "tasks_anchored",
+        "result": "pass",
+        "detail": "every task must be anchored to a North Star outcome",
+        "offending": []
+      },
+      {
+        "name": "owner_opened_execution",
+        "result": "pass",
+        "detail": "the owner must explicitly open execution",
+        "offending": []
+      }
+    ]
+  },
+  "artifacts": [
+    "generated/north_star_graph_closure.json",
+    "generated/execution_bundle.manifest.json",
+    "proof_records/GRAPH-005.proof.json"
+  ]
+}

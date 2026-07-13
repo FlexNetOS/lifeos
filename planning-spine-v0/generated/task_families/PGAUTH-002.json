@@ -1,0 +1,59 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "PGAUTH-002",
+  "title": "redb use-case and authority contract bounded",
+  "status": "defined",
+  "owner": "LifeOS Memory / Runtime Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Inventory every current and proposed redb record class across CodeDB source blobs, envctl migration state, high-frequency buffers, caches, WAL/outbox, ingestion buffers, and shared read-views, and assign each a justified use case, owner, lifetime, durability requirement, identity, synchronization edge, crash-replay rule, recovery source, observability signal, and explicit relationship to PostgreSQL and CodeDB — under the settled STORE-001 tiered-authority model, so that no existing durable use is silently reclassified.",
+  "work_items": [
+    {
+      "id": "PGAUTH-002-A",
+      "surface": "PGREDB-001 — CodeDB source_blobs (codedb_store_redb, durable default today)",
+      "owner": "CodeDB capture CLI (single writer per store file)",
+      "decision": "Classify durable-TRANSITIONAL: target owner is PostgreSQL-canonical per STORE-001 'durable relational macro-state'; redb demotes to transient forward buffer only after a green live blobstore_parity.rs cutover under one preserved SHA-256 identity. Remains redb-durable until then. Reclassification is explicit and gated, not silent."
+    },
+    {
+      "id": "PGAUTH-002-B",
+      "surface": "PGREDB-002 — envctl migration_db (durable runtime store, ADOPT-002)",
+      "owner": "envctl engine (single writer)",
+      "decision": "Split classification: durable audit HISTORY targets PostgreSQL-canonical via forward promotion (STORE-001 'histories'); in-flight runtime orchestration state may remain redb-transient. Migration is explicit and identity-preserving via the replayable migration engine; kept distinct from CodeDB to avoid conflation."
+    },
+    {
+      "id": "PGAUTH-002-C",
+      "surface": "PGREDB-003 — high-frequency agent scratchpad (proposed)",
+      "owner": "owning agent runtime (single writer per scratchpad)",
+      "decision": "Classify transient-TERMINAL: redb is the STORE-001 canonical owner of transient high-frequency state (agent thoughts/traces/logs). Forward-only optional flush to PostgreSQL for significant states; loss-on-crash acceptable. No durable use to preserve; the microsecond-latency claim stays UNVERIFIED and is not asserted."
+    },
+    {
+      "id": "PGAUTH-002-D",
+      "surface": "PGREDB-004 — embedding/dedup cache + f32 geometry engine (proposed)",
+      "owner": "embedding pipeline (single writer)",
+      "decision": "Classify disposable CACHE: BLAKE3-keyed, miss-is-safe, never authority; the redb 'geometry engine' f32 distance-math role is the compute function over these cached vectors, not a distinct class. Canonical vectors are owned by PostgreSQL+RuVector (native extension, no sidecar); redb holds no vector/SQL authority."
+    },
+    {
+      "id": "PGAUTH-002-E",
+      "surface": "PGREDB-005 — application-level WAL / outbox (proposed)",
+      "owner": "outbox worker (single writer)",
+      "decision": "Classify durable-until-ACKED buffer, strictly subordinate to PostgreSQL; distinct from PostgreSQL's own internal WAL. Forward-only replay-with-ack; PostgreSQL is destination authority (envctl is not the durable writer; AUTH-CLAIM-001 refuted). Ordering/idempotency/backpressure protocol is a required build item before adoption."
+    },
+    {
+      "id": "PGAUTH-002-F",
+      "surface": "PGREDB-006 — intermediate ingestion buffer (proposed target; contradicted current durable default)",
+      "owner": "ingestion pipeline (parser/nu_plugin + envctl bridge)",
+      "decision": "Resolve the direct contradiction via STORE-001: adopt the buffer-only framing (redb transient, parser->redb->envctl->PostgreSQL) as the TARGET, and route the current durable-on-redb default through PGREDB-001's verified cutover rather than silently flipping either class. Current reality (no plugin->redb buffering, NUPG-CLAIM-007) is the build gap, not asserted as done."
+    },
+    {
+      "id": "PGAUTH-002-G",
+      "surface": "PGREDB-007 — shared redb read-view for LifeOS UI over UDS (proposed)",
+      "owner": "agents write (PGREDB-003 class); LifeOS UI reads",
+      "decision": "Classify non-authoritative READ-VIEW: low-latency UI projection over transient agent/redb state; must never become a second writable owner. UDS-only vs shared-redb-file access is an owner decision deferred to PGAUTH-004. Holds no PostgreSQL or CodeDB authority."
+    },
+    {
+      "id": "PGAUTH-002-H",
+      "surface": "No-silent-reclassification ledger + STORE-001 hold (generated/redb_use_case_matrix.json reclassification_ledger)",
+      "owner": "LifeOS Memory / Runtime Agent",
+      "decision": "Record every currently-durable redb use (PGREDB-001, PGREDB-002) in an explicit reclassification ledger with target owner, migration mechanism, verified cutover proof gate, and zero-loss guarantee (SHA-256 identity preserved). Hold all activation/migration for STORE-001's gated cutover proofs; this task performs planning classification only, no store mutation."
+    }
+  ]
+}

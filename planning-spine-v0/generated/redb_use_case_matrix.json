@@ -1,0 +1,266 @@
+{
+  "schema_version": "lifeos-planning-spine.redb-use-case-matrix.v0",
+  "task_id": "PGAUTH-002",
+  "title": "redb use-case and authority contract bounded",
+  "generated_at": "2026-07-13T03:47:08Z",
+  "owner": "LifeOS Memory / Runtime Agent",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json",
+    "generated/pgauth_redb_usage_inventory.csv",
+    "generated/adopted_capabilities.source.csv",
+    "generated/pgauth_closure_matrix.csv",
+    "generated/notebooklm_postgres_context.meta.json"
+  ],
+  "store_authority_alignment": {
+    "keystone_decision": "STORE-001",
+    "keystone_owner_decision": "adopt-intended-tiered-architecture",
+    "keystone_decided_at": "2026-07-13T03:47:08Z",
+    "how_this_matrix_settles_the_prior_inventory": "generated/pgauth_redb_usage_inventory.csv enumerated the same 7 redb record classes but left every classification column at 'pending STORE-001' and carried pre-decision inline commentary asserting that demoting a durable redb use would 'erase a durable use (forbidden by PGAUTH-002 gate)'. STORE-001 is now decided and explicitly corrects that framing (correction_of_prior_brief in store_relationship_decision.json): redb's INTENDED role per the Architecture Blueprint is the transient buffer / local AI scratchpad / application-level WAL / BLAKE3 dedup cache / geometry engine, and PostgreSQL + RuVector is the INTENDED canonical durable owner. This matrix therefore assigns each class its STORE-001-settled classification. It does NOT freeze redb as durable; it honors 'upgrades, never downgrades' through the migration MECHANISM (verified SHA-256 parity cutover), not by preserving a transitional durable role.",
+    "no_silent_reclassification_rule": "The gate clause 'no existing durable use is silently reclassified' is satisfied precisely: the two currently-durable redb uses (PGREDB-001 CodeDB source_blobs, PGREDB-002 envctl migration_db) are reclassified to durable-TRANSITIONAL with an EXPLICIT, evidence-gated migration path recorded in reclassification_ledger below. Each remains redb-durable until its PostgreSQL replacement passes a green live parity/promotion proof under one preserved SHA-256 identity. The reclassification is documented, gated, and reversible-by-rollback — never assumed, never silent, never lossy.",
+    "applied_invariants": [
+      "Single durable writer: PostgreSQL owns every durable macro-state class exactly once; redb never becomes a second durable writer for a PostgreSQL-owned class.",
+      "Forward-only sync: redb -> envctl -> PostgreSQL; no undirected redb<->PostgreSQL dual-write.",
+      "Verified cutover: a class leaves redb-durable only after a green live parity/promotion run for that class; never by assumption.",
+      "No sidecar: RuVector runs as a native PostgreSQL extension; redb holds no SQL / secondary index / native vector authority (it is a f32 distance-math cache only).",
+      "Provenance preserved: every migrated class keeps its SHA-256 identity and its source commit/PR lineage."
+    ]
+  },
+  "gate_contract": {
+    "verification_gate": "Every current and proposed redb record class has a justified use case, owner, lifetime, durability requirement, identity, synchronization edge, crash-replay rule, recovery source, observability signal, and explicit relationship to PostgreSQL and CodeDB; no existing durable use is silently reclassified.",
+    "per_class_clauses": [
+      "justified_use_case",
+      "owner",
+      "lifetime",
+      "durability_requirement",
+      "identity",
+      "synchronization_edge",
+      "crash_replay_rule",
+      "recovery_source",
+      "observability_signal",
+      "relationship_to_postgresql",
+      "relationship_to_codedb"
+    ],
+    "global_clause": "no existing durable use is silently reclassified",
+    "record_class_universe": "The complete, evidence-grounded set of current + proposed redb record classes is PGREDB-001..PGREDB-007. Current (verified in code): PGREDB-001 (CodeDB source_blobs), PGREDB-002 (envctl migration_db). Proposed (blueprint-named mechanisms, not yet adopted): PGREDB-003 scratchpad, PGREDB-004 embedding/dedup cache incl. the f32 geometry-engine compute role, PGREDB-005 application-level WAL/outbox, PGREDB-006 intermediate ingestion buffer, PGREDB-007 shared redb read-view for LifeOS UI. The redb 'high-speed geometry engine' is the f32 distance-math compute function over PGREDB-004 cache vectors, not a distinct record class, and is captured inside PGREDB-004.",
+    "every_class_assigned_exactly_once": true
+  },
+  "record_classes": [
+    {
+      "usage_id": "PGREDB-001",
+      "redb_use": "CodeDB source_blobs — content-addressed captured file bytes via codedb_store_redb (redb-backed BlobStore)",
+      "current_status": "current; implemented + parity-tested (blobstore_parity.rs); durable DEFAULT store today",
+      "justified_use_case": "Durable, resumable, content-addressed capture of exact source bytes during CodeDB ingestion; today this is the operating source-of-truth store for captured blobs (codedb_store_redb, 1761 ln, 14 tests).",
+      "owner": "CodeDB capture CLI (single writer per store file)",
+      "lifetime": "per-capture, persists across restarts (long-lived) — TRANSITIONAL under STORE-001",
+      "durability_requirement": "durable TODAY but TRANSITIONAL: STORE-001 sets the target owner to PostgreSQL-canonical; redb is demoted to a transient forward buffer for this class ONLY after the verified BlobStore parity cutover. Until that green run, it remains redb-durable (no data at risk).",
+      "identity": "SHA-256 content hash of file bytes (byte-exact); identical identity across redb and PgStore backends",
+      "synchronization_edge": "forward-only: capture -> store; the peer backend codedb_store_pg::PgStore implements the SAME BlobStore contract, so cutover is a verified swap under one SHA-256 identity, not a dual-write",
+      "crash_replay_rule": "redb single-file ACID: re-open recovers committed state; any missing blobs are re-captured from the working tree (resumable capture skip-set)",
+      "recovery_source": "redb store file + working tree; cutover parity proof crates/codedb_store_pg/tests/blobstore_parity.rs; post-cutover recovery source is PostgreSQL PITR",
+      "observability_signal": "capture receipts, resume skip-set, store schema version (StoreMetadataRow)",
+      "redb_tier_role": "durable-transitional store today -> intended transient forward buffer after cutover",
+      "relationship_to_postgresql": "PostgreSQL + RuVector is the STORE-001 canonical target owner of this durable blob class (state_class 'durable relational macro-state'); redb is subordinate/transitional. Cutover is per-class and verified.",
+      "relationship_to_codedb": "This IS a CodeDB store class — codedb_store_redb is the current backend; codedb_store_pg is its PostgreSQL parity peer under the shared BlobStore trait (ADOPT-001).",
+      "store_001_class": "durable relational macro-state (identities, histories, provenance, code AST/rows, blob-refs)",
+      "settled_classification": "durable-transitional; target PostgreSQL-canonical via verified BlobStore SHA-256 parity cutover",
+      "reclassification": {
+        "is_reclassified": true,
+        "silent": false,
+        "cutover_gate": "green live crates/codedb_store_pg/tests/blobstore_parity.rs against a disposable PostgreSQL for this class (CDB086 / CDB106-AC05 lane)",
+        "until_cutover": "remains redb-durable; no durable data is lost; SHA-256 identity preserved across backends"
+      },
+      "evidence_citations": ["REDB-CLAIM-001", "REDB-CLAIM-004", "REDB-CLAIM-020", "NUPG-CLAIM-005", "NUPG-CLAIM-006", "adopted_capabilities.source.csv:BlobStore trait / redb source-blob store / PgStore"]
+    },
+    {
+      "usage_id": "PGREDB-002",
+      "redb_use": "envctl migration_db — replayable migration/orchestration state (targets, runs, run_events, approvals, checkpoints, rollbacks) in redb",
+      "current_status": "current; implemented durable runtime store for envctl (adopted via ADOPT-002)",
+      "justified_use_case": "Durable, replayable migration/orchestration audit and runtime state for the envctl engine's declarative migration plan/apply (migration_db, DbSnapshot).",
+      "owner": "envctl engine (single writer)",
+      "lifetime": "durable across the migration lifecycle (long-lived audit history) — TRANSITIONAL for the audit-history portion under STORE-001",
+      "durability_requirement": "durable TODAY but SPLIT under STORE-001: the durable audit HISTORY (settled runs, approvals, rollbacks) is a macro-state class targeting PostgreSQL-canonical via forward promotion; the in-flight runtime orchestration state (uncommitted run working set) may legitimately remain redb-transient. Neither is silently erased.",
+      "identity": "migration/run identifiers (envctl-internal keys)",
+      "synchronization_edge": "forward-only: promote settled run history to PostgreSQL audit tables; envctl redb stays the runtime working store or is cut over per-class — no undirected dual-write",
+      "crash_replay_rule": "redb single-file ACID; envctl's replayable migration engine re-derives state from recorded run_events/checkpoints",
+      "recovery_source": "redb store file + envctl replay engine; post-promotion durable-history recovery source is PostgreSQL PITR",
+      "observability_signal": "run_events / checkpoint records, migration status",
+      "redb_tier_role": "durable-transitional runtime + audit store today -> transient runtime store after audit-history promotion",
+      "relationship_to_postgresql": "Durable audit history is a PostgreSQL-canonical macro-state class (STORE-001 'histories'); promotion is forward-only and gated. In-flight runtime state stays redb-transient (redb's intended role).",
+      "relationship_to_codedb": "SEPARATE durable redb owner from CodeDB — this is envctl-owned migration state, not CodeDB blobs; the two must be decided independently (explicitly named in the inventory to avoid conflation).",
+      "store_001_class": "durable relational macro-state (histories/provenance) for the audit portion; transient high-frequency state for the in-flight runtime portion",
+      "settled_classification": "durable-transitional (audit history -> PostgreSQL forward promotion); transient (in-flight runtime state -> redb terminal)",
+      "reclassification": {
+        "is_reclassified": true,
+        "silent": false,
+        "cutover_gate": "green forward-promotion proof of settled envctl run history into PostgreSQL audit tables (envctl crates/engine db_parity.rs lineage), preserving run identity",
+        "until_cutover": "remains redb-durable and replay-recoverable; no audit history is lost"
+      },
+      "evidence_citations": ["REDB-CLAIM-020", "COGEVO-CLAIM-002", "adopted_capabilities.source.csv:Replayable migration engine / Catalog blob metadata (ADOPT-002)"]
+    },
+    {
+      "usage_id": "PGREDB-003",
+      "redb_use": "High-frequency agent scratchpad — transient per-agent thoughts/state changes/terminal traces logged to redb without network lag",
+      "current_status": "proposed; blueprint-named mechanism (Phase 2 Milestone 3 'The Scratchpad'); not a current adopted LifeOS role",
+      "justified_use_case": "Autonomous agents generate a high volume of transient thoughts, terminal traces, and intermediate logs; direct PostgreSQL writes bottleneck the agent loop, so redb absorbs them at process-local speed. This is redb's INTENDED terminal role per the blueprint.",
+      "owner": "owning agent runtime (single writer per scratchpad)",
+      "lifetime": "transient / ephemeral (session-scoped)",
+      "durability_requirement": "TRANSIENT — no adopted retention/privacy/promotion decision makes this durable; loss on crash is acceptable by definition. This is redb's intended terminal owner class (STORE-001 state_class 'transient high-frequency state').",
+      "identity": "agent-local key (not a shared/global identity)",
+      "synchronization_edge": "forward-only and optional: scratchpad -> envctl flush -> PostgreSQL, where only settled/significant cognitive states are persisted; never authoritative back-write",
+      "crash_replay_rule": "safe to discard on crash (transient by definition); recompute from live agent context",
+      "recovery_source": "none required (disposable); re-created by the agent",
+      "observability_signal": "scratchpad write latency and volume (the microsecond-latency claim RUVPG-CLAIM-018 is UNVERIFIED and must not be asserted as fact)",
+      "redb_tier_role": "transient high-frequency scratchpad (redb intended terminal role)",
+      "relationship_to_postgresql": "Subordinate: only envctl-flushed significant states reach PostgreSQL; PostgreSQL is canonical for anything promoted. redb owns the transient tier here (STORE-001 canonical_owner = redb).",
+      "relationship_to_codedb": "None — unrelated to CodeDB source blobs; different data class.",
+      "store_001_class": "transient high-frequency state (agent thoughts, terminal traces, intermediate logs, state flags)",
+      "settled_classification": "transient-terminal (redb intended owner); no reclassification of any durable use",
+      "reclassification": {
+        "is_reclassified": false,
+        "silent": false,
+        "cutover_gate": "n/a — redb's intended terminal role; no durable use exists to preserve",
+        "until_cutover": "n/a"
+      },
+      "evidence_citations": ["REDB-CLAIM-015", "EDGEDEP-CLAIM-009", "EDGEDEP-CLAIM-010", "RUVPG-CLAIM-017", "RUVPG-CLAIM-018"]
+    },
+    {
+      "usage_id": "PGREDB-004",
+      "redb_use": "Embedding / dedup cache — model-output cache keyed by BLAKE3 content hash to avoid duplicate inference; includes the redb 'geometry engine' f32 distance-math compute role over cached vectors",
+      "current_status": "proposed; blueprint-named mechanism (envctl dedup cache + geometry engine); no current model-aware cache schema proven",
+      "justified_use_case": "Embedding generation is compute-heavy; redb serves as a semantic cache (BLAKE3 hash -> vector) so envctl never re-embeds an identical code block, and executes f32 distance math (SIMD) over the cached vectors as the 'geometry engine'. A cache miss is always safe.",
+      "owner": "embedding pipeline (single writer)",
+      "lifetime": "cache-lifetime (evictable)",
+      "durability_requirement": "DISPOSABLE cache — never authority; a miss is always safe (recompute). This is redb's intended cache/geometry role (STORE-001: redb performs f32 distance math only as a cache, with no SQL / secondary index / native vector authority).",
+      "identity": "BLAKE3 hash of (content + model + version + config); collision/invalidation handling is a KNOWN GAP (unproven)",
+      "synchronization_edge": "forward-only: canonical source input -> cache entry; read-only on hit; cache never writes back to authority",
+      "crash_replay_rule": "safe to discard on crash; recompute on miss",
+      "recovery_source": "recompute from source input + local model (all-MiniLM-L6-v2)",
+      "observability_signal": "cache hit/miss ratio",
+      "redb_tier_role": "disposable dedup cache + f32 geometry-engine compute (redb intended role)",
+      "relationship_to_postgresql": "Derived from canonical source rows; the durable embeddings/vectors are owned by PostgreSQL + RuVector (native extension, no sidecar). redb never competes as a vector authority (REDB-CLAIM-008/009/010 refuted, 013 qualified).",
+      "relationship_to_codedb": "Derived from CodeDB-captured source content (the hashed input), but holds no CodeDB authority — it is a compute cache over that content.",
+      "store_001_class": "semantic/vector state (derived cache portion) + transient high-frequency state (BLAKE3 dedup hashes)",
+      "settled_classification": "transient-disposable cache (redb intended owner); no reclassification of any durable use",
+      "reclassification": {
+        "is_reclassified": false,
+        "silent": false,
+        "cutover_gate": "n/a — disposable cache; canonical vectors live in PostgreSQL+RuVector",
+        "until_cutover": "n/a"
+      },
+      "evidence_citations": ["REDB-CLAIM-016", "REDB-CLAIM-011", "REDB-CLAIM-008", "REDB-CLAIM-009", "REDB-CLAIM-010", "REDB-CLAIM-013"]
+    },
+    {
+      "usage_id": "PGREDB-005",
+      "redb_use": "Application-level WAL / outbox — redb buffers outgoing PostgreSQL operations during PG latency spikes or outages, retaining until connectivity returns",
+      "current_status": "proposed; blueprint-named mechanism ('redb safely acts as an application-level Write-Ahead Log'); no ordered/idempotent redb->PG outage protocol implemented",
+      "justified_use_case": "When PostgreSQL is busy or offline during intensive GNN operations, the edge node must stay functional; redb buffers PG-destined writes until the connection returns. This is redb's intended resilience role per the blueprint.",
+      "owner": "outbox worker (single writer)",
+      "lifetime": "durable-until-flushed (bounded), then discarded",
+      "durability_requirement": "DURABLE-UNTIL-ACKED buffer — subordinate to PostgreSQL; must NOT be conflated with PostgreSQL's own internal WAL, nor treated as authority. Capacity/backpressure/ordering/idempotency are KNOWN GAPS (undefined today).",
+      "identity": "monotonic sequence key + operation idempotency key (protocol undefined today — flagged gap)",
+      "synchronization_edge": "forward-only: local op -> outbox -> replay to PostgreSQL with ack; retry + dedup on reconnect; PostgreSQL is the destination authority",
+      "crash_replay_rule": "on crash, replay unacked entries in order; idempotency prevents double-apply (this protocol is NOT yet built — a required build item)",
+      "recovery_source": "redb store file replayed forward into PostgreSQL; PostgreSQL is the recovery authority once acked",
+      "observability_signal": "outbox depth, replay lag, poison-record count",
+      "redb_tier_role": "durable-until-acked application-level WAL/outbox (redb intended resilience role, subordinate to PostgreSQL)",
+      "relationship_to_postgresql": "Strictly subordinate — buffers writes destined for PostgreSQL; PostgreSQL remains canonical; envctl is NOT the synchronizing durable writer (AUTH-CLAIM-001 refuted).",
+      "relationship_to_codedb": "None directly — a generic PG-write outbox, not a CodeDB store; may carry CodeDB-originated ops as payload without owning them.",
+      "store_001_class": "transient high-frequency state (WAL during PostgreSQL latency/outage)",
+      "settled_classification": "transient durable-until-acked buffer subordinate to PostgreSQL (redb intended role); no reclassification of any durable authority",
+      "reclassification": {
+        "is_reclassified": false,
+        "silent": false,
+        "cutover_gate": "n/a — inherently subordinate/transient; PostgreSQL is always the authority. Build gate: define ordering/idempotency/backpressure protocol before adoption.",
+        "until_cutover": "n/a"
+      },
+      "evidence_citations": ["REDB-CLAIM-017", "EDGE-CLAIM-004", "RUVPG-CLAIM-021", "AUTH-CLAIM-001"]
+    },
+    {
+      "usage_id": "PGREDB-006",
+      "redb_use": "Intermediate ingestion buffer — redb as the transient buffer between parser output and durable PostgreSQL state (NotebookLM 'migration bridge' framing: parser -> redb buffer -> envctl -> PostgreSQL)",
+      "current_status": "proposed TARGET; the pre-decision inventory flagged this as a DIRECT CONTRADICTION with PGREDB-001 (redb durable default) and with verified code (nu_plugin does NOT currently buffer parsed blocks into redb)",
+      "justified_use_case": "The blueprint's Three Pillars of Ingestion define redb as the transient buffer that caches structured AST fragments at low latency before envctl embeds and commits them to PostgreSQL. STORE-001 resolves the contradiction by adopting this buffer-only framing as the TARGET (redb transient), with PGREDB-001's current durable-on-redb default recognized as the transitional artifact that migrates to PostgreSQL-canonical.",
+      "owner": "ingestion pipeline (parser/nu_plugin + envctl bridge) if adopted",
+      "lifetime": "transient (buffer) in the target design",
+      "durability_requirement": "TRANSIENT buffer in the STORE-001 target — NOT durable. The current durable behavior belongs to PGREDB-001 and is handled by that class's verified cutover; PGREDB-006 is the intended terminal buffer role once ingestion is wired parser->redb->PG.",
+      "identity": "SHA-256 blob identity (shared with PGREDB-001)",
+      "synchronization_edge": "forward-only target: parser -> redb buffer -> envctl (embed) -> PostgreSQL; current reality has no plugin->redb buffering (NUPG-CLAIM-007) — the wiring is the build gap",
+      "crash_replay_rule": "if buffer: replay/re-parse from working tree into redb, then forward to PostgreSQL; unflushed buffer contents are re-derivable from source",
+      "recovery_source": "working tree re-parse (buffer) and, post-ingest, PostgreSQL (durable destination)",
+      "observability_signal": "ingestion throughput; buffer occupancy",
+      "redb_tier_role": "transient ingestion buffer (redb intended terminal role)",
+      "relationship_to_postgresql": "Buffer feeds PostgreSQL, which is the canonical durable destination (STORE-001); redb holds no ingestion authority in the target.",
+      "relationship_to_codedb": "This is the CodeDB ingestion path's buffer tier; it shares SHA-256 identity with PGREDB-001 CodeDB blobs. The contradiction (durable default vs transient buffer) is resolved by PGREDB-001's cutover, not by silently flipping either class.",
+      "store_001_class": "transient high-frequency state (ingestion buffer) feeding durable relational macro-state in PostgreSQL",
+      "settled_classification": "transient buffer (redb intended TARGET role); the durable behavior is owned by PGREDB-001 and migrated via its explicit verified cutover — resolving, not erasing, the durable use",
+      "reclassification": {
+        "is_reclassified": true,
+        "silent": false,
+        "cutover_gate": "same verified BlobStore parity cutover as PGREDB-001 (the durable default migrates to PostgreSQL; the buffer role is what remains for redb) plus wiring the parser->redb->envctl->PG path",
+        "until_cutover": "current capture stays durable-on-redb (PGREDB-001); the buffer-only target is not asserted as current behavior"
+      },
+      "evidence_citations": ["REDB-CLAIM-020", "NUPG-CLAIM-007", "INGEST-CLAIM-002", "VECTORFLOW-CLAIM-005"]
+    },
+    {
+      "usage_id": "PGREDB-007",
+      "redb_use": "Shared redb read-view — LifeOS UI reads the same redb file agents write, for low-latency swarm-status views over UDS or shared redb state files",
+      "current_status": "proposed; owner-decision-required; not implemented; competes with a UDS-only control path",
+      "justified_use_case": "The blueprint states LifeOS renders the swarm's real-time status by reading the same memory-mapped redb file the agents write, over UDS or shared redb state, to avoid overlapping state and network lag. This is a read-only projection for the UI (interactive_control_path per notebooklm_postgres_context.meta.json).",
+      "owner": "agents write (PGREDB-003 class); LifeOS UI reads (multi-reader, potential shared-file coupling)",
+      "lifetime": "as-durable-as the underlying transient state it mirrors (no independent lifetime)",
+      "durability_requirement": "READ-VIEW — holds NO authority and creates NO second writable owner over agent state. The view is disposable; durability belongs to whatever underlying class it mirrors.",
+      "identity": "shared file path + table identity of the mirrored agent state",
+      "synchronization_edge": "read-only projection for the UI; the interactive control path may instead be UDS with redb-backed views (PGAUTH-004 projection territory); no write edge from the UI",
+      "crash_replay_rule": "UI view is disposable; the underlying agent state recovers per its own family (PGREDB-003)",
+      "recovery_source": "re-read from the canonical agent state; the view holds no authority to recover",
+      "observability_signal": "UI render latency; view staleness",
+      "redb_tier_role": "read-only low-latency view over transient agent/redb state (must never become a dual-writer)",
+      "relationship_to_postgresql": "Independent of PostgreSQL durable authority; a low-latency UI view over transient redb state, not a PostgreSQL projection (contrast PGAUTH-004 which projects PostgreSQL to filesystem).",
+      "relationship_to_codedb": "None — different data class (agent swarm status, not CodeDB blobs).",
+      "store_001_class": "derived/interactive view over transient high-frequency state (LifeOS UDS control path)",
+      "settled_classification": "transient read-view (non-authoritative); no reclassification of any durable use; guard against becoming a second writer",
+      "reclassification": {
+        "is_reclassified": false,
+        "silent": false,
+        "cutover_gate": "n/a — read-view holds no authority; owner decision required on UDS-only vs shared-redb-file access (PGAUTH-004)",
+        "until_cutover": "n/a"
+      },
+      "evidence_citations": ["BAREMETAL-CLAIM-005", "SWARM-CLAIM-009", "SWARM-CLAIM-012", "RUVPG-CLAIM-043"]
+    }
+  ],
+  "reclassification_ledger": {
+    "purpose": "Explicit, non-silent record of every currently-durable redb use and its evidence-gated migration path. Presence of this ledger is what satisfies the gate clause 'no existing durable use is silently reclassified'.",
+    "entries": [
+      {
+        "usage_id": "PGREDB-001",
+        "durable_today": true,
+        "target_owner": "PostgreSQL + RuVector (canonical)",
+        "redb_target_role": "transient forward buffer (PGREDB-006)",
+        "migration_mechanism": "codedb_store_pg::PgStore already implements the BlobStore contract; blobstore_parity.rs proves symmetry; per-class verified swap under one preserved SHA-256 identity",
+        "cutover_proof_gate": "green live crates/codedb_store_pg/tests/blobstore_parity.rs against a disposable PostgreSQL (CDB086 / CDB106-AC05 lane)",
+        "loss_risk": "none — SHA-256 identity preserved across backends; class stays redb-durable until proof is green",
+        "silent": false
+      },
+      {
+        "usage_id": "PGREDB-002",
+        "durable_today": true,
+        "target_owner": "PostgreSQL (canonical) for settled audit history; redb-transient for in-flight runtime state",
+        "redb_target_role": "transient runtime orchestration store",
+        "migration_mechanism": "forward promotion of settled envctl run history into PostgreSQL audit tables; envctl replayable migration engine re-derives runtime state",
+        "cutover_proof_gate": "green forward-promotion proof preserving run identity (envctl crates/engine db_parity.rs lineage)",
+        "loss_risk": "none — replay-recoverable; history preserved through promotion",
+        "silent": false
+      }
+    ]
+  },
+  "open_dependencies": [
+    "Live blobstore_parity.rs green run against a disposable PostgreSQL captures the PGREDB-001 durable-class cutover proof (CDB086 / CDB106-AC05 lane; STORE-001 open dependency; PostgreSQL provisioned this run).",
+    "Live RuVector-in-PostgreSQL extension activation not yet locally proven; the semantic/vector aspect of PGREDB-004 caches derives from PostgreSQL+RuVector once activation is green (NBVERIFY-001 / REDB-CLAIM-023 remainder).",
+    "PGREDB-005 outbox ordering/idempotency/backpressure protocol is undefined and must be designed before adoption.",
+    "PGREDB-007 UDS-only vs shared-redb-file access is an owner decision deferred to PGAUTH-004."
+  ],
+  "hold": "Final activation/migration of any class is held for the owner discussion represented by STORE-001 (decided) and its gated cutover proofs; this matrix is a planning classification, not a store mutation.",
+  "product_execution_performed": false
+}

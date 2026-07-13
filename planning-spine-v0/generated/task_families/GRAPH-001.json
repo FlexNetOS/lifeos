@@ -1,0 +1,70 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "GRAPH-001",
+  "title": "High-level phases decomposed into bounded task families",
+  "status": "defined",
+  "owner": "LifeOS Planning Spine",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Iterate the canonical task graph until every high-level LifeOS phase is decomposed into complete, dependency-ordered, proof-bearing task families whose summed outcomes equal the North Star, while product execution remains fail-closed pending owner approval.",
+  "work_items": [
+    {
+      "id": "GRAPH-001-A",
+      "surface": "generated/north_star_coverage.source.csv (5 immutable anchors: NS-EXTENSION, NS-WHOLE, NS-CLARITY, NS-DIRECTION, NS-PROGRESS)",
+      "owner": "LifeOS Planning Spine",
+      "decision": "Certify that every coverage row carries a bounded phase_task_ids child-task family and a decomposition_status, and that every referenced task id resolves in task_graph.source.csv. Verified: 5/5 rows complete, 0 unmapped. Decomposition status stays 'owner-decision-pending' by design."
+    },
+    {
+      "id": "GRAPH-001-B",
+      "surface": "generated/current_state_gap.source.csv (45 observed-state gaps)",
+      "owner": "LifeOS Planning Spine",
+      "decision": "Certify that every observed gap maps to a non-empty phase_task_ids set and a required_task_family, all resolving to real tasks. Verified: 45/45 rows mapped, 0 missing, 0 unmapped."
+    },
+    {
+      "id": "GRAPH-001-C",
+      "surface": "generated/prior_task_conflict.source.csv (42 reconciled prior-task conflicts)",
+      "owner": "LifeOS Planning Spine / Governance Board (via GRAPH-002)",
+      "decision": "Certify that every conflicting prior task carries an explicit disposition and canonical_task_ids that resolve, and that no execution_gate authorizes out-of-graph execution. Verified: 42/42 dispositioned (17 distinct dispositions), 0 empty, 0 unmapped. Inherits the GRAPH-002 reconciliation proof."
+    },
+    {
+      "id": "GRAPH-001-D",
+      "surface": "generated/notebooklm_source_claims.source.csv + notebooklm_source_registry.source.csv (396 claims across 32 captured sources)",
+      "owner": "LifeOS Planning Spine (via NBSOURCE-* / NBVERIFY-*)",
+      "decision": "Certify that every processed NotebookLM claim maps to a task (task_ids non-empty). Verified: 396/396 claims carry task_ids; all 32 registry sources captured with mapped_claim_count == claim_count (396 = 396)."
+    },
+    {
+      "id": "GRAPH-001-E",
+      "surface": "generated/notebooklm_claim_verification_queue.source.csv (396 queue entries)",
+      "owner": "LifeOS Planning Spine (via NBVERIFY-*)",
+      "decision": "Certify one verification-queue entry per claim and that each unresolved (queued) claim carries a next_action. Verified: 396 queue rows, 1:1 with claims, 0 orphan entries, 323 queued (each with next_action) + 73 resolved (17 verified, 19 refuted, 37 qualified)."
+    },
+    {
+      "id": "GRAPH-001-F",
+      "surface": "generated/notebooklm_claim_evidence.source.csv (135 evidence rows)",
+      "owner": "LifeOS Planning Spine (via NBVERIFY-*)",
+      "decision": "Certify evidence stays claim-scoped and provenance-preserving (source_uri + exact_pointer + content_sha256/version), with cross-references resolving to real graph entities. Verified: 135/135 scoped and provenanced, 0 dangling; 7 relation rows additionally cross-reference real tasks/conflicts."
+    },
+    {
+      "id": "GRAPH-001-G",
+      "surface": "generated/task_graph.source.csv structural integrity (196 tasks across 27 phases)",
+      "owner": "LifeOS Planning Spine",
+      "decision": "Certify no declared phase is empty (27/27 populated, 0 undeclared) and no task lacks a North Star path (LIFEOS-000 sole root; all 196 tasks reachable over the acyclic parent_ids DAG; 0 orphan parents). Distinct from the stricter execution-opening 'tasks_anchored' coverage check, which remains owner-gated."
+    },
+    {
+      "id": "GRAPH-001-H",
+      "surface": "Execution posture across coverage/gap/conflict execution gates + owner_execution_approval",
+      "owner": "David (final authority) / LifeOS Planning Spine (enforcement)",
+      "decision": "Keep product execution fail-closed: owner_execution_approval='closed', all coverage and gap execution gates closed-prefixed, no conflict gate authorizes open/out-of-graph execution. Preserve STORE-001's tiered store-authority model with no state-class reclassification absent a verified BlobStore SHA-256 parity cutover."
+    }
+  ],
+  "execution_order": [
+    "GRAPH-001-A",
+    "GRAPH-001-B",
+    "GRAPH-001-C",
+    "GRAPH-001-D",
+    "GRAPH-001-E",
+    "GRAPH-001-F",
+    "GRAPH-001-G",
+    "GRAPH-001-H"
+  ],
+  "completion_gate": "Every coverage row has bounded child-task families, every observed gap maps to those tasks, conflicting prior tasks have explicit dispositions, every processed NotebookLM claim maps to a task and verification queue where unresolved, evidence remains claim-scoped and provenance-preserving, no phase is empty, no task lacks a North Star path, and product execution remains closed. GRAPH-001.proof.json records the in-place certification with concrete per-clause counts and zero product execution."
+}

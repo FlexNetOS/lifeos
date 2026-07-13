@@ -1,0 +1,103 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-003",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every current control-plane column, relation, proof URI, lifecycle transition, North Star anchor, and source provenance has a database owner and deterministic projection contract with no information loss.",
+  "gate_result": {
+    "every_control_plane_column_has_database_owner": {
+      "satisfied": true,
+      "task_graph_columns_owned": 17,
+      "coverage_columns_owned": 8,
+      "owners": "17 task_graph columns -> task_node + 5 ordinal child tables (task_dependency, task_input, task_target_artifact, task_allowed_path, task_blocked_path); 8 coverage columns -> ns_anchor + anchor_coverage; proof-record, proof-ledger, task-family, source-registry (16 cols), adopted-capabilities (12 cols), and store-decision fields each mapped to a named owning column",
+      "multi_value_columns_normalized": ["parent_id", "inputs", "target_artifacts", "allowed_paths", "blocked_paths", "phase_task_ids", "mapped_task_ids"],
+      "mutable_columns_only": ["status", "proof_uri", "next_action"],
+      "mutable_authority_source": "matches generated/task_graph.status.json update_policy.allowed_updated_fields exactly (mutates_source_graph=false)"
+    },
+    "every_relation_has_database_owner": {
+      "satisfied": true,
+      "owning_table_count": 31,
+      "core_relations_covered": ["task_graph.source.csv", "task_graph.normalized.json", "task_graph.status.json", "north_star_coverage.source.csv", "north_star_coverage.control.json", "proof_records/*.proof.json", "proof_records/proof_ledger.jsonl", "generated/task_families/*.json", "notebooklm_source_registry.source.csv", "adopted_capabilities.source.csv", "store_relationship_decision.json"],
+      "single_writer_invariant": "PostgreSQL owns each relation exactly once (STORE-001 invariant 1); redb never a second durable writer"
+    },
+    "every_proof_uri_has_database_owner": {
+      "satisfied": true,
+      "task_rows_with_proof_uri": 196,
+      "accepted_proof_records_referenced": 118,
+      "proof_ledger_entries": 166,
+      "owner": "proof_record keyed by (task_id, revision) + proof_ledger_entry keyed by sequence with proof_sha256 pinning content identity; source-extract proof_uris (NBSTATED family) owned by the source relation",
+      "integrity_rule": "proof_uri -> proof_records/*.proof.json requires a proof_record whose recomputed SHA-256 equals proof_ledger_entry.proof_sha256"
+    },
+    "every_lifecycle_transition_has_database_owner": {
+      "satisfied": true,
+      "canonical_states": ["draft", "ready", "running", "simulated", "complete", "blocked", "rolled-back"],
+      "observed_state_counts": {"draft": 76, "ready": 0, "running": 1, "simulated": 0, "complete": 118, "blocked": 0, "rolled-back": 1},
+      "transition_edges_defined": 10,
+      "csv_status_to_lifecycle_map": {"Draft": "draft|ready|blocked", "Running": "running|simulated", "Complete": "complete|rolled-back"},
+      "owner": "lifecycle_state + lifecycle_transition (state machine) + task_status_event (append-only) + proof_ledger_entry (append-only)",
+      "history_preserved": "append-only; proof history never rewritten (blocked_paths honored)"
+    },
+    "every_north_star_anchor_has_database_owner": {
+      "satisfied": true,
+      "anchor_count": 5,
+      "anchors": ["NS-EXTENSION", "NS-WHOLE", "NS-CLARITY", "NS-DIRECTION", "NS-PROGRESS"],
+      "owner": "ns_anchor (insert-once; anchor_id + required_outcome frozen per NORTH_STAR.md lock 2026-07-10) + anchor_coverage for anchor->task causal edges",
+      "postgres_003_covered_by_anchors": ["NS-WHOLE", "NS-CLARITY", "NS-DIRECTION"]
+    },
+    "every_source_provenance_has_database_owner": {
+      "satisfied": true,
+      "notebooklm_sources": 32,
+      "adopted_capabilities": 19,
+      "owner": "source (content_sha256) + source_task_map + source_claim + claim_evidence + adopted_capability (source_commit_or_pr, current_path, ci_receipt, parity_gate) + store_decision + store_class_assignment + store_invariant",
+      "identity_rule": "content_sha256 / proof_sha256 / source_commit_or_pr preserved; projection rejected if recomputed hash != stored identity (STORE-001 invariant 5)"
+    },
+    "deterministic_projection_contract": {
+      "satisfied": true,
+      "projection_contracts_defined": 11,
+      "determinism_rules": ["stable ORDER BY on persisted ordinal key (source_row_number, anchor_ordinal, sequence)", "'; ' delimiter re-serialized in ordinal order", "CSV RFC4180 QUOTE_ALL / UTF-8 / LF / verbatim header", "JSON/JSONL fixed key order", "recomputed SHA-256 compared to expected"],
+      "engine": "PostgreSQL -> envctl materialize -> filesystem (forward-only, disposable derived class)"
+    },
+    "no_information_loss": {
+      "satisfied": true,
+      "contract": "for each relation, DB -> projection -> parse -> DB is an identity (round-trip) AND projection bytes equal the committed file (checksum)",
+      "guarantees": ["ordinal preservation", "verbatim free-text", "boolean fidelity (TRUE/FALSE literal)", "row-order fidelity", "content identity via SHA-256", "append-only history fidelity"]
+    },
+    "store_001_alignment": {
+      "control_plane_class": "durable relational macro-state -> PostgreSQL + RuVector canonical owner",
+      "projection_class": "derived projections -> PostgreSQL projected by envctl (read-only, forward-only)",
+      "redb_role": "transient forward buffer during one-time ingest only; never a second durable writer",
+      "codedb_role": "parser/ingestion path only (parses committed surfaces -> redb buffer -> envctl -> PostgreSQL)",
+      "ruvector_role": "native No-Sidecar extension hosting goal/gate/summary embeddings for hybrid SQL+vector planning queries",
+      "directive_honored": "building to intended specs is never a downgrade"
+    },
+    "cutover_guard": {
+      "committed_csv_remains_canonical_until": "POSTGRES-010",
+      "live_postgres_mutation": false,
+      "proof_history_rewrite": false
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-003 defines the PostgreSQL-native control plane for the Planning Spine in generated/postgres_control_plane_schema_plan.json, assigning a database owner and a deterministic projection contract to every item in each of the gate's six categories. COLUMNS: all 17 task_graph.source.csv columns and all 8 north_star_coverage.source.csv columns are owned, with the seven '; '-delimited multi-value columns (parent_id, inputs, target_artifacts, allowed_paths, blocked_paths, phase_task_ids, mapped_task_ids) normalized into ordinal child tables so re-serialization is byte-identical, and only status/proof_uri/next_action left mutable to mirror task_graph.status.json update_policy exactly. RELATIONS: 31 owning PostgreSQL tables cover the task graph, coverage table, proof records, the 166-entry proof ledger, task families, the 32-row source registry, the 19-row adopted-capabilities map, and the STORE-001 decision, each owned exactly once per STORE-001 invariant 1. PROOF URIs: proof_record (task_id, revision) plus proof_ledger_entry pinning proof_sha256 own every proof URI, with source-extract URIs owned by the source relation. LIFECYCLE: the seven canonical states from task_graph.status.json.lifecycle_counts (draft 76, ready 0, running 1 GRAPH-001, simulated 0, complete 118, blocked 0, rolled-back 1 LPS-025) plus ten transition edges are owned by lifecycle_state/lifecycle_transition with append-only task_status_event and proof_ledger_entry so no history is rewritten, and the coarse authored status {Draft, Running, Complete} maps deterministically to the fine state. NORTH STAR: all five immutable anchors (NS-EXTENSION, NS-WHOLE, NS-CLARITY, NS-DIRECTION, NS-PROGRESS) are owned by ns_anchor with anchor_coverage holding the anchor->task edges; POSTGRES-003 itself is covered by NS-WHOLE, NS-CLARITY, and NS-DIRECTION. SOURCE PROVENANCE: source, source_claim, claim_evidence, adopted_capability, and store_decision own all provenance with content_sha256 and source commit/PR lineage preserved per STORE-001 invariant 5. Eleven projection contracts make the committed CSV/JSON/JSONL/MD surfaces byte-identical, round-trippable envctl projections of PostgreSQL rows (derived-projections class), and the no-information-loss contract requires each projection to both round-trip to identical rows and match the committed file checksum. Under STORE-001 the control plane is the durable relational macro-state class owned by PostgreSQL + RuVector, the surfaces are the derived-projections class projected by envctl, and redb is transient-only. No live PostgreSQL was created or mutated; the committed CSV and proof ledger remain canonical until POSTGRES-010 proves cutover; product_execution_performed is false.",
+  "artifact_paths": [
+    "generated/postgres_control_plane_schema_plan.json",
+    "generated/task_families/POSTGRES-003.json",
+    "proof_records/POSTGRES-003.proof.json"
+  ],
+  "live_commands": [
+    {
+      "purpose": "Enumerate the real control-plane sets the gate references (columns, statuses, phases, anchors, ledger entries, source/capability rows) directly from the committed surfaces so every assignment is grounded",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (csv/json enumeration of task_graph.source.csv, task_graph.status.json, north_star_coverage.source.csv, proof_ledger.jsonl, notebooklm_source_registry.source.csv, adopted_capabilities.source.csv)",
+      "exit_status": 0,
+      "output": [
+        "task_graph columns=17 rows=196 status={Draft,Running,Complete} phases=27",
+        "lifecycle_counts: draft=76 ready=0 running=1 simulated=0 complete=118 blocked=0 rolled-back=1",
+        "coverage columns=8 anchors=5 (NS-EXTENSION,NS-WHOLE,NS-CLARITY,NS-DIRECTION,NS-PROGRESS)",
+        "proof_ledger entries=166; source_registry rows=32 cols=16; adopted_capabilities rows=19 cols=12",
+        "multi-value delimiter='; ' ; csv dialect=QUOTE_ALL ; stable order key=source_row_number ; multi-parent example=LIFEOS-010"
+      ]
+    }
+  ],
+  "product_execution_performed": false
+}

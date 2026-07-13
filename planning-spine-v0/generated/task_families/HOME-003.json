@@ -1,0 +1,210 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "HOME-003",
+  "title": "Home physical-control acceptance plan defined",
+  "status": "defined",
+  "owner": "LifeOS Safety / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the proof ladder that carries one home action from a simulated recommendation up to an explicitly approved, reversible, observed physical action with an armed emergency stop, a rehearsed rollback, a witness-chained proof ledger entry, and an owner acceptance. This task defines the acceptance ladder and its per-clause gate only; it is a proof-cell simulation (simulation_required=TRUE, execution_cell=proof-cell) that executes NO physical action, mutates NO device or utility state, touches NO smart plug, and reads the home digital twin exclusively from the single governed PostgreSQL + RuVector canonical state per STORE-001. The physical rung of the ladder is DEFINED here, never performed; its real execution is deferred until the HOME-001 twin and HOME-002 governed workflows are proven and every prior gate on this ladder passes.",
+  "golden_physical_action": {
+    "id": "HOME-003-GPA",
+    "action_text": "Switch off the study desk lamp (one smart-plug-controlled light), then restore it.",
+    "why_this_action": "It is the smallest single physical actuator in the HOME-001 digital twin whose action is fully reversible (a toggle has an exact inverse), directly observable (binary on/off plus a power-draw telemetry channel), harmless in both directions (a low-power lighting load whose failure state is simply on or off, never a hazard), and bounded to one device and one command with a trivially safe emergency state. It therefore exercises every rung of the proof ladder — simulation, explicit approval, bounded command, before/after observation, emergency stop, rollback rehearsal, proof ledger, owner acceptance — at the least possible physical risk, matching next_action's 'smallest harmless reversible physical proof'.",
+    "safety_class": "harmless-reversible (single low-power lighting load; both action outcomes, on and off, are non-hazardous; no consumable, no irreversible side effect, no utility-grade load)",
+    "voice_conformance": "Calm, second-person, present-tense, sentence-case; any agent recommendation is prefixed 'LifeOS suggests:' per the design voice contract.",
+    "home_asset_universe_from_HOME_001": [
+      "identity",
+      "topology",
+      "telemetry",
+      "digital-twin",
+      "resource",
+      "media",
+      "appliance",
+      "network",
+      "environment"
+    ],
+    "home_service_universe_from_HOME_002": [
+      "energy",
+      "gas",
+      "storage",
+      "water",
+      "food",
+      "irrigation",
+      "appliances",
+      "media",
+      "network",
+      "security",
+      "maintenance"
+    ],
+    "asset_touched": {
+      "twin_id": "study-desk-lamp",
+      "asset_class": "appliance / energy (single smart-plug-controlled desk lamp)",
+      "identity_source": "HOME-001 digital-twin record (identity, owner, telemetry provenance, simulation representation, privacy boundary, failure mode)",
+      "canonical_state_owner": "PostgreSQL + RuVector (STORE-001 durable relational macro-state: device identity, state history, telemetry provenance)",
+      "before_state": { "reported": "on", "power_draw_w_approx": 9, "source": "twin telemetry provenance (HOME-001)" },
+      "intended_after_state": { "reported": "off", "power_draw_w_approx": 0 },
+      "inverse_command": "switch the same study-desk-lamp smart plug back on",
+      "safe_state": "last-known-good recorded before-state (lamp on); emergency stop reverts the twin to this state",
+      "reversibility": "fully reversible via the inverse command; the toggle has an exact inverse and leaves no residual state"
+    },
+    "single_bounded_command": {
+      "target": "study-desk-lamp smart plug (exactly one device)",
+      "operation": "switch off (exactly one reversible operation)",
+      "authority": "scoped, rate-limited, single-use token (no wildcard, no batch, no standing authority)",
+      "no_unlimited_authority": "LIFEOS-003 — the agent holds no unlimited authority; MinCut scopes the executing agent to this single dependency-graph edge (blueprint section 6)"
+    }
+  },
+  "proof_ladder": [
+    {
+      "rung": "L-0",
+      "name": "Baseline observation (read-only twin before-state)",
+      "physical_effect": "none",
+      "gate_clause": "precondition for before/after observation (AR-04)",
+      "architecture_edge": "Read-only snapshot of the study-desk-lamp twin from canonical PostgreSQL (HOME-001 read-only twin; 'observation causes no physical mutation'); high-frequency telemetry buffers through the redb scratchpad and forward-flushes settled state via envctl into PostgreSQL (STORE-001 transient tier, forward-only).",
+      "checkpoint": "before-state recorded as a proof-bearing record; no device contact"
+    },
+    {
+      "rung": "L-1",
+      "name": "Simulated recommendation",
+      "physical_effect": "none",
+      "gate_clause": "simulation (AR-01)",
+      "architecture_edge": "The 'LifeOS suggests:' proposal is simulated only: the twin state is cloned into an isolated Copy-On-Write branch inside PostgreSQL (blueprint section 5) and ATAS/ESN forecast the action's future timeline — projected state diff (on -> off), resource burn (a single low-power switch), failure nodes (blueprint section 4). RuvLTRA routes this low-complexity reflex to a local ruvllm node (Proportional Intelligence).",
+      "checkpoint": "recommendation and projected before/after exist entirely in a COW branch; zero command reaches the smart plug"
+    },
+    {
+      "rung": "L-2",
+      "name": "Rollback rehearsal (prove reversibility first)",
+      "physical_effect": "none",
+      "gate_clause": "rollback rehearsal (AR-06)",
+      "architecture_edge": "The inverse command (switch the plug back on) is rehearsed inside the COW simulation branch and proven to return the twin to the exact before-state before the forward command may ascend (blueprint COW branching; task next_action 'reversible physical proof'). Recovery source for the twin is PostgreSQL PITR (STORE-001).",
+      "checkpoint": "inverse rehearsed green; pre/post-rollback twin state byte-identical; only a proven-reversible action ascends"
+    },
+    {
+      "rung": "L-3",
+      "name": "Bounded command construction",
+      "physical_effect": "none",
+      "gate_clause": "bounded command (AR-03)",
+      "architecture_edge": "Construct exactly one device / one reversible operation / one scoped rate-limited token with a defined inverse (LIFEOS-003 bounded, no unlimited authority). RuVector MinCut scopes the executing agent to this single graph edge so authority cannot widen (blueprint section 6).",
+      "checkpoint": "command targets one asset with one reversible operation and a defined inverse; scope-broadening rejected"
+    },
+    {
+      "rung": "L-4",
+      "name": "Emergency stop armed",
+      "physical_effect": "none",
+      "gate_clause": "emergency stop (AR-05)",
+      "architecture_edge": "An always-available halt is armed and tested before any command issues: RuVector MinCut can deterministically sever the executing agent in subpolynomial time (blueprint section 6 immune system), the command channel exposes an owner-triggerable kill switch at every rung, and on trip the twin reverts to safe_state (last-known-good = lamp on).",
+      "checkpoint": "emergency stop proven to halt and restore safe_state from any rung before the physical rung may arm"
+    },
+    {
+      "rung": "L-5",
+      "name": "Explicit human approval (pre-execution)",
+      "physical_effect": "none",
+      "gate_clause": "explicit human approval (AR-02)",
+      "architecture_edge": "The transition from COW simulation to a real command is gated by an explicit, scoped owner-approval token for exactly this action (LIFEOS-003 human-approval gates; HOME-002 approval thresholds). Distinct from and prior to the post-observation owner acceptance at L-10.",
+      "checkpoint": "no physical command is constructed or issued without a valid owner-approval token; absent the token the run halts at simulation (governed non-action)"
+    },
+    {
+      "rung": "L-6",
+      "name": "Before observation captured",
+      "physical_effect": "none",
+      "gate_clause": "before/after observation (AR-04, before half)",
+      "architecture_edge": "Snapshot the device state and telemetry immediately before the command (lamp 'on', ~9W) as a proof-bearing record on PostgreSQL (HOME-001 telemetry provenance).",
+      "checkpoint": "before snapshot recorded on canonical PostgreSQL"
+    },
+    {
+      "rung": "L-7",
+      "name": "Physical action (the ONLY rung with a real effect) — DEFINED, not performed in this task",
+      "physical_effect": "physical (deferred; NOT executed in HOME-003 — proof-cell defines this rung, it is performed only after all prior gates pass per next_action)",
+      "gate_clause": "the action gated by every clause above",
+      "architecture_edge": "Issue the single bounded reversible command to the one study-desk-lamp smart plug. In HOME-003 this rung is specified only; blocked_paths forbids physical device mutation and product_execution_performed remains false.",
+      "checkpoint": "specified only; execution deferred to a proven, observed environment after the ladder passes"
+    },
+    {
+      "rung": "L-8",
+      "name": "After observation captured and diffed",
+      "physical_effect": "none (observation)",
+      "gate_clause": "before/after observation (AR-04, after half)",
+      "architecture_edge": "Snapshot the device state after (intended 'off', ~0W); the after/before diff must equal exactly the intended single-asset transition with no collateral change to any other twin asset (HOME-001 telemetry provenance; ATAS state-diff concept). Settled observations forward-flush redb -> envctl -> PostgreSQL (STORE-001 forward-only).",
+      "checkpoint": "after snapshot on PostgreSQL; diff equals only the intended lamp transition, zero collateral effect"
+    },
+    {
+      "rung": "L-9",
+      "name": "Proof ledger entry (witness-chained)",
+      "physical_effect": "none",
+      "gate_clause": "proof ledger entry (AR-07)",
+      "architecture_edge": "Write a proof-bearing ledger entry on canonical PostgreSQL (LIFEOS-003 'proof-bearing on the canonical PostgreSQL state') bound by a SHAKE256 Cryptographic Witness Chain to the source recommendation vector with a Causal-Graph-Verification root (blueprint section 6 anti-bluffing), capturing before-state, bounded command, approval token, emergency-stop status, rollback-rehearsal result, after-state diff, and acceptance outcome.",
+      "checkpoint": "witness-chained ledger entry with a causal root; an entry lacking a causal root is rejected, not written"
+    },
+    {
+      "rung": "L-10",
+      "name": "Owner acceptance (post-observation)",
+      "physical_effect": "none",
+      "gate_clause": "owner acceptance (AR-08)",
+      "architecture_edge": "The owner explicitly accepts or rejects the observed result (HOME-002 approval / manual override; LIFEOS-003 human-approval gates). On rejection or any anomaly the rehearsed inverse command restores the before-state and the ledger records a rejected-and-rolled-back outcome.",
+      "checkpoint": "run closes only on an explicit owner acceptance token; any non-acceptance triggers the proven rollback to the before-state"
+    }
+  ],
+  "work_items": [
+    {
+      "id": "HOME-003-A",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-1 -> acceptance rung AR-01 (simulation)",
+      "owner": "LifeOS Safety Agent / Runtime Kernel",
+      "decision": "Bind the simulation clause to AR-01 and ladder rung L-1. Before any physical effect, the recommended action is produced as a 'LifeOS suggests:' proposal and simulated only: the swarm clones the study-desk-lamp twin state into an isolated Copy-On-Write branch inside PostgreSQL (blueprint COW branching, section 5) and ATAS/ESN forecast the action's future timeline — its projected state diff (lamp on -> off), resource burn (a single low-power switch), and any failure nodes (blueprint section 4) — with zero physical device contact; RuvLTRA routes this low-complexity reflex to a local ruvllm node (Proportional Intelligence). Pass = a simulated recommendation and its projected before/after state exist entirely inside a COW branch on canonical PostgreSQL with no command reaching the physical smart plug."
+    },
+    {
+      "id": "HOME-003-B",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-5 -> acceptance rung AR-02 (explicit human approval)",
+      "owner": "Governance Board / Runtime Kernel",
+      "decision": "Bind the explicit-human-approval clause to AR-02 and ladder rung L-5. The transition from the COW simulation to any physical command is gated by an explicit, scoped owner-approval token for exactly this action (LIFEOS-003 human-approval gates; HOME-002 approval thresholds); the agent holds no unlimited authority (LIFEOS-003) and cannot cross from simulation into a real command without the token. This pre-execution approval is distinct from and precedes the post-observation owner acceptance in AR-08. Pass = no physical command is constructed or issued until a valid owner-approval token scoped to this single action is present; absent the token the run halts at simulation with zero physical effect (governed non-action)."
+    },
+    {
+      "id": "HOME-003-C",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-3 -> acceptance rung AR-03 (bounded command)",
+      "owner": "Runtime Kernel / LifeOS Safety Agent",
+      "decision": "Bind the bounded-command clause to AR-03 and ladder rung L-3. The command is bounded to exactly one device (the study-desk-lamp smart plug), one reversible operation (switch off), one scoped and rate-limited single-use authority grant, and a known inverse; it carries no wildcard, no batch, and no standing authority (LIFEOS-003 'each implementation child is bounded', 'no unlimited agent authority'). RuVector MinCut scopes the executing agent to this single edge of the dependency graph so its authority cannot widen (blueprint section 6). Pass = the command targets one asset with one reversible operation and a defined inverse, and any attempt to broaden scope, target a second asset, or acquire standing authority is rejected before execution."
+    },
+    {
+      "id": "HOME-003-D",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-0, L-6, L-8 -> acceptance rung AR-04 (before/after observation)",
+      "owner": "LifeOS Safety Agent / QA Agent",
+      "decision": "Bind the before/after-observation clause to AR-04 and ladder rungs L-0 (baseline), L-6 (before), L-8 (after). The digital twin's device state and telemetry (HOME-001 telemetry provenance) are snapshotted immediately before the command (lamp reported 'on', ~9W) and immediately after (intended 'off', ~0W); high-frequency raw telemetry buffers through the redb scratchpad and only settled observations forward-flush via envctl into the canonical PostgreSQL twin (blueprint redb/envctl; STORE-001 transient tier, forward-only sync, redb never a second durable authority). The after/before diff must show only the intended single-asset change and no collateral change to any other twin asset. Pass = a before snapshot and an after snapshot exist as proof-bearing records on PostgreSQL and their diff equals exactly the intended lamp transition with zero collateral effect."
+    },
+    {
+      "id": "HOME-003-E",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-4 -> acceptance rung AR-05 (emergency stop)",
+      "owner": "LifeOS Safety Agent / Runtime Kernel",
+      "decision": "Bind the emergency-stop clause to AR-05 and ladder rung L-4. An always-available halt is armed and tested before the command is issued: RuVector MinCut can deterministically sever the executing agent in subpolynomial time (blueprint section 6 immune system) to stop further commands, the command channel exposes an owner-triggerable kill switch at every rung, and on trip the system reverts the twin to its recorded safe_state (last-known-good = lamp on). Pass = the emergency stop is proven to halt the action and restore safe_state from any rung, and this proof is required before the physical rung (L-7) is permitted to arm."
+    },
+    {
+      "id": "HOME-003-F",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-2 + rollback path -> acceptance rung AR-06 (rollback rehearsal)",
+      "owner": "LifeOS Data Agent / QA Agent",
+      "decision": "Bind the rollback-rehearsal clause to AR-06 and ladder rung L-2. Before the forward command may ascend, its inverse (switch the same plug back on) is rehearsed inside the COW simulation branch and proven to return the twin to the exact before-state; only a demonstrably reversible action is allowed upward (blueprint COW branching; task next_action 'smallest harmless reversible physical proof'). The rollback path combines COW branch discard for the simulation and the rehearsed inverse physical command for any real effect, with PostgreSQL PITR as the twin's canonical recovery source (STORE-001 recovery_source). Pass = the inverse command is rehearsed green and the pre/post-rollback twin state is byte-identical, so reversibility is proven before action rather than discovered after it."
+    },
+    {
+      "id": "HOME-003-G",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-9 -> acceptance rung AR-07 (proof ledger entry)",
+      "owner": "QA Agent / Runtime Kernel",
+      "decision": "Bind the proof-ledger clause to AR-07 and ladder rung L-9. Every rung emits a proof-bearing record on the canonical PostgreSQL state (LIFEOS-003 'proof-bearing on the canonical PostgreSQL state'), and the ledger entry for the action is bound by a SHAKE256 Cryptographic Witness Chain to the source recommendation vector with a Causal-Graph-Verification root (blueprint section 6 anti-bluffing), capturing before-state, bounded command, approval token, emergency-stop status, rollback-rehearsal result, after-state diff, and the acceptance outcome. Pass = a witness-chained proof ledger entry with a causal root records the full ladder; an entry lacking a causal root is rejected, not written, so the record cannot be a hallucination."
+    },
+    {
+      "id": "HOME-003-H",
+      "surface": "generated/task_families/HOME-003.json#proof_ladder L-10 -> acceptance rung AR-08 (owner acceptance)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Bind the owner-acceptance clause to AR-08 and ladder rung L-10. After the before/after observation, the owner explicitly accepts or rejects the observed result (HOME-002 approval / manual override; LIFEOS-003 human-approval gates); acceptance is the final, post-observation gate and is distinct from the pre-execution approval in AR-02. On rejection or any anomaly the rehearsed inverse command restores the before-state and the ledger records a rejected-and-rolled-back outcome. Pass = the run closes only on an explicit owner acceptance token, and any non-acceptance triggers the proven rollback with the twin restored to its before-state."
+    }
+  ],
+  "execution_order": [
+    "HOME-003-A",
+    "HOME-003-B",
+    "HOME-003-C",
+    "HOME-003-D",
+    "HOME-003-E",
+    "HOME-003-F",
+    "HOME-003-G",
+    "HOME-003-H"
+  ],
+  "store_001_alignment": "The home digital twin is read and served from the one canonical PostgreSQL + RuVector durable owner (STORE-001 single durable writer of durable relational macro-state: device identity, state history, telemetry provenance). Simulation runs in a Copy-On-Write branch inside PostgreSQL and the recommendation timeline is forecast by ATAS/ESN; high-frequency telemetry uses redb strictly as the transient scratchpad / application-level WAL with forward-only redb -> envctl -> PostgreSQL sync, so redb is never a second durable authority; the twin's recovery source is PostgreSQL PITR. The proof ledger is written on PostgreSQL and witness-chained (SHAKE256) with a causal-graph root. Defining one governed, reversible, observed physical proof over this tiered model is building to the intended blueprint spec — an upgrade, not a downgrade.",
+  "completion_gate": "generated/task_families/HOME-003.json defines one golden harmless-reversible physical action (HOME-003-GPA, 'switch off the study desk lamp'), its eleven-rung proof ladder L-0..L-10 from simulated recommendation to observed physical action (with the physical rung defined, not performed), and all eight verification-gate clauses bound one-to-one to acceptance rungs AR-01..AR-08 (simulation, explicit human approval, bounded command, before/after observation, emergency stop, rollback rehearsal, proof ledger entry, owner acceptance), each with an owner, a check, an architecture edge, and a pass criterion; proof_records/HOME-003.proof.json records status pass, product_execution_performed=false, zero physical-state change, and STORE-001 alignment.",
+  "next_action": "Keep physical state unchanged; only after the HOME-001 twin and HOME-002 governed workflows are proven and every prior gate on this ladder passes, execute this smallest harmless reversible physical proof once in the proof-cell/observed environment before any broader home actuator (energy, water, gas, irrigation, security) is permitted a first governed physical action."
+}

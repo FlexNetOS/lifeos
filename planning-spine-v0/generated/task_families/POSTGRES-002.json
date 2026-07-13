@@ -1,0 +1,105 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-002",
+  "title": "Whole user-space relational graph and identity model defined",
+  "status": "defined",
+  "owner": "LifeOS Data Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the PostgreSQL + RuVector schemas, stable identities, temporal relations, content addressing, metadata, binary references, permissions, provenance, and graph edges that represent the entire user-space with lossless round-trip keys under the STORE-001 store relationship, covering files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, and domain records.",
+  "decision_artifact": "generated/postgres_user_space_schema_plan.json",
+  "parent": "STORE-001",
+  "work_items": [
+    {
+      "id": "POSTGRES-002-A",
+      "surface": "files + directories",
+      "owner": "PostgreSQL + RuVector (fs_node family)",
+      "decision": "Unified fs_node table (node_kind file|directory|symlink) with (root_id, relative_path) natural key, parent_id containment edge, module_path/ordinal for deterministic projection, and blob_ref (SHA-256) for file content; round-trips to exact tree and bytes via envctl exact-byte materialization."
+    },
+    {
+      "id": "POSTGRES-002-B",
+      "surface": "code modules",
+      "owner": "PostgreSQL + RuVector (code_unit family)",
+      "decision": "AST-fragment rows carrying raw_code + raw_code_sha256, module_path + ordinal, RuVector semantic_embedding, and COW branch/status; concatenation by (module_path, ordinal) regenerates the exact source file per blueprint Phase 4."
+    },
+    {
+      "id": "POSTGRES-002-C",
+      "surface": "configuration",
+      "owner": "PostgreSQL + RuVector (config_record family)",
+      "decision": "Non-secret config rows keyed by (config_scope, config_key); secret-valued config carries a keyring secret_ref only, never the value (STORE-001 external-secret class)."
+    },
+    {
+      "id": "POSTGRES-002-D",
+      "surface": "planning tables",
+      "owner": "PostgreSQL + RuVector (planning_record family)",
+      "decision": "Task/anchor/decision/proof/status rows keyed by (record_type, external_id) with a projection_target; deterministic CSV/document projection contract is elaborated downstream in POSTGRES-003."
+    },
+    {
+      "id": "POSTGRES-002-E",
+      "surface": "communications",
+      "owner": "PostgreSQL + RuVector (communication family)",
+      "decision": "Thread-ordered (thread_id, seq_no) messages with body_sha256 and attachment blob references; only settled/significant agent traces flush forward from redb, transient thoughts stay redb-local (STORE-001-B boundary)."
+    },
+    {
+      "id": "POSTGRES-002-F",
+      "surface": "application state",
+      "owner": "PostgreSQL + RuVector (app_state family)",
+      "decision": "Settled UI/session/agent/swarm state keyed by (state_scope, state_key, principal_id); redb is the microsecond scratchpad/WAL, envctl flushes only settled execution trees forward; LifeOS reads live state via UDS from redb."
+    },
+    {
+      "id": "POSTGRES-002-G",
+      "surface": "media and blob references",
+      "owner": "PostgreSQL PgStore (blob family), redb source-blob store transitional",
+      "decision": "Content-addressed BlobStore keyed by SHA-256 (content is its own identity); all binary payloads referenced by hash, migrated redb->PgStore only after a green blobstore_parity.rs run under one identity (STORE-001 'Verified cutover')."
+    },
+    {
+      "id": "POSTGRES-002-H",
+      "surface": "identities",
+      "owner": "PostgreSQL + RuVector (principal family)",
+      "decision": "user|account|agent|service|node principals with (principal_type, external_ref) natural key; provider accounts (anthropic|openai|gemini) and agent .rvf ids carry credential_ref keyring handles, never credential values; seeded by the one-time account.json migration."
+    },
+    {
+      "id": "POSTGRES-002-I",
+      "surface": "permissions",
+      "owner": "PostgreSQL + RuVector (grant family)",
+      "decision": "principal x resource x capability grant rows; deny is absence of grant; revocation is a new revision (valid_to set), preserving full permission history; grants reference secrets by handle only."
+    },
+    {
+      "id": "POSTGRES-002-J",
+      "surface": "history",
+      "owner": "PostgreSQL + RuVector (revision family)",
+      "decision": "Append-only temporal spine recording before/after SHA-256, COW branch lineage, SHAKE256 witness_chain, and ESN merge scores; PITR + revision chain reconstruct any point-in-time or branch state."
+    },
+    {
+      "id": "POSTGRES-002-K",
+      "surface": "relationships",
+      "owner": "PostgreSQL + RuVector (graph_edge family)",
+      "decision": "Typed directed edges (contains|depends_on|calls|causal|belongs_to_domain|...) with weight for MinCut and RuVector semantic_embedding for GNN causal verification; edges lacking a historical root are rejected."
+    },
+    {
+      "id": "POSTGRES-002-L",
+      "surface": "domain records",
+      "owner": "PostgreSQL + RuVector (domain_record family)",
+      "decision": "Whole-life records across the four North Star domains (company|personal|development|home) keyed by (domain, record_type, external_id), unified into one coherent whole via belongs_to_domain graph edges (NS-WHOLE)."
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-002-H",
+    "POSTGRES-002-J",
+    "POSTGRES-002-K",
+    "POSTGRES-002-G",
+    "POSTGRES-002-A",
+    "POSTGRES-002-B",
+    "POSTGRES-002-C",
+    "POSTGRES-002-E",
+    "POSTGRES-002-F",
+    "POSTGRES-002-D",
+    "POSTGRES-002-I",
+    "POSTGRES-002-L"
+  ],
+  "completion_gate": "The model in generated/postgres_user_space_schema_plan.json covers files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, and domain records, each assigned exactly one PostgreSQL + RuVector canonical owner with a lossless round-trip key under the STORE-001 store relationship, and POSTGRES-002.proof.json records that no live schema or user data was touched.",
+  "downstream": [
+    "POSTGRES-003 (control-plane projection contract for planning_record)",
+    "POSTGRES-004 (collectors + lossless reconstruction test)",
+    "POSTGRES-005 (embedding + semantic edit over semantic_embedding/graph_edge)"
+  ]
+}

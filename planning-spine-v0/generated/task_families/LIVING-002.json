@@ -1,0 +1,171 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "LIVING-002",
+  "title": "Failure learning and proven-world promotion family defined",
+  "status": "defined",
+  "owner": "LifeOS Memory / Governance Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Under the settled STORE-001 tiered-authority model and building on the INTEL-003 failure-capsule primitives and the LIVING-001 continuous-audit cadence, define the complete failure-learning chain as an ordered pipeline of ten stages — raw event, failure capsule, causal map, scoped lesson, guardrail, instinct, simulation, promotion, monitoring, and rollback — and assign each stage exactly once its owner, lifetime, synchronization edge, recovery source, and explicit relationship to PostgreSQL+RuVector / redb / AgentDB / CodeDB, such that every learning task carries (1) source evidence, (2) causal scope, (3) simulation, (4) regression tests, (5) human authority where required, (6) reversible promotion, (7) monitoring, and (8) automatic rollback on failed proof. This is planning classification only in the policy-cell: no model is trained, no baseline is promoted, no production state is mutated, no policy or guardrail is autonomously changed, and no secret is touched. Promotion of any stage output remains blocked until its simulation and regression stages are separately proven.",
+  "entity_universe": {
+    "chain_stages": [
+      "STAGE-1 raw event (LIVING-002-A)",
+      "STAGE-2 failure capsule (LIVING-002-B)",
+      "STAGE-3 causal map (LIVING-002-C)",
+      "STAGE-4 scoped lesson (LIVING-002-D)",
+      "STAGE-5 guardrail (LIVING-002-E)",
+      "STAGE-6 instinct (LIVING-002-F)",
+      "STAGE-7 simulation (LIVING-002-G)",
+      "STAGE-8 promotion (LIVING-002-H)",
+      "STAGE-9 monitoring (LIVING-002-I)",
+      "STAGE-10 rollback (LIVING-002-J)"
+    ],
+    "total_work_items": 10,
+    "every_stage_assigned_exactly_once": true,
+    "chain_source": "Goal enumerates the exact ten stages 'raw event through failure capsule, causal map, scoped lesson, guardrail, instinct, simulation, promotion, monitoring, and rollback'; each becomes one work item in that order."
+  },
+  "work_items": [
+    {
+      "id": "LIVING-002-A",
+      "surface": "Raw event — the observed origin signal (failed terminal commands, agent 'thoughts', terminal traces, intermediate execution logs, high-frequency state changes)",
+      "owner": "redb transient high-frequency scratchpad / application-level WAL (per process / per edge node, single writer per store file)",
+      "decision": "Classify TRANSIENT-HIGH-FREQUENCY SOURCE STATE (STORE-001 'transient high-frequency state' class; Blueprint §2 'Local AI Scratchpad'; Context Matrix rows 3/19/29). Owner = redb, which captures agent thoughts, terminal traces, intermediate logs and the FAILED terminal command at microsecond latency without network lag. Reference boundary: the raw event is the primary observed evidence that grounds the entire chain — nothing downstream may be learned without a raw event actually observed here; redb is never a durable authority for it and never holds secrets. Lifetime: process lifecycle / local disk; transient by definition. Sync edge: redb -> envctl flush -> PostgreSQL, forward-only, only settled/significant states persist (Blueprint 'redb' + envctl sections). Recovery: none required — on loss the state was transient by definition; a re-observed event re-enters here. Relationship: redb owns the transient signal; PostgreSQL receives only significant flushes; AgentDB SONA also reads the failure signal for its own cognition; CodeDB/nu_plugin feed ingestion in the opposite direction. Gate clause SOURCE-EVIDENCE (this stage IS the source evidence; it anchors the anti-fabrication chain). No event is generated or replayed here — planning classification only."
+    },
+    {
+      "id": "LIVING-002-B",
+      "surface": "Failure capsule — the packaged, witnessed observed failure (SONA local success-threshold update after a failed command; ATAS failure-node capsule; the significant failure record flushed forward)",
+      "owner": "AgentDB (.rvf) SONA for the per-agent failure signal; the durable shared capsule is owned by PostgreSQL (relational macro-state: histories/provenance); ATAS emits transient failure-node capsules for the simulation stage",
+      "decision": "Classify PROOF-DERIVED FAILURE RECORD spanning two STORE-001 classes: the per-agent failure signal is 'per-agent cognition' (AgentDB), and the promoted durable capsule is 'durable relational macro-state (histories, provenance)' (PostgreSQL). Owner-of-signal = AgentDB SONA, which 'updates a local success threshold after a FAILED terminal command' (Blueprint §3); owner-of-durable-capsule = PostgreSQL. Reference boundary: the capsule packages the raw event (A) together with a SHAKE256 Cryptographic Witness Chain rooted in a verified PostgreSQL source vector — there is no capsule without a witnessed observed root, and Causal Graph Verification (GNN) rejects a rootless capsule. Lifetime: transient signal in AgentDB/redb; durable capsule in PostgreSQL (ACID/PITR). Sync edge: redb/AgentDB -> envctl embed -> PostgreSQL forward-only, only significant states persist. Recovery: PostgreSQL PITR for the durable capsule; .rvf for the agent-local signal. Relationship: AgentDB owns the active signal, PostgreSQL owns the witnessed durable capsule and the source vectors it binds to, redb is only the transient in-flight buffer. Gate clause SOURCE-EVIDENCE (the capsule is witness-rooted, never fabricated)."
+    },
+    {
+      "id": "LIVING-002-C",
+      "surface": "Causal map — the why-it-failed graph (Causal Graph Verification over the PostgreSQL knowledge graph: causal dependency edges + GNN)",
+      "owner": "PostgreSQL + RuVector (native extension, No-Sidecar) — GNN causal edges and causal dependency edges",
+      "decision": "Classify SEMANTIC / KNOWLEDGE-GRAPH + DURABLE-RELATIONAL STATE (STORE-001 'semantic / vector / knowledge-graph state (GNN causal edges)' and 'durable relational macro-state (causal dependency edges)'; Blueprint 'Causal Graph Verification uses GNNs and Cypher queries to enforce causal edges'; Context Matrix rows 12/14). Owner = PostgreSQL + RuVector. Reference boundary: the causal map is constructed ONLY from causal edges that already exist in the PostgreSQL knowledge graph; Causal Graph Verification rejects any edge lacking a historical root ('because the hallucinated detail has no historical root in reality, the graph automatically rejects it'). This bounded set of edges IS the causal scope of everything learned downstream. Lifetime: durable (edges are macro-state); a specific map is a query view. Sync edge: computed in-database by RuVector as a native PostgreSQL extension (No Sidecar) — no separate vector database. Recovery: PostgreSQL PITR + reproducible re-embedding. Relationship: PostgreSQL+RuVector owns; redb has no SQL / secondary index / native vector logic and holds no causal authority; AgentDB references the map but does not own it. Gate clauses CAUSAL-SCOPE (the map defines the scope) and SOURCE-EVIDENCE."
+    },
+    {
+      "id": "LIVING-002-D",
+      "surface": "Scoped lesson — the bounded learning derived from the capsule within the causal map (SONA ranking adjustment steering away from the failure pattern)",
+      "owner": "AgentDB (.rvf) SONA for the per-agent lesson (non-authoritative); the durable shared lesson root is witnessed in PostgreSQL",
+      "decision": "Classify PROOF-DERIVED, CAUSALLY-SCOPED LEARNING (STORE-001 'per-agent cognition'; Blueprint SONA 'steering the model away from repetitive failure patterns'). Owner = AgentDB SONA per agent; the witnessed root of any shared lesson is PostgreSQL. Reference boundary: the lesson's blast radius is exactly the causal edges of stage C and no wider — SONA adjusts ranking ONLY from observed successes/failures (the failure capsule B), never from a fabricated outcome, and Causal Graph Verification rejects any generalization beyond the witnessed causal root. This makes 'causal scope' literal: a lesson cannot silently over-generalize. Lifetime: .rvf; regenerable from base model + witnessed training history. Sync edge: self-contained per agent; shared knowledge flushes forward to PostgreSQL only after verification. Recovery: .rvf / regenerate; PostgreSQL root for the witnessed lesson. Relationship: AgentDB owns the active lesson, PostgreSQL owns the proof root, redb is a transient scratchpad for in-flight reasoning only. Gate clauses CAUSAL-SCOPE and SOURCE-EVIDENCE. No adapter is trained here (blocked_paths: model training)."
+    },
+    {
+      "id": "LIVING-002-E",
+      "surface": "Guardrail — the durable shared enforcement rule that prevents recurrence (RuVector MinCut immune isolation + Causal Graph Verification + SHAKE256 witness layer, backed by a governed PostgreSQL rule)",
+      "owner": "PostgreSQL owns the durable guardrail rule (governed policy / relational macro-state); enforcement engines are RuVector MinCut + RuVector GNN (Causal Graph Verification) + the SHAKE256 witness-chain layer",
+      "decision": "Classify DURABLE GOVERNED-POLICY RULE (STORE-001 'durable relational macro-state'; single durable writer = PostgreSQL). Owner-of-rule = PostgreSQL; enforcement = MinCut (which severs a hallucinating agent in subpolynomial O(n^{o(1)}) time) + Causal Graph Verification + witness chains. Reference boundary: a guardrail turns the scoped lesson (D) into a shared, enforced constraint on the whole swarm — it is baseline-affecting policy, so introducing or changing one is NOT autonomous: it is routed through the INTEL-003-M explicit promotion gate stack with LifeOS Mission Control human-in-the-loop confirmation (human authority), and it is versioned so it can be reverted (reversible promotion). Lifetime: durable, versioned (ACID/PITR). Sync edge: promoted forward only through the gate stack; redb never becomes a second durable authority for the rule. Recovery: PostgreSQL PITR; revert to the prior guardrail version. Relationship: PostgreSQL owns; MinCut/GNN/witness layer enforce; AgentDB and redb cannot self-author a shared guardrail. Distinct from the instinct (F): a guardrail is durable, shared, and authoritative, whereas an instinct is per-agent and non-authoritative (Context Matrix row 20 passive-shared vs active-per-agent memory). Gate clauses HUMAN-AUTHORITY-WHERE-REQUIRED and REVERSIBLE-PROMOTION. This planning task DEFINES the guardrail contract only; no guardrail is applied (blocked_paths: autonomous policy change, baseline promotion)."
+    },
+    {
+      "id": "LIVING-002-F",
+      "surface": "Instinct — the internalized fast-reflex form of a proven lesson (MicroLoRA adapter hot-swap + SONA local success threshold + FastGRNN routing; RuvLTRA routes reflex tasks to lightweight local ruvllm nodes)",
+      "owner": "AgentDB (.rvf) per agent — MicroLoRA adapters, SONA policy matrix, FastGRNN routing graph",
+      "decision": "Classify NON-AUTHORITATIVE PER-AGENT REFLEX (STORE-001 'per-agent cognition'; Blueprint §3 .rvf components — MicroLoRA hot-swap <1ms, SONA threshold, FastGRNN pre-filter; RuvLTRA 'reflex' routing to local ruvllm). Owner = AgentDB per agent. Reference boundary: an instinct is the low-latency internalization of a proven scoped lesson (D) into per-agent cognition so the agent avoids the failure pattern WITHOUT re-deliberating — it is agent-local, non-authoritative for shared macro-state, witnessed by SHAKE256 chains rooted in PostgreSQL, and regenerable, so it is never a durable shared authority. It inherits the causal scope of the lesson it internalizes; it cannot widen it. Lifetime: .rvf; regenerable from base model + witnessed training history. Sync edge: self-contained; provenance links back to the PostgreSQL knowledge graph. Recovery: .rvf / regenerate. Relationship: AgentDB owns the active reflex; PostgreSQL owns the witnessed root; the guardrail (E) is the durable shared counterpart. Gate clauses SOURCE-EVIDENCE (rooted in the proven lesson) and CAUSAL-SCOPE (inherited, not widened). No adapter is trained or hot-swapped here (blocked_paths: model training)."
+    },
+    {
+      "id": "LIVING-002-G",
+      "surface": "Simulation — test the guardrail/instinct in isolated futures before any promotion (ATAS ensemble ESN simulation + Copy-On-Write staging branches; in-sandbox regression suite)",
+      "owner": "ATAS (ESN reservoir fixed + trained readout layer) for the forecast; PostgreSQL Copy-On-Write (COW) staging branches for the sandbox rows",
+      "decision": "Classify TRANSIENT SIMULATION STATE over ISOLATED COW BRANCHES (STORE-001 transient tier for ATAS forecasts; COW staging branches are PostgreSQL rows not yet merged, hence not baseline; Blueprint §4-5, Context Matrix rows 6/7/14/15/24). Owner = ATAS + COW staging branches. simulation_required = TRUE for this family. Reference boundary: the candidate guardrail (E) and instinct (F) are exercised inside isolated COW sandboxes and parallel ESN ensembles (up to 100 steps ahead) BEFORE any promotion; the forecast (state diffs, resource burn, complexity spikes, failure nodes) is transient sim-only state that never writes the baseline directly; a REGRESSION suite runs inside the sandbox so that a branch is confirmed 'mathematically stable and successful' by automated tests before it can be a promotion candidate; a branch that fails simulation or regression is deterministically discarded (eliminating the 'dirty repository' problem). Lifetime: ephemeral per ensemble; COW staging rows live until merge or discard. Sync edge: reads current PostgreSQL/redb state as the initial condition; emits only routing/stability signals to Ruflo/RuvLTRA — no direct trunk write. Recovery: recomputable from current state + observed failure history. Relationship: PostgreSQL is the initial-condition source of truth and hosts the COW branches; redb may buffer transient ensemble state; failed simulated worlds are discarded, never merged. Gate clauses SIMULATION (the literal stage), REGRESSION-TESTS (in-sandbox), and AUTOMATIC-ROLLBACK-ON-FAILED-PROOF (a failed sim/regression branch is rolled back and discarded). No production write occurs (blocked_paths: production mutation)."
+    },
+    {
+      "id": "LIVING-002-H",
+      "surface": "Promotion — the gated merge of a proven change to the baseline (COW commit to the PostgreSQL main production trunk via the INTEL-003-M explicit gate stack)",
+      "owner": "PostgreSQL COW commit to the main production trunk (promotion target); authorization by the INTEL-003-M explicit gate stack",
+      "decision": "Classify EXPLICIT-GATE PROMOTION (STORE-001 single durable writer = PostgreSQL; gate stack from INTEL-003-M; Blueprint §5-6). Owner = PostgreSQL trunk; no self-promotion by redb or AgentDB. Reference boundary: a change is promoted to the trunk ONLY after passing every gate — (1) RuVector MinCut has not severed the originating agent; (2) Causal Graph Verification confirms a historical causal edge; (3) the SHAKE256 Cryptographic Witness Chain binds the change to a verified source vector; (4) ATAS/ESN scores the branch the mathematically stable winning timeline; (5) the in-sandbox REGRESSION suite is green; (6) RuvLTRA has escalated the security/architectural validation to a high-tier model per Proportional Intelligence; (7) LifeOS Mission Control provides human-in-the-loop confirmation for baseline-affecting promotions. Autonomous promotion is BLOCKED (blocked_paths: baseline promotion, autonomous policy change). Promotion is REVERSIBLE — it is a COW merge that can be rolled back (COW rollback + PostgreSQL PITR). Any redb-durable -> PostgreSQL class reclassification is itself gated by a green live blobstore_parity.rs SHA-256 parity cutover, never by assumption. Lifetime: durable once merged (ACID/PITR). Sync edge: COW staging branch -> gate stack -> forward-only verified merge to trunk. Recovery: PostgreSQL PITR; revert the merge. Gate clauses REGRESSION-TESTS (green required to merge), HUMAN-AUTHORITY-WHERE-REQUIRED (LifeOS human-in-the-loop), and REVERSIBLE-PROMOTION. No promotion is executed here — the contract is defined only."
+    },
+    {
+      "id": "LIVING-002-I",
+      "surface": "Monitoring — continuous post-promotion observation of the promoted guardrail/instinct (RuVector MinCut real-time immune system + LIVING-001 audit cadence + ATAS trajectory monitoring), producing proof",
+      "owner": "RuVector MinCut (continuous subpolynomial O(n^{o(1)}) graph monitoring) + the LIVING-001 continuous-audit cadence (Daily Pulse / health / drift / provenance audits) + ATAS ongoing trajectory monitoring",
+      "decision": "Classify OBSERVE-ONLY MONITORING that produces PROOF into the durable ledger (STORE-001 durable relational macro-state for proof/audit rows; Blueprint §6 MinCut immune system; Context Matrix rows 8/21/32; input: LIVING-001 cadence + proof ledger). Owner = MinCut + LIVING-001 cadence + ATAS. Reference boundary: after a change is promoted, MinCut continuously watches the dependency graph and flags/severs any agent that drifts or hallucinates, the LIVING-001 audit cadence emits bounded proof of continued health, and ATAS watches for a trajectory spiralling out of bounds — all observe-only; there is NO autonomous remediation here (blocked_paths: autonomous remediation), only detection that arms the rollback trigger (J). Lifetime: continuous; proof/audit rows are durable in PostgreSQL. Sync edge: reads the live PostgreSQL knowledge graph + live IPC streams; writes proof/audit rows forward to PostgreSQL (the proof ledger). Recovery: PostgreSQL PITR for the proof history. Relationship: PostgreSQL owns the durable proof; MinCut/ATAS are read-side monitors; redb is not a durable proof authority. Gate clauses MONITORING (the literal stage) and AUTOMATIC-ROLLBACK-ON-FAILED-PROOF (monitoring is the trigger source). No remediation action is taken — detection is defined only."
+    },
+    {
+      "id": "LIVING-002-J",
+      "surface": "Rollback — automatic reversal of a promoted change on failed proof (COW rollback of the merge + PostgreSQL PITR restore to the last proven world; redb forward-only WAL replay as subordinate)",
+      "owner": "PostgreSQL COW rollback + PITR (baseline authority); redb application-level WAL / outbox (forward-only replay, subordinate, never a second baseline)",
+      "decision": "Classify AUTOMATIC BASELINE-ROLLBACK CONTRACT (STORE-001 single durable writer + verified-cutover invariants; INTEL-003-N; Blueprint §5-6, Context Matrix rows 15/19). Owner = PostgreSQL COW rollback + PITR; redb is a subordinate WAL only. Reference boundary: when monitoring (I) detects a failed proof — the promoted guardrail/instinct drifts, regresses, or its continued proof fails — the promotion is AUTOMATICALLY rolled back so the failed world CANNOT remain the baseline: the merge is reverted by COW rollback and the baseline is restored to the last proven world via PostgreSQL PITR. redb acts only as a forward-only application-level WAL/outbox during PostgreSQL latency/outage (replay-with-ack), never a durable authority and never a second baseline (STORE-001 single-durable-writer invariant). No class leaves redb-durable for PostgreSQL except via a green live blobstore_parity.rs SHA-256 cutover; a failed or unverified cutover is rejected, so a broken migration cannot silently become the baseline. Lifetime: rollback restores the durable baseline. Sync edge: COW rollback + PITR restore; redb WAL forward-only. Recovery: PostgreSQL PITR + COW rollback of the un-proven merge. Relationship: PostgreSQL is the sole baseline authority; redb WAL is subordinate; AgentDB instincts derived from a rolled-back lesson are re-witnessed against the restored root. Rollback plan for THIS planning task: restore the archived learning plan; no model, policy, guardrail, or baseline is changed. Gate clauses AUTOMATIC-ROLLBACK-ON-FAILED-PROOF (the literal stage) and REVERSIBLE-PROMOTION (rollback is the reverse of promotion)."
+    }
+  ],
+  "execution_order": [
+    "LIVING-002-A",
+    "LIVING-002-B",
+    "LIVING-002-C",
+    "LIVING-002-D",
+    "LIVING-002-E",
+    "LIVING-002-F",
+    "LIVING-002-G",
+    "LIVING-002-H",
+    "LIVING-002-I",
+    "LIVING-002-J"
+  ],
+  "next_action_alignment": "Per the task next_action, observation-to-lesson (LIVING-002-A..D) is decomposed first; promotion (LIVING-002-H) remains blocked until the simulation (LIVING-002-G) and regression (in-sandbox, G/H) stages are separately proven. Guardrail (E) and instinct (F) are defined as contracts but not applied.",
+  "gate_clause_coverage": {
+    "clause_1_source_evidence": [
+      "LIVING-002-A",
+      "LIVING-002-B",
+      "LIVING-002-C",
+      "LIVING-002-D",
+      "LIVING-002-F"
+    ],
+    "clause_2_causal_scope": [
+      "LIVING-002-C",
+      "LIVING-002-D",
+      "LIVING-002-F"
+    ],
+    "clause_3_simulation": [
+      "LIVING-002-G"
+    ],
+    "clause_4_regression_tests": [
+      "LIVING-002-G",
+      "LIVING-002-H"
+    ],
+    "clause_5_human_authority_where_required": [
+      "LIVING-002-E",
+      "LIVING-002-H"
+    ],
+    "clause_6_reversible_promotion": [
+      "LIVING-002-E",
+      "LIVING-002-H",
+      "LIVING-002-J"
+    ],
+    "clause_7_monitoring": [
+      "LIVING-002-I"
+    ],
+    "clause_8_automatic_rollback_on_failed_proof": [
+      "LIVING-002-G",
+      "LIVING-002-I",
+      "LIVING-002-J"
+    ]
+  },
+  "store_001_alignment": {
+    "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+    "classes_applied": [
+      "transient high-frequency state -> STAGE-1 raw event (redb, never durable authority) and the redb WAL of STAGE-10",
+      "durable relational macro-state (histories, provenance, causal dependency edges) -> STAGE-2 durable capsule, STAGE-3 causal map, STAGE-5 guardrail rule, STAGE-9 proof rows, STAGE-8/10 trunk (PostgreSQL single durable owner)",
+      "semantic / vector / knowledge-graph state (GNN causal edges) -> STAGE-3 causal map (PostgreSQL + RuVector native extension, No Sidecar)",
+      "per-agent cognition (SONA / MicroLoRA / FastGRNN / RL) -> STAGE-2 signal, STAGE-4 scoped lesson, STAGE-6 instinct (AgentDB non-authoritative, witnessed by SHAKE256 chains rooted in PostgreSQL)",
+      "derived / disposable staging -> STAGE-7 COW branches and ATAS forecasts (never baseline until merged)"
+    ],
+    "invariants_honored": [
+      "single durable writer = PostgreSQL (no redb second baseline)",
+      "forward-only redb -> envctl -> PostgreSQL",
+      "verified cutover only (green live blobstore_parity.rs under one SHA-256 identity)",
+      "no sidecar (RuVector runs as a native PostgreSQL extension)",
+      "provenance / SHA-256 / witness-chain identity preserved"
+    ]
+  },
+  "inputs_reconciled": {
+    "LIVING-001": "STAGE-9 monitoring reuses the LIVING-001 continuous-audit cadence (Daily Pulse / health / drift / provenance) as the proof-producing observation layer.",
+    "INTEL-003": "STAGE-8 promotion reuses the INTEL-003-M explicit gate stack; STAGE-10 rollback reuses the INTEL-003-N proven-world COW rollback + verified-cutover guard; STAGE-2/4/6 reuse the INTEL-003-K/L failure-capsule and SONA/ATAS learning primitives.",
+    "failure_learning_doctrine": "The ten-stage ordering (event -> capsule -> causal map -> scoped lesson -> guardrail/instinct -> simulation -> promotion -> monitoring -> rollback) instantiates the doctrine that learning is proof-derived and reversible, never fabricated or autonomously promoted.",
+    "proof_ledger": "STAGE-8 regression results and STAGE-9 monitoring proofs land as durable rows in the PostgreSQL proof ledger; a failed proof there is what arms STAGE-10 automatic rollback."
+  },
+  "grounded_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/task_families/INTEL-003.json (failure-capsule learning, gate stack, proven-world rollback)",
+    "generated/task_graph.source.csv (LIVING-001 continuous-audit cadence input)"
+  ],
+  "completion_gate": "Learning tasks require source evidence, causal scope, simulation, regression tests, human authority where required, reversible promotion, monitoring, and automatic rollback on failed proof.",
+  "blocked_paths_respected": "No model trained; no baseline promoted; no production state mutated; no autonomous policy or guardrail change (all promotion routed through the explicit gate stack with human authority); no secret touched. Simulation-only, policy-cell."
+}

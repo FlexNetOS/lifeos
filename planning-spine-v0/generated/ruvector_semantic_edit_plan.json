@@ -1,0 +1,437 @@
+{
+  "schema_version": "lifeos-planning-spine.ruvector-semantic-edit-plan.v0",
+  "task_id": "POSTGRES-005",
+  "title": "RuVector embedding and semantic database editing defined",
+  "phase": "2-postgres-foundation",
+  "owner": "LifeOS Data Agent / RuVector Agent",
+  "defined_at": "2026-07-13T03:47:08Z",
+  "planning_only": true,
+  "product_execution_performed": false,
+  "simulation_required": true,
+  "simulation_note": "This plan DEFINES the embedding, retrieval, branch, integrity, and merge contracts and the simulated COW/ATAS behavior. No embeddings were computed, no vectors written, no database rows created, no branch merged, and no source file overwritten. Blocked per CSV blocked_paths: live embeddings, database writes, source-file overwrite, autonomous merge, product implementation, secrets/**.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001 keystone)",
+    "generated/adopted_capabilities.source.csv (ADOPT-001 BlobStore SHA-256 content-addressing)",
+    "generated/user_space_ingestion_plan.json (POSTGRES-004 inputs; content hashes, AST parsing, module_path, checkpoints)"
+  ],
+  "scope_boundaries": {
+    "allowed_paths": ["planning-spine-v0/generated/**", "planning-spine-v0/proof_records/**"],
+    "blocked_paths": ["live embeddings", "database writes", "source-file overwrite", "autonomous merge", "product implementation", "secrets/**"],
+    "execution_cell": "policy-cell",
+    "downstream_note": "next_action decomposes retrieval, edit, branch, integrity, and merge into separate bounded target tasks after graph closure; this plan is the shared contract they inherit."
+  },
+
+  "store_001_alignment": {
+    "semantic_vector_knowledge_graph_class": {
+      "canonical_owner": "PostgreSQL + RuVector (native extension, No-Sidecar)",
+      "write_authority": "PostgreSQL + RuVector",
+      "sync_direction": "embeddings computed by a local all-MiniLM-L6-v2 model during the envctl bridge, then stored in PostgreSQL (redb -> envctl(embed) -> PostgreSQL, forward-only)",
+      "recovery_source": "PostgreSQL PITR + reproducible re-embedding",
+      "migration_path": "RuVector-in-PostgreSQL extension activation must be proven locally before this class fully cuts over; until then embeddings may be produced via the proven Bun-loaded ruvector N-API path (NBVERIFY-004) and committed to PostgreSQL",
+      "source": "store_relationship_decision.json state_class_assignments[1]"
+    },
+    "durable_relational_macro_state_class": {
+      "canonical_owner": "PostgreSQL + RuVector",
+      "note": "content-addressed code blocks / AST rows / causal edges are durable relational macro-state; redb may hold a transient forward buffer + the transitional durable blobs migrating via the BlobStore SHA-256 parity cutover; envctl is the writer bridge",
+      "source": "store_relationship_decision.json state_class_assignments[0]"
+    },
+    "transient_high_frequency_class": {
+      "canonical_owner": "redb",
+      "note": "BLAKE3 dedup cache, f32 geometry math, ESN ensemble scratch, and application-level WAL are transient; redb never becomes a second durable writer for a PostgreSQL-owned class",
+      "source": "store_relationship_decision.json state_class_assignments[2]"
+    },
+    "per_agent_cognition_class": {
+      "canonical_owner": "AgentDB (.rvf)",
+      "note": "per-agent witness facts live in AgentDB but are witnessed by SHAKE256 chains rooted in PostgreSQL source vectors; non-authoritative for shared macro-state",
+      "source": "store_relationship_decision.json state_class_assignments[3]"
+    },
+    "derived_projection_class": {
+      "canonical_owner": "PostgreSQL (source of truth) projected by envctl / CodeDB materialization",
+      "note": "source reconstruction / materialized directories are derived and disposable; re-projected deterministically from PostgreSQL via module_path",
+      "source": "store_relationship_decision.json state_class_assignments[4]"
+    }
+  },
+
+  "invariants": [
+    "Single durable writer: every durable semantic-edit class (code blocks, embeddings, causal edges) is owned by PostgreSQL exactly once; redb, AgentDB, and ATAS timelines are never a second durable writer for these classes.",
+    "Database does not generate embeddings: PostgreSQL only stores and measures vectors; the local all-MiniLM-L6-v2 model in the Rust/envctl binary produces them (Blueprint: 'the database itself does not generate embeddings; it only stores and measures them').",
+    "No-Sidecar: RuVector runs as a native PostgreSQL extension; there is no separate vector database in the target (Blueprint §1 'No Sidecar'; Context Matrix row 26).",
+    "Content identity is authority: every code block is addressed by a SHA-256 content hash under the ADOPT-001 BlobStore contract; an edit produces a new content hash, never a silent in-place overwrite of identity.",
+    "Edits happen only in isolated COW branch rows: agents never UPDATE the main-trunk rows directly and never overwrite a source file on disk; the winning branch is committed, failing branches are rolled back.",
+    "Witness-before-commit: no edit reaches the main trunk without a SHAKE256 witness chain rooted in a PostgreSQL source vector and a causal-graph edge with a historical root; hallucinated edits are rejected.",
+    "Deterministic merge: the winning timeline is committed by copying already-computed branch rows to the main trunk (the model is never asked to redo the work); selection is a deterministic function of ESN score + integrity gates.",
+    "Forward-only reproducibility: re-embedding a source block with the pinned model weights reproduces the identical vector, so semantic state is recoverable from source + model pin without trusting any single stored copy."
+  ],
+
+  "entity_authority_matrix": [
+    {
+      "id": "E01",
+      "entity": "content-addressed code block (raw_code + AST fragment)",
+      "canonical_owner": "PostgreSQL",
+      "lifetime": "durable (canonical macro-state)",
+      "write_authority": "PostgreSQL (single durable writer, via envctl bridge commit)",
+      "sync_edge": "nu_plugin AST parse -> redb buffer -> envctl bridge -> PostgreSQL (forward-only)",
+      "recovery_source": "PostgreSQL PITR; content identity SHA-256; re-ingestible from source under the same hash",
+      "identity_keys": ["block_id", "sha256_content_hash", "module_path", "language", "status"],
+      "relationship": {
+        "postgresql": "canonical durable owner of the row (raw_code, module_path, status)",
+        "ruvector": "attaches semantic_embedding + causal edges to the block row",
+        "redb": "transient parse buffer; holds transitional durable blobs migrating via BlobStore SHA-256 parity cutover, never a second durable writer",
+        "codedb_nu_plugin": "parser/ingestion producer (Nushell AST -> MessagePack -> redb)",
+        "agentdb": "none (blocks are shared macro-state, not per-agent cognition)",
+        "envctl": "writer bridge that commits the block into PostgreSQL"
+      },
+      "grounding": "Blueprint §5 Ingestion Pipeline; Semantic Editing (UPDATE on raw_code rows); STORE-001 durable-relational class; ADOPT-001 SHA-256 content addressing"
+    },
+    {
+      "id": "E02",
+      "entity": "semantic_embedding (384-dim all-MiniLM-L6-v2 vector)",
+      "canonical_owner": "PostgreSQL + RuVector",
+      "lifetime": "durable",
+      "write_authority": "PostgreSQL + RuVector",
+      "sync_edge": "local all-MiniLM-L6-v2 model (Candle/ORT in the Rust binary) computes vector during envctl bridge -> stored in PostgreSQL; redb serves the BLAKE3 dedup cache",
+      "recovery_source": "PostgreSQL PITR + reproducible re-embedding from source under the pinned model",
+      "identity_keys": ["block_id (FK)", "embedding_model_pin_id", "vector[384]"],
+      "relationship": {
+        "postgresql": "stores and measures the vector; does not generate it",
+        "ruvector": "native extension providing the vector column type, <-> operator, and hybrid search over it",
+        "redb": "BLAKE3(text) -> vector dedup cache to avoid recomputing identical blocks; transient",
+        "codedb_nu_plugin": "supplies the text block whose embedding is computed",
+        "agentdb": "none for shared embeddings",
+        "envctl": "runs the embedding model during the bridge and commits the vector"
+      },
+      "grounding": "Blueprint: 'database does not generate embeddings... local, lightweight embedding model (all-MiniLM-L6-v2)'; Context Matrix row 17 (Orchestrating Vector Ingestion); STORE-001 semantic class"
+    },
+    {
+      "id": "E03",
+      "entity": "embedding_model_pin (model id, weights hash, dim, distance metric, runtime)",
+      "canonical_owner": "committed source pin (provenance authority) + PostgreSQL provenance row (reference only)",
+      "lifetime": "durable / immutable per model version",
+      "write_authority": "owner-committed pin; PostgreSQL stores a reference, never raw secrets",
+      "sync_edge": "pin committed in source -> referenced by every embedding row's provenance",
+      "recovery_source": "committed pins + OS keyring for any credentialed download (STORE-001 external-secret class)",
+      "identity_keys": ["model_id=all-MiniLM-L6-v2", "weights_sha256", "embedding_dim=384", "distance_metric=cosine/<->", "runtime=Candle|ORT"],
+      "relationship": {
+        "postgresql": "stores provenance reference bound to each embedding row",
+        "ruvector": "distance metric and vector dim must match the pin",
+        "redb": "none (redb caches vectors, not the model)",
+        "codedb_nu_plugin": "none",
+        "agentdb": "none",
+        "envctl": "loads the pinned model at bridge time"
+      },
+      "grounding": "Blueprint 'all-MiniLM-L6-v2' / Candle-ORT inference; STORE-001 external-secret/provenance class; reproducible-embedding gate clause"
+    },
+    {
+      "id": "E04",
+      "entity": "dedup_cache_entry (BLAKE3 text hash -> vector)",
+      "canonical_owner": "redb",
+      "lifetime": "transient (process-lifecycle / local disk)",
+      "write_authority": "redb (per edge node / process)",
+      "sync_edge": "cache-miss => run model, store in redb; cache-hit => return cached vector; no durable flush of the cache itself",
+      "recovery_source": "recomputable (transient by definition); loss only re-runs inference",
+      "identity_keys": ["blake3_text_hash"],
+      "relationship": {
+        "postgresql": "receives only the deduplicated embedding result, never the cache",
+        "ruvector": "consumes the produced vector",
+        "redb": "canonical owner of the cache (intended transient role)",
+        "codedb_nu_plugin": "provides text blocks that are BLAKE3-hashed",
+        "agentdb": "none",
+        "envctl": "checks the cache before invoking the model"
+      },
+      "grounding": "Blueprint §redb 'BLAKE3 hash... Cache Hit/Cache Miss'; Context Matrix row 3/17; STORE-001 transient class"
+    },
+    {
+      "id": "E05",
+      "entity": "causal_dependency_edge (GNN knowledge-graph edge)",
+      "canonical_owner": "PostgreSQL + RuVector",
+      "lifetime": "durable",
+      "write_authority": "PostgreSQL + RuVector (GNN)",
+      "sync_edge": "derived from AST + embeddings during ingestion/edit, stored as graph edges in PostgreSQL",
+      "recovery_source": "PostgreSQL PITR + recomputation from blocks and embeddings",
+      "identity_keys": ["from_block_id", "to_block_id", "edge_type", "causal_root_ref"],
+      "relationship": {
+        "postgresql": "stores the knowledge-graph edges alongside relational rows",
+        "ruvector": "GNN + Causal Graph Verification operate over these edges natively",
+        "redb": "none durable",
+        "codedb_nu_plugin": "AST dependency extraction seeds candidate edges",
+        "agentdb": "witness chains reference these edges as historical roots",
+        "envctl": "commits edges with the block"
+      },
+      "grounding": "Blueprint §6 Causal Graph Verification (GNN scans for a causal edge); Context Matrix row 12/14"
+    },
+    {
+      "id": "E06",
+      "entity": "hybrid_retrieval (relational filter + vector <-> + BM25 + FastGRNN pre-filter)",
+      "canonical_owner": "PostgreSQL + RuVector (read/query capability, no durable state)",
+      "lifetime": "query-scoped (no persisted authority)",
+      "write_authority": "none (read path)",
+      "sync_edge": "target_vector computed by the same pinned model; query executes in-database via standard SQL",
+      "recovery_source": "n/a (stateless read)",
+      "identity_keys": ["query_embedding", "relational_predicate", "k (LIMIT)"],
+      "relationship": {
+        "postgresql": "executes the SQL (WHERE language/status AND ORDER BY semantic_embedding <-> [target] LIMIT k)",
+        "ruvector": "provides <-> operator, BM25 keyword search, and FastGRNN routing pre-filter",
+        "redb": "may perform f32 distance math ONLY as a cache; no SQL, no secondary index, no native vector logic (REDB-CLAIM-008/009/010 refuted)",
+        "codedb_nu_plugin": "none at query time",
+        "agentdb": "FastGRNN routing graph in .rvf pre-filters agent-local context before the LLM",
+        "envctl": "none at query time"
+      },
+      "grounding": "Blueprint §4/§Semantic Graph Query 'ORDER BY semantic_embedding <->'; §1 '230+ native SQL functions... BM25'; Context Matrix row 26; STORE-001 semantic class role_of_others"
+    },
+    {
+      "id": "E07",
+      "entity": "cow_branch (isolated staging rows cloned from main trunk)",
+      "canonical_owner": "PostgreSQL (COW branching in-database)",
+      "lifetime": "transient staging until merge or rollback",
+      "write_authority": "PostgreSQL (branch rows); agents write only inside their branch",
+      "sync_edge": "clone(main-trunk rows) -> branch; on select commit(branch rows) -> main trunk; on failure discard(branch)",
+      "recovery_source": "rollback (discard branch) + PostgreSQL PITR",
+      "identity_keys": ["branch_id", "parent_branch_id", "agent_state_id", "esn_score"],
+      "relationship": {
+        "postgresql": "hosts COW branches and the main trunk; MVCC isolates concurrent readers/writers",
+        "ruvector": "MinCut monitors the branch dependency graph; ESN scores the branch",
+        "redb": "transient agent thoughts/traces during branch work; application-level WAL during PostgreSQL latency",
+        "codedb_nu_plugin": "none",
+        "agentdb": "agent performs branch edits carrying its .rvf cognition",
+        "envctl": "none (branches are internal to PostgreSQL)"
+      },
+      "grounding": "Blueprint §ATAS/COW 'clones the current codebase state into isolated staging branches'; Context Matrix row 15; redb MVCC"
+    },
+    {
+      "id": "E08",
+      "entity": "semantic_sql_edit (UPDATE rewriting raw_code within branch rows)",
+      "canonical_owner": "PostgreSQL (executed on branch rows only)",
+      "lifetime": "branch-scoped until merge",
+      "write_authority": "agent-issued UPDATE constrained to its COW branch; produces a new SHA-256 content hash",
+      "sync_edge": "retrieve target row (E06) -> UPDATE raw_code in branch -> attach witness chain (E12) + new embedding (E02)",
+      "recovery_source": "branch rollback; prior content hash retained on main trunk until merge",
+      "identity_keys": ["branch_id", "block_id", "new_sha256_content_hash", "witness_chain_id"],
+      "relationship": {
+        "postgresql": "applies the UPDATE to branch rows (never main-trunk directly, never a source file)",
+        "ruvector": "re-embeds and re-verifies causal edges for the edited block",
+        "redb": "buffers the agent's intermediate edit thoughts",
+        "codedb_nu_plugin": "re-parses the edited block's AST if needed",
+        "agentdb": "records the edit decision under its witness chain",
+        "envctl": "not involved until projection/materialization"
+      },
+      "grounding": "Blueprint §Semantic Editing 'standard SQL UPDATE statements to rewrite the code directly within those specific database rows'; blocked_paths: source-file overwrite forbidden"
+    },
+    {
+      "id": "E09",
+      "entity": "temporal_timeline (ATAS/ESN future branch: state diffs, resource burn, complexity spikes, failure nodes)",
+      "canonical_owner": "ATAS simulation (transient/derived, non-authoritative)",
+      "lifetime": "simulation-scoped (up to 100 steps ahead); discarded after selection",
+      "write_authority": "ATAS/ESN (never durable macro-state)",
+      "sync_edge": "PostgreSQL current state -> ESN ensemble simulation -> ranked timelines -> selection informs which COW branch merges",
+      "recovery_source": "n/a (derived; re-simulatable from PostgreSQL state)",
+      "identity_keys": ["timeline_id", "branch_id (FK)", "esn_score", "state_diff", "resource_burn", "complexity_spike", "failure_node"],
+      "relationship": {
+        "postgresql": "provides the current codebase state as the initial condition; never stores timelines as authority",
+        "ruvector": "graph math identifies weak links / stability inside timelines",
+        "redb": "may hold transient ESN ensemble scratch state",
+        "codedb_nu_plugin": "none",
+        "agentdb": "agent state cloned into simulated timelines",
+        "envctl": "none"
+      },
+      "grounding": "Blueprint §4 ATAS/ESN 'Future Timelines: State Diffs, Resource Burn, Complexity Spikes, Failure Nodes'; Context Matrix rows 6/7/23/24"
+    },
+    {
+      "id": "E10",
+      "entity": "temporal_score (ESN stability score / cosine similarity / strange-attractor boundary check)",
+      "canonical_owner": "ATAS/ESN (deterministic scoring capability)",
+      "lifetime": "selection-scoped",
+      "write_authority": "ESN readout layer (trained linear); reservoir fixed/random",
+      "sync_edge": "score each timeline -> pick the most mathematically stable, in-bounds trajectory -> deterministic input to merge selection",
+      "recovery_source": "n/a (recomputable)",
+      "identity_keys": ["timeline_id", "cosine_similarity", "attractor_in_bounds:boolean", "esn_readout_score"],
+      "relationship": {
+        "postgresql": "supplies initial-condition state vectors",
+        "ruvector": "cosine similarity + graph stability signals",
+        "redb": "geometry engine may compute f32 cosine distances as a cache",
+        "codedb_nu_plugin": "none",
+        "agentdb": "none",
+        "envctl": "none"
+      },
+      "grounding": "Blueprint §4 'Cosine Similarity to determine state alignment'; Temporal Strange Attractors boundary constraints; RuvLTRA steers toward the most stable path"
+    },
+    {
+      "id": "E11",
+      "entity": "mincut_isolation (RuVector MinCut, O(n^{o(1)}) dynamic minimum cut)",
+      "canonical_owner": "PostgreSQL + RuVector (integrity gate capability)",
+      "lifetime": "continuous real-time monitoring",
+      "write_authority": "RuVector (routing overrides that sever a node); no durable data authority",
+      "sync_edge": "monitor agent-communication + dependency graph -> detect weakest link -> deterministically sever hallucinating cluster -> reroute before bad code merges",
+      "recovery_source": "reroute / branch discard (no state lost from isolation)",
+      "identity_keys": ["graph_snapshot_id", "min_cut_edge_set", "severed_agent_node"],
+      "relationship": {
+        "postgresql": "protects the canonical trunk from infected logic",
+        "ruvector": "core GNN application; the min-cut math (arXiv:2512.13105)",
+        "redb": "none",
+        "codedb_nu_plugin": "none",
+        "agentdb": "isolated agent's .rvf output is quarantined, not merged",
+        "envctl": "none"
+      },
+      "grounding": "Blueprint §6 RuVector MinCut 'subpolynomial time O(n^{o(1)})... isolates that cluster deterministically'; Context Matrix rows 8/32"
+    },
+    {
+      "id": "E12",
+      "entity": "witness_chain (SHAKE256 audit trail rooted in a PostgreSQL source vector)",
+      "canonical_owner": "AgentDB (.rvf) holds per-agent chains; roots are canonical in PostgreSQL",
+      "lifetime": "durable audit (roots durable in PostgreSQL; per-agent chain in .rvf)",
+      "write_authority": "AgentDB per agent; verification authority is PostgreSQL (rejects unrooted claims)",
+      "sync_edge": "agent claim -> must link to a PostgreSQL source vector via SHAKE256 -> verified before any commit; unrooted claims rejected",
+      "recovery_source": "chains rooted in PostgreSQL PITR source vectors; .rvf regenerable",
+      "identity_keys": ["witness_chain_id", "shake256_digest", "source_vector_ref", "claim_ref"],
+      "relationship": {
+        "postgresql": "canonical root store for source vectors that chains must bind to",
+        "ruvector": "Causal Graph Verification confirms a historical root exists",
+        "redb": "none (never holds secrets or witness authority)",
+        "codedb_nu_plugin": "none",
+        "agentdb": "owner of per-agent witness facts, bound to SHAKE256",
+        "envctl": "none"
+      },
+      "grounding": "Blueprint §6 'Cryptographic Witness Chains (SHAKE256)... mathematically link that claim directly back to the original source vector'; Context Matrix rows 4/18; STORE-001 per-agent cognition class"
+    },
+    {
+      "id": "E13",
+      "entity": "causal_graph_verification (GNN + Cypher historical-root check)",
+      "canonical_owner": "PostgreSQL + RuVector",
+      "lifetime": "verification-scoped (per edit / per claim)",
+      "write_authority": "none durable (accept/reject gate)",
+      "sync_edge": "proposed edge/claim -> GNN scans for a causal edge with a historical root -> accept if rooted, reject if invented",
+      "recovery_source": "n/a (stateless gate)",
+      "identity_keys": ["claim_ref", "causal_root_ref", "verdict:accept|reject"],
+      "relationship": {
+        "postgresql": "hosts the knowledge graph scanned for roots",
+        "ruvector": "GNN + Cypher queries enforce causal edges",
+        "redb": "none",
+        "codedb_nu_plugin": "none",
+        "agentdb": "the claim originates from an agent's .rvf",
+        "envctl": "none"
+      },
+      "grounding": "Blueprint §6/§RuVector cognitive architecture 'Causal Graph Verification... GNN scans the graph for the causal edge... rejects it'; Context Matrix row 12"
+    },
+    {
+      "id": "E14",
+      "entity": "merge_decision (deterministic commit of the winning branch rows to main trunk)",
+      "canonical_owner": "PostgreSQL (deterministic commit) under a gated approval",
+      "lifetime": "one-shot transition (branch -> trunk)",
+      "write_authority": "PostgreSQL commit of already-computed branch rows; the model is NOT re-invoked",
+      "sync_edge": "gate(tests pass AND witness rooted AND MinCut intact AND ESN-selected) -> commit branch rows to trunk -> new main-trunk content hashes",
+      "recovery_source": "pre-merge trunk retained via PITR; a bad merge reverts to the prior trunk snapshot",
+      "identity_keys": ["merge_id", "winning_branch_id", "gate_evidence_ref", "committed_block_hashes"],
+      "planning_constraint": "autonomous merge is BLOCKED in this planning task; the plan defines the gate, an executor task (decomposition target 'merge') performs a gated, non-autonomous commit later",
+      "relationship": {
+        "postgresql": "performs the deterministic row-copy commit",
+        "ruvector": "MinCut + causal verification are pre-merge gates",
+        "redb": "none",
+        "codedb_nu_plugin": "none",
+        "agentdb": "winning agent's witnessed edits are the merge payload",
+        "envctl": "consumes the merged trunk later for projection"
+      },
+      "grounding": "Blueprint §5 (Predictive Forecasting) 'it simply commits the successful database rows... eliminating the risk of the model failing to reproduce'; Context Matrix row 15"
+    },
+    {
+      "id": "E15",
+      "entity": "rollback (failed-branch discard + PostgreSQL PITR + redb WAL)",
+      "canonical_owner": "PostgreSQL (branch discard / PITR); redb (application-level WAL)",
+      "lifetime": "on-demand recovery",
+      "write_authority": "PostgreSQL discards branch rows / restores to a recovery point; redb buffers writes during PostgreSQL outage",
+      "sync_edge": "branch fails -> discard branch (trunk untouched); PostgreSQL latency/outage -> redb WAL holds writes -> replay forward when PostgreSQL returns",
+      "recovery_source": "PostgreSQL PITR; redb local disk (ACID) during the outage window",
+      "identity_keys": ["rollback_id", "discarded_branch_id", "pitr_target", "redb_wal_segment"],
+      "relationship": {
+        "postgresql": "authoritative rollback (discard + PITR)",
+        "ruvector": "none (rollback is relational)",
+        "redb": "application-level Write-Ahead Log during PostgreSQL latency/outage; forward-replayed",
+        "codedb_nu_plugin": "none",
+        "agentdb": "none",
+        "envctl": "replays buffered redb WAL forward to PostgreSQL on recovery"
+      },
+      "grounding": "Blueprint §ATAS/COW 'if a branch fails, the database simply rolls it back'; §redb 'application-level Write-Ahead Log' during Postgres downtime; STORE-001 recovery sources"
+    },
+    {
+      "id": "E16",
+      "entity": "source_reconstruction (envctl projection / materialization from PostgreSQL)",
+      "canonical_owner": "PostgreSQL (source of truth) projected by envctl",
+      "lifetime": "derived + disposable (regenerated on demand)",
+      "write_authority": "envctl projection (read-only from PostgreSQL); never a reverse authority",
+      "sync_edge": "PostgreSQL production branch -> module_path metadata maps directory -> concatenate raw_code blocks -> byte-exact .rs/.toml/.nu files -> build env",
+      "recovery_source": "re-projection from PostgreSQL; independently, reproducible re-embedding restores semantic state",
+      "identity_keys": ["production_branch_id", "module_path", "byte_exact_checksum"],
+      "relationship": {
+        "postgresql": "source of truth for code rows and module_path metadata",
+        "ruvector": "none at projection time",
+        "redb": "none",
+        "codedb_nu_plugin": "materialization can re-parse to verify round-trip",
+        "agentdb": "none",
+        "envctl": "the projection engine (owned in detail by POSTGRES-008; used here for the reconstruction gate clause)"
+      },
+      "grounding": "Blueprint §Materialization 'queries PostgreSQL... module_path metadata... concatenates raw_code blocks back into complete standard files'; ADOPT-001 exact-byte materialization; STORE-001 derived-projection class"
+    }
+  ],
+
+  "capability_contracts": {
+    "retrieval": {
+      "decomposition_target": "retrieval",
+      "entities": ["E02", "E03", "E04", "E06"],
+      "contract": "target text -> pinned all-MiniLM-L6-v2 -> query vector; hybrid SQL: WHERE relational predicate (language, status) AND ORDER BY semantic_embedding <-> [query_vector] LIMIT k, optionally BM25 keyword scoring and FastGRNN pre-filter. RuVector executes natively in PostgreSQL (No-Sidecar); redb only caches f32 distance math.",
+      "gate_clauses_covered": ["hybrid search", "model and vector provenance", "reproducible embedding"]
+    },
+    "edit": {
+      "decomposition_target": "edit",
+      "entities": ["E01", "E08", "E05"],
+      "contract": "retrieved block -> UPDATE raw_code inside a COW branch row -> compute new SHA-256 content hash + re-embed + refresh causal edges. Never overwrites a source file; never touches main-trunk rows directly. Every edit carries a witness chain before it is eligible to merge.",
+      "gate_clauses_covered": ["concurrent edits", "source reconstruction (content identity preserved)"]
+    },
+    "branch": {
+      "decomposition_target": "branch",
+      "entities": ["E07", "E09", "E10"],
+      "contract": "clone main-trunk rows into isolated COW staging branches (MVCC isolation); agents work concurrently in separate branches; ATAS/ESN simulate parallel timelines (state diffs, resource burn, complexity spikes, failure nodes) up to 100 steps and score each by stability (cosine similarity, strange-attractor bounds).",
+      "gate_clauses_covered": ["branch isolation", "concurrent edits", "temporal scoring"]
+    },
+    "integrity": {
+      "decomposition_target": "integrity",
+      "entities": ["E11", "E12", "E13"],
+      "contract": "RuVector MinCut continuously severs hallucinating agent clusters in O(n^{o(1)}); every claim/edit must present a SHAKE256 witness chain rooted in a PostgreSQL source vector and pass Causal Graph Verification (a historical causal edge must exist) or it is rejected.",
+      "gate_clauses_covered": ["witness-bound decisions", "branch isolation (MinCut)"]
+    },
+    "merge": {
+      "decomposition_target": "merge",
+      "entities": ["E14", "E15", "E16"],
+      "contract": "deterministic gate = (automated tests pass) AND (witness chain rooted) AND (MinCut/causal integrity intact) AND (ESN-selected winning timeline); merge commits the already-computed winning branch rows to the main trunk (model never re-runs). Failed branches roll back; PostgreSQL PITR + redb WAL provide recovery; envctl re-projects byte-exact source. Autonomous merge is blocked in planning; the executor performs a gated, non-autonomous commit.",
+      "gate_clauses_covered": ["deterministic merge gates", "rollback", "source reconstruction"]
+    }
+  },
+
+  "gate_clause_coverage": {
+    "model_and_vector_provenance": "E03 embedding_model_pin (model id all-MiniLM-L6-v2, weights_sha256, dim=384, metric=cosine/<->, runtime Candle/ORT) bound to every E02 embedding; provenance is a PostgreSQL reference row, secrets stay in the keyring.",
+    "reproducible_embedding": "E02+E03: re-embedding a source block with the pinned weights reproduces the identical vector (deterministic inference), which is exactly the recovery mechanism (PITR + re-embedding).",
+    "hybrid_search": "E06: relational predicate + ORDER BY semantic_embedding <-> + BM25 + FastGRNN, executed natively by RuVector in PostgreSQL (No-Sidecar); redb only caches f32 distance math.",
+    "branch_isolation": "E07 COW staging branches (MVCC-isolated rows) + E11 MinCut isolation of hallucinating clusters.",
+    "concurrent_edits": "E07+E08: each agent edits its own COW branch; MVCC prevents overwrite; conflicts resolved at deterministic merge, not by clobbering.",
+    "temporal_scoring": "E09+E10: ATAS/ESN parallel timelines scored by stability (cosine similarity, strange-attractor bounds); RuvLTRA steers toward the most stable path.",
+    "witness_bound_decisions": "E12 SHAKE256 witness chain rooted in a PostgreSQL source vector + E13 causal-graph verification; unrooted/hallucinated edits rejected before merge.",
+    "deterministic_merge_gates": "E14: gate = tests AND witness AND MinCut/causal integrity AND ESN selection; commit copies already-computed winning branch rows to trunk (model never re-runs).",
+    "rollback": "E15: failed-branch discard + PostgreSQL PITR + redb application-level WAL during PostgreSQL latency/outage.",
+    "source_reconstruction": "E16: envctl projection (production branch -> module_path -> byte-exact concatenation of raw_code blocks); independently, reproducible re-embedding restores semantic state."
+  },
+
+  "decomposition_targets": [
+    {"target": "retrieval", "future_task_hint": "bounded embedding+hybrid-retrieval task", "entities": ["E02", "E03", "E04", "E06"]},
+    {"target": "edit", "future_task_hint": "bounded content-addressed semantic-SQL-edit task", "entities": ["E01", "E05", "E08"]},
+    {"target": "branch", "future_task_hint": "bounded COW-branch + temporal-alternative task", "entities": ["E07", "E09", "E10"]},
+    {"target": "integrity", "future_task_hint": "bounded MinCut + witness-chain task", "entities": ["E11", "E12", "E13"]},
+    {"target": "merge", "future_task_hint": "bounded deterministic-merge + rollback + reconstruction task", "entities": ["E14", "E15", "E16"]}
+  ],
+
+  "open_dependencies": [
+    "Live RuVector-in-PostgreSQL native extension activation is not yet locally proven; the semantic-vector class full cutover waits on it (STORE-001 open dependency; NBVERIFY-001 / REDB-CLAIM-023 remainder). Until then embeddings are produced via the proven Bun-loaded ruvector N-API path (NBVERIFY-004) and committed to PostgreSQL.",
+    "POSTGRES-004 user-space ingestion contracts (content hashes, AST parsing, module_path, restartable checkpoints) are the upstream inputs this plan consumes; POSTGRES-002/POSTGRES-003 schema plans define the concrete code_block / branch / edge columns this plan references by role.",
+    "Deterministic merge and rollback here define the gate only; the actual gated commit is a later executor task (decomposition target 'merge'), never an autonomous merge in this policy-cell."
+  ],
+
+  "rollback_plan": "Restore the prior semantic-edit plan; no vectors, branches, or source state are changed during planning."
+}

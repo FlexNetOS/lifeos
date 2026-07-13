@@ -1,0 +1,489 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "EXPERIENCE-001",
+  "title": "Rust-native LifeOS application boundary and API family defined",
+  "status": "defined",
+  "owner": "LifeOS Experience / Runtime Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "phase": "10-experience",
+  "objective": "Define the stable Rust-native application, state, command, event, plugin, policy, and data APIs that presentation clients consume without owning LifeOS logic. Every user-visible capability resolves through one of these seven governed API families; business logic and durable authority stay inside the Rust-native application core (the governed bounded contexts) and never migrate into a replaceable client; offline, error, rollback, and proof behavior are specified per family and globally.",
+  "product_execution_performed": false,
+  "verification_gate": "Every user-visible capability resolves through stable governed APIs; business logic and authority stay outside replaceable clients; offline, error, rollback, and proof behavior are specified.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/capability_merge_matrix.json (CONSOLIDATE-001: 15 bounded contexts + 36 published contracts)",
+    "generated/task_graph.source.csv (LIFEOS-010 parent; EXPERIENCE-002/003 siblings)",
+    "src/lifeos/CLAUDE.md (existing Tauri/Vue app surfaces: ai_complete, ai_provider_get/set, db_health, db_migrate, calm error strings, six workspaces + settings)"
+  ],
+  "store_authority_reference": "generated/store_relationship_decision.json",
+  "input_note": "Inputs per task_graph.source.csv: LIFEOS-010 (coherent replaceable interface layer over a Rust-native substrate), CONSOLIDATE-001 (the 15 bounded contexts and their published contracts that own all durable authority), the existing Tauri/Vue app, and governed domain contracts. This family does not invent capabilities; it exposes the already-governed CONSOLIDATE-001 contract surface through a stable seven-family API and pins the client/authority boundary.",
+  "governing_decision": "STORE-001 adopt-intended-tiered-architecture. BC-UI-PRESENTATION owns no durable macro-state; PostgreSQL + RuVector remains the single durable writer; redb is the transient/WAL tier; clients are read-only sinks that dispatch governed commands. The API boundary enforces the single-durable-writer invariant by construction: no API family lets a client become a durable authority.",
+
+  "application_boundary": {
+    "principle": "The UI is not the system. The Rust-native application core is the system; presentation clients are replaceable skins over a fixed seven-family API. This realizes LIFEOS-010 (separate Rust-native substrate from replaceable presentation) and the blueprint statement that LifeOS is a Mission Control UI that renders swarm status by reading the same memory-mapped redb state and PostgreSQL via UDS/IPC as a read-only sink.",
+    "rust_native_core": {
+      "identity": "The 15 CONSOLIDATE-001 bounded contexts compiled into the single-application host, minus BC-UI-PRESENTATION which is the client role itself.",
+      "owns": [
+        "all business logic (routing, forecasting, ingestion, bridging, cognition, policy, verification)",
+        "all durable authority (STORE-001: PostgreSQL+RuVector durable macro-state, redb transient tier, AgentDB per-agent cognition, OS keyring secrets, envctl projections)",
+        "all command validation, policy enforcement, proof emission, and rollback execution"
+      ],
+      "exposes_only": "the seven governed API families defined in api_families; nothing else crosses the boundary."
+    },
+    "replaceable_clients": {
+      "current": "Vue3 + Vite + Pinia + vue-router + Tauri2 shell (BC-UI-PRESENTATION PresentationShell + UDSClient).",
+      "future_approved": "desktop-first, then approved mobile, glasses, and ambient surfaces (LIFEOS-010; decomposed further by EXPERIENCE-002). Any client is swappable without moving logic because the seven-family API is the only contract.",
+      "presentation_groupings_no_authority": "The six existing workspaces (ai, gaming, work, personal, home, media) plus the /settings context are navigation containers only. They group and render governed capabilities; they hold no business logic and no durable state. A grouping is a view over the API families, never an owner."
+    },
+    "client_contract": {
+      "clients_may": [
+        "render governed state and data projections (State API, Data API)",
+        "dispatch typed commands to the owning context (Command API)",
+        "subscribe to server-pushed events and streams (Event API)",
+        "request a policy verdict before offering an action (Policy API)",
+        "list and invoke governed plugins through the protocol (Plugin API)",
+        "read application lifecycle/health and negotiate API version (Application API)",
+        "display proof references and error strings surfaced by the core"
+      ],
+      "clients_may_not": [
+        "mutate durable governed state directly (must go through Command API into the owning context)",
+        "embed business rules, routing, forecasting, verification, or migration logic",
+        "become a second durable writer for any STORE-001 macro-state class (single-durable-writer invariant)",
+        "hold raw secrets (references only; BC-SECRET keeps keys in the OS keyring)",
+        "bypass Policy API enforcement or forge a proof/witness chain",
+        "reconstruct authority locally (e.g., write directly to redb-durable or to PostgreSQL) outside the governed API"
+      ],
+      "authority_containment_by_context": "Enumerated in api_family_contract_coverage and store_001_alignment: every durable state class stays with its STORE-001 canonical owner behind the API boundary."
+    }
+  },
+
+  "api_families": [
+    {
+      "id": "API-APPLICATION",
+      "goal_term": "application",
+      "name": "Application Lifecycle & Capability Handshake API",
+      "purpose": "Boot, health, shutdown, and capability/version negotiation for the whole application. A client attaches, discovers which API families and versions the core supports, receives lifecycle/navigation intents, and probes health. Owns nothing domain-specific; it is the front door.",
+      "transport": "Tauri IPC command channel + native menu events (e.g. lifeos:navigate); available before any domain API.",
+      "served_by": "Rust-native application core (setup/boot orchestrator)",
+      "consumed_by": "every replaceable client",
+      "fronts_bounded_contexts": ["(cross-cutting; not a domain context)", "BC-PERSIST (health of CanonicalStore via db_health)"],
+      "governed_contracts": ["(lifecycle)", "CanonicalStore (health probe only)"],
+      "operations": [
+        {"name": "boot/init", "kind": "lifecycle", "routes_to": "setup orchestrator: Storage::new -> migrate() -> accounts::migrate_from_json (from CLAUDE.md storage init sequence)", "authority_owner": "Rust-native core; refuses to start with calm error on failure"},
+        {"name": "capability_handshake", "kind": "discovery", "routes_to": "API registry (supported families + semantic versions)", "authority_owner": "core"},
+        {"name": "db_health", "kind": "read", "routes_to": "BC-PERSIST CanonicalStore", "authority_owner": "PostgreSQL + RuVector"},
+        {"name": "navigate_intent", "kind": "event", "routes_to": "client router (e.g. /settings via lifeos:navigate)", "authority_owner": "core emits; client renders"},
+        {"name": "shutdown", "kind": "lifecycle", "routes_to": "graceful teardown (flush redb WAL forward before exit)", "authority_owner": "core"}
+      ],
+      "authority_location": "Rust-native core owns boot ordering and refuses to start on storage-init failure (calm string 'LifeOS couldn't initialize storage at <path> — see logs.').",
+      "offline_behavior": "Boot proceeds; db_health returns status='degraded' when applied_migrations < embedded count; client shown calm degraded banner, never blocked from local reads.",
+      "error_behavior": "Init failure -> calm sentence-case string; app refuses to start rather than start half-initialized.",
+      "rollback_behavior": "Not a mutation surface; the task-level rollback (restore archived interface-boundary plan, application source unchanged) applies here.",
+      "proof_behavior": "Exposes db_health {status, db_path, applied_migrations, last_migration_version, schema_version} as a boot-time proof handle.",
+      "stability": "v0; additive-only; handshake lets old clients keep working when new families are added."
+    },
+    {
+      "id": "API-STATE",
+      "goal_term": "state",
+      "name": "Governed State Read API",
+      "purpose": "Read-only projections of governed application/UI state: workspace/section/item ordering, swarm status snapshots, temporal-forecast state, hardware inventory, evidence corpus, prompt registry, task/bead boards, storage health. No mutation path. This is the client's window onto the current governed state.",
+      "transport": "UDS / Tauri IPC read calls + shared memory-mapped redb reads (blueprint: LifeOS reads the same redb files agents write).",
+      "served_by": "Rust-native application core",
+      "consumed_by": "every replaceable client",
+      "fronts_bounded_contexts": ["BC-ORCHESTRATION", "BC-INGEST", "BC-COGNITION", "BC-GOVERNANCE", "BC-DEVEX", "BC-COMPUTE", "BC-EVIDENCE", "BC-PERSIST"],
+      "governed_contracts": ["SwarmRouter (status)", "TemporalForecast", "TaskRunner (status)", "ScratchpadBuffer (redb read)", "AgentRuntime (status)", "TaskSubstrate", "PromptRegistry", "ReadOnlyViewer", "HardwareInventory", "SourceEvidencePipeline", "CanonicalStore (read projections)"],
+      "operations": [
+        {"name": "get_swarm_status", "kind": "read", "routes_to": "BC-ORCHESTRATION SwarmRouter + BC-INGEST ScratchpadBuffer (redb) + BC-COGNITION AgentRuntime", "authority_owner": "redb transient tier (status) / PostgreSQL (settled)"},
+        {"name": "get_forecast_state", "kind": "read", "routes_to": "BC-ORCHESTRATION TemporalForecast (ATAS/ESN future timelines)", "authority_owner": "PostgreSQL (initial conditions); simulation state transient"},
+        {"name": "get_task_board", "kind": "read", "routes_to": "BC-GOVERNANCE TaskSubstrate + BC-DEVEX ReadOnlyViewer", "authority_owner": "subordinate task store; provenance references BC-PERSIST"},
+        {"name": "get_prompt_registry", "kind": "read", "routes_to": "BC-GOVERNANCE PromptRegistry", "authority_owner": "subordinate registry"},
+        {"name": "get_hardware_inventory", "kind": "read", "routes_to": "BC-COMPUTE HardwareInventory", "authority_owner": "inventory facts (non-durable)"},
+        {"name": "get_evidence_corpus", "kind": "read", "routes_to": "BC-EVIDENCE SourceEvidencePipeline", "authority_owner": "evidence files (non-durable)"},
+        {"name": "get_workspace_layout", "kind": "read", "routes_to": "core projection of persisted keys (activeId, sectionByWs, orders) per CLAUDE.md persistence whitelist", "authority_owner": "PostgreSQL-backed via BC-PERSIST for durable prefs"},
+        {"name": "get_db_health", "kind": "read", "routes_to": "BC-PERSIST CanonicalStore", "authority_owner": "PostgreSQL + RuVector"}
+      ],
+      "authority_location": "All reads are projections; the client cannot write. Durable state stays with each STORE-001 owner. redb reads are the transient tier only.",
+      "offline_behavior": "Reads degrade to last-known redb-buffered/cached snapshot when PostgreSQL is offline; the client renders a 'stale as of <t>' marker. redb-backed status keeps flowing because it is local (mmap/UDS).",
+      "error_behavior": "Unavailable projection returns a typed empty/stale result with a calm reason string; never a partial/guessed value.",
+      "rollback_behavior": "Read-only; nothing to roll back.",
+      "proof_behavior": "State projections that reflect a settled durable fact carry the source provenance reference (module_path / PostgreSQL row / witness root) so a client can show where a value came from.",
+      "stability": "v0; additive fields only; removed fields go through deprecation."
+    },
+    {
+      "id": "API-COMMAND",
+      "goal_term": "command",
+      "name": "Governed Command (Mutation) API",
+      "purpose": "The single mutation entry point. A client dispatches a typed command; the core validates it through the Policy API, executes it inside the owning bounded context under that context's authority, and returns a typed result plus a proof and rollback handle. The client never mutates governed state itself.",
+      "transport": "Tauri IPC invoke (e.g. invoke('ai_complete', {prompt, source})) / UDS request-response.",
+      "served_by": "Rust-native application core (command router)",
+      "consumed_by": "every replaceable client",
+      "fronts_bounded_contexts": ["BC-COGNITION", "BC-ORCHESTRATION", "BC-INGEST", "BC-BRIDGE", "BC-FOUNDATION", "BC-HOME-NETWORK", "BC-SECRET", "BC-GOVERNANCE", "BC-CONTROL-PLANE", "BC-PERSIST"],
+      "governed_contracts": ["AgentRuntime (ai_complete)", "SwarmRouter/TaskRunner (route/run task)", "IngestPipeline (start ingest)", "ForwardBridge/Projection/MigrationEngine (materialize/migrate)", "PortableBuild/BuildCoordinator (build release)", "NetworkControl", "SecretAuthority (set reference)", "TaskSubstrate/HandoffSeam (task ops)", "MetaOrchestrator/LoopEngine (meta exec / run)", "CanonicalStore (governed writes via UPDATE)"],
+      "operations": [
+        {"name": "ai_complete", "kind": "mutation/dispatch", "routes_to": "BC-COGNITION AgentRuntime via BC-ORCHESTRATION RuvLTRA routing; Tauri host -> Rust -> provider; Vitest/browser keeps canned-reply path", "authority_owner": "AgentDB (.rvf) cognition + provider; keys from BC-SECRET keyring"},
+        {"name": "set_ai_provider", "kind": "mutation", "routes_to": "core provider selection; key resolution BC-SECRET", "authority_owner": "OS keyring (BC-SECRET); provider choice persisted per whitelist"},
+        {"name": "start_ingest", "kind": "mutation", "routes_to": "BC-INGEST IngestPipeline (Nushell parse -> redb buffer -> BlobStore capture)", "authority_owner": "redb transient tier; durable blobs cut over to PostgreSQL via verified BlobStore SHA-256 parity (STORE-001)"},
+        {"name": "materialize_release", "kind": "mutation", "routes_to": "BC-BRIDGE Projection (PostgreSQL -> filesystem via module_path) then BC-FOUNDATION PortableBuild (musl static)", "authority_owner": "envctl projection is read-only from PostgreSQL; PostgreSQL is source of truth"},
+        {"name": "run_migration", "kind": "mutation", "routes_to": "BC-BRIDGE MigrationEngine (db_migrate, idempotent sqlx::migrate!)", "authority_owner": "PostgreSQL (single durable writer)"},
+        {"name": "route_task", "kind": "mutation/dispatch", "routes_to": "BC-ORCHESTRATION SwarmRouter/TaskRunner (Proportional Intelligence)", "authority_owner": "orchestration reads BC-PERSIST; commits via COW branch merge"},
+        {"name": "network_control", "kind": "mutation", "routes_to": "BC-HOME-NETWORK NetworkControl", "authority_owner": "durable home/network state persisted to BC-PERSIST (single writer)"},
+        {"name": "set_secret_reference", "kind": "mutation", "routes_to": "BC-SECRET SecretAuthority", "authority_owner": "OS keyring / external vault; PostgreSQL stores provenance references, never raw secrets"},
+        {"name": "task_op", "kind": "mutation", "routes_to": "BC-GOVERNANCE TaskSubstrate/HandoffSeam", "authority_owner": "subordinate task store; provenance to BC-PERSIST"},
+        {"name": "meta_exec", "kind": "mutation/dispatch", "routes_to": "BC-CONTROL-PLANE MetaOrchestrator/LoopEngine", "authority_owner": "orchestration only; no durable macro-state"}
+      ],
+      "authority_location": "The command router validates (Policy API), then the OWNING context performs the write under its own STORE-001 authority. The client holds no write capability; it holds a command result + proof_ref + rollback_handle.",
+      "offline_behavior": "Commands requiring a durable write while PostgreSQL is offline are accepted into the redb application-level WAL and forward-flushed by envctl on reconnect (forward-only; blueprint redb WAL + STORE-001 invariant). The client is told 'queued, will sync' — it does not itself hold the durable truth. Commands that cannot be safely queued (e.g. release build) are refused with a calm reason.",
+      "error_behavior": "Every command returns a typed Result; on reject the core surfaces a calm second-person string (e.g. 'LifeOS couldn't reach the AI provider right now — try again.'). No raw provider/DB error reaches the client.",
+      "rollback_behavior": "Each command returns a rollback_handle bound to the owning context's mechanism (COW staging-branch discard, idempotent migration re-run, BlobStore SHA-256 parity cutover reversal with redb retained, meta git snapshot restore). The client may REQUEST rollback; the core EXECUTES it in the owning context.",
+      "proof_behavior": "Every governed mutation emits a SHAKE256 Cryptographic Witness Chain rooted in a PostgreSQL source vector; the command result carries proof_ref. Causal-graph verification rejects any claim lacking a historical root, so a client cannot forge a mutation proof.",
+      "stability": "v0; command names + payload schemas are the stable contract; additive-only; Vitest/browser dual-mode path (window.__TAURI__ guard) preserved."
+    },
+    {
+      "id": "API-EVENT",
+      "goal_term": "event",
+      "name": "Event & Stream Subscription API",
+      "purpose": "Server-pushed, read-only streams: real-time swarm/agent status, ingestion progress, build logs, AI token streams, temporal-forecast updates, and policy/MinCut/merge verdicts. The client subscribes and renders; it originates no authority.",
+      "transport": "UDS / Tauri event channel + shared memory-mapped redb tailing (blueprint: render swarm status by reading the same redb file agents write).",
+      "served_by": "Rust-native application core (event bus)",
+      "consumed_by": "every replaceable client",
+      "fronts_bounded_contexts": ["BC-ORCHESTRATION", "BC-INGEST", "BC-COGNITION", "BC-BRIDGE", "BC-FOUNDATION", "BC-INTEGRITY"],
+      "governed_contracts": ["SwarmRouter (status stream)", "TaskRunner (progress)", "ScratchpadBuffer (redb tail)", "AgentRuntime (token stream)", "ForwardBridge (sync progress)", "PortableBuild (build log)", "TemporalForecast (timeline updates)", "PolicyGuard/SwarmImmuneSystem/MergeGate (verdict stream)"],
+      "operations": [
+        {"name": "subscribe_swarm_status", "kind": "stream", "routes_to": "BC-ORCHESTRATION SwarmRouter + redb tail", "authority_owner": "redb (transient); core is emitter"},
+        {"name": "subscribe_ai_tokens", "kind": "stream", "routes_to": "BC-COGNITION AgentRuntime", "authority_owner": "cognition; core relays"},
+        {"name": "subscribe_ingest_progress", "kind": "stream", "routes_to": "BC-INGEST IngestPipeline", "authority_owner": "redb transient tier"},
+        {"name": "subscribe_build_log", "kind": "stream", "routes_to": "BC-BRIDGE ForwardBridge + BC-FOUNDATION PortableBuild", "authority_owner": "envctl / build coordinator"},
+        {"name": "subscribe_policy_verdicts", "kind": "stream", "routes_to": "BC-INTEGRITY PolicyGuard/SwarmImmuneSystem (MinCut isolation)/MergeGate", "authority_owner": "BC-INTEGRITY (verdicts only; no durable state)"}
+      ],
+      "authority_location": "Push-only; a subscription cannot mutate. Streams are projections of governed state or of context verdicts.",
+      "offline_behavior": "redb-sourced streams (swarm status, ingest progress) keep flowing while PostgreSQL is offline because they read the local mmap tier; PostgreSQL-sourced streams pause and resume with a gap marker on reconnect.",
+      "error_behavior": "Dropped subscription -> typed 'stream_interrupted' event with a calm reason; the client re-subscribes; no silent gaps.",
+      "rollback_behavior": "N/A (read-only); rollback of an underlying mutation surfaces as a compensating event on the stream.",
+      "proof_behavior": "Verdict events (MinCut isolation, merge-gate result) are proof-carrying: each references the witness/causal-edge basis so the client can display why an agent was severed or a merge blocked.",
+      "stability": "v0; event types are additive; a client ignores unknown event types safely."
+    },
+    {
+      "id": "API-PLUGIN",
+      "goal_term": "plugin",
+      "name": "Plugin & Extension Protocol API",
+      "purpose": "Expose governed extensions: typed subprocess plugins over MessagePack (meta plugin protocol) and Nushell ingestion plugins (nu_plugin CodeDB). A client can list registered plugins and invoke governed plugin operations; the protocol, capability gating, and plugin authority live server-side.",
+      "transport": "MessagePack over subprocess stdio (blueprint: native Nushell plugins stream structured data via MessagePack, avoiding JSON); meta_plugin_protocol::run_plugin.",
+      "served_by": "Rust-native application core (plugin host)",
+      "consumed_by": "every replaceable client",
+      "fronts_bounded_contexts": ["BC-CONTROL-PLANE", "BC-INGEST"],
+      "governed_contracts": ["PluginProtocol", "IngestPipeline (nu_plugin CodeDB path)", "MetaOrchestrator (plugin routing)"],
+      "operations": [
+        {"name": "list_plugins", "kind": "read", "routes_to": "BC-CONTROL-PLANE PluginProtocol registry", "authority_owner": "core plugin host"},
+        {"name": "invoke_plugin", "kind": "dispatch", "routes_to": "BC-CONTROL-PLANE PluginProtocol -> typed subprocess; BC-INGEST for nu_plugin CodeDB ingestion", "authority_owner": "plugin subprocess under core-granted capability; ingestion writes to redb buffer then envctl bridge to PostgreSQL"},
+        {"name": "register_plugin", "kind": "mutation", "routes_to": "BC-CONTROL-PLANE (capability-gated registration)", "authority_owner": "core; gated by Policy API"}
+      ],
+      "authority_location": "Plugins run as core-hosted subprocesses with core-granted capabilities; a client cannot grant itself plugin capability or bypass the MessagePack protocol. nu_plugin ingestion never becomes a durable authority — it buffers into redb and envctl bridges forward to PostgreSQL (STORE-001).",
+      "offline_behavior": "nu_plugin ingestion continues into the redb buffer while PostgreSQL is offline; the envctl bridge forward-flushes on reconnect. Other plugins report degraded per their own contract.",
+      "error_behavior": "Plugin crash/timeout -> typed 'plugin_failed' with a calm reason and the plugin id; the core isolates the subprocess; the client is not exposed to raw stderr.",
+      "rollback_behavior": "A plugin-initiated governed write is rolled back through the same owning-context mechanism as any command (e.g. ingested blobs discarded before envctl bridge, or COW branch discard).",
+      "proof_behavior": "Plugin-produced ingested code carries BLAKE3 dedup hashes and, once bridged, SHA-256 content-addressed identity; witness chains bind the resulting rows to source vectors.",
+      "stability": "v0; MessagePack schema versioned; plugin capability grants are explicit and additive."
+    },
+    {
+      "id": "API-POLICY",
+      "goal_term": "policy",
+      "name": "Policy, Capability-Gating & Verification API",
+      "purpose": "Enforcement seam that keeps authority server-side. A client asks 'may I dispatch command X on target Y?' and the core returns an allow/deny verdict; the core also enforces the same policy internally on every command (a client cannot bypass by calling the Command API directly). Fronts the swarm immune system, witness-chain verification, and merge gates.",
+      "transport": "Tauri IPC / UDS request-response; also enforced inline on every Command API call (PreToolUse-style denial).",
+      "served_by": "Rust-native application core (policy engine)",
+      "consumed_by": "every replaceable client; also invoked internally by API-COMMAND and API-PLUGIN",
+      "fronts_bounded_contexts": ["BC-INTEGRITY"],
+      "governed_contracts": ["PolicyGuard", "SwarmImmuneSystem", "WitnessChain", "MergeGate"],
+      "operations": [
+        {"name": "evaluate_policy", "kind": "read/verdict", "routes_to": "BC-INTEGRITY PolicyGuard (agent guard / PreToolUse denial)", "authority_owner": "BC-INTEGRITY (verdict only)"},
+        {"name": "check_merge_gate", "kind": "verdict", "routes_to": "BC-INTEGRITY MergeGate (inverse-dependency verification)", "authority_owner": "BC-INTEGRITY"},
+        {"name": "verify_witness", "kind": "verdict", "routes_to": "BC-INTEGRITY WitnessChain (SHAKE256) + causal-graph verification over BC-PERSIST", "authority_owner": "BC-INTEGRITY over PostgreSQL provenance"},
+        {"name": "report_immune_status", "kind": "read", "routes_to": "BC-INTEGRITY SwarmImmuneSystem (MinCut)", "authority_owner": "BC-INTEGRITY"}
+      ],
+      "authority_location": "Policy verdicts are advisory to the client but binding in the core: even if a client offers a denied action, the Command API re-checks and refuses. Authority to allow/deny lives in BC-INTEGRITY, never in the client.",
+      "offline_behavior": "Policy evaluation is local to the core and continues offline; witness-chain verification against PostgreSQL provenance degrades to 'unverifiable-offline' (fail-closed for durable writes) rather than allow-by-default.",
+      "error_behavior": "Denial returns a typed verdict with a calm reason and the failing clause; never a silent block.",
+      "rollback_behavior": "A merge-gate/MinCut denial prevents a mutation from landing, so there is nothing to roll back; an isolated (severed) agent's in-flight work is discarded, not merged.",
+      "proof_behavior": "Every verdict is proof-carrying: allow verdicts reference the satisfied capability grant; deny/verify verdicts reference the missing causal edge or witness root. This is the anti-bluffing guarantee (blueprint: mathematically impossible to write hallucinated fiction).",
+      "stability": "v0; policy verdict schema stable; new policy clauses are additive and default to fail-closed for durable writes."
+    },
+    {
+      "id": "API-DATA",
+      "goal_term": "data",
+      "name": "Canonical Data & Semantic Query API",
+      "purpose": "The governed query surface over the canonical knowledge graph: hybrid semantic + relational search, knowledge-graph traversal, code AST/row reads, and causal-dependency edges. Richer than State-API projections — it is the human-visible analog of the agent Semantic-IDE (SQL + RuVector hybrid search). Reads are direct; writes are only via the Command API into BC-PERSIST.",
+      "transport": "UDS / Tauri IPC query calls into BC-PERSIST (PostgreSQL + RuVector native extension, No Sidecar).",
+      "served_by": "Rust-native application core (query gateway)",
+      "consumed_by": "every replaceable client",
+      "fronts_bounded_contexts": ["BC-PERSIST"],
+      "governed_contracts": ["CanonicalStore", "HybridSearch", "KnowledgeGraph"],
+      "operations": [
+        {"name": "hybrid_search", "kind": "read", "routes_to": "BC-PERSIST HybridSearch (ORDER BY semantic_embedding <-> [target]; BM25 + vector)", "authority_owner": "PostgreSQL + RuVector"},
+        {"name": "traverse_graph", "kind": "read", "routes_to": "BC-PERSIST KnowledgeGraph (GNN causal edges, dependency columns)", "authority_owner": "PostgreSQL + RuVector"},
+        {"name": "read_code_rows", "kind": "read", "routes_to": "BC-PERSIST CanonicalStore (raw_code, module_path, AST fragments)", "authority_owner": "PostgreSQL (single durable owner)"},
+        {"name": "governed_write", "kind": "delegated-mutation", "routes_to": "REDIRECTS to API-COMMAND -> BC-PERSIST UPDATE under COW branching", "authority_owner": "PostgreSQL; never a direct client write"}
+      ],
+      "authority_location": "PostgreSQL + RuVector is the single durable owner of relational + semantic macro-state. The Data API is read + governed-write-via-Command only; RuVector runs as a native PostgreSQL extension (No Sidecar). redb performs f32 distance math only as a cache and holds no SQL/secondary index (STORE-001 REDB-CLAIM-008/009/010 refuted).",
+      "offline_behavior": "Semantic/graph queries requiring live RuVector degrade to the last redb-cached vector distance results or a 'canonical-store-offline' typed response; the client never writes canonical data locally to compensate.",
+      "error_behavior": "Query failure -> typed empty/degraded result with a calm reason; embeddings are reproducible (re-embed on recovery), so degraded reads are recoverable, not lost.",
+      "rollback_behavior": "Reads have none; governed writes roll back via BC-PERSIST COW staging-branch discard (blueprint COW branching).",
+      "proof_behavior": "Every returned code row/edge carries its provenance (source commit/PR lineage per adopted_capabilities.source.csv, module_path, witness root); results are traceable, not asserted.",
+      "stability": "v0; query shapes stable; semantic-class full cutover to RuVector-in-PostgreSQL is gated on STORE-001 open dependency (live extension activation)."
+    }
+  ],
+
+  "api_family_contract_coverage": {
+    "purpose": "Rigorous 'every X' enumeration: every governed published contract from CONSOLIDATE-001 (36 total across 15 contexts; the 2 BC-UI-PRESENTATION contracts define the client role and are excluded, leaving 34 consumed governed contracts) is fronted by at least one API family, and each is marked user-visible or internal-only. No governed contract is unreachable and no user-visible capability lacks a governed API.",
+    "consumed_governed_contract_count": 34,
+    "coverage": [
+      {"context": "BC-PERSIST", "contract": "CanonicalStore", "api_families": ["API-DATA", "API-STATE", "API-APPLICATION(health)"], "user_visible": true, "note": "read code rows / db_health; writes only via API-COMMAND"},
+      {"context": "BC-PERSIST", "contract": "HybridSearch", "api_families": ["API-DATA"], "user_visible": true, "note": "semantic codebase search surface"},
+      {"context": "BC-PERSIST", "contract": "KnowledgeGraph", "api_families": ["API-DATA"], "user_visible": true, "note": "dependency-graph browse"},
+      {"context": "BC-INGEST", "contract": "IngestPipeline", "api_families": ["API-COMMAND", "API-EVENT", "API-PLUGIN"], "user_visible": true, "note": "start ingest + progress; nu_plugin path"},
+      {"context": "BC-INGEST", "contract": "BlobStore", "api_families": ["API-COMMAND(internal)"], "user_visible": false, "note": "content-addressed capture; internal to ingestion, surfaced only as ingest progress"},
+      {"context": "BC-INGEST", "contract": "ScratchpadBuffer", "api_families": ["API-STATE", "API-EVENT"], "user_visible": true, "note": "redb-backed live swarm status the UI renders"},
+      {"context": "BC-BRIDGE", "contract": "ForwardBridge", "api_families": ["API-EVENT"], "user_visible": true, "note": "sync progress stream; write path itself is internal/forward-only"},
+      {"context": "BC-BRIDGE", "contract": "Projection", "api_families": ["API-COMMAND", "API-EVENT"], "user_visible": true, "note": "trigger materialize/release + log"},
+      {"context": "BC-BRIDGE", "contract": "MigrationEngine", "api_families": ["API-COMMAND"], "user_visible": true, "note": "run db_migrate (idempotent)"},
+      {"context": "BC-COGNITION", "contract": "AgentRuntime", "api_families": ["API-COMMAND", "API-EVENT", "API-STATE"], "user_visible": true, "note": "AI chat / ai_complete + token stream + agent status"},
+      {"context": "BC-COGNITION", "contract": "CognitiveContainer", "api_families": ["API-COMMAND(internal)"], "user_visible": false, "note": ".rvf hot-swap is runtime-internal; not directly client-driven"},
+      {"context": "BC-ORCHESTRATION", "contract": "SwarmRouter", "api_families": ["API-COMMAND", "API-STATE", "API-EVENT"], "user_visible": true, "note": "route task / view swarm status"},
+      {"context": "BC-ORCHESTRATION", "contract": "TemporalForecast", "api_families": ["API-STATE", "API-EVENT"], "user_visible": true, "note": "future-timeline view (ATAS/ESN)"},
+      {"context": "BC-ORCHESTRATION", "contract": "TaskRunner", "api_families": ["API-COMMAND", "API-STATE", "API-EVENT"], "user_visible": true, "note": "run/monitor swarm tasks"},
+      {"context": "BC-INTEGRITY", "contract": "PolicyGuard", "api_families": ["API-POLICY"], "user_visible": true, "note": "capability gating verdict; also internal on every command"},
+      {"context": "BC-INTEGRITY", "contract": "SwarmImmuneSystem", "api_families": ["API-POLICY", "API-EVENT"], "user_visible": true, "note": "MinCut isolation alerts"},
+      {"context": "BC-INTEGRITY", "contract": "WitnessChain", "api_families": ["API-POLICY(verify)"], "user_visible": false, "note": "SHAKE256 verification; surfaced as proof_ref, not a standalone screen"},
+      {"context": "BC-INTEGRITY", "contract": "MergeGate", "api_families": ["API-POLICY", "API-EVENT"], "user_visible": true, "note": "merge-gate verdict view"},
+      {"context": "BC-GOVERNANCE", "contract": "TaskSubstrate", "api_families": ["API-STATE", "API-COMMAND"], "user_visible": true, "note": "bead/task board"},
+      {"context": "BC-GOVERNANCE", "contract": "HandoffSeam", "api_families": ["API-COMMAND"], "user_visible": true, "note": "one-way task handoff from KB"},
+      {"context": "BC-GOVERNANCE", "contract": "PromptRegistry", "api_families": ["API-STATE", "API-COMMAND"], "user_visible": true, "note": "browse/select prompts"},
+      {"context": "BC-EVIDENCE", "contract": "SourceEvidencePipeline", "api_families": ["API-STATE"], "user_visible": true, "note": "evidence corpus browse; producer is offline/internal"},
+      {"context": "BC-CONTROL-PLANE", "contract": "MetaOrchestrator", "api_families": ["API-COMMAND", "API-EVENT"], "user_visible": true, "note": "meta exec / workspace-tree run status"},
+      {"context": "BC-CONTROL-PLANE", "contract": "PluginProtocol", "api_families": ["API-PLUGIN"], "user_visible": true, "note": "list/invoke plugins"},
+      {"context": "BC-CONTROL-PLANE", "contract": "LoopEngine", "api_families": ["API-COMMAND", "API-EVENT"], "user_visible": true, "note": "cross-repo command execution status"},
+      {"context": "BC-FOUNDATION", "contract": "ToolchainEnv", "api_families": ["API-STATE(internal)"], "user_visible": false, "note": "Yazelix toolchain env; build-time, not a user action surface"},
+      {"context": "BC-FOUNDATION", "contract": "PortableBuild", "api_families": ["API-COMMAND", "API-EVENT"], "user_visible": true, "note": "trigger musl static release + build log"},
+      {"context": "BC-FOUNDATION", "contract": "BuildCoordinator", "api_families": ["API-COMMAND(internal)"], "user_visible": false, "note": "orchestrates PortableBuild; surfaced via build log, not a separate control"},
+      {"context": "BC-COMPUTE", "contract": "GpuComputeSeam", "api_families": ["API-STATE(internal)"], "user_visible": false, "note": "safe compute trait; placement-internal"},
+      {"context": "BC-COMPUTE", "contract": "HardwareInventory", "api_families": ["API-STATE"], "user_visible": true, "note": "GPU/hardware inventory view"},
+      {"context": "BC-HOME-NETWORK", "contract": "NetworkControl", "api_families": ["API-COMMAND", "API-STATE"], "user_visible": true, "note": "home/network control panel"},
+      {"context": "BC-DEVEX", "contract": "ReadOnlyViewer", "api_families": ["API-STATE"], "user_visible": true, "note": "bead viewer / board TUI"},
+      {"context": "BC-DEVEX", "contract": "TokenProxy", "api_families": ["API-STATE(internal)"], "user_visible": false, "note": "token-minimizing CLI proxy; dev-side, not a UI screen"},
+      {"context": "BC-SECRET", "contract": "SecretAuthority", "api_families": ["API-COMMAND", "API-STATE"], "user_visible": true, "note": "set/rotate key REFERENCES + view provenance refs; raw secrets never leave keyring"}
+    ],
+    "invariant_every_governed_contract_fronted": true,
+    "invariant_every_user_visible_capability_has_governed_api": true,
+    "user_visible_contract_count": 27,
+    "internal_only_contract_count": 7
+  },
+
+  "user_visible_capabilities": [
+    {"capability": "View real-time agent-swarm status", "api_families": ["API-STATE", "API-EVENT"], "operation": "get_swarm_status / subscribe_swarm_status", "governing_context": "BC-ORCHESTRATION + BC-INGEST(redb) + BC-COGNITION", "governing_contract": "SwarmRouter / ScratchpadBuffer / AgentRuntime", "authority_owner": "redb transient tier (live) / PostgreSQL (settled)", "grounded_source": "Blueprint: LifeOS renders swarm status by reading the same memory-mapped redb file via UDS"},
+    {"capability": "Semantic search of the database-hosted codebase", "api_families": ["API-DATA"], "operation": "hybrid_search", "governing_context": "BC-PERSIST", "governing_contract": "HybridSearch", "authority_owner": "PostgreSQL + RuVector", "grounded_source": "Blueprint Semantic IDE: ORDER BY semantic_embedding <-> ; No-Sidecar RuVector"},
+    {"capability": "Browse knowledge-graph / dependency edges", "api_families": ["API-DATA"], "operation": "traverse_graph", "governing_context": "BC-PERSIST", "governing_contract": "KnowledgeGraph", "authority_owner": "PostgreSQL + RuVector", "grounded_source": "Blueprint: causal dependency edges, GNN in Postgres"},
+    {"capability": "AI chat / agent completion", "api_families": ["API-COMMAND", "API-EVENT"], "operation": "ai_complete / subscribe_ai_tokens", "governing_context": "BC-COGNITION + BC-ORCHESTRATION(routing)", "governing_contract": "AgentRuntime / SwarmRouter(RuvLTRA)", "authority_owner": "AgentDB (.rvf) + provider; keys in BC-SECRET keyring", "grounded_source": "CLAUDE.md ai_complete dual-mode; Blueprint RuvLTRA Proportional Intelligence"},
+    {"capability": "Select / configure AI provider", "api_families": ["API-COMMAND", "API-STATE"], "operation": "set_ai_provider / get_workspace_layout(aiProvider)", "governing_context": "BC-SECRET (key auth) + core", "governing_contract": "SecretAuthority", "authority_owner": "OS keyring (anthropic|openai|gemini)", "grounded_source": "CLAUDE.md ai_provider_get/set; keyring service 'lifeos'"},
+    {"capability": "Trigger + monitor code ingestion", "api_families": ["API-COMMAND", "API-EVENT", "API-PLUGIN"], "operation": "start_ingest / subscribe_ingest_progress / invoke_plugin(nu_plugin)", "governing_context": "BC-INGEST", "governing_contract": "IngestPipeline", "authority_owner": "redb transient tier; forward-only to PostgreSQL via envctl", "grounded_source": "Blueprint three-pillar ingestion: Nushell -> redb -> envctl -> PostgreSQL"},
+    {"capability": "Materialize + build a portable release", "api_families": ["API-COMMAND", "API-EVENT"], "operation": "materialize_release / subscribe_build_log", "governing_context": "BC-BRIDGE + BC-FOUNDATION", "governing_contract": "Projection / PortableBuild", "authority_owner": "envctl projection (read-only from PostgreSQL) + musl static build", "grounded_source": "Blueprint Phase 4 materialization + Nix musl install-in-place"},
+    {"capability": "View temporal future-timeline forecast", "api_families": ["API-STATE", "API-EVENT"], "operation": "get_forecast_state", "governing_context": "BC-ORCHESTRATION", "governing_contract": "TemporalForecast", "authority_owner": "PostgreSQL (initial conditions); simulation transient", "grounded_source": "Blueprint ATAS/ESN future timelines: state diffs, resource burn, failure nodes"},
+    {"capability": "View task / bead governance board", "api_families": ["API-STATE", "API-COMMAND"], "operation": "get_task_board / task_op", "governing_context": "BC-GOVERNANCE + BC-DEVEX", "governing_contract": "TaskSubstrate / ReadOnlyViewer", "authority_owner": "subordinate task store; provenance references BC-PERSIST", "grounded_source": "CONSOLIDATE-001 BC-GOVERNANCE (beads/handoff) + BC-DEVEX viewer"},
+    {"capability": "Accept a task handoff from the knowledge base", "api_families": ["API-COMMAND"], "operation": "task_op(handoff)", "governing_context": "BC-GOVERNANCE", "governing_contract": "HandoffSeam", "authority_owner": "subordinate task store", "grounded_source": "CONSOLIDATE-001 BC-GOVERNANCE one-way handoff"},
+    {"capability": "Browse / select a prompt from the registry", "api_families": ["API-STATE", "API-COMMAND"], "operation": "get_prompt_registry / task_op(select)", "governing_context": "BC-GOVERNANCE", "governing_contract": "PromptRegistry", "authority_owner": "subordinate registry", "grounded_source": "CONSOLIDATE-001 BC-GOVERNANCE prompt registry"},
+    {"capability": "View policy verdicts, MinCut isolation, and merge gates", "api_families": ["API-POLICY", "API-EVENT"], "operation": "evaluate_policy / check_merge_gate / subscribe_policy_verdicts", "governing_context": "BC-INTEGRITY", "governing_contract": "PolicyGuard / MergeGate / SwarmImmuneSystem", "authority_owner": "BC-INTEGRITY (verdicts only)", "grounded_source": "Blueprint MinCut immune system + agent guard PreToolUse denial (meta rules)"},
+    {"capability": "Home / network control panel", "api_families": ["API-COMMAND", "API-STATE"], "operation": "network_control / get(NetworkControl)", "governing_context": "BC-HOME-NETWORK", "governing_contract": "NetworkControl", "authority_owner": "durable state persisted to BC-PERSIST", "grounded_source": "CONSOLIDATE-001 BC-HOME-NETWORK; LifeOS 'home' workspace"},
+    {"capability": "View / recover storage health", "api_families": ["API-APPLICATION", "API-STATE", "API-COMMAND"], "operation": "db_health / run_migration", "governing_context": "BC-PERSIST + BC-BRIDGE", "governing_contract": "CanonicalStore / MigrationEngine", "authority_owner": "PostgreSQL + RuVector", "grounded_source": "CLAUDE.md db_health / db_migrate (idempotent)"},
+    {"capability": "List and invoke governed plugins", "api_families": ["API-PLUGIN"], "operation": "list_plugins / invoke_plugin", "governing_context": "BC-CONTROL-PLANE + BC-INGEST", "governing_contract": "PluginProtocol / IngestPipeline", "authority_owner": "core plugin host (capability-gated)", "grounded_source": "Blueprint MessagePack nu_plugin; meta_plugin_protocol::run_plugin"},
+    {"capability": "Manage secret references (keys, pins, attestations)", "api_families": ["API-COMMAND", "API-STATE"], "operation": "set_secret_reference / get(provenance refs)", "governing_context": "BC-SECRET", "governing_contract": "SecretAuthority", "authority_owner": "OS keyring + committed source pins; PostgreSQL stores references only", "grounded_source": "STORE-001 external-secret/provenance class; redb never holds secrets"},
+    {"capability": "Meta multi-repo orchestration view (workspace tree, run status)", "api_families": ["API-COMMAND", "API-EVENT"], "operation": "meta_exec / subscribe(LoopEngine)", "governing_context": "BC-CONTROL-PLANE", "governing_contract": "MetaOrchestrator / LoopEngine", "authority_owner": "orchestration only (no durable macro-state)", "grounded_source": "Blueprint gitkb/meta control plane; meta exec"},
+    {"capability": "Browse the source-evidence corpus", "api_families": ["API-STATE"], "operation": "get_evidence_corpus", "governing_context": "BC-EVIDENCE", "governing_contract": "SourceEvidencePipeline", "authority_owner": "evidence files (non-durable)", "grounded_source": "CONSOLIDATE-001 BC-EVIDENCE NotebookLM extraction"},
+    {"capability": "View GPU / hardware inventory for edge placement", "api_families": ["API-STATE"], "operation": "get_hardware_inventory", "governing_context": "BC-COMPUTE", "governing_contract": "HardwareInventory", "authority_owner": "inventory facts (non-durable)", "grounded_source": "CONSOLIDATE-001 BC-COMPUTE edge-inference hardware"}
+  ],
+
+  "cross_cutting_behavior": {
+    "offline": {
+      "principle": "STORE-001 single-durable-writer holds even offline: a client never becomes a durable authority. When PostgreSQL is offline or latent, redb is the application-level Write-Ahead Log and envctl forward-flushes on reconnect (forward-only).",
+      "reads": "State/Data reads degrade to last-known redb-buffered/cached snapshot with a 'stale as of <t>' marker; redb-backed status/streams keep flowing (local mmap/UDS).",
+      "writes": "Command dispatches needing a durable write are queued into the redb WAL and forward-flushed by envctl when PostgreSQL returns; the client is told 'queued, will sync', not that it owns the truth. Non-queueable commands (e.g. release build) are refused with a calm reason.",
+      "grounded_source": "Blueprint redb WAL: 'If Postgres ever goes offline... redb safely acts as an application-level Write-Ahead Log'; STORE-001 forward-only invariant"
+    },
+    "error": {
+      "principle": "Every API returns a typed Result; failures surface as calm, second-person, present-tense, sentence-case strings (design voice), never raw stack traces.",
+      "examples": [
+        "'LifeOS couldn't reach the AI provider right now — try again.' (Command API / AgentRuntime)",
+        "'LifeOS couldn't initialize storage at <path> — see logs.' (Application API boot)"
+      ],
+      "structure": "error_class + calm_message + optional proof_ref/log_ref; the client renders, it does not invent recovery.",
+      "grounded_source": "CLAUDE.md AI-provider calm string + storage-init calm string + design voice contract"
+    },
+    "rollback": {
+      "principle": "Governed mutations are reversible through the OWNING context's mechanism; the client requests, the core executes. No client-side rollback of governed state.",
+      "mechanisms_by_context": [
+        "BC-PERSIST / BC-ORCHESTRATION: COW staging-branch discard (blueprint COW branching)",
+        "BC-BRIDGE: idempotent replayable migration re-run (db_migrate)",
+        "BC-INGEST/BC-PERSIST cutover: BlobStore SHA-256 parity reversal, redb retained until PostgreSQL parity is green (STORE-001 verified-cutover invariant)",
+        "BC-CONTROL-PLANE: meta git snapshot restore for cross-repo operations",
+        "task-level: restore the archived interface-boundary plan; application source unchanged"
+      ],
+      "handle": "Every Command API result carries a rollback_handle bound to one of these mechanisms.",
+      "grounded_source": "Blueprint COW branching; STORE-001 verified cutover; CLAUDE.md db_migrate idempotent; meta-destructive-commands snapshot restore"
+    },
+    "proof": {
+      "principle": "Anti-bluffing by construction: every governed mutation emits a SHAKE256 Cryptographic Witness Chain rooted in a PostgreSQL source vector; causal-graph verification rejects any claim without a historical root, so a client cannot forge a proof.",
+      "surfaces": [
+        "Command API result carries proof_ref",
+        "Event API streams proof-carrying verdicts (MinCut isolation, merge-gate result)",
+        "Policy API verdicts reference the satisfied grant or the missing causal edge",
+        "planning-spine proof-record contract records task-level proof (this family emits proof_records/EXPERIENCE-001.proof.json)"
+      ],
+      "grounded_source": "Blueprint Cryptographic Witness Chains (SHAKE256) + Causal Graph Verification; 'mathematically impossible to write hallucinated fiction'"
+    }
+  },
+
+  "api_stability": {
+    "versioning": "Semantic versioning per API family; current v0. Within a major version changes are additive-only (new operations, new optional fields, new event types).",
+    "handshake": "API-APPLICATION capability_handshake lets a client learn supported families + versions at attach time, so an older client keeps working when new families/operations are added.",
+    "deprecation": "Removals go through an explicit deprecation window; a client that ignores unknown event types / fields remains forward-compatible.",
+    "transport_stability": "Transport bindings (Tauri IPC, UDS, MessagePack subprocess, shared redb mmap) are part of the stable contract; the dual-mode window.__TAURI__ guard preserves the Vitest/browser canned path (CLAUDE.md)."
+  },
+
+  "transport_bindings": {
+    "tauri_ipc": "invoke() command/response + Tauri event channel — primary desktop binding (existing app: ai_complete, ai_provider_get/set, db_health, db_migrate).",
+    "unix_domain_sockets": "UDS request-response + shared memory-mapped redb reads for real-time status (blueprint: LifeOS connects via UDS / reads shared redb state files, avoiding HTTP/REST).",
+    "messagepack_subprocess": "typed plugin protocol over stdio (blueprint nu_plugin MessagePack; meta_plugin_protocol).",
+    "note": "All four are read/dispatch bindings into the Rust-native core; none let a client hold durable authority."
+  },
+
+  "work_items": [
+    {
+      "id": "EXPERIENCE-001-A",
+      "surface": "API-APPLICATION — Application Lifecycle & Capability Handshake API",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define the front-door API: boot/init (Storage::new -> migrate -> accounts migrate), capability/version handshake, db_health, navigate intents, shutdown (flush redb WAL forward). Core refuses to start on storage-init failure with the calm string. No domain authority lives here.",
+      "fronts_bounded_contexts": ["cross-cutting", "BC-PERSIST(health)"],
+      "gate_clauses": ["stable-governed-api", "authority-outside-client", "offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-B",
+      "surface": "API-STATE — Governed State Read API",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define read-only projections over BC-ORCHESTRATION/BC-INGEST/BC-COGNITION/BC-GOVERNANCE/BC-DEVEX/BC-COMPUTE/BC-EVIDENCE/BC-PERSIST. No mutation path; reads degrade to redb-cached snapshots offline with a stale marker; projections carry provenance references.",
+      "fronts_bounded_contexts": ["BC-ORCHESTRATION", "BC-INGEST", "BC-COGNITION", "BC-GOVERNANCE", "BC-DEVEX", "BC-COMPUTE", "BC-EVIDENCE", "BC-PERSIST"],
+      "gate_clauses": ["stable-governed-api", "authority-outside-client", "offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-C",
+      "surface": "API-COMMAND — Governed Command (Mutation) API",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define the single mutation entry point: client dispatches a typed command, core validates via Policy API, the OWNING context executes under its STORE-001 authority, and returns result + proof_ref + rollback_handle. Offline durable writes queue into the redb WAL and forward-flush via envctl. Preserve the dual-mode window.__TAURI__ path.",
+      "fronts_bounded_contexts": ["BC-COGNITION", "BC-ORCHESTRATION", "BC-INGEST", "BC-BRIDGE", "BC-FOUNDATION", "BC-HOME-NETWORK", "BC-SECRET", "BC-GOVERNANCE", "BC-CONTROL-PLANE", "BC-PERSIST"],
+      "gate_clauses": ["stable-governed-api", "authority-outside-client", "offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-D",
+      "surface": "API-EVENT — Event & Stream Subscription API",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define server-pushed read-only streams (swarm status, AI tokens, ingest progress, build log, forecast updates, policy/MinCut/merge verdicts) over UDS + shared redb tail. redb-sourced streams survive PostgreSQL outage; verdict events are proof-carrying. A subscription cannot mutate.",
+      "fronts_bounded_contexts": ["BC-ORCHESTRATION", "BC-INGEST", "BC-COGNITION", "BC-BRIDGE", "BC-FOUNDATION", "BC-INTEGRITY"],
+      "gate_clauses": ["stable-governed-api", "authority-outside-client", "offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-E",
+      "surface": "API-PLUGIN — Plugin & Extension Protocol API",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define the governed extension surface: list/invoke/register typed subprocess plugins over MessagePack and nu_plugin CodeDB ingestion. Plugin capabilities are core-granted and Policy-gated; nu_plugin ingestion buffers into redb and forward-bridges to PostgreSQL, never becoming a durable authority.",
+      "fronts_bounded_contexts": ["BC-CONTROL-PLANE", "BC-INGEST"],
+      "gate_clauses": ["stable-governed-api", "authority-outside-client", "offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-F",
+      "surface": "API-POLICY — Policy, Capability-Gating & Verification API",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define the enforcement seam over BC-INTEGRITY: evaluate_policy, check_merge_gate, verify_witness, report_immune_status. Verdicts are advisory to clients but binding in the core (Command API re-checks; a client cannot bypass). Fail-closed for durable writes when verification is offline.",
+      "fronts_bounded_contexts": ["BC-INTEGRITY"],
+      "gate_clauses": ["stable-governed-api", "authority-outside-client", "offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-G",
+      "surface": "API-DATA — Canonical Data & Semantic Query API",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define the governed query surface over BC-PERSIST (hybrid_search, traverse_graph, read_code_rows); governed writes redirect to API-COMMAND under COW branching. PostgreSQL + RuVector is the single durable owner (No Sidecar); redb is distance-math cache only. Semantic-class full cutover gated on STORE-001 RuVector-in-PostgreSQL activation.",
+      "fronts_bounded_contexts": ["BC-PERSIST"],
+      "gate_clauses": ["stable-governed-api", "authority-outside-client", "offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-H",
+      "surface": "Application boundary & client contract (authority containment)",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Pin the Rust-native-core vs replaceable-client line: clients render, dispatch, subscribe, request verdicts, display proofs; clients may NOT mutate durable state, embed business logic, become a durable writer, hold raw secrets, bypass policy, or re-derive authority. The six workspaces + settings are navigation groupings with no authority. Any client (Vue3+Tauri now; desktop/mobile/glasses/ambient later) is swappable without moving logic.",
+      "fronts_bounded_contexts": ["all 14 governed contexts (BC-UI-PRESENTATION is the client role)"],
+      "gate_clauses": ["authority-outside-client"]
+    },
+    {
+      "id": "EXPERIENCE-001-I",
+      "surface": "Cross-cutting offline / error / rollback / proof behavior",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Specify the four cross-cutting behaviors globally and per family: offline (redb WAL + forward-only flush; client never a durable authority), error (typed Results + calm design-voice strings), rollback (owning-context mechanisms: COW discard / idempotent migration / SHA-256 parity reversal / meta snapshot restore; client requests, core executes), proof (SHAKE256 witness chains rooted in PostgreSQL vectors + causal-graph verification; proof_ref on every mutation).",
+      "fronts_bounded_contexts": ["cross-cutting"],
+      "gate_clauses": ["offline-error-rollback-proof"]
+    },
+    {
+      "id": "EXPERIENCE-001-J",
+      "surface": "API stability, versioning & transport bindings",
+      "owner": "LifeOS Experience / Runtime Agent",
+      "decision": "Define stability: semantic-versioned families (v0), additive-only within a major, capability handshake for forward compatibility, explicit deprecation windows. Fix transport bindings (Tauri IPC, UDS, MessagePack subprocess, shared redb mmap) as part of the stable contract; preserve the dual-mode window.__TAURI__ guard so Vitest/browser paths stay green.",
+      "fronts_bounded_contexts": ["cross-cutting"],
+      "gate_clauses": ["stable-governed-api"]
+    }
+  ],
+
+  "execution_order": [
+    "EXPERIENCE-001-H",
+    "EXPERIENCE-001-A",
+    "EXPERIENCE-001-F",
+    "EXPERIENCE-001-B",
+    "EXPERIENCE-001-G",
+    "EXPERIENCE-001-C",
+    "EXPERIENCE-001-D",
+    "EXPERIENCE-001-E",
+    "EXPERIENCE-001-I",
+    "EXPERIENCE-001-J"
+  ],
+  "dependency_ordering_rationale": "H first pins the client/authority boundary that every family obeys. A (application front door + handshake) and F (policy enforcement) precede the domain families because every command and plugin invocation is policy-gated at attach time. Read families (B state, G data) precede the mutation family (C command) because commands return projections that reads must already model. D (events) and E (plugins) build on the command/read surfaces. I and J are cross-cutting closures over the finished family set.",
+
+  "gate_clause_coverage": {
+    "clause_1_every_user_visible_capability_resolves_through_stable_governed_apis": {
+      "satisfied": true,
+      "evidence": "user_visible_capabilities enumerates 19 capabilities, each mapped to one or more of the seven API families and to exactly one governing bounded context + published contract from CONSOLIDATE-001. api_family_contract_coverage proves the inverse: all 34 consumed governed contracts are fronted by an API family (27 user-visible, 7 internal-only), so no user-visible capability lacks a governed API and no governed contract is unreachable. The seven families exactly match the seven API kinds named in the task goal (application, state, command, event, plugin, policy, data)."
+    },
+    "clause_2_business_logic_and_authority_stay_outside_replaceable_clients": {
+      "satisfied": true,
+      "evidence": "application_boundary.client_contract lists clients_may (render/dispatch/subscribe/request-verdict/display) vs clients_may_not (mutate durable state, embed business rules, become a durable writer, hold raw secrets, bypass policy, re-derive authority). Every API family names an authority_location inside a Rust-native bounded context; the Command API routes mutations into the OWNING context and the Policy API re-checks so a client cannot bypass. Aligns with STORE-001: BC-UI-PRESENTATION owns no durable macro-state and PostgreSQL remains the single durable writer. The six workspaces + settings are declared navigation groupings with no authority."
+    },
+    "clause_3_offline_error_rollback_and_proof_behavior_are_specified": {
+      "satisfied": true,
+      "evidence": "cross_cutting_behavior specifies all four globally AND each api_families entry specifies its own offline_behavior/error_behavior/rollback_behavior/proof_behavior. Offline = redb application-level WAL + envctl forward-only flush (client never a durable authority). Error = typed Results + calm design-voice strings (two verbatim examples). Rollback = owning-context mechanisms (COW discard, idempotent migration, SHA-256 parity reversal, meta snapshot restore) executed by the core on client request. Proof = SHAKE256 witness chains rooted in PostgreSQL source vectors + causal-graph verification + proof_ref on every mutation."
+    }
+  },
+
+  "store_001_alignment": {
+    "adopted_authority_model": "adopt-intended-tiered-architecture",
+    "single_durable_writer_preserved": true,
+    "note": "The API boundary enforces STORE-001 by construction. No API family lets a client mutate durable state; the Command/Data APIs route every durable write into the owning context, where PostgreSQL + RuVector is the single durable owner of relational + semantic macro-state, redb is the transient/WAL tier (offline queue is forward-only), AgentDB owns per-agent cognition, envctl owns derived projections, and the OS keyring owns secrets (references only in the client). BC-UI-PRESENTATION and every future client own no durable macro-state.",
+    "verified_cutover_respected": "The Command/Plugin APIs surface ingestion into the redb buffer and forward-bridge to PostgreSQL; durable-class cutover happens only via the verified BlobStore SHA-256 parity contract server-side, never by a client assumption."
+  },
+
+  "rollback": "Restore the archived interface-boundary plan; application source remains unchanged. No API is implemented, no client is rewritten, no deployment occurs — this family defines the boundary and API contract only.",
+
+  "open_dependencies": [
+    "EXPERIENCE-002 decomposes the concrete desktop/mobile/glasses/ambient client families that consume this seven-family API (LIFEOS-010).",
+    "EXPERIENCE-003 defines cross-interface continuity + accessibility acceptance over the same governed API set.",
+    "Semantic-class (API-DATA) full cutover to RuVector-in-PostgreSQL is gated on STORE-001 open dependency: live RuVector-in-PostgreSQL extension activation (NBVERIFY-001 remainder).",
+    "Durable-class (API-COMMAND/DATA) cutover proof is gated on STORE-001 open dependency: live blobstore_parity.rs green run against a disposable PostgreSQL."
+  ],
+
+  "blocked_paths_respected": "No application source mutated, no UI rewritten, no deployment, no secrets touched. Only planning artifacts under generated/** and proof_records/** are written.",
+
+  "completion_gate": "All seven API families (application, state, command, event, plugin, policy, data) are specified with operations, authority_location, and per-family offline/error/rollback/proof behavior; every one of the 19 user-visible capabilities maps to a governed API family + exactly one governing context/contract; all 34 consumed governed contracts are fronted (coverage complete); the client contract keeps business logic and durable authority server-side (STORE-001 single-durable-writer preserved); and proof_records/EXPERIENCE-001.proof.json records the three gate clauses satisfied with concrete values and product_execution_performed=false."
+}

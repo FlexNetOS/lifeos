@@ -1,0 +1,122 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "CONSOLIDATE-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every preserved capability maps to exactly one LifeOS bounded context and contract; dependency cycles, duplicate owners, anti-corruption seams, and migration order are explicit.",
+  "gate_result": {
+    "clause_every_preserved_capability_maps_to_exactly_one_bounded_context_and_contract": {
+      "satisfied": true,
+      "preserved_capability_source": "generated/preserve_capability_provenance.json (PRESERVE-002), 42 live peers",
+      "peer_count_total": 42,
+      "independent_capabilities_mapped": 32,
+      "consolidation_target_host_lifeos": 1,
+      "worktree_reconciliations_to_parent": 9,
+      "sum_check": "32 + 1 + 9 = 42 (equals peer_count_total)",
+      "every_independent_capability_mapped_exactly_once": true,
+      "each_assignment_has_target_bounded_context_and_target_contract": true,
+      "example_assignments": [
+        "nu_plugin -> BC-INGEST / BlobStore",
+        "meta-ruvector -> BC-PERSIST / HybridSearch",
+        "envctl -> BC-BRIDGE / ForwardBridge",
+        "harness-agent-rs -> BC-COGNITION / AgentRuntime",
+        "agent -> BC-INTEGRITY / PolicyGuard",
+        "beads_rust -> BC-GOVERNANCE / TaskSubstrate",
+        "yazelix -> BC-FOUNDATION / ToolchainEnv",
+        "vault_hub -> BC-SECRET / SecretAuthority"
+      ],
+      "worktrees_are_not_independent_owners": "the 9 worktree-transient peers inherit their parent's bounded context and are reconciled per PRESERVE-003 (merge or archive) — never adopted as independent capabilities or second owners",
+      "host_is_receiver_not_peer_capability": "lifeos is the consolidation TARGET (BC-UI-PRESENTATION host sink), enumerated but not counted among the merged peer capabilities"
+    },
+    "clause_dependency_cycles_explicit": {
+      "satisfied": true,
+      "bounded_context_count": 15,
+      "edge_semantics": "from->to = 'from' depends on / consumes contract of 'to' (customer -> supplier)",
+      "cycle_check_method": "Kahn topological sort; acyclic iff all 15 nodes emitted",
+      "acyclic": true,
+      "topological_order_suppliers_first": [
+        "BC-COMPUTE", "BC-EVIDENCE", "BC-INGEST", "BC-PERSIST", "BC-COGNITION",
+        "BC-HOME-NETWORK", "BC-INTEGRITY", "BC-ORCHESTRATION", "BC-SECRET",
+        "BC-BRIDGE", "BC-FOUNDATION", "BC-CONTROL-PLANE", "BC-GOVERNANCE",
+        "BC-DEVEX", "BC-UI-PRESENTATION"
+      ]
+    },
+    "clause_duplicate_owners_explicit": {
+      "satisfied": true,
+      "single_owner_ledger": {
+        "durable relational macro-state": "BC-PERSIST (PostgreSQL + RuVector)",
+        "semantic / vector / knowledge-graph state": "BC-PERSIST (PostgreSQL + RuVector, No-Sidecar)",
+        "transient high-frequency state": "BC-INGEST (redb)",
+        "per-agent cognition": "BC-COGNITION (AgentDB .rvf)",
+        "derived projections": "BC-BRIDGE (envctl, read-only from PostgreSQL)",
+        "external-secret / provenance authority": "BC-SECRET (OS keyring + source pins)"
+      },
+      "no_state_class_has_two_owners": true,
+      "single_durable_writer_invariant_preserved": true,
+      "no_capability_ownerless": true,
+      "no_capability_dropped": true
+    },
+    "clause_anti_corruption_seams_explicit": {
+      "satisfied": true,
+      "anti_corruption_seam_count": 12,
+      "seams": [
+        "ACL-01 BC-INGEST: redb transitional durable blobstore -> BlobStore SHA-256 verified cutover (STORE-001)",
+        "ACL-02 BC-PERSIST: RuVector native PostgreSQL extension (No Sidecar)",
+        "ACL-03 BC-ORCHESTRATION: ruflo Node runtime -> subprocess/IPC adapter",
+        "ACL-04 BC-COGNITION: hermes-agent node+python -> message-bus adapter",
+        "ACL-05 BC-INTEGRITY: Claude Code PreToolUse hook -> typed policy verdict (policy seam)",
+        "ACL-06 BC-COMPUTE: CUDA driver FFI -> safe GpuComputeSeam trait",
+        "ACL-07 BC-FOUNDATION: yazelix-helix MPL-2.0 -> license + process boundary",
+        "ACL-08 BC-SECRET: external secret provisioning -> references only, never raw secrets",
+        "ACL-09 BC-BRIDGE: envctl remote libSQL -> subordinate to PostgreSQL (deferred to STORE-001)",
+        "ACL-10 BC-CONTROL-PLANE: meta subprocess plugins -> MessagePack protocol boundary",
+        "ACL-11 BC-GOVERNANCE: beads SQLite/JSONL -> subordinate repository adapter",
+        "ACL-12 BC-EVIDENCE: notebooklm-py Python -> process-boundary CLI wrapper"
+      ],
+      "policy_seam_identified": "ACL-05 (agent guard PreToolUse denial) is the explicit policy seam owned by BC-INTEGRITY"
+    },
+    "clause_migration_order_explicit": {
+      "satisfied": true,
+      "wave_count": 6,
+      "waves": [
+        "wave-0-data-spine: BC-PERSIST/BC-INGEST/BC-BRIDGE/BC-SECRET (meta-ruvector, nu_plugin, envctl, vault_hub) under STORE-001 verified-cutover",
+        "wave-1-cognition-compute: BC-COMPUTE/BC-COGNITION (cuda-oxide, meta-hardware, harness-agent-rs, hermes-agent, harness_hub)",
+        "wave-2-orchestration-governance: BC-INTEGRITY/BC-ORCHESTRATION/BC-GOVERNANCE (agent, rusty-idd, ruflo, teri, flexnetos_runner, beads_rust, handoff, prompt_hub)",
+        "wave-3-foundation-control: BC-FOUNDATION/BC-CONTROL-PLANE/BC-EVIDENCE (yazelix x4, weave, loop_lib, meta_plugin_protocol, meta-plugins, grit, icm, notebooklm-py)",
+        "wave-4-presentation-devex: BC-UI-PRESENTATION/BC-DEVEX/BC-HOME-NETWORK (lifeos host, ccboard, rtk-tokenkill, beads_viewer, network-control)",
+        "wave-5-reconcile: 9 worktrees merged/archived to parents per PRESERVE-003"
+      ],
+      "order_respects_topological_order": "suppliers land before consumers; data spine first"
+    },
+    "store_001_alignment": {
+      "adopted_authority_model": "adopt-intended-tiered-architecture (STORE-001)",
+      "five_data_owning_contexts_reproduce_store_001_state_classes": true,
+      "note": "BC-PERSIST, BC-INGEST, BC-BRIDGE, BC-COGNITION, BC-SECRET reproduce STORE-001's 6 state-class assignments (PERSIST owns 2); all other 10 contexts own no durable macro-state and reference BC-PERSIST — preserving single durable writer, forward-only sync, verified cutover, and No-Sidecar."
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "CONSOLIDATE-001 defines the LifeOS single-application Rust target as 15 bounded contexts, each with stable published contracts and canonical data ownership drawn from the Architecture Blueprint layers and STORE-001's state-class model. generated/capability_merge_matrix.json maps every one of the 42 PRESERVE-002 peers to exactly one destination: 32 independent peer capabilities each land in exactly one bounded context and contract (nu_plugin->BC-INGEST/BlobStore, meta-ruvector->BC-PERSIST/HybridSearch, envctl->BC-BRIDGE/ForwardBridge, harness-agent-rs/hermes-agent/harness_hub->BC-COGNITION/AgentRuntime, ruflo/teri/flexnetos_runner->BC-ORCHESTRATION, agent/rusty-idd->BC-INTEGRITY, beads_rust/handoff/prompt_hub->BC-GOVERNANCE, notebooklm-py->BC-EVIDENCE, loop_lib/meta_plugin_protocol/meta-plugins/grit/icm->BC-CONTROL-PLANE, yazelix stack + weave->BC-FOUNDATION, cuda-oxide/meta-hardware->BC-COMPUTE, network-control->BC-HOME-NETWORK, ccboard/rtk-tokenkill/beads_viewer->BC-DEVEX, vault_hub->BC-SECRET); the lifeos peer is the BC-UI-PRESENTATION host that RECEIVES capabilities (not a merged capability); and the 9 transient worktrees inherit their parent's context and reconcile per PRESERVE-003 rather than becoming second owners. The context map is proven acyclic by Kahn topological sort over the depends-on-contract edges (15/15 nodes emitted; suppliers-first order recorded). A single-owner ledger binds each of STORE-001's six durable state classes to exactly one context, upholding the single-durable-writer invariant and confirming zero duplicate owners, zero ownerless capabilities, and zero dropped capabilities. Twelve anti-corruption seams (ACL-01..ACL-12) wrap every foreign model/runtime, including the explicit policy seam (ACL-05, Claude Code agent guard) and the redb->PostgreSQL transitional-blobstore seam (ACL-01) gated on STORE-001's verified SHA-256 parity cutover. Migration order is a six-wave plan (data spine -> compute/cognition -> integrity/orchestration/governance -> foundation/control/evidence -> presentation/devex/home -> worktree reconciliation) that respects the topological order and STORE-001's verified-cutover rule. This is a definition artifact only: no product code, database, or live data was created (product_execution_performed=false); no peer source was mutated.",
+  "artifact_paths": [
+    "generated/capability_merge_matrix.json",
+    "generated/task_families/CONSOLIDATE-001.json",
+    "proof_records/CONSOLIDATE-001.proof.json"
+  ],
+  "checksums": {
+    "generated/capability_merge_matrix.json": "53fd2f77971ed1c79f6a7980b4283f2d4858e8bb9bb03899b05ae7a786e97424"
+  },
+  "live_commands": [
+    {
+      "purpose": "Generate + self-validate the capability merge matrix (every peer mapped exactly once; context map acyclic; no duplicate owner)",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 gen_matrix.py (asserts 32+9+1==42, every peer once, Kahn acyclic, disjoint state-class owners)",
+      "exit_status": 0,
+      "output": [
+        "coverage: peer_count_total=42 independent=32 worktrees=9 host=1 sum_equals_total=true every_independent_capability_mapped_exactly_once=true no_duplicate_owner=true bounded_context_count=15 anti_corruption_seam_count=12 context_map_acyclic=true",
+        "topo: BC-COMPUTE BC-EVIDENCE BC-INGEST BC-PERSIST BC-COGNITION BC-HOME-NETWORK BC-INTEGRITY BC-ORCHESTRATION BC-SECRET BC-BRIDGE BC-FOUNDATION BC-CONTROL-PLANE BC-GOVERNANCE BC-DEVEX BC-UI-PRESENTATION"
+      ]
+    }
+  ],
+  "product_execution_performed": false,
+  "store_001_alignment": "Data-owning contexts reproduce STORE-001 state-class assignments exactly; single durable writer preserved; redb-durable classes migrate to PostgreSQL only via verified BlobStore SHA-256 parity cutover."
+}

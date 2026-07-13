@@ -1,0 +1,48 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "STORE-001",
+  "title": "redb PostgreSQL and nu_plugin CodeDB relationship decided",
+  "status": "decided",
+  "owner": "David / LifeOS Data Agent / Runtime Kernel",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Make the explicit owner decision assigning every macro-state data class exactly once across redb, PostgreSQL+RuVector, and nu_plugin CodeDB, with synchronization direction, durability, recovery, and a safe transition path, grounded in the Architecture Blueprint as the intended spec.",
+  "decision_artifact": "generated/store_relationship_decision.json",
+  "work_items": [
+    {
+      "id": "STORE-001-A",
+      "surface": "durable relational + semantic macro-state",
+      "owner": "PostgreSQL + RuVector",
+      "decision": "canonical durable owner; single writer of truth; RuVector native extension (No-Sidecar)",
+      "restore": "PostgreSQL PITR"
+    },
+    {
+      "id": "STORE-001-B",
+      "surface": "transient high-frequency state (thoughts, traces, WAL, dedup cache, geometry math)",
+      "owner": "redb",
+      "decision": "intended transient tier; forward-only flush to PostgreSQL via envctl; never a second durable writer",
+      "restore": "local disk (process-lifecycle); transient by definition"
+    },
+    {
+      "id": "STORE-001-C",
+      "surface": "nu_plugin CodeDB current durable-on-redb source blobs",
+      "owner": "PostgreSQL (target) via BlobStore parity cutover",
+      "decision": "transitional; migrate per class to PostgreSQL under one SHA-256 identity using codedb_store_pg::PgStore + blobstore_parity.rs; only after a green live parity run",
+      "restore": "verified swap under identical content identity; no data loss"
+    },
+    {
+      "id": "STORE-001-D",
+      "surface": "per-agent cognition (.rvf)",
+      "owner": "AgentDB",
+      "decision": "non-authoritative for shared macro-state; witnessed by SHAKE256 chains rooted in PostgreSQL",
+      "restore": "regenerable from base model + history"
+    },
+    {
+      "id": "STORE-001-E",
+      "surface": "derived projections (materialized dirs for musl builds)",
+      "owner": "envctl / CodeDB materialization from PostgreSQL",
+      "decision": "derived and disposable; re-projected deterministically from PostgreSQL via module_path",
+      "restore": "re-projection"
+    }
+  ],
+  "corrects": "generated/store_001_decision_brief.md (prior brief inverted redb/PostgreSQL authority direction; see store_relationship_decision.json.correction_of_prior_brief)"
+}

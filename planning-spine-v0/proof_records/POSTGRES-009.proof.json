@@ -1,0 +1,110 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-009",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "One bounded source slice completes source-to-database-to-projection-to-reproducible-build-to-running-UDS round trip with byte, identity, behavior, provenance, rollback, and rebuild proofs.",
+  "gate_result": {
+    "bounded_source_slice_defined": {
+      "slice_id": "postgres009-uds-probe",
+      "members": ["Cargo.toml", "src/main.rs", "src/uds.rs"],
+      "one_uds_request": "lifeos.status",
+      "membership": "checksummed include manifest (SHA-256 + BLAKE3), not a directory glob",
+      "exclusions": ["secrets/**", "AgentDB .rvf per-agent cognition", "media/communications/domain records not needed to answer one request"]
+    },
+    "stage_source_to_database": {
+      "clause": "source-to-database",
+      "mechanism": "Nushell AST parse -> nu_plugin redb buffer (MessagePack, BLAKE3 dedup) -> envctl embed (all-MiniLM-L6-v2) + commit raw_code/semantic_embedding/module_path/causal edges to bounded PostgreSQL branch",
+      "canonical_owner": "PostgreSQL + RuVector (durable + semantic); redb transient forward buffer",
+      "receipt": "ingestion_receipt"
+    },
+    "stage_database_to_projection": {
+      "clause": "database-to-projection",
+      "mechanism": "envctl four-step: query production branch -> module_path map -> concatenate raw_code -> dump clean disposable directory",
+      "canonical_owner": "PostgreSQL source of truth; envctl read-only projection; filesystem disposable",
+      "receipt": "projection_receipt"
+    },
+    "stage_projection_to_reproducible_build": {
+      "clause": "reproducible-build",
+      "mechanism": "Nix deterministic compile against x86_64-unknown-linux-musl (strict static, no /nix/store RPATH), gitkb/meta scoped to pure Rust, packed install-in-place folder",
+      "canonical_owner": "binary/closure is a derived, regenerable projection; PostgreSQL remains authority",
+      "receipt": "build_receipt"
+    },
+    "stage_build_to_running_uds": {
+      "clause": "running-UDS",
+      "mechanism": "launch portable folder (Yazelix inits Zellij+Nushell) -> bind Unix Domain Socket -> answer one lifeos.status request from canonical PostgreSQL identities",
+      "canonical_owner": "LifeOS control surface maps to canonical PG identities (POSTGRES-007); no HTTP/REST; no hidden filesystem control-write",
+      "receipt": "run_receipt"
+    },
+    "byte_proof": {
+      "clause": "byte proof",
+      "criteria": "SHA-256(projected member) == SHA-256(source member) for all 3 members; two independent projection runs byte-identical (POSTGRES-008); byte_len and mode preserved",
+      "evidence_source": "projection_receipt.per_file vs bounded_source_slice.members"
+    },
+    "identity_proof": {
+      "clause": "identity proof",
+      "criteria": "bijection source-block <-> PostgreSQL row <-> projected byte-range via (module_path, SHA-256); each member in exactly one STORE-001 class; redb never a durable second writer",
+      "state_classes_assigned_exactly_once": 6
+    },
+    "behavior_proof": {
+      "clause": "behavior proof",
+      "criteria": "run_receipt shows lifeos.status answered with status==ok; every response field resolves to a canonical PostgreSQL identity/receipt; exit_status==0",
+      "evidence_source": "run_receipt"
+    },
+    "provenance_proof": {
+      "clause": "provenance proof",
+      "criteria": "each slice row carries source commit+PR (adopted_capabilities.source.csv), a causal dependency edge, and a SHAKE256 witness; Causal Graph Verification rejects rootless blocks; zero rootless blocks in slice",
+      "provenance_derived_from": "generated/adopted_capabilities.source.csv (ADOPT-001)"
+    },
+    "rollback_proof": {
+      "clause": "rollback proof",
+      "criteria": "drop bounded PostgreSQL namespace/branch + remove projected directory + remove build folder by receipt id; original source checksums unchanged; installed profile untouched; rollback_receipt records zero destructive action on source/profile",
+      "plan_matches_task_rollback_plan": true
+    },
+    "rebuild_proof": {
+      "clause": "rebuild proof",
+      "criteria": "two independent S2->S3 runs from the same source_version_id produce identical build_binary_sha256; projection byte-identical; re-embedding reproducible under pinned model + BLAKE3 key",
+      "evidence_source": "projection_receipt + build_receipt across two runs; embedding_model_pin"
+    },
+    "round_trip_closed": true,
+    "store_001_alignment": {
+      "single_durable_writer": "PostgreSQL owns every durable macro-state class in the slice exactly once; redb buffer/dedup only",
+      "forward_only_sync": "redb -> envctl(embed) -> PostgreSQL; no dual-write",
+      "no_sidecar": "RuVector native PostgreSQL extension; semantic column in PostgreSQL",
+      "verified_cutover": "exercises the intended path against a disposable bounded namespace; no silent redb-durable reclassification",
+      "provenance_preserved": "SHA-256 identity + commit/PR lineage + SHAKE256 witness kept for every block"
+    },
+    "artifacts_json_valid": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-009 defines the smallest end-to-end round-trip proof for a portable projected LifeOS build and shows every gate clause is covered by a concrete, blueprint-grounded contract. The bounded slice postgres009-uds-probe is one crate with three content-addressed members (Cargo.toml, src/main.rs, src/uds.rs) and exactly one lifeos.status UDS request; membership is a checksummed include manifest with secrets/** and AgentDB .rvf explicitly excluded. Four round-trip stages each carry one owner and one receipt: S1 source-to-database runs the blueprint's three pillars (Nushell AST -> nu_plugin redb buffer with MessagePack + BLAKE3 dedup -> envctl embed via all-MiniLM-L6-v2 -> PostgreSQL commit of raw_code/semantic_embedding/module_path/causal edges); S2 database-to-projection runs envctl's four-step materialization into a disposable byte-deterministic directory; S3 projection-to-reproducible-build compiles deterministically with Nix against x86_64-unknown-linux-musl, gitkb/meta-scoped to pure Rust, into an install-in-place folder; S4 build-to-running-UDS launches the folder (Yazelix inits Zellij+Nushell), binds a Unix Domain Socket, and answers the one request from canonical PostgreSQL identities with no HTTP/REST and no hidden filesystem control-write. All six required proofs receive concrete acceptance criteria: byte (projected==source SHA-256 and cross-run byte-identical projection), identity (bijection source-block <-> PostgreSQL row <-> projected byte-range via module_path+SHA-256, each of the six STORE-001 state classes assigned exactly once), behavior (UDS request answered, fields identity-mapped, clean exit), provenance (commit/PR lineage from adopted_capabilities.source.csv + SHAKE256 witness + causal edge, zero rootless blocks), rollback (drop bounded namespace + remove projection + remove build folder by receipt id, source and installed profile unchanged), and rebuild (byte-identical binary and reproducible re-embedding from the same PostgreSQL version). STORE-001 alignment holds throughout: PostgreSQL+RuVector is the single durable/semantic owner, redb is a forward-only transient buffer, envctl is the bridge and projection engine, RuVector is a No-Sidecar native extension, and every block keeps its SHA-256 identity and lineage; the one open dependency (live RuVector-in-PostgreSQL extension activation not yet locally proven) is handled per STORE-001 by producing the slice's embeddings via the verified Bun ruvector N-API path while PostgreSQL keeps column ownership. A validator confirmed both design artifacts are valid JSON, all four round-trip stages and all six proofs are present, the slice has three members and one UDS request, all six STORE-001 state classes are covered, and the task family carries seven work_items with id/surface/owner/decision. No live database mutation, projection, build, or run was performed; this is a definition gate and product_execution_performed is false.",
+  "artifact_paths": [
+    "generated/postgres_projection_build_acceptance.json",
+    "generated/task_families/POSTGRES-009.json",
+    "proof_records/POSTGRES-009.proof.json"
+  ],
+  "checksums": {
+    "generated/postgres_projection_build_acceptance.json": "4d4021511d8b183d5697ee72641a2578ab6414bc46e64264319b3039696152f6",
+    "generated/task_families/POSTGRES-009.json": "3c174d7be3ee49e41bf2d655ee11dd77a1a79092693038d908e0d22c826c4126"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate POSTGRES-009 definition gate: both artifacts are valid JSON, all 4 round-trip stages and all 6 proofs present, slice has 3 members + 1 UDS request, all 6 STORE-001 state classes covered, task family work_items carry id/surface/owner/decision",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (POSTGRES-009 gate validation over generated/postgres_projection_build_acceptance.json + generated/task_families/POSTGRES-009.json)",
+      "exit_status": 0,
+      "output": [
+        "json_valid=True",
+        "all_4_round_trip_stages=True stages=['source-to-database','database-to-projection','reproducible-build','running-UDS']",
+        "all_6_proofs=True proofs=['byte proof','identity proof','behavior proof','provenance proof','rollback proof','rebuild proof']",
+        "slice_members=3 one_uds_request=True",
+        "store_001_classes_covered=6",
+        "receipts=['ingestion_receipt','projection_receipt','build_receipt','run_receipt','rollback_receipt']",
+        "closure_round_trip_closed=True no_dual_write=True product_exec=False",
+        "taskfamily_status=defined work_items=7 keys_ok=True"
+      ]
+    }
+  ],
+  "product_execution_performed": false
+}

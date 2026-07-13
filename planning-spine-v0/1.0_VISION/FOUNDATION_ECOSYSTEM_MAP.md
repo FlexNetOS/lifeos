@@ -8,6 +8,11 @@
 > **Purpose:** answer the owner's pointed questions — *did the harness + the new TEAS engine reinvent or
 > break what `meta` already provides?* — and map the four systems that the LifeOS endgame depends on:
 > the coordination fabric, the single-binary consolidation engine, the secrets vault, and ruvector-as-OS.
+>
+> Navigation: [Vision index](./README.md) ·
+> [Blueprint compatibility](./ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) ·
+> [[planning-spine-v0/1.0_VISION/README]] ·
+> [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]
 
 ---
 

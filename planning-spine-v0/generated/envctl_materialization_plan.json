@@ -1,0 +1,240 @@
+{
+  "schema_version": "lifeos-planning-spine.envctl-materialization-plan.v0",
+  "task_id": "POSTGRES-008",
+  "title": "envctl database-to-directory materialization defined",
+  "defined_at": "2026-07-13T03:47:08Z",
+  "owner": "envctl Agent / Runtime Kernel",
+  "phase": "2-postgres-foundation",
+  "product_execution_performed": false,
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json",
+    "generated/adopted_capabilities.source.csv"
+  ],
+  "objective": "Define envctl as the deterministic projection engine that reconstructs a selected PostgreSQL branch and pinned version into a clean, disposable directory or build input. Authority flows one direction only: PostgreSQL is the canonical source, the projected directory is derived output. There is no reverse ownership edge, and manual edits to generated output never become source.",
+  "store_001_alignment": {
+    "governing_state_class": "derived projections (materialized source directories for musl compilation, exported release trees)",
+    "canonical_owner": "PostgreSQL (source of truth) projected by envctl / CodeDB materialization",
+    "role_of_others": "filesystem projections are derived and disposable; regenerated deterministically from PostgreSQL rows via module_path metadata",
+    "write_authority": "envctl projection (read-only from PostgreSQL)",
+    "sync_direction": "PostgreSQL -> envctl materialize -> filesystem (forward-only, derived)",
+    "recovery_source": "re-projection from PostgreSQL",
+    "migration_path": "none; projection is the intended read path",
+    "invariant_enforced": "Forward-only sync: envctl never writes durable state back into PostgreSQL from a projected directory; the projection is a read path, so no second durable owner is created (STORE-001 invariant: single durable writer)."
+  },
+  "engine_definition": {
+    "name": "envctl projection engine",
+    "blueprint_role": "When a release is required, envctl reconstructs the directory structure in memory from the database rows and projects the code back into the filesystem for compilation (Architecture Blueprint, section 5, Materialization via envctl).",
+    "authority_direction": "PostgreSQL (canonical) -> filesystem (derived output); one direction only",
+    "reads_from": "PostgreSQL selected branch + pinned version (relational rows: raw_code, module_path, metadata, ordering keys, mode bits, dependency edges)",
+    "writes_to": "a clean, disposable output directory consumed by the Nix or Yazelix build environment",
+    "must_never": [
+      "write durable state back into PostgreSQL from projected output (no reverse ownership edge)",
+      "treat any file in the output directory as a source of truth",
+      "preserve or merge manual edits made to generated output (edits are discarded on next projection)",
+      "become a second durable owner for any PostgreSQL-owned class (STORE-001 single-durable-writer invariant)",
+      "resolve content from host filesystem state rather than the selected database version"
+    ],
+    "no_reverse_ownership_rationale": "Because every projected byte derives from a database row identity and the output is regenerated wholesale from that version, the projected directory carries no authority. Deleting it loses nothing (recovery_source = re-projection). This removes the ownership ambiguity the goal forbids: the DB row is always the source, the file is always derived."
+  },
+  "selection_contract": {
+    "description": "A projection is parameterized by an explicit, pinned selector so the same input always names the same immutable database version (satisfies the gate clause 'a selected database version').",
+    "selector_keys": [
+      {
+        "key": "production_branch_id",
+        "meaning": "the final production branch queried from PostgreSQL",
+        "source": "Architecture Blueprint step 1: 'envctl queries PostgreSQL for the final production branch'"
+      },
+      {
+        "key": "version_snapshot_id",
+        "meaning": "a pinned, immutable version/commit identity of that branch (not 'latest'); COW staging branches are merged to the main trunk before a production version is pinned",
+        "source": "Architecture Context Matrix row 25 (module_path metadata, production branch ID) and row 15 (COW branch commit to main trunk)"
+      },
+      {
+        "key": "status_predicate",
+        "meaning": "status = 'production' filter that bounds the row set",
+        "source": "Architecture Blueprint Phase 2 SQL: WHERE language = 'rust' AND status = 'production'"
+      }
+    ],
+    "determinism_rule": "Selection is by explicit pinned identity, never by mutable 'latest'; a given selector resolves to a fixed, immutable set of rows, which is the precondition for byte-identical repeat projection."
+  },
+  "pipeline_stages": [
+    {
+      "stage": 1,
+      "name": "Query",
+      "blueprint_step": "envctl queries PostgreSQL for the final production branch",
+      "action": "Resolve the selector to the exact row set (raw_code blocks, module_path, metadata, ordering keys, mode bits, dependency edges) for the pinned version.",
+      "database_identities": ["production_branch_id", "version_snapshot_id", "row primary keys", "BlobStore content hashes"],
+      "determinism_guarantee": "Read-only SELECT against an immutable pinned version yields a fixed row set."
+    },
+    {
+      "stage": 2,
+      "name": "Map",
+      "blueprint_step": "It uses the stored module_path metadata to map out the exact directory structure in memory",
+      "action": "Reconstruct the directory + module tree in memory purely from module_path metadata and dependency edges.",
+      "database_identities": ["module_path", "causal dependency edges", "language / file-type metadata"],
+      "determinism_guarantee": "Directory tree is a pure function of the stored module_path set; no host path resolution or filesystem walk contributes to the shape."
+    },
+    {
+      "stage": 3,
+      "name": "Concatenate",
+      "blueprint_step": "It combines the raw_code blocks back into complete, standard files (like .rs or .toml)",
+      "action": "Join the ordered raw_code blocks for each mapped file into exact-byte file contents, with no reformatting or re-serialization.",
+      "database_identities": ["raw_code blocks", "block ordinal / ordering keys", "BlobStore SHA-256 identity per block"],
+      "determinism_guarantee": "Blocks are concatenated in stored ordinal order at exact bytes (Exact-byte materialization, ADOPT-001 PR#16)."
+    },
+    {
+      "stage": 4,
+      "name": "Dump",
+      "blueprint_step": "It dumps this clean directory into your Nix or Yazelix build environment for final compilation",
+      "action": "Write the reconstructed tree to a clean, disposable output directory; apply stored mode bits; fail closed if the target is not clean or if symlink limits are violated.",
+      "database_identities": ["module_path -> output path", "stored file-mode metadata", "symlink target metadata"],
+      "determinism_guarantee": "Output is written into a clean target from the in-memory tree only; existing output is never read back as input (fail-closed materialization + symlink limits, ADOPT-001 PR#16)."
+    }
+  ],
+  "reconstruction_facets": [
+    {
+      "facet": "paths",
+      "database_source": "module_path metadata column",
+      "reconstruction_rule": "module_path tree maps deterministically to the filesystem directory hierarchy; each leaf becomes a file path with its stored extension.",
+      "determinism_guarantee": "module_path is a stored, version-pinned column; the map is a pure function with no host-dependent path resolution.",
+      "verification_check": "Re-projection from the same version yields an identical path set; the sorted path-set hash is equal across projections.",
+      "provenance": "Architecture Blueprint materialization step 2; STORE-001 derived-projections class ('regenerated deterministically from PostgreSQL rows via module_path metadata')."
+    },
+    {
+      "facet": "bytes",
+      "database_source": "raw_code blocks (content-addressed via BlobStore SHA-256)",
+      "reconstruction_rule": "Ordered concatenation of a file's raw_code blocks reproduces file contents at exact bytes; no reformat, no re-serialize.",
+      "determinism_guarantee": "Exact-byte materialization is fail-closed; emitted bytes equal stored block bytes.",
+      "verification_check": "Each emitted file's content hash equals the composed BlobStore SHA-256 of its ordered blocks.",
+      "provenance": "Adopted capability 'Exact-byte materialization' (ADOPT-001, nu_plugin PR#16, crates/codedb_core tests/materialization_paths.rs, 7 tests, CDB106 PASS); 'BlobStore trait' content-addressed identity."
+    },
+    {
+      "facet": "metadata",
+      "database_source": "relational columns: module_path, language, status, file-type/extension",
+      "reconstruction_rule": "Metadata columns select which rows project and where; the captured metadata projection is content-stable per version.",
+      "determinism_guarantee": "Metadata is stored and version-pinned; its JSON projection is stable.",
+      "verification_check": "captured_metadata_json_projection_is_stable parity gate holds for the pinned version.",
+      "provenance": "Adopted capability 'SHA-256 identity' (ADOPT-001, nu_plugin PR#14, crates/codedb_core workspace_identity, parity_gate captured_metadata_json_projection_is_stable); Architecture Blueprint Phase 2 SQL (SELECT raw_code, module_path ... WHERE language='rust' AND status='production')."
+    },
+    {
+      "facet": "ordering",
+      "database_source": "block ordinal / stable sort keys within a module_path, and canonical enumeration order of files and directories",
+      "reconstruction_rule": "Blocks concatenate in stored ordinal order; files and directories enumerate in a canonical (byte-lexical) order, never in hash-map or filesystem iteration order.",
+      "determinism_guarantee": "Ordering derives from stored keys, so it is stable across runs and hosts.",
+      "verification_check": "Two projections of the same version produce identical byte streams; ordering is subsumed by whole-tree byte-identity.",
+      "provenance": "Architecture Blueprint materialization step 3 (combine raw_code blocks into complete files); gate determinism requirement ('repeated projections are byte-identical')."
+    },
+    {
+      "facet": "permissions",
+      "database_source": "stored file-mode metadata and symlink target metadata",
+      "reconstruction_rule": "Apply stored mode bits to each emitted file; enforce symlink limits and fail closed on violation rather than inheriting host umask or following unbounded links.",
+      "determinism_guarantee": "Mode is stored metadata; it is not derived from the host umask or process environment.",
+      "verification_check": "materialization_paths.rs (fail-closed materialization + symlink limits) confirms mode and symlink handling.",
+      "provenance": "Adopted capability 'Exact-byte materialization' boundary ('fail-closed materialization + symlink limits', ADOPT-001 PR#16).",
+      "known_gap": "Non-Linux permission lanes are Linux-fallback rows only (ADOPT-001 Exact-byte materialization known_gap: 'multi-OS lanes are Linux-fallback rows only'); cross-OS permission parity is an open dependency, not asserted here."
+    },
+    {
+      "facet": "module relationships",
+      "database_source": "module_path hierarchy plus causal dependency edges committed at ingestion",
+      "reconstruction_rule": "Parent/child module_path becomes nested directories and module declarations; dependency edges are reconstructed so the projected tree forms a compilable workspace (e.g., Cargo members resolve).",
+      "determinism_guarantee": "Relationships are stored edges; reconstruction is a pure function of the selected branch version.",
+      "verification_check": "The projected relationship graph hash is equal across projections; downstream the tree compiles under the musl target (FOUNDATION / Nix build lane).",
+      "provenance": "Architecture Blueprint section 5 ('Commits code with AST fragments, Semantic Embeddings, and Causal Dependency Edges') and materialization step 2 (module_path)."
+    }
+  ],
+  "determinism_contract": {
+    "gate_clause": "repeated projections are byte-identical",
+    "rule": "Two projections of the same pinned version, on any conforming host, produce a byte-identical output tree.",
+    "why_it_holds": "Every facet (paths, bytes, metadata, ordering, permissions, module relationships) derives from stored, version-pinned identities and pure reconstruction functions; no facet reads host state or mutable 'latest'.",
+    "verification_method": "Project the pinned version twice into two disposable targets; compute a whole-tree SHA-256 workspace identity over each; assert equality.",
+    "evidence_class": "SHA-256 identity / workspace_identity parity (ADOPT-001 PR#14, CDB106) is the existing green primitive; a live POSTGRES-008 re-projection parity run against a provisioned PostgreSQL is an open dependency (see open_dependencies)."
+  },
+  "disposability_contract": {
+    "gate_clause": "projection output is disposable",
+    "rule": "The output directory holds no authority and can be deleted at any time with zero loss, because it is regenerated wholesale from the pinned database version.",
+    "manual_edit_policy": "Manual edits to generated output are not merged and do not survive the next projection; the DB row remains the sole source (satisfies the goal's 'no manual edits to generated output').",
+    "verification_method": "Delete the output tree, re-project the same version, and confirm the result is byte-identical to the pre-deletion tree while the canonical PostgreSQL rows are unchanged.",
+    "recovery_source": "re-projection from PostgreSQL (STORE-001 derived-projections recovery_source)."
+  },
+  "traceability_contract": {
+    "gate_clause": "projection output is traceable to database identities",
+    "rule": "A projection manifest maps every emitted file to its database identities and every byte range to a content-addressed block identity.",
+    "manifest_fields_per_file": [
+      "output_path",
+      "production_branch_id",
+      "version_snapshot_id",
+      "module_path",
+      "ordered_block_content_hashes (BlobStore SHA-256)",
+      "file_mode",
+      "composed_file_sha256"
+    ],
+    "verification_method": "For each emitted file, recompute the composed SHA-256 from the listed ordered block hashes and assert it equals the file's on-disk hash; every hash resolves to a real PostgreSQL/BlobStore row.",
+    "provenance": "Adopted capabilities 'SHA-256 identity' (PR#14) and 'envctl export contract' (ADOPT-001, nu_plugin PR#19, crates/codedb envctl_export_rows, docs/ENVCTL_EXPORT_CONTRACT.md, CDB035 export validation); Cryptographic Witness Chain lineage roots every projected artifact in a verified source vector (Architecture Blueprint section 6)."
+  },
+  "adopted_capabilities": [
+    {
+      "capability": "Exact-byte materialization",
+      "adopt_task": "ADOPT-001",
+      "source": "nu_plugin PR#16, crates/codedb_core tests/materialization_paths.rs (7 tests), CI CDB106",
+      "role_here": "guarantees bytes, ordering, and permissions facets (fail-closed materialization + symlink limits)",
+      "target_lifeos_owner": "lifeos codedb materialization"
+    },
+    {
+      "capability": "envctl export contract",
+      "adopt_task": "ADOPT-001",
+      "source": "nu_plugin PR#19, crates/codedb envctl_export_rows, docs/ENVCTL_EXPORT_CONTRACT.md, CI logs/CDB035-envctl-export.log",
+      "role_here": "defines the codedb -> envctl export rows that feed the projection manifest and traceability contract",
+      "target_lifeos_owner": "lifeos envctl bridge"
+    },
+    {
+      "capability": "SHA-256 identity",
+      "adopt_task": "ADOPT-001",
+      "source": "nu_plugin PR#14, crates/codedb_core workspace_identity, parity_gate captured_metadata_json_projection_is_stable, CI CDB106",
+      "role_here": "guarantees metadata stability, byte-identical determinism, and traceability to database identities",
+      "target_lifeos_owner": "lifeos codedb ingestion"
+    },
+    {
+      "capability": "BlobStore trait",
+      "adopt_task": "ADOPT-001",
+      "source": "nu_plugin PR#13/#14, crates/codedb_core, parity_gate blobstore_parity.rs (13 tests)",
+      "role_here": "content-addressed block identity that makes each projected byte range traceable to a durable database identity",
+      "target_lifeos_owner": "lifeos codedb store"
+    }
+  ],
+  "verification_plan": [
+    {
+      "gate_clause": "deterministically reconstructs paths, bytes, metadata, ordering, permissions, and module relationships",
+      "check": "Run the per-facet parity checks in reconstruction_facets (path-set hash equality, composed block SHA-256 equality, captured_metadata_json_projection_is_stable, byte-stream equality, materialization_paths.rs mode/symlink, relationship-graph hash equality).",
+      "status_in_v0": "defined; primitive parity gates already green as adopted evidence (materialization_paths.rs, workspace_identity, blobstore_parity)"
+    },
+    {
+      "gate_clause": "repeated projections are byte-identical",
+      "check": "Project the pinned version twice; assert whole-tree workspace SHA-256 equality.",
+      "status_in_v0": "defined; live re-projection run is an open dependency"
+    },
+    {
+      "gate_clause": "projection output is disposable",
+      "check": "Delete output, re-project, assert byte-identical result and unchanged canonical rows; assert manual edits do not survive re-projection.",
+      "status_in_v0": "defined"
+    },
+    {
+      "gate_clause": "projection output is traceable to database identities",
+      "check": "Emit the projection manifest; recompute composed SHA-256 per file from ordered block hashes; assert every hash resolves to a real PostgreSQL/BlobStore row.",
+      "status_in_v0": "defined; envctl export contract (CDB035) is the existing export primitive"
+    }
+  ],
+  "decomposition_targets": [
+    {"target": "query", "scope": "selector resolution and pinned-version row extraction (pipeline stage 1)"},
+    {"target": "projection", "scope": "in-memory tree map + exact-byte concatenation + dump (pipeline stages 2-4)"},
+    {"target": "metadata", "scope": "module_path / mode / language metadata capture and stability (metadata + permissions facets)"},
+    {"target": "determinism", "scope": "byte-identical repeat-projection parity harness (determinism_contract)"},
+    {"target": "cleanup", "scope": "clean-target enforcement, disposability, and manual-edit discard (disposability_contract, rollback)"}
+  ],
+  "open_dependencies": [
+    "Live re-projection parity run (project pinned version twice against a provisioned PostgreSQL and assert byte-identical whole-tree SHA-256) is not executed in this planning task; the SHA-256 identity and materialization primitives are already green as adopted evidence.",
+    "Cross-OS permission parity: non-Linux mode lanes are Linux-fallback rows only (Exact-byte materialization known_gap); full multi-OS permission determinism remains open."
+  ],
+  "rollback": "Delete the derived projection output and restore the prior materialization plan; the canonical PostgreSQL database and source inputs remain unchanged (nothing durable is lost because the projection is derived output)."
+}

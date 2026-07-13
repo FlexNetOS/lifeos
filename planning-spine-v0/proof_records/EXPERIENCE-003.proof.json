@@ -1,0 +1,60 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "EXPERIENCE-003",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Acceptance covers accessibility, identity continuity, conflict handling, offline recovery, authorization parity, performance, rollback, and identical proof authority across clients.",
+  "gate_result": {
+    "task_family": "generated/task_families/EXPERIENCE-003.json",
+    "approved_interfaces_enumerated": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+    "gate_clauses_total": 8,
+    "acceptance_dimensions_total": 8,
+    "every_gate_clause_mapped_to_exactly_one_dimension": true,
+    "every_dimension_spans_all_four_approved_clients": true,
+    "every_dimension_bound_to_one_governed_api_and_one_state_authority": true,
+    "accessibility_check": "EXPERIENCE-003-A: every governed capability is reachable and confirmable through each client's accessible path; desktop/mobile pass the LifeOS design-system WCAG AA axe suite, glasses adds a visual+voice/gesture path, ambient adds a non-visual voice-first path with audible intent/approval/proof confirmation; pass = union of accessible paths covers 100% of EXPERIENCE-001 governed capabilities with no inaccessible-modality dead end.",
+    "identity_continuity_check": "EXPERIENCE-003-B: identity is a STORE-001 PostgreSQL-owned durable relational class; a single user_id resolves to the same governed state, permission set, and proof/history on every client even when the per-client authentication method differs; pass = durable identity-state diff across clients is empty and no client-local identity record becomes authoritative.",
+    "conflict_handling_check": "EXPERIENCE-003-C: concurrent same-target intent from two clients forks two isolated database COW staging branches; the verified branch merges to the main trunk and the loser rolls back, deterministically and identically regardless of which client won; RuVector MinCut / Causal Graph rejects a rootless branch; pass = exactly one trunk row per target, the rejected branch recorded rolled back, no client-side last-write-wins, single durable writer preserved.",
+    "offline_recovery_check": "EXPERIENCE-003-D: durable-bound intent authored while a client is offline queues in the redb application-level WAL (STORE-001 transient class) and replays forward-only into PostgreSQL via envctl on reconnect, each replayed action carrying its identical Witness Chain proof; pass = post-reconnect durable state equals the online-path result, forward-only, no client-authored durable divergence; transient offline state is transient by definition.",
+    "authorization_parity_check": "EXPERIENCE-003-E: permissions are a STORE-001 PostgreSQL-owned durable class and the authorization decision lives behind the EXPERIENCE-001 policy API; a fixed (identity, capability, resource) tuple yields an identical allow/deny on every client, each client's bounded capability set is a subset of the governed capabilities, and ADOPT-001 secret-output guards / bounded read-only MCP hold identically; pass = principal x resource decision diff across clients is empty.",
+    "performance_check": "EXPERIENCE-003-F: each surface is accepted against the blueprint substrate tier it belongs to — real-time agent status via UDS/Bun-FFI memory-mapped redb at the microsecond in-process tier, governed durable operations at the millisecond PostgreSQL network/IPC tier — and the per-tier p50/p95 budget is defined once and applied to every client; pass = each client meets its surface's tier budget and the budget is client-independent (a client cannot change canonical-write latency).",
+    "rollback_check": "EXPERIENCE-003-G: rollback is reversible at both levels — this acceptance plan reverts to the archived experience acceptance plan and deploys/mutates no client, account, or database, while a governed action reverts by COW branch discard and, if committed, PostgreSQL PITR, identically regardless of issuing client; pass = adopting the plan performs zero deployment/mutation and no rollback path depends on client-local state.",
+    "identical_proof_authority_across_clients_check": "EXPERIENCE-003-H (keystone): every action's proof is a SHAKE256 Cryptographic Witness Chain rooted in a PostgreSQL source vector with Causal Graph Verification; any client renders the byte-identical chain and none can forge, diverge, or bluff it because proof lives in the single canonical owner, not in replaceable presentation; pass = proof diff across desktop/mobile/glasses/ambient is empty and rootless client claims are rejected identically.",
+    "store_001_alignment": "The plan inherits the STORE-001 keystone verbatim: PostgreSQL + RuVector is the single durable owner of identity, permissions, history, relationships, and semantic macro-state (recovery = PITR); redb is the transient WAL/scratchpad tier; AgentDB (.rvf) is non-authoritative per-agent cognition; envctl is the forward-only bridge; proof authority is SHAKE256 Witness Chains rooted in PostgreSQL source vectors. Continuity and parity are therefore structural: because clients own no durable state, no authorization authority, and no proof, the same governed intent/state/approval/action/proof/recovery is coherent across every approved interface by construction. No durable class is reclassified and no cutover is performed by this task.",
+    "core_invariant_upheld": "The client is replaceable presentation and never owns LifeOS logic, durable state, authorization authority, or proof (LIFEOS-010 'without making the UI the system'; EXPERIENCE-001 'authority stays outside replaceable clients').",
+    "inputs_status": "EXPERIENCE-001 and EXPERIENCE-002 artifacts are not yet written; the API boundary and client set are derived from the LIFEOS-010 / EXPERIENCE-001 / EXPERIENCE-002 goal text plus the blueprint, and the plan records this as an open dependency that binds to concrete API/client definitions when those families are authored.",
+    "interfaces_deployed": "none",
+    "accounts_or_database_mutated": "none",
+    "product_execution_performed": false
+  },
+  "proof_summary": "EXPERIENCE-003 defines the cross-interface continuity and accessibility acceptance plan as planning artifacts only; no interface was deployed and no account, database, or product code was mutated. generated/task_families/EXPERIENCE-003.json enumerates the four approved presentation clients (CLIENT-DESKTOP — the first-approved and only currently-real LifeOS Tauri/Vue shell reading memory-mapped redb over UDS/Bun FFI, plus later-approved CLIENT-MOBILE, CLIENT-GLASSES, and CLIENT-AMBIENT) and binds each of the eight gate dimensions to exactly one work item spanning all four clients: EXPERIENCE-003-A accessibility, -B identity continuity, -C conflict handling, -D offline recovery, -E authorization parity, -F performance, -G rollback, and -H identical proof authority. Each dimension is bound to one governed EXPERIENCE-001 API surface and one STORE-001 state authority: identity and permissions to the PostgreSQL durable relational class (PITR recovery); conflict handling to database COW branching plus RuVector MinCut under the single-durable-writer invariant; offline recovery to the redb application-level WAL flushed forward-only through envctl into PostgreSQL; performance to the blueprint substrate tiers (microsecond redb via UDS/Bun FFI for real-time status, millisecond PostgreSQL for governed durable operations); and the keystone, proof authority, to SHAKE256 Cryptographic Witness Chains rooted in PostgreSQL source vectors with Causal Graph Verification so that the proof rendered by any client is byte-identical and unforgeable. Accessibility is treated as a presentation obligation that must expose but never own governed state, requiring the union of accessible paths (desktop/mobile visual+keyboard WCAG AA, glasses visual+voice/gesture, ambient non-visual voice-first) to cover 100% of governed capabilities. Rollback restores the archived experience acceptance plan and deploys no interface, and state-level rollback uses COW discard plus PostgreSQL PITR. A live validation over the task family confirmed 8/8 gate clauses covered exactly once, all four clients enumerated, every dimension spanning all clients and bound to a state authority, and every work item carrying the required fields and at least three concrete acceptance criteria (exit 0). The plan honors the STORE-001 keystone and the core invariant that the client is replaceable presentation; because clients own no durable state, authority, or proof, continuity and parity are structural rather than per-client reimplementations. EXPERIENCE-001/EXPERIENCE-002 artifacts are not yet written, so the governed-API boundary and per-client bounded-capability set are derived from the LIFEOS-010/EXPERIENCE-001/EXPERIENCE-002 goal text and the blueprint and recorded as an explicit open dependency.",
+  "artifact_paths": [
+    "generated/task_families/EXPERIENCE-003.json",
+    "proof_records/EXPERIENCE-003.proof.json"
+  ],
+  "checksums": {
+    "generated/task_families/EXPERIENCE-003.json": "5a207b81096da095403f4f6fc596664d3f8b8d8769a1b943939d07cc21b832a1"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate EXPERIENCE-003 acceptance plan: all 8 gate clauses covered exactly once, four approved clients enumerated, every dimension spans all clients and binds to one governed API + one state authority, required fields and >=3 acceptance criteria present",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (acceptance-plan gate validation over generated/task_families/EXPERIENCE-003.json against the CSV gate)",
+      "exit_status": 0,
+      "output": [
+        "work_items: 8",
+        "gate_clauses_covered: 8 missing: []",
+        "clients_enumerated: ['CLIENT-AMBIENT', 'CLIENT-DESKTOP', 'CLIENT-GLASSES', 'CLIENT-MOBILE'] == expected: True",
+        "all_items_span_all_clients: True",
+        "every_item_bound_to_state_authority: True",
+        "every_item_has_required_fields: True",
+        "every_item_has_>=3_acceptance_criteria: True",
+        "exactly_one_item_per_gate_clause: True",
+        "RESULT: PASS"
+      ]
+    }
+  ],
+  "rollback_plan": "Restore the archived experience acceptance plan; no interface is deployed.",
+  "product_execution_performed": false
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "PGAUTH-005",
+  "title": "External source authority contract bounded",
+  "status": "defined",
+  "owner": "LifeOS Data Agent / Governance Board",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Bound how externally authoritative services, devices, repositories, credential stores, and human-approved records synchronize with LifeOS so that each external state family has one declared external authority, a local identity reference (never the secret value), an allowed cached-metadata surface, explicit inbound and outbound synchronization directions, a conflict and freshness policy, an approval gate, an outage-recovery source, and an enforced prohibition on secret-value capture. No external system is contacted; this is a planning contract only.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "generated/store_relationship_decision.json (STORE-001, class F external-secret/provenance authority + forward-only and single-durable-writer invariants)",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/adopted_capabilities.source.csv (ADOPT-001: source commit/PR provenance, SHA-256 identity, secret-output guards, envctl export contract)",
+    "generated/notebooklm_postgres_context.meta.json",
+    "generated/task_graph.source.csv (PGAUTH-001 durable authority; POSTGRES-004 archive-first ingestion)"
+  ],
+  "external_state_family_boundary_principle": "Every external source is a READ-authoritative or human-authoritative peer, never a second durable writer of a PostgreSQL-owned macro-state class. LifeOS keeps only a local identity reference plus allowed non-secret cached metadata; canonical durable truth for anything LifeOS owns stays in PostgreSQL+RuVector (PGAUTH-001), transient capture stays in redb (STORE-001 class C), and secret values stay in the OS keyring / committed pins (STORE-001 class F). Every synchronization edge is directional and idempotent (PGAUTH-006 requirement); no edge is an undirected dual-write.",
+  "work_items": [
+    {
+      "id": "PGAUTH-005-A",
+      "surface": "External cloud LLM / inference services reached by RuvLTRA + Ruflo proportional routing and by the LifeOS ai_complete command (Anthropic Claude, OpenAI GPT, Google Gemini; plus any local ruvllm node treated as a service endpoint)",
+      "owner": "The provider API is authoritative for its own model outputs; LifeOS is authoritative for whether a returned output is persisted",
+      "decision": "Treat each provider as a stateless, read-authoritative completion source; persist only witness-bound outputs and non-secret request/response provenance; never write LifeOS canonical truth back to the provider and never store the provider credential.",
+      "contract": {
+        "external_authority": "Provider endpoint (Anthropic / OpenAI / Google Gemini, or a local ruvllm edge node exposed as an endpoint). The provider owns its model weights and the tokens it returns; the blueprint routes simple tasks to local ruvllm / Claude Haiku and escalates architectural or security tasks to Claude Opus / GPT-4 via RuvLTRA Proportional Intelligence.",
+        "local_identity_reference": "Provider account label only (aiProvider persisted key = anthropic | openai | gemini; keyring service 'lifeos', matching account) plus a PostgreSQL request/response provenance row keyed by request_id and model_id. The API key itself is never a stored identity.",
+        "allowed_cached_metadata": "provider name, model_id, request_id, request/response timestamps, token counts, cost/resource-burn accounting, latency, and the response content ONLY after it passes witness-chain binding to a source vector. Excluded: the API key, any Authorization header, any raw secret.",
+        "inbound_sync": "provider -> LifeOS completion tokens -> redb scratchpad (microsecond capture, STORE-001 class C) -> envctl embed/flush -> PostgreSQL+RuVector, where only settled/significant states persist. Forward-only.",
+        "outbound_sync": "LifeOS -> provider: prompt/request payload for one call. No durable LifeOS macro-state is written to or owned by the provider; the provider holds no LifeOS authority.",
+        "conflict_and_freshness_policy": "The provider is authoritative for its own outputs and is never overwritten by LifeOS. Each call is a fresh request; BLAKE3-keyed dedup reuse of a prior completion is confined to the redb cache lifetime and never treated as durable truth. Every persisted claim must link to a source vector (Cryptographic Witness Chains / Causal Graph Verification) or it is rejected as a hallucination.",
+        "approval_gate": "RuvLTRA routing selects the tier; owner/Governance escalation is required before heavy cloud models are used for architectural or security decisions; MinCut + witness verification gate persistence; a COW staging branch plus passing test gate is required before any provider-derived edit merges to the PostgreSQL trunk.",
+        "outage_recovery": "On provider unreachable/latency, LifeOS surfaces the calm string 'LifeOS couldn't reach the AI provider right now - try again.' and redb acts as the application-level WAL holding pending state until retry; no partial durable write is committed.",
+        "secret_value_capture_prohibition": "The API key stays in the OS keyring (env-var fallback only when keyring is absent) and is used in-process by reqwest at call time only. It is never written to redb, PostgreSQL, projections, logs, or witness chains. Only the account label and non-secret provenance are stored (ADOPT-001 secret-output guards)."
+      }
+    },
+    {
+      "id": "PGAUTH-005-B",
+      "surface": "External devices / edge nodes running ruvllm and the agent swarm, plus no_std/ESP32 storage-disabled consumers and local sensors that LifeOS observes over UDS or shared redb state files",
+      "owner": "Each device owns its own hardware runtime state and its own node keyring; LifeOS owns the device registry reference and the significant states flushed forward from it",
+      "decision": "Treat a device as authoritative only for its transient local runtime; register it by id, read its status forward through redb, dispatch deployment forward from PostgreSQL, and keep node secrets on the node.",
+      "contract": {
+        "external_authority": "The edge node / device is authoritative for its VRAM residency, the shared-memory frozen foundation model, loaded MicroLoRA adapters, local sensor readings, and heartbeat; its own OS keyring is authoritative for that node's secrets. (Blueprint: ruvllm keeps one frozen model in shared memory running 50+ agents; LifeOS reads redb via UDS for real-time agent status.)",
+        "local_identity_reference": "device/node_id + agent_id + the Foundation Engine identity keys from the context matrix (Model ID, shared-memory address). PostgreSQL holds a device-registry reference row; it does not hold the device's raw runtime state.",
+        "allowed_cached_metadata": "node_id, agent_id, assigned model_id / shared-memory address, agent-to-device assignment, health/heartbeat status, last-seen timestamp, and the significant execution states envctl flushes forward. Excluded: the device's local secrets and the raw high-frequency scratchpad stream.",
+        "inbound_sync": "device -> redb (UDS / shared memory-mapped redb state files, microsecond, STORE-001 class C) -> envctl flush -> PostgreSQL, persisting only significant states.",
+        "outbound_sync": "PostgreSQL / LifeOS -> device: forward-only dispatch of agent .rvf deployment, MicroLoRA adapters, and RuvLTRA/Ruflo routing commands. This is dispatch, not a dual-write of canonical truth.",
+        "conflict_and_freshness_policy": "Device transient state is authoritative locally and transient by definition (STORE-001 class C: on loss it is transient). A heartbeat freshness window governs liveness; a device past its window is marked degraded and MinCut may deterministically sever a hallucinating node in milliseconds without restarting the swarm.",
+        "approval_gate": "Device enrollment/registration requires owner/Governance approval before it may receive dispatch; MinCut acts as the runtime immune-system gate isolating drifting nodes.",
+        "outage_recovery": "Device offline -> its redb acts as local WAL; PostgreSQL retains the last flushed significant state; the agent is re-deployable because AgentDB .rvf cognition is regenerable from the base model + training history (STORE-001 class D).",
+        "secret_value_capture_prohibition": "Device-local secrets remain in the node's keyring and are never synchronized into PostgreSQL or redb macro-state; only non-secret identity, assignment, and status metadata cross the boundary."
+      }
+    },
+    {
+      "id": "PGAUTH-005-C",
+      "surface": "External source repositories and package registries: GitHub org remotes (gitkb/meta, FlexNetOS/nu_plugin, FlexNetOS/envctl, Yazelix, Ruvnet), Crates.io (ruvector-core, ruvllm, ruvector-sona), and the NPM registry (ruvector for the Bun UI path)",
+      "owner": "The upstream git remote / registry is authoritative for released source and versions; LifeOS owns the committed pin and the ingested code rows derived from that pin",
+      "decision": "Consume upstream only through a committed pin (commit SHA / crate version / NPM version); ingest forward through nu_plugin -> redb -> envctl -> PostgreSQL; advance a pin only by an explicit, approved, CI-green re-pin (upgrades never silent downgrades).",
+      "contract": {
+        "external_authority": "The upstream remote/registry is authoritative for upstream truth: GitHub default branches, Crates.io published crates, and NPM releases (blueprint notes NPM-first cadence vs. Crates.io lag; the directive is to pull pure Rust crates from Crates.io and isolate napi-rs exhaust via gitkb/meta).",
+        "local_identity_reference": "Committed source pin: commit SHA / crate version / NPM version + PR id, plus module_path metadata and the SHA-256 content identity of adopted blobs (ADOPT-001). PostgreSQL stores the pin/provenance; the remote stays the authority for upstream state.",
+        "allowed_cached_metadata": "repo URL, default branch name, pinned commit/version, PR id, passing CI receipt, SHA-256 content identity, and the .meta project-boundary definition. Excluded: access tokens, deploy keys, and any credential.",
+        "inbound_sync": "upstream repo/registry -> pinned fetch -> Nushell AST parse (nu_plugin, MessagePack) -> redb buffer -> envctl embed -> PostgreSQL code rows (blueprint three-pillar ingestion; POSTGRES-004 archive-first, restartable, exactly-once).",
+        "outbound_sync": "LifeOS -> upstream: PRs/pushes are human-approved and meta-orchestrated; the materialized/projected tree (PGAUTH-004) is a one-way derived projection from PostgreSQL, so LifeOS never silently dual-writes canonical truth back into a remote.",
+        "conflict_and_freshness_policy": "The pin is the frozen truth; a newer upstream version is adopted only through an explicit re-pin (never a silent update). The NPM-first-vs-Crates.io freshness tension is resolved by pinning pure-Rust Crates.io sources and isolating the Node/napi-rs exhaust. Upgrades-not-downgrades: a pin advances only forward under owner approval.",
+        "approval_gate": "A pin advances only with owner/Governance approval + a green CI receipt + the ADOPT-001 parity gate; gitkb/meta isolates machine-generated bindings so exhaust never contaminates the pinned source.",
+        "outage_recovery": "Committed pins plus local git bundles (PRESERVE-001 checksummed archive) permit rebuild without the remote; code is re-projectable deterministically from PostgreSQL via module_path (STORE-001 class E).",
+        "secret_value_capture_prohibition": "Repository access tokens and deploy keys stay in the OS keyring and are never persisted to macro-state; only public commit/version/PR identifiers and content hashes are stored."
+      }
+    },
+    {
+      "id": "PGAUTH-005-D",
+      "surface": "External credential / secret / attestation authority: the OS keyring (service 'lifeos', accounts anthropic | openai | gemini) with env-var fallback, attestation bundles, and committed source pins",
+      "owner": "OS keyring + committed source pins remain the sole write authority (STORE-001 class F, unchanged); LifeOS owns only a non-secret reference/provenance row",
+      "decision": "Keep every secret value in the keyring/pins; store in PostgreSQL only a reference (which account is configured, presence, rotation time, attestation hash); secret values never enter redb, PostgreSQL, projections, or witness chains.",
+      "contract": {
+        "external_authority": "OS keyring and committed source pins are the canonical owner of secret material and provenance, explicitly unchanged from STORE-001 class F ('external-secret / provenance authority (API keys, attestation bundles, source pins)', write authority = keyring / owner).",
+        "local_identity_reference": "Account label (keyring service 'lifeos' + account name) and pin id. PostgreSQL holds a reference/provenance row only; it never holds the raw secret (STORE-001: 'PostgreSQL stores references/provenance, never raw secrets; redb never holds secrets').",
+        "allowed_cached_metadata": "which provider/account is configured (aiProvider persisted key), a key-presence boolean, attestation-bundle hash / pin id, and last-rotation timestamp. Never the secret value, never a decrypted attestation payload.",
+        "inbound_sync": "keyring -> in-process use only at call time (reqwest); the value is read into process memory for one operation and is never crossed into redb or PostgreSQL.",
+        "outbound_sync": "None. LifeOS never writes a secret value outward into macro-state, projections, or any remote.",
+        "conflict_and_freshness_policy": "keyring/owner is the sole write authority; the env-var fallback applies only when the keyring is absent; rotation is owner-driven; there is no LifeOS-side caching of the secret value, so no stale-secret conflict can exist in macro-state.",
+        "approval_gate": "The owner sets/rotates keys via ai_provider_set; no agent may read a raw secret; ADOPT-001 secret-output guards enforce that captured build/command output cannot leak a secret.",
+        "outage_recovery": "The keyring + committed pins ARE the recovery source (STORE-001 class F recovery); a lost key is re-provisioned by the owner, not reconstructed from the database.",
+        "secret_value_capture_prohibition": "This is the keystone invariant of PGAUTH-005: raw secret values are never captured into redb, PostgreSQL, filesystem projections, logs, or witness chains. Only references and provenance are stored."
+      }
+    },
+    {
+      "id": "PGAUTH-005-E",
+      "surface": "Human-approved records: owner / Governance Board ratified decisions (the DECIDE-00x pattern), COW-branch merge approvals, and human-in-the-loop control events surfaced through the LifeOS Mission Control UI / Ruflo",
+      "owner": "David / Governance Board is the human authority for approvals, ratifications, and merge sign-off; LifeOS owns the durable decision record that stores that approval",
+      "decision": "Treat a human approval as the authoritative inbound event that gates execution; record it durably in PostgreSQL/committed docs; never let an agent silently override a ratified record, and never auto-execute without the human gate.",
+      "contract": {
+        "external_authority": "David / Governance Board. The human is the authority for approvals, ratifications, and merge/commit sign-off (AGENTS.md accountability model; DECIDE-00x recorded decisions; the context matrix places Ruflo interfacing with LifeOS for human-in-the-loop control).",
+        "local_identity_reference": "decision_id (e.g., POSTV0-Q3), ratification-record slug (e.g., 09_OPEN_QUESTIONS.md#recorded-decisions), and the human git-config commit author. PostgreSQL stores the decision record + provenance.",
+        "allowed_cached_metadata": "decision_id, decision text, unblock_condition, deferral/rollback rule, owner name, owner_ratified flag, recorded_in path, and timestamp (the DECIDE-006 shape). No secret material.",
+        "inbound_sync": "human -> approval event -> committed decision doc / task-family record -> PostgreSQL decision tables (POSTGRES-002 database-native planning tables). The human decision is the inbound authoritative event.",
+        "outbound_sync": "LifeOS -> human: surfaces proposed decisions, simulated timelines, and pending merges for approval (Mission Control UI, human-in-the-loop); it does not auto-commit without the human gate.",
+        "conflict_and_freshness_policy": "A ratified human record wins over any agent-proposed state; the recorded default is preserved until an explicit unblock RFC with owner sign-off (DECIDE pattern); no agent may silently supersede a ratified record.",
+        "approval_gate": "The human record IS the approval gate: a COW staging branch merges to the PostgreSQL trunk only after a human-approved passing test gate; witness chains bind the change; there is no autonomous execution.",
+        "outage_recovery": "Decisions are durable in PostgreSQL + committed docs and are preserved in the PRESERVE-001 checksummed evidence bundle; they are replayable, and the current default is preserved until unblocked.",
+        "secret_value_capture_prohibition": "Human-approval records carry no secret values; any credential is referenced by label only (delegating to PGAUTH-005-D)."
+      }
+    }
+  ],
+  "store_001_alignment": "Directly extends STORE-001 class F (external-secret / provenance authority: canonical owner = OS keyring + committed source pins; PostgreSQL stores references/provenance, never raw secrets; redb never holds secrets) and honors STORE-001's single-durable-writer and forward-only-sync invariants: no external source becomes a second durable writer of a PostgreSQL-owned class, and every external synchronization edge is directional and idempotent rather than an undirected dual-write.",
+  "completion_gate": "Each of the five external state families (PGAUTH-005-A..E) declares an external authority, a local identity reference, allowed cached metadata, an inbound and an outbound synchronization direction, a conflict-and-freshness policy, an approval gate, an outage-recovery source, and a secret-value-capture prohibition; no external service, device, repository, credential store, or human system is contacted during planning; and proof_records/PGAUTH-005.proof.json records product_execution_performed = false."
+}

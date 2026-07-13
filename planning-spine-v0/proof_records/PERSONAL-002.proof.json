@@ -1,0 +1,187 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PERSONAL-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each domain begins read-only, has explicit authority and privacy, defines simulation and approval for impact, and includes rollback, proof, and a bounded next action.",
+  "gate_result": {
+    "domains_required": 10,
+    "domains_defined": 10,
+    "domains": [
+      "personal finance",
+      "health",
+      "legal",
+      "files",
+      "calendar",
+      "contacts",
+      "communications",
+      "knowledge",
+      "tasks",
+      "family coordination"
+    ],
+    "clause_1_every_domain_begins_read_only": true,
+    "clause_2_every_domain_has_explicit_authority": true,
+    "clause_3_every_domain_has_explicit_privacy": true,
+    "clause_4_every_domain_defines_simulation_for_impact": true,
+    "clause_5_every_domain_defines_approval_for_impact": true,
+    "clause_6_every_domain_has_rollback": true,
+    "clause_7_every_domain_has_proof": true,
+    "clause_8_every_domain_has_bounded_next_action": true,
+    "per_domain_clause_matrix": {
+      "personal finance": {
+        "work_item": "PERSONAL-002-A",
+        "begins_read_only": "Ingest balances/transactions/statements/budgets; no spend/transfer/trade",
+        "authority": "David final; §6 no unauthorized spend; spend+trading -> §11 Needs-Human-Approval",
+        "privacy": "owner-scoped, encrypted, local-first, per-account consent, retention, no silent share",
+        "simulation_for_impact": "money movement run as WorldSeed -> SimulationReport (balance diffs, failure nodes) as constraints",
+        "approval_for_impact": "§11 spend/trading automatic Needs-Human-Approval (bounded+reversible+evidence)",
+        "rollback": "pre-mutation snapshot + PITR + revision spine; reversal is a new revision",
+        "proof": "ProofRecord binds simulation+approval+snapshot+revision",
+        "bounded_next_action": "read-only ingest of balances + transaction history; no spend"
+      },
+      "health": {
+        "work_item": "PERSONAL-002-B",
+        "begins_read_only": "Ingest records/metrics/medications/appointments; no booking/provider-message/regimen execution",
+        "authority": "David final; health action is §11 external-real-world action -> Needs-Human-Approval; blocked_paths forbid health action here",
+        "privacy": "most-sensitive: encrypted, strict per-record consent, no provider/family share without grant, retention+deletion authority",
+        "simulation_for_impact": "any health action run as WorldSeed first; SimulationReport as constraints",
+        "approval_for_impact": "§11 external-action + any health-data share -> Needs-Human-Approval; nothing leaves boundary silently",
+        "rollback": "snapshot + PITR + revision spine; provider share revoked via new revision",
+        "proof": "ProofRecord binds simulation+approval+snapshot+revision",
+        "bounded_next_action": "read-only ingest of health records/metrics; no health action"
+      },
+      "legal": {
+        "work_item": "PERSONAL-002-C",
+        "begins_read_only": "Ingest contracts/filings/obligations + extract deadlines; no filing/signing/commitment",
+        "authority": "David final; §6 no legal bypass; legal action -> §11 Needs-Human-Approval",
+        "privacy": "privileged, owner-scoped, encrypted, consent-gated, retained per obligation, no share without grant",
+        "simulation_for_impact": "proposed legal action run as WorldSeed; SimulationReport surfaces missed-deadline/invalid-filing failure nodes",
+        "approval_for_impact": "§11 legal action automatic Needs-Human-Approval (bounded+reversible+evidence)",
+        "rollback": "snapshot + PITR + revision spine; source blob immutable by SHA-256 (read-only ingest non-destructive)",
+        "proof": "ProofRecord binds simulation+approval+snapshot+revision",
+        "bounded_next_action": "read-only ingest of legal documents + deadline extraction; no legal action"
+      },
+      "files": {
+        "work_item": "PERSONAL-002-D",
+        "begins_read_only": "Catalog fs_node metadata + blob content_sha256; no write/move/rename/overwrite/delete",
+        "authority": "owner_principal_id; write/move/delete require grant; §6 no mutation without snapshot",
+        "privacy": "encrypted at rest, local-first, per-file/per-tree grants, owner retention+deletion authority",
+        "simulation_for_impact": "move/dedup/cleanup/delete run as WorldSeed -> projected tree diffs as constraints",
+        "approval_for_impact": "§11 destructive/irreversible ops (delete/overwrite) Needs-Human-Approval; no mutation without snapshot",
+        "rollback": "revision spine + BlobStore SHA-256 immutability -> exact tree+bytes via envctl materialization; PITR restores catalog",
+        "proof": "ProofRecord binds simulation+approval+snapshot+fs_node revision",
+        "bounded_next_action": "read-only catalog of user-space files into fs_node with content_sha256; no mutation"
+      },
+      "calendar": {
+        "work_item": "PERSONAL-002-E",
+        "begins_read_only": "Ingest events/times/attendees/recurrence; no create/modify/cancel/invite-send",
+        "authority": "David final; event side effects or invite sends -> §11 external-real-world/communication-send Needs-Human-Approval",
+        "privacy": "owner-scoped, encrypted, consent-gated; attendee PII; no share without grant",
+        "simulation_for_impact": "schedule change run as WorldSeed; SimulationReport surfaces conflicts/downstream impact as constraints",
+        "approval_for_impact": "§11 invite-send (blocked here) + external side effect -> Needs-Human-Approval",
+        "rollback": "snapshot + PITR + revision spine; cancelled/moved event is a new revision",
+        "proof": "ProofRecord binds simulation+approval+snapshot+revision",
+        "bounded_next_action": "read-only ingest of events + conflict view; no event mutation, no invite send"
+      },
+      "contacts": {
+        "work_item": "PERSONAL-002-F",
+        "begins_read_only": "Ingest names/handles/relationships + dedup candidates; no create/edit/merge/message",
+        "authority": "owner_principal_id; messaging a contact is communication-send -> §11 Needs-Human-Approval (blocked here)",
+        "privacy": "PII: owner-scoped, encrypted, consent-gated, retention+deletion authority, no share without grant",
+        "simulation_for_impact": "merge/dedup/edit/outreach run as WorldSeed; SimulationReport writes merge-collision constraints",
+        "approval_for_impact": "§11 approval on simulated merge/edit diff; outbound message -> communication-send Needs-Human-Approval",
+        "rollback": "snapshot + PITR + revision spine; merge reversible as new revision, prior rows preserved",
+        "proof": "ProofRecord binds simulation+approval+snapshot+revision",
+        "bounded_next_action": "read-only ingest of contacts + dedup candidates; no mutation, no outreach"
+      },
+      "communications": {
+        "work_item": "PERSONAL-002-G",
+        "begins_read_only": "Ingest threads/messages (body_sha256)/attachments; no send/reply, drafts only",
+        "authority": "David final; any send is §11 external-real-world action -> Needs-Human-Approval; blocked_paths forbid communication send",
+        "privacy": "owner-scoped, encrypted, consent-gated, retained; redactions are new revisions; no thread share without grant",
+        "simulation_for_impact": "proposed send/reply run as WorldSeed producing draft + projected recipients; wrong-recipient failure node",
+        "approval_for_impact": "§11 send automatic Needs-Human-Approval before dispatch",
+        "rollback": "drafts discarded; durable rows via revision spine + PITR; unsent-by-design (gate precedes any dispatch)",
+        "proof": "ProofRecord binds draft+simulation+approval+revision",
+        "bounded_next_action": "read-only ingest of communication threads + surface unread/important; no send, no reply"
+      },
+      "knowledge": {
+        "work_item": "PERSONAL-002-H",
+        "begins_read_only": "Ingest notes/documents (body_sha256) + build semantic index + graph_edge links; no edit/reorg/delete",
+        "authority": "owner_principal_id; bulk edit/deletion require grant + §6 no mutation without snapshot",
+        "privacy": "owner-scoped, encrypted, consent-gated, retained+deletable, no share without grant",
+        "simulation_for_impact": "summarize/reorganize/merge/delete run as WorldSeed over a COW branch -> projected diffs; failed reorg -> failure capsule",
+        "approval_for_impact": "§11 approval on simulated COW-branch diff; irreversible deletion Needs-Human-Approval",
+        "rollback": "COW branch_id isolation + revision spine + PITR; unmerged branch discarded, merged change reversible",
+        "proof": "ProofRecord binds SimulationReport + COW merge selection + approval + snapshot + revision",
+        "bounded_next_action": "read-only ingest of knowledge base + semantic index + link graph; no edit, no deletion"
+      },
+      "tasks": {
+        "work_item": "PERSONAL-002-I",
+        "begins_read_only": "Ingest tasks/due-dates/priorities/dependencies; no create/complete/delegate-with-side-effects",
+        "authority": "owner; delegation bounded (no unlimited agent authority, runtime rule); external-effect task escalates via §11 gate",
+        "privacy": "owner-scoped, encrypted, consent-gated, retained+deletable",
+        "simulation_for_impact": "external-effect task run as WorldSeed; SimulationReport as constraints (compiler mental model)",
+        "approval_for_impact": "§11 task that would spend/send/act inherits that domain's Needs-Human-Approval; planning edits bounded+reversible",
+        "rollback": "snapshot + PITR + revision spine; completed/reopened task is a new revision",
+        "proof": "ProofRecord binds simulation+approval+snapshot+revision",
+        "bounded_next_action": "read-only ingest of personal tasks + prioritized action-free view; no execution"
+      },
+      "family coordination": {
+        "work_item": "PERSONAL-002-J",
+        "begins_read_only": "Read shared items already within existing consent-backed grants; no new grant/share/send",
+        "authority": "David final; cross-principal sharing requires explicit consent-backed grant (no data leaves boundary silently)",
+        "privacy": "per-member consent + per-member grants; each member's data owner-scoped, encrypted; scoped, revocable shares",
+        "simulation_for_impact": "share/grant or coordination message run as WorldSeed showing exactly which records cross to which member; over-share failure node",
+        "approval_for_impact": "§11 share/grant requires member consent + David approval; coordination message is communication-send (blocked here)",
+        "rollback": "grant revocation is a new revision (valid_to set), never delete; PITR + revision spine restore pre-share access-control state",
+        "proof": "ProofRecord binds SimulationReport + consent record + approval + snapshot + grant revision",
+        "bounded_next_action": "read-only ingest of shared family items within existing consent; no new share, no grant, no send"
+      }
+    },
+    "cross_cutting_grounding": {
+      "constitution_ss6": "no hidden mutation; no unauthorized spend; no legal bypass; no real-world execution without authority; no production mutation without snapshot; no completion without proof (Master Plan §6)",
+      "execution_gates_ss11": "Needs-Human-Approval for spend, legal, external real-world action, production mutation, account creation, credential handling, trading, physically-impactful home automation, anything irreversible; approval requires bounded+reversible+evidence-sufficient (Master Plan §11)",
+      "runtime_rule": "no agent receives unlimited authority; every meaningful action passes through identity, policy, memory, simulation, execution, proof, and rollback; David is final human authority",
+      "cell_law": "policy-cell: network denied by default, read-only FS except writable_paths, no mutation without snapshot; simulation writes constraints not advice, failed world -> failure capsule",
+      "personal_001_privacy_inheritance": "each domain inherits ownership, consent, local-first storage, encryption, access(grant), retention, export/sharing, deletion authority, backup, recovery; no personal data leaves its boundary silently"
+    },
+    "substrate_mapping_under_store_001": {
+      "canonical_owner_all_durable_personal_classes": "PostgreSQL + RuVector (single durable writer)",
+      "families_used": ["domain_record", "fs_node", "blob", "communication", "principal", "grant", "graph_edge", "revision", "planning_record"],
+      "redb_role": "transient buffer/scratchpad/WAL/BLAKE3 dedup only; never a second durable writer for a personal class",
+      "sync_direction": "collector -> redb -> envctl(embed) -> PostgreSQL (forward-only)",
+      "recovery_source": "PostgreSQL PITR + revision spine; blob content self-verifies by SHA-256",
+      "no_sidecar": "semantic_embedding + graph_edge analytics native in PostgreSQL via RuVector",
+      "secrets": "credentials/secrets referenced by keyring handle only; never stored in the personal model (STORE-001 external-secret class)"
+    },
+    "blocked_paths_respected": {
+      "no_health_or_legal_action": true,
+      "no_spend": true,
+      "no_communication_send": true,
+      "no_credential_access": true,
+      "no_product_implementation": true,
+      "no_secrets_access": true
+    },
+    "no_personal_data_accessed": true,
+    "no_personal_service_touched": true,
+    "product_execution_performed": false
+  },
+  "store_001_alignment": "Every durable personal domain class in all ten workflows names PostgreSQL + RuVector as its single canonical durable owner (STORE-001 invariant 'Single durable writer'), mapping onto the POSTGRES-002 substrate families domain_record / fs_node / blob / communication / principal / grant / graph_edge / revision. redb holds only its intended transient roles (buffer / scratchpad / application-level WAL / BLAKE3 dedup) with forward-only envctl sync (invariant 'Forward-only sync'); the blob-backed classes (finance statements, legal documents, files, attachments) migrate off the transitional redb source-blob store only under the verified BlobStore SHA-256 parity cutover (invariant 'Verified cutover'); RuVector runs native for the knowledge domain's semantic index and the relationship graph (invariant 'No sidecar'); every row carries witness_root + provenance and content-addressed classes keep their SHA-256 identity (invariant 'Provenance preserved'); credentials stay in the OS keyring (external-secret class). No durable class is silently reclassified.",
+  "proof_summary": "PERSONAL-002 defines ten bounded personal-domain workflow families in generated/task_families/PERSONAL-002.json — personal finance (PERSONAL-002-A), health (-B), legal (-C), files (-D), calendar (-E), contacts (-F), communications (-G), knowledge (-H), tasks (-I), and family coordination (-J) — and each satisfies all eight gate clauses with concrete, grounded values. Every domain begins read-only: finance ingests balances/transactions with no spend, health ingests records with no health action, legal ingests documents and extracts deadlines with no filing, files catalog fs_node metadata with no write/delete, calendar ingests events with no invite-send, contacts ingest with no message, communications ingest threads as drafts-only with no send, knowledge builds a read-only semantic index, tasks ingest with no execution, and family coordination reads only items already inside an existing consent-backed grant. Explicit authority is named per domain and rooted in Constitution §6 (no unauthorized spend, no legal bypass, no real-world execution without authority, no mutation without snapshot, no completion without proof), the runtime rule (no unlimited agent authority; David is final human authority), and the §11 Needs-Human-Approval gate (spend, legal, external action, trading, credential handling, anything irreversible). Explicit privacy per domain inherits the PERSONAL-001 personal-data family — ownership, consent, local-first encrypted storage, grant-based access, retention, export/sharing, deletion authority, and recovery — with the invariant that no personal data leaves its boundary silently; health, legal, and contacts are called out as the most-sensitive/PII classes. Each domain defines simulation for impact via a DevWorld WorldSeed producing a SimulationReport that writes constraints (not advice), with failed worlds becoming failure capsules, and defines the §11 Needs-Human-Approval step before any impact crosses out of read-only. Rollback is the pre-mutation snapshot plus PostgreSQL PITR plus the append-only revision spine (COW branch isolation for knowledge, grant-revocation-as-new-revision for shares, BlobStore SHA-256 immutability for content). Proof is a ProofRecord binding simulation + approval + snapshot + revision before any workflow closes (Constitution §6 no completion without proof). Each domain declares exactly one read-only bounded next action, honoring the PERSONAL-002 next_action to decompose one read-only workflow per domain before any action. The whole family sits on the STORE-001 governed substrate (PostgreSQL + RuVector canonical, redb transient, forward-only envctl sync, verified SHA-256 blob cutover, No-Sidecar RuVector, secrets in keyring) and respects every blocked path: no health or legal action, no spend, no communication send, no credential access, no product implementation, no secrets. This is a planning artifact only — no personal service or data was accessed and no product execution was performed.",
+  "artifact_paths": [
+    "generated/task_families/PERSONAL-002.json",
+    "proof_records/PERSONAL-002.proof.json"
+  ],
+  "grounding_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md (Constitution §6; Execution gates §11; runtime rule; cell types; simulation doctrine; MVP1 financial+legal)",
+    "generated/store_relationship_decision.json",
+    "generated/postgres_user_space_schema_plan.json",
+    "generated/task_families/POSTGRES-002.json",
+    "generated/task_graph.source.csv (PERSONAL-002 and PERSONAL-001 rows)"
+  ],
+  "product_execution_performed": false
+}

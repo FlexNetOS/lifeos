@@ -1,0 +1,295 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "MVP1-003",
+  "title": "Financial and legal MVP1 acceptance plan defined",
+  "status": "defined",
+  "owner": "LifeOS Product / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "phase": "6-mvp1-financial-legal",
+  "objective": "Define the connected MVP1 acceptance proof in which one governed financial workflow and one governed legal workflow both run intent-to-verified-next-action through the SAME LifeOS substrate — the governed execution spine (LIFEOS-003: identity/authority, policy, task graph, memory, simulation, human-approval, hermetic execution, proof, rollback, next-action) sitting on the intelligence substrate (LIFEOS-005: hot/warm/cold memory, proof-derived learning, secrets brokerage, promotion of proven state only) — with store ownership fixed by STORE-001. Acceptance is proven when both workflows, driven by real-shaped sanitized fixtures, are covered for every gate clause: real inputs, authority, simulation, execution-or-deliberate-non-action, proof, rollback, next action, and measurable user value. This artifact DEFINES the acceptance contract; it performs no financial or legal action and mutates no live state.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001 — store authority keystone)",
+    "generated/runtime_store_boundary_plan.json (POSTGRES-006 — redb/AgentDB runtime boundaries)",
+    "generated/task_graph.source.csv rows MVP1-001 (financial slice), MVP1-002 (legal slice), LIFEOS-003 (governed execution spine), LIFEOS-005 (intelligence substrate), LIFEOS-006 (financial+legal operating domain)",
+    "generated/postgres_projection_build_acceptance.json (POSTGRES-009 — end-to-end acceptance-artifact pattern)"
+  ],
+  "store_authority_reference": "STORE-001 — PostgreSQL + RuVector is the single canonical durable owner of relational + semantic macro-state; redb is the transient high-frequency tier (intent/thoughts/traces/WAL/dedup); AgentDB (.rvf) is per-agent non-authoritative cognition; envctl is the forward-only bridge and projection engine; OS keyring holds external secrets. No durable class is silently reclassified; forward-only redb -> envctl(embed) -> PostgreSQL; single durable writer is PostgreSQL.",
+  "simulation_required": true,
+  "product_execution_performed": false,
+  "verification_gate": "Acceptance covers real inputs with sanitized fixtures, authority, simulation, execution or deliberate non-action, proof, rollback, next action, and measurable user value.",
+  "execution_gate_note": "This artifact DEFINES the acceptance criteria for the connected financial+legal MVP1 proof. It reads no live bank/legal account, sends no notice, submits no transfer, signs nothing, and writes no production row. Live execution of the two workflows is deferred to the proof-cell execution gate (execution_cell=proof-cell) after MVP1-001 and MVP1-002 fully bound their slices; per allowed/blocked paths, financial or legal action, production deployment, product implementation, and secrets/** are out of scope here.",
+
+  "hard_invariants": [
+    "Observation precedes action: both workflows begin with read-only aggregation/understanding before any recommendation or cell write (MVP1-001, MVP1-002 next_action).",
+    "No unlimited agent authority: every write is scoped by an identity+policy authority contract; the agent may recommend but never self-authorizes a spend, trade, or legal commitment (LIFEOS-003 goal).",
+    "No autonomous spend or trading: the financial workflow submits no transfer/payment/trade; its only write is a reversible non-spending reminder/flag cell (MVP1-001 gate spend/trading prohibitions; LIFEOS-006 gate).",
+    "No autonomous legal commitment: the legal workflow sends/signs/files nothing; every commitment or external action is held for explicit human authority (MVP1-002 gate; LIFEOS-006 gate).",
+    "Information is separated from advice and from action in the legal workflow, and each is a distinct, labeled artifact (MVP1-002 gate).",
+    "Source documents are preserved with provenance; no financial or legal claim exists in system state without a SHAKE256 witness rooted in the source fixture (MVP1-002 gate; blueprint Cryptographic Witness Chains).",
+    "Every reversible cell is COW-discardable and leaves original source bytes and external state unchanged on rollback (MVP1-001 reversible cells; blueprint COW branching).",
+    "Only proven state is promoted forward into canonical PostgreSQL learning; simulated/unapproved branches are discarded (LIFEOS-005 'promotion of proven state only')."
+  ],
+
+  "shared_substrate_spine": {
+    "principle": "The 'same LifeOS substrate' is one ordered set of governed-execution stages (LIFEOS-003) resting on the intelligence-substrate memory tiers (LIFEOS-005). BOTH workflows traverse the identical stage sequence G0..G10; the connected proof is that the substrate is workflow-agnostic — the financial and legal slices differ only in their bounded data and their execute/non-act branch, not in the spine or the store owners.",
+    "stages": [
+      {
+        "stage_id": "G0",
+        "name": "Intent capture",
+        "spine_source": "LIFEOS-003 'converts human intent'",
+        "store_owner": "redb (STORE-001-B transient high-frequency) — the raw intent utterance and interaction trace land in the microsecond scratchpad first; only the settled intent record is flushed forward.",
+        "clause_touched": "real inputs"
+      },
+      {
+        "stage_id": "G1",
+        "name": "Identity + Authority + Policy",
+        "spine_source": "LIFEOS-003 'through authority ... with no unlimited agent authority'",
+        "store_owner": "PostgreSQL + RuVector (durable relational macro-state: identities, permissions, policy) — the authority decision (scope, prohibitions, approval requirement) is a canonical row; secrets referenced, never stored raw (OS keyring, STORE-001 external-secret).",
+        "clause_touched": "authority"
+      },
+      {
+        "stage_id": "G2",
+        "name": "Task graph / bounded plan",
+        "spine_source": "LIFEOS-003 'task graph'",
+        "store_owner": "PostgreSQL + RuVector (durable relational macro-state; causal dependency edges) — the bounded step plan is a canonical, provenance-linked graph, not free agent latitude.",
+        "clause_touched": "authority"
+      },
+      {
+        "stage_id": "G3",
+        "name": "Memory retrieval (hot/warm/cold)",
+        "spine_source": "LIFEOS-005 'hot/warm/cold memory'",
+        "store_owner": "hot=redb (recent traces/dedup), warm/cold=PostgreSQL + RuVector (canonical relational + semantic; hybrid ORDER BY semantic_embedding <-> retrieval); agent routing memory=AgentDB (.rvf) non-authoritative.",
+        "clause_touched": "real inputs"
+      },
+      {
+        "stage_id": "G4",
+        "name": "Simulation (COW dry-run)",
+        "spine_source": "LIFEOS-003 'simulation'; blueprint COW branching + ATAS",
+        "store_owner": "PostgreSQL COW staging branch (isolated from trunk) — recommendation and candidate cell are computed and dry-run in a cloned branch; simulation traces buffer in redb; nothing touches trunk yet.",
+        "clause_touched": "simulation"
+      },
+      {
+        "stage_id": "G5",
+        "name": "Human-approval gate",
+        "spine_source": "LIFEOS-003 'human-approval gates'",
+        "store_owner": "PostgreSQL (durable) — the explicit human decision (approve reversible cell / withhold commitment) is recorded as a canonical, audited row; no branch commits without it.",
+        "clause_touched": "authority"
+      },
+      {
+        "stage_id": "G6",
+        "name": "Execution OR deliberate non-action (hermetic, reversible)",
+        "spine_source": "LIFEOS-003 'hermetic execution'; MVP1-001 reversible cells; MVP1-002 rollback-or-non-action",
+        "store_owner": "PostgreSQL trunk commit of the approved COW branch (reversible cell) OR a recorded deliberate-non-action decision; redb WAL shields the write during any PostgreSQL latency; forward-only.",
+        "clause_touched": "execution or deliberate non-action"
+      },
+      {
+        "stage_id": "G7",
+        "name": "Proof",
+        "spine_source": "LIFEOS-003 'proof' on canonical PostgreSQL state; execution_cell=proof-cell",
+        "store_owner": "PostgreSQL + RuVector (durable) — an audit/proof row bound by a SHAKE256 witness chain to the source fixture and a causal edge; Causal Graph Verification rejects any rootless (bluffed) financial/legal claim.",
+        "clause_touched": "proof"
+      },
+      {
+        "stage_id": "G8",
+        "name": "Rollback",
+        "spine_source": "LIFEOS-003 'rollback'; blueprint COW discard",
+        "store_owner": "PostgreSQL COW-branch discard + reversal of the reminder/flag cell using recorded receipts; original source bytes and external state unchanged.",
+        "clause_touched": "rollback"
+      },
+      {
+        "stage_id": "G9",
+        "name": "Next-action derivation",
+        "spine_source": "LIFEOS-003 'next-action recommendation'; RuvLTRA proportional routing",
+        "store_owner": "PostgreSQL (durable) — the verified next action is derived FROM the proof row (not invented) and recorded; routing/complexity metadata may live in AgentDB (.rvf) non-authoritatively.",
+        "clause_touched": "next action"
+      },
+      {
+        "stage_id": "G10",
+        "name": "Measurable user value + proven-state promotion",
+        "spine_source": "LIFEOS-005 'proof-derived learning ... promotion of proven state only'; LIFEOS-006 'self-sustaining value'",
+        "store_owner": "PostgreSQL (durable) — the value metric and the promoted learning are committed ONLY because the proof passed; simulated/unapproved state is never promoted.",
+        "clause_touched": "measurable user value"
+      }
+    ]
+  },
+
+  "bounded_workflows": [
+    {
+      "workflow_id": "MVP1-003-FIN",
+      "domain": "financial",
+      "derives_from": "MVP1-001 (governed financial operating slice) — read-only aggregation first, bounded recommendation, explicit approval, reversible execution, proof",
+      "slice_name": "Recurring-charge shortfall awareness (read-only aggregation -> reversible reminder cell)",
+      "smallest_slice_rationale": "The least financial surface that still forces the whole spine: aggregate read-only transactions, detect one upcoming recurring charge that would overdraw the available balance, recommend, gate on approval, and write ONE reversible non-spending reminder. It moves no money, so spend/trading prohibitions hold, yet every stage G0..G10 does real work.",
+      "intent_G0": "User asks LifeOS: 'Am I about to get hit with anything I can't cover?'",
+      "real_input_with_sanitized_fixture": {
+        "fixture_id": "mvp1-003-fin-statement.sanitized",
+        "shape": "A real-shaped bank transaction export (CSV: posted_date, description, amount, running_balance) plus a recurring-charge schedule; structurally identical to a genuine export.",
+        "sanitization": "No real account numbers, names, balances, or credentials. Account id is a validly-formatted synthetic token; amounts/dates/merchant names are fabricated. No secrets/** content. Read-only; the fixture is never written back.",
+        "location_at_execution": "proof_records/fixtures/mvp1-003/fin-statement.sanitized.csv (not created by this definition task)"
+      },
+      "authority_G1_G2": "Scope = read-only aggregation over the sanitized statement; policy prohibits any transfer/payment/trade; the only permitted write is a reversible reminder/flag; approval required before that write. No unlimited authority — the agent proposes, the human authorizes.",
+      "simulation_G4": "In a PostgreSQL COW branch, aggregate transactions, project available balance against the next recurring charge date, and compute the shortfall and a candidate reminder cell. Dry-run only; trunk untouched.",
+      "approval_G5": "Human sees 'LifeOS suggests: your $<amount> <merchant> charge on <date> exceeds projected balance by $<gap>; set a reminder to move funds?' and explicitly approves or declines.",
+      "branch_G6": "EXECUTION branch — on approval, commit the COW branch to trunk, writing ONE reversible reminder/flag cell to canonical PostgreSQL. No bank action; no money moves. The cell is fully reversible.",
+      "proof_G7": "Proof row records: the shortfall was deterministically derived from the fixture, the reminder cell id, and a SHAKE256 witness binding the finding to the source rows. No bluffed number enters state.",
+      "rollback_G8": "Delete the reminder/flag cell by receipt id (COW-discardable); the sanitized fixture bytes are unchanged; no external financial state ever existed to reverse.",
+      "next_action_G9": "Verified next action derived from the proof: 'Await user execution of the funds move (outside LifeOS in MVP1); decompose an action-capable transfer-draft task only under a future action gate.' No autonomous escalation.",
+      "measurable_value_G10": {
+        "value": "An overdraft/NSF fee event is avoided by surfacing the shortfall with lead time.",
+        "baseline": "Without LifeOS the recurring charge posts against insufficient balance and incurs a fixture-defined NSF fee; the user learns after the fact.",
+        "metric": "dollars_of_fee_avoided (fixture NSF fee) AND lead_time_days = charge_date - reminder_creation_date (must be >= the fixture's configured minimum lead time).",
+        "proof_method": "Deterministic re-run over the fixture must flag the same shortfall and produce a reminder with lead_time_days >= threshold; value is checkable, not asserted."
+      }
+    },
+    {
+      "workflow_id": "MVP1-003-LEG",
+      "domain": "legal",
+      "derives_from": "MVP1-002 (governed legal operating slice) — information/advice/action separated, source documents preserved, provenance recorded, explicit approval for commitments, rollback or non-action proven",
+      "slice_name": "Contract auto-renewal notice-window surfacing (document intake -> deadline/obligation -> deliberate non-action)",
+      "smallest_slice_rationale": "The least legal surface that still forces the whole spine and demonstrates the NON-ACTION branch: intake one contract, preserve it, extract the auto-renewal date and the notice-period obligation, separate information from advice from action, and HOLD the commitment (sending notice) for human authority.",
+      "intent_G0": "User asks LifeOS: 'Is anything about to auto-renew on me?'",
+      "real_input_with_sanitized_fixture": {
+        "fixture_id": "mvp1-003-leg-contract.sanitized",
+        "shape": "A real-shaped lease/service contract (term, effective_date, auto_renewal clause, notice_period_days, governing_law) as preserved source text; structurally identical to a genuine agreement.",
+        "sanitization": "Fabricated parties, addresses, and dates; no real PII, no signatures, no secrets/**. The source document is preserved read-only with a content hash for provenance; never altered.",
+        "location_at_execution": "proof_records/fixtures/mvp1-003/leg-contract.sanitized.txt (not created by this definition task)"
+      },
+      "authority_G1_G2": "Scope = read-only understanding + deadline/obligation extraction; policy prohibits sending, signing, filing, or any external legal action; a reversible calendar reminder is permitted with approval; the legal commitment (non-renewal notice) is human-only.",
+      "simulation_G4": "In a PostgreSQL COW branch, extract the auto-renewal date and notice deadline, and simulate BOTH outcomes (act: send notice; not-act: allow renewal) so the user sees consequences. Dry-run; trunk untouched.",
+      "approval_G5": "Human sees three separated artifacts — INFORMATION ('auto-renews <date>; notice required <notice_period_days> days prior, i.e. by <deadline>'), ADVICE ('LifeOS suggests: send non-renewal notice by <deadline> if you intend to leave'), and ACTION (send the notice) — and the ACTION is presented as requiring explicit human authority.",
+      "branch_G6": "DELIBERATE NON-ACTION branch — LifeOS sends/signs/files NOTHING. It commits only a reversible calendar reminder (if approved) and records a deliberate-non-action decision for the commitment itself. Non-action is the proven outcome.",
+      "proof_G7": "Proof row records: the deadline was deterministically extracted from the preserved document, the information/advice/action separation, the reminder id (if any), the recorded non-action on the commitment, and a SHAKE256 witness binding the extracted deadline to the source clause. No invented clause enters state.",
+      "rollback_G8": "Delete the calendar reminder by receipt id; the deliberate non-action leaves ZERO external legal state to reverse; the preserved source document bytes are unchanged.",
+      "next_action_G9": "Verified next action derived from the proof: 'Hold; await explicit human decision to send or not send the notice. If the user elects to send, route to a human-authored action-capable legal task under an action gate.' No autonomous commitment.",
+      "measurable_value_G10": {
+        "value": "A silent auto-renewal / missed notice-window is avoided by surfacing the deadline before the window closes.",
+        "baseline": "Without LifeOS the notice window lapses unnoticed and the contract auto-renews.",
+        "metric": "lead_time_days = notice_deadline - surfaced_date (must be >= notice_period_days + a configured buffer) AND missed_deadlines = 0 over the fixture set.",
+        "proof_method": "Deterministic re-run over the fixture must extract the same deadline and surface it with lead_time_days >= (notice_period_days + buffer); value is checkable, not asserted."
+      }
+    }
+  ],
+
+  "gate_clause_coverage": {
+    "real_inputs_with_sanitized_fixtures": "Both workflows are driven by real-shaped, content-sanitized fixtures (mvp1-003-fin-statement.sanitized, mvp1-003-leg-contract.sanitized): genuine export/contract structure, fabricated identifiers, zero PII/credentials, read-only. Real input shape, safe content.",
+    "authority": "Both bind an identity+policy authority contract at G1/G2 with explicit prohibitions (no spend/trade for FIN; no send/sign/file for LEG) and a mandatory human-approval gate at G5; no unlimited agent authority; secrets stay in the OS keyring.",
+    "simulation": "Both run G4 in an isolated PostgreSQL COW branch (blueprint COW branching); simulation_required=TRUE is satisfied because no candidate write reaches trunk before it is dry-run and approved.",
+    "execution_or_deliberate_non_action": "FIN exercises the EXECUTION branch (a reversible, non-spending reminder cell committed on approval); LEG exercises the DELIBERATE NON-ACTION branch (commitment withheld, nothing sent/signed/filed). Both branches of the clause are demonstrated across the connected proof.",
+    "proof": "Both emit a proof row on canonical PostgreSQL state (proof-cell), each bound by a SHAKE256 witness chain to its source fixture with a causal edge; Causal Graph Verification rejects any rootless claim — no bluffed financial/legal fact persists.",
+    "rollback": "Both are reversible: FIN's reminder cell and LEG's calendar reminder are COW-discardable by receipt id; LEG's deliberate non-action leaves zero external state; original fixture bytes are unchanged. The task-level rollback restores the archived acceptance plan with no external state changed.",
+    "next_action": "Both derive a verified next action FROM the proof at G9 (FIN: await user-executed funds move, decompose transfer-draft only under a future action gate; LEG: hold for human decision, route to human-authored action task if elected). Derived, not invented.",
+    "measurable_user_value": "Both carry a concrete, checkable value metric at G10 (FIN: dollars_of_fee_avoided + lead_time_days; LEG: lead_time_days + missed_deadlines=0), each provable by deterministic re-run over the fixture — self-sustaining value per LIFEOS-006."
+  },
+
+  "work_items": [
+    {
+      "id": "MVP1-003-A",
+      "surface": "Financial bounded workflow (MVP1-003-FIN): read-only recurring-charge shortfall awareness -> reversible reminder cell",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Accept the smallest financial slice as read-only aggregation first, one reversible non-spending reminder as the execution branch, and dollars_of_fee_avoided + lead_time_days as the value metric; no transfer, payment, or trade is ever executed (MVP1-001 gate)."
+    },
+    {
+      "id": "MVP1-003-B",
+      "surface": "Legal bounded workflow (MVP1-003-LEG): contract auto-renewal notice-window surfacing -> deliberate non-action",
+      "owner": "LifeOS Product / Legal Governance Agent",
+      "decision": "Accept the smallest legal slice as document intake + deadline/obligation extraction with information/advice/action separated, the commitment held as deliberate non-action, and lead_time_days + missed_deadlines=0 as the value metric; nothing is sent, signed, or filed (MVP1-002 gate)."
+    },
+    {
+      "id": "MVP1-003-C",
+      "surface": "Shared substrate spine binding (shared_substrate_spine G0..G10)",
+      "owner": "Governance Board / Runtime Kernel",
+      "decision": "Both workflows MUST traverse the identical governed-execution spine (LIFEOS-003) on the intelligence substrate (LIFEOS-005); the connected proof is that the substrate is workflow-agnostic and each stage's store owner is fixed by STORE-001 (redb hot, PostgreSQL+RuVector canonical, AgentDB non-authoritative, keyring secrets)."
+    },
+    {
+      "id": "MVP1-003-D",
+      "surface": "Real-inputs-with-sanitized-fixtures contract (bounded_workflows.*.real_input_with_sanitized_fixture)",
+      "owner": "LifeOS Product / QA Agent",
+      "decision": "Fixtures are real in shape and sanitized in content (no PII, no credentials, no secrets/**), read-only, and content-hashed for provenance; they are produced at the proof-cell execution gate, not by this definition task."
+    },
+    {
+      "id": "MVP1-003-E",
+      "surface": "Authority contract (shared_substrate_spine G1/G2/G5; hard_invariants)",
+      "owner": "Governance Board / Runtime Kernel",
+      "decision": "Every write is scoped by identity+policy with explicit prohibitions and a mandatory human-approval gate; no unlimited agent authority; no autonomous spend or legal commitment; secrets remain in the OS keyring (STORE-001 external-secret)."
+    },
+    {
+      "id": "MVP1-003-F",
+      "surface": "Simulation contract (shared_substrate_spine G4; simulation_required=TRUE)",
+      "owner": "Runtime Kernel / Simulation Agent",
+      "decision": "Both workflows dry-run in an isolated PostgreSQL COW staging branch before any trunk commit; the legal workflow additionally simulates both act and not-act outcomes; no candidate write reaches trunk unsimulated or unapproved."
+    },
+    {
+      "id": "MVP1-003-G",
+      "surface": "Execution-or-deliberate-non-action contract (shared_substrate_spine G6)",
+      "owner": "LifeOS Product / QA Agent",
+      "decision": "The connected proof demonstrates BOTH clause branches: FIN commits a reversible non-spending cell (execution); LEG withholds the commitment (deliberate non-action). Reversibility and non-action are each proven."
+    },
+    {
+      "id": "MVP1-003-H",
+      "surface": "Proof contract (shared_substrate_spine G7; execution_cell=proof-cell)",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Each workflow emits a proof row on canonical PostgreSQL state bound by a SHAKE256 witness chain to its source fixture with a causal edge; Causal Graph Verification rejects rootless claims so no bluffed financial/legal fact persists (blueprint anti-bluffing)."
+    },
+    {
+      "id": "MVP1-003-I",
+      "surface": "Rollback contract (shared_substrate_spine G8; task rollback_plan)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Reversible cells are COW-discardable by receipt id; deliberate non-action leaves zero external state; original fixture bytes are unchanged; the task-level rollback restores the archived MVP1 acceptance plan with no external state changed."
+    },
+    {
+      "id": "MVP1-003-J",
+      "surface": "Next-action derivation contract (shared_substrate_spine G9)",
+      "owner": "LifeOS Product / QA Agent",
+      "decision": "Each workflow derives a verified next action FROM its proof row (FIN: await user-executed funds move, defer transfer-draft to a future action gate; LEG: hold for human decision, route to a human-authored action task if elected); next actions are derived, never invented, and never autonomously escalated to action."
+    },
+    {
+      "id": "MVP1-003-K",
+      "surface": "Measurable-user-value contract (shared_substrate_spine G10; bounded_workflows.*.measurable_value_G10)",
+      "owner": "LifeOS Product / QA Agent",
+      "decision": "Each workflow carries a concrete, deterministically re-checkable value metric (FIN: dollars_of_fee_avoided + lead_time_days>=threshold; LEG: lead_time_days>=notice_period+buffer, missed_deadlines=0); only proven value/learning is promoted forward into canonical PostgreSQL (LIFEOS-005 promotion of proven state only)."
+    }
+  ],
+
+  "store_001_alignment": {
+    "single_durable_writer": "PostgreSQL + RuVector owns every durable class the acceptance touches (authority rows, task graph, aggregated facts, proof rows, provenance, value metrics) exactly once; redb is buffer/WAL/dedup only.",
+    "forward_only_sync": "Intent and traces enter redb (hot) and flow forward via envctl(embed) to PostgreSQL; no undirected redb<->PostgreSQL dual-write anywhere in either workflow.",
+    "no_sidecar": "Semantic retrieval (G3 hybrid search) uses RuVector as a native PostgreSQL extension; no separate vector database.",
+    "non_authoritative_cognition": "AgentDB (.rvf) may hold agent routing/skill state (RuvLTRA/SONA) but is non-authoritative for the financial/legal macro-state, which lives only in PostgreSQL.",
+    "secrets_isolated": "Any bank/legal-portal credential stays in the OS keyring; PostgreSQL stores provenance references, never raw secrets; redb never holds secrets.",
+    "no_silent_reclassification": "This acceptance exercises the intended tiered path against disposable COW branches; it reclassifies no existing durable class and performs no cutover (STORE-001 'no unverified cutover' guardrail)."
+  },
+
+  "rollback": {
+    "plan_verbatim": "Restore the archived MVP1 acceptance plan; no external state is changed.",
+    "ordered_steps": [
+      "Restore generated/task_families/MVP1-003.json and proof_records/MVP1-003.proof.json from the archived acceptance plan.",
+      "Confirm no fixture, bank, legal-portal, PostgreSQL row, redb entry, or .rvf file was written by this definition task (product_execution_performed=false).",
+      "Confirm the FIN reversible reminder cell and LEG calendar reminder were never committed (they exist only in the execution-gate contract, not here), so there is nothing external to reverse."
+    ],
+    "invariants_preserved": [
+      "No external financial or legal action was taken (blocked_paths honored).",
+      "No secrets/** were read or written.",
+      "Original fixture and source bytes are unchanged; only the two planning artifacts exist."
+    ]
+  },
+
+  "open_dependencies": [
+    "MVP1-001 and MVP1-002 must fully bound their financial and legal slices before this acceptance is decomposed into executable child tasks (this task's next_action).",
+    "The governed execution spine (LIFEOS-003) and intelligence substrate (LIFEOS-005) phase plans are referenced by gate language here; their generated phase-plan artifacts are produced upstream and the live proof-cell run consumes them.",
+    "Live execution of both workflows (fixture creation, COW dry-run, approval, reversible-cell commit, proof rows) runs at the proof-cell execution gate; this definition supplies the acceptance criteria that execution must satisfy."
+  ],
+
+  "completion_gate": "Both bounded workflows (MVP1-003-FIN, MVP1-003-LEG) traverse the identical G0..G10 substrate spine; every one of the eight gate clauses is covered for both workflows with concrete acceptance criteria; every store touch is owned exactly once under STORE-001; the execution branch (FIN reversible cell) and the deliberate-non-action branch (LEG withheld commitment) are both demonstrated; and MVP1-003.proof.json records zero financial or legal action and product_execution_performed=false.",
+
+  "closure": {
+    "both_workflows_traverse_same_spine": true,
+    "all_eight_gate_clauses_covered_for_both_workflows": true,
+    "execution_branch_and_non_action_branch_both_demonstrated": true,
+    "every_store_touch_owned_once_under_STORE_001": true,
+    "no_autonomous_spend_or_legal_commitment": true,
+    "measurable_value_defined_and_recheckable": true,
+    "product_execution_performed": false
+  }
+}

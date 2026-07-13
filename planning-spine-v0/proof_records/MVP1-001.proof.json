@@ -1,0 +1,95 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "MVP1-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each financial workflow has data authority, simulation, approval, spend/trading prohibitions, reversible cells, audit, rollback, and value proof; observation precedes action.",
+  "gate_result": {
+    "design_artifact": "generated/task_families/MVP1-001.json",
+    "workflows_enumerated": 8,
+    "workflows": [
+      "MVP1-001-W1 Unified cash position aggregation",
+      "MVP1-001-W2 Transaction categorization and spend breakdown",
+      "MVP1-001-W3 Bill and obligation due-date surfacing",
+      "MVP1-001-W4 Recurring subscription and waste detection",
+      "MVP1-001-W5 Budget vs actual variance and alert",
+      "MVP1-001-W6 Company runway and burn-rate forecast",
+      "MVP1-001-W7 Receivables and invoice reconciliation",
+      "MVP1-001-W8 Portfolio position aggregation (no trading)"
+    ],
+    "every_workflow_has_data_authority": true,
+    "data_authority_binding": "All 8 workflows bind to PostgreSQL+RuVector as the single canonical durable owner (STORE-001 single-writer invariant); redb appears only as the transient buffer / f32 distance cache / live-quote feed, and the OS keyring owns credentials.",
+    "every_workflow_has_simulation": true,
+    "simulation_binding": "Each workflow runs simulation-first: rungs 1-2 dry-run under a COW branch in a sim-cell/policy-cell verifying no write escapes; W6 uses the ATAS/ESN resource-burn ensemble mapped to financial runway.",
+    "every_workflow_has_approval": true,
+    "approval_binding": "Read-only rungs 1-2 need no approval to observe; every state-changing rung (bill payment W3, cancellation W4, collection W7, any capital move W6, any order W8) raises a mandatory Needs-Human-Approval to David per Constitution §6 and Execution gates §11, and none is exercised in this planning slice.",
+    "every_workflow_has_spend_trading_prohibitions": true,
+    "prohibition_binding": "All 8 workflows carry the full blocked set {spend, trading, account creation, credential access, external financial action}; W8 excludes trading structurally (no broker-order path exists in the sim-cell trace), not merely by deferral.",
+    "every_workflow_has_reversible_cell": true,
+    "reversible_cell_binding": "Every workflow runs in a policy-cell (W6 in a sim-cell): read-only FS, network denied by default, no mutation without snapshot; any future approved action executes only with a snapshot + COW discard path.",
+    "every_workflow_has_audit": true,
+    "audit_binding": "Every read, recommendation, and future approval is bound to a PostgreSQL-rooted Cryptographic Witness Chain (SHAKE256); a figure or order with no causal edge to real ledger rows is rejected (anti-bluffing).",
+    "every_workflow_has_rollback": true,
+    "rollback_binding": "Every workflow rolls back by restoring the archived financial plan and/or re-deriving from PostgreSQL; no financial account, transaction, or credential is touched.",
+    "every_workflow_has_value_proof": true,
+    "value_proof_binding": "Each workflow names a concrete self-sustaining value (whole-position clarity W1/W8, spend understanding W2, avoided late fees W3, recovered recurring waste W4, early overrun catch W5, runway visibility W6, faster receivables W7) proven by deriving solely from canonical PostgreSQL rows with reproducible re-computation.",
+    "observation_precedes_action": true,
+    "observation_precedes_action_binding": "The maturity ladder enforces read-only aggregation (rung 1) -> bounded recommendation (rung 2) -> [human approval rung 3] -> reversible execution (rung 4) -> proof (rung 5); MVP1-001 authorizes only rungs 1-2; every workflow's observation_precedes_action field states the gate explicitly.",
+    "financial_state_classes_assigned_exactly_once": true,
+    "financial_state_class_count": 13,
+    "each_class_has_single_canonical_owner": true,
+    "store_001_alignment": {
+      "single_durable_writer": "PostgreSQL+RuVector owns every durable financial macro-state class exactly once",
+      "transient_tier_redb": "live_balance_and_quote_poll_feed, statement_fetch_dedup_cache (BLAKE3), recommendation_draft_cognition scratch — forward-only flush via envctl, never a second durable writer",
+      "ingestion_reuses_codedb_pattern": "financial records: nu_plugin parse -> redb buffer -> envctl embed/commit -> PostgreSQL",
+      "no_sidecar": "transaction_categorization_embeddings live in PostgreSQL via the RuVector native extension; no separate vector store",
+      "credentials_out_of_db": "bank_and_brokerage_credentials owned by OS keyring; PostgreSQL stores references/provenance only, redb never holds secrets"
+    },
+    "prohibited_paths_untouched": ["spend", "trading", "account creation", "credential access", "external financial action", "product implementation"],
+    "grounded_in": [
+      "generated/store_relationship_decision.json (STORE-001)",
+      "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+      "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+      "1.0_VISION/LifeOS Master Plan - Consolidated v1 (2026-07-07).md (§1 Constitution, §1.5 MVP1 financial domain, §2 cell types, §11 Execution gates, §18 proof spine)",
+      "1.0_VISION/NORTH_STAR.md"
+    ],
+    "product_execution_performed": false
+  },
+  "proof_summary": "MVP1-001 defines the smallest end-to-end governed financial slice as 8 concrete read-only-first workflows in generated/task_families/MVP1-001.json: W1 unified cash position aggregation, W2 transaction categorization and spend breakdown, W3 bill and obligation due-date surfacing, W4 recurring subscription and waste detection, W5 budget vs actual variance and alert, W6 company runway and burn-rate forecast, W7 receivables and invoice reconciliation, and W8 portfolio position aggregation with no trading. Each workflow carries all eight verification-gate dimensions with concrete values: data authority is PostgreSQL+RuVector canonical on every workflow (STORE-001 single durable writer, with redb only as the transient live-quote/dedup buffer and the OS keyring owning credentials); simulation is a sim-cell/COW dry-run (ATAS/ESN resource-burn ensemble for W6); approval is a mandatory Needs-Human-Approval gate on every state-changing rung (bill payment, cancellation, collection, capital move, order) per Constitution §6 and Execution gates §11; the full prohibition set {spend, trading, account creation, credential access, external financial action} is attached to all 8; every workflow runs in a reversible policy-cell with snapshot; every read and recommendation is bound to a PostgreSQL-rooted SHAKE256 witness chain; rollback restores the archived plan and touches no real account; and every workflow names a self-sustaining value proof that derives solely from canonical rows. Observation precedes action via a five-rung maturity ladder where MVP1-001 authorizes only rungs 1-2 (aggregation and bounded recommendation) and defers rungs 3-5 behind human approval. The design artifact assigns all 13 financial state classes to exactly one canonical owner each, specializing the STORE-001 keystone; the financial ingestion path reuses the nu_plugin CodeDB parse -> redb buffer -> envctl commit -> PostgreSQL pattern; categorization vectors live in PostgreSQL via the RuVector No-Sidecar extension. A live gate validator confirmed 8 workflows, all eight per-workflow dimensions present and non-empty, the full prohibition set and PostgreSQL-canonical authority on every workflow, and 13 uniquely-assigned single-owner state classes. No spend, trading, account, credential, or external financial action was defined as executable and product_execution_performed is false.",
+  "artifact_paths": [
+    "generated/task_families/MVP1-001.json",
+    "proof_records/MVP1-001.proof.json"
+  ],
+  "checksums": {
+    "generated/task_families/MVP1-001.json": "94d137fae8a64c7dc46f44afc97f8a213740d8b75725740f5a5b639c73e8b690"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate MVP1-001 gate: 8 workflows each carry data authority, simulation, approval, spend/trading prohibitions, reversible cell, audit, rollback, value proof, observation-precedes-action; 13 financial state classes assigned exactly once with a single canonical owner",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (MVP1-001 gate validation over generated/task_families/MVP1-001.json)",
+      "exit_status": 0,
+      "output": [
+        "workflows_enumerated = 8",
+        "every_workflow_has_data_authority = True",
+        "every_workflow_has_simulation = True",
+        "every_workflow_has_approval = True",
+        "every_workflow_has_reversible_cell = True",
+        "every_workflow_has_audit = True",
+        "every_workflow_has_rollback = True",
+        "every_workflow_has_value_proof = True",
+        "observation_precedes_action_all = True",
+        "every_workflow_prohibits_spend_and_trading = True",
+        "every_workflow_carries_full_prohibition_set = True",
+        "every_workflow_data_authority_is_postgres_canonical = True",
+        "financial_state_class_count = 13",
+        "each_state_class_assigned_exactly_once = True",
+        "each_class_has_single_canonical_owner = True",
+        "OVERALL_PASS = True"
+      ]
+    }
+  ],
+  "product_execution_performed": false,
+  "rollback_plan": "Restore the archived financial plan; no financial account, transaction, or credential is touched."
+}

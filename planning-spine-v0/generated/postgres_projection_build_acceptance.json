@@ -1,0 +1,301 @@
+{
+  "schema_version": "lifeos-planning-spine.postgres-projection-build-acceptance.v0",
+  "task_id": "POSTGRES-009",
+  "title": "Portable projected LifeOS build proven end to end",
+  "defined_at": "2026-07-13T03:47:08Z",
+  "owner": "Runtime Kernel / QA Agent",
+  "phase": "2-postgres-foundation",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/adopted_capabilities.source.csv (ADOPT-001 provenance + parity capabilities)",
+    "generated/user_space_ingestion_plan.json (POSTGRES-004)",
+    "generated/ruvector_semantic_edit_plan.json (POSTGRES-005)",
+    "generated/runtime_store_boundary_plan.json (POSTGRES-006)",
+    "generated/lifeos_uds_database_surface_plan.json (POSTGRES-007)",
+    "generated/envctl_materialization_plan.json (POSTGRES-008)"
+  ],
+  "store_authority_reference": "STORE-001 — PostgreSQL + RuVector is the single canonical durable owner; redb is the transient forward buffer; envctl is the forward-only bridge and the projection engine; AgentDB (.rvf) is non-authoritative per-agent cognition; nu_plugin CodeDB is the parser/ingestion path.",
+  "objective": "Define the smallest end-to-end proof in which one bounded LifeOS source slice completes the full round trip source -> PostgreSQL+RuVector -> envctl projection -> reproducible Nix+musl build -> running binary -> answered LifeOS UDS request, carrying byte, identity, behavior, provenance, rollback, and rebuild proofs, with every entity assigned exactly one canonical owner under STORE-001.",
+  "simulation_required": true,
+  "product_execution_performed": false,
+  "verification_gate": "One bounded source slice completes source-to-database-to-projection-to-reproducible-build-to-running-UDS round trip with byte, identity, behavior, provenance, rollback, and rebuild proofs.",
+  "execution_gate_note": "This artifact DEFINES the smallest end-to-end proof and its per-stage/per-proof acceptance criteria. It performs no live database mutation, no build, and no run: those actions are deferred to the POSTGRES execution gate (the POSTGRES-010 authority-cutover lane and its live blobstore/RuVector parity runs). Per the task allowed/blocked paths, live database mutation before the execution gate, profile installation, and production deployment are out of scope here.",
+
+  "bounded_source_slice": {
+    "slice_id": "postgres009-uds-probe",
+    "principle": "The smallest LifeOS source subset that is simultaneously (a) parseable to a Nushell AST, (b) embeddable by the local model, (c) losslessly projectable to a clean directory, (d) statically musl-compilable, (e) runnable as an install-in-place folder, and (f) able to answer exactly one LifeOS UDS request. No stage in the round trip is allowed to be a no-op.",
+    "membership_contract": "An explicit include manifest enumerates every source block by module_path. Only blocks in the manifest enter the bounded PostgreSQL namespace (a dedicated schema/branch for this proof). The slice is content-addressed: each member carries a SHA-256 and a BLAKE3 dedup hash so membership is a checksummed set, not a directory glob.",
+    "exclusions": [
+      "secrets/** — external-secret / provenance authority stays in the OS keyring (STORE-001 external-secret class); never ingested.",
+      "AgentDB (.rvf) per-agent cognition — non-authoritative active cognition (STORE-001 per-agent cognition class); the minimal UDS request is answered from canonical PostgreSQL state, so no agent brain is required in the slice.",
+      "Any user-space class not required to bind a socket and answer one status request (media blobs, communications, domain records) — bounded out to keep the slice minimal."
+    ],
+    "members": [
+      {
+        "member": "crate manifest",
+        "surface": "Cargo.toml",
+        "kind": "configuration block",
+        "ingest_identity": "module_path=Cargo.toml + SHA-256(content) + BLAKE3(dedup)",
+        "owner_after_ingest": "PostgreSQL — durable relational macro-state (STORE-001 class 1)"
+      },
+      {
+        "member": "binary entrypoint",
+        "surface": "src/main.rs",
+        "kind": "rust AST blocks (fn main, UDS listener bootstrap)",
+        "ingest_identity": "module_path=src/main.rs + per-block SHA-256 + BLAKE3",
+        "owner_after_ingest": "PostgreSQL — durable relational macro-state (code AST/rows, module_path metadata, causal edges)"
+      },
+      {
+        "member": "UDS responder module",
+        "surface": "src/uds.rs",
+        "kind": "rust AST blocks (bind, accept, handle_request -> status response)",
+        "ingest_identity": "module_path=src/uds.rs + per-block SHA-256 + BLAKE3",
+        "owner_after_ingest": "PostgreSQL — durable relational macro-state; semantic_embedding column owned by PostgreSQL+RuVector"
+      }
+    ],
+    "one_uds_request": {
+      "request": "lifeos.status — a single structured status/health request sent over a Unix Domain Socket (no HTTP/REST).",
+      "grounding": "Blueprint section 'LifeOS Unix Domain Sockets (UDS) via Yazelix (Zellij)': LifeOS communicates with the workspace via UDS (or shared redb state files) and renders swarm status without overlapping state; POSTGRES-007 requires every visible LifeOS state/command to map to canonical database identities with an explicit UDS request/response contract.",
+      "expected_response": "A deterministic structured record: { status: \"ok\", slice_id, projected_version_id, build_binary_sha256, answered_from: \"postgresql-canonical\" }. Every field traces to a canonical PostgreSQL identity or a recorded stage receipt — nothing is synthesized at request time."
+    },
+    "bound_size_rationale": "One crate, three source members, one request. This is the least surface that still forces every mechanism the blueprint names: AST parse (Nushell) -> redb buffer (nu_plugin, MessagePack, BLAKE3 dedup) -> embed (all-MiniLM-L6-v2) + commit (envctl) -> PostgreSQL rows -> envctl 4-step projection -> Nix x86_64-unknown-linux-musl static build -> install-in-place run -> UDS answer."
+  },
+
+  "round_trip_stages": [
+    {
+      "stage_id": "S1",
+      "name": "source-to-database (ingestion + embedding)",
+      "gate_clause_served": "source-to-database",
+      "blueprint_pillars": "Three Pillars of Ingestion — Nushell (Parser) -> nu_plugin (redb Buffer) -> envctl (Bridge to PostgreSQL).",
+      "inputs": "The bounded_source_slice include manifest (Cargo.toml, src/main.rs, src/uds.rs).",
+      "mechanism": [
+        "Nushell traverses the slice and parses each member into AST blocks (functions, structs, dependencies).",
+        "nu_plugin CodeDB streams the structured blocks into the redb buffer over the MessagePack protocol at microsecond latency; redb computes a BLAKE3 hash per block as the embedding-dedup cache key.",
+        "envctl pulls the blocks from redb, runs the local all-MiniLM-L6-v2 model to produce semantic_embedding vectors (dedup-guarded by the BLAKE3 cache), and commits raw_code + semantic_embedding + module_path metadata + causal dependency edges into the bounded PostgreSQL namespace as a single production branch."
+      ],
+      "store_001_ownership": {
+        "durable_relational_macro_state": "PostgreSQL (single durable writer of raw_code, module_path, causal edges).",
+        "semantic_vector_state": "PostgreSQL + RuVector (native extension, No-Sidecar) owns semantic_embedding.",
+        "transient_high_frequency_state": "redb holds the forward buffer and BLAKE3 dedup hashes only; forward-only redb -> envctl -> PostgreSQL; no dual-write."
+      },
+      "receipt": "ingestion_receipt — { namespace_id, branch_id, source_manifest_sha256, per_member{module_path, block_shas, blake3}, envctl_commit_ids, embedding_model_pin }.",
+      "notes": "Per STORE-001 open dependency, while live RuVector-in-PostgreSQL extension activation is not yet locally proven, embeddings for this proof are produced via the already-verified Bun-loaded ruvector N-API path and committed to PostgreSQL; the vector column owner remains PostgreSQL."
+    },
+    {
+      "stage_id": "S2",
+      "name": "database-to-projection (envctl materialization)",
+      "gate_clause_served": "database-to-projection",
+      "blueprint_pillars": "envctl Projection Engine — the four-step materialization (query -> module_path map -> concatenate -> dump).",
+      "inputs": "The selected production branch/version committed in S1.",
+      "mechanism": [
+        "envctl queries PostgreSQL for the selected production branch of the bounded namespace.",
+        "It uses stored module_path metadata to reconstruct the exact directory structure in memory.",
+        "It concatenates the raw_code blocks back into complete standard files (Cargo.toml, src/main.rs, src/uds.rs).",
+        "It dumps the clean, disposable directory into the Nix/Yazelix build input path."
+      ],
+      "store_001_ownership": {
+        "derived_projections": "PostgreSQL is the source of truth; envctl projection is read-only from PostgreSQL; the filesystem tree is derived and disposable, regenerated deterministically from rows via module_path (STORE-001 class 5)."
+      },
+      "receipt": "projection_receipt — { source_branch_id, source_version_id, projected_tree_path, per_file{path, sha256, byte_len, mode}, projection_run_id }.",
+      "notes": "POSTGRES-008 requires repeated projections to be byte-identical; this stage's receipt captures the per-file SHA-256 that the byte and rebuild proofs compare against."
+    },
+    {
+      "stage_id": "S3",
+      "name": "projection-to-reproducible-build (Nix + musl static)",
+      "gate_clause_served": "reproducible-build",
+      "blueprint_pillars": "Portable Release Strategy — Nix deterministic compilation against x86_64-unknown-linux-musl; gitkb/meta isolates pure Rust from napi-rs exhaust; nix bundle / AppImage yields an install-in-place folder.",
+      "inputs": "The projected clean directory from S2.",
+      "mechanism": [
+        "Nix deterministically compiles the projected crate against the x86_64-unknown-linux-musl target, forcing strict static linking so all dependencies are bundled into the binary and no hardcoded /nix/store RPATHs remain.",
+        "gitkb/meta scopes the compilation to the pure Rust directory, bypassing any napi-rs / wasm exhaust so the release artifact is untainted.",
+        "The output is packed into a portable install-in-place folder (nix bundle wrapped in AppImage or nix-user-chroot + buildEnv)."
+      ],
+      "store_001_ownership": {
+        "build_artifact": "The musl binary and its closure are a derived projection: disposable and regenerable from the same PostgreSQL version; PostgreSQL remains the sole authority."
+      },
+      "receipt": "build_receipt — { nix_derivation_hash, target_triple: \"x86_64-unknown-linux-musl\", static: true, output_folder_path, binary_sha256, meta_include_scope }.",
+      "notes": "Determinism of this stage is what the rebuild_proof asserts: same projected input -> byte-identical binary_sha256."
+    },
+    {
+      "stage_id": "S4",
+      "name": "build-to-running-UDS (run + answer one request)",
+      "gate_clause_served": "running-UDS",
+      "blueprint_pillars": "Phase 4 Run + Execute — launch the portable folder; Yazelix initializes the Zellij + Nushell environment; LifeOS connects via Unix Domain Sockets.",
+      "inputs": "The install-in-place folder / musl binary from S3.",
+      "mechanism": [
+        "Launch the portable folder; Yazelix initializes the Zellij + Nushell background environment.",
+        "The binary binds a Unix Domain Socket and accepts one connection.",
+        "It receives the single lifeos.status request and returns the deterministic structured response, whose fields are read from canonical PostgreSQL identities / recorded stage receipts (not synthesized)."
+      ],
+      "store_001_ownership": {
+        "lifeos_control_surface": "Per POSTGRES-007, every LifeOS UDS request/response maps to canonical PostgreSQL identities; redb-backed low-latency views may serve reads but never become a second authority; no hidden filesystem control-write path."
+      },
+      "receipt": "run_receipt — { socket_path, request: \"lifeos.status\", response_record, response_field_identity_map, pid, exit_status }.",
+      "notes": "The behavior_proof consumes this receipt: the request was answered and every response field resolves to a canonical identity."
+    }
+  ],
+
+  "required_proofs": [
+    {
+      "proof_id": "P-BYTE",
+      "name": "byte proof",
+      "claim": "The projected files are byte-identical to the ingested source, and repeated projections are byte-identical to each other.",
+      "mechanism": "Exact-byte materialization (ADOPT-001 capability) over the content-addressed BlobStore; envctl concatenation reconstructs raw_code blocks losslessly.",
+      "acceptance_criteria": [
+        "For every slice member m: SHA-256(projected(m)) == SHA-256(source(m)).",
+        "For two independent projection runs r1, r2 of the same PostgreSQL version: SHA-256(projected_r1(m)) == SHA-256(projected_r2(m)) for every m (POSTGRES-008 byte-identical clause).",
+        "byte_len and file mode in projection_receipt match the source member exactly."
+      ],
+      "evidence_source": "projection_receipt.per_file (S2) compared against bounded_source_slice.members ingest_identity."
+    },
+    {
+      "proof_id": "P-IDENT",
+      "name": "identity proof",
+      "claim": "Every entity keeps exactly one stable identity across source -> database -> projection; no entity is assigned twice and none is silently reclassified.",
+      "mechanism": "module_path metadata + SHA-256 content addressing form a bijection: source block <-> PostgreSQL row <-> projected byte-range. STORE-001 invariant: every migrated class keeps its SHA-256 identity.",
+      "acceptance_criteria": [
+        "The identity map is a bijection over the slice: |source blocks| == |PostgreSQL rows| == |projected byte-ranges|, matched by (module_path, SHA-256).",
+        "Each slice member appears in exactly one STORE-001 state class (see state_class_participation) — no second owner, no dual-write.",
+        "No redb key for a slice block is treated as durable authority; redb entries are buffer/dedup only (STORE-001 single-durable-writer invariant)."
+      ],
+      "evidence_source": "ingestion_receipt (S1) + projection_receipt (S2) + state_class_participation."
+    },
+    {
+      "proof_id": "P-BEHAVIOR",
+      "name": "behavior proof",
+      "claim": "The statically built binary binds a UDS and returns the expected structured response to the one lifeos.status request.",
+      "mechanism": "Run the install-in-place folder; send the single request; capture the response and resolve every field to a canonical PostgreSQL identity or recorded receipt.",
+      "acceptance_criteria": [
+        "run_receipt shows the request sent and a response received with status == \"ok\".",
+        "Every response field (slice_id, projected_version_id, build_binary_sha256, answered_from) resolves through response_field_identity_map to a canonical PostgreSQL identity / stage receipt.",
+        "Process exits cleanly (exit_status == 0); no HTTP/REST path and no hidden filesystem control-write is used (POSTGRES-007)."
+      ],
+      "evidence_source": "run_receipt (S4)."
+    },
+    {
+      "proof_id": "P-PROV",
+      "name": "provenance proof",
+      "claim": "Every ingested block and every answered response field has a verifiable historical root; nothing is bluffed into system state.",
+      "mechanism": "Source commit/PR lineage inherited via adopted_capabilities.source.csv (ADOPT-001); Cryptographic Witness Chains (SHAKE256) bind each block to its source vector; Causal Graph Verification (GNN) requires a causal edge; RuVector MinCut would sever a rootless node.",
+      "acceptance_criteria": [
+        "Each PostgreSQL row for a slice block carries: source commit + PR, a causal dependency edge, and a SHAKE256 witness linking raw_code to its source vector.",
+        "Any block lacking a historical root in the knowledge graph is rejected (Causal Graph Verification) — the slice contains zero rootless blocks.",
+        "Each response field in run_receipt is traceable to a committed provenance record, not generated at request time."
+      ],
+      "evidence_source": "ingestion_receipt.provenance + run_receipt.response_field_identity_map; provenance derived from generated/adopted_capabilities.source.csv."
+    },
+    {
+      "proof_id": "P-ROLLBACK",
+      "name": "rollback proof",
+      "claim": "The entire proof is reversible using recorded receipts, leaving the original source and any installed profile unchanged.",
+      "mechanism": "COW-branch discard semantics: the bounded namespace is a disposable branch; the projection tree and build folder are derived/disposable. Rollback deletes only derived state, driven by the receipts ledger.",
+      "acceptance_criteria": [
+        "After rollback: the bounded PostgreSQL namespace/branch is dropped, the projected directory is removed, and the build folder is removed — all identified by receipt ids only.",
+        "Original source checksums (bounded_source_slice.members SHA-256) are unchanged; the installed profile is untouched (blocked_paths honored).",
+        "The rollback_receipt records zero destructive action against source or profile (PRESERVE-style completion evidence)."
+      ],
+      "evidence_source": "receipts_ledger + rollback (this artifact); matches the task rollback_plan verbatim."
+    },
+    {
+      "proof_id": "P-REBUILD",
+      "name": "rebuild proof",
+      "claim": "The build is reproducible: re-projecting and re-building from the same PostgreSQL version yields a byte-identical binary, and re-embedding is reproducible.",
+      "mechanism": "envctl projection is deterministic (module_path + content-addressed blocks); Nix musl static compilation is deterministic; the embedding model is pinned so re-embedding from the same BLAKE3-keyed text reproduces the same vector.",
+      "acceptance_criteria": [
+        "Two independent runs of S2->S3 from the same source_version_id produce identical build_binary_sha256.",
+        "Projection is byte-identical across runs (shares evidence with P-BYTE second criterion).",
+        "Re-embedding the same block (same embedding_model_pin, same BLAKE3 key) reproduces the same semantic_embedding — no drift."
+      ],
+      "evidence_source": "projection_receipt + build_receipt across two runs (S2, S3); embedding_model_pin in ingestion_receipt."
+    }
+  ],
+
+  "state_class_participation": [
+    {
+      "state_class": "durable relational macro-state (code AST/rows, module_path metadata, causal dependency edges)",
+      "canonical_owner": "PostgreSQL + RuVector",
+      "participation_in_slice": "The three slice members' raw_code, module_path, and causal edges are committed here in S1 and are the source of truth for S2 projection.",
+      "others_role": "redb holds a transient forward buffer; envctl is the writer bridge (forward-only)."
+    },
+    {
+      "state_class": "semantic / vector / knowledge-graph state (embeddings)",
+      "canonical_owner": "PostgreSQL + RuVector (native extension, No-Sidecar)",
+      "participation_in_slice": "semantic_embedding vectors for the slice blocks, produced by all-MiniLM-L6-v2 during the envctl bridge and committed to PostgreSQL.",
+      "others_role": "redb performs f32 distance/dedup math as a cache only; no SQL/secondary-index/native-vector logic in redb."
+    },
+    {
+      "state_class": "transient high-frequency state (buffer entries, BLAKE3 dedup hashes, WAL during PostgreSQL latency)",
+      "canonical_owner": "redb",
+      "participation_in_slice": "Slice blocks are buffered in redb and BLAKE3-hashed for dedup before envctl flushes them forward; on loss they are regenerable from source (transient by definition).",
+      "others_role": "PostgreSQL receives only the settled, significant commit; redb never becomes a second durable writer."
+    },
+    {
+      "state_class": "per-agent cognition (MicroLoRA / SONA / .rvf)",
+      "canonical_owner": "AgentDB (.rvf)",
+      "participation_in_slice": "EXCLUDED from the minimal slice — the one UDS request is answered from canonical PostgreSQL state, so no agent brain participates. Listed to prove it was decided, not forgotten.",
+      "others_role": "Non-authoritative for shared macro-state; witnessed by SHAKE256 chains rooted in PostgreSQL source vectors."
+    },
+    {
+      "state_class": "derived projections (materialized source directory, musl build folder)",
+      "canonical_owner": "PostgreSQL (source of truth) projected by envctl",
+      "participation_in_slice": "The S2 projected directory and the S3 install-in-place build folder are derived and disposable; both are targets of the rollback proof.",
+      "others_role": "Filesystem projections are read-only outputs of envctl; regenerated deterministically from PostgreSQL rows."
+    },
+    {
+      "state_class": "external-secret / provenance authority (API keys, source pins)",
+      "canonical_owner": "OS keyring + committed source pins",
+      "participation_in_slice": "EXCLUDED — secrets/** is never ingested; PostgreSQL stores provenance references (commit/PR lineage) but never raw secrets; redb never holds secrets.",
+      "others_role": "Provenance references in PostgreSQL support the provenance proof without holding the secrets themselves."
+    }
+  ],
+
+  "receipts_ledger": {
+    "archive_root": "One checksummed archive root holds all proof receipts so the round trip is auditable and reversible from a single place (PRESERVE-style completion evidence).",
+    "receipts": [
+      { "id": "ingestion_receipt", "produced_by": "S1", "used_for": ["P-IDENT", "P-PROV", "P-REBUILD"] },
+      { "id": "projection_receipt", "produced_by": "S2", "used_for": ["P-BYTE", "P-IDENT", "P-REBUILD"] },
+      { "id": "build_receipt", "produced_by": "S3", "used_for": ["P-REBUILD"] },
+      { "id": "run_receipt", "produced_by": "S4", "used_for": ["P-BEHAVIOR", "P-PROV"] },
+      { "id": "rollback_receipt", "produced_by": "rollback", "used_for": ["P-ROLLBACK"] }
+    ]
+  },
+
+  "rollback": {
+    "plan_verbatim": "Delete the bounded database namespace and derived build projection using recorded receipts; original source and installed profile remain unchanged.",
+    "ordered_steps": [
+      "Read ingestion_receipt.namespace_id/branch_id, projection_receipt.projected_tree_path, and build_receipt.output_folder_path from the receipts ledger.",
+      "Drop the bounded PostgreSQL namespace/branch (COW-branch discard) — removes S1 durable + semantic rows for the slice.",
+      "Remove the projected directory (S2) and the install-in-place build folder (S3) — derived/disposable state.",
+      "Verify original source checksums (bounded_source_slice.members SHA-256) are unchanged and the installed profile is untouched.",
+      "Write rollback_receipt recording zero destructive action against source or profile."
+    ],
+    "invariants_preserved": [
+      "Original source bytes unchanged (byte identity verified post-rollback).",
+      "Installed profile untouched (profile installation is a blocked_path).",
+      "Only derived state (namespace, projection, build folder) is deleted."
+    ]
+  },
+
+  "store_001_alignment": {
+    "single_durable_writer": "PostgreSQL owns every durable macro-state class in the slice exactly once; redb is buffer/dedup only.",
+    "forward_only_sync": "redb -> envctl(embed) -> PostgreSQL; no undirected redb<->PostgreSQL dual-write anywhere in the round trip.",
+    "no_sidecar": "RuVector runs as a native PostgreSQL extension; the semantic vector column lives in PostgreSQL, not a separate vector database.",
+    "verified_cutover": "This proof does not silently reclassify any redb-durable class; it exercises the intended path against a disposable bounded namespace, consistent with STORE-001's 'no unverified cutover' guardrail.",
+    "provenance_preserved": "Every slice block keeps its SHA-256 identity and its source commit/PR lineage (adopted_capabilities.source.csv) plus a SHAKE256 witness."
+  },
+
+  "open_dependencies": [
+    "Live RuVector-in-PostgreSQL extension activation is not yet locally proven (STORE-001 semantic-class open dependency); until then the slice's embeddings are produced via the verified Bun-loaded ruvector N-API path and committed to PostgreSQL — the column owner stays PostgreSQL.",
+    "The live source-to-database-to-projection-to-build-to-run execution of this proof runs at the POSTGRES execution gate (POSTGRES-010 cutover lane), where a green blobstore parity run captures the durable-class cutover evidence. This definition supplies the acceptance criteria that execution must satisfy."
+  ],
+
+  "closure": {
+    "every_stage_has_one_owner_one_receipt": true,
+    "every_proof_has_concrete_acceptance_criteria": true,
+    "no_dual_write_authority": true,
+    "round_trip_closed_source_to_uds": true,
+    "product_execution_performed": false
+  }
+}

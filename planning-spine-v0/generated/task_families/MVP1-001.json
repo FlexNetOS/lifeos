@@ -1,0 +1,322 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "MVP1-001",
+  "title": "Governed financial operating slice plan defined",
+  "status": "defined",
+  "owner": "LifeOS Product / Finance Governance Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the smallest end-to-end financial workflows that deliver self-sustaining value through read-only aggregation first, bounded recommendation second, explicit human approval third, reversible execution fourth, and proof fifth. Every workflow is bound to a single canonical data authority, runs simulation-first inside a reversible policy-cell, carries mandatory Needs-Human-Approval before any state-changing rung, prohibits autonomous spend / trading / account creation / credential access / external financial action, keeps a witnessed audit trail, has a rollback that touches no real financial account, and proves its self-sustaining value. Observation precedes action in every workflow.",
+  "design_artifact_role": "This file is the governed financial slice contract named in MVP1-001.target_artifacts. It encodes every financial state class exactly once with owner, lifetime, sync edge, and recovery per STORE-001, and it enumerates the concrete workflow set with the eight verification-gate dimensions plus the observation-precedes-action ladder.",
+  "source_grounding": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md (tiered memory: PostgreSQL+RuVector canonical, redb transient, envctl bridge, nu_plugin ingestion, ATAS/ESN resource-burn simulation, SHAKE256 witness chains, COW branching)",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv (canonical vs temporary/derived state ownership per component)",
+    "generated/store_relationship_decision.json (STORE-001 keystone: single durable writer = PostgreSQL+RuVector; redb transient; forward-only sync; verified cutover)",
+    "1.0_VISION/LifeOS Master Plan - Consolidated v1 (2026-07-07).md (§1 Constitution: no unauthorized spend / no legal bypass; §1.5 MVP1 domain = financial+legal self-sustained growth, Element Ark Holdings; §2 cell types + Execution gates §11 Needs-Human-Approval for spend/trading/account creation/credentials/external action; §18 proof spine)",
+    "1.0_VISION/NORTH_STAR.md (NS-CLARITY see the whole; NS-DIRECTION direct as one system; NS-PROGRESS advance every domain)",
+    "generated/task_graph.source.csv rows MVP1-001, LIFEOS-006 (parent), LIFEOS-003 (execution spine), LIFEOS-005 (memory/compute substrate)"
+  ],
+  "governance_spine": {
+    "derives_from": "LIFEOS-003 governed intent-to-proof execution spine",
+    "stages": [
+      "identity/authority (David is final human authority; Finance Governance Agent may propose/aggregate, never execute raw financial action)",
+      "policy (Constitution §6 + Execution gates §11: spend/trading/account/credential/external = automatic Needs-Human-Approval)",
+      "memory (canonical financial state on PostgreSQL+RuVector; transient reads on redb per STORE-001)",
+      "simulation (sim-cell dry-run under COW branch; ESN resource-burn forecast for runway) before any render or action",
+      "execution (only rungs 1-2 authorized by this planning task; rungs 3-5 defined but gated behind human approval and out of scope here)",
+      "proof (per-workflow value_proof recorded to the proof ledger; no completion without proof)",
+      "rollback (restore archived financial plan; no financial account/transaction/credential touched)",
+      "next-action (decompose action-capable financial tasks only after this read-only slice is proven)"
+    ]
+  },
+  "maturity_ladder": {
+    "doctrine": "observation precedes action; a workflow may not advance a rung until the prior rung is proven",
+    "rungs": [
+      { "rung": 1, "name": "read-only aggregation", "authority": "authorized in MVP1-001", "gate": "no write escapes the sim-cell; canonical reads only" },
+      { "rung": 2, "name": "bounded recommendation", "authority": "authorized in MVP1-001", "gate": "recommendation is advisory constraint only; prefixed 'LifeOS suggests:'; no external effect" },
+      { "rung": 3, "name": "explicit human approval", "authority": "defined, NOT exercised here", "gate": "mandatory Needs-Human-Approval from David before any state-changing action" },
+      { "rung": 4, "name": "reversible execution", "authority": "defined, NOT exercised here", "gate": "policy-cell with snapshot; COW branch; discardable; no irreversible action without explicit authority" },
+      { "rung": 5, "name": "proof", "authority": "defined, NOT exercised here", "gate": "witnessed proof record of the executed action and its reversibility point" }
+    ],
+    "mvp1_001_scope": "This planning task authorizes only rungs 1-2 (read-only aggregation + bounded recommendation). No spend, trading, account creation, credential access, or external financial action is defined as executable here; rungs 3-5 are specified so downstream action-capable tasks inherit the gates, but product_execution_performed is false."
+  },
+  "financial_state_authority": {
+    "note": "Every financial state class is assigned exactly once, specializing the STORE-001 keystone to the financial domain. PostgreSQL+RuVector is the single durable writer; redb is the transient tier; envctl is the forward-only bridge; the financial ingestion path reuses the nu_plugin CodeDB pattern (parse -> redb buffer -> envctl embed/commit -> PostgreSQL).",
+    "classes": [
+      {
+        "class": "account_registry_and_balances",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "lifetime": "durable macro-state (ACID / PITR)",
+        "sync_edge": "external statement/feed -> nu_plugin parse -> redb buffer -> envctl commit -> PostgreSQL",
+        "recovery": "PostgreSQL PITR",
+        "tier_relationship": "canonical; redb only buffers the in-flight refresh"
+      },
+      {
+        "class": "transaction_ledger_history",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "lifetime": "durable macro-state (immutable append + provenance)",
+        "sync_edge": "nu_plugin parse -> redb buffer -> envctl commit -> PostgreSQL",
+        "recovery": "PostgreSQL PITR",
+        "tier_relationship": "canonical; forward-only from redb"
+      },
+      {
+        "class": "obligation_and_bill_schedule",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "lifetime": "durable macro-state",
+        "sync_edge": "nu_plugin parse -> redb buffer -> envctl commit -> PostgreSQL",
+        "recovery": "PostgreSQL PITR",
+        "tier_relationship": "canonical"
+      },
+      {
+        "class": "budget_and_category_definitions",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "lifetime": "durable macro-state",
+        "sync_edge": "David-authored -> PostgreSQL (single writer)",
+        "recovery": "PostgreSQL PITR",
+        "tier_relationship": "canonical"
+      },
+      {
+        "class": "transaction_categorization_embeddings",
+        "canonical_owner": "PostgreSQL + RuVector (native extension, No-Sidecar)",
+        "lifetime": "durable semantic/vector state",
+        "sync_edge": "local model (all-MiniLM-L6-v2) during envctl bridge -> PostgreSQL vectors",
+        "recovery": "PostgreSQL PITR + reproducible re-embedding",
+        "tier_relationship": "canonical; redb performs f32 distance math only as a cache, no SQL/index/vector logic"
+      },
+      {
+        "class": "recurring_charge_and_variance_detections",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "lifetime": "durable derived analytical rows (recomputable)",
+        "sync_edge": "computed in sim-cell over PostgreSQL rows -> committed back to PostgreSQL",
+        "recovery": "re-derivation from PostgreSQL ledger",
+        "tier_relationship": "canonical derived; disposable and regenerable"
+      },
+      {
+        "class": "portfolio_positions",
+        "canonical_owner": "PostgreSQL + RuVector",
+        "lifetime": "durable macro-state (positions only; NO trading capability)",
+        "sync_edge": "nu_plugin parse -> redb buffer -> envctl commit -> PostgreSQL",
+        "recovery": "PostgreSQL PITR",
+        "tier_relationship": "canonical; live quotes are transient on redb"
+      },
+      {
+        "class": "live_balance_and_quote_poll_feed",
+        "canonical_owner": "redb",
+        "lifetime": "transient high-frequency (process/refresh lifecycle)",
+        "sync_edge": "redb -> envctl flush -> PostgreSQL (only settled significant values persist)",
+        "recovery": "redb local disk; transient by definition",
+        "tier_relationship": "intended terminal transient role; never a second durable writer"
+      },
+      {
+        "class": "statement_fetch_dedup_cache",
+        "canonical_owner": "redb",
+        "lifetime": "transient (BLAKE3 content-hash dedup cache)",
+        "sync_edge": "none; prevents re-ingesting/re-embedding an identical statement block",
+        "recovery": "recomputable; transient by definition",
+        "tier_relationship": "redb intended dedup-cache role (blueprint semantic cache)"
+      },
+      {
+        "class": "recommendation_draft_cognition",
+        "canonical_owner": "redb scratchpad + AgentDB (.rvf) — non-authoritative",
+        "lifetime": "transient agent cognition until approved",
+        "sync_edge": "only the settled human-approval decision persists forward to PostgreSQL; the draft itself does not become durable truth",
+        "recovery": "regenerable; provenance links back to PostgreSQL source rows",
+        "tier_relationship": "non-authoritative for shared macro-state; witnessed by SHAKE256 chains rooted in PostgreSQL"
+      },
+      {
+        "class": "financial_audit_witness_chain",
+        "canonical_owner": "PostgreSQL-rooted Cryptographic Witness Chain (SHAKE256)",
+        "lifetime": "durable append-only audit",
+        "sync_edge": "every read, recommendation, and (future) approval is bound to a source vector in PostgreSQL",
+        "recovery": "PostgreSQL PITR",
+        "tier_relationship": "canonical; anti-bluffing root; a recommendation with no causal edge to real ledger rows is rejected"
+      },
+      {
+        "class": "runway_forecast_simulation_state",
+        "canonical_owner": "sim-cell / ESN ensemble (ATAS) — non-authoritative",
+        "lifetime": "transient simulation state",
+        "sync_edge": "only the proven forecast summary persists to PostgreSQL; failed worlds become failure capsules, never baseline",
+        "recovery": "re-simulation from PostgreSQL initial conditions",
+        "tier_relationship": "non-authoritative forecast; blueprint ATAS resource-burn maps to financial runway"
+      },
+      {
+        "class": "bank_and_brokerage_credentials",
+        "canonical_owner": "OS keyring (unchanged)",
+        "lifetime": "durable secret, out of database scope",
+        "sync_edge": "n/a; PostgreSQL stores references/provenance, never raw secrets; redb never holds secrets",
+        "recovery": "keyring",
+        "tier_relationship": "credential access is a prohibited path for this slice"
+      }
+    ],
+    "assignment_invariant": "13 financial state classes, each assigned to exactly one canonical owner; no class has two durable writers; redb never becomes a second durable authority for a PostgreSQL-owned class (STORE-001 single-writer invariant)."
+  },
+  "global_prohibitions": {
+    "blocked_paths": ["spend", "trading", "account creation", "credential access", "external financial action", "product implementation"],
+    "policy_basis": "Master Plan Constitution §6 (no unauthorized spend, no legal bypass, no real-world execution without authority) + Execution gates §11 (automatic Needs-Human-Approval for spend, trading, account creation, credential handling, external action, anything irreversible)",
+    "enforcement": "Every workflow is read-only at rungs 1-2; any transition to a state-changing rung raises a mandatory Needs-Human-Approval to David and executes only inside a reversible policy-cell with a snapshot. This planning task exercises none of the prohibited paths."
+  },
+  "store_001_alignment": {
+    "single_durable_writer": "PostgreSQL+RuVector owns every durable financial macro-state class exactly once",
+    "transient_tier": "redb holds live poll feeds, the statement dedup cache, and recommendation scratch; forward-only flush via envctl",
+    "ingestion_path": "financial records reuse the nu_plugin CodeDB pattern: parse -> redb buffer -> envctl embed/commit -> PostgreSQL",
+    "no_sidecar": "categorization vectors live in PostgreSQL via the RuVector native extension; no separate vector store",
+    "provenance_preserved": "SHAKE256 witness chains and source-row lineage bind every derived financial figure to canonical PostgreSQL rows"
+  },
+  "work_items": [
+    {
+      "id": "MVP1-001-W1",
+      "surface": "Unified cash position aggregation",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only aggregation of all account balances and recent transactions into one canonical view; rung-1 only; no action.",
+      "data_authority": "PostgreSQL+RuVector canonical (account_registry_and_balances, transaction_ledger_history); redb buffers the live refresh only",
+      "observation": "Reads canonical balances and settled transactions; the single financial-position view that satisfies NS-CLARITY (see the whole)",
+      "simulation": "sim-cell dry-run under COW branch verifies the aggregation reads only and produces no write outside the cell before the view is rendered",
+      "recommendation": "none at rung 1 (pure observation)",
+      "approval": "no approval needed to observe; any future refresh that mutates external state would raise Needs-Human-Approval",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "policy-cell, read-only FS, network denied by default; no mutation without snapshot",
+      "audit": "SHAKE256 witness chain binds the rendered figures to canonical PostgreSQL rows (anti-bluffing)",
+      "rollback": "restore archived financial plan; no financial account/transaction/credential touched",
+      "value_proof": "David sees his whole cash position in one place without switching systems (NS-CLARITY); proven by a proof record showing the view derives solely from canonical rows",
+      "observation_precedes_action": "rung 1; nothing downstream may act until this aggregation is proven",
+      "spine_path": "identity -> policy(read-only) -> memory(PostgreSQL) -> simulation(sim-cell) -> proof"
+    },
+    {
+      "id": "MVP1-001-W2",
+      "surface": "Transaction categorization and spend breakdown",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only semantic categorization of transactions into spend-by-category using RuVector; rung-1 observation plus derived analytics.",
+      "data_authority": "PostgreSQL+RuVector canonical (transaction_categorization_embeddings computed by all-MiniLM-L6-v2 during envctl bridge, stored in PostgreSQL); redb only as f32 distance cache",
+      "observation": "Reads canonical transactions and their embeddings; groups spend by category",
+      "simulation": "sim-cell recomputes categories over a COW branch; MinCut/causal-graph rejects any category with no source-vector root",
+      "recommendation": "none required; produces a factual breakdown (optional rung-2 note 'LifeOS suggests: review category X')",
+      "approval": "not required for read-only categorization",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "policy-cell; derived rows are recomputable and disposable",
+      "audit": "SHAKE256 witness chain roots each category assignment in the underlying transaction vector",
+      "rollback": "re-derive from PostgreSQL ledger; no external state touched",
+      "value_proof": "David understands where money goes by category; proven by reproducible re-embedding matching the stored categorization",
+      "observation_precedes_action": "rung 1-2; understanding precedes any waste recommendation",
+      "spine_path": "memory(PostgreSQL+RuVector) -> simulation(sim-cell + causal verification) -> proof"
+    },
+    {
+      "id": "MVP1-001-W3",
+      "surface": "Bill and obligation due-date surfacing",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only surfacing of upcoming bills with a bounded recommendation of pay order; payment itself is spend and stays gated.",
+      "data_authority": "PostgreSQL+RuVector canonical (obligation_and_bill_schedule, account_registry_and_balances)",
+      "observation": "Reads canonical bill schedule and available balances; flags obligations due within a horizon",
+      "simulation": "sim-cell dry-runs the pay-order recommendation against a cloned world to confirm it never emits an external payment call",
+      "recommendation": "rung 2: 'LifeOS suggests:' a pay order to avoid late fees; advisory constraint only, no payment executed",
+      "approval": "any actual bill payment is spend -> automatic Needs-Human-Approval to David; not exercised in this planning slice",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "policy-cell; a future approved payment would run only with snapshot + rollback point in a dev-cell/policy-cell",
+      "audit": "SHAKE256 witness chain records the recommendation and its ledger basis",
+      "rollback": "restore archived financial plan; no payment, account, or credential touched",
+      "value_proof": "avoided late fees and missed obligations (self-sustaining value); proven by the recommendation deriving from canonical due dates with no external call in the sim-cell trace",
+      "observation_precedes_action": "rung 1-2 only; the spend action is explicitly deferred behind human approval",
+      "spine_path": "memory(PostgreSQL) -> simulation(sim-cell) -> recommendation -> [approval gate STOP] -> proof"
+    },
+    {
+      "id": "MVP1-001-W4",
+      "surface": "Recurring subscription and waste detection",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only detection of recurring charges with a bounded cancellation recommendation; cancellation is external action and stays gated.",
+      "data_authority": "PostgreSQL+RuVector canonical (recurring_charge_and_variance_detections derived from transaction_ledger_history)",
+      "observation": "Reads canonical transaction history; detects recurring/duplicate charges and idle subscriptions",
+      "simulation": "sim-cell recomputes detections over a COW branch; verifies no cancel request is emitted",
+      "recommendation": "rung 2: 'LifeOS suggests:' cancel/renegotiate specific subscriptions; advisory only",
+      "approval": "any cancellation is external financial action -> Needs-Human-Approval; not exercised here",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "policy-cell; a future approved cancellation runs only with snapshot + rollback",
+      "audit": "SHAKE256 witness chain roots each detection in the underlying recurring transactions",
+      "rollback": "re-derive from PostgreSQL; no subscription or account touched",
+      "value_proof": "recovered recurring waste directly funds self-sustained growth (MVP1 domain); proven by detections tracing to real recurring ledger rows",
+      "observation_precedes_action": "rung 1-2; the cancellation action is deferred behind human approval",
+      "spine_path": "memory(PostgreSQL derived) -> simulation(sim-cell) -> recommendation -> [approval gate STOP]"
+    },
+    {
+      "id": "MVP1-001-W5",
+      "surface": "Budget vs actual variance and alert",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only comparison of actual spend against David-defined budgets with a bounded overrun alert; no enforcement action.",
+      "data_authority": "PostgreSQL+RuVector canonical (budget_and_category_definitions, transaction_categorization_embeddings, transaction_ledger_history)",
+      "observation": "Reads canonical budgets and categorized actuals; computes per-category variance",
+      "simulation": "sim-cell computes variance over a COW branch and confirms alerts are advisory-only",
+      "recommendation": "rung 2: 'LifeOS suggests:' attention on overrun categories; advisory constraint",
+      "approval": "no external action; any future spend control would raise Needs-Human-Approval",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "policy-cell; variance rows recomputable and disposable",
+      "audit": "SHAKE256 witness chain binds each variance figure to budget rows and categorized transactions",
+      "rollback": "re-derive from PostgreSQL; no external state touched",
+      "value_proof": "David directs spend as one system (NS-DIRECTION), catching overruns early; proven by variance reproducing from canonical budget + actuals",
+      "observation_precedes_action": "rung 1-2; no enforcement without human approval",
+      "spine_path": "memory(PostgreSQL) -> simulation(sim-cell) -> recommendation"
+    },
+    {
+      "id": "MVP1-001-W6",
+      "surface": "Company runway and burn-rate forecast",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only aggregation plus ESN simulation of Element Ark runway/burn; forecast only, never a real-world action.",
+      "data_authority": "PostgreSQL+RuVector canonical (account_registry_and_balances, transaction_ledger_history as initial conditions); runway_forecast_simulation_state non-authoritative in the sim-cell",
+      "observation": "Reads canonical balances and historical burn as initial conditions",
+      "simulation": "ATAS/ESN ensemble forecasts runway up to N steps ahead (blueprint resource-burn maps to financial burn); failed worlds become failure capsules, never baseline",
+      "recommendation": "rung 2: 'LifeOS suggests:' runway-extending focus areas; advisory only",
+      "approval": "no external action; any capital move is spend/trading -> Needs-Human-Approval",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "sim-cell; only a proven forecast summary may persist to PostgreSQL",
+      "audit": "SHAKE256 witness chain roots the forecast in the canonical initial-condition rows",
+      "rollback": "discard the simulated worlds; restore archived plan; nothing external touched",
+      "value_proof": "David sees self-sustaining runway for Element Ark (MVP1 self-sustained growth); proven by the forecast deriving solely from canonical initial conditions with failed worlds quarantined",
+      "observation_precedes_action": "rung 1 (aggregate) then simulate; no action rung reachable without human approval",
+      "spine_path": "memory(PostgreSQL initial conditions) -> simulation(ATAS/ESN sim-cell) -> proof"
+    },
+    {
+      "id": "MVP1-001-W7",
+      "surface": "Receivables and invoice reconciliation",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only matching of incoming payments to invoices with a bounded follow-up recommendation; no external collection action.",
+      "data_authority": "PostgreSQL+RuVector canonical (transaction_ledger_history, obligation_and_bill_schedule for receivable side)",
+      "observation": "Reads canonical incoming transactions and outstanding invoices; matches paid vs unpaid",
+      "simulation": "sim-cell dry-runs the match over a COW branch; confirms no dunning/collection message is emitted",
+      "recommendation": "rung 2: 'LifeOS suggests:' follow up on specific unpaid invoices; advisory only",
+      "approval": "any external follow-up/collection is external action -> Needs-Human-Approval; not exercised here",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "policy-cell; match rows recomputable and disposable",
+      "audit": "SHAKE256 witness chain roots each match in the paired invoice and payment rows",
+      "rollback": "re-derive from PostgreSQL; no message, account, or credential touched",
+      "value_proof": "faster collection of receivables sustains company cash flow (MVP1 self-sustained growth); proven by matches tracing to real invoice+payment rows",
+      "observation_precedes_action": "rung 1-2; the follow-up action is deferred behind human approval",
+      "spine_path": "memory(PostgreSQL) -> simulation(sim-cell) -> recommendation -> [approval gate STOP]"
+    },
+    {
+      "id": "MVP1-001-W8",
+      "surface": "Portfolio position aggregation (no trading)",
+      "owner": "LifeOS Product / Finance Governance Agent",
+      "decision": "Read-only aggregation of stock/crypto positions with live quotes; trading is explicitly prohibited and never defined as executable.",
+      "data_authority": "PostgreSQL+RuVector canonical (portfolio_positions); live_balance_and_quote_poll_feed transient on redb, flushed forward",
+      "observation": "Reads canonical positions; overlays transient live quotes buffered in redb",
+      "simulation": "sim-cell verifies the aggregation is read-only and emits no order to any broker",
+      "recommendation": "none that implies trading; at most an advisory 'LifeOS suggests: review concentration', never an order",
+      "approval": "trading is an automatic prohibited path -> would require explicit David authority; not exercised and not defined as executable in this slice",
+      "prohibitions": ["spend", "trading", "account creation", "credential access", "external financial action"],
+      "reversible_cell": "policy-cell; positions read-only; quotes transient and disposable",
+      "audit": "SHAKE256 witness chain roots reported positions in canonical rows; any order attempt has no causal edge and is rejected",
+      "rollback": "drop transient quotes; restore archived plan; no brokerage account or order touched",
+      "value_proof": "David sees total portfolio position across accounts (NS-CLARITY) with zero trading capability; proven by the sim-cell trace showing no broker order path exists",
+      "observation_precedes_action": "rung 1 only; trading is structurally excluded, not merely deferred",
+      "spine_path": "memory(PostgreSQL canonical + redb transient quotes) -> simulation(sim-cell, no-order proof) -> proof"
+    }
+  ],
+  "execution_order": [
+    "MVP1-001-W1",
+    "MVP1-001-W2",
+    "MVP1-001-W5",
+    "MVP1-001-W3",
+    "MVP1-001-W4",
+    "MVP1-001-W7",
+    "MVP1-001-W6",
+    "MVP1-001-W8"
+  ],
+  "execution_order_rationale": "Aggregation (W1) and categorization (W2) establish the read-only base; variance (W5) needs categories; bill/subscription/receivables recommendations (W3/W4/W7) build on the base; runway forecast (W6) needs history; portfolio (W8) is independent read-only. Every earlier rung is proven before a later workflow relies on it.",
+  "completion_gate": "Each of the 8 financial workflows carries a single canonical data authority (PostgreSQL+RuVector per STORE-001), a simulation stage, a mandatory human-approval gate for any state-changing rung, explicit spend/trading/account/credential/external prohibitions, a reversible policy-cell, a SHAKE256 audit trail, a rollback that touches no real financial account, and a self-sustaining value proof; observation precedes action in every workflow; all 13 financial state classes are assigned exactly once; and MVP1-001.proof.json records product_execution_performed=false with no prohibited path exercised."
+}

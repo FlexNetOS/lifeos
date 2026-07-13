@@ -1,0 +1,107 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "HOME-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every observed asset has identity, owner, telemetry provenance, simulation representation, privacy boundary, failure mode, and proof; observation causes no physical mutation.",
+  "gate_result": {
+    "design_artifact": "generated/task_families/HOME-001.json",
+    "observation_surfaces_enumerated": 10,
+    "observation_surface_ids": [
+      "HOME-001-A",
+      "HOME-001-B",
+      "HOME-001-C",
+      "HOME-001-D",
+      "HOME-001-E",
+      "HOME-001-F",
+      "HOME-001-G",
+      "HOME-001-H",
+      "HOME-001-I",
+      "HOME-001-J"
+    ],
+    "covers_ten_goal_tasks": {
+      "value": true,
+      "goal_tasks": ["discovery", "identity", "topology", "telemetry", "digital-twin", "resource", "media", "appliance", "network", "environment"],
+      "note": "The observation_task field of the ten work items is exactly the ten read-only task types named in the HOME-001 goal."
+    },
+    "every_asset_has_identity": {
+      "value": true,
+      "note": "Every surface carries a non-empty identity key. All ten share one join key: the HOME-001-B canonical identity {hardware_id, service_instance, usd_prim_path, first_seen, owner_person_ref}; the spatial half of that key is the LPS-033/LPS-034 twin prim path."
+    },
+    "every_asset_has_owner": {
+      "value": true,
+      "store_001_mapping": {
+        "PostgreSQL+RuVector (durable relational/semantic macro-state, STORE-001 assignments 1 & 2)": ["HOME-001-A inventory", "HOME-001-B identity", "HOME-001-C topology graph", "HOME-001-E twin binding/metadata", "durable history of D/F/G/H/I/J"],
+        "redb (transient high-frequency tier + geometry engine + WAL, STORE-001 assignment 3)": ["HOME-001-A raw scan buffer + BLAKE3 dedup", "HOME-001-D telemetry samples", "HOME-001-E geometry distance math", "HOME-001-F meter ticks", "HOME-001-G player-state flags", "HOME-001-H state flags", "HOME-001-I link counters", "HOME-001-J env samples"],
+        "envctl (forward-only bridge + projection, STORE-001 assignment 5)": ["redb -> embed -> PostgreSQL flush for all high-frequency surfaces", "PostgreSQL -> twin projection for HOME-001-E"],
+        "OS keyring (external-secret/provenance family, STORE-001 assignment 6)": ["device credentials never accessed; only references/provenance stored (HOME-001-B, HOME-001-I)"]
+      },
+      "note": "Every owner assignment traces to a named STORE-001 state_class_assignment; no home class is a second durable writer for a PostgreSQL-owned class; no cloud vector sidecar."
+    },
+    "every_asset_has_telemetry_provenance": {
+      "value": true,
+      "provenance_tuple": "(source-device/sensor/announce, read-method, observer-node-id, observed_at)",
+      "note": "Every surface stamps the read-only provenance tuple on each record; geometry provenance for the twin is the LPS-029 -> LPS-031 -> LPS-032 -> LPS-033 chain."
+    },
+    "every_asset_has_simulation_representation": {
+      "value": true,
+      "twin": "WorldSim USD twin (worldsim/usd/stage.usda, room.usdc, workstation.usdc)",
+      "note": "HOME-001-E is the single simulation representation; every physical asset in A/B/F/G/H/I/J binds to a twin prim; environment fields (J) map to LPS-032 segmented instances; network-only assets bind to a HOME-001-C topology node."
+    },
+    "every_asset_has_privacy_boundary": {
+      "value": true,
+      "note": "Every surface states a privacy tier and keeps data inside the local trust boundary (local PostgreSQL, No-Sidecar, UDS); raw secrets/credentials are never accessed or stored (references only, secrets remain in the OS keyring); no cloud sink."
+    },
+    "every_asset_has_failure_mode": {
+      "value": true,
+      "note": "Every surface has a safe failure mode: redb application-level WAL on PostgreSQL outage; stale/unknown marking on sensor dropout; twin rejection on LPS-035 gate failure; MinCut isolation of inconsistent subgraphs; identity quarantine on conflict. No failure path ever actuates a device."
+    },
+    "every_asset_has_proof": {
+      "value": true,
+      "note": "Every surface names its verification: PostgreSQL row/provenance checks and forward-flush receipts for A/B/C/D/F/G/H/I/J; LPS-035 four-gate + usdchecker (LPS-033) + watertight (LPS-031) + immutable-base layer diff (LPS-034) for the twin (E)."
+    },
+    "observation_causes_no_physical_mutation": {
+      "value": true,
+      "blocked_ops_excluded": ["device control", "network mutation", "purchase", "utility change", "credential access", "product implementation"],
+      "note": "Every work item is read-only and carries an explicit no_physical_mutation statement; the family is only the read/parse half of the CodeDB-style ingestion pipeline (sense -> redb buffer -> envctl bridge -> PostgreSQL); physical control is deferred to a later gated-physical-control phase per LIFEOS-009 next_action; LPS-034 base-scan-immutability doctrine governs the twin."
+    },
+    "digital_twin_reconciles_worldsim_rows": ["LPS-029", "LPS-030", "LPS-031", "LPS-032", "LPS-033", "LPS-034", "LPS-035", "LPS-036"],
+    "store_001_alignment": {
+      "keystone": "generated/store_relationship_decision.json (STORE-001)",
+      "canonical_durable_owner": "PostgreSQL + RuVector (No-Sidecar native extension) owns home identity, topology, provenance, and durable history exactly once",
+      "transient_tier": "redb buffers discovery/telemetry, holds the BLAKE3 dedup cache, runs geometry-engine distance math over twin vectors, and acts as the application-level WAL",
+      "forward_only_bridge": "envctl bridges redb -> embed -> PostgreSQL and projects the twin; no undirected dual-write",
+      "verified_no_reclassification": "No existing durable class is silently reclassified; the home family adds only read-only observation and does not move any CodeDB blob class off redb-durable (that remains STORE-001's BlobStore SHA-256 parity cutover concern)."
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "HOME-001 defines the read-only home operating-domain observation family in generated/task_families/HOME-001.json as ten observation surfaces (HOME-001-A discovery, B identity, C topology, D telemetry, E digital-twin, F resource, G media, H appliance, I network, J environment) that exactly match the ten task types named in the goal. Every one of the ten surfaces carries all seven attributes the gate demands - identity, owner, telemetry provenance, simulation representation, privacy boundary, failure mode, and proof - plus an explicit no_physical_mutation statement and a decision. Owner assignments are grounded once each in the STORE-001 tiered model: PostgreSQL + RuVector is the single canonical durable owner of home identity, topology (as a native RuVector graph, No-Sidecar), provenance, and durable history; redb is the transient high-frequency tier that buffers discovery and telemetry samples, holds the BLAKE3 dedup cache, runs geometry-engine distance math over twin vectors, and acts as the application-level WAL during PostgreSQL outage; envctl is the forward-only bridge (redb -> embed -> PostgreSQL) and the twin projection engine; device credentials are never accessed and remain in the OS keyring. The digital-twin surface (HOME-001-E) reconciles the existing worldsim rows LPS-029 through LPS-036 - it consumes their validated USD twin (LiDAR capture, watertight mesh, segmentation, USD composition, immutable base layer with colliders, four-gate acceptance, Genesis feasibility) read-only and honors the LPS-034 doctrine that agent code must never mutate the base scan layer. The whole family is the read/parse half of the CodeDB-style ingestion pipeline and emits zero device-control, network-mutation, purchase, utility-change, or credential-access operations; physical control is explicitly deferred to a later gated-physical-control phase per LIFEOS-009 next_action. A validator over the family confirmed all ten surfaces present, all seven gate attributes non-empty on every surface, ids unique, every owner tracing to a STORE-001 store, every item read-only, and the twin reconciliation covering LPS-029..LPS-036. No product code, schema, database, or live data was produced; product_execution_performed is false.",
+  "artifact_paths": [
+    "generated/task_families/HOME-001.json",
+    "proof_records/HOME-001.proof.json"
+  ],
+  "checksums": {
+    "generated/task_families/HOME-001.json": "6cfc543de439c443a1949eb40cb5487a45d315910dfbccb3e1ab0b512373b136"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate HOME-001 family against every clause of the verification gate: ten surfaces, all seven gate attributes non-empty on each, ids unique, every owner traces to a STORE-001 store, every item read-only/mutation-free, twin reconciles LPS-029..LPS-036",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (HOME-001 gate validation over generated/task_families/HOME-001.json)",
+      "exit_status": 0,
+      "output": [
+        "rows=10",
+        "all_seven_gate_attrs_present=True",
+        "covers_ten_goal_tasks=True",
+        "ids_unique=True",
+        "every_owner_traces_to_STORE001_store=True",
+        "every_item_read_only_mutation_free=True",
+        "twin_reconciles_LPS_029_036=True",
+        "json_valid=True",
+        "sha256=6cfc543de439c443a1949eb40cb5487a45d315910dfbccb3e1ab0b512373b136",
+        "OK"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PGAUTH-004",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every projected state class declares its canonical source identity, selected branch and version, deterministic materializer, checksum and metadata contract, permitted edit surface, cleanup rule, and proof that projection output cannot become a competing writable owner.",
+  "gate_result": {
+    "task_family": "generated/task_families/PGAUTH-004.json",
+    "owner": "envctl Agent / Runtime Kernel",
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "keystone_decision": "generated/store_relationship_decision.json (STORE-001 derived-projections class)",
+    "projected_state_classes": [
+      "PGAUTH-004-A flat files",
+      "PGAUTH-004-B generated directories",
+      "PGAUTH-004-C build inputs",
+      "PGAUTH-004-D runtime materializations",
+      "PGAUTH-004-E reports",
+      "PGAUTH-004-F exports",
+      "PGAUTH-004-G caches"
+    ],
+    "every_projected_class_bounded_exactly_once": true,
+    "class_set_matches_goal_enumeration": "flat files, generated directories, build inputs, runtime materializations, reports, exports, and caches -- the exact seven categories named in the PGAUTH-004 goal",
+    "clause_canonical_source_identity": {
+      "PGAUTH-004-A": "PostgreSQL codebase_table production rows (raw_code, module_path) with per-block SHA-256 identity",
+      "PGAUTH-004-B": "PostgreSQL module_path metadata for the selected production branch",
+      "PGAUTH-004-C": "materialized production tree + committed Nix/source pins",
+      "PGAUTH-004-D": "the intended profile package the runtime frontdoor resolves to (FOUNDATION-003)",
+      "PGAUTH-004-E": "PostgreSQL codebase state + agent failure history (ATAS input); observed revision for receipts",
+      "PGAUTH-004-F": "materialized build input (-> PostgreSQL rows) + pinned Nix/musl inputs",
+      "PGAUTH-004-G": "canonical semantic_embedding in PostgreSQL+RuVector; BLAKE3 content-hash key"
+    },
+    "clause_selected_branch_and_version": {
+      "shared_selector": "envctl queries the final production branch at a pinned version (Blueprint Materialization step 1) for A/B/C/F; D selects the released profile package version; E records the ESN initial-condition state / attested revision; G is content-hash keyed with the authoritative vector version in PostgreSQL",
+      "recorded_on_projection": true
+    },
+    "clause_deterministic_materializer": {
+      "PGAUTH-004-A": "envctl block concatenation (Blueprint step 3)",
+      "PGAUTH-004-B": "envctl module_path directory reconstruction (Blueprint step 2)",
+      "PGAUTH-004-C": "envctl dump into Nix/Yazelix build env (Blueprint step 4)",
+      "PGAUTH-004-D": "profile -> generated-runtime materialization via Yazelix frontdoor (FOUNDATION-003)",
+      "PGAUTH-004-E": "ATAS Echo-State-Network ensemble simulation",
+      "PGAUTH-004-F": "envctl export -> Nix static musl (x86_64-unknown-linux-musl) compilation",
+      "PGAUTH-004-G": "all-MiniLM-L6-v2 re-embedding on cache miss"
+    },
+    "clause_checksum_and_metadata_contract": {
+      "byte_identity": "exact-byte materialization under one SHA-256 identity (ADOPT-001); repeated projection of one version is byte-identical (POSTGRES-008 gate) for A/B/C",
+      "directory_metadata": "paths, ordering, permissions, module relationships reconstructed from module_path (B)",
+      "runtime": "generated runtime reproducible from the profile package (FOUNDATION-003 gate, D)",
+      "reports": "each report records the canonical source-state identity it derives from (E)",
+      "exports": "release artifact checksum, regenerable from same version + pins; musl self-containment (F)",
+      "caches": "BLAKE3 content-hash identity; cache value equals canonical embedding (G)"
+    },
+    "clause_permitted_edit_surface": "read-only for every class; source changes are applied upstream (SQL UPDATE on canonical rows, or the profile source) and re-projected; ATAS winners enter canonical state only by COW-branch merge; generated output is never hand-edited (blocked_paths: generated-runtime hand-edit and profile mutation forbidden)",
+    "clause_cleanup_rule": {
+      "disposable": ["PGAUTH-004-A", "PGAUTH-004-B", "PGAUTH-004-C", "PGAUTH-004-D", "PGAUTH-004-G"],
+      "preserved_non_authoritative": ["PGAUTH-004-E proof/evidence receipts", "PGAUTH-004-F shipped release artifacts"],
+      "disposable_recovery": "re-projection from PostgreSQL / re-materialization from profile / re-embedding",
+      "shadow_retirement": "superseded runtime shadows archived-first, never deleted (FOUNDATION-003)"
+    },
+    "clause_non_competing_owner_proof": "every class has no reverse-synchronization edge into canonical state; envctl/Nix/ATAS write authority is read-only-from-canonical (STORE-001 derived-projections: write_authority = envctl projection read-only, sync PostgreSQL -> filesystem forward-only); for caches, storage ownership is deferred to redb's transient tier without reclassification and the cached vector is never the authority (STORE-001 invariant 'redb never becomes a second durable writer for a PostgreSQL-owned class')",
+    "one_way_provenance": "canonical (PostgreSQL+RuVector rows / intended profile package) -> deterministic materializer -> filesystem projection; no undirected or reverse dual-write",
+    "store_001_alignment": "PGAUTH-004 is the class-by-class bounding of STORE-001 state_class_assignments[4] 'derived projections' (canonical_owner: PostgreSQL projected by envctl/CodeDB; role_of_others: derived and disposable, regenerated deterministically via module_path; write_authority: envctl projection read-only; sync_direction: PostgreSQL -> envctl materialize -> filesystem forward-only; recovery_source: re-projection)",
+    "no_second_owner_conflict": "cache STORAGE ownership belongs to redb's transient tier (STORE-001-B / PGAUTH-002); PGAUTH-004 bounds only the projection/provenance dimension, so no capability is silently reclassified and no second implementation owner is created",
+    "inputs_honored": ["PGAUTH-001", "POSTGRES-008", "FOUNDATION-003", "Yazelix input-output-frontdoor ownership contract"],
+    "no_live_projection_materialized": true,
+    "blocked_paths_respected": "no live projection, generated-runtime hand-edit, profile mutation, reverse synchronization into canonical state, product implementation, or secrets access performed",
+    "product_execution_performed": false
+  },
+  "proof_summary": "PGAUTH-004 bounds the derived-projection authority contract by enumerating exactly the seven projected-state classes named in its goal -- flat files, generated directories, build inputs, runtime materializations, reports, exports, and caches -- and assigning each a full seven-clause contract in generated/task_families/PGAUTH-004.json. Flat files (.rs/.toml/.nu) project from PostgreSQL codebase production rows via envctl concatenation under SHA-256 exact-byte identity; generated directories project from module_path metadata via envctl reconstruction; build inputs are the materialized tree plus committed pins dumped into the Nix/Yazelix environment; runtime materializations project the intended profile package through the Yazelix input-output-frontdoor (FOUNDATION-003); reports are ATAS Echo-State-Network forecasts and evidence receipts derived from PostgreSQL codebase state; exports are envctl-export/Nix static-musl release trees; caches are the redb BLAKE3 read-through dedup cache whose authority is the PostgreSQL+RuVector embedding. Each class declares its canonical source identity, the selected production branch/version (or profile version, or content-hash key), a named deterministic materializer, a checksum-and-metadata contract (SHA-256 exact-byte and byte-identical repeats per POSTGRES-008; BLAKE3 for caches; reproducible generated runtime per FOUNDATION-003), a read-only permitted edit surface (changes go upstream via SQL UPDATE or the profile source, ATAS winners via COW-branch merge), a cleanup rule (five disposable, two preserved-but-non-authoritative), and a non-competing-owner proof grounded in STORE-001's forward-only, read-only derived-projections assignment. Cache storage ownership is deferred to redb's transient tier (STORE-001-B / PGAUTH-002) so no existing durable use is silently reclassified and no second implementation owner is created. No live projection, generated runtime, profile, database, or user-space source was materialized or edited; this is a planning definition only.",
+  "artifact_paths": [
+    "generated/task_families/PGAUTH-004.json",
+    "proof_records/PGAUTH-004.proof.json"
+  ]
+}

@@ -1,0 +1,286 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "MVP1-002",
+  "title": "Governed legal operating slice plan defined",
+  "status": "defined",
+  "owner": "LifeOS Product / Legal Governance Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the smallest end-to-end legal slice as six governed workflows (information, document, obligation, deadline, risk, recommendation) where every workflow separates read-only information from advice and from action, no commitment or external action occurs without explicit human approval, every source document is preserved immutably, every derived claim records provenance to a preserved source, and every commitment-capable path proves rollback or non-action; all durable legal state is owned by PostgreSQL + RuVector, transient reasoning by redb, per-agent cognition by AgentDB, ingestion by nu_plugin CodeDB, and the migration/authority model inherits STORE-001 rather than inventing a new store.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "keystone_decision": "generated/store_relationship_decision.json (STORE-001)",
+  "inputs": [
+    "generated/task_graph.source.csv (MVP1-002 goal, verification_gate, blocked_paths, rollback_plan)",
+    "generated/task_graph.source.csv (MVP1-001 governed-slice pattern: observation precedes action, reversible cells, proof)",
+    "generated/store_relationship_decision.json (STORE-001 state_class_assignments 1-6, invariants)",
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md (Section 5 ingestion pipeline; Section 6 Witness Chains + COW; tiered memory table)",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv (rows 1, 3, 18: PostgreSQL canonical, redb transient, Witness Chains provenance)",
+    "proof_records/ADOPT-001.proof.json (BlobStore SHA-256 content-addressed preservation, exact-byte materialization, secret-output guards)"
+  ],
+  "tier_separation_model": {
+    "purpose": "Satisfy the gate clause 'separates information from advice and action' as a hard type boundary, not a UI convention. A workflow output carries exactly one tier and cannot silently promote to a higher tier.",
+    "tiers": [
+      {
+        "tier": "information",
+        "definition": "Read-only fact: what a preserved source document or a deterministic derivation of it states. No interpretation, no opinion, no external effect.",
+        "examples": "document retrieval, clause text, extracted defined terms, a deadline date computed from a stated rule, a surfaced upcoming-deadline list.",
+        "grounding": "Blueprint Section 5 (database-hosted codebase, agents query only the AST/rows they need); STORE-001 assignment 1 (durable relational macro-state).",
+        "commitment_capable": false
+      },
+      {
+        "tier": "advice",
+        "definition": "Interpretation grounded in preserved information: risk assessment, obligation interpretation, and recommendation. Must carry a witness chain to a source vector; must be explicitly labeled advice; produces no external effect on its own.",
+        "examples": "risk flag on an auto-renewal clause, recommendation to renegotiate before a deadline.",
+        "grounding": "Blueprint Section 6 (Cryptographic Witness Chains SHAKE256; Causal Graph Verification rejects any claim without a historical root); Context Matrix row 18.",
+        "commitment_capable": false
+      },
+      {
+        "tier": "action",
+        "definition": "A commitment or external action (filing, signing, sending, account creation, credential use). Prepared only as a proposal inside an isolated COW staging branch; never merged, never executed, without explicit human approval. Blocked outright at this planning stage per MVP1-002 blocked_paths.",
+        "examples": "e-file a response, sign a contract, submit a renewal, create an external legal-service account.",
+        "grounding": "Blueprint Section 6 (COW branching: successful branches commit only on verification, failures roll back); MVP1-002 blocked_paths (legal commitment; filing; signature; account creation; credential access; external action).",
+        "commitment_capable": true
+      }
+    ],
+    "promotion_rule": "information -> advice requires a witness-chained derivation; advice -> action requires an explicit human approval event recorded against the proposing COW branch. No automatic promotion across any boundary."
+  },
+  "human_authority_model": {
+    "principle": "Human authority over every commitment or external action (MVP1-002 goal).",
+    "approval_gate": "A commitment-capable output (only the recommendation workflow produces one) materializes solely as a proposal in an isolated PostgreSQL COW staging branch. It becomes a commitment only when a human approval event is recorded against that branch and the branch is merged to the main trunk. Absent approval, the default is non-action (branch never merged).",
+    "surface": "LifeOS Mission Control UI over the PostgreSQL-hosted legal state, communicating via UDS / shared state per Blueprint Section 7 runtime layer; approval is a first-class recorded event, witness-chained like any other durable fact.",
+    "at_this_stage": "This is a DESIGN/DEFINITION task. No approval flow is executed, no branch is merged, no external legal action is possible; all action surfaces sit in blocked_paths.",
+    "grounding": "MVP1-002 goal + blocked_paths; MVP1-001 sibling pattern (explicit approval, reversible execution, observation precedes action); Blueprint COW branching (deterministic selection only after verification)."
+  },
+  "work_items": [
+    {
+      "id": "MVP1-002-A",
+      "surface": "Legal information workflow — read-only understanding and aggregation of the user's legal picture (defined terms, parties, effective/expiry dates, governing law) drawn only from preserved source documents.",
+      "tier": "information",
+      "owner": "PostgreSQL + RuVector owns the durable information records; RuVector (native No-Sidecar extension) owns semantic clause/precedent search; redb only buffers parsed blocks during ingestion.",
+      "store_assignment": {
+        "canonical_owner": "PostgreSQL + RuVector",
+        "lifetime": "durable macro-state (ACID / PITR)",
+        "sync_edge": "nu_plugin CodeDB parse -> redb buffer -> envctl(embed all-MiniLM-L6-v2) -> PostgreSQL, forward-only",
+        "recovery": "PostgreSQL PITR + reproducible re-embedding",
+        "relationship": "STORE-001 assignments 1 and 2 (durable relational + semantic/vector); Blueprint Section 5 three-pillar ingestion"
+      },
+      "separates_info_advice_action": "Information tier only. Emits no interpretation; any interpretive question is refused at this tier and routed to the advice tier (risk/recommendation).",
+      "explicit_approval_for_commitments": "Not commitment-capable; produces zero commitments, so the approval invariant holds vacuously.",
+      "preserves_source_documents": "Reads only from the immutable content-addressed documents owned by MVP1-002-B; never mutates a source.",
+      "records_provenance": "Every information record carries a causal edge (Blueprint Causal Graph Verification) to the exact source-document clause it was extracted from; a fact with no historical root is rejected (anti-bluffing).",
+      "rollback_or_non_action": "Read-only; nothing to roll back. Re-derivation from PostgreSQL is deterministic.",
+      "decision": "Legal understanding is a read-only, provenance-bound information tier owned by PostgreSQL + RuVector; observation precedes action (MVP1-001 pattern), and no advice or action is possible from this surface."
+    },
+    {
+      "id": "MVP1-002-B",
+      "surface": "Legal document workflow — preservation and retrieval of source legal documents (contracts, filings, notices, statutes/regulations, correspondence) as the immutable substrate every other workflow grounds against.",
+      "tier": "information",
+      "owner": "PostgreSQL is the canonical durable owner of the content-addressed document blob + relational metadata; nu_plugin CodeDB is the ingestion parser; redb is the transient capture buffer only.",
+      "store_assignment": {
+        "canonical_owner": "PostgreSQL (content blob + metadata), under one SHA-256 content-addressed identity",
+        "lifetime": "durable and immutable (originals never mutated)",
+        "sync_edge": "capture -> redb buffer -> envctl bridge -> PostgreSQL; class leaves any redb-durable staging only after a green blobstore_parity.rs run (STORE-001 invariant: verified cutover)",
+        "recovery": "PostgreSQL PITR; exact-byte re-materialization",
+        "relationship": "STORE-001 assignment 1 + correction (BlobStore SHA-256 parity contract); ADOPT-001 (BlobStore trait, SHA-256 identity, exact-byte materialization)"
+      },
+      "separates_info_advice_action": "Information tier: stores and returns exact bytes; performs no interpretation and takes no action on the document.",
+      "explicit_approval_for_commitments": "Not commitment-capable; preservation and retrieval create no external effect.",
+      "preserves_source_documents": "This IS the preservation contract: each document is stored by SHA-256 content hash as an immutable durable record; the original is never edited in place, mirroring ADOPT-001 exact-byte materialization and secret-output guards.",
+      "records_provenance": "Each document carries its origin metadata and, per Blueprint provenance model, becomes the source vector that all downstream witness chains root into; commit/PR-style lineage is preserved (STORE-001 invariant: provenance preserved).",
+      "rollback_or_non_action": "Immutability makes destructive rollback unnecessary; a superseding version is a new content-addressed record, and the prior version remains recoverable via PITR (never deleted).",
+      "decision": "Source documents are preserved as immutable SHA-256 content-addressed durable records in PostgreSQL and are the single grounding root for the whole slice; preservation is guaranteed by construction, not by policy."
+    },
+    {
+      "id": "MVP1-002-C",
+      "surface": "Legal obligation workflow — extraction and tracking of duties, prohibitions, and conditions (what the user must do, must not do, or must satisfy) from preserved documents, each bound to its governing clause.",
+      "tier": "information",
+      "owner": "PostgreSQL owns durable obligation records and their causal dependency edges to source clauses; interpretation of an ambiguous obligation escalates to the advice tier (risk workflow).",
+      "store_assignment": {
+        "canonical_owner": "PostgreSQL + RuVector (relational rows + causal dependency edges / GNN)",
+        "lifetime": "durable macro-state",
+        "sync_edge": "envctl bridge commits extracted obligations + causal edges; forward-only",
+        "recovery": "PostgreSQL PITR",
+        "relationship": "STORE-001 assignment 1 (durable relational incl. causal dependency edges); Blueprint Section 5 (causal dependency edges committed to the knowledge graph)"
+      },
+      "separates_info_advice_action": "Information tier: records the obligation as stated and bound to its clause. It never advises on how to satisfy the obligation and never acts; any judgment about ambiguity or consequence is explicitly promoted to the advice tier.",
+      "explicit_approval_for_commitments": "Not commitment-capable; tracking an obligation is not fulfilling it. Fulfilment (an external action) is blocked and would route through the recommendation workflow's approval gate.",
+      "preserves_source_documents": "Extracts from, never mutates, the MVP1-002-B originals.",
+      "records_provenance": "Each obligation row holds a causal edge to the exact governing clause; Causal Graph Verification rejects an obligation with no historical root, so no obligation can be invented (anti-bluffing).",
+      "rollback_or_non_action": "Obligation records are derived; a mis-extraction is corrected by re-deriving from the preserved source, and prior states are PITR-recoverable. No external state is touched.",
+      "decision": "Obligations are provenance-bound factual extractions owned by PostgreSQL, held strictly at the information tier with a hard escalation boundary to advice for any interpretation."
+    },
+    {
+      "id": "MVP1-002-D",
+      "surface": "Legal deadline workflow — deterministic computation and surfacing of legally significant dates (statutes of limitation, filing/response dates, renewal/termination windows, notice periods) derived from obligations and documents.",
+      "tier": "information",
+      "owner": "PostgreSQL owns the durable deadline record (date + provenance edge); the recurring deadline-scan / reminder computation is a redb transient working set.",
+      "store_assignment": {
+        "canonical_owner": "PostgreSQL (durable deadline record) with redb as the transient scan/scratch tier",
+        "lifetime": "durable record; process-lifecycle scan state",
+        "sync_edge": "deadline computed at ingest/refresh -> envctl -> PostgreSQL; the scan working set stays redb-local and is flushed forward only as settled records (STORE-001 assignment 3)",
+        "recovery": "PostgreSQL PITR for the durable record; scan state is transient by definition and re-computed",
+        "relationship": "STORE-001 assignments 1 and 3 (durable record vs transient high-frequency scan); Blueprint tiered-memory table (redb microsecond scratch, PostgreSQL durable)"
+      },
+      "separates_info_advice_action": "Information tier: a deadline date computed from a stated rule is a fact. Prioritizing or acting before a deadline is not part of this workflow; that judgment is advice, and acting is action.",
+      "explicit_approval_for_commitments": "Not commitment-capable; surfacing a deadline commits nothing. Meeting a deadline via an external filing is blocked and gated through the recommendation approval gate.",
+      "preserves_source_documents": "Derives dates from preserved obligations/documents; mutates no source.",
+      "records_provenance": "Every deadline carries a causal edge to the obligation/clause that establishes it, so a deadline with no rule-of-origin is rejected.",
+      "rollback_or_non_action": "Deadline records are derived and re-computable; the redb scan is discardable with no durable loss. No external calendar or filing system is touched at this stage.",
+      "decision": "Deadlines are deterministic, provenance-bound information: the durable date is owned by PostgreSQL and the high-frequency scan is redb-transient, honoring the STORE-001 durable/transient split."
+    },
+    {
+      "id": "MVP1-002-E",
+      "surface": "Legal risk workflow — grounded assessment and flagging of legal risk (e.g., an auto-renewal trap, a lapsing right, an unmet condition), produced as explicitly-labeled advice.",
+      "tier": "advice",
+      "owner": "PostgreSQL owns the durable, witness-chained advice RECORD labeled tier=advice; the agent's intermediate reasoning is redb-transient and its policy/skill is AgentDB (.rvf) per-agent cognition — both non-authoritative over shared legal truth.",
+      "store_assignment": {
+        "canonical_owner": "PostgreSQL (durable advice record + witness chain); AgentDB (.rvf) owns the agent's cognition; redb owns transient reasoning traces",
+        "lifetime": "durable advice record; process-lifecycle reasoning; per-agent cognition self-contained",
+        "sync_edge": "reasoning in redb -> only the settled advice record + witness chain flush forward to PostgreSQL; AgentDB promotes shared knowledge one-way to PostgreSQL, never back-writes",
+        "recovery": "PostgreSQL PITR for the record; reasoning is transient/regenerable; AgentDB .rvf regenerable from base model + history",
+        "relationship": "STORE-001 assignments 1, 3, 4 (durable record, transient reasoning, AgentDB cognition); Blueprint Section 6 Witness Chains; Context Matrix rows 3, 4, 18"
+      },
+      "separates_info_advice_action": "Advice tier: the output is interpretation and is stamped tier=advice. It is separated from information (it must root in an information-tier source) and from action (it triggers nothing; a human must act).",
+      "explicit_approval_for_commitments": "Not directly commitment-capable; a risk flag prompts but does not perform any action. Any resulting action is blocked and routes through MVP1-002-F's approval gate.",
+      "preserves_source_documents": "Consumes preserved documents/obligations; mutates no source.",
+      "records_provenance": "Every risk assessment carries a Cryptographic Witness Chain (SHAKE256) to the source vector it derives from; Causal Graph Verification rejects any risk claim lacking a historical root — advice cannot be hallucinated.",
+      "rollback_or_non_action": "A risk record is advisory and reversible: superseding assessments are new records, priors are PITR-recoverable, and nothing external is changed. Default posture is non-action.",
+      "decision": "Risk is witness-chained advice: the durable labeled record is owned by PostgreSQL, the reasoning is non-authoritative (redb/AgentDB), and the anti-bluffing chain is precisely what keeps advice separated from — and honestly rooted in — information."
+    },
+    {
+      "id": "MVP1-002-F",
+      "surface": "Legal recommendation workflow — bounded, human-authority-gated recommendations that may propose a commitment or external action (e.g., renegotiate, respond, renew, engage counsel), prepared as a non-merged proposal.",
+      "tier": "advice (producing an action-tier proposal)",
+      "owner": "The proposal is prepared in an isolated PostgreSQL COW staging branch, owned by PostgreSQL but never merged without human approval; the external action authority (court e-filing, signing service, counsel, portal) is an external owner referenced but never captured.",
+      "store_assignment": {
+        "canonical_owner": "PostgreSQL COW staging branch (proposal) + external authority (the action itself); OS keyring holds any external credential reference",
+        "lifetime": "proposal is transient-until-approved (default discarded); an approved commitment becomes durable only on merge; external action lifetime belongs to the external system",
+        "sync_edge": "recommendation prepared in COW branch; merges to main trunk ONLY after a recorded human approval event; no automatic merge; secret values never captured (keyring reference only)",
+        "recovery": "discard the COW branch (non-action default); PITR for any approved+merged record; external action is out of scope and blocked at this stage",
+        "relationship": "STORE-001 assignments 5-6 style external-authority + Blueprint COW branching (Section 6); STORE-001 invariant no-dual-write; MVP1-002 blocked_paths"
+      },
+      "separates_info_advice_action": "The recommendation is advice; the commitment/action it proposes is a distinct action-tier artifact that exists only as an un-merged COW proposal. The advice never becomes action by itself — the boundary is the human approval + merge event.",
+      "explicit_approval_for_commitments": "This is the workflow the gate clause targets: a commitment requires an explicit, recorded human approval against the proposing COW branch before any merge; without it, nothing commits. At this planning stage the action surface is fully blocked (blocked_paths: legal commitment, filing, signature, account creation, credential access, external action).",
+      "preserves_source_documents": "The recommendation is grounded in preserved documents/obligations/risks and mutates no source.",
+      "records_provenance": "The recommendation carries a witness chain to its supporting risk/obligation/source records, and the approval event (if it ever occurs) is itself a witness-chained durable fact.",
+      "rollback_or_non_action": "This is the explicit rollback/non-action proof: an unapproved proposal is simply never merged (non-action) or its COW branch is discarded (rollback), exactly the Blueprint COW model ('if a branch fails, the database rolls it back'). Task-level rollback_plan restores the archived legal plan and changes no legal document, filing, or commitment.",
+      "decision": "Recommendations are advice that may propose an action, but the action exists only as a discardable, human-approval-gated COW proposal; rollback (discard) and non-action (never merge) are the guaranteed defaults, satisfying human authority over every commitment."
+    }
+  ],
+  "legal_state_class_assignments": [
+    {
+      "class": "Source legal document (contract, filing, notice, statute/regulation text, correspondence)",
+      "canonical_owner": "PostgreSQL (content-addressed SHA-256 blob + relational metadata)",
+      "lifetime": "durable, immutable",
+      "sync_edge": "nu_plugin CodeDB parse -> redb buffer -> envctl bridge -> PostgreSQL (forward-only; verified cutover before any redb-durable staging is retired)",
+      "recovery": "PostgreSQL PITR + exact-byte re-materialization",
+      "relationship_to_stores": "PostgreSQL canonical (STORE-001 #1); redb transient buffer only; CodeDB is the parser/ingestion path; SHA-256 identity per ADOPT-001 BlobStore contract"
+    },
+    {
+      "class": "Legal information record (parsed clauses, defined terms, parties, dates, extracted facts)",
+      "canonical_owner": "PostgreSQL + RuVector (relational rows)",
+      "lifetime": "durable",
+      "sync_edge": "envctl bridge commits records + causal edges; forward-only",
+      "recovery": "PostgreSQL PITR",
+      "relationship_to_stores": "STORE-001 #1; each row causally edged to its source document (MVP1-002-B)"
+    },
+    {
+      "class": "Legal semantic index (clause / precedent embeddings for hybrid search)",
+      "canonical_owner": "PostgreSQL + RuVector (native No-Sidecar extension)",
+      "lifetime": "durable-derived (reproducible)",
+      "sync_edge": "embeddings computed by local model (all-MiniLM-L6-v2) at the envctl bridge, stored in PostgreSQL",
+      "recovery": "PostgreSQL PITR + reproducible re-embedding",
+      "relationship_to_stores": "STORE-001 #2; redb performs only f32 distance math as a cache, never an independent authority; No-Sidecar rule (Blueprint Section 1)"
+    },
+    {
+      "class": "Obligation record (duty / prohibition / condition + causal edge to governing clause)",
+      "canonical_owner": "PostgreSQL + RuVector (relational rows + causal dependency edges / GNN)",
+      "lifetime": "durable",
+      "sync_edge": "envctl bridge; forward-only",
+      "recovery": "PostgreSQL PITR",
+      "relationship_to_stores": "STORE-001 #1 (durable relational incl. causal edges); Blueprint Section 5 causal dependency edges"
+    },
+    {
+      "class": "Deadline record (derived date + source-obligation edge)",
+      "canonical_owner": "PostgreSQL (durable record); redb (transient scan / reminder working set)",
+      "lifetime": "durable record; process-lifecycle scan",
+      "sync_edge": "computed date -> envctl -> PostgreSQL; scan state stays redb-local, flushed forward only as settled records",
+      "recovery": "PostgreSQL PITR (record); transient re-computation (scan)",
+      "relationship_to_stores": "STORE-001 #1 + #3 (durable/transient split); Blueprint tiered-memory table"
+    },
+    {
+      "class": "Risk assessment (advice-tier, grounded, witnessed)",
+      "canonical_owner": "PostgreSQL (durable advice record labeled tier=advice + witness chain)",
+      "lifetime": "durable record",
+      "sync_edge": "reasoning traces in redb -> only settled advice record + SHAKE256 witness chain flush to PostgreSQL",
+      "recovery": "PostgreSQL PITR (record); reasoning transient/regenerable",
+      "relationship_to_stores": "STORE-001 #1 (record) + #3 (transient reasoning) + #4 (AgentDB cognition); Blueprint Section 6 Witness Chains"
+    },
+    {
+      "class": "Recommendation + proposed commitment/action (advice-tier proposal at the action boundary)",
+      "canonical_owner": "PostgreSQL COW staging branch (proposal, non-merged); external authority owns the action itself",
+      "lifetime": "transient-until-approved (default discarded); durable only if a recorded human approval merges it",
+      "sync_edge": "prepared in COW branch; merges to main trunk only after a recorded human approval event; no automatic merge",
+      "recovery": "discard the COW branch (non-action default); PITR for any approved+merged record",
+      "relationship_to_stores": "Blueprint COW branching (Section 6); STORE-001 no-dual-write invariant; MVP1-002 blocked_paths keep the action blocked at this stage"
+    },
+    {
+      "class": "Legal drafting / analysis scratchpad (intermediate agent thoughts, retrieval traces, WAL during PostgreSQL latency)",
+      "canonical_owner": "redb (per edge node / process)",
+      "lifetime": "process-lifecycle (transient)",
+      "sync_edge": "redb -> envctl flush -> PostgreSQL (only significant settled states persist), forward-only",
+      "recovery": "redb local disk; on loss, transient by definition",
+      "relationship_to_stores": "STORE-001 #3 (redb intended terminal transient role); Blueprint redb scratchpad + application-level WAL"
+    },
+    {
+      "class": "Per-agent legal cognition (MicroLoRA / SONA policy of the legal-analysis agent)",
+      "canonical_owner": "AgentDB (.rvf) per agent",
+      "lifetime": "self-contained, regenerable",
+      "sync_edge": "self-contained; one-way promotion AgentDB -> PostgreSQL knowledge graph; no back-write",
+      "recovery": "AgentDB .rvf file; regenerable from base model + training history",
+      "relationship_to_stores": "STORE-001 #4; non-authoritative over shared legal truth; witnessed by SHAKE256 chains rooted in PostgreSQL source vectors"
+    },
+    {
+      "class": "Provenance / witness record (SHAKE256 witness chain + causal edge + commit/PR lineage)",
+      "canonical_owner": "PostgreSQL (rooted in source vectors)",
+      "lifetime": "durable (audit authority)",
+      "sync_edge": "written alongside the durable fact it witnesses; forward-only",
+      "recovery": "PostgreSQL PITR",
+      "relationship_to_stores": "STORE-001 invariant 'provenance preserved'; Blueprint Section 6 Causal Graph Verification; Context Matrix row 18"
+    },
+    {
+      "class": "External-authority handoff reference (court e-filing, signing service, counsel, government portal, credential)",
+      "canonical_owner": "External authority (LifeOS holds only a reference; OS keyring holds credential references)",
+      "lifetime": "external",
+      "sync_edge": "n/a for secret values (never captured); governed outbound handoff only after human approval",
+      "recovery": "external system + keyring; fail-closed re-solicit on outage",
+      "relationship_to_stores": "STORE-001 #6 external-secret authority (unchanged); redb never holds secrets; PostgreSQL stores references/provenance, never raw secrets; blocked at this stage"
+    }
+  ],
+  "blocked_actions": [
+    "legal commitment (no obligation is entered or fulfilled)",
+    "filing (no court/agency submission)",
+    "signature (no document is signed)",
+    "account creation (no external legal-service account)",
+    "credential access (no secret retrieved or used)",
+    "external action (no message, payment, or handoff to any external legal system)",
+    "product implementation (no live schema, database, or code is deployed by this DESIGN task)"
+  ],
+  "invariants": [
+    "Tier integrity: every workflow output carries exactly one tier (information | advice | action); no automatic promotion — information->advice needs a witness chain, advice->action needs a recorded human approval.",
+    "Preserved-source grounding: every advice or derived record roots (causal edge / witness chain) in an immutable SHA-256 content-addressed source document; a claim with no historical root is rejected (anti-bluffing).",
+    "Single durable owner: PostgreSQL + RuVector owns every durable legal macro-state class exactly once; redb is transient and never a second durable writer; AgentDB is non-authoritative over shared legal truth (STORE-001 invariants).",
+    "Human authority over commitments: no commitment or external action without an explicit recorded human approval; default is non-action.",
+    "Provable non-action / rollback: commitment-capable outputs exist only as discardable, non-merged COW proposals; rollback = discard branch, non-action = never merge; task rollback restores the archived plan and changes no legal state.",
+    "Forward-only sync: redb -> envctl -> PostgreSQL; no undirected dual-write; verified cutover before any redb-durable staging is retired (STORE-001)."
+  ],
+  "store_001_alignment": "MVP1-002 invents no store. Durable legal documents, information, obligations, deadlines, risk records, recommendations-once-approved, and provenance are the STORE-001 durable relational + semantic macro-state families (assignments 1-2), owned canonically by PostgreSQL + RuVector. Transient legal reasoning, deadline scans, and WAL are STORE-001 assignment 3 (redb). Per-agent legal cognition is STORE-001 assignment 4 (AgentDB). External filing/signing authorities and credentials are STORE-001 assignment 6 (external/keyring, unchanged). Document preservation uses the STORE-001 BlobStore SHA-256 content-addressed parity contract and the forward-only, verified-cutover invariants. Building this legal slice to the intended tiered spec is an upgrade, never a downgrade.",
+  "grounding_sources": [
+    "generated/task_graph.source.csv :: MVP1-002 (goal, verification_gate, blocked_paths, rollback_plan)",
+    "generated/store_relationship_decision.json :: STORE-001 (state_class_assignments 1-6, invariants, correction_of_prior_brief)",
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md :: Sections 1 (No-Sidecar), 5 (ingestion pipeline), 6 (Witness Chains, Causal Graph Verification, COW branching), tiered-memory table",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv :: rows 1 (PostgreSQL canonical), 3 (redb transient), 4 (AgentDB cognition), 18 (Witness Chains provenance)",
+    "proof_records/ADOPT-001.proof.json :: BlobStore trait, SHA-256 identity, exact-byte materialization, secret-output guards"
+  ],
+  "completion_gate": "All six legal workflows (information, document, obligation, deadline, risk, recommendation) separate information from advice from action, require explicit human approval for any commitment, ground every derived record in an immutable preserved source with recorded provenance, and prove rollback (discard COW branch) or non-action (never merge); every legal state class has exactly one canonical owner, one lifetime, one sync edge, and one recovery source consistent with STORE-001; and MVP1-002.proof.json records zero legal commitments, filings, signatures, or external actions.",
+  "downstream": "MVP1-003 (financial and legal MVP1 acceptance plan) proves one governed financial and one governed legal workflow run through the same LifeOS substrate from intent to verified next action; MVP1-002 supplies the legal slice's tier, authority, provenance, and rollback contract for that acceptance."
+}

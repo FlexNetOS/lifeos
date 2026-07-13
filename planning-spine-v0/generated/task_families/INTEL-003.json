@@ -1,0 +1,195 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "INTEL-003",
+  "title": "Regenerative configuration secrets and learning plan defined",
+  "status": "defined",
+  "owner": "LifeOS Governance / Memory Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Under the settled STORE-001 tiered-authority model, decompose the six INTEL-003 domains — env regeneration, secrets brokerage, identity, failure-capsule learning, guardrail promotion, and proven-world rollback — and assign every configuration class, secret class, identity class, learning class, promotion gate, and rollback surface exactly once its owner, reference boundary, lifetime, synchronization edge, recovery source, and explicit relationship to PostgreSQL / redb / AgentDB / CodeDB, so that (1) every configuration and secret has an owner and a reference boundary, (2) all learning is proof-derived, (3) failed worlds cannot become the baseline, and (4) promotion and rollback require explicit gates rather than autonomous action. This is planning classification only in the policy-cell: no config is applied, no secret value is written or rotated, no model or baseline is changed.",
+  "entity_universe": {
+    "configuration_classes": [
+      "CFG-1 materialized source-tree projection (INTEL-003-A)",
+      "CFG-2 envctl environment-control flags & transformation rules (INTEL-003-B)",
+      "CFG-3 Nix/musl build + gitkb/meta .meta boundary config (INTEL-003-C)",
+      "CFG-4 swarm routing & model config (Ruflo/RuvLTRA/ruvllm) (INTEL-003-D)",
+      "CFG-5 redb transient runtime/system-config buffer (INTEL-003-E)"
+    ],
+    "secret_classes": [
+      "SEC-1 provider API keys (Anthropic/OpenAI/Gemini) (INTEL-003-F)",
+      "SEC-2 attestation bundles & committed source pins (INTEL-003-G)",
+      "SEC-3 PostgreSQL secret-reference & provenance rows (INTEL-003-H)"
+    ],
+    "identity_classes": [
+      "ID-1 relational identity keys & schema fields (INTEL-003-I)",
+      "ID-2 per-agent identity & witness roots (INTEL-003-J)"
+    ],
+    "learning_classes": [
+      "LRN-1 per-agent cognition learning (SONA/MicroLoRA/RL) (INTEL-003-K)",
+      "LRN-2 ATAS failure-node capsules / ESN forecast (INTEL-003-L)"
+    ],
+    "promotion_gate_surface": [
+      "PROM-1 explicit promotion gate stack (INTEL-003-M)"
+    ],
+    "rollback_surface": [
+      "RBK-1 COW proven-world rollback baseline + WAL replay + verified-cutover guard (INTEL-003-N)"
+    ]
+  },
+  "work_items": [
+    {
+      "id": "INTEL-003-A",
+      "surface": "Env regeneration — materialized source-tree projection (envctl projects the PostgreSQL production-branch rows -> filesystem .rs/.toml/.nu for musl/Yazelix compilation)",
+      "owner": "envctl projection engine (read-only from PostgreSQL; PostgreSQL production branch is the source of truth)",
+      "decision": "Classify DERIVED-DISPOSABLE config (STORE-001 'derived projections' class). Owner of truth = PostgreSQL production branch; owner of the projection act = envctl (read-only). Reference boundary: canonical config lives only in PostgreSQL rows keyed by module_path metadata; the filesystem source tree is derived and never authored in place, so it may be deleted at will. Lifetime: build-time ephemeral, regenerated per release. Sync edge: PostgreSQL -> envctl materialize -> filesystem, forward-only and derived (no reverse write of filesystem edits back into the projection). Recovery: deterministic re-projection from PostgreSQL via the Blueprint Phase-4 four-step (query production branch -> map dirs from module_path -> concatenate raw_code blocks -> dump). Relationship: PostgreSQL owns; redb holds no projection authority; CodeDB/nu_plugin feed ingestion in the opposite direction. Gate clause-1 (owner + reference boundary). No projection is executed here (blocked_paths: config apply)."
+    },
+    {
+      "id": "INTEL-003-B",
+      "surface": "Env regeneration — envctl environment-control flags & transformation rules",
+      "owner": "envctl engine (single controller)",
+      "decision": "Classify CONTROL-CONFIG (Context Matrix row 10: envctl canonical state = 'Environment control flags and transformation rules'). Owner = envctl. Reference boundary: committed, non-secret transformation rules; envctl NEVER stores raw secrets (secret custody stays in the keyring per INTEL-003-F/G). Lifetime: durable rule set is versioned in the governed store; transient in-flight orchestration state may remain redb-transient per the STORE-001 / PGAUTH-002-B split. Sync edge: durable rule history promoted forward redb -> envctl -> PostgreSQL; runtime flags stay process-local. Recovery: committed rule set + PostgreSQL-promoted history. Relationship: PostgreSQL canonical for durable rule history; redb transient for in-flight state; distinct from CodeDB. Gate clause-1."
+    },
+    {
+      "id": "INTEL-003-C",
+      "surface": "Env regeneration — Nix/musl static-build config (x86_64-unknown-linux-musl) + gitkb/meta .meta boundary config",
+      "owner": "Yazelix/Nix build system + gitkb/meta orchestrator (.meta config file)",
+      "decision": "Classify COMMITTED-BUILD config (Context Matrix rows 9/20/22). Owner = Nix derivations + the .meta project-boundary file. Reference boundary: version-controlled derivations and .meta boundaries are the authority; the /nix/store closure is a disposable build artifact, never the config authority (musl static compile bundles dependencies and drops the /nix/store RPATH per Blueprint §7). Lifetime: durable committed config; build closures ephemeral. Sync edge: committed source -> Nix build -> portable folder (forward-only). Recovery: rebuild deterministically from committed derivations + the projected source of INTEL-003-A. Relationship: consumes PostgreSQL-projected source; independent of the redb/CodeDB runtime tiers. Gate clause-1."
+    },
+    {
+      "id": "INTEL-003-D",
+      "surface": "Env regeneration — swarm routing & model config (Ruflo provider configurations, RuvLTRA proportional-intelligence routing policy, ruvllm frozen-model/sampling/LoRA-rank config)",
+      "owner": "Ruflo meta-harness (routing/provider policy) + ruvllm runtime (frozen-model + sampling config)",
+      "decision": "Classify GOVERNED-POLICY config (Context Matrix rows 5/16/21). Owner = Ruflo (routing/provider policy) and ruvllm (model-load + sampling config). Reference boundary: the routing policy references provider IDENTITIES and complexity tiers only — it holds NO provider secrets; keys are resolved from the keyring at call time per INTEL-003-F. Lifetime: durable policy; per-request routing decisions transient. Sync edge: policy stored in the PostgreSQL meta-analytics store; transient routing decisions buffered in redb and forward-flushed only when significant. Recovery: committed policy + PostgreSQL telemetry. Relationship: PostgreSQL canonical for policy + telemetry; redb transient for routing decisions; AgentDB receives routing instructions non-authoritatively. Gate clause-1. Autonomous promotion of a changed routing policy is BLOCKED — any policy change is promoted only through the INTEL-003-M gate stack."
+    },
+    {
+      "id": "INTEL-003-E",
+      "surface": "Env regeneration — redb transient runtime/system-config buffer (Context Matrix row 3: redb 'system configs')",
+      "owner": "redb per process (single writer per store file)",
+      "decision": "Classify TRANSIENT-CACHE config, never authority (STORE-001 transient high-frequency tier). Owner = redb process-local. Reference boundary: redb holds only a disposable process-lifetime copy/cache of PostgreSQL-canonical or committed config, is never the config authority, and NEVER holds secrets (STORE-001 external-secret class: 'redb never holds secrets'). Lifetime: process lifecycle / local disk. Sync edge: forward-only redb -> envctl -> PostgreSQL for settled significant state; config flows the other way only as a read cache. Recovery: transient by definition; re-read from PostgreSQL/committed source on loss. Relationship: subordinate to PostgreSQL; no CodeDB/AgentDB authority. Gate clause-1 (owner + boundary); reinforces clause-3 (a transient redb copy can never become the baseline authority)."
+    },
+    {
+      "id": "INTEL-003-F",
+      "surface": "Secrets brokerage — provider API keys (Anthropic / OpenAI / Gemini)",
+      "owner": "OS keyring (service 'lifeos', accounts anthropic|openai|gemini) with env-var fallback (ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI equivalents)",
+      "decision": "Classify RAW-SECRET, keyring-owned (STORE-001 'external-secret / provenance authority' class; source-of-truth is the LifeOS AI-provider routing contract and src-tauri/src/lib.rs ai_provider_get/ai_provider_set). Owner = OS keyring + env fallback; unchanged by LifeOS. Reference boundary (the gate's 'reference boundary' made literal): the raw key exists ONLY in the keyring/env; PostgreSQL stores references/provenance (which account, rotation marker, provenance) and NEVER the raw value; redb NEVER holds secrets; projections/materializations never embed keys; committed source pins never contain keys. Lifetime: owner-managed; brokered per-call, not persisted into the memory substrate. Sync edge: none (n/a — secrets do not sync into PostgreSQL/redb/AgentDB). Recovery: keyring. Relationship: PostgreSQL holds reference rows only; redb/CodeDB/AgentDB hold none. Gate clause-1. Credential rotation and secret values are BLOCKED (blocked_paths) — no key is read, written, or rotated here."
+    },
+    {
+      "id": "INTEL-003-G",
+      "surface": "Secrets brokerage — attestation bundles & committed source pins (provenance authority)",
+      "owner": "Committed in-repo source pins + attestation issuer",
+      "decision": "Classify PROVENANCE-SECRET / ATTESTATION (STORE-001 external-secret class: 'attestation bundles, source pins'). Owner = committed pins + attestation issuer. Reference boundary: pins are committed provenance references carrying commit/PR lineage (adopted_capabilities.source.csv); PostgreSQL stores provenance rows that REFERENCE them, never the raw attestation material. Lifetime: durable committed. Sync edge: n/a for raw material; provenance references are promoted into PostgreSQL. Recovery: keyring + committed pins (STORE-001 recovery_source). Relationship: PostgreSQL references; redb none. Gate clause-1; also anchors clause-2 because witness-chain roots and causal-edge provenance derive from these verified pins, keeping learning proof-derived rather than fabricated."
+    },
+    {
+      "id": "INTEL-003-H",
+      "surface": "Secrets brokerage — PostgreSQL secret-reference & provenance rows (references only, never raw)",
+      "owner": "PostgreSQL (single durable writer of reference/provenance rows)",
+      "decision": "Classify REFERENCE-ONLY row set (STORE-001 external-secret class role_of_others: 'PostgreSQL stores references/provenance, never raw secrets'). Owner = PostgreSQL. Reference boundary: rows hold account handles, rotation markers, and provenance/witness roots — contractually enforced to contain NO raw-secret bytes; any raw-secret write is a contract violation to be rejected. Lifetime: durable (ACID/PITR). Sync edge: provenance promoted forward from committed pins / keyring metadata; never the reverse leak of raw material. Recovery: PostgreSQL PITR for references, keyring for raw material. Relationship: PostgreSQL canonical for references; redb never holds secrets; AgentDB witness chains root here. Gate clause-1 — this row set IS the reference boundary that separates raw-secret custody (keyring) from provenance custody (PostgreSQL)."
+    },
+    {
+      "id": "INTEL-003-I",
+      "surface": "Identity — relational identity keys & schema fields (user_id, provenance, module_path metadata, permissions, causal dependency edges)",
+      "owner": "PostgreSQL + RuVector (single durable owner)",
+      "decision": "Classify DURABLE-IDENTITY (STORE-001 'durable relational macro-state (identities, histories, permissions, provenance, module_path metadata, code AST/rows, causal dependency edges)'; Context Matrix row 1 identity key user_id). Owner = PostgreSQL + RuVector. Reference boundary: identity keys and schema fields are canonical in PostgreSQL; every other tier references them by key and never forks a second identity authority (STORE-001 single-durable-writer invariant). Lifetime: durable (ACID/PITR). Sync edge: redb -> envctl(embed) -> PostgreSQL forward-only for any identity-bearing macro-state. Recovery: PostgreSQL PITR. Relationship: PostgreSQL canonical; redb transient buffer only; AgentDB references identity, does not own it; CodeDB module_path metadata lands here. Gate clause-1 (identity owner + boundary)."
+    },
+    {
+      "id": "INTEL-003-J",
+      "surface": "Identity — per-agent identity & cryptographic witness roots (AgentDB .rvf + SHAKE256 witness chains + causal edges)",
+      "owner": "AgentDB (.rvf) per agent for the agent's own cognitive identity; witness-chain roots owned by PostgreSQL source vectors",
+      "decision": "Classify NON-AUTHORITATIVE-AGENT-IDENTITY (STORE-001 'per-agent cognition' class; Context Matrix row 4 identity keys = 'SHAKE256 witness chains and causal edges'). Owner = AgentDB per agent for its self-contained cognitive identity; the TRUTH root is PostgreSQL (the source vectors the chain binds to). Reference boundary: agent identity is self-contained in the .rvf, but every claim is bound to a SHAKE256 chain whose root MUST already exist in the PostgreSQL knowledge graph — an agent cannot mint identity or claims with no historical root, and Causal Graph Verification (GNN) rejects rootless claims. Lifetime: .rvf file; regenerable from base model + witnessed training history. Sync edge: self-contained; provenance links back to PostgreSQL. Recovery: .rvf file / regenerate. Relationship: AgentDB owns active cognition, PostgreSQL owns the witnessed root, redb none. Gate clause-1 and clause-2 (identity claims are proof-derived via witness roots)."
+    },
+    {
+      "id": "INTEL-003-K",
+      "surface": "Failure-capsule learning — per-agent cognition (SONA policy matrices, MicroLoRA adapters, Thompson-Sampling/Q-Learning/PPO reinforcement weights)",
+      "owner": "AgentDB (.rvf) per agent",
+      "decision": "Classify PROOF-DERIVED LEARNING (STORE-001 'per-agent cognition'; Blueprint: SONA 'updates a local success threshold after a FAILED terminal command'). Owner = AgentDB. Learning is proof-derived (gate clause-2), not free-floating: (i) every learned fact/edit is bound to a SHAKE256 Cryptographic Witness Chain rooted in a verified PostgreSQL source vector; (ii) Causal Graph Verification (GNN) rejects any adjustment whose claim lacks a historical causal edge; (iii) SONA adjusts ranking ONLY from observed agent successes/failures — the failure capsule — never from a fabricated outcome. Reference boundary: weights are agent-local and non-authoritative for shared macro-state. Lifetime: .rvf; regenerable from base model + witnessed training history. Sync edge: self-contained; shared knowledge flushes forward to PostgreSQL only after verification. Recovery: .rvf / regenerate. Relationship: AgentDB owns; PostgreSQL owns the proof roots; redb is a transient scratchpad for in-flight thoughts only. Gate clause-2 in full: no learned adjustment can be asserted without a verifiable root."
+    },
+    {
+      "id": "INTEL-003-L",
+      "surface": "Failure-capsule learning — ATAS failure-node capsules & ESN failure prediction (Temporal Strange Attractors, ensemble simulation)",
+      "owner": "ATAS (ESN reservoir fixed + trained readout layer); Ruflo/RuvLTRA consume the forecasts",
+      "decision": "Classify PROOF-DERIVED FORECAST (Context Matrix rows 6/14/15/24; Blueprint §4). Owner = ATAS. Proof-derived (gate clause-2): failure nodes are computed from OBSERVED past agent failure rates plus the current PostgreSQL codebase state as the initial condition, and each candidate is validated inside isolated COW sandboxes BEFORE any production write — a predicted failure is evidence-grounded, not invented. Reference boundary: forecasts (projected git diffs, resource burn, complexity spikes, failure nodes) are simulation-only transient state and never write the baseline directly. Lifetime: ephemeral per simulation ensemble. Sync edge: reads PostgreSQL/redb state; emits only routing signals to Ruflo/RuvLTRA — no direct trunk write. Recovery: recomputable from current state + failure history. Relationship: PostgreSQL is the initial-condition source of truth; redb may buffer transient ESN ensemble state; failed simulated worlds feed clause-3 (they are discarded, never merged). Gate clause-2."
+    },
+    {
+      "id": "INTEL-003-M",
+      "surface": "Guardrail promotion — explicit promotion gate stack (RuVector MinCut, Causal Graph Verification, Cryptographic Witness Chain, ESN stability, RuvLTRA escalation, LifeOS human-in-the-loop)",
+      "owner": "RuVector MinCut + RuVector GNN + witness-chain layer + ATAS/ESN + RuvLTRA + LifeOS Mission Control (governance)",
+      "decision": "Classify EXPLICIT-GATE stack (gate clause-4). No promotion is autonomous (blocked_paths: 'autonomous promotion'). A change is promoted to the PostgreSQL main trunk ONLY after passing every gate: (1) RuVector MinCut has not severed the originating agent (subpolynomial O(n^{o(1)}) immune isolation); (2) Causal Graph Verification confirms a historical causal edge for the change; (3) the SHAKE256 Cryptographic Witness Chain binds the change to a verified source vector; (4) ATAS/ESN scores the branch mathematically stable (the winning timeline); (5) RuvLTRA has escalated security/architectural validations to a high-tier model per Proportional Intelligence; (6) LifeOS Mission Control provides human-in-the-loop confirmation for baseline-affecting promotions. Reference boundary: promotion authority is the PostgreSQL COW commit; gates are evaluated in sandboxes, not on the trunk. Relationship: PostgreSQL is the promotion target; redb/AgentDB cannot self-promote. Gate clause-4 (promotion requires explicit gates); reinforces clause-3 (a world failing any gate cannot be promoted). Additionally, any redb-durable -> PostgreSQL class reclassification is itself gated by the STORE-001 verified BlobStore SHA-256 parity cutover — never by assumption."
+    },
+    {
+      "id": "INTEL-003-N",
+      "surface": "Proven-world rollback — COW branching baseline (PostgreSQL main production trunk) + redb application-level WAL replay + STORE-001 verified-cutover guard",
+      "owner": "PostgreSQL COW branching (baseline authority); redb outbox worker (forward-only WAL, subordinate)",
+      "decision": "Classify BASELINE-ROLLBACK contract (gate clauses 3 + 4; Blueprint §5-6, Context Matrix rows 15/19). The proven-world baseline = the PostgreSQL main production trunk. Failed worlds CANNOT become the baseline (clause-3): agents work only in isolated COW staging branches; a branch merges to the trunk ONLY via the INTEL-003-M gate stack; a branch that fails is deterministically rolled back and discarded, eliminating the 'dirty repository' problem — the failed rows never touch the trunk. Rollback requires an explicit gate (clause-4): reverting to a proven world is a COW rollback of un-merged branches, and restoring the baseline uses PostgreSQL PITR. redb acts as a subordinate application-level WAL/outbox during PostgreSQL latency/outage: forward-only replay-with-ack, never a durable authority and never a second baseline (STORE-001 invariant: single durable writer = PostgreSQL). No class leaves redb-durable for PostgreSQL except via a green live blobstore_parity.rs cutover under one preserved SHA-256 identity (STORE-001 verified-cutover invariant); a failed or unverified cutover is rejected, so a broken migration cannot silently become the baseline. Reference boundary: only gate-passing, parity-verified state defines the baseline. Recovery: PostgreSQL PITR + COW rollback. Rollback plan for THIS planning task: restore the archived governance/learning plan; no config, secret, model, or baseline is changed. Gate clauses 3 and 4."
+    }
+  ],
+  "execution_order": [
+    "INTEL-003-A",
+    "INTEL-003-B",
+    "INTEL-003-C",
+    "INTEL-003-D",
+    "INTEL-003-E",
+    "INTEL-003-F",
+    "INTEL-003-G",
+    "INTEL-003-H",
+    "INTEL-003-I",
+    "INTEL-003-J",
+    "INTEL-003-K",
+    "INTEL-003-L",
+    "INTEL-003-M",
+    "INTEL-003-N"
+  ],
+  "gate_clause_coverage": {
+    "clause_1_every_config_and_secret_has_owner_and_reference_boundary": [
+      "INTEL-003-A",
+      "INTEL-003-B",
+      "INTEL-003-C",
+      "INTEL-003-D",
+      "INTEL-003-E",
+      "INTEL-003-F",
+      "INTEL-003-G",
+      "INTEL-003-H",
+      "INTEL-003-I"
+    ],
+    "clause_2_learning_is_proof_derived": [
+      "INTEL-003-G",
+      "INTEL-003-J",
+      "INTEL-003-K",
+      "INTEL-003-L"
+    ],
+    "clause_3_failed_worlds_cannot_become_baseline": [
+      "INTEL-003-E",
+      "INTEL-003-L",
+      "INTEL-003-M",
+      "INTEL-003-N"
+    ],
+    "clause_4_promotion_and_rollback_require_explicit_gates": [
+      "INTEL-003-D",
+      "INTEL-003-M",
+      "INTEL-003-N"
+    ]
+  },
+  "store_001_alignment": {
+    "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+    "classes_applied": [
+      "external-secret / provenance authority -> SEC-1/SEC-2/SEC-3 (keyring raw, PostgreSQL references only, redb never holds secrets)",
+      "derived projections -> CFG-1 (PostgreSQL source projected by envctl, forward-only, re-projection recovery)",
+      "durable relational macro-state (identities) -> ID-1 (PostgreSQL single durable owner)",
+      "per-agent cognition -> ID-2 / LRN-1 (AgentDB non-authoritative, witnessed by SHAKE256 chains rooted in PostgreSQL)",
+      "transient high-frequency state -> CFG-5 / redb WAL in RBK-1 (redb transient, never durable authority)"
+    ],
+    "invariants_honored": [
+      "single durable writer = PostgreSQL",
+      "forward-only redb -> envctl -> PostgreSQL",
+      "verified cutover only (blobstore_parity.rs SHA-256)",
+      "no sidecar (RuVector native extension)",
+      "provenance / SHA-256 identity preserved"
+    ]
+  },
+  "grounded_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/adopted_capabilities.source.csv (ADOPT-001/ADOPT-002 provenance)",
+    "generated/task_families/PGAUTH-002.json (redb use-case bounding, house style)"
+  ],
+  "completion_gate": "Every configuration and secret has an owner and reference boundary; learning is proof-derived; failed worlds cannot become baseline; promotion and rollback require explicit gates.",
+  "blocked_paths_respected": "No secret values written; no credential rotation; no config applied; no autonomous promotion (all promotion gated); no product implementation. Simulation-only, policy-cell."
+}

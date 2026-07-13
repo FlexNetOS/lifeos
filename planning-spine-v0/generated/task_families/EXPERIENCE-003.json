@@ -1,0 +1,223 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "EXPERIENCE-003",
+  "title": "Cross-interface continuity and accessibility acceptance plan defined",
+  "status": "defined",
+  "owner": "LifeOS Experience / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define end-to-end acceptance proving that the same governed LifeOS intent, state, approval, action, proof, and recovery remain coherent across every approved presentation client. Because the substrate is Rust-native and the clients are replaceable presentation (LIFEOS-010, EXPERIENCE-001), continuity is proven not by comparing clients to each other but by proving that each client resolves through the same governed APIs against the single canonical authority (PostgreSQL + RuVector per STORE-001) with proof rooted in the same Cryptographic Witness Chains. No interface is deployed and no account, database, or product code is mutated by this task.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "grounding_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001 keystone)",
+    "task_graph.source.csv rows LIFEOS-010, EXPERIENCE-001, EXPERIENCE-002 (parent goals define the client set and the governed-API boundary this plan validates)"
+  ],
+  "authority_model_inherited_from_STORE_001": {
+    "canonical_durable_owner": "PostgreSQL + RuVector — single durable writer of identities, permissions, histories, provenance, relationships, and semantic macro-state; recovery = PostgreSQL PITR.",
+    "transient_tier": "redb — agent thoughts, terminal traces, state flags, BLAKE3 dedup cache, and the application-level Write-Ahead Log during PostgreSQL latency/outage; recovery = local disk, transient by definition.",
+    "per_agent_cognition": "AgentDB (.rvf) — non-authoritative active cognition (MicroLoRA/SONA), witnessed by SHAKE256 chains rooted in PostgreSQL source vectors.",
+    "bridge": "envctl — forward-only redb -> embed -> PostgreSQL sync and PostgreSQL -> filesystem projection.",
+    "proof_authority": "Cryptographic Witness Chains (SHAKE256) + Causal Graph Verification, rooted in PostgreSQL source vectors — the anti-bluffing mechanism that makes every action's proof identical regardless of the client that renders it.",
+    "conflict_and_rollback_primitive": "Copy-On-Write (COW) branching inside the database — concurrent intent forks into isolated staging branches; the winning branch merges to the main trunk, the losing branch rolls back; RuVector MinCut isolates divergent logic."
+  },
+  "core_invariant": "The client is replaceable presentation; it never owns LifeOS logic, durable state, authorization authority, or proof. Every approved client is accepted against the identical governed contract, so continuity and parity are structural, not per-client reimplementations.",
+  "approved_interfaces": [
+    {
+      "id": "CLIENT-DESKTOP",
+      "surface": "LifeOS desktop (Tauri/Vue shell; Bun FFI reads memory-mapped redb; UDS to the Yazelix/Zellij workspace)",
+      "approval": "first-approved and the only currently-real client",
+      "bounded_capability": "renders Mission Control over the governed APIs; reads real-time agent status directly from the shared memory-mapped redb file via UDS/Bun FFI (blueprint: LifeOS connects via UDS or shared redb state files); owns no durable authority",
+      "source": "Blueprint 'LifeOS Unix Domain Sockets (UDS) via Yazelix' + 'Bun/Bunx' sections; Context Matrix rows 2, 3 (LifeOS reads redb via UDS)"
+    },
+    {
+      "id": "CLIENT-MOBILE",
+      "surface": "Mobile client (later-approved)",
+      "approval": "later approved (LIFEOS-010 / EXPERIENCE-002)",
+      "bounded_capability": "consumes the same EXPERIENCE-001 Rust-native governed APIs over the sanctioned transport; presents the same governed state; owns no local durable authority and issues no privileged capability the desktop lacks",
+      "source": "EXPERIENCE-002 goal (approved mobile client presenting one coherent LifeOS state)"
+    },
+    {
+      "id": "CLIENT-GLASSES",
+      "surface": "Glasses client (later-approved)",
+      "approval": "later approved (LIFEOS-010 / EXPERIENCE-002)",
+      "bounded_capability": "visual + voice/gesture presentation over the same governed APIs; heads-up rendering of governed state, approvals, and proof; owns no authority",
+      "source": "EXPERIENCE-002 goal (approved glasses surface)"
+    },
+    {
+      "id": "CLIENT-AMBIENT",
+      "surface": "Ambient client (later-approved; voice-first / non-visual ambient surface)",
+      "approval": "later approved (LIFEOS-010 / EXPERIENCE-002)",
+      "bounded_capability": "non-visual, voice-first governed interaction; audibly confirms governed intent, approval, and proof; owns no authority and cannot bypass authorization or proof because those live in the substrate",
+      "source": "EXPERIENCE-002 goal (approved ambient surface)"
+    }
+  ],
+  "shared_governed_contract": {
+    "consumed_apis": "EXPERIENCE-001 stable Rust-native application / state / command / event / plugin / policy / data APIs — the single boundary every client crosses; business logic and authority stay behind it",
+    "intent_path": "client intent -> EXPERIENCE-001 command API -> governed handler -> PostgreSQL canonical write (or redb WAL if PostgreSQL is unavailable) -> Witness Chain proof",
+    "state_read_path": "durable/governed state via the governed data API from PostgreSQL (ms tier); real-time transient status via UDS/shared memory-mapped redb (microsecond tier)",
+    "proof_path": "every committed action emits a SHAKE256 Witness Chain rooted in a PostgreSQL source vector; any client renders the same chain, none can forge or diverge it",
+    "recovery_path": "durable = PostgreSQL PITR; transient = redb local disk (transient by definition); durable state authored while a client was offline replays forward-only via envctl on reconnect"
+  },
+  "work_items": [
+    {
+      "id": "EXPERIENCE-003-A",
+      "surface": "Accessibility parity across every approved client modality",
+      "gate_clause": "accessibility",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "EXPERIENCE-001 application + event APIs (the same governed capability set is reachable through each client's accessible path)",
+      "state_authority": "n/a — accessibility is a presentation obligation; it must expose, never own, governed state",
+      "decision": "Every governed capability must be reachable and confirmable through each approved client's accessible path; no governed capability may be gated behind an inaccessible modality.",
+      "acceptance_criteria": [
+        "Desktop and mobile pass the LifeOS design-system accessibility bar (WCAG AA contrast, semantic roles, focus order, keyboard operability) via the axe assertion suite already established for LifeOS views and overlays.",
+        "Glasses provides an equivalent visual + voice/gesture path to the same governed intents, approvals, and proof.",
+        "Ambient (non-visual) provides a voice-first path that can issue governed intent, receive an approval prompt, and hear a governed-proof confirmation — no visual-only dead ends.",
+        "Coverage check: the union of accessible paths across clients covers 100% of the governed capabilities exposed by EXPERIENCE-001; a capability with zero accessible path on a modality that claims to expose it fails."
+      ],
+      "recovery": "n/a (presentation-layer acceptance)",
+      "source": "EXPERIENCE-002 gate (accessibility); LifeOS design-system a11y suite (project DESIGN.md / tests/a11y)"
+    },
+    {
+      "id": "EXPERIENCE-003-B",
+      "surface": "Identity continuity across clients",
+      "gate_clause": "identity continuity",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "EXPERIENCE-001 policy + data APIs (identity resolution)",
+      "state_authority": "PostgreSQL + RuVector — identities are STORE-001 durable relational macro-state; recovery = PostgreSQL PITR",
+      "decision": "A single identity resolves to the same governed state on every client; identity authority is PostgreSQL, so no client forks a local identity even if the authentication method differs per client.",
+      "acceptance_criteria": [
+        "Sign in on the desktop, then resume on mobile / glasses / ambient: the same user_id resolves to the same governed state, the same permission set, and the same proof/history.",
+        "Client-specific authentication (EXPERIENCE-002 authentication) may differ, but it must resolve to the one PostgreSQL-owned identity — no client-local identity record becomes authoritative.",
+        "Continuity check: for a fixed identity, the governed state snapshot returned to each client is equal (durable fields) or explicitly a transient-tier field flagged as such; zero divergent durable identity state across clients."
+      ],
+      "recovery": "PostgreSQL PITR restores identity/permission state; a lost or replaced client re-authenticates to the same PostgreSQL identity with no state loss",
+      "source": "STORE-001 durable relational class (identities, permissions); EXPERIENCE-002 gate (identity, authentication)"
+    },
+    {
+      "id": "EXPERIENCE-003-C",
+      "surface": "Concurrent-intent conflict handling",
+      "gate_clause": "conflict handling",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "EXPERIENCE-001 command API -> governed handler (server-side COW resolution)",
+      "state_authority": "PostgreSQL + RuVector single durable writer; COW branching + RuVector MinCut resolve concurrency inside the database",
+      "decision": "Concurrent intent from two clients against the same target is resolved by database Copy-On-Write branching in the substrate, never by client-side last-write-wins; the single-durable-writer invariant (STORE-001) holds regardless of client.",
+      "acceptance_criteria": [
+        "Two clients issue conflicting intent on the same target: the system forks two isolated COW staging branches, merges the verified branch to the main trunk, and rolls back the loser — deterministically and identically no matter which client 'won'.",
+        "No client performs an authoritative merge; the clients only render the resolved outcome.",
+        "MinCut/Causal Graph rejection: an intent that would introduce a branch with no causal root is rejected identically for every client.",
+        "Conflict check: after the resolved commit, exactly one trunk row exists for the target and the rejected branch is recorded as rolled back (no dirty-repository state, no dual durable write)."
+      ],
+      "recovery": "the losing COW branch is discarded; PostgreSQL PITR can restore the pre-conflict trunk state",
+      "source": "Blueprint 'ATAS, Copy-On-Write (COW)' and 'RuVector MinCut'; STORE-001 invariant 'single durable writer'"
+    },
+    {
+      "id": "EXPERIENCE-003-D",
+      "surface": "Offline recovery",
+      "gate_clause": "offline recovery",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "EXPERIENCE-001 command API with the redb WAL fallback + envctl forward-flush",
+      "state_authority": "redb (transient WAL during PostgreSQL/network unavailability) -> envctl forward-only flush -> PostgreSQL (durable); recovery = PostgreSQL PITR for durable, redb local disk for transient",
+      "decision": "Intent authored while a client is offline queues in the redb application-level WAL at the edge and replays forward-only into PostgreSQL via envctl on reconnect; a client never becomes a durable authority while offline.",
+      "acceptance_criteria": [
+        "With PostgreSQL/network unavailable, durable-bound intent is captured in the redb WAL (blueprint: redb acts as application-level WAL until the connection returns), not committed as authoritative in the client.",
+        "On reconnect, envctl flushes only settled/significant states forward into PostgreSQL; each replayed action carries its identical Witness Chain proof binding.",
+        "Purely transient offline state (thoughts, traces) is transient by definition — its loss is acceptable and does not corrupt durable state.",
+        "Offline check: the durable state after reconnect equals the state that would have resulted from an online path (forward-only, no dual-write, no client-authored durable divergence)."
+      ],
+      "recovery": "durable = PostgreSQL PITR after the forward flush; transient = redb local disk, transient by definition",
+      "source": "Blueprint 'redb' section (application-level WAL) + 'envctl' bridge; STORE-001 transient class (WAL during PostgreSQL latency/outage)"
+    },
+    {
+      "id": "EXPERIENCE-003-E",
+      "surface": "Authorization parity",
+      "gate_clause": "authorization parity",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "EXPERIENCE-001 policy API (authorization decisions) + bounded read-only capability boundary",
+      "state_authority": "PostgreSQL + RuVector — permissions are STORE-001 durable relational macro-state; authorization is decided centrally, never in the client",
+      "decision": "For a fixed (identity, capability, resource) tuple the authorization outcome is identical on every client; no client can exceed its bounded capability set because the decision lives behind the governed policy API, not in replaceable presentation.",
+      "acceptance_criteria": [
+        "The same (identity, capability, resource) tuple yields an identical allow/deny decision across desktop, mobile, glasses, and ambient — the authorization decision diff is empty.",
+        "Each client's bounded capability set (EXPERIENCE-002) is a subset of the governed capabilities; no client surfaces a privileged action the policy API would deny.",
+        "Secret-output guards and bounded read-only MCP boundaries (ADOPT-001 adopted capabilities) hold identically on every client; no client leaks a secret the substrate withholds.",
+        "Parity check: a principal x resource x client matrix produces one decision per (principal, resource) independent of client."
+      ],
+      "recovery": "PostgreSQL PITR restores the permission set; a compromised or replaced client cannot retain elevated authority because authority is not stored client-side",
+      "source": "STORE-001 durable relational class (permissions); EXPERIENCE-001 gate (authority stays outside clients); EXPERIENCE-002 gate (privacy, bounded capabilities); ADOPT-001 (secret-output guards, bounded read-only MCP)"
+    },
+    {
+      "id": "EXPERIENCE-003-F",
+      "surface": "Performance tier acceptance",
+      "gate_clause": "performance",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "EXPERIENCE-001 data + event APIs, measured against the substrate latency tiers",
+      "state_authority": "redb microsecond in-process/UDS tier for real-time status; PostgreSQL millisecond network/IPC tier for governed durable operations",
+      "decision": "Each surface is accepted against the substrate tier appropriate to it — microsecond redb reads for real-time status, millisecond PostgreSQL for governed durable operations — and the tier budget is identical across clients because the substrate, not the client, sets it.",
+      "acceptance_criteria": [
+        "Real-time agent-status surfaces read the shared memory-mapped redb via UDS/Bun FFI and meet the microsecond in-process budget (blueprint tier table: redb = microseconds, in-process).",
+        "Governed durable operations (identity, permissions, proof, canonical writes) meet the millisecond PostgreSQL budget (blueprint tier table: PostgreSQL = milliseconds, network/IPC).",
+        "The per-tier p50/p95 budget is defined once and applied to every client; a client cannot make a canonical write faster or slower than the governed API allows.",
+        "Performance check: each client meets the budget of the tier its surface belongs to; a surface that misses its tier budget fails, but the budget itself is client-independent."
+      ],
+      "recovery": "n/a — performance is a budget acceptance, not a state to recover",
+      "source": "Blueprint tier table (redb microseconds vs PostgreSQL milliseconds) + 'Bun/Bunx' zero-network redb read + 'UDS' shared-state read"
+    },
+    {
+      "id": "EXPERIENCE-003-G",
+      "surface": "Rollback",
+      "gate_clause": "rollback",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "planning-level rollback of this acceptance plan; state-level rollback via COW discard + PostgreSQL PITR",
+      "state_authority": "PostgreSQL PITR + COW branch discard for state; archived predecessor plan for the definition",
+      "decision": "Rollback is reversible at both levels: this acceptance plan reverts to its archived predecessor and deploys/mutates no client, account, or database; a governed action reverts by discarding its COW branch and, if committed, by PostgreSQL PITR.",
+      "acceptance_criteria": [
+        "Adopting this plan performs no interface deployment and no account or database mutation (product_execution_performed = false).",
+        "The plan is restorable to the archived experience acceptance plan (task rollback_plan).",
+        "State-level rollback of a governed action is proven by COW branch discard and PostgreSQL PITR, identically regardless of which client issued the action.",
+        "Rollback check: no rollback path depends on client-local state, because clients hold no durable authority."
+      ],
+      "recovery": "restore the archived experience acceptance plan; no interface is deployed",
+      "source": "EXPERIENCE-003 rollback_plan; Blueprint COW branching + PostgreSQL PITR"
+    },
+    {
+      "id": "EXPERIENCE-003-H",
+      "surface": "Identical proof authority across clients",
+      "gate_clause": "identical proof authority across clients",
+      "owner": "LifeOS Experience / QA Agent",
+      "clients": ["CLIENT-DESKTOP", "CLIENT-MOBILE", "CLIENT-GLASSES", "CLIENT-AMBIENT"],
+      "governed_api": "EXPERIENCE-001 event/data APIs surfacing the Witness Chain; proof is produced in the substrate, never in the client",
+      "state_authority": "Cryptographic Witness Chains (SHAKE256) + Causal Graph Verification rooted in PostgreSQL source vectors — the single canonical proof authority",
+      "decision": "Every action's proof is a SHAKE256 Witness Chain rooted in a PostgreSQL source vector; any client renders the same chain and none can forge, diverge, or bluff it — proof authority is identical because it lives in the single canonical owner, not in replaceable presentation. This is the keystone that makes the whole plan hold.",
+      "acceptance_criteria": [
+        "For a fixed committed action, the proof (witness-chain identity / SHAKE256 root) rendered by desktop, mobile, glasses, and ambient is byte-identical.",
+        "Causal Graph Verification rejects any client-originated claim lacking a historical root in the PostgreSQL knowledge graph, identically for every client (anti-bluffing).",
+        "No client stores or mints authoritative proof; a client displaying proof reads it from the substrate.",
+        "Proof-authority check: the proof-record set for a set of actions is independent of the issuing/rendering client — proof diff across clients is empty."
+      ],
+      "recovery": "proof is reconstructible from PostgreSQL source vectors + Witness Chains (PostgreSQL PITR); a lost client loses no proof authority",
+      "source": "Blueprint 'Cryptographic Witness Chains (SHAKE256)' + 'Causal Graph Verification'; Context Matrix row 18 (witness chains linking to source vectors); STORE-001 (AgentDB witnessed by SHAKE256 chains rooted in PostgreSQL source vectors)"
+    }
+  ],
+  "execution_order": [
+    "EXPERIENCE-003-B",
+    "EXPERIENCE-003-E",
+    "EXPERIENCE-003-H",
+    "EXPERIENCE-003-C",
+    "EXPERIENCE-003-D",
+    "EXPERIENCE-003-A",
+    "EXPERIENCE-003-F",
+    "EXPERIENCE-003-G"
+  ],
+  "completion_gate": "Acceptance covers accessibility, identity continuity, conflict handling, offline recovery, authorization parity, performance, rollback, and identical proof authority across clients — each dimension is bound to exactly one governed API surface and exactly one STORE-001 state authority (or is explicitly presentation-only), enumerated across all four approved interfaces, with concrete acceptance criteria and recovery, and no interface is deployed.",
+  "rollback": "Restore the archived experience acceptance plan; no interface is deployed. product_execution_performed = false.",
+  "open_dependencies": [
+    "EXPERIENCE-001 (governed Rust-native API family) and EXPERIENCE-002 (per-client bounded capability + shared state contract) are named as inputs; their artifacts are not yet written, so this plan derives the API boundary and client set from the LIFEOS-010 / EXPERIENCE-001 / EXPERIENCE-002 goal text plus the blueprint. When those families are authored, the acceptance criteria bind to their concrete API and client-capability definitions.",
+    "Concrete continuity test decomposition is deferred until the first approved client is bounded (task next_action) — mobile/glasses/ambient acceptance instantiates once each client family is defined."
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PERSONAL-003",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Acceptance proves cross-domain continuity, privacy, authority, offline recovery, rollback, accessibility, proof, and no unauthorized external effect.",
+  "gate_result": {
+    "task_family": "generated/task_families/PERSONAL-003.json",
+    "golden_intent": "PERSONAL-003-GI: 'Help me get ready for Mom's cardiology follow-up next Tuesday.'",
+    "intent_trace_stages": [
+      "ST-1 identity",
+      "ST-2 memory",
+      "ST-3 planning",
+      "ST-4 domains",
+      "ST-5 governed action or non-action",
+      "ST-6 verified next recommendation"
+    ],
+    "personal_domain_universe_total": 10,
+    "domains_crossed_by_the_intent": [
+      "health",
+      "calendar",
+      "contacts",
+      "files",
+      "knowledge",
+      "personal finance",
+      "legal",
+      "family coordination",
+      "tasks",
+      "communications"
+    ],
+    "domains_read_only": 9,
+    "external_effect_candidates": 1,
+    "acceptance_dimensions_defined": 8,
+    "cross_domain_continuity_check": "AD-01: the one intent traverses all six trace stages ST-1..ST-6 (identity -> memory -> planning -> domains -> governed action or non-action -> verified next recommendation) of the LIFEOS-003 governed spine while every stage reads and writes the single governed PostgreSQL canonical state (STORE-001 durable relational macro-state; LIFEOS-010 same-governed-state requirement); pass = the intent crosses at least two personal domains (observed 10 of 10) with no per-domain silo and no stage break.",
+    "privacy_check": "AD-02: every personal data class the intent touches carries the PERSONAL-001 boundary (consent, encryption, local-first, provenance, retention, sharing, deletion, backup, recovery); Mom's health/legal data is read only behind an explicit unexpired family-coordination consent grant and is non-read when the grant is absent; raw secrets never enter PostgreSQL or redb (STORE-001 external-secret class stays in the OS keyring; PostgreSQL holds references/provenance only); pass = every touched class has owner+consent+boundary and no data leaves its boundary silently.",
+    "authority_check": "AD-03: no unlimited agent authority (LIFEOS-003) — the agent reads the read-only domains and proposes, but every external-effect step is bound to a human-approval gate and PostgreSQL is the single durable writer (STORE-001 invariant); pass = zero external-effect steps execute without an owner-approval token and the only planned write authority is PostgreSQL.",
+    "offline_recovery_check": "AD-04: during a simulated PostgreSQL latency/outage mid-intent, transient intent state buffers into redb as the application-level Write-Ahead Log (blueprint redb section; STORE-001 transient high-frequency tier), and on reconnect envctl forward-flushes only significant settled state redb -> envctl -> PostgreSQL (forward-only, no dual-write); canonical recovery source is PostgreSQL PITR; pass = the intent resumes with no lost settled state and redb never becomes a second durable authority.",
+    "rollback_check": "AD-05: the single external-effect candidate (the reminder draft) is staged in a Copy-On-Write branch (blueprint COW section) and, on non-approval or failure, the branch is discarded with no personal state mutated; the task rollback_plan restores the archived personal acceptance plan; recovery source = PostgreSQL PITR plus COW branch discard; pass = post-rollback personal state is byte-identical to pre-intent state (zero mutation).",
+    "accessibility_check": "AD-06: the one LifeOS experience renders through the replaceable presentation layer over the Rust-native governed substrate (LIFEOS-010 separation) and conforms to the DESIGN.md accessibility contract (WCAG AA, axe assertions, Lucide-only iconography, tokens-not-literals, calm second-person voice), with cross-device continuity desktop-first; pass = the acceptance run asserts zero axe violations on the intent's surfaces and the same governed state is operable from each approved surface.",
+    "proof_check": "AD-07: every trace stage emits a proof-bearing record on the canonical PostgreSQL state (LIFEOS-003), and the verified next recommendation is bound by a SHAKE256 Cryptographic Witness Chain to its source vector with a Causal-Graph-Verification root (blueprint anti-bluffing section) so it cannot be a hallucination; pass = each stage has a proof record and the next recommendation has a witness-chain root; a recommendation lacking a causal root is rejected, not surfaced.",
+    "no_unauthorized_external_effect_check": "AD-08: the acceptance is a proof-cell simulation (simulation_required=TRUE, execution_cell=proof-cell) in which no real personal action, external communication, production deployment, or product mutation occurs (blocked_paths); the non-approval branch yields a governed non-action (proposal retained, zero side effect) and the approval branch is simulated only; pass = zero external effects observed, product_execution_performed=false, personal state unchanged.",
+    "all_eight_gate_clauses_bound_one_to_one": true,
+    "governed_action_and_non_action_both_proven": "AD-03 and AD-08 together prove both branches of ST-5: the approved external-effect path is staged in a COW branch and simulated only, and the non-approved path is a governed non-action that retains the proposal and produces zero side effect.",
+    "store_001_alignment": "One canonical PostgreSQL + RuVector durable owner reads/serves every domain (single durable writer); offline recovery uses redb only as the transient application-level WAL with forward-only redb -> envctl -> PostgreSQL sync and PostgreSQL PITR recovery, so redb is never a second durable authority; rollback uses COW branch discard plus PITR and mutates no personal state; secrets stay in the OS keyring. Proving one governed cross-domain experience over this tiered model is building to the intended blueprint spec (an upgrade, not a downgrade).",
+    "simulation_only": true,
+    "rollback_plan": "Restore the archived personal acceptance plan; no personal state is changed.",
+    "authority_state_after_this_task": "unchanged — the acceptance PLAN is defined only; no personal intent was executed and no personal state was changed.",
+    "personal_state_changed": "none",
+    "product_execution_performed": false
+  },
+  "proof_summary": "PERSONAL-003 defines, as planning artifacts only, the acceptance proof that one personal intent traverses the full governed LifeOS spine in a single experience; no personal action was taken, no personal state was mutated, and no product code was run. generated/task_families/PERSONAL-003.json fixes one smallest golden intent (PERSONAL-003-GI, 'Help me get ready for Mom's cardiology follow-up next Tuesday'), enumerates the 10-domain PERSONAL-002 personal-domain universe, and records that the intent crosses all ten domains (health, calendar, contacts, files, knowledge, personal finance, legal, family coordination, tasks read-only, and communications as the one human-approval-gated external-effect candidate). It traces the intent through the six governed stages ST-1..ST-6 (identity, memory, planning, domains, governed action or non-action, verified next recommendation) of the LIFEOS-003 execution spine, and binds all eight gate clauses one-to-one to acceptance dimensions AD-01..AD-08, each with an owner, check, evidence, and pass criterion: AD-01 cross-domain continuity over the single governed PostgreSQL canonical state (STORE-001, LIFEOS-010); AD-02 privacy over the PERSONAL-001 data-ownership boundary with Mom's health/legal data consent-gated and secrets kept in the OS keyring; AD-03 authority with no unlimited agent authority and PostgreSQL as the single durable writer; AD-04 offline recovery via redb acting as the application-level WAL with forward-only envctl flush to PostgreSQL and PITR recovery; AD-05 rollback via Copy-On-Write branch discard plus PITR with zero personal-state mutation; AD-06 accessibility over the LIFEOS-010 substrate/presentation separation and the DESIGN.md WCAG-AA contract; AD-07 proof with each stage proof-bearing on PostgreSQL and the next recommendation bound by a SHAKE256 witness chain with a causal-graph root so it cannot be hallucinated; and AD-08 no unauthorized external effect, enforced by the proof-cell simulation and the blocked_paths, proving both the governed-action (COW-staged, simulated) and governed-non-action (proposal retained, zero side effect) branches of ST-5. The plan is STORE-001-aligned: redb is only the transient WAL and is never a second durable authority, PostgreSQL is the single canonical owner and recovery source, and building one governed cross-domain experience over this tiered model is an upgrade to the intended blueprint spec. Authority and personal state are left unchanged; product execution remains closed.",
+  "artifact_paths": [
+    "generated/task_families/PERSONAL-003.json",
+    "proof_records/PERSONAL-003.proof.json"
+  ],
+  "checksums": {
+    "generated/task_families/PERSONAL-003.json": "7a44f3142013c412fa0d0e6f61113a0d9cf4880cad7e1f2e4bc947524d8458ee"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate the PERSONAL-003 acceptance plan: JSON parses, all eight acceptance dimensions AD-01..AD-08 are bound, the six trace stages and the golden intent are present, and every gate clause keyword is covered in the proof gate_result.",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (PERSONAL-003 acceptance-plan gate validation over the task family and this proof)",
+      "exit_status": 0,
+      "output": [
+        "PERSONAL-003: family_valid=True proof_valid=True acceptance_dimensions=8 trace_stages=6 domains_crossed=10 all_eight_gate_clauses_bound=True store_001_aligned=True product_execution_performed=False"
+      ]
+    }
+  ],
+  "product_execution_performed": false
+}

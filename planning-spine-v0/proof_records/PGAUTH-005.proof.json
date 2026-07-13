@@ -1,0 +1,100 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PGAUTH-005",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every external state family declares the external authority, local identity reference, allowed cached metadata, inbound and outbound synchronization direction, conflict and freshness policy, approval gate, outage recovery, and prohibition on secret-value capture.",
+  "gate_result": {
+    "external_state_families": [
+      {"id": "PGAUTH-005-A", "surface": "External cloud LLM / inference services (Anthropic, OpenAI, Gemini, local ruvllm endpoint) via RuvLTRA+Ruflo routing and ai_complete"},
+      {"id": "PGAUTH-005-B", "surface": "External devices / edge nodes running ruvllm + agent swarm, no_std/ESP32 consumers, and observed sensors over UDS/shared redb"},
+      {"id": "PGAUTH-005-C", "surface": "External source repositories and registries (GitHub org remotes, Crates.io, NPM)"},
+      {"id": "PGAUTH-005-D", "surface": "External credential/secret/attestation authority (OS keyring 'lifeos', env fallback, attestation bundles, source pins)"},
+      {"id": "PGAUTH-005-E", "surface": "Human-approved records (owner/Governance ratified decisions, COW-merge approvals, human-in-the-loop control)"}
+    ],
+    "family_count": 5,
+    "every_family_declares_all_nine_clauses": true,
+    "clause_1_external_authority": {
+      "PGAUTH-005-A": "Provider endpoint owns its model outputs; local ruvllm node treated as an endpoint",
+      "PGAUTH-005-B": "The edge node/device owns its runtime state; its node keyring owns its secrets",
+      "PGAUTH-005-C": "Upstream git remote / Crates.io / NPM is authoritative for released source and versions",
+      "PGAUTH-005-D": "OS keyring + committed source pins (STORE-001 class F, unchanged)",
+      "PGAUTH-005-E": "David / Governance Board (human authority for approvals and sign-off)"
+    },
+    "clause_2_local_identity_reference": {
+      "PGAUTH-005-A": "aiProvider account label + PostgreSQL request/response provenance row (request_id, model_id); never the key",
+      "PGAUTH-005-B": "device/node_id + agent_id + Model ID / shared-memory address; PostgreSQL device-registry reference row",
+      "PGAUTH-005-C": "committed source pin (commit SHA / crate version / NPM version) + PR id + module_path + SHA-256 content identity",
+      "PGAUTH-005-D": "account label (service 'lifeos' + account name) + pin id; reference/provenance row only",
+      "PGAUTH-005-E": "decision_id + ratification-record slug + human git-config commit author"
+    },
+    "clause_3_allowed_cached_metadata": {
+      "PGAUTH-005-A": "provider, model_id, request_id, timestamps, token/cost accounting, latency, witness-bound response content; NOT the API key",
+      "PGAUTH-005-B": "node_id, agent_id, model_id/shared-memory address, assignment, heartbeat status, last-seen, flushed significant states; NOT device secrets",
+      "PGAUTH-005-C": "repo URL, default branch, pinned commit/version, PR id, CI receipt, SHA-256 identity, .meta boundaries; NOT tokens/keys",
+      "PGAUTH-005-D": "configured provider/account, key-presence boolean, attestation hash / pin id, last-rotation timestamp; NEVER the secret value",
+      "PGAUTH-005-E": "decision_id, decision text, unblock_condition, deferral/rollback rule, owner, owner_ratified flag, recorded_in path, timestamp"
+    },
+    "clause_4_inbound_synchronization_direction": {
+      "PGAUTH-005-A": "provider -> redb scratchpad -> envctl embed/flush -> PostgreSQL (significant states only), forward-only",
+      "PGAUTH-005-B": "device -> redb (UDS/shared memory-mapped files) -> envctl flush -> PostgreSQL, forward-only",
+      "PGAUTH-005-C": "upstream (pinned fetch) -> nu_plugin AST parse -> redb buffer -> envctl embed -> PostgreSQL code rows",
+      "PGAUTH-005-D": "keyring -> in-process use at call time only; value never crosses into redb/PostgreSQL",
+      "PGAUTH-005-E": "human approval event -> committed decision doc / task-family -> PostgreSQL decision tables"
+    },
+    "clause_5_outbound_synchronization_direction": {
+      "PGAUTH-005-A": "LifeOS -> provider: one prompt/request per call; no durable LifeOS truth stored provider-side",
+      "PGAUTH-005-B": "PostgreSQL/LifeOS -> device: forward-only dispatch of .rvf, MicroLoRA adapters, routing commands (dispatch, not dual-write)",
+      "PGAUTH-005-C": "LifeOS -> upstream: human-approved, meta-orchestrated PRs; PGAUTH-004 projection is one-way derived, no silent dual-write",
+      "PGAUTH-005-D": "None; secret values are never written outward into macro-state or projections",
+      "PGAUTH-005-E": "LifeOS -> human: surfaces proposed decisions/timelines/merges for approval; no auto-commit without the human gate"
+    },
+    "clause_6_conflict_and_freshness_policy": {
+      "PGAUTH-005-A": "provider authoritative for its outputs, never overwritten; BLAKE3 dedup reuse confined to redb cache lifetime; witness-chain binding rejects hallucinations",
+      "PGAUTH-005-B": "device transient state authoritative locally and transient by definition; heartbeat freshness window; MinCut severs drifting nodes",
+      "PGAUTH-005-C": "pin is frozen truth; newer version adopted only via explicit re-pin; NPM-vs-Crates.io tension resolved by pinning pure-Rust sources; upgrades-not-downgrades (forward-only)",
+      "PGAUTH-005-D": "keyring/owner sole write authority; env fallback only when keyring absent; owner-driven rotation; no value cached so no stale-secret conflict",
+      "PGAUTH-005-E": "ratified human record wins over any agent-proposed state; default preserved until explicit unblock RFC with owner sign-off"
+    },
+    "clause_7_approval_gate": {
+      "PGAUTH-005-A": "RuvLTRA tier routing + owner/Governance escalation for heavy models; MinCut + witness verify persistence; COW branch + test gate before trunk merge",
+      "PGAUTH-005-B": "device enrollment/registration owner approval before dispatch; MinCut runtime immune-system isolation",
+      "PGAUTH-005-C": "pin advances only with owner approval + green CI receipt + ADOPT-001 parity gate; gitkb/meta isolates napi-rs exhaust",
+      "PGAUTH-005-D": "owner sets/rotates keys via ai_provider_set; no agent reads raw secret; ADOPT-001 secret-output guards",
+      "PGAUTH-005-E": "the human record IS the approval gate; COW merges to trunk only after human-approved passing test gate; no autonomous execution"
+    },
+    "clause_8_outage_recovery": {
+      "PGAUTH-005-A": "calm error string on unreachable; redb WAL holds pending state until retry; no partial durable write",
+      "PGAUTH-005-B": "device offline -> local redb WAL; PostgreSQL retains last flushed significant state; .rvf cognition regenerable (STORE-001 class D)",
+      "PGAUTH-005-C": "committed pins + PRESERVE-001 git bundles rebuild without the remote; deterministic re-projection from PostgreSQL (STORE-001 class E)",
+      "PGAUTH-005-D": "keyring + committed pins ARE the recovery source (STORE-001 class F); lost key re-provisioned by owner, not from DB",
+      "PGAUTH-005-E": "decisions durable in PostgreSQL + committed docs + PRESERVE-001 evidence bundle; replayable; default preserved until unblocked"
+    },
+    "clause_9_secret_value_capture_prohibition": {
+      "PGAUTH-005-A": "API key stays in keyring (env fallback), used in-process by reqwest only; never in redb/PostgreSQL/projections/logs/witness chains",
+      "PGAUTH-005-B": "device-local secrets stay in the node keyring; never synchronized into PostgreSQL/redb macro-state",
+      "PGAUTH-005-C": "repo access tokens / deploy keys stay in keyring; never persisted; only public identifiers + content hashes stored",
+      "PGAUTH-005-D": "keystone invariant: raw secret values never captured into redb/PostgreSQL/projections/logs/witness chains; only references/provenance",
+      "PGAUTH-005-E": "human records carry no secret values; credentials referenced by label only (delegates to PGAUTH-005-D)"
+    },
+    "no_unresolved_dual_write": true,
+    "every_synchronization_edge_directional_and_idempotent": true,
+    "no_external_system_contacted": true,
+    "blocked_paths_honored": "no external API calls, no device mutation, no credential reads, no repository mutation, no live database writes, no secrets/** access",
+    "store_001_alignment": {
+      "extends_class": "STORE-001 class F (external-secret / provenance authority): canonical owner = OS keyring + committed source pins; PostgreSQL stores references/provenance, never raw secrets; redb never holds secrets",
+      "honors_invariants": [
+        "Single durable writer: no external source becomes a second durable writer of a PostgreSQL-owned class",
+        "Forward-only sync: every external edge is directional (inbound redb->PostgreSQL flush or outbound dispatch/projection), never an undirected dual-write",
+        "Provenance preserved: repository sources retain SHA-256 identity and source commit/PR lineage (ADOPT-001)"
+      ]
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "PGAUTH-005 bounds five external state families and declares all nine gate clauses for each, with no external system contacted. PGAUTH-005-A (external cloud LLM / inference services: Anthropic, OpenAI, Gemini, and local ruvllm endpoints reached by RuvLTRA+Ruflo routing and the ai_complete command) treats each provider as a stateless read-authoritative completion source: prompts flow outbound one call at a time, completions flow inbound through the redb scratchpad and envctl into PostgreSQL only after witness-chain binding, freshness is per-call with BLAKE3 dedup confined to the redb cache, the approval gate is RuvLTRA tiering plus MinCut/witness verification plus a COW test gate, outage recovery is the calm error string plus redb WAL, and the API key never leaves the keyring. PGAUTH-005-B (edge devices/nodes, no_std/ESP32 consumers, and observed sensors) makes the device authoritative only for its transient local runtime, registered by node_id, read forward through UDS/shared redb, dispatched forward from PostgreSQL as .rvf/MicroLoRA deployment, kept fresh by heartbeat and guarded by MinCut, recovered via local WAL plus regenerable .rvf cognition, with node secrets staying on the node. PGAUTH-005-C (GitHub remotes, Crates.io, NPM) makes the upstream authoritative for released source, pins it by commit SHA/crate version/NPM version with PR and SHA-256 provenance, ingests forward through nu_plugin -> redb -> envctl -> PostgreSQL, advances a pin only by an approved CI-green re-pin (upgrades never silent downgrades), recovers from committed pins plus PRESERVE-001 bundles, and keeps access tokens in the keyring. PGAUTH-005-D (OS keyring, env fallback, attestation bundles, source pins) is the unchanged STORE-001 class F authority: secret values are used in-process only and are never captured into redb, PostgreSQL, projections, logs, or witness chains; only account labels, presence booleans, attestation hashes, and rotation timestamps are stored; recovery is the keyring/pins themselves. PGAUTH-005-E (owner/Governance human-approved records) makes the human the authoritative inbound approver whose ratified record is durably stored in PostgreSQL and committed docs, wins over any agent-proposed state until an explicit unblock RFC, and is itself the approval gate for COW-to-trunk merges with no autonomous execution. Every synchronization edge is directional and idempotent with no unresolved dual-write, honoring STORE-001's single-durable-writer and forward-only invariants. No external service, device, repository, credential store, or human system was contacted and no product execution was performed.",
+  "artifact_paths": [
+    "generated/task_families/PGAUTH-005.json",
+    "proof_records/PGAUTH-005.proof.json"
+  ]
+}

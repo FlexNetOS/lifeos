@@ -1,0 +1,407 @@
+{
+  "schema_version": "lifeos-planning-spine.user-space-ingestion-plan.v0",
+  "task_id": "POSTGRES-004",
+  "title": "Complete user-space inventory and lossless ingestion defined",
+  "defined_at": "2026-07-13T03:47:08Z",
+  "owner": "LifeOS Data Agent / envctl Agent",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/adopted_capabilities.source.csv (ADOPT-001)",
+    "generated/pgauth_redb_usage_inventory.csv",
+    "generated/notebooklm_source_extracts/NBSOURCE-030-three-pillars-code-ingestion.md",
+    "generated/notebooklm_source_extracts/NBSOURCE-015-vector-ingestion-embedding-workflows.md",
+    "generated/task_families/PRESERVE-001.json (archive-first pattern)",
+    "task_graph.source.csv rows POSTGRES-002 (user-space class enumeration) and POSTGRES-003 (control-plane collector)"
+  ],
+  "scope_boundary": {
+    "this_task_defines": "Archive-first, read-only collectors and lossless ingestion contracts that inventory the entire user-space and import it into STAGING (transient redb buffer, then envctl-bridged PostgreSQL staging tables) without changing any source state.",
+    "this_task_does_not": "Run live ingestion, mutate any source, provision databases, write live rows, or perform the authority cutover (that is POSTGRES-010 under the STORE-001 verified-cutover invariant). No product execution is performed.",
+    "product_execution_performed": false,
+    "no_source_mutation": "All collectors are read-only. blocked_paths (live ingestion, source mutation, destructive scan, credential values, raw secrets, product implementation) are honored by construction."
+  },
+  "store_authority_alignment": {
+    "keystone": "STORE-001 (generated/store_relationship_decision.json)",
+    "canonical_durable_owner": "PostgreSQL + RuVector — the single canonical owner of durable relational + semantic macro-state (ACID / PITR, No-Sidecar native extension).",
+    "transient_buffer": "redb — intended terminal role is the high-frequency buffer / scratchpad / dedup cache; ingestion writes land here FIRST and are forwarded, never held as durable authority.",
+    "forward_only_bridge": "envctl — the one-directional bridge redb -> embed -> PostgreSQL and the projection engine PostgreSQL -> filesystem. envctl is NOT a second authority (AUTH-CLAIM-001 refuted); PostgreSQL is the destination authority.",
+    "parser_path": "nu_plugin CodeDB — Nushell AST parser that streams typed records into the redb buffer via MessagePack, per the blueprint Three Pillars.",
+    "staging_is_pre_cutover": "Ingestion targets STAGING tables under one SHA-256 content identity. No existing durable redb class (CodeDB source_blobs PGREDB-001, envctl migration_db PGREDB-002) is silently reclassified; any move off redb-durable happens only later via the verified BlobStore SHA-256 parity cutover (STORE-001 invariant 'Verified cutover')."
+  },
+  "ingestion_pipeline": {
+    "model": "Three Pillars of Ingestion (Architecture Blueprint sections 5 and Phase 1; NBSOURCE-030).",
+    "stages": [
+      {
+        "pillar": "Parser (Nushell / nu_plugin CodeDB)",
+        "action": "Traverse the bounded user-space read-only; for code, parse source into ASTs (functions, structs, dependencies); for every other class, emit typed records. Stream via MessagePack (no JSON serialization bottleneck).",
+        "grounding": "Blueprint 'The Parser'/'Three Pillars'; NBSOURCE-030 INGEST-CLAIM-001; context matrix envctl+nu_plugin row."
+      },
+      {
+        "pillar": "Buffer (redb)",
+        "action": "nu_plugin writes parsed blocks into the local redb staging buffer at low latency; BLAKE3 content hashing acts as the deduplication cache so identical blocks are never re-processed.",
+        "grounding": "Blueprint 'The Buffer'; redb dedup cache (blueprint section 4, BLAKE3); STORE-001 transient class; context matrix redb row 'Exact Key (BLAKE3 Hash for cache)'."
+      },
+      {
+        "pillar": "Bridge (envctl)",
+        "action": "envctl pulls blocks from the redb buffer, attaches provenance, computes/attaches SHA-256 content identity, and commits code + metadata + (where in scope) vectors into PostgreSQL STAGING tables. Forward-only; PostgreSQL is the durable destination.",
+        "grounding": "Blueprint 'The Bridge'/envctl; NBSOURCE-015 VECTORFLOW-CLAIM-004..007; STORE-001 sync_direction 'redb -> envctl(embed) -> PostgreSQL (forward-only)'."
+      }
+    ],
+    "archive_first": "Before any pillar runs, a checksummed read-only archive of the source surface is recorded (PRESERVE-001 pattern: git bundle / file+byte counts / permissions / device+inode). The archive is the rollback and the reconstruction oracle; it is never modified."
+  },
+  "global_invariants": {
+    "archive_first_read_only": "Collectors open sources read-only; no write, rename, chmod, or delete on any source path. The only writes are to the archive root and the staging buffer.",
+    "single_content_identity": "Every collected entity is content-addressed by SHA-256 of its canonical bytes (BlobStore identity per ADOPT-001 / STORE-001). The redb dedup cache keys on BLAKE3 (blueprint). One entity => one identity across retries.",
+    "exactly_once": "Staging upserts are keyed on the stable identity; a resume skip-set of already-committed identities plus BLAKE3 dedup make re-runs idempotent (no duplicate rows, no recomputed inference).",
+    "restartable_checkpoints": "A per-class cursor and the resume skip-set are persisted in the envctl migration_db (targets, runs, run_events, approvals, checkpoints, rollbacks — PGREDB-002). An interrupted run resumes from the last committed checkpoint.",
+    "provenance_on_every_record": "Each staged record carries: source_path, collector_id, collection_run_id, collected_at, content_sha256, metadata_sha256, and source lineage (git commit/PR where applicable, per ADOPT-001 provenance).",
+    "secret_exclusion": "Credential VALUES and raw secrets are never collected. Only references/provenance are recorded (STORE-001 external-secret class: 'PostgreSQL stores references/provenance, never raw secrets; redb never holds secrets').",
+    "deterministic_ordering": "Every class declares a total order so repeated collection and repeated projection are byte-identical (feeds POSTGRES-008 'repeated projections are byte-identical').",
+    "lossless_round_trip": "For every class, staged records must reconstruct the archived source byte-for-byte (content), tuple-for-tuple (metadata), and in declared order — verified against the archive oracle before any authority claim."
+  },
+  "user_space_classes": [
+    {
+      "class_id": "USI-C01",
+      "class": "files",
+      "description": "Regular file byte content across the bounded user-space (text and binary handled uniformly as opaque bytes at this class; code-specific parse is USI-C03, non-text specifics are USI-C08).",
+      "bounded_collector": {
+        "collector_id": "COL-files",
+        "surface": "All regular files under the approved archive roots (workspace + user-data roots).",
+        "bounds": "Explicit root allow-list; symlinks recorded as edges (USI-C12), not followed across roots; max-depth and per-file byte cap for streaming (large blobs handed to USI-C08).",
+        "method": "Read-only open + streamed read; nu_plugin emits a typed file record."
+      },
+      "exclusion_policy": "Skip blocked_paths, VCS internal object stores (captured once via USI-C11 history), build/exhaust dirs (node_modules, target, .nix exhaust), and any file whose bytes match a secret pattern (recorded as reference only, never bytes).",
+      "stable_identity": "SHA-256 of file bytes (content address) bound to the normalized logical path; identity = (content_sha256, logical_path).",
+      "content_checksum": "SHA-256 over the exact file bytes (BlobStore identity, ADOPT-001).",
+      "metadata_checksum": "SHA-256 over the canonical JSON of {size, mode, uid, gid, mtime, ctime, device, inode} (PRESERVE-001 metadata set).",
+      "ordering_contract": "Lexicographic by normalized logical path; ties broken by content_sha256.",
+      "checkpoint": "Per-run cursor = last committed logical_path; resume skip-set = committed content_sha256 set (envctl migration_db).",
+      "exactly_once": "Idempotent upsert keyed on (content_sha256, logical_path); BLAKE3 dedup cache skips unchanged bytes.",
+      "failure_recovery": "Resume from cursor; redb ACID re-open recovers the buffer; re-read of unchanged bytes from the read-only working tree fills gaps (PGREDB-001 pattern).",
+      "lossless_reconstruction_test": "envctl projects staged bytes to a scratch path; assert projected SHA-256 == archived content_sha256 and metadata tuple matches (exact-byte materialization, blobstore_parity).",
+      "store_role": "redb buffer (transient) -> envctl bridge -> PostgreSQL staging blob/rows; bytes durable in BlobStore under SHA-256.",
+      "grounding": ["Blueprint Three Pillars", "ADOPT-001 BlobStore/SHA-256/exact-byte", "PRESERVE-001 metadata set", "STORE-001 durable relational class"]
+    },
+    {
+      "class_id": "USI-C02",
+      "class": "directories",
+      "description": "Directory tree structure and directory-level metadata; the containment skeleton of the user-space.",
+      "bounded_collector": {
+        "collector_id": "COL-dirs",
+        "surface": "Every directory under the approved roots.",
+        "bounds": "Same root allow-list and max-depth as USI-C01; mount boundaries not crossed.",
+        "method": "Read-only directory walk emitting a typed directory record with ordered child identities."
+      },
+      "exclusion_policy": "Skip blocked_paths and VCS internal directories except as captured by USI-C11; do not descend into excluded subtrees.",
+      "stable_identity": "Normalized logical directory path; identity = (logical_path, tree_position).",
+      "content_checksum": "Merkle-style SHA-256 over the ordered list of child identities (directories have no bytes; their content is ordered membership).",
+      "metadata_checksum": "SHA-256 over canonical {mode, uid, gid, mtime, ctime} of the directory node.",
+      "ordering_contract": "Depth-first, children in lexicographic order; parent recorded before children.",
+      "checkpoint": "Per-run cursor = last committed directory path; the tree is re-derivable, so the cursor is advisory.",
+      "exactly_once": "Idempotent upsert keyed on logical_path; the Merkle content_checksum detects membership drift between runs.",
+      "failure_recovery": "Re-walk is safe and cheap; membership recomputed deterministically from the read-only tree.",
+      "lossless_reconstruction_test": "Reconstruct the directory skeleton from staged records and assert the Merkle root over reconstructed children equals the archived Merkle root; feeds envctl module_path directory reconstruction (POSTGRES-008).",
+      "store_role": "redb buffer -> PostgreSQL staging directory table; canonical containment edges materialized in USI-C12.",
+      "grounding": ["Blueprint materialization 'module_path metadata to map the directory structure'", "POSTGRES-008 directory reconstruction", "PRESERVE-001 tree capture"]
+    },
+    {
+      "class_id": "USI-C03",
+      "class": "code modules",
+      "description": "Source code parsed into Abstract Syntax Trees: functions, structs, dependencies, and module_path metadata — the database-hosted-codebase substrate.",
+      "bounded_collector": {
+        "collector_id": "COL-code-ast",
+        "surface": "Source files (.rs, .toml, .nu, .ts, .vue, etc.) under the approved roots.",
+        "bounds": "Language-typed parse only; files that fail to parse are staged as raw USI-C01 bytes with a parse_failed flag (never dropped).",
+        "method": "Nushell parser / nu_plugin CodeDB produces AST blocks (functions/structs/deps) streamed via MessagePack into redb; module_path metadata attached."
+      },
+      "exclusion_policy": "Skip generated/exhaust code (napi-rs, wasm-pack) per gitkb/meta isolation; skip vendored dependency trees; never embed secret literals.",
+      "stable_identity": "(module_path, symbol_kind, symbol_name) + SHA-256 of the raw_code block; module_path is the reconstruction key.",
+      "content_checksum": "SHA-256 over the raw_code block bytes of each AST fragment.",
+      "metadata_checksum": "SHA-256 over canonical {module_path, language, symbol_kind, symbol_name, dependency_refs, byte_span}.",
+      "ordering_contract": "File order (USI-C01 path order), then AST document order (byte_span ascending) within each file.",
+      "checkpoint": "Per-run cursor = (logical_path, byte_span); resume skip-set = committed raw_code SHA-256; envctl migration_db checkpoint.",
+      "exactly_once": "Idempotent upsert keyed on raw_code SHA-256 + module_path; BLAKE3 dedup skips re-parsing identical blocks (blueprint dedup cache).",
+      "failure_recovery": "Re-parse from the read-only source is deterministic; redb ACID recovers buffered blocks; envctl replay re-derives commit state (PGREDB-002).",
+      "lossless_reconstruction_test": "envctl concatenates raw_code blocks by module_path back into complete .rs/.toml/.nu files (blueprint 4-step materialization) and asserts reconstructed-file SHA-256 == archived file SHA-256 (byte-exact).",
+      "store_role": "nu_plugin -> redb buffer -> envctl embed+bridge -> PostgreSQL staging code rows (raw_code, module_path, dependency edges; embeddings deferred to POSTGRES-005).",
+      "grounding": ["Blueprint Three Pillars / Ingestion Pipeline (AST fragments, module_path)", "NBSOURCE-030 INGEST-CLAIM-001/003", "STORE-001 durable relational class (code AST/rows)", "POSTGRES-008 materialization"]
+    },
+    {
+      "class_id": "USI-C04",
+      "class": "configuration",
+      "description": "Configuration files and declared environment shape: toml/json/yaml, dotfiles, .meta.yaml, Cargo.toml, tsconfig, capability manifests.",
+      "bounded_collector": {
+        "collector_id": "COL-config",
+        "surface": "Recognized configuration files under the approved roots.",
+        "bounds": "Parsed as typed key trees where possible; otherwise staged as raw bytes (USI-C01) with a config flag.",
+        "method": "Read-only parse to typed key/value tree; secret values redacted to references at collection time."
+      },
+      "exclusion_policy": "Redact credential VALUES and raw secrets to a reference token (STORE-001 external-secret class); never stage secret material.",
+      "stable_identity": "(logical_path, config_format) + SHA-256 of the redacted canonical bytes.",
+      "content_checksum": "SHA-256 over the redacted canonical config bytes.",
+      "metadata_checksum": "SHA-256 over {logical_path, config_format, redaction_map_digest, size, mode}.",
+      "ordering_contract": "Logical path order; within a file, canonical key order of the format.",
+      "checkpoint": "Cursor = last committed config logical_path; skip-set = committed redacted-content SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on (logical_path, redacted content_sha256).",
+      "failure_recovery": "Re-parse from read-only source; redaction is deterministic given the secret-pattern set.",
+      "lossless_reconstruction_test": "Reconstruct the redacted config file and assert redacted-bytes SHA-256 == archived redacted SHA-256; secret positions round-trip as reference tokens with no value loss beyond the intentional redaction (recorded in redaction_map).",
+      "store_role": "redb buffer -> PostgreSQL staging config table; secret references only.",
+      "grounding": ["STORE-001 external-secret class (references, never raw secrets)", "Meta-repo .meta.yaml / Cargo.toml conventions", "task blocked_paths: credential values / raw secrets"]
+    },
+    {
+      "class_id": "USI-C05",
+      "class": "planning tables",
+      "description": "The control-plane tabular state: task_graph.source.csv, generated/*.json control artifacts, GitKB documents, North Star anchors, proof URIs.",
+      "bounded_collector": {
+        "collector_id": "COL-planning",
+        "surface": "planning-spine-v0/generated/**, proof_records/**, .kb/ documents, control CSV/JSON.",
+        "bounds": "Read-only snapshot; this collector is the ingestion feeder for the POSTGRES-003 database-native control plane.",
+        "method": "Typed-row extraction keyed on primary identity (task_id / slug / usage_id)."
+      },
+      "exclusion_policy": "Skip ephemeral scratch and non-control artifacts; no secret material present in control tables (already reference-only).",
+      "stable_identity": "Primary key of the row (task_id, slug, usage_id, proof task_id) + SHA-256 of canonical row bytes.",
+      "content_checksum": "SHA-256 over canonical serialized row.",
+      "metadata_checksum": "SHA-256 over {source_artifact, primary_key, column_set, lifecycle_status}.",
+      "ordering_contract": "Primary-key ascending within each source artifact; artifacts in declared load order.",
+      "checkpoint": "Cursor = (source_artifact, last primary_key); skip-set = committed row SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on primary_key; deterministic projection back to CSV/JSON preserves the row (POSTGRES-003 deterministic projection contract).",
+      "failure_recovery": "Re-read from read-only control artifacts; rows are content-addressed so partial runs resume cleanly.",
+      "lossless_reconstruction_test": "Project staged rows back to CSV/JSON and assert byte-identical to the archived control artifact (POSTGRES-003 'CSV and documents become deterministic projections').",
+      "store_role": "redb buffer -> PostgreSQL staging control tables; becomes canonical under POSTGRES-003.",
+      "grounding": ["POSTGRES-003 gate (database-native control plane, deterministic projection)", "task_graph.source.csv", "pgauth_redb_usage_inventory.csv"]
+    },
+    {
+      "class_id": "USI-C06",
+      "class": "communications",
+      "description": "Message and correspondence histories: chat threads, AI conversation logs, and inter-agent messages present in the user-space.",
+      "bounded_collector": {
+        "collector_id": "COL-comms",
+        "surface": "Stored message logs and conversation archives under the approved roots.",
+        "bounds": "Archive-first snapshot of at-rest message stores only; no live capture of in-flight streams.",
+        "method": "Read-only extraction of normalized message records (thread, author, timestamp, body)."
+      },
+      "exclusion_policy": "Redact embedded secrets/tokens in message bodies to references; skip volatile live buffers (e.g., runtime aiMessages, which are excluded from persistence and are URL/session-ephemeral).",
+      "stable_identity": "(thread_id, author, sequence) + SHA-256 of the normalized message body.",
+      "content_checksum": "SHA-256 over the normalized message body bytes.",
+      "metadata_checksum": "SHA-256 over {thread_id, author, timestamp, sequence, channel}.",
+      "ordering_contract": "(thread_id ascending, monotonic timestamp, sequence) — total order per thread.",
+      "checkpoint": "Cursor = (thread_id, last sequence); skip-set = committed message SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on (thread_id, sequence, content_sha256).",
+      "failure_recovery": "Resume per-thread from last committed sequence; at-rest stores are re-readable.",
+      "lossless_reconstruction_test": "Reconstruct each thread in order and assert per-message SHA-256 and thread ordering match the archived snapshot.",
+      "store_role": "redb buffer -> PostgreSQL staging communications table.",
+      "grounding": ["POSTGRES-002 gate (communications class)", "LifeOS persistence whitelist (aiMessages excluded / ephemeral)", "context matrix communications rows"]
+    },
+    {
+      "class_id": "USI-C07",
+      "class": "application state",
+      "description": "At-rest application state: LifeOS persisted keys, the lifeos.db SQLite store, redb runtime state files, and envctl migration_db state.",
+      "bounded_collector": {
+        "collector_id": "COL-appstate",
+        "surface": "$APPDATA/lifeos/* persisted state, lifeos.db, redb state files, envctl migration_db.",
+        "bounds": "Consistent read-only snapshot (copy-then-read of DB files) so live processes are never blocked or mutated.",
+        "method": "Snapshot + typed extraction of state keys and rows."
+      },
+      "exclusion_policy": "Persist only whitelisted/meaningful state (per LIFEOS_PERSIST_KEYS discipline); exclude ephemeral keys (cmdkOpen, extraItems, pendingExpand); never stage secrets from keyring.",
+      "stable_identity": "(app, store, state_key, snapshot_epoch) + SHA-256 of canonical value.",
+      "content_checksum": "SHA-256 over the canonical serialized state value.",
+      "metadata_checksum": "SHA-256 over {app, store, state_key, snapshot_epoch, source_file}.",
+      "ordering_contract": "(store, state_key) ascending within a snapshot_epoch.",
+      "checkpoint": "Cursor = (store, last state_key); snapshot_epoch pins consistency; skip-set = committed value SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on (store, state_key, snapshot_epoch); redb runtime classes (PGREDB-001/002) are inventoried, not reclassified.",
+      "failure_recovery": "Re-open the pinned snapshot; redb ACID and envctl replay re-derive state; PostgreSQL PITR covers committed staging.",
+      "lossless_reconstruction_test": "Reconstruct the state map from staged rows and assert value SHA-256 parity against the snapshot; for redb-durable classes, blobstore_parity SHA-256 symmetry is the reconstruction proof.",
+      "store_role": "redb buffer -> PostgreSQL staging app-state table; existing durable redb classes remain owned by redb until a verified STORE-001 cutover.",
+      "grounding": ["STORE-001 transient class + PGREDB-001/002 (durable redb owners, not silently reclassified)", "CLAUDE.md storage layer (lifeos.db) and persistence whitelist", "STORE-001 recovery_source PostgreSQL PITR"]
+    },
+    {
+      "class_id": "USI-C08",
+      "class": "media and blob references",
+      "description": "Non-text and large-binary assets: images, audio, video, archives, and any opaque blob; represented as a reference plus non-text metadata, with bytes content-addressed.",
+      "bounded_collector": {
+        "collector_id": "COL-media",
+        "surface": "Files classified as binary/non-text or exceeding the streaming byte cap of USI-C01.",
+        "bounds": "Bytes never decoded/transformed; only measured and hashed; sidecar metadata (MIME, dimensions where cheaply detectable) recorded without decoding content.",
+        "method": "Read-only streamed hash + non-text metadata sidecar; bytes handed to the BlobStore."
+      },
+      "exclusion_policy": "Skip blocked_paths; do not attempt to parse or transcode; do not extract secrets from binary payloads.",
+      "stable_identity": "SHA-256 of blob bytes (content address); identity = (content_sha256, logical_path); a blob reference row points at the BlobStore entry.",
+      "content_checksum": "SHA-256 over the exact blob bytes (BlobStore identity).",
+      "metadata_checksum": "SHA-256 over {mime_type, byte_size, logical_path, mode, mtime} (non-text metadata).",
+      "ordering_contract": "Logical path order; ties by content_sha256.",
+      "checkpoint": "Cursor = last committed logical_path; skip-set = committed blob content_sha256 (large-blob-safe resume).",
+      "exactly_once": "Content addressing collapses duplicate blobs to one BlobStore entry; reference rows dedup on (content_sha256, logical_path).",
+      "failure_recovery": "Re-hash from read-only source; BlobStore SHA-256 identity makes partial transfers self-correcting (blobstore_parity).",
+      "lossless_reconstruction_test": "Materialize the blob from the BlobStore by content_sha256 and assert byte-identical to the archived blob; metadata sidecar round-trips exactly.",
+      "store_role": "redb buffer / BlobStore (SHA-256) -> PostgreSQL staging blob-reference rows; bytes in the content-addressed BlobStore (PgStore parity target).",
+      "grounding": ["ADOPT-001 BlobStore / SHA-256 identity / exact-byte materialization", "POSTGRES-002 gate (media and blob references)", "STORE-001 durable relational class"]
+    },
+    {
+      "class_id": "USI-C09",
+      "class": "identities",
+      "description": "Principals and entity identity keys: OS accounts, LifeOS accounts (accounts table), git author identities, and the minted stable identities that bind every collected entity.",
+      "bounded_collector": {
+        "collector_id": "COL-identities",
+        "surface": "accounts table / account.json, git author metadata, OS ownership (uid/gid) referenced by permissions.",
+        "bounds": "References and non-secret attributes only; identity-key minting contract for all classes lives here.",
+        "method": "Read-only extraction of principals + deterministic identity-URN minting for entities."
+      },
+      "exclusion_policy": "Never collect credentials, keyring material, or private keys; store principal references and public identity attributes only (STORE-001 external-secret class).",
+      "stable_identity": "Principal URN = (identity_domain, natural_key) e.g. os-account:uid, lifeos-account:id, git-author:email; entity identities = content-addressed keys minted per class.",
+      "content_checksum": "SHA-256 over the canonical principal attribute tuple.",
+      "metadata_checksum": "SHA-256 over {identity_domain, natural_key, display_attributes, source}.",
+      "ordering_contract": "(identity_domain, natural_key) ascending.",
+      "checkpoint": "Cursor = last committed principal URN; skip-set = committed principal SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on principal URN; identity minting is a pure function of content so it is inherently idempotent.",
+      "failure_recovery": "Re-derive principals from the read-only account/state snapshot; identity minting is deterministic and replayable.",
+      "lossless_reconstruction_test": "Reconstruct the principal set and assert every collected entity's foreign key resolves to exactly one principal URN with matching attribute SHA-256; no orphan identities.",
+      "store_role": "redb buffer -> PostgreSQL staging identity table; the durable identity anchor for USI-C10/C11/C12 foreign keys.",
+      "grounding": ["STORE-001 durable relational class (identities)", "CLAUDE.md storage layer accounts migration (account.json -> accounts table)", "POSTGRES-002 gate (identities)"]
+    },
+    {
+      "class_id": "USI-C10",
+      "class": "permissions",
+      "description": "Access and ownership metadata: POSIX mode bits, uid/gid ownership, and ACLs attached to files and directories.",
+      "bounded_collector": {
+        "collector_id": "COL-permissions",
+        "surface": "stat() metadata for every USI-C01 file and USI-C02 directory, plus ACL entries where present.",
+        "bounds": "Metadata only; no permission is changed on any source (read-only stat).",
+        "method": "Read-only stat/getfacl emitting a permission tuple per entity."
+      },
+      "exclusion_policy": "Skip entities excluded upstream; do not attempt privilege escalation to read protected metadata (record access_denied provenance instead of failing silently).",
+      "stable_identity": "(entity_identity, permission_scheme) where entity_identity is the USI-C01/C02 identity and scheme in {posix, acl}.",
+      "content_checksum": "SHA-256 over the canonical permission tuple {mode, uid, gid, acl_entries}.",
+      "metadata_checksum": "SHA-256 over {entity_identity, permission_scheme, captured_at}.",
+      "ordering_contract": "Entity order inherited from USI-C01/C02; scheme order posix before acl.",
+      "checkpoint": "Cursor = last committed entity_identity; skip-set = committed permission SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on (entity_identity, permission_scheme).",
+      "failure_recovery": "Re-stat from read-only source; permission tuples are deterministic.",
+      "lossless_reconstruction_test": "Reconstruct the permission tuple per entity and assert it equals the archived stat tuple (PRESERVE-001 permission capture); reprojected files carry identical mode/owner (POSTGRES-008 permissions parity).",
+      "store_role": "redb buffer -> PostgreSQL staging permission table, foreign-keyed to USI-C09 principals and USI-C01/C02 entities.",
+      "grounding": ["STORE-001 durable relational class (permissions)", "PRESERVE-001 (permissions, device and inode)", "POSTGRES-008 (metadata/permissions in projection)"]
+    },
+    {
+      "class_id": "USI-C11",
+      "class": "history",
+      "description": "Temporal and version history: git commit graphs, refs, reflogs, worktrees, and filesystem timestamps — the time dimension of the user-space.",
+      "bounded_collector": {
+        "collector_id": "COL-history",
+        "surface": "Git repositories (all refs, branches, reflogs, worktrees) plus file mtime/ctime; git bundle as the archive form.",
+        "bounds": "Read-only; captured once per repo as an all-refs bundle (PRESERVE-001), avoiding per-object duplication with USI-C01.",
+        "method": "git bundle create --all + rev-list enumeration + reflog/worktree/status/fsck capture."
+      },
+      "exclusion_policy": "Do not rewrite or gc history; do not prune reflogs; secrets committed historically are flagged as references, not re-extracted as values.",
+      "stable_identity": "git object id (commit/tree/blob oid — already content-addressed by git); repo identity = origin URL + HEAD oid.",
+      "content_checksum": "SHA-256 of the git bundle (and native oid per object); the bundle is the byte-exact history archive.",
+      "metadata_checksum": "SHA-256 over {repo_identity, ref_map, reflog_digest, worktree_list, fsck_status}.",
+      "ordering_contract": "Git topological order (parent commit before child); refs in lexicographic order.",
+      "checkpoint": "Cursor = last committed commit oid in topo order; skip-set = committed oids (git is inherently content-addressed).",
+      "exactly_once": "Object oids dedup natively; re-bundling an unchanged repo yields the same oid set (idempotent).",
+      "failure_recovery": "Restore from the archived bundle + recorded commit id (PRESERVE-001 restore: 'recreate a branch only from the archived bundle and recorded commit ID').",
+      "lossless_reconstruction_test": "Clone/verify the bundle and assert every archived ref resolves to its recorded oid and git fsck is clean; full history round-trips.",
+      "store_role": "redb buffer / bundle archive -> PostgreSQL staging history tables (commit graph, refs) with oids as identity; PostgreSQL PITR covers committed staging.",
+      "grounding": ["PRESERVE-001 (git bundle, HEAD/branches/reflogs/worktrees/fsck; restore from bundle)", "STORE-001 durable relational class (histories, provenance)", "POSTGRES-002 gate (history)"]
+    },
+    {
+      "class_id": "USI-C12",
+      "class": "relationships",
+      "description": "The graph edges that connect entities: directory containment, code import/dependency edges, configuration references, and provenance links — the knowledge-graph fabric.",
+      "bounded_collector": {
+        "collector_id": "COL-edges",
+        "surface": "Derived during collection from USI-C02 containment, USI-C03 AST dependencies, USI-C04 config references, and provenance of every staged record.",
+        "bounds": "Edges reference only already-collected entity identities; dangling edges are rejected (referential integrity).",
+        "method": "Deterministic edge extraction keyed on (src_identity, edge_type, dst_identity)."
+      },
+      "exclusion_policy": "No edge is minted to an excluded/secret entity; provenance edges never carry secret values.",
+      "stable_identity": "SHA-256 of the canonical triple (src_identity, edge_type, dst_identity); edge_type in {contains, imports, depends_on, references, derived_from, provenance_of}.",
+      "content_checksum": "SHA-256 over the canonical edge triple + attributes.",
+      "metadata_checksum": "SHA-256 over {edge_type, src_class, dst_class, extracted_by_collector, run_id}.",
+      "ordering_contract": "(src_identity, edge_type, dst_identity) ascending — total order over triples.",
+      "checkpoint": "Cursor = last committed edge triple hash; skip-set = committed edge SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on the triple hash; a given relationship is minted exactly once.",
+      "failure_recovery": "Edges are pure functions of the collected entities; re-derive deterministically after a crash.",
+      "lossless_reconstruction_test": "Rebuild the graph from staged edges and assert containment reconstructs the USI-C02 tree and imports reconstruct the USI-C03 dependency set; no edge references a missing entity (Causal Dependency Edges intact).",
+      "store_role": "redb buffer -> PostgreSQL staging edge table (feeds RuVector GNN causal edges); vector/graph semantics deferred to POSTGRES-005.",
+      "grounding": ["Blueprint (Causal Dependency Edges, knowledge graph, module_path dependencies)", "context matrix (graph structures / GNN causal edges)", "POSTGRES-002 gate (relationships)"]
+    },
+    {
+      "class_id": "USI-C13",
+      "class": "domain records",
+      "description": "Application-domain structured records not covered by the physical classes: LifeOS content items, notes/journal/task entries, media catalog rows, and other typed domain rows.",
+      "bounded_collector": {
+        "collector_id": "COL-domain",
+        "surface": "Structured domain stores (LifeOS data layer records, app databases, typed record files).",
+        "bounds": "Typed row extraction per domain schema; unknown domains staged as raw records (USI-C01) with a domain_unclassified flag (never dropped).",
+        "method": "Read-only typed extraction keyed on domain natural key."
+      },
+      "exclusion_policy": "Redact secret fields to references; skip ephemeral/derived caches that are regenerable from other classes.",
+      "stable_identity": "(domain, record_type, natural_key) + SHA-256 of the canonical record.",
+      "content_checksum": "SHA-256 over the canonical serialized domain record.",
+      "metadata_checksum": "SHA-256 over {domain, record_type, natural_key, schema_version, source_store}.",
+      "ordering_contract": "(domain, record_type, natural_key) ascending.",
+      "checkpoint": "Cursor = (domain, record_type, last natural_key); skip-set = committed record SHA-256.",
+      "exactly_once": "Idempotent upsert keyed on (domain, record_type, natural_key, content_sha256).",
+      "failure_recovery": "Re-read from the read-only domain store; content addressing makes partial runs resumable.",
+      "lossless_reconstruction_test": "Project staged domain rows back to their source shape and assert per-record SHA-256 and ordering match the archived store.",
+      "store_role": "redb buffer -> PostgreSQL staging domain tables.",
+      "grounding": ["POSTGRES-002 gate (domain records)", "LifeOS data.js content layer (LIFEOS_DATA items)", "context matrix relational-metadata rows"]
+    }
+  ],
+  "cross_cutting_contracts": {
+    "staging_destination": {
+      "buffer": "redb transient staging buffer (STORE-001 transient tier) — first landing zone for all collectors; never the durable authority for a PostgreSQL-owned class.",
+      "durable_staging": "PostgreSQL staging tables committed by envctl (forward-only bridge); BlobStore holds content-addressed bytes under SHA-256.",
+      "no_cutover_here": "Staging is pre-authority. The authority switch and retirement of flat files as editable source is POSTGRES-010 under the STORE-001 verified-cutover invariant; nothing here reclassifies a durable redb class (PGREDB-001/002)."
+    },
+    "provenance_model": {
+      "per_record_fields": ["source_path", "collector_id", "collection_run_id", "collected_at", "content_sha256", "metadata_sha256", "source_lineage (git commit/PR where applicable)"],
+      "grounding": "ADOPT-001 provenance (source commit/PR per capability); STORE-001 invariant 'Provenance preserved'."
+    },
+    "checkpoint_protocol": {
+      "store": "envctl migration_db (targets, runs, run_events, approvals, checkpoints, rollbacks — PGREDB-002).",
+      "cursor": "Per-class monotonic cursor + resume skip-set of committed identities (PGREDB-001 resume skip-set; ADOPT-001 resumable capture).",
+      "restart": "An interrupted run resumes from the last committed checkpoint with no re-collection of committed identities and no gaps."
+    },
+    "exactly_once_semantics": {
+      "mechanism": "Content-addressed SHA-256 identity + idempotent upsert keyed on identity + BLAKE3 dedup cache (skip recompute) + resume skip-set (skip re-collection).",
+      "result": "Any number of retries produces exactly one canonical staged record per source entity."
+    },
+    "exclusion_policy_global": {
+      "never_collected": ["credential values", "raw secrets", "private keys / keyring material", "blocked_paths", "generated exhaust (napi-rs / wasm-pack / node_modules / target)"],
+      "recorded_as_reference_only": ["secret positions in config/messages/domain records", "external-secret provenance"],
+      "grounding": "task blocked_paths; STORE-001 external-secret class."
+    },
+    "lossless_reconstruction_test_global": {
+      "oracle": "The archive-first checksummed snapshot (PRESERVE-001 pattern) is the reconstruction oracle.",
+      "procedure": "For every class, envctl projects staged records to a scratch target and asserts content_sha256 parity, metadata tuple equality, and declared ordering against the archive; code classes additionally assert AST-concatenation byte-exact file reconstruction via module_path.",
+      "pass_condition": "Zero byte-level, metadata-level, or ordering-level differences across all classes before any authority claim (feeds POSTGRES-009/010 round-trip proofs).",
+      "grounding": "ADOPT-001 exact-byte materialization; blobstore_parity SHA-256 symmetry; POSTGRES-008 byte-identical projection."
+    }
+  },
+  "gate_coverage": {
+    "gate": "Every user-space class has a bounded collector, exclusion policy, stable identity, content and metadata checksum, ordering contract, checkpoint, exactly-once behavior, failure recovery, and lossless reconstruction test.",
+    "class_count": 13,
+    "clause_to_field": {
+      "bounded collector": "user_space_classes[].bounded_collector",
+      "exclusion policy": "user_space_classes[].exclusion_policy",
+      "stable identity": "user_space_classes[].stable_identity",
+      "content and metadata checksum": "user_space_classes[].content_checksum + user_space_classes[].metadata_checksum",
+      "ordering contract": "user_space_classes[].ordering_contract",
+      "checkpoint": "user_space_classes[].checkpoint + cross_cutting_contracts.checkpoint_protocol",
+      "exactly-once behavior": "user_space_classes[].exactly_once + cross_cutting_contracts.exactly_once_semantics",
+      "failure recovery": "user_space_classes[].failure_recovery",
+      "lossless reconstruction test": "user_space_classes[].lossless_reconstruction_test + cross_cutting_contracts.lossless_reconstruction_test_global"
+    },
+    "goal_specific_requirements": {
+      "archive_first_no_source_change": "scope_boundary.no_source_mutation + global_invariants.archive_first_read_only",
+      "nushell_ast_parsing": "USI-C03 (COL-code-ast, nu_plugin CodeDB)",
+      "non_text_metadata": "USI-C08 (COL-media, non-text metadata sidecar)",
+      "content_hashes": "global_invariants.single_content_identity (SHA-256) + BLAKE3 dedup",
+      "ordering": "global_invariants.deterministic_ordering + per-class ordering_contract",
+      "provenance": "cross_cutting_contracts.provenance_model",
+      "restartable_checkpoints": "cross_cutting_contracts.checkpoint_protocol"
+    }
+  },
+  "product_execution_performed": false
+}

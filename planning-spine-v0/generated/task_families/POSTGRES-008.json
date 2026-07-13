@@ -1,0 +1,76 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-008",
+  "title": "envctl database-to-directory materialization defined",
+  "status": "defined",
+  "owner": "envctl Agent / Runtime Kernel",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define envctl as the deterministic projection engine that reconstructs a selected PostgreSQL branch and pinned version into a clean, disposable directory or build input, with authority flowing one direction only (PostgreSQL canonical -> filesystem derived), no reverse ownership edge, and no manual edits to generated output surviving re-projection.",
+  "work_items": [
+    {
+      "id": "POSTGRES-008-A",
+      "surface": "Selection contract (Query stage)",
+      "owner": "envctl Agent / Runtime Kernel",
+      "decision": "Parameterize every projection by an explicit pinned selector (production_branch_id + version_snapshot_id + status='production'); resolution is by immutable identity, never mutable 'latest', so a selector always names the same row set. Grounded in Architecture Blueprint materialization step 1 and Context Matrix row 25."
+    },
+    {
+      "id": "POSTGRES-008-B",
+      "surface": "Path and module-relationship reconstruction (Map stage)",
+      "owner": "envctl Agent / Runtime Kernel",
+      "decision": "Reconstruct the directory + module tree in memory purely from module_path metadata and causal dependency edges; the tree is a pure function of stored identities with no host path resolution. Verified by path-set hash equality and relationship-graph hash equality. Grounded in Architecture Blueprint materialization step 2 and section 5 (causal dependency edges)."
+    },
+    {
+      "id": "POSTGRES-008-C",
+      "surface": "Exact-byte content reconstruction (Concatenate stage)",
+      "owner": "lifeos codedb materialization",
+      "decision": "Join ordered raw_code blocks into complete files at exact bytes with no reformatting; ordering derives from stored block ordinals. Verified by composed BlobStore SHA-256 equality. Adopts proven Exact-byte materialization (ADOPT-001, nu_plugin PR#16, materialization_paths.rs, 7 tests)."
+    },
+    {
+      "id": "POSTGRES-008-D",
+      "surface": "Permissions and clean-target dump (Dump stage)",
+      "owner": "lifeos codedb materialization",
+      "decision": "Apply stored file-mode metadata; enforce symlink limits and fail closed on a non-clean target; never read existing output as input. Verified by materialization_paths.rs mode/symlink checks. Records the open cross-OS permission-parity gap (Linux-fallback lanes only)."
+    },
+    {
+      "id": "POSTGRES-008-E",
+      "surface": "Metadata stability",
+      "owner": "lifeos codedb ingestion",
+      "decision": "Capture module_path/language/status/mode metadata such that its projection is content-stable per version. Verified by captured_metadata_json_projection_is_stable. Adopts proven SHA-256 identity (ADOPT-001, nu_plugin PR#14, workspace_identity)."
+    },
+    {
+      "id": "POSTGRES-008-F",
+      "surface": "Byte-identical determinism harness",
+      "owner": "envctl Agent / Runtime Kernel",
+      "decision": "Define the repeat-projection parity method: project the pinned version twice and assert whole-tree SHA-256 workspace-identity equality. Live run against a provisioned PostgreSQL is an open dependency; the SHA-256 identity primitive is already green."
+    },
+    {
+      "id": "POSTGRES-008-G",
+      "surface": "Traceability manifest",
+      "owner": "lifeos envctl bridge",
+      "decision": "Emit a projection manifest mapping every emitted file to production_branch_id, version_snapshot_id, module_path, ordered block content hashes, file_mode, and composed_file_sha256; every hash resolves to a real PostgreSQL/BlobStore row. Adopts proven envctl export contract (ADOPT-001, nu_plugin PR#19, CDB035) and Cryptographic Witness Chain lineage."
+    },
+    {
+      "id": "POSTGRES-008-H",
+      "surface": "Disposability and no-reverse-ownership guarantee",
+      "owner": "envctl Agent / Runtime Kernel",
+      "decision": "Guarantee the output holds no authority: deletable with zero loss, regenerated wholesale from the pinned version, manual edits never merged and discarded on re-projection, and no write path back into PostgreSQL. Aligns with STORE-001 derived-projections class (write_authority = envctl projection read-only; recovery_source = re-projection) and the single-durable-writer invariant."
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-008-A",
+    "POSTGRES-008-B",
+    "POSTGRES-008-C",
+    "POSTGRES-008-D",
+    "POSTGRES-008-E",
+    "POSTGRES-008-F",
+    "POSTGRES-008-G",
+    "POSTGRES-008-H"
+  ],
+  "decomposition_targets": ["query", "projection", "metadata", "determinism", "cleanup"],
+  "completion_gate": "A selected database version deterministically reconstructs paths, bytes, metadata, ordering, permissions, and module relationships; repeated projections are byte-identical; projection output is disposable and traceable to database identities.",
+  "artifacts": [
+    "generated/envctl_materialization_plan.json",
+    "proof_records/POSTGRES-008.proof.json"
+  ],
+  "product_execution_performed": false
+}

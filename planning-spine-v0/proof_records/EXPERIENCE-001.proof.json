@@ -1,0 +1,82 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "EXPERIENCE-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every user-visible capability resolves through stable governed APIs; business logic and authority stay outside replaceable clients; offline, error, rollback, and proof behavior are specified.",
+  "gate_result": {
+    "design_artifact": "generated/task_families/EXPERIENCE-001.json",
+    "api_family_count": 7,
+    "api_families": [
+      "API-APPLICATION (application)",
+      "API-STATE (state)",
+      "API-COMMAND (command)",
+      "API-EVENT (event)",
+      "API-PLUGIN (plugin)",
+      "API-POLICY (policy)",
+      "API-DATA (data)"
+    ],
+    "api_families_match_goal_terms": {
+      "satisfied": true,
+      "evidence": "The seven families map one-to-one onto the seven API kinds named in the EXPERIENCE-001 goal: application, state, command, event, plugin, policy, data."
+    },
+    "clause_1_every_user_visible_capability_resolves_through_stable_governed_apis": {
+      "satisfied": true,
+      "user_visible_capability_count": 19,
+      "consumed_governed_contract_count": 34,
+      "user_visible_contract_count": 27,
+      "internal_only_contract_count": 7,
+      "evidence": "user_visible_capabilities enumerates 19 capabilities (view swarm status, semantic codebase search, knowledge-graph browse, AI chat, provider select, ingestion trigger+monitor, materialize+build release, temporal forecast, task/bead board, task handoff, prompt registry, policy/MinCut/merge verdicts, home/network control, storage health/recover, plugin list/invoke, secret-reference management, meta orchestration view, evidence-corpus browse, hardware inventory). Each names one or more of the 7 API families and exactly one governing bounded context + published contract from CONSOLIDATE-001. api_family_contract_coverage proves the inverse coverage: all 34 consumed governed contracts (of the 36 CONSOLIDATE-001 contracts; 2 BC-UI-PRESENTATION contracts define the client role) are fronted by an API family — 27 user-visible, 7 internal-only — so no user-visible capability lacks a governed API and no governed contract is unreachable."
+    },
+    "clause_2_business_logic_and_authority_stay_outside_replaceable_clients": {
+      "satisfied": true,
+      "evidence": "application_boundary.client_contract enumerates clients_may (render governed state/data, dispatch typed commands, subscribe to events, request policy verdicts, list/invoke plugins, read lifecycle/health, display proofs) vs clients_may_not (mutate durable state directly, embed business rules, become a second durable writer, hold raw secrets, bypass policy, re-derive authority locally). Every one of the 7 api_families declares an authority_location inside a Rust-native bounded context: API-COMMAND routes each mutation into the OWNING context under its STORE-001 authority and API-POLICY re-checks so a client cannot bypass; API-DATA writes redirect to API-COMMAND. The six workspaces + /settings are declared navigation groupings with no authority. Any client (Vue3+Tauri now; desktop/mobile/glasses/ambient later) is swappable without moving logic.",
+      "authority_locations": {
+        "durable relational + semantic macro-state": "PostgreSQL + RuVector (BC-PERSIST) — single durable writer",
+        "transient / WAL / dedup / geometry": "redb (BC-INGEST) — transient tier only",
+        "per-agent cognition": "AgentDB .rvf (BC-COGNITION) — non-authoritative for shared macro-state",
+        "derived projections": "envctl (BC-BRIDGE) — read-only from PostgreSQL",
+        "secrets / provenance": "OS keyring + committed pins (BC-SECRET) — client holds references only",
+        "policy / verification": "BC-INTEGRITY — verdicts only, no durable state",
+        "replaceable client": "BC-UI-PRESENTATION — owns no durable macro-state"
+      }
+    },
+    "clause_3_offline_error_rollback_and_proof_behavior_are_specified": {
+      "satisfied": true,
+      "specified_globally_and_per_family": true,
+      "offline": "redb application-level WAL + envctl forward-only flush on reconnect; reads degrade to redb-cached snapshots with a stale marker; durable writes queue and forward-flush; the client never becomes a durable authority (STORE-001 single-durable-writer invariant).",
+      "error": "Every API returns a typed Result; failures surface as calm second-person present-tense sentence-case strings (design voice), e.g. 'LifeOS couldn't reach the AI provider right now — try again.' and 'LifeOS couldn't initialize storage at <path> — see logs.'; no raw stack traces reach the client.",
+      "rollback": "Owning-context mechanisms — COW staging-branch discard (BC-PERSIST/BC-ORCHESTRATION), idempotent replayable migration re-run (BC-BRIDGE db_migrate), BlobStore SHA-256 parity reversal with redb retained until green (STORE-001 verified cutover), meta git snapshot restore (BC-CONTROL-PLANE); each Command API result carries a rollback_handle; the client requests, the core executes.",
+      "proof": "SHAKE256 Cryptographic Witness Chains rooted in PostgreSQL source vectors + causal-graph verification reject rootless claims; proof_ref on every mutation; Event API streams proof-carrying verdicts (MinCut isolation, merge-gate result); a client cannot forge a proof.",
+      "evidence": "cross_cutting_behavior specifies all four globally, and each of the 7 api_families entries also carries its own offline_behavior/error_behavior/rollback_behavior/proof_behavior fields."
+    },
+    "coverage_invariants": {
+      "every_governed_contract_fronted": true,
+      "every_user_visible_capability_has_governed_api": true,
+      "seven_api_families_present": true,
+      "authority_stays_server_side": true,
+      "offline_error_rollback_proof_specified_per_family_and_global": true
+    },
+    "store_001_alignment": {
+      "adopted_authority_model": "adopt-intended-tiered-architecture",
+      "single_durable_writer_preserved": true,
+      "note": "The API boundary enforces STORE-001 by construction — no API family lets a client mutate durable state or become a durable writer; PostgreSQL + RuVector remains the single durable owner; redb is the transient/WAL tier; durable-class cutover is server-side via verified BlobStore SHA-256 parity only."
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "EXPERIENCE-001 defines the stable Rust-native LifeOS application boundary and its seven-family governed API (application, state, command, event, plugin, policy, data), exactly matching the seven API kinds named in the task goal. The design artifact (generated/task_families/EXPERIENCE-001.json) fronts all 34 consumed governed contracts from CONSOLIDATE-001's 15 bounded contexts (36 published contracts; the 2 BC-UI-PRESENTATION contracts define the client role) and maps 19 enumerated user-visible capabilities — swarm status, semantic codebase search, knowledge-graph browse, AI chat/completion, provider selection, ingestion, materialize/build release, temporal forecast, task/bead board, task handoff, prompt registry, policy/MinCut/merge verdicts, home/network control, storage health, plugin list/invoke, secret-reference management, meta orchestration, evidence browse, and hardware inventory — each to one or more API families and exactly one governing context + contract, satisfying gate clause 1. Gate clause 2 holds because every API family names an authority_location inside a Rust-native bounded context: the Command API routes mutations into the owning context and the Policy API re-checks so a client cannot bypass; clients may only render, dispatch, subscribe, request verdicts, and display proofs, and the six workspaces + settings are authority-free navigation groupings — preserving STORE-001's single-durable-writer invariant (BC-UI-PRESENTATION and all future clients own no durable macro-state; PostgreSQL + RuVector stays the sole durable writer, redb the transient/WAL tier). Gate clause 3 holds because offline (redb WAL + envctl forward-only flush), error (typed Results + calm design-voice strings), rollback (COW discard, idempotent migration, SHA-256 parity reversal, meta snapshot restore — core-executed on client request), and proof (SHAKE256 witness chains rooted in PostgreSQL vectors + causal-graph verification + proof_ref on every mutation) are specified both globally and per API family. No product execution, no application-source mutation, no UI rewrite, no deployment, and no secrets access occurred — planning artifacts only.",
+  "artifact_paths": [
+    "generated/task_families/EXPERIENCE-001.json",
+    "proof_records/EXPERIENCE-001.proof.json"
+  ],
+  "grounded_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/capability_merge_matrix.json (CONSOLIDATE-001)",
+    "generated/task_graph.source.csv (EXPERIENCE-001 row; LIFEOS-010 parent)",
+    "src/lifeos/CLAUDE.md (existing Tauri/Vue app surfaces + calm error strings)"
+  ],
+  "product_execution_performed": false
+}

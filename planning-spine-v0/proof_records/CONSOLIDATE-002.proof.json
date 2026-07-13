@@ -1,0 +1,115 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "CONSOLIDATE-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each migration wave has bounded source and target paths, adapter and native stages, baseline and parity commands, data migration, rollback, proof, and no-loss acceptance.",
+  "gate_result": {
+    "wave_plan_artifact": "generated/task_families/CONSOLIDATE-002.json",
+    "wave_count": 10,
+    "waves": [
+      "CONSOLIDATE-002-W1",
+      "CONSOLIDATE-002-W2",
+      "CONSOLIDATE-002-W3",
+      "CONSOLIDATE-002-W4",
+      "CONSOLIDATE-002-W5",
+      "CONSOLIDATE-002-W6",
+      "CONSOLIDATE-002-W7",
+      "CONSOLIDATE-002-W8",
+      "CONSOLIDATE-002-W9",
+      "CONSOLIDATE-002-W10"
+    ],
+    "clause_every_wave_has_bounded_source_paths": {
+      "satisfied": true,
+      "evidence": "Each wave names verbatim peer source paths from generated/adopted_capabilities.source.csv, e.g. W1 crates/codedb_core (BlobStore) + crates/codedb_core/capture_policy.rs; W3 crates/codedb_store_redb (1761 ln, 14 tests); W4 crates/codedb_store_pg (1281 ln); W7 envctl crates/engine (DbSnapshot, migration_db, catalog); W8 crates/codedb_mcp (1764 ln) + envctl crates/{cli,gui,engine} db*.rs; W9 crates/codedb_rust_static + crates/codedb_build_capture (5503 ln); W10 envctl crates/ libSQL/RuVector/semantic/secrets."
+    },
+    "clause_every_wave_has_bounded_target_paths": {
+      "satisfied": true,
+      "evidence": "Each wave names LifeOS bounded-context targets from the target_lifeos_owner column, e.g. lifeos codedb store, lifeos secret boundary, lifeos codedb ingestion, lifeos postgres store (POSTGRES-004/005), lifeos codedb materialization, lifeos envctl bridge, lifeos migration engine, lifeos catalog, lifeos codedb MCP surface, lifeos envctl-db surface, lifeos codedb compiler lane, lifeos codedb build broker, lifeos external store (subordinate), lifeos postgres+ruvector (POSTGRES-005), lifeos intelligence substrate (INTEL-*), lifeos secret authority (external)."
+    },
+    "clause_every_wave_has_adapter_and_native_stages": {
+      "satisfied": true,
+      "evidence": "All 10 waves carry both an adapter_stage (land the peer capability behind a LifeOS anti-corruption port) and a native_stage (re-home as native LifeOS code). Two-stage adapter->native structure is present for every wave including W5 (dual-write window -> PostgreSQL sole writer) and W10 (disarmed port -> gated activation)."
+    },
+    "clause_every_wave_has_baseline_and_parity_commands": {
+      "satisfied": true,
+      "evidence": "Each wave carries baseline_commands at peer HEAD and parity_commands against the LifeOS-homed code, grounded in the ci_receipt and parity_gate columns, e.g. W1 blobstore_parity.rs (13) / test_plugin_secret_guard.nu; W3 test_redb_lifecycle.nu (14); W4 CDB106 PG17 (13) / test_mandatory_pg_parity.py; W5 live blobstore_parity.rs vs disposable PostgreSQL; W6 materialization_paths.rs (7) / CDB035; W8 policy_and_stdio.rs (24) / db_parity.rs; W9 compiler_observed_tests.rs (2/2) / capture_approved_fixture_build."
+    },
+    "clause_every_wave_has_data_migration": {
+      "satisfied": true,
+      "evidence": "Each wave specifies its data-migration handling with a concrete value. Nine waves specify 'none / abstraction / read-only / derived / carried-schema-versioned-backup' with the reason; exactly one wave (W5) specifies the real durable move: forward-copy every redb-durable source-blob into PostgreSQL, verify SHA-256 per blob, flip the durable writer only after the full set matches."
+    },
+    "clause_every_wave_has_rollback": {
+      "satisfied": true,
+      "evidence": "Each wave carries a rollback that keeps peers and the application unchanged (revert the LifeOS-homed module; peer crate untouched). W5's rollback is the load-bearing one: redb-durable is retained until PostgreSQL parity is green; on any SHA-256 mismatch the PostgreSQL writer is disarmed and redb remains the durable authority; no blob is deleted during cutover."
+    },
+    "clause_every_wave_has_proof": {
+      "satisfied": true,
+      "evidence": "Each wave names a planned per-wave proof (proof_records/CONSOLIDATE-002-W{1..10}) tied to the green parity command(s) for that wave. W5 and W10 additionally record the STORE-001 open-dependency proofs (live blobstore_parity.rs vs disposable PostgreSQL; live RuVector-in-PostgreSQL extension activation; secretd runbook)."
+    },
+    "clause_every_wave_has_no_loss_acceptance": {
+      "satisfied": true,
+      "evidence": "Each wave carries a no_loss_acceptance clause that preserves behavior, history, tests, and provenance, and carries forward the exact known_gap from the ADOPT map rather than dropping it (e.g. W4 dual-backend receipt absent; W6 multi-OS Linux-fallback; W8 symbols/deploy/watch unwired; W9 FAKE rustc / production broker unbuilt). W5 asserts every redb-durable blob maps to exactly one identical-SHA-256 PostgreSQL row with zero unmatched and redb retained (not deleted)."
+    },
+    "clause_dependency_ordered": {
+      "satisfied": true,
+      "evidence": "Every wave carries depends_on edges over the BlobStore seam; the linear execution_order [W1..W10] is a valid topological sort (W1 has no deps; W2->W1; W3->W1,W2; W4->W1,W3; W5->W3,W4; W6->W4,W5; W7->W4; W8->W5,W6; W9->W2,W4; W10->W4,W5 + external gates). No cycles."
+    },
+    "capability_coverage": {
+      "every_adopted_capability_placed_exactly_once": true,
+      "placed_capabilities": [
+        "BlobStore trait (W1)",
+        "Secret-output guards (W1)",
+        "SHA-256 identity (W2)",
+        "Resumable capture (W2)",
+        "redb source-blob store (W3)",
+        "PgStore (PostgreSQL parity) (W4)",
+        "verified durable-class cutover per STORE-001 (W5)",
+        "Exact-byte materialization (W6)",
+        "envctl export contract (W6)",
+        "Replayable migration engine (W7)",
+        "Catalog blob metadata (W7)",
+        "Bounded read-only MCP (W8)",
+        "envctl db code-graph surface (W8)",
+        "Compiler-observed evidence HIR/MIR/rustdoc (W9)",
+        "Sandboxed build/proc-macro capture (W9)",
+        "Remote libSQL store (W10)",
+        "PostgreSQL-RuVector component (W10)",
+        "Semantic consumer (W10)",
+        "Secrets engine / secretd / secretctl (W10)"
+      ],
+      "governing_row_excluded_from_waves": "Final store authority (STORE-001) is the settled decision that governs the waves, not a capability that migrates; it is referenced as governing_decision, not placed in a wave.",
+      "no_second_implementation_wave": true
+    },
+    "store_001_alignment": {
+      "governing_decision": "generated/store_relationship_decision.json (adopt-intended-tiered-architecture)",
+      "durable_class_owner": "PostgreSQL + RuVector (W4 lands PgStore; W5 makes it sole durable writer)",
+      "transient_class_owner": "redb (W3 lands it as transient; W5 demotes durable-on-redb to transient forward buffer after verified parity)",
+      "verified_cutover_invariant_operationalized_in": "W5 (live blobstore_parity.rs vs disposable PostgreSQL; class leaves redb-durable only after green)",
+      "no_unverified_cutover_for_semantic_and_external_classes": "W10 holds RuVector/semantic/libSQL/secrets behind disarmed ports until live RuVector-in-PostgreSQL activation, operator unfreeze, and secretd runbook clear",
+      "single_durable_writer_preserved": true,
+      "forward_only_sync_preserved": true,
+      "provenance_and_sha256_identity_preserved": true
+    },
+    "input_grounding": {
+      "capability_merge_matrix_json_present_on_disk": false,
+      "substitute_source_used": "generated/adopted_capabilities.source.csv (Complete ADOPT-001/ADOPT-002 capability map) + CONSOLIDATE-001 task_graph row (receiving bounded contexts)",
+      "note": "CONSOLIDATE-001's capability_merge_matrix.json is not yet materialized; every wave is grounded verbatim in the adopted-capabilities map (source paths, CI receipts, parity gates, boundaries, known gaps, target owners) and STORE-001, not invented."
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "CONSOLIDATE-002 defines ten dependency-ordered, upgrade-only migration waves in generated/task_families/CONSOLIDATE-002.json that physically merge all 18 preserved peer code capabilities (nu_plugin CodeDB lane + envctl bridge/engine lane, from generated/adopted_capabilities.source.csv) into the single LifeOS Rust application, plus the one verified STORE-001 durable cutover. The ordering is topological over the BlobStore seam: W1 lands the content-addressed BlobStore trait and secret-output guards as the anti-corruption port; W2 lands SHA-256 workspace identity + resumable capture; W3 lands the redb source-blob store as the transient tier; W4 lands PgStore as the durable backend; W5 executes the single verified durable cutover (forward-copy every redb-durable blob into PostgreSQL, verify SHA-256 per blob against a disposable PostgreSQL via blobstore_parity.rs, then flip PostgreSQL to sole durable writer and demote redb to transient buffer); W6 lands exact-byte materialization + the envctl export contract as the derived-projection path; W7 lands the replayable migration engine + catalog; W8 lands the read-only bounded MCP + envctl db code-graph surfaces; W9 lands the two EXTEND-class capabilities (compiler-observed evidence, sandboxed build capture) with their FAKE-rustc / unbuilt-broker gaps carried forward as tracked child work; W10 holds the deferred/externally-gated classes (remote libSQL store subordinate, PostgreSQL-RuVector component, semantic consumer, external secrets engine) behind disarmed ports until live RuVector-in-PostgreSQL extension activation, operator unfreeze of meta-ruvector, and the secretd runbook clear. Every wave carries all ten gate fields with concrete, source-cited values (bounded source path, bounded target path, adapter stage, native stage, baseline command, parity command, data migration, rollback, proof, no-loss acceptance), and each capability appears in exactly one wave with no second implementation wave. The store roles are not re-litigated: they are governed by the settled STORE-001 decision (PostgreSQL+RuVector canonical durable owner; redb transient tier; envctl forward-only bridge/projection; AgentDB non-authoritative cognition), and the single-durable-writer, forward-only-sync, and verified-cutover invariants are honored. CONSOLIDATE-001's capability_merge_matrix.json is not yet on disk, so the waves are grounded in the Complete ADOPT-001/ADOPT-002 adopted-capabilities map and the CONSOLIDATE-001 target bounded contexts rather than invented. No product code, schema, database, or peer mutation was performed; this is a planning artifact only.",
+  "artifact_paths": [
+    "generated/task_families/CONSOLIDATE-002.json",
+    "proof_records/CONSOLIDATE-002.proof.json"
+  ],
+  "inputs_grounded_in": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json",
+    "generated/adopted_capabilities.source.csv",
+    "generated/task_graph.source.csv"
+  ],
+  "product_execution_performed": false
+}

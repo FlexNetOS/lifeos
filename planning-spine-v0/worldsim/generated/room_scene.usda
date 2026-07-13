@@ -1,0 +1,17 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    metersPerUnit = 1
+    subLayers = [
+        @/home/flexnetos/meta/src/lifeos/planning-spine-v0/worldsim/generated/room.usdc@
+    ]
+    upAxis = "Z"
+)
+
+over "World" (
+    prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMassAPI"]
+)
+{
+    float physics:mass = 0
+}
+

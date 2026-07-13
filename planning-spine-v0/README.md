@@ -2,6 +2,29 @@
 
 This package converts the `lifeos-planning-spine v0` source brief into a buildable architecture contract for the first LifeOS execution spine.
 
+## Agent Quick Navigation
+
+- Vision index: [`1.0_VISION/README.md`](./1.0_VISION/README.md) ·
+  [[planning-spine-v0/1.0_VISION/README]]
+- Blueprint compatibility and session-course audit:
+  [`ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md`](./1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) ·
+  [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]
+- Raw NotebookLM artifact catalog:
+  [`1.0_VISION/Notebooklm/README.md`](./1.0_VISION/Notebooklm/README.md) ·
+  [[planning-spine-v0/1.0_VISION/Notebooklm/README]]
+- Ecosystem ownership map:
+  [`FOUNDATION_ECOSYSTEM_MAP.md`](./1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md) ·
+  [[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]]
+- Portability model:
+  [`FOUNDATION_META_PORTABILITY_MODEL.md`](./1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md) ·
+  [[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]]
+
+Desired architecture and implementation truth are separate axes. Explicit owner
+decisions govern desired targets. Checked source/tests, exact proof, normalized
+claims, maintained reviews, and raw NotebookLM inputs govern current-state truth
+in that order. Read the compatibility review before treating blueprint wording
+as implementation state.
+
 Status table:
 
 | Scope | Status | Meaning |
@@ -38,6 +61,12 @@ Preserved operating assumptions:
 | `07_MVP_VERTICAL_SLICE.md` | End-to-end MVP flow |
 | `08_EXECUTION_GATES.md` | Required gates before progress/completion |
 | `09_OPEN_QUESTIONS.md` | Explicit unresolved decisions |
+| `1.0_VISION/README.md` | Agent-oriented vision, authority, and evidence navigation |
+| `1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md` | Blueprint-to-CodeDB compatibility review and concurrent landing audit |
+| `1.0_VISION/Notebooklm/README.md` | Exact-byte raw artifact catalog and provenance boundary |
+| `1.0_VISION/Notebooklm/artifacts.meta.json` | Machine-readable artifact hashes, sizes, types, and lineage gaps |
+| `1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md` | Built/planned ecosystem ownership map |
+| `1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md` | Meta coordination and portability boundaries |
 | `rfcs/` | Post-v0 and proposal surfaces |
 | `schemas/` | JSON Schema contracts |
 | `examples/` | Valid example instances for every schema |
@@ -66,6 +95,9 @@ That verifier checks:
 - `examples/mvp-bundle.json` preserves the `v0` / `RFC` / `post-v0` boundary, and
 - the bundle's `intent -> goal -> authority assignment -> task -> worldseed -> simulation report -> cell -> proof -> decision -> action -> artifact` chain resolves live into `planning-spine-v0/state/mvp_bundle_report.json`, and
 - verifier authority resolves live into explicit agent/role/capability objects with proof-link integrity emitted to `planning-spine-v0/state/authority_integrity_report.json`.
+- vision-navigation Markdown and wiki links resolve inside the repository, and
+- every raw NotebookLM artifact matches the exact digest, byte count, and
+  newline count in `1.0_VISION/Notebooklm/artifacts.meta.json`.
 
 ## Implementation Boundary
 

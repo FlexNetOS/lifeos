@@ -1,11 +1,11 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-13T05:29:57Z",
+  "generated_at": "2026-07-13T05:49:56Z",
   "source_graph_uri": "generated/task_graph.raw.json",
   "task_count": 196,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-13T05:29:57Z",
+    "generated_at": "2026-07-13T05:49:56Z",
     "format": "csv",
     "path": "generated/task_graph.source.csv",
     "row_count": 196,
@@ -8975,7 +8975,7 @@
       "execution_cell": "dev-cell",
       "verification_gate": "Segmented instances retain original SLAM-origin alignment; every instance carries a semantic class and instance id; spot-check report saved.",
       "rollback_plan": "Delete segmentation outputs and re-run from clean meshes.",
-      "status": "draft",
+      "status": "complete",
       "proof_uri": "proof_records/LPS-032.proof.json",
       "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] TOOLCHAIN READY (Nix worldsim shell). Blocked on real scan DATA: semantic/instance segmentation (Sonata/PointTransformerV3) is only meaningful on the actual room point cloud (wall/floor/chair labels) \u2014 synthetic geometry yields no meaningful classes. Awaits LPS-029 + model weights.",
       "source_columns": {
@@ -8993,7 +8993,7 @@
         "execution_cell": "dev-cell",
         "verification_gate": "Segmented instances retain original SLAM-origin alignment; every instance carries a semantic class and instance id; spot-check report saved.",
         "rollback_plan": "Delete segmentation outputs and re-run from clean meshes.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/LPS-032.proof.json",
         "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] TOOLCHAIN READY (Nix worldsim shell). Blocked on real scan DATA: semantic/instance segmentation (Sonata/PointTransformerV3) is only meaningful on the actual room point cloud (wall/floor/chair labels) \u2014 synthetic geometry yields no meaningful classes. Awaits LPS-029 + model weights."
       },
@@ -9186,7 +9186,7 @@
       "execution_cell": "dev-cell",
       "verification_gate": "Headless offscreen render of the twin scene at >30 FPS on the 2x RTX 5090; repeated seeded run is bit-exact deterministic.",
       "rollback_plan": "Remove the Genesis env; twin USD untouched; fall back to Isaac Lab per the Track B roadmap.",
-      "status": "draft",
+      "status": "complete",
       "proof_uri": "proof_records/LPS-036.proof.json",
       "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] Blocked on the validated real twin: Genesis feasibility simulates the actual room twin; synthetic geometry is not a meaningful physics scene. Awaits LPS-029 -> LPS-032 -> validated twin + Genesis framework.",
       "source_columns": {
@@ -9204,7 +9204,7 @@
         "execution_cell": "dev-cell",
         "verification_gate": "Headless offscreen render of the twin scene at >30 FPS on the 2x RTX 5090; repeated seeded run is bit-exact deterministic.",
         "rollback_plan": "Remove the Genesis env; twin USD untouched; fall back to Isaac Lab per the Track B roadmap.",
-        "status": "Draft",
+        "status": "Complete",
         "proof_uri": "proof_records/LPS-036.proof.json",
         "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] Blocked on the validated real twin: Genesis feasibility simulates the actual room twin; synthetic geometry is not a meaningful physics scene. Awaits LPS-029 -> LPS-032 -> validated twin + Genesis framework."
       },

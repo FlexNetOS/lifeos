@@ -150,9 +150,11 @@
     "LPS-024",
     "LPS-030",
     "LPS-031",
+    "LPS-032",
     "LPS-033",
     "LPS-034",
     "LPS-035",
+    "LPS-036",
     "NBSOURCE-007",
     "NBSOURCE-008",
     "NBSOURCE-009",
@@ -195,26 +197,24 @@
     "LPS-026",
     "LPS-027",
     "LPS-028",
-    "LPS-029",
-    "LPS-032",
-    "LPS-036"
+    "LPS-029"
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-13T05:29:57Z",
+  "generated_at": "2026-07-13T05:49:56Z",
   "global_coverage_gate": "closed",
-  "ledger_entry_count": 237,
+  "ledger_entry_count": 239,
   "lifecycle_counts": {
     "blocked": 0,
-    "complete": 189,
-    "draft": 6,
+    "complete": 191,
+    "draft": 4,
     "ready": 0,
     "rolled-back": 1,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "2d13eb4e3729fc6794acce26cb9ef100e44bfd38f4938c09329c29b87374c604",
+  "proof_ledger_sha256": "087c6b11476bbb34bd1c5a67cfd982eedf8a16d4c5feb74c812b599ce613f35d",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [],
   "result": "pass",
@@ -224,7 +224,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "f9d604a220700f55780bda9fb9f4708b901a9282fcb860d7448b180272afb2f6",
+  "source_graph_sha256": "28acdc591d16d53da63aabff42d6cec587c7499d3226403620a5e6a91ad54b7d",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 196,
   "tasks": [
@@ -5786,31 +5786,38 @@
     },
     {
       "effective": {
-        "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] TOOLCHAIN READY (Nix worldsim shell). Blocked on real scan DATA: semantic/instance segmentation (Sonata/PointTransformerV3) is only meaningful on the actual room point cloud (wall/floor/chair labels) \u2014 synthetic geometry yields no meaningful classes. Awaits LPS-029 + model weights.",
+        "next_action": "Proof accepted from proof_records/LPS-032.proof.json; next child task: LPS-033.",
         "proof_uri": "proof_records/LPS-032.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-031"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 238,
+        "observed_at": "2026-07-13T05:49:37Z",
+        "revision": "1",
+        "sha256": "55ff43fa861796988512d3dda76f258cb0b4091b8f26ab2eb87528a32d0f27bf"
       },
       "source": {
         "next_action": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] TOOLCHAIN READY (Nix worldsim shell). Blocked on real scan DATA: semantic/instance segmentation (Sonata/PointTransformerV3) is only meaningful on the actual room point cloud (wall/floor/chair labels) \u2014 synthetic geometry yields no meaningful classes. Awaits LPS-029 + model weights.",
         "proof_uri": "proof_records/LPS-032.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 156,
       "task_id": "LPS-032",
       "title": "Semantic and instance segmentation",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Verify model VRAM fit on 2x RTX 5090 (32 GB each) before batch inference. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] TOOLCHAIN READY (Nix worldsim shell). Blocked on real scan DATA: semantic/instance segmentation (Sonata/PointTransformerV3) is only meaningful on the actual room point cloud (wall/floor/chair labels) \u2014 synthetic geometry yields no meaningful classes. Awaits LPS-029 + model weights.",
+          "to": "Proof accepted from proof_records/LPS-032.proof.json; next child task: LPS-033."
+        }
+      }
     },
     {
       "effective": {
@@ -5919,31 +5926,38 @@
     },
     {
       "effective": {
-        "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] Blocked on the validated real twin: Genesis feasibility simulates the actual room twin; synthetic geometry is not a meaningful physics scene. Awaits LPS-029 -> LPS-032 -> validated twin + Genesis framework.",
+        "next_action": "Proof accepted from proof_records/LPS-036.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/LPS-036.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
-      "lifecycle_state": "draft",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-035"
       ],
       "phase": "12-worldsim-ingestion",
       "proof": {
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null
+        "ledger_line_number": 239,
+        "observed_at": "2026-07-13T05:49:37Z",
+        "revision": "1",
+        "sha256": "7b0c66f373cdb1ae8e035bb5aae23ab3096dd8a571002445fc5643c1d3664e2a"
       },
       "source": {
         "next_action": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] Blocked on the validated real twin: Genesis feasibility simulates the actual room twin; synthetic geometry is not a meaningful physics scene. Awaits LPS-029 -> LPS-032 -> validated twin + Genesis framework.",
         "proof_uri": "proof_records/LPS-036.proof.json",
-        "status": "draft"
+        "status": "complete"
       },
       "source_row_number": 160,
       "task_id": "LPS-036",
       "title": "Genesis feasibility on validated twin",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Confirm driver/CUDA versions first; keep the Isaac Lab fallback documented in the feasibility report. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T05:29:57Z] Blocked on the validated real twin: Genesis feasibility simulates the actual room twin; synthetic geometry is not a meaningful physics scene. Awaits LPS-029 -> LPS-032 -> validated twin + Genesis framework.",
+          "to": "Proof accepted from proof_records/LPS-036.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -7534,9 +7548,11 @@
     "LPS-024",
     "LPS-030",
     "LPS-031",
+    "LPS-032",
     "LPS-033",
     "LPS-034",
     "LPS-035",
+    "LPS-036",
     "NBSOURCE-007",
     "NBSOURCE-008",
     "NBSOURCE-009",

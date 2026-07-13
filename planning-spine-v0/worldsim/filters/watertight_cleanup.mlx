@@ -1,0 +1,20 @@
+<!DOCTYPE FilterScript>
+<FilterScript>
+ <filter name="Remove Duplicate Faces"/>
+ <filter name="Remove Duplicate Vertices"/>
+ <filter name="Remove Unreferenced Vertices"/>
+ <filter name="Repair non Manifold Edges">
+  <Param name="method" value="0" type="RichEnum" enum_cardinality="2" enum_val0="Remove Faces" enum_val1="Split Vertices" description="Method"/>
+ </filter>
+ <filter name="Close Holes">
+  <Param name="maxholesize" value="300" type="RichInt" description="Max size to be closed"/>
+  <Param name="Selected" value="false" type="RichBool" description="Close holes with selected faces"/>
+  <Param name="NewFaceSelected" value="true" type="RichBool" description="Select the newly created faces"/>
+  <Param name="SelfIntersection" value="true" type="RichBool" description="Prevent creation of selfIntersecting faces"/>
+ </filter>
+ <filter name="Taubin Smooth">
+  <Param name="lambda" value="0.5" type="RichFloat" description="Lambda"/>
+  <Param name="mu" value="-0.53" type="RichFloat" description="mu"/>
+  <Param name="stepSmoothNum" value="10" type="RichInt" description="Smoothing steps"/>
+ </filter>
+</FilterScript>

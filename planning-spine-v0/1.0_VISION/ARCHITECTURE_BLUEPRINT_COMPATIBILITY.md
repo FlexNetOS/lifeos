@@ -1,12 +1,12 @@
 ---
 id: lifeos.vision.architecture-blueprint-compatibility
 title: Architecture Blueprint Compatibility — CodeDB Foundation Review
-description: Evidence-backed cross-reference between the NotebookLM architecture blueprint, the 2026-07-12 CodeDB change set, and its concurrent planning-spine landing.
+description: Evidence-backed cross-reference between the NotebookLM architecture blueprint, the CodeDB change set, and the current migration-package/task-table integration.
 type: architecture-cross-reference
-status: reviewed-with-blocking-session-divergence
+status: reviewed-current-integration-on-course-with-open-product-gaps
 lifecycle: active
 created: 2026-07-12
-updated: 2026-07-12
+updated: 2026-07-13
 review:
   implementation_repository: FlexNetOS/nu_plugin
   baseline_commit: d7cc4d830a5f8c1c51ac6850062b7066b5bbb9d2
@@ -16,6 +16,10 @@ review:
   planning_spine_baseline: 712272c0774564e96b7619ba5a11bd1cd346795b
   planning_spine_source_branch: planning-spine-nbstated-2026-07-12
   concurrent_snapshot_observed_at: 2026-07-13T03:54:51Z
+  integration_branch: task-migration-integrated-2026-07-13
+  integration_baseline: ee71a506957b92767591b19b9048840c4d530cb5
+  migration_source_commit: c84740532ded2a27ee283ea7a3a5f303eaeb61a7
+  reference_superset: planning-spine-v0/envctl-db-nu-plugin-migration-automation-package
 source_artifact:
   path: 1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md
   sha256: 014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827
@@ -70,11 +74,13 @@ This distinction is intentional: the blueprint is architecture input. Checked
 source, tests, receipts, and normalized claim verification remain the
 implementation authority.
 
-The concurrent planning-spine landing is **not on course as a whole**. Its raw
-artifact and navigation additions are sound after the metadata/link repairs in
-this worktree, but its `STORE-001` completion is not supported by the task's
-approval, simulation, or evidence gates. Do not use that completion to unlock a
-downstream store migration or PostgreSQL task.
+The earlier concurrent planning-spine snapshot was **not on course as a whole**
+because its `STORE-001` completion lacked the task's approval, simulation, and
+evidence gates. The current integration branch is **on course**: it preserves
+the raw Blueprint bytes, applies append-only proof corrections, keeps imported
+migration work review-only, requires actual human approval, and exposes exact
+navigation routes. It does not promote the Blueprint, copied package, source
+CSV statuses, or agent-authored approvals into implementation truth.
 
 ## Review boundary
 
@@ -151,10 +157,10 @@ Status vocabulary used below:
    environment facts, and materialized paths. It must not couple to CodeDB store
    internals or take ownership by implication.
 
-6. **Nix ownership is the current reproducibility proof.** Static musl or
-   closure bundling may later improve distribution, but the reviewed changes
-   prove pinned Nix outputs and sandbox execution, not universal Nix-store
-   independence.
+6. **Nix ownership is the current reproducibility proof.** Static musl and
+   closure bundling remain mandatory distribution targets, but the reviewed
+   changes prove only pinned Nix outputs and sandbox execution. Universal
+   Nix-store-independent distribution remains unverified.
 
 7. **Absolute guarantees remain hypotheses until proven.** “Mathematically
    impossible,” “absolute stability,” fixed microsecond/millisecond latency,
@@ -205,6 +211,40 @@ The integrated disposition is additive:
 This resolution preserves both feature sets without treating either a stale
 generated report or the historical concurrent-worktree audit as the current
 source of authority.
+
+## 2026-07-13 migration-package and task-table cross-reference
+
+The current integration applies the Blueprint's control-plane, ingestion,
+projection, portability, and integrity direction without importing its
+unproven absolute claims. The exact Blueprint bytes remain bound by SHA-256
+`014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827`.
+
+| Integrated change | Blueprint relationship | Current authority and disposition |
+|---|---|---|
+| Full moved envctl DB + nu_plugin migration package | Supplies concrete workflow, proof, recovery, visualization, parser/indexer, and migration design detail for the Blueprint's database-hosted development, Nushell/envctl bridge, COW, integrity, and release sections. | The [moved package](../envctl-db-nu-plugin-migration-automation-package/README.md) is the reference/workflow superset. Its statuses, proof files, and model approvals are evidence only. |
+| Eight source CSV tables | Implements exact-source ingestion and deterministic projection principles from the Blueprint's three-pillar ingestion and structured-data-streaming sections. | All 428 rows remain source-qualified: 106 graph rows, 106 scope rows, 140 requirement rows, and 76 command rows. Source status never becomes LifeOS status. |
+| 106 CDB WorkOrders | Converts source graph intent into bounded, hash-locked review packets consistent with the task-graph and isolated-execution direction. | Every `TASK-CDB000..105` record remains `review`, has zero execution proof, and requires actual human approval. |
+| `handoff.task.v1` correction | Preserves bounded packet exchange without mistaking a transport envelope for the larger workflow. | `handoff.task.v1` is exactly one WorkOrder envelope; `handoff.task.v1.collection` only wraps 106 envelopes. Neither is the superset. |
+| Mandatory feature catalog and reverse modal-language inventory | Turns architectural and package feature language into explicit review obligations instead of silently dropping recommended or conditional surfaces. | All 28 migration capabilities are mandatory. All 295 scoped `optional`/`should`/`may`/`must` occurrences across 87 sources are classified; zero normative occurrences are unclassified. Configurable activation does not make support or verification skippable. |
+| Human approval and proof boundary | Implements the Blueprint's integrity intent using the planning spine's stricter authority graph and proof ledger. | Package agents cannot approve LifeOS work. All 106 imported actions remain pending human approval, and imported execution-proof count remains zero. |
+| Append-only correction of unsupported completion | Reconciles Blueprint direction with the stronger rule that architecture prose is not completion proof. | Sixty-eight unsupported task completions are invalidated append-only; later valid proof revisions remain ordered. Current lifecycle truth is generated from the corrected source and ledger. |
+| Deterministic navigation graph | Supports the Blueprint's Meta/GitKB coordination direction while avoiding dependence on a stale external index. | Exact lookups distinguish canonical tasks, imported WorkOrders, mandatory capabilities, claims, sources, proofs, and files. Markdown/wiki links are repository-portable and unresolved local links fail verification. |
+| Host-independent navigation receipt | Enforces the Blueprint's reproducibility and portability direction at the generated-evidence boundary. | Runtime caches, bytecode, test caches, and PID files remain excluded from indexing but are never serialized into deterministic validation output. A clone-portability regression injects a host-only cache artifact and requires byte-identical graph, index, and validation receipts. |
+| Configuration-inventory console hardening | Applies the Blueprint's secret-aware observability direction without promoting the raw Blueprint to security proof. | The generator emits only allowlisted task ID, constant pass/fail status, and package-relative report path fields. The detailed report remains bounded to artifact files, secret values remain uncaptured, and the current package manifest/landing receipt is refreshed without rewriting historical proof. |
+| Bun/Vite/Tauri icon and build frontdoors | Aligns the UI/package surface with the Blueprint's Yazelix/Nix portability direction. | Bun and Bunx resolve through the Yazelix Nix profile; Vite runs Vue; Tauri package commands use Bun. This proves toolchain ownership, not universal static-musl portability. |
+
+Owner scope rule: no feature is optional. Raw or historical uses of
+`optional`, `recommended`, `should`, or `may` remain preserved as provenance,
+but they create mandatory implementation/review obligations unless the owner
+explicitly rejects the feature. Activation values can be configurable; parsing,
+validation, safe fallback, compatibility, and verification cannot be omitted.
+
+Machine routes: [landing contract](../ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) ·
+[task-table control plane](../task_tables/README.md) ·
+[mandatory capabilities](../task_tables/workflow/mandatory_capabilities.json) ·
+[modal-language inventory](../task_tables/workflow/mandatory_language_inventory.json) ·
+[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]] ·
+[[planning-spine-v0/task_tables/README]].
 
 ## Recent change map
 

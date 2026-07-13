@@ -1,0 +1,61 @@
+{
+  "artifact_paths": [
+    "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "generated/task_graph.source.csv",
+    "proof_records/GRAPH-005.proof.json",
+    "proof_records/corrections/architecture-blueprint-owner-ratification-2026-07-13/GRAPH-005-v4.proof.json"
+  ],
+  "gate_result": {
+    "blueprint_treated_as_architecture_input_only": true,
+    "explicit_owner_ratification_receipt_present": false,
+    "historical_revision_1_ledger_expected_sha256": "1d06edc08b843edf17684b6ca2caf7ac5cd32c2615cee3da2ffed3f598ac4e3c",
+    "historical_revision_1_ledger_sequence": 185,
+    "historical_revision_1_observed_sha256": "e991b760e43417667dc47c45131be4c50f74aaa9d15c28270feee6393b666efa",
+    "historical_revision_1_hash_mismatch_preserved": true,
+    "latest_proof_reports_owner_approval_gate": "closed",
+    "ledger_expected_proof_sha256": "5e1e788a6a07d86bd1a8a630ef3bb130be26f64537bc50c97d663b24baabfe49",
+    "ledger_history_rewritten": false,
+    "ledger_proof_hash_matches_observed_bytes": true,
+    "observed_latest_proof_sha256": "5e1e788a6a07d86bd1a8a630ef3bb130be26f64537bc50c97d663b24baabfe49",
+    "prior_ledger_sequence": 238,
+    "prior_pass_accepted_into_ledger": true,
+    "prior_pass_status_invalidated": true,
+    "prior_proof_verifier_acceptance_present": false,
+    "prior_revision_preserved": true,
+    "reason_codes": [
+      "verification-gate-not-met",
+      "owner-approval-gate-closed",
+      "depends-on-unsupported-owner-ratification-cascade"
+    ],
+    "required_simulation_receipt_present": false,
+    "simulation_required": true,
+    "source_status_restored": "Draft"
+  },
+  "invalidates": {
+    "ledger_accepted": true,
+    "ledger_hash_matches_observed_bytes": true,
+    "ledger_sequence": 238,
+    "observed_proof_sha256": "5e1e788a6a07d86bd1a8a630ef3bb130be26f64537bc50c97d663b24baabfe49",
+    "original_proof_uri": "proof_records/GRAPH-005.proof.json",
+    "proof_sha256": "5e1e788a6a07d86bd1a8a630ef3bb130be26f64537bc50c97d663b24baabfe49",
+    "proof_uri": "proof_records/GRAPH-005.proof.json",
+    "revision": "3"
+  },
+  "integration_reconciliation": {
+    "base_commit": "ee71a506957b92767591b19b9048840c4d530cb5",
+    "reconciled_at": "2026-07-13T05:57:37Z",
+    "reconciled_by": "Codex integration agent /root",
+    "upstream_ledger_sequence": 238
+  },
+  "invalidation_reason": "Revision 3 reports the owner-approval gate as closed even though the canonical GRAPH-005 verification gate requires owner-approval gates to pass; its lifecycle and proof counts also depend on the unsupported owner-ratification cascade.",
+  "observed_at": "2026-07-13T05:57:37Z",
+  "proof_summary": "Append-only revision 4 invalidates the latest revision-3 completion for GRAPH-005. The canonical source lifecycle is restored to Draft because revision 3 explicitly reports the owner-approval gate closed while the task requires that gate to pass. Revisions 1 through 3 remain ledger history. The differing sequence-185 revision-1 ledger and observed hashes remain recorded without fabricating the missing ledger-bound bytes.",
+  "restores_source_status": "Draft",
+  "revision": 4,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "invalidated",
+  "task_id": "GRAPH-005",
+  "verification_gate": "Fail closed when a prior pass lacks verifier acceptance, required simulation evidence, or explicit owner ratification; preserve revision 1 and restore the canonical source lifecycle.",
+  "verified_at": "2026-07-13T05:57:37Z",
+  "verified_by": "Codex integration agent /root"
+}

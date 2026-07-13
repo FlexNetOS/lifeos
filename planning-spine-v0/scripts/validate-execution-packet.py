@@ -58,7 +58,7 @@ def nonempty_text_list(value: Any) -> bool:
     return isinstance(value, list) and bool(value) and all(nonempty_text(item) for item in value)
 
 
-def validate_packet(packet: dict[str, Any], expect_task_id: str | None = None) -> list[ValidationIssue]:
+def validate_packet(packet: dict[str, Any], expect_task_id: str) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
 
     for field in REQUIRED_TEXT_FIELDS:
@@ -73,7 +73,7 @@ def validate_packet(packet: dict[str, Any], expect_task_id: str | None = None) -
             )
         )
 
-    if expect_task_id and packet.get("task_id") != expect_task_id:
+    if packet.get("task_id") != expect_task_id:
         issues.append(
             ValidationIssue("task_id", f"task_id must be {expect_task_id}; got {packet.get('task_id')!r}")
         )
@@ -135,7 +135,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--expect-task-id",
-        help="Optional task_id expected in the packet",
+        required=True,
+        help="Caller-bound task_id that must match the packet",
     )
     args = parser.parse_args()
 

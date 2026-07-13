@@ -6,7 +6,7 @@ type: architecture-cross-reference
 status: verified-with-gaps
 lifecycle: maintained
 created: 2026-07-08
-updated: 2026-07-12
+updated: 2026-07-13
 aliases:
   - Foundation portability model
   - Meta bootstrap model
@@ -237,6 +237,8 @@ Thesis (`lifeos-toolchain-and-dependency-bundle.md:4-8`): *"The portable release
 pinned source and lockfiles, with runtime dependencies copied into the LifeOS prefix only after proof.
 Ambient host tools are allowed for building only when their versions and provenance are recorded."* And
 `lifeos-portable-release-roadmap.md:108`: *"The release artifact is a **portable prefix, not a host root**."*
+The maintained requirement is **MUST**: the quoted `should` records source
+wording and does not downgrade the portable-release obligation.
 
 The bundle is a **layered prefix**, not a git-vendored cargo dir:
 - **Toolchain payloads** under `toolchains/rust/`, `toolchains/bun/`, `toolchains/node/`, `toolchains/nix/`,

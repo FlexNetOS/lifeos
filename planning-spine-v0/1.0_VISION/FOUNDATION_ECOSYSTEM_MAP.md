@@ -6,7 +6,7 @@ type: architecture-cross-reference
 status: verified-with-gaps
 lifecycle: maintained
 created: 2026-07-08
-updated: 2026-07-12
+updated: 2026-07-13
 aliases:
   - Foundation ecosystem map
   - LifeOS ownership map
@@ -198,14 +198,18 @@ dependency-light, host-identical data substrate the portable app needs.
 Every OS layer has a purpose-built crate family (`crates/ruvix/README.md:96-130`): **kernel** = RuVix
 Cognition Kernel (6 primitives, 12 syscalls, proof-gated; BUILT, v0.1); **hypervisor** = RVM (§5.2);
 **package/boot** = RVF cognitive container (AppImage model; BUILT, ADR-030); **mesh** = QuDAG; **memory** =
-AgentDB + kernel HNSW; **inference** = RuVLLM + rvm-gpu backends. The master plan files ruvix/rvm as
-*"optional L0 substrate"* (`…Consolidated v1.md:77`). **Operationally research-grade, AArch64-targeted —
-not a shipping x86_64 host OS.**
+AgentDB + kernel HNSW; **inference** = RuVLLM + rvm-gpu backends. The raw master
+plan calls ruvix/rvm an *"optional L0 substrate"* (`…Consolidated v1.md:77`),
+but the owner directive makes it mandatory planned capability. **Operationally
+research-grade, AArch64-targeted — not a shipping x86_64 host OS.** The gap blocks
+present adoption; it does not remove the capability from scope.
 
 ### 5.2 rvm = bare-metal AArch64 microhypervisor (pre-operational)
 *"No KVM. No Linux. No VMs. Bare-metal Rust."* Partitions = "coherence domains" gated by per-partition
-capability tables (`rvm-partition/src/cap_table.rs`, 256 caps); scheduler `rvm-sched`; WASM is an
-**optional** guest with a **7-call, no-POSIX/no-filesystem/no-exec** ABI (`rvm-wasm/src/host_functions.rs:103-160`).
+capability tables (`rvm-partition/src/cap_table.rs`, 256 caps); scheduler `rvm-sched`; WASM guest
+support is mandatory, currently limited to a **7-call, no-POSIX/no-filesystem/no-exec** ABI
+(`rvm-wasm/src/host_functions.rs:103-160`). Runtime activation may be configurable; support and
+compatibility proof are not skippable.
 Target `aarch64-unknown-none` (`Makefile:16`). **`HARDWARE_SWITCH_IMPLEMENTED = false`** (`rvm-sched/src/switch.rs:37`) —
 it is verified `no_std` libraries + a QEMU bring-up, not a running hypervisor executing real guests.
 

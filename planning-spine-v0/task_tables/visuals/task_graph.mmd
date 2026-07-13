@@ -1,0 +1,278 @@
+flowchart TD
+  %% Derived only from canonical/task_graph.normalized.json; source_status never controls dispatch.
+  TASK_CDB000["TASK-CDB000: Initialize execution package"]
+  TASK_CDB001["TASK-CDB001: Create AI navigation graph"]
+  TASK_CDB002["TASK-CDB002: Create readiness and stop gates"]
+  TASK_CDB003["TASK-CDB003: Create task graph and task-file map"]
+  TASK_CDB004["TASK-CDB004: Create command ledger and worklog"]
+  TASK_CDB005["TASK-CDB005: Generate manifest, checksums, link report"]
+  TASK_CDB006["TASK-CDB006: Write architecture document"]
+  TASK_CDB007["TASK-CDB007: Write schema document"]
+  TASK_CDB008["TASK-CDB008: Write command reference"]
+  TASK_CDB009["TASK-CDB009: Write integration contracts"]
+  TASK_CDB010["TASK-CDB010: Write security and unsafe capture policies"]
+  TASK_CDB011["TASK-CDB011: Write compatibility bridge docs"]
+  TASK_CDB012["TASK-CDB012: Write test and fixture matrix"]
+  TASK_CDB013["TASK-CDB013: Create Rust workspace skeleton"]
+  TASK_CDB014["TASK-CDB014: Implement codedb-core schemas"]
+  TASK_CDB015["TASK-CDB015: Implement redb store init"]
+  TASK_CDB016["TASK-CDB016: Implement redb schema version, locks, backup, restore"]
+  TASK_CDB017["TASK-CDB017: Implement filesystem scanner"]
+  TASK_CDB018["TASK-CDB018: Implement exact source metadata and blob policy"]
+  TASK_CDB019["TASK-CDB019: Implement cargo metadata capture"]
+  TASK_CDB020["TASK-CDB020: Implement Cargo source provenance capture"]
+  TASK_CDB021["TASK-CDB021: Implement cfg/feature/target/toolchain context"]
+  TASK_CDB022["TASK-CDB022: Implement static Rust item inventory"]
+  TASK_CDB023["TASK-CDB023: Implement macro_rules static inventory"]
+  TASK_CDB024["TASK-CDB024: Implement proc-macro static detection and gaps"]
+  TASK_CDB025["TASK-CDB025: Implement build.rs static detection and gaps"]
+  TASK_CDB026["TASK-CDB026: Implement static include/path edge detection"]
+  TASK_CDB027["TASK-CDB027: Implement native/linker static/gap rows"]
+  TASK_CDB028["TASK-CDB028: Implement no-mutation proof"]
+  TASK_CDB029["TASK-CDB029: Implement codedb CLI scan/export/schema"]
+  TASK_CDB030["TASK-CDB030: Implement Nushell plugin commands"]
+  TASK_CDB031["TASK-CDB031: Implement doctor checks"]
+  TASK_CDB032["TASK-CDB032: Implement bounded read-only MCP server"]
+  TASK_CDB033["TASK-CDB033: Implement unsafe build capture gate scaffold"]
+  TASK_CDB034["TASK-CDB034: Implement optional build/proc-macro raw log capture"]
+  TASK_CDB035["TASK-CDB035: Implement envctl export contract"]
+  TASK_CDB036["TASK-CDB036: Implement meta repo selection inputs"]
+  TASK_CDB037["TASK-CDB037: Implement Codex bridge docs and sample MCP config"]
+  TASK_CDB038["TASK-CDB038: Implement Yazelix placement docs"]
+  TASK_CDB039["TASK-CDB039: Implement runner proof contract"]
+  TASK_CDB040["TASK-CDB040: Implement GitKB/RTK/Kache/wild/Fenix docs"]
+  TASK_CDB041["TASK-CDB041: Create fixture matrix"]
+  TASK_CDB042["TASK-CDB042: Add deterministic scan tests"]
+  TASK_CDB043["TASK-CDB043: Add security/no-leak tests"]
+  TASK_CDB044["TASK-CDB044: Add no-mutation tests"]
+  TASK_CDB045["TASK-CDB045: Add unsafe capture tests"]
+  TASK_CDB046["TASK-CDB046: Run full local validation"]
+  TASK_CDB047["TASK-CDB047: Generate release manifest"]
+  TASK_CDB048["TASK-CDB048: Prepare handoff and backlog"]
+  TASK_CDB049["TASK-CDB049: Inspect Yazelix Nushell runtime bridge"]
+  TASK_CDB050["TASK-CDB050: Package nu_plugin_codedb as runtime tool"]
+  TASK_CDB051["TASK-CDB051: Validate host Nu vs Yazelix runtime Nu protocol"]
+  TASK_CDB052["TASK-CDB052: Implement transient nu --plugins smoke test"]
+  TASK_CDB053["TASK-CDB053: Implement temp-HOME plugin registry smoke test"]
+  TASK_CDB054["TASK-CDB054: Generate CodeDB extern/init bridge artifact"]
+  TASK_CDB055["TASK-CDB055: Verify generated initializer checksums/provenance"]
+  TASK_CDB056["TASK-CDB056: Extend syntax validator path for CodeDB fixtures"]
+  TASK_CDB057["TASK-CDB057: Add no-real-HOME plugin registration test"]
+  TASK_CDB058["TASK-CDB058: Add Yazelix launch smoke with CodeDB disabled"]
+  TASK_CDB059["TASK-CDB059: Add Yazelix launch smoke with CodeDB enabled"]
+  TASK_CDB060["TASK-CDB060: Add plugin stderr/trace secret-leak guard"]
+  TASK_CDB061["TASK-CDB061: Add redb lock/plugin-GC behavior test"]
+  TASK_CDB062["TASK-CDB062: Add Codex bounded CLI/MCP invocation smoke"]
+  TASK_CDB063["TASK-CDB063: Add envctl table rows for CodeDB runtime integration"]
+  TASK_CDB064["TASK-CDB064: Verify ZIP extraction proof before construction"]
+  TASK_CDB065["TASK-CDB065: Upgrade controlled task graph table and Markdown projection"]
+  TASK_CDB066["TASK-CDB066: Complete checklist evidence map"]
+  TASK_CDB067["TASK-CDB067: Validate and seal final execution package"]
+  TASK_CDB068["TASK-CDB068: Repair TASK_GRAPH CSV source-of-truth file linkage"]
+  TASK_CDB069["TASK-CDB069: Complete audit upgrade hardening without downgrades"]
+  TASK_CDB070["TASK-CDB070: Evidence audit and drift repair"]
+  TASK_CDB071["TASK-CDB071: Read-only foundation hardening"]
+  TASK_CDB072["TASK-CDB072: Lossless round-trip artifact generation"]
+  TASK_CDB073["TASK-CDB073: Change-plan graph without apply"]
+  TASK_CDB074["TASK-CDB074: Patch generation into isolated worktrees"]
+  TASK_CDB075["TASK-CDB075: Operator-approved apply gate"]
+  TASK_CDB076["TASK-CDB076: Bidirectional sync semantics"]
+  TASK_CDB077["TASK-CDB077: Macro expansion beyond static inventory"]
+  TASK_CDB078["TASK-CDB078: Proc-macro execution gate"]
+  TASK_CDB079["TASK-CDB079: Build-script execution gate"]
+  TASK_CDB080["TASK-CDB080: Generated OUT_DIR artifact reproduction"]
+  TASK_CDB081["TASK-CDB081: Symlink and platform materialization limits"]
+  TASK_CDB082["TASK-CDB082: Native and linker dynamic facts"]
+  TASK_CDB083["TASK-CDB083: MCP raw source and blob reads blocked"]
+  TASK_CDB084["TASK-CDB084: Stable anonymous and unstable syntax identity"]
+  TASK_CDB085["TASK-CDB085: Semantic and public API hashing"]
+  TASK_CDB086["TASK-CDB086: Store migrations and schema evolution"]
+  TASK_CDB087["TASK-CDB087: Source drift versus stored plans"]
+  TASK_CDB088["TASK-CDB088: Failed materialization and apply recovery"]
+  TASK_CDB089["TASK-CDB089: Operator approval and manual decision provenance"]
+  TASK_CDB090["TASK-CDB090: Final bidirectional release gate and manifest reseal"]
+  TASK_CDB091["TASK-CDB091: Research current polyglot parsing/indexing/tooling landscape"]
+  TASK_CDB092["TASK-CDB092: Design polyglot schema extension"]
+  TASK_CDB093["TASK-CDB093: Implement language detection and package marker inventory"]
+  TASK_CDB094["TASK-CDB094: Implement raw whole-repo byte/blob import fixtures"]
+  TASK_CDB095["TASK-CDB095: Add Tree-sitter/ast-grep parser-backed summary prototype"]
+  TASK_CDB096["TASK-CDB096: Add Python import surface fixture plan"]
+  TASK_CDB097["TASK-CDB097: Add Ruby import surface fixture plan"]
+  TASK_CDB098["TASK-CDB098: Add TypeScript/JavaScript import surface fixture plan"]
+  TASK_CDB099["TASK-CDB099: Add Go/Shell/Nix/config import surface fixture plan"]
+  TASK_CDB100["TASK-CDB100: Design single-binary Rust export crate generator"]
+  TASK_CDB101["TASK-CDB101: Prototype generated export crate verify/list/materialize commands"]
+  TASK_CDB102["TASK-CDB102: Add proof gates for DB import -> crate export -> materialize round trip"]
+  TASK_CDB103["TASK-CDB103: Add bounded Nu/CLI/MCP polyglot views"]
+  TASK_CDB104["TASK-CDB104: Add security/no-script-execution/no-credential-leak gates"]
+  TASK_CDB105["TASK-CDB105: Release/readiness gate for polyglot import V1.2 planning"]
+  TASK_CDB000 --> TASK_CDB001
+  TASK_CDB000 --> TASK_CDB002
+  TASK_CDB000 --> TASK_CDB003
+  TASK_CDB000 --> TASK_CDB004
+  TASK_CDB001 --> TASK_CDB005
+  TASK_CDB003 --> TASK_CDB005
+  TASK_CDB004 --> TASK_CDB005
+  TASK_CDB005 --> TASK_CDB006
+  TASK_CDB006 --> TASK_CDB007
+  TASK_CDB006 --> TASK_CDB008
+  TASK_CDB006 --> TASK_CDB009
+  TASK_CDB006 --> TASK_CDB010
+  TASK_CDB009 --> TASK_CDB011
+  TASK_CDB007 --> TASK_CDB012
+  TASK_CDB006 --> TASK_CDB013
+  TASK_CDB068 --> TASK_CDB013
+  TASK_CDB013 --> TASK_CDB014
+  TASK_CDB007 --> TASK_CDB014
+  TASK_CDB014 --> TASK_CDB015
+  TASK_CDB015 --> TASK_CDB016
+  TASK_CDB014 --> TASK_CDB017
+  TASK_CDB015 --> TASK_CDB017
+  TASK_CDB017 --> TASK_CDB018
+  TASK_CDB014 --> TASK_CDB019
+  TASK_CDB015 --> TASK_CDB019
+  TASK_CDB019 --> TASK_CDB020
+  TASK_CDB019 --> TASK_CDB021
+  TASK_CDB018 --> TASK_CDB022
+  TASK_CDB021 --> TASK_CDB022
+  TASK_CDB022 --> TASK_CDB023
+  TASK_CDB022 --> TASK_CDB024
+  TASK_CDB022 --> TASK_CDB025
+  TASK_CDB022 --> TASK_CDB026
+  TASK_CDB025 --> TASK_CDB027
+  TASK_CDB017 --> TASK_CDB028
+  TASK_CDB015 --> TASK_CDB029
+  TASK_CDB017 --> TASK_CDB029
+  TASK_CDB019 --> TASK_CDB029
+  TASK_CDB022 --> TASK_CDB029
+  TASK_CDB029 --> TASK_CDB030
+  TASK_CDB029 --> TASK_CDB031
+  TASK_CDB030 --> TASK_CDB031
+  TASK_CDB029 --> TASK_CDB032
+  TASK_CDB025 --> TASK_CDB033
+  TASK_CDB032 --> TASK_CDB033
+  TASK_CDB033 --> TASK_CDB034
+  TASK_CDB029 --> TASK_CDB035
+  TASK_CDB029 --> TASK_CDB036
+  TASK_CDB032 --> TASK_CDB037
+  TASK_CDB031 --> TASK_CDB038
+  TASK_CDB028 --> TASK_CDB039
+  TASK_CDB029 --> TASK_CDB039
+  TASK_CDB032 --> TASK_CDB039
+  TASK_CDB009 --> TASK_CDB040
+  TASK_CDB012 --> TASK_CDB041
+  TASK_CDB013 --> TASK_CDB041
+  TASK_CDB041 --> TASK_CDB042
+  TASK_CDB029 --> TASK_CDB042
+  TASK_CDB041 --> TASK_CDB043
+  TASK_CDB032 --> TASK_CDB043
+  TASK_CDB028 --> TASK_CDB044
+  TASK_CDB041 --> TASK_CDB044
+  TASK_CDB033 --> TASK_CDB045
+  TASK_CDB034 --> TASK_CDB045
+  TASK_CDB041 --> TASK_CDB045
+  TASK_CDB042 --> TASK_CDB046
+  TASK_CDB043 --> TASK_CDB046
+  TASK_CDB044 --> TASK_CDB046
+  TASK_CDB045 --> TASK_CDB046
+  TASK_CDB046 --> TASK_CDB047
+  TASK_CDB047 --> TASK_CDB048
+  TASK_CDB038 --> TASK_CDB049
+  TASK_CDB049 --> TASK_CDB050
+  TASK_CDB030 --> TASK_CDB050
+  TASK_CDB050 --> TASK_CDB051
+  TASK_CDB051 --> TASK_CDB052
+  TASK_CDB051 --> TASK_CDB053
+  TASK_CDB050 --> TASK_CDB054
+  TASK_CDB052 --> TASK_CDB054
+  TASK_CDB054 --> TASK_CDB055
+  TASK_CDB054 --> TASK_CDB056
+  TASK_CDB053 --> TASK_CDB057
+  TASK_CDB049 --> TASK_CDB058
+  TASK_CDB056 --> TASK_CDB058
+  TASK_CDB058 --> TASK_CDB059
+  TASK_CDB054 --> TASK_CDB059
+  TASK_CDB052 --> TASK_CDB060
+  TASK_CDB032 --> TASK_CDB060
+  TASK_CDB014 --> TASK_CDB061
+  TASK_CDB050 --> TASK_CDB061
+  TASK_CDB032 --> TASK_CDB062
+  TASK_CDB060 --> TASK_CDB062
+  TASK_CDB035 --> TASK_CDB063
+  TASK_CDB055 --> TASK_CDB063
+  TASK_CDB005 --> TASK_CDB064
+  TASK_CDB064 --> TASK_CDB065
+  TASK_CDB065 --> TASK_CDB066
+  TASK_CDB066 --> TASK_CDB067
+  TASK_CDB067 --> TASK_CDB068
+  TASK_CDB068 --> TASK_CDB069
+  TASK_CDB069 --> TASK_CDB070
+  TASK_CDB070 --> TASK_CDB071
+  TASK_CDB071 --> TASK_CDB072
+  TASK_CDB072 --> TASK_CDB073
+  TASK_CDB073 --> TASK_CDB074
+  TASK_CDB074 --> TASK_CDB075
+  TASK_CDB075 --> TASK_CDB076
+  TASK_CDB071 --> TASK_CDB077
+  TASK_CDB071 --> TASK_CDB078
+  TASK_CDB071 --> TASK_CDB079
+  TASK_CDB079 --> TASK_CDB080
+  TASK_CDB072 --> TASK_CDB081
+  TASK_CDB079 --> TASK_CDB082
+  TASK_CDB071 --> TASK_CDB083
+  TASK_CDB072 --> TASK_CDB084
+  TASK_CDB084 --> TASK_CDB085
+  TASK_CDB072 --> TASK_CDB086
+  TASK_CDB073 --> TASK_CDB087
+  TASK_CDB075 --> TASK_CDB088
+  TASK_CDB075 --> TASK_CDB089
+  TASK_CDB070 --> TASK_CDB090
+  TASK_CDB071 --> TASK_CDB090
+  TASK_CDB072 --> TASK_CDB090
+  TASK_CDB073 --> TASK_CDB090
+  TASK_CDB074 --> TASK_CDB090
+  TASK_CDB075 --> TASK_CDB090
+  TASK_CDB076 --> TASK_CDB090
+  TASK_CDB077 --> TASK_CDB090
+  TASK_CDB078 --> TASK_CDB090
+  TASK_CDB079 --> TASK_CDB090
+  TASK_CDB080 --> TASK_CDB090
+  TASK_CDB081 --> TASK_CDB090
+  TASK_CDB082 --> TASK_CDB090
+  TASK_CDB083 --> TASK_CDB090
+  TASK_CDB084 --> TASK_CDB090
+  TASK_CDB085 --> TASK_CDB090
+  TASK_CDB086 --> TASK_CDB090
+  TASK_CDB087 --> TASK_CDB090
+  TASK_CDB088 --> TASK_CDB090
+  TASK_CDB089 --> TASK_CDB090
+  TASK_CDB091 --> TASK_CDB092
+  TASK_CDB091 --> TASK_CDB093
+  TASK_CDB091 --> TASK_CDB094
+  TASK_CDB091 --> TASK_CDB095
+  TASK_CDB093 --> TASK_CDB096
+  TASK_CDB093 --> TASK_CDB097
+  TASK_CDB093 --> TASK_CDB098
+  TASK_CDB093 --> TASK_CDB099
+  TASK_CDB091 --> TASK_CDB100
+  TASK_CDB100 --> TASK_CDB101
+  TASK_CDB094 --> TASK_CDB102
+  TASK_CDB100 --> TASK_CDB102
+  TASK_CDB101 --> TASK_CDB102
+  TASK_CDB095 --> TASK_CDB103
+  TASK_CDB102 --> TASK_CDB104
+  TASK_CDB103 --> TASK_CDB104
+  TASK_CDB091 --> TASK_CDB105
+  TASK_CDB092 --> TASK_CDB105
+  TASK_CDB093 --> TASK_CDB105
+  TASK_CDB094 --> TASK_CDB105
+  TASK_CDB095 --> TASK_CDB105
+  TASK_CDB096 --> TASK_CDB105
+  TASK_CDB097 --> TASK_CDB105
+  TASK_CDB098 --> TASK_CDB105
+  TASK_CDB099 --> TASK_CDB105
+  TASK_CDB100 --> TASK_CDB105
+  TASK_CDB101 --> TASK_CDB105
+  TASK_CDB102 --> TASK_CDB105
+  TASK_CDB103 --> TASK_CDB105
+  TASK_CDB104 --> TASK_CDB105

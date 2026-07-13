@@ -1,0 +1,47 @@
+{
+  "artifact_paths": [
+    "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "generated/task_graph.source.csv",
+    "proof_records/PERSONAL-003.proof.json",
+    "proof_records/corrections/architecture-blueprint-owner-ratification-2026-07-13/PERSONAL-003-v2.proof.json"
+  ],
+  "gate_result": {
+    "blueprint_treated_as_architecture_input_only": true,
+    "explicit_owner_ratification_receipt_present": false,
+    "ledger_history_rewritten": false,
+    "prior_ledger_sequence": 200,
+    "prior_pass_accepted_into_ledger": true,
+    "prior_pass_status_invalidated": true,
+    "prior_proof_verifier_acceptance_present": false,
+    "prior_revision_preserved": true,
+    "reason_codes": [
+      "missing-verifier-acceptance",
+      "missing-required-simulation-receipt",
+      "depends-on-unsupported-owner-ratification-cascade"
+    ],
+    "required_simulation_receipt_present": false,
+    "simulation_required": true,
+    "source_status_restored": "Draft"
+  },
+  "invalidates": {
+    "ledger_accepted": true,
+    "ledger_hash_matches_observed_bytes": true,
+    "ledger_sequence": 200,
+    "observed_proof_sha256": "8707d1135bf1e255b4e2806a1109fc66e97fc8d25b96a8f6576dc12ec73b0cb7",
+    "original_proof_uri": "proof_records/PERSONAL-003.proof.json",
+    "proof_sha256": "8707d1135bf1e255b4e2806a1109fc66e97fc8d25b96a8f6576dc12ec73b0cb7",
+    "proof_uri": "proof_records/PERSONAL-003.proof.json",
+    "revision": "1"
+  },
+  "invalidation_reason": "Revision 1 had no verifier acceptance or required simulation receipt and participated in the unsupported STORE-001 owner-ratification cascade.",
+  "observed_at": "2026-07-13T05:35:07Z",
+  "proof_summary": "Append-only revision 2 invalidates the unsupported revision-1 completion for PERSONAL-003. The canonical source lifecycle is restored to Draft; revision 1 remains preserved as historical evidence and cannot authorize downstream execution.",
+  "restores_source_status": "Draft",
+  "revision": 2,
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "status": "invalidated",
+  "task_id": "PERSONAL-003",
+  "verification_gate": "Fail closed when a prior pass lacks verifier acceptance, required simulation evidence, or explicit owner ratification; preserve revision 1 and restore the canonical source lifecycle.",
+  "verified_at": "2026-07-13T05:35:07Z",
+  "verified_by": "Codex verifier agent /root/proof_integrity_audit"
+}

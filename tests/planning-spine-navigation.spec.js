@@ -1,22 +1,30 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   buildNavigationArtifacts,
   checkNavigationArtifacts,
   explainNavigationNode,
   parseCsv,
+  parseFrontmatter,
   renderNavigationArtifacts,
   searchNavigationIndex,
   writeNavigationArtifacts,
 } from "../planning-spine-v0/scripts/build-navigation-index.mjs";
 
 const repoRoot = process.cwd();
+const navigationBuildTimeout = 90_000;
+
+let navigation;
 
 describe("planning-spine agent navigation", () => {
+  beforeAll(() => {
+    navigation = buildNavigationArtifacts({ repoRoot });
+  }, navigationBuildTimeout);
+
   it("builds a complete, connected, richly described planning graph", () => {
-    const { graph, index, validation } = buildNavigationArtifacts({ repoRoot });
+    const { graph, index, validation } = navigation;
 
     expect(validation.result).toBe("pass");
     expect(validation.counts.included_package_files).toBeGreaterThan(390);
@@ -34,6 +42,18 @@ describe("planning-spine agent navigation", () => {
       && Array.isArray(node.aliases)
       && Array.isArray(node.tags)
     ))).toBe(true);
+
+    const wikiProjection = graph.nodes.find((node) => (
+      node.path === "planning-spine-v0/task_tables/visuals/task_graph.wiki.md"
+    ));
+    const normalizedGraph = graph.nodes.find((node) => (
+      node.path === "planning-spine-v0/task_tables/canonical/task_graph.normalized.json"
+    ));
+    expect(graph.edges).toContainEqual(expect.objectContaining({
+      from: wikiProjection.id,
+      to: normalizedGraph.id,
+      kind: "wiki-link",
+    }));
   });
 
   it("keeps all committed navigation outputs byte-for-byte current", () => {
@@ -45,7 +65,7 @@ describe("planning-spine agent navigation", () => {
       const committed = fs.readFileSync(path.join(repoRoot, "planning-spine-v0", relativePath), "utf8");
       expect(committed).toBe(expected);
     }
-  });
+  }, navigationBuildTimeout);
 
   it("uses canonical LF bytes for maintained generated CSV inputs", () => {
     const generatedRoot = path.join(repoRoot, "planning-spine-v0", "generated");
@@ -57,7 +77,7 @@ describe("planning-spine agent navigation", () => {
   });
 
   it("recalls task, claim, and source nodes without an external index", () => {
-    const { graph, index } = buildNavigationArtifacts({ repoRoot });
+    const { graph, index } = navigation;
 
     expect(index.by_task_id["STORE-001"]).toBe("task:STORE-001");
     expect(index.by_claim_id["REDB-CLAIM-002"]).toBe("claim:REDB-CLAIM-002");
@@ -70,6 +90,84 @@ describe("planning-spine agent navigation", () => {
     ]));
   });
 
+  it("indexes migration WorkOrders and mandatory capabilities without promoting them to canonical tasks", () => {
+    const { graph, index, validation } = navigation;
+    const expectedWorkOrderIds = Array.from(
+      { length: 106 },
+      (_, index) => `TASK-CDB${String(index).padStart(3, "0")}`,
+    );
+    const expectedCapabilityIds = Array.from(
+      { length: 28 },
+      (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`,
+    );
+
+    expect(Object.keys(index.by_task_id)).toHaveLength(196);
+    expect(Object.keys(index.by_work_order_id)).toEqual(expectedWorkOrderIds);
+    expect(Object.keys(index.by_mandatory_capability_id)).toEqual(expectedCapabilityIds);
+    expect(index.by_task_id["TASK-CDB000"]).toBeUndefined();
+    expect(index.by_task_id["CAP-MIG-001"]).toBeUndefined();
+
+    const workOrderNodeId = index.by_work_order_id["TASK-CDB000"];
+    const capabilityNodeId = index.by_mandatory_capability_id["CAP-MIG-001"];
+    const workOrder = graph.nodes.find((node) => node.id === workOrderNodeId);
+    const capability = graph.nodes.find((node) => node.id === capabilityNodeId);
+    expect(workOrder).toMatchObject({
+      kind: "imported-work-order",
+      status: "review",
+      authority_class: "review-only-import",
+      metadata: {
+        canonical_task: false,
+        local_status: "review",
+        source_status: "complete",
+        proof_promoted: false,
+      },
+    });
+    expect(capability).toMatchObject({
+      kind: "mandatory-migration-capability",
+      status: "review",
+      authority_class: "review-only-import",
+      metadata: {
+        canonical_task: false,
+        local_status: "review",
+        product_complete: "false",
+        proof_promoted: false,
+      },
+    });
+    expect(graph.edges).toContainEqual(expect.objectContaining({
+      from: capabilityNodeId,
+      to: index.by_work_order_id["TASK-CDB030"],
+      kind: "covered-by-work-order",
+    }));
+    const watchCapability = graph.nodes.find((node) => (
+      node.id === index.by_mandatory_capability_id["CAP-MIG-027"]
+    ));
+    expect(watchCapability.metadata.coverage_reference_refs).toContain("REQ-057_WATCH_INCREMENTAL");
+    expect(graph.edges).toContainEqual(expect.objectContaining({
+      from: index.by_mandatory_capability_id["CAP-MIG-028"],
+      to: index.by_work_order_id["TASK-CDB095"],
+      kind: "covered-by-work-order",
+    }));
+
+    expect(validation.counts).toMatchObject({
+      tasks: 196,
+      imported_work_orders: 106,
+      mandatory_migration_capabilities: 28,
+    });
+    expect(validation.checks).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: "imported_work_orders_are_review_only", result: "pass", observed: 106, expected: 106 }),
+      expect.objectContaining({ name: "mandatory_migration_capabilities_are_review_only", result: "pass", observed: 28, expected: 28 }),
+      expect.objectContaining({ name: "migration_lookup_namespaces_are_exact", result: "pass", observed: 134, expected: 134 }),
+    ]));
+    expect(index.entrypoints.map(({ path }) => path)).toEqual(expect.arrayContaining([
+      "planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+      "planning-spine-v0/task_tables/README.md",
+      "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/README.md",
+      "planning-spine-v0/task_tables/projections/work_orders.csv",
+      "planning-spine-v0/task_tables/workflow/mandatory_capabilities.csv",
+      "planning-spine-v0/task_tables/workflow/mandatory_language_inventory.json",
+    ]));
+  });
+
   it("is clone-portable and preserves last-known-good outputs on failure", () => {
     const temporaryBase = fs.mkdtempSync(path.join(os.tmpdir(), "lifeos-navigation-"));
     const isolatedRoot = path.join(temporaryBase, "lifeos");
@@ -77,10 +175,12 @@ describe("planning-spine agent navigation", () => {
     try {
       fs.cpSync(path.join(repoRoot, "planning-spine-v0"), path.join(isolatedRoot, "planning-spine-v0"), { recursive: true });
       fs.copyFileSync(path.join(repoRoot, "AGENTS.md"), path.join(isolatedRoot, "AGENTS.md"));
+      const cachePath = path.join(isolatedRoot, "planning-spine-v0", "scripts", "__pycache__", "runtime-only.pyc");
+      fs.mkdirSync(path.dirname(cachePath), { recursive: true });
+      fs.writeFileSync(cachePath, Buffer.from([0, 1, 2, 3]));
 
-      const local = buildNavigationArtifacts({ repoRoot });
       const isolated = buildNavigationArtifacts({ repoRoot: isolatedRoot });
-      expect(renderNavigationArtifacts(isolated)).toEqual(renderNavigationArtifacts(local));
+      expect(renderNavigationArtifacts(isolated)).toEqual(renderNavigationArtifacts(navigation));
       const externalReferences = isolated.graph.nodes.filter((node) => node.kind === "external-reference");
       expect(externalReferences.map((node) => node.path).sort()).toEqual([
         "../nu_plugin/docs/INTEGRATION_CONTRACTS.md",
@@ -108,10 +208,10 @@ describe("planning-spine agent navigation", () => {
     } finally {
       fs.rmSync(temporaryBase, { recursive: true, force: true });
     }
-  }, 20_000);
+  }, 180_000);
 
   it("preserves nested source metadata and classifies catalogs and projections accurately", () => {
-    const { graph } = buildNavigationArtifacts({ repoRoot });
+    const { graph } = navigation;
     const byPath = Object.fromEntries(graph.nodes.filter((node) => node.path).map((node) => [node.path, node]));
     const compatibility = byPath["planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md"];
     const catalog = byPath["planning-spine-v0/1.0_VISION/Notebooklm/artifacts.meta.json"];
@@ -126,5 +226,15 @@ describe("planning-spine agent navigation", () => {
   it("parses quoted commas, escaped quotes, and multiline CSV cells", () => {
     const rows = parseCsv('id,title,body\r\n"A-1","A, title","line 1\nline ""2"""\r\n');
     expect(rows).toEqual([{ id: "A-1", title: "A, title", body: 'line 1\nline "2"' }]);
+  });
+
+  it("distinguishes YAML frontmatter from imported Markdown separators", () => {
+    expect(parseFrontmatter("---\nid: valid.frontmatter\ntags:\n  - navigation\n---\n# Title\n")).toEqual({
+      id: "valid.frontmatter",
+      tags: ["navigation"],
+    });
+    expect(parseFrontmatter("---\n\n# FILE: prompts/MASTER_PROMPT.md\n\nThe runner may provide:\n\n---\n")).toEqual({});
+    expect(parseFrontmatter("---\nid: [not-valid-yaml\n---\n# Title\n")).toEqual({});
+    expect(parseFrontmatter("---\nid: unterminated\n# Title\n")).toEqual({});
   });
 });

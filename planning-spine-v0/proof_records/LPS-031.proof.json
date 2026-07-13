@@ -1,0 +1,39 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-031",
+  "observed_at": "2026-07-13T05:26:04Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Compute Geometric Measures reports zero holes (watertight) per mesh; non-manifold repair runs before hole filling; hole-fill artifact inspection recorded.",
+  "gate_result": {
+    "deliverable": "filters/watertight_cleanup.mlx + scripts/mesh_cleanup.py",
+    "verified_on": "reference geometry (worldsim Nix toolchain, LPS-030)",
+    "reference_verification": {
+      "task_id": "LPS-031",
+      "input": "/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/6554d639-e89a-40ce-a7b6-02580fb26337/scratchpad/worldsim-test/room_raw.ply",
+      "output": "/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/6554d639-e89a-40ce-a7b6-02580fb26337/scratchpad/worldsim-test/room_wt.ply",
+      "filter_script": "planning-spine-v0/worldsim/filters/watertight_cleanup.mlx",
+      "boundary_edges_before": 112,
+      "boundary_edges_after": 0,
+      "holes_before": 2,
+      "holes_after": 0,
+      "watertight": true,
+      "faces_before": 3984,
+      "faces_after": 4092,
+      "hole_fill_artifact_inspection": {
+        "boundary_edges_closed": 112,
+        "holes_closed": 2,
+        "non_manifold_repair_before_hole_fill": true
+      }
+    },
+    "production_input": "planning-spine-v0/worldsim/scans/{room,workstation}/*.ply from LPS-029 physical scan",
+    "tooling_implemented_and_verified": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "LPS-031: Verified on reference geometry (sphere with 2 punched occlusion holes, 112 boundary edges) -> watertight (0 boundary edges / 0 holes) via topological measures; non-manifold repair runs before iterative hole-fill; hole-fill artifact inspection recorded. The tooling is implemented and verified end-to-end through the LPS-030 Nix toolchain (pymeshlab / OpenUSD, no install). Production application runs the identical verified pipeline on the real room/workstation twin once the LPS-029 physical LiDAR capture (owner task) lands PLY scans in worldsim/scans/.",
+  "artifact_paths": [
+    "planning-spine-v0/worldsim/filters/watertight_cleanup.mlx",
+    "planning-spine-v0/worldsim/scripts/mesh_cleanup.py",
+    "planning-spine-v0/generated/worldsim_verification/LPS-031.reference-verification.json"
+  ]
+}

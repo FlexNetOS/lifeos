@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 
 const repoRoot = process.cwd();
 const pkgRoot = path.join(repoRoot, "planning-spine-v0");
@@ -43,6 +44,10 @@ const requiredDocs = [
   "07_MVP_VERTICAL_SLICE.md",
   "08_EXECUTION_GATES.md",
   "09_OPEN_QUESTIONS.md",
+  "1.0_VISION/README.md",
+  "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+  "1.0_VISION/Notebooklm/README.md",
+  "1.0_VISION/Notebooklm/artifacts.meta.json",
   "rfcs/RFC-001_DEVWORLD_MIROFISH_ADAPTER.md",
   "rfcs/RFC-002_COMPILED_AGENT_BRAINPACK.md"
 ];
@@ -91,6 +96,27 @@ function assert(condition, message) {
 
 function recordCheck(name) {
   performedChecks.push(name);
+}
+
+function assertInside(parent, candidate, label) {
+  const relative = path.relative(parent, candidate);
+  assert(
+    relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative),
+    `${label} must stay inside ${parent}`
+  );
+}
+
+function sha256File(filePath) {
+  return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
+}
+
+function countNewlines(filePath) {
+  const bytes = fs.readFileSync(filePath);
+  let count = 0;
+  for (const byte of bytes) {
+    if (byte === 0x0a) count += 1;
+  }
+  return count;
 }
 
 function recordBundleLink(name, from, to, detail, passed) {
@@ -203,6 +229,84 @@ function verifyDocs() {
   recordCheck("required_docs_exist");
   for (const relativePath of requiredDocs) {
     assert(fs.existsSync(path.join(pkgRoot, relativePath)), `Missing required doc: ${relativePath}`);
+  }
+}
+
+function verifyVisionArtifactCatalog() {
+  recordCheck("vision_artifact_catalog_matches_exact_bytes");
+  const catalog = readJson("1.0_VISION/Notebooklm/artifacts.meta.json");
+  assert(
+    catalog.schema_version === "lifeos-planning-spine.raw-artifact-catalog.v0",
+    "Vision artifact catalog schema version must be recognized"
+  );
+  assert(catalog.status === "cataloged-unverified", "Raw artifact catalog must not imply verification");
+  assert(catalog.authority?.proves_implementation === false, "Raw artifacts must not claim implementation proof");
+  assert(catalog.authority?.grants_decision_authority === false, "Raw artifacts must not claim decision authority");
+  assert(Array.isArray(catalog.artifacts) && catalog.artifacts.length === 4, "Vision artifact catalog must list all four imports");
+
+  const ids = new Set();
+  const paths = new Set();
+  for (const artifact of catalog.artifacts) {
+    assert(typeof artifact.id === "string" && artifact.id.length > 0, "Every vision artifact needs a stable id");
+    assert(!ids.has(artifact.id), `Duplicate vision artifact id: ${artifact.id}`);
+    ids.add(artifact.id);
+
+    assert(typeof artifact.path === "string" && artifact.path.length > 0, `${artifact.id} must define path`);
+    assert(!paths.has(artifact.path), `Duplicate vision artifact path: ${artifact.path}`);
+    paths.add(artifact.path);
+
+    const artifactPath = path.resolve(pkgRoot, artifact.path);
+    assertInside(pkgRoot, artifactPath, `${artifact.id}.path`);
+    assert(fs.existsSync(artifactPath), `Missing vision artifact: ${artifact.path}`);
+    assert(fs.statSync(artifactPath).isFile(), `Vision artifact must be a file: ${artifact.path}`);
+    assert(fs.statSync(artifactPath).size === artifact.byte_count, `${artifact.id} byte count drifted`);
+    assert(sha256File(artifactPath) === artifact.sha256, `${artifact.id} SHA-256 drifted`);
+    assert(countNewlines(artifactPath) === artifact.newline_count, `${artifact.id} newline count drifted`);
+    assert(
+      ["incomplete", "partial"].includes(artifact.provenance?.identity_status),
+      `${artifact.id} must preserve its incomplete provenance state`
+    );
+  }
+}
+
+function verifyVisionNavigationLinks() {
+  recordCheck("vision_navigation_links_resolve");
+  const docs = [
+    "README.md",
+    "1.0_VISION/README.md",
+    "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "1.0_VISION/Notebooklm/README.md",
+    "1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md",
+    "1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md",
+    "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md"
+  ];
+
+  for (const relativeDoc of docs) {
+    const docPath = path.join(pkgRoot, relativeDoc);
+    const text = fs.readFileSync(docPath, "utf8");
+
+    const markdownLinks = text.matchAll(/\[[^\]]+\]\((?:<([^>]+)>|([^\s)]+))\)/g);
+    for (const match of markdownLinks) {
+      const target = (match[1] ?? match[2]).split("#", 1)[0];
+      if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target)) continue;
+      const resolved = path.resolve(path.dirname(docPath), decodeURIComponent(target));
+      const fromRepo = path.relative(repoRoot, resolved);
+      if (fromRepo.startsWith("..") || path.isAbsolute(fromRepo)) continue;
+      assert(fs.existsSync(resolved), `Broken Markdown link in ${relativeDoc}: ${target}`);
+    }
+
+    const wikiText = text
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/`[^`\n]*`/g, "");
+    const wikiLinks = wikiText.matchAll(/\[\[([^\]]+)\]\]/g);
+    for (const match of wikiLinks) {
+      const target = match[1].split("|", 1)[0].split("#", 1)[0].trim();
+      if (!target) continue;
+      let resolved = path.resolve(repoRoot, target);
+      if (path.extname(resolved) === "") resolved += ".md";
+      assertInside(repoRoot, resolved, `Wiki link in ${relativeDoc}`);
+      assert(fs.existsSync(resolved), `Broken wiki link in ${relativeDoc}: ${target}`);
+    }
   }
 }
 
@@ -554,6 +658,8 @@ function verifyMvpBundle() {
 
 try {
   verifyDocs();
+  verifyVisionArtifactCatalog();
+  verifyVisionNavigationLinks();
   verifySchemas();
   verifyExamples();
   verifyMvpConstraints();

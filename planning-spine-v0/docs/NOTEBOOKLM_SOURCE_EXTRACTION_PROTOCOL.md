@@ -5,6 +5,26 @@
 Process exactly one NotebookLM object at a time. Do not begin the next object
 until the current object is captured, mapped, verified, and proof-recorded.
 
+## Composite export landing
+
+A composite export or data-table bundle may be preserved before exact
+NotebookLM object identity is available, but it is not a captured source object:
+
+1. preserve the raw bytes without frontmatter, reformatting, or line-ending
+   normalization;
+2. catalog the digest, byte/newline counts, type, known provenance, and identity
+   gaps in a maintained sidecar;
+3. link a maintained compatibility review that separates desired architecture
+   from current implementation truth;
+4. do not add the composite to the source registry, promote claims, or close a
+   task until the normal identity/atomization/proof loop below is complete.
+
+The current LifeOS architecture bundle is cataloged at
+[`1.0_VISION/Notebooklm/README.md`](../1.0_VISION/Notebooklm/README.md) ·
+[[planning-spine-v0/1.0_VISION/Notebooklm/README]], with interpretation in
+[`ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md`](../1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) ·
+[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]].
+
 ## Loop
 
 1. **Resolve identity**

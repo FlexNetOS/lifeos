@@ -1,0 +1,111 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/YAZELIX_PLACEMENT.md",
+    "src/nu_plugin/logs/CDB058-yazelix-disabled.log",
+    "src/nu_plugin/tests/test_ci_detached_attestation.py",
+    "src/nu_plugin/tests/test_ci_toolchain_ownership.py",
+    "src/nu_plugin/tests/test_codex_bounded_bridge.nu",
+    "src/nu_plugin/tests/test_deterministic_scan.nu",
+    "src/nu_plugin/tests/test_dynamic_store_plugin.nu",
+    "src/nu_plugin/tests/test_init_provenance.nu",
+    "src/nu_plugin/tests/test_locked_context_integration.py",
+    "src/nu_plugin/tests/test_mandatory_capability_policy.py",
+    "src/nu_plugin/tests/test_mandatory_pg_parity.py",
+    "src/nu_plugin/tests/test_materialization_safety.py",
+    "src/nu_plugin/tests/test_no_mutation.nu",
+    "src/nu_plugin/tests/test_no_real_home_plugin_registration.nu",
+    "src/nu_plugin/tests/test_nushell_syntax_gate.nu",
+    "src/nu_plugin/tests/test_plugin_registry.nu",
+    "src/nu_plugin/tests/test_plugin_secret_guard.nu",
+    "src/nu_plugin/tests/test_postgres_open_policy.py",
+    "src/nu_plugin/tests/test_redb_lifecycle.nu",
+    "src/nu_plugin/tests/test_release_validators.py",
+    "src/nu_plugin/tests/test_requirement_proof_attestation.py",
+    "src/nu_plugin/tests/test_requirement_proof_ledger.py",
+    "src/nu_plugin/tests/test_security_no_leak.nu",
+    "src/nu_plugin/tests/test_task_graph_validator.py",
+    "src/nu_plugin/tests/test_transient_plugin.nu",
+    "src/nu_plugin/tests/test_truth_surface.py",
+    "src/nu_plugin/tests/test_unsafe_capture.nu",
+    "src/nu_plugin/tests/test_yazelix_disabled_smoke.nu",
+    "src/nu_plugin/tests/test_yazelix_enabled_smoke.nu"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB058",
+    "decision": null,
+    "intent_lock_digest": "blake3:0e97ec713b2ef0a23fa7af8fb672512627088dca7ce6611a4c0eb7a7be4ec79d",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB059"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB058",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB058",
+  "depends_on": [
+    "TASK-CDB049",
+    "TASK-CDB056"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "disabled mode safe",
+    "deterministic": true,
+    "verification_command": "Yazelix launch unaffected without CodeDB"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/research/nushell_yazelix_cross_reference_report.md"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:0e97ec713b2ef0a23fa7af8fb672512627088dca7ce6611a4c0eb7a7be4ec79d"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:cb0d258191476274ed6ef11fd57fc5fa36454811b3ff36171bf1752f2a4cf2f6",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB058",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB058"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB058 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/disabled smoke"
+  ],
+  "task_id": "TASK-CDB058",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB058"
+}

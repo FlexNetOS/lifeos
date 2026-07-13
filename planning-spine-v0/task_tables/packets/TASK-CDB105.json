@@ -1,0 +1,99 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/execution/POLYGLOT_GITHUB_ISSUE_DRAFTS.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/NAVIGATION.json",
+    "src/nu_plugin/DOC_GRAPH.md",
+    "src/nu_plugin/HANDOFF.md",
+    "src/nu_plugin/ACCEPTANCE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/STOP_CONDITIONS.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB105",
+    "decision": null,
+    "intent_lock_digest": "blake3:ab6474505fe365c0989cec9d1547433ea148faf821a37cfdeb75df0b28b525c0",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB105",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB105",
+  "depends_on": [
+    "TASK-CDB091",
+    "TASK-CDB092",
+    "TASK-CDB093",
+    "TASK-CDB094",
+    "TASK-CDB095",
+    "TASK-CDB096",
+    "TASK-CDB097",
+    "TASK-CDB098",
+    "TASK-CDB099",
+    "TASK-CDB100",
+    "TASK-CDB101",
+    "TASK-CDB102",
+    "TASK-CDB103",
+    "TASK-CDB104"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "issue drafts exist and truth surfaces updated",
+    "deterministic": true,
+    "verification_command": "issue drafts exist and truth surfaces updated"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:ab6474505fe365c0989cec9d1547433ea148faf821a37cfdeb75df0b28b525c0"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:5c6392cfe8ee704be091b4e16fb1d13b6842980218f6e6e38c7734fad10732ed",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB105",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB105"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB105 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/execution/POLYGLOT_GITHUB_ISSUE_DRAFTS.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/NAVIGATION.json",
+    "src/nu_plugin/DOC_GRAPH.md",
+    "src/nu_plugin/HANDOFF.md",
+    "src/nu_plugin/ACCEPTANCE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/STOP_CONDITIONS.md"
+  ],
+  "task_id": "TASK-CDB105",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB105"
+}

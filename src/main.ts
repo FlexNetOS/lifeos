@@ -7,6 +7,10 @@ import { tauriPersistence, LIFEOS_PERSIST_KEYS } from "@/lib/persistence";
 // Load data.js (sets window.LIFEOS_DATA / AGGREGATORS / FLOWS).
 // In production, port this to a typed module under src/data/.
 import "../data.js";
+// Keep runtime CSS imports explicit and ordered. Nested CSS @imports trigger
+// PostCSS ordering warnings after Vite has expanded the first stylesheet.
+import "../colors_and_type.css";
+import "../lifeos_app.css";
 import "../styles.css";
 
 const pinia = createPinia();

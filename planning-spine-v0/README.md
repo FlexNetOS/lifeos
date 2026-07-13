@@ -6,7 +6,7 @@ type: planning-contract
 status: active
 lifecycle: maintained
 created: 2026-07-03
-updated: 2026-07-12
+updated: 2026-07-13
 aliases:
   - LifeOS planning spine
   - Planning spine v0
@@ -19,6 +19,8 @@ related:
   - "[[planning-spine-v0/navigation/README]]"
   - "[[planning-spine-v0/00_NORTH_STAR]]"
   - "[[planning-spine-v0/1.0_VISION/README]]"
+  - "[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]]"
+  - "[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW]]"
 ---
 
 # LifeOS Planning Spine v0
@@ -34,6 +36,13 @@ This package converts the `lifeos-planning-spine v0` source brief into a buildab
 - Blueprint compatibility and session-course audit:
   [`ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md`](./1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) ·
   [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]
+- envctl DB + nu_plugin migration-package landing, truth boundary, and
+  mandatory-capability route:
+  [`ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) ·
+  [[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]]
+- Exact-fingerprint credential and fixture review for the immutable package:
+  [`ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md) ·
+  [[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW]]
 - Raw NotebookLM artifact catalog:
   [`1.0_VISION/Notebooklm/README.md`](./1.0_VISION/Notebooklm/README.md) ·
   [[planning-spine-v0/1.0_VISION/Notebooklm/README]]
@@ -50,15 +59,31 @@ claims, maintained reviews, and raw NotebookLM inputs govern current-state truth
 in that order. Read the compatibility review before treating blueprint wording
 as implementation state.
 
+## Mandatory Feature Policy
+
+Owner directive: no planning feature is optional. Any source or historical
+artifact that says `optional`, `recommended`, `should`, or `may` contributes
+mandatory implementation and review scope unless the owner explicitly rejects
+that feature. A runtime activation value may remain configurable, but support,
+parsing, validation, safe fallback, compatibility behavior, and verification
+are mandatory. Raw and proof-bound artifacts retain their original bytes for
+provenance; their modal wording does not override this maintained contract.
+
+For the envctl DB + nu_plugin migration, the exact machine-enforced projection
+is the [28-capability catalog](./task_tables/workflow/mandatory_capabilities.json)
+plus the [mandatory-language inventory](./task_tables/workflow/mandatory_language_inventory.json),
+which classifies every scoped occurrence and permits zero unclassified
+normative terms.
+
 Status table:
 
 | Scope | Status | Meaning |
 |---|---|---|
 | `v0` | In scope | Intent -> authority graph -> task graph -> DevWorld simulation -> hermetic cell -> proof ledger -> next-action recommendation |
-| `RFC` | Proposed only | Mirofish adapter and compiled agent brainpack |
-| `post-v0` | Deferred | Full Odysseus, full Hermes, full company hierarchy, standalone Mirofish |
+| `RFC` | Mandatory design/review scope | Mirofish adapter and compiled agent brainpack remain approval- and proof-gated before implementation. |
+| `post-v0` | Mandatory sequenced scope | Full Odysseus, full Hermes, full company hierarchy, and standalone Mirofish follow the v0 slice; they are not removed from scope. |
 
-Non-goals:
+First-slice exclusions (mandatory later, not feature deletions):
 
 - No Docker-first runtime.
 - No native dependence on full Odysseus integration.
@@ -89,6 +114,8 @@ Preserved operating assumptions:
 | [`07_MVP_VERTICAL_SLICE.md`](./07_MVP_VERTICAL_SLICE.md) | End-to-end MVP flow |
 | [`08_EXECUTION_GATES.md`](./08_EXECUTION_GATES.md) | Required gates before progress/completion |
 | [`09_OPEN_QUESTIONS.md`](./09_OPEN_QUESTIONS.md) | Explicit unresolved decisions |
+| [`ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) | Reference-package superset receipt, 28-capability mandatory catalog, namespace separation, and actual-human approval boundary |
+| [`ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md) | Value-free classification and exact-fingerprint baseline for credential-shaped package fixtures and proof identifiers |
 | `1.0_VISION/README.md` | Agent-oriented vision, authority, and evidence navigation |
 | `1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md` | Blueprint-to-CodeDB compatibility review and concurrent landing audit |
 | `1.0_VISION/Notebooklm/README.md` | Exact-byte raw artifact catalog and provenance boundary |

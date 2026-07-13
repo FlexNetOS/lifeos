@@ -36,6 +36,7 @@ const CLAIM_HUB_ID = "hub:claims";
 const EVIDENCE_HUB_ID = "hub:evidence";
 const PROOF_HUB_ID = "hub:proof-history";
 const STRUCTURED_HUB_ID = "hub:structured-sources";
+const MIGRATION_HUB_ID = "hub:migration-task-tables";
 
 function slash(value) {
   return value.split(path.sep).join("/");
@@ -134,12 +135,22 @@ function countNewlines(bytes) {
   return count;
 }
 
-function parseFrontmatter(text) {
+export function parseFrontmatter(text) {
   if (!text.startsWith("---\n") && !text.startsWith("---\r\n")) return {};
   const lines = text.replace(/\r\n/g, "\n").split("\n");
   const closing = lines.indexOf("---", 1);
   if (closing < 0) return {};
-  const metadata = parseYaml(lines.slice(1, closing).join("\n"), { uniqueKeys: true }) ?? {};
+  const candidateLines = lines.slice(1, closing);
+  const firstContent = candidateLines.find((line) => line.trim());
+  // A leading Markdown horizontal rule is not YAML frontmatter. Imported prompt
+  // bundles commonly use `---` as a file separator before a heading.
+  if (!firstContent || !/^[A-Za-z0-9_$.-]+\s*:/.test(firstContent)) return {};
+  let metadata;
+  try {
+    metadata = parseYaml(candidateLines.join("\n"), { uniqueKeys: true }) ?? {};
+  } catch {
+    return {};
+  }
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
     throw new Error("Markdown frontmatter must be a YAML mapping");
   }
@@ -153,7 +164,9 @@ function stripMarkdownCode(text) {
 function markdownMetadata(text) {
   const normalized = text.replace(/\r\n/g, "\n");
   const frontmatter = parseFrontmatter(normalized);
-  const body = normalized.replace(/^---\n[\s\S]*?\n---\n?/, "");
+  const body = Object.keys(frontmatter).length
+    ? normalized.replace(/^---\n[\s\S]*?\n---\n?/, "")
+    : normalized;
   const headings = unique(
     [...body.matchAll(/^#{1,6}\s+(.+)$/gm)].map((match) => truncate(match[1].replace(/\s+#+$/, ""), 180))
   );
@@ -351,7 +364,12 @@ function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = fals
     decoded = trimmed;
   }
   let absolutePath = wiki ? path.resolve(repoRoot, decoded) : path.resolve(path.dirname(sourceAbsolutePath), decoded);
-  if (wiki && !path.extname(absolutePath)) absolutePath += ".md";
+  const wikiExtensions = [".md", ".json", ".csv", ".jsonl", ".yaml", ".yml"];
+  if (wiki && !wikiExtensions.includes(path.extname(absolutePath).toLowerCase())) {
+    const candidates = wikiExtensions
+      .map((extension) => `${absolutePath}${extension}`);
+    absolutePath = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
+  }
   let relativeToRepo = path.relative(repoRoot, absolutePath);
   const outside = relativeToRepo.startsWith("..") || path.isAbsolute(relativeToRepo);
   if (!outside && fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
@@ -466,7 +484,8 @@ export function buildNavigationArtifacts(options = {}) {
     [CLAIM_HUB_ID, "Claims and verification queue", "Normalized source claims and their verification state."],
     [EVIDENCE_HUB_ID, "Evidence", "Claim evidence records and exact source relationships."],
     [PROOF_HUB_ID, "Proof history", "Accepted append-only proof-ledger revisions."],
-    [STRUCTURED_HUB_ID, "Structured planning entities", "Coverage anchors, gaps, conflicts, and capability rows."]
+    [STRUCTURED_HUB_ID, "Structured planning entities", "Coverage anchors, gaps, conflicts, and capability rows."],
+    [MIGRATION_HUB_ID, "Migration task tables", "Review-only imported WorkOrders and mandatory migration capabilities kept outside the canonical LifeOS task namespace."]
   ]) {
     addNode({
       id,
@@ -1018,32 +1037,72 @@ export function buildNavigationArtifacts(options = {}) {
     if (fileNodeByPackagePath.has(localPath)) addEdge(nodeId, fileNodeByPackagePath.get(localPath), "sourced-from");
   }
 
+  const structuredRowsByKind = new Map();
+  const workOrderNodeIds = new Map();
+  const mandatoryCapabilityNodeIds = new Map();
+  const migrationKinds = new Set(["imported-work-order", "mandatory-migration-capability"]);
+
   for (const adapter of source.structured_sources) {
     const adapterRows = parseCsv(fs.readFileSync(path.join(pkgRoot, adapter.path), "utf8"));
+    structuredRowsByKind.set(adapter.kind, adapterRows);
+    const seenIdentifiers = new Set();
     adapterRows.forEach((row, index) => {
-      const identifier = row[adapter.id_column] || `row-${index + 1}`;
+      const identifier = String(row[adapter.id_column] ?? "").trim();
+      if (!identifier) {
+        errors.push(`structured source ${adapter.path} row ${index + 2} is missing ${adapter.id_column}`);
+        return;
+      }
+      if (seenIdentifiers.has(identifier)) {
+        errors.push(`structured source ${adapter.path} has duplicate ${adapter.id_column} ${identifier}`);
+        return;
+      }
+      seenIdentifiers.add(identifier);
       let nodeId = `structured:${adapter.kind}:${slug(identifier)}`;
       if (nodes.has(nodeId)) nodeId = `${nodeId}:${index + 1}`;
+      const statusColumn = adapter.status_column;
+      const localStatus = String(
+        statusColumn
+          ? row[statusColumn] ?? ""
+          : row.status || row.coverage_status || row.decomposition_status || "unspecified"
+      ).trim().toLowerCase() || "unspecified";
+      const imported = migrationKinds.has(adapter.kind);
+      const selectedMetadata = Object.fromEntries(
+        (adapter.metadata_columns ?? []).map((column) => [column, row[column] ?? ""])
+      );
       addNode({
         id: nodeId,
         kind: adapter.kind,
         title: truncate(row[adapter.title_column] || identifier, 260),
         description: truncate(row[adapter.description_column] || `${adapter.kind} ${identifier}`, 500),
         path: null,
-        status: String(row.status || row.coverage_status || row.decomposition_status || "unspecified").toLowerCase(),
-        authority_class: "canonical-input",
+        status: localStatus,
+        authority_class: adapter.authority_class ?? "canonical-input",
         lifecycle: "maintained",
         aliases: unique([identifier, row[adapter.title_column]]),
         tags: ["structured-source", slug(adapter.kind)],
         identifiers: [identifier],
         headings: [],
-        routes: [],
+        routes: imported ? ["migration-task-tables"] : [],
         content: null,
-        metadata: { source_path: adapter.path, source_row_number: index + 2 }
+        metadata: {
+          source_path: adapter.path,
+          source_row_number: index + 2,
+          ...selectedMetadata,
+          ...(imported
+            ? {
+                namespace: adapter.kind,
+                canonical_task: false,
+                local_status: localStatus,
+                proof_promoted: false
+              }
+            : {})
+        }
       });
-      addEdge(STRUCTURED_HUB_ID, nodeId, "contains");
+      addEdge(imported ? MIGRATION_HUB_ID : STRUCTURED_HUB_ID, nodeId, "contains");
       addEdge(nodeId, fileNodeByPackagePath.get(adapter.path), "defined-in");
-      for (const column of adapter.task_columns) {
+      if (adapter.kind === "imported-work-order") workOrderNodeIds.set(identifier, nodeId);
+      if (adapter.kind === "mandatory-migration-capability") mandatoryCapabilityNodeIds.set(identifier, nodeId);
+      for (const column of adapter.task_columns ?? []) {
         const cell = String(row[column] ?? "");
         for (const taskId of [...taskIds, ...source.allowed_historical_task_ids]) {
           if (!new RegExp(`(^|[^A-Z0-9-])${escapeRegExp(taskId)}([^A-Z0-9-]|$)`).test(cell)) continue;
@@ -1052,7 +1111,97 @@ export function buildNavigationArtifacts(options = {}) {
         }
       }
     });
+    if (Number.isInteger(adapter.expected_count) && adapterRows.length !== adapter.expected_count) {
+      errors.push(
+        `structured source ${adapter.path} has ${adapterRows.length} row(s); expected ${adapter.expected_count}`
+      );
+    }
   }
+
+  const extractWorkOrderReferences = (value) => unique(String(value ?? "").match(/TASK-CDB[0-9]{3}/g) ?? []);
+  let unresolvedWorkOrderReferences = 0;
+  for (const row of structuredRowsByKind.get("imported-work-order") ?? []) {
+    const nodeId = workOrderNodeIds.get(row.work_order_id);
+    if (!nodeId) continue;
+    for (const dependency of extractWorkOrderReferences(row.depends_on)) {
+      const target = workOrderNodeIds.get(dependency);
+      if (target) addEdge(nodeId, target, "depends-on-work-order");
+      else {
+        unresolvedWorkOrderReferences += 1;
+        errors.push(`imported WorkOrder ${row.work_order_id} depends on unknown WorkOrder ${dependency}`);
+      }
+    }
+    for (const blocked of extractWorkOrderReferences(row.blocks)) {
+      const target = workOrderNodeIds.get(blocked);
+      if (target) addEdge(nodeId, target, "blocks-work-order");
+      else {
+        unresolvedWorkOrderReferences += 1;
+        errors.push(`imported WorkOrder ${row.work_order_id} blocks unknown WorkOrder ${blocked}`);
+      }
+    }
+  }
+  for (const row of structuredRowsByKind.get("mandatory-migration-capability") ?? []) {
+    const nodeId = mandatoryCapabilityNodeIds.get(row.capability_id);
+    if (!nodeId) continue;
+    for (const workOrderId of extractWorkOrderReferences(row.coverage_work_order_refs)) {
+      const target = workOrderNodeIds.get(workOrderId);
+      if (target) addEdge(nodeId, target, "covered-by-work-order");
+      else {
+        unresolvedWorkOrderReferences += 1;
+        errors.push(`mandatory capability ${row.capability_id} references unknown WorkOrder ${workOrderId}`);
+      }
+    }
+  }
+
+  const expectedWorkOrderIds = Array.from(
+    { length: 106 },
+    (_, index) => `TASK-CDB${String(index).padStart(3, "0")}`
+  );
+  const expectedCapabilityIds = Array.from(
+    { length: 28 },
+    (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`
+  );
+  const importedWorkOrderRows = structuredRowsByKind.get("imported-work-order") ?? [];
+  const mandatoryCapabilityRows = structuredRowsByKind.get("mandatory-migration-capability") ?? [];
+  const workOrdersReviewOnly = (
+    JSON.stringify([...workOrderNodeIds.keys()].sort()) === JSON.stringify(expectedWorkOrderIds)
+    && importedWorkOrderRows.every((row) => row.status === "review" && !row.proof_uri)
+  );
+  const capabilitiesReviewOnly = (
+    JSON.stringify([...mandatoryCapabilityNodeIds.keys()].sort()) === JSON.stringify(expectedCapabilityIds)
+    && mandatoryCapabilityRows.every((row) => (
+      row.requirement === "mandatory"
+      && row.local_status === "review"
+      && row.product_complete === "false"
+    ))
+  );
+  const migrationNamespacesExact = (
+    workOrderNodeIds.size === expectedWorkOrderIds.length
+    && mandatoryCapabilityNodeIds.size === expectedCapabilityIds.length
+    && [...workOrderNodeIds.keys(), ...mandatoryCapabilityNodeIds.keys()].every((identifier) => !taskIds.has(identifier))
+    && unresolvedWorkOrderReferences === 0
+  );
+  if (!workOrdersReviewOnly) errors.push("imported WorkOrders must be exactly TASK-CDB000..105 with review status and no promoted proof URI");
+  if (!capabilitiesReviewOnly) errors.push("mandatory migration capabilities must be exactly CAP-MIG-001..028 with review status and product_complete=false");
+  if (!migrationNamespacesExact) errors.push("migration WorkOrder/capability namespaces must be exact, resolvable, and disjoint from canonical tasks");
+  checks.push({
+    name: "imported_work_orders_are_review_only",
+    result: workOrdersReviewOnly ? "pass" : "fail",
+    observed: workOrderNodeIds.size,
+    expected: expectedWorkOrderIds.length
+  });
+  checks.push({
+    name: "mandatory_migration_capabilities_are_review_only",
+    result: capabilitiesReviewOnly ? "pass" : "fail",
+    observed: mandatoryCapabilityNodeIds.size,
+    expected: expectedCapabilityIds.length
+  });
+  checks.push({
+    name: "migration_lookup_namespaces_are_exact",
+    result: migrationNamespacesExact ? "pass" : "fail",
+    observed: workOrderNodeIds.size + mandatoryCapabilityNodeIds.size,
+    expected: expectedWorkOrderIds.length + expectedCapabilityIds.length
+  });
 
   const semanticNodesByIdentifier = new Map();
   for (const node of nodes.values()) {
@@ -1268,7 +1417,7 @@ export function buildNavigationArtifacts(options = {}) {
   }
   const cacheArtifacts = excludedExisting.filter((item) => /(?:__pycache__|\.py[co]$|\.pid$|\.pytest_cache)/.test(item));
   if (cacheArtifacts.length) warnings.push(`${cacheArtifacts.length} local cache/process artifact(s) were excluded from navigation.`);
-  warnings.push("GitNexus and GitKB are optional projections, never planning authority; verify each tool's repository and worktree identity before using its results.");
+  warnings.push("GitNexus and GitKB are supplemental projections, never planning authority; verify each tool's repository and worktree identity before using its results.");
 
   const sortedNodes = [...nodes.values()].sort((left, right) => left.id.localeCompare(right.id));
   const inventoryInputs = [...nodes.values()].filter((node) => (
@@ -1303,10 +1452,15 @@ export function buildNavigationArtifacts(options = {}) {
 
   const byPath = {};
   const byKind = {};
-  const byTaskId = Object.fromEntries([
-    ...[...taskIds].map((identifier) => [identifier, `task:${identifier}`]),
-    ...[...historicalTaskIds].map((identifier) => [identifier, `historical-task:${identifier}`])
-  ].sort(([left], [right]) => left.localeCompare(right)));
+  const byTaskId = Object.fromEntries(
+    [...taskIds].sort().map((identifier) => [identifier, `task:${identifier}`])
+  );
+  const byWorkOrderId = Object.fromEntries(
+    [...workOrderNodeIds.entries()].sort(([left], [right]) => left.localeCompare(right))
+  );
+  const byMandatoryCapabilityId = Object.fromEntries(
+    [...mandatoryCapabilityNodeIds.entries()].sort(([left], [right]) => left.localeCompare(right))
+  );
   const byClaimId = Object.fromEntries([...claimIds].sort().map((identifier) => [identifier, `claim:${identifier}`]));
   const bySourceId = Object.fromEntries([...sourceIds].sort().map((identifier) => [identifier, `source:${identifier}`]));
   const byAlias = {};
@@ -1354,6 +1508,8 @@ export function buildNavigationArtifacts(options = {}) {
     by_path: Object.fromEntries(Object.entries(byPath).sort(([left], [right]) => left.localeCompare(right))),
     by_kind: sortObjectOfArrays(byKind),
     by_task_id: byTaskId,
+    by_work_order_id: byWorkOrderId,
+    by_mandatory_capability_id: byMandatoryCapabilityId,
     by_claim_id: byClaimId,
     by_source_id: bySourceId,
     by_alias: sortObjectOfArrays(byAlias),
@@ -1388,6 +1544,8 @@ export function buildNavigationArtifacts(options = {}) {
       nodes: sortedNodes.length,
       edges: sortedEdges.length,
       tasks: taskIds.size,
+      imported_work_orders: workOrderNodeIds.size,
+      mandatory_migration_capabilities: mandatoryCapabilityNodeIds.size,
       historical_tasks: historicalTaskIds.size,
       notebooklm_sources: sourceRows.length,
       claims: claimRows.length,

@@ -18,6 +18,12 @@
     "1.0_VISION/README.md",
     "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
     "1.0_VISION/Notebooklm/README.md",
+    "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+    "task_tables/README.md",
+    "envctl-db-nu-plugin-migration-automation-package/README.md",
+    "task_tables/projections/work_orders.csv",
+    "task_tables/workflow/mandatory_capabilities.csv",
+    "task_tables/workflow/mandatory_language_inventory.json",
     "generated/task_graph.index.json",
     "generated/notebooklm_source_registry.source.csv",
     "proof_records/proof_ledger.jsonl"
@@ -38,6 +44,9 @@
     "1.0_VISION/Notebooklm/README.md",
     "1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md",
     "1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md",
+    "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+    "task_tables/README.md",
+    "envctl-db-nu-plugin-migration-automation-package/README.md",
     "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md"
   ],
   "external_reference_paths": [
@@ -109,12 +118,60 @@
       "title_column": "capability",
       "description_column": "boundary",
       "task_columns": ["adopt_task"]
+    },
+    {
+      "path": "task_tables/projections/work_orders.csv",
+      "kind": "imported-work-order",
+      "id_column": "work_order_id",
+      "title_column": "title",
+      "description_column": "completion_gate",
+      "status_column": "status",
+      "expected_count": 106,
+      "authority_class": "review-only-import",
+      "metadata_columns": [
+        "correlation_id",
+        "phase",
+        "source_status",
+        "status",
+        "proof_required",
+        "proof_uri",
+        "human_approval_required",
+        "verification_command",
+        "completion_gate",
+        "rollback_plan"
+      ],
+      "task_columns": [],
+      "work_order_columns": ["depends_on", "blocks"]
+    },
+    {
+      "path": "task_tables/workflow/mandatory_capabilities.csv",
+      "kind": "mandatory-migration-capability",
+      "id_column": "capability_id",
+      "title_column": "title",
+      "description_column": "mandatory_requirement",
+      "status_column": "local_status",
+      "expected_count": 28,
+      "authority_class": "review-only-import",
+      "metadata_columns": [
+        "requirement",
+        "source_refs",
+        "mandatory_requirement",
+        "verification_gate",
+        "coverage_reference_refs",
+        "coverage_boundary",
+        "planning_evidence",
+        "local_status",
+        "product_complete"
+      ],
+      "task_columns": [],
+      "work_order_columns": ["coverage_work_order_refs"]
     }
   ],
   "authority_classes": {
     "operating-contract": "Repository-level instructions that govern agent behavior.",
     "maintained-contract": "Authored planning, schema, protocol, or authority contract.",
     "canonical-input": "Authored source table or manifest from which projections are generated.",
+    "review-only-import": "Pinned upstream planning data isolated from canonical LifeOS task status and proof until separately reviewed and accepted.",
     "exact-evidence": "Proof, receipt, ledger, or captured exact-source evidence; result must be read from the artifact.",
     "derived-projection": "Generated or current-state view that is reproducible from stronger sources.",
     "architecture-input": "Vision or NotebookLM material that informs design but does not prove implementation or grant decision authority.",
@@ -216,6 +273,25 @@
       "path_prefixes": [],
       "keywords": ["CodeDB", "envctl", "Nushell", "projection engine"],
       "task_prefixes": ["ADOPT-", "RECOVERY-", "POSTGRES-"]
+    },
+    {
+      "id": "migration-task-tables",
+      "title": "envctl and nu_plugin migration package",
+      "description": "Review-only imported WorkOrders, mandatory migration capabilities, package instructions, and their exact source projections.",
+      "aliases": ["migration package", "CDB WorkOrders", "CAP-MIG"],
+      "tags": ["migration", "work-orders", "capabilities", "review-only"],
+      "entrypoints": [
+        "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+        "task_tables/README.md",
+        "envctl-db-nu-plugin-migration-automation-package/README.md",
+        "task_tables/projections/work_orders.csv",
+        "task_tables/workflow/mandatory_capabilities.csv"
+      ],
+      "path_prefixes": [
+        "task_tables/",
+        "envctl-db-nu-plugin-migration-automation-package/"
+      ],
+      "keywords": ["WorkOrder", "TASK-CDB", "CAP-MIG", "mandatory capability", "envctl migration"]
     },
     {
       "id": "cognition-and-simulation",

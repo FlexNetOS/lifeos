@@ -5,6 +5,7 @@ import {
   checkNavigationArtifacts,
   validateNavigationArtifactSchemas
 } from "../planning-spine-v0/scripts/build-navigation-index.mjs";
+import { checkTaskTableArtifacts } from "../planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs";
 
 const repoRoot = process.cwd();
 const pkgRoot = path.join(repoRoot, "planning-spine-v0");
@@ -38,6 +39,7 @@ const authorityIntegrityReport = {
 
 const requiredDocs = [
   "README.md",
+  "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
   "navigation/README.md",
   "navigation/source.json",
   "00_NORTH_STAR.md",
@@ -54,6 +56,12 @@ const requiredDocs = [
   "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
   "1.0_VISION/Notebooklm/README.md",
   "1.0_VISION/Notebooklm/artifacts.meta.json",
+  "generated/envctl_package_landing_receipt.json",
+  "task_tables/README.md",
+  "task_tables/workflow/mandatory_capabilities.json",
+  "task_tables/workflow/mandatory_capabilities.csv",
+  "task_tables/workflow/mandatory_language_inventory.json",
+  "task_tables/workflow/mandatory_language_inventory.csv",
   "navigation/generated/navigation_graph.json",
   "navigation/generated/navigation_index.json",
   "navigation/generated/navigation.validation_report.json",
@@ -321,12 +329,14 @@ function verifyVisionNavigationLinks() {
   recordCheck("vision_navigation_links_resolve");
   const docs = [
     "README.md",
+    "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
     "1.0_VISION/README.md",
     "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
     "1.0_VISION/Notebooklm/README.md",
     "1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md",
     "1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md",
-    "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md"
+    "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+    "task_tables/README.md"
   ];
 
   for (const relativeDoc of docs) {
@@ -351,11 +361,30 @@ function verifyVisionNavigationLinks() {
       const target = match[1].split("|", 1)[0].split("#", 1)[0].trim();
       if (!target) continue;
       let resolved = path.resolve(repoRoot, target);
-      if (path.extname(resolved) === "") resolved += ".md";
+      const wikiExtensions = [".md", ".json", ".csv", ".jsonl", ".yaml", ".yml"];
+      if (!wikiExtensions.includes(path.extname(resolved).toLowerCase())) {
+        const candidates = wikiExtensions
+          .map((extension) => `${resolved}${extension}`);
+        resolved = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
+      }
       assertInside(repoRoot, resolved, `Wiki link in ${relativeDoc}`);
       assert(fs.existsSync(resolved), `Broken wiki link in ${relativeDoc}: ${target}`);
     }
   }
+}
+
+async function verifyTaskTableHandoff() {
+  recordCheck("nu_plugin_task_table_handoff_is_complete_deterministic_and_review_only");
+  const result = await checkTaskTableArtifacts({ repoRoot });
+  assert(result.ok, `nu_plugin task-table handoff drifted: ${result.errors.join("; ")}`);
+  assert(result.report.status === "passed", "nu_plugin task-table validation report must pass");
+  assert(result.report.counts.total === 428, "nu_plugin task-table source taxonomy must retain all 428 rows");
+  assert(result.report.counts.work_orders === 106, "nu_plugin task-table handoff must retain 106 CDB WorkOrders");
+  assert(result.report.counts.task_execution_proofs === 0, "Imported CDB WorkOrders must not acquire execution proof");
+  assert(result.report.counts.pending_human_approvals === 106, "Every imported CDB WorkOrder must remain human-approval gated");
+  assert(result.report.counts.mandatory_capabilities === 28, "All 28 migration capabilities must remain mandatory review scope");
+  assert(result.report.counts.mandatory_language_occurrences === 295, "Mandatory-language inventory must retain all 295 scoped occurrences");
+  assert(result.report.counts.mandatory_language_unclassified === 0, "No normative optional/should/may/must occurrence may remain unclassified");
 }
 
 function verifyAgentNavigationGraph() {
@@ -418,6 +447,13 @@ function verifySchemas() {
   for (const field of ["allowed_paths", "blocked_paths", "verification_gate", "rollback_plan", "proof_uri"]) {
     assert(taskSchema.required.includes(field), `Task schema must require ${field}`);
   }
+
+  recordCheck("cell_schema_requires_pre_execution_snapshot");
+  const cellSchema = readJson(schemaFiles.Cell);
+  assert(
+    cellSchema.properties?.snapshot_boundary?.properties?.mode?.const === "required",
+    "Cell schema must require snapshot_boundary.mode=required"
+  );
 }
 
 function verifyExamples() {
@@ -756,6 +792,7 @@ try {
   verifyDocs();
   verifyVisionArtifactCatalog();
   verifyVisionNavigationLinks();
+  await verifyTaskTableHandoff();
   verifyAgentNavigationGraph();
   verifySchemas();
   verifyExamples();

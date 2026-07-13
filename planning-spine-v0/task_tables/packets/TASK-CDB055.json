@@ -1,0 +1,118 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/logs/CDB055-init-provenance.log",
+    "src/nu_plugin/manifests/CHECKLIST_COMPLETION.json",
+    "src/nu_plugin/manifests/CHECKSUMS.sha256",
+    "src/nu_plugin/manifests/CSV_DOC_LINK_AUDIT_INPUT.md",
+    "src/nu_plugin/manifests/CSV_SOURCE_OF_TRUTH_REPAIR.json",
+    "src/nu_plugin/manifests/EXTRACTION_PROOF.json",
+    "src/nu_plugin/manifests/INIT_PROVENANCE.json",
+    "src/nu_plugin/manifests/LINK_CHECK_REPORT.md",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json",
+    "src/nu_plugin/manifests/PACK_MANIFEST.json",
+    "src/nu_plugin/tests/test_ci_detached_attestation.py",
+    "src/nu_plugin/tests/test_ci_toolchain_ownership.py",
+    "src/nu_plugin/tests/test_codex_bounded_bridge.nu",
+    "src/nu_plugin/tests/test_deterministic_scan.nu",
+    "src/nu_plugin/tests/test_dynamic_store_plugin.nu",
+    "src/nu_plugin/tests/test_init_provenance.nu",
+    "src/nu_plugin/tests/test_locked_context_integration.py",
+    "src/nu_plugin/tests/test_mandatory_capability_policy.py",
+    "src/nu_plugin/tests/test_mandatory_pg_parity.py",
+    "src/nu_plugin/tests/test_materialization_safety.py",
+    "src/nu_plugin/tests/test_no_mutation.nu",
+    "src/nu_plugin/tests/test_no_real_home_plugin_registration.nu",
+    "src/nu_plugin/tests/test_nushell_syntax_gate.nu",
+    "src/nu_plugin/tests/test_plugin_registry.nu",
+    "src/nu_plugin/tests/test_plugin_secret_guard.nu",
+    "src/nu_plugin/tests/test_postgres_open_policy.py",
+    "src/nu_plugin/tests/test_redb_lifecycle.nu",
+    "src/nu_plugin/tests/test_release_validators.py",
+    "src/nu_plugin/tests/test_requirement_proof_attestation.py",
+    "src/nu_plugin/tests/test_requirement_proof_ledger.py",
+    "src/nu_plugin/tests/test_security_no_leak.nu",
+    "src/nu_plugin/tests/test_task_graph_validator.py",
+    "src/nu_plugin/tests/test_transient_plugin.nu",
+    "src/nu_plugin/tests/test_truth_surface.py",
+    "src/nu_plugin/tests/test_unsafe_capture.nu",
+    "src/nu_plugin/tests/test_yazelix_disabled_smoke.nu",
+    "src/nu_plugin/tests/test_yazelix_enabled_smoke.nu"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB055",
+    "decision": null,
+    "intent_lock_digest": "blake3:c18c05d96eeeb5fb170f34787a433453570bb9789e5b58c95f4cfdd09dc8fd47",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB063"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB055",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB055",
+  "depends_on": [
+    "TASK-CDB054"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "initializer provenance proven",
+    "deterministic": true,
+    "verification_command": "checksum/provenance manifest validates"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/research/nushell_yazelix_cross_reference_report.md"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:c18c05d96eeeb5fb170f34787a433453570bb9789e5b58c95f4cfdd09dc8fd47"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:e3c0e1940088a03f640a643107b1418ec106d350300f653176bda9b93e400dad",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB055",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB055"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB055 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/initializer manifest"
+  ],
+  "task_id": "TASK-CDB055",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB055"
+}

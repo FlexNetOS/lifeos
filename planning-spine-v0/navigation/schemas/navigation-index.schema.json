@@ -4,7 +4,7 @@
   "title": "LifeOS Planning Spine Navigation Index",
   "description": "Compact exact-lookup and search-record projection of the navigation graph; typed neighbors remain in the graph artifact.",
   "type": "object",
-  "required": ["schema_version", "id", "title", "description", "source", "entrypoints", "records", "by_path", "by_kind", "by_task_id", "by_claim_id", "by_source_id", "by_alias", "by_tag", "by_route"],
+  "required": ["schema_version", "id", "title", "description", "source", "entrypoints", "records", "by_path", "by_kind", "by_task_id", "by_work_order_id", "by_mandatory_capability_id", "by_claim_id", "by_source_id", "by_alias", "by_tag", "by_route"],
   "properties": {
     "schema_version": { "const": "lifeos-planning-spine.navigation-index.v0" },
     "id": { "type": "string", "minLength": 1 },
@@ -28,6 +28,8 @@
     "by_path": { "$ref": "#/$defs/pathLookup" },
     "by_kind": { "$ref": "#/$defs/listLookup" },
     "by_task_id": { "$ref": "#/$defs/pathLookup" },
+    "by_work_order_id": { "$ref": "#/$defs/workOrderLookup" },
+    "by_mandatory_capability_id": { "$ref": "#/$defs/mandatoryCapabilityLookup" },
     "by_claim_id": { "$ref": "#/$defs/pathLookup" },
     "by_source_id": { "$ref": "#/$defs/pathLookup" },
     "by_alias": { "$ref": "#/$defs/listLookup" },
@@ -55,6 +57,20 @@
       "additionalProperties": false
     },
     "pathLookup": { "type": "object", "additionalProperties": { "type": "string" } },
+    "workOrderLookup": {
+      "type": "object",
+      "minProperties": 106,
+      "maxProperties": 106,
+      "propertyNames": { "pattern": "^TASK-CDB[0-9]{3}$" },
+      "additionalProperties": { "type": "string", "pattern": "^structured:imported-work-order:task-cdb[0-9]{3}$" }
+    },
+    "mandatoryCapabilityLookup": {
+      "type": "object",
+      "minProperties": 28,
+      "maxProperties": 28,
+      "propertyNames": { "pattern": "^CAP-MIG-[0-9]{3}$" },
+      "additionalProperties": { "type": "string", "pattern": "^structured:mandatory-migration-capability:cap-mig-[0-9]{3}$" }
+    },
     "listLookup": {
       "type": "object",
       "additionalProperties": { "type": "array", "items": { "type": "string" } }

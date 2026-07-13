@@ -1,10 +1,6 @@
-/* LifeOS — top-level styles
-   Imports the design tokens and the LifeOS component CSS (ported from the
-   React canon, kept identical so visuals match the design system 1:1).
-   Vue-specific overrides (router transitions, skip-link, etc.) live below. */
-
-@import url("./colors_and_type.css");
-@import url("./lifeos_app.css");
+/* LifeOS — Vue-specific top-level styles.
+   src/main.ts loads tokens, canonical component styles, then this file so the
+   Vite/PostCSS entrypoint is explicit and warning-free. */
 
 /* Vue-specific: vue-router enter/leave transitions on the main canvas */
 .canvas-fade-enter-active,

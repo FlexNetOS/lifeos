@@ -1,0 +1,131 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/fixtures/README.md",
+    "src/nu_plugin/fixtures/build_script/Cargo.toml",
+    "src/nu_plugin/fixtures/build_script/build.rs",
+    "src/nu_plugin/fixtures/build_script/src/lib.rs",
+    "src/nu_plugin/fixtures/clean_repo/Cargo.toml",
+    "src/nu_plugin/fixtures/clean_repo/src/lib.rs",
+    "src/nu_plugin/fixtures/dirty_repo/README.md",
+    "src/nu_plugin/fixtures/feature_cfg/Cargo.toml",
+    "src/nu_plugin/fixtures/feature_cfg/deps/unix_helper/Cargo.toml",
+    "src/nu_plugin/fixtures/feature_cfg/deps/unix_helper/src/lib.rs",
+    "src/nu_plugin/fixtures/feature_cfg/src/lib.rs",
+    "src/nu_plugin/fixtures/fixture_matrix.csv",
+    "src/nu_plugin/fixtures/include_edges/Cargo.toml",
+    "src/nu_plugin/fixtures/include_edges/assets/blob.bytes",
+    "src/nu_plugin/fixtures/include_edges/assets/message.txt",
+    "src/nu_plugin/fixtures/include_edges/src/lib.rs",
+    "src/nu_plugin/fixtures/macro_rules/Cargo.toml",
+    "src/nu_plugin/fixtures/macro_rules/src/lib.rs",
+    "src/nu_plugin/fixtures/native_link/Cargo.toml",
+    "src/nu_plugin/fixtures/native_link/build.rs",
+    "src/nu_plugin/fixtures/native_link/src/lib.rs",
+    "src/nu_plugin/fixtures/non_rust_assets/Cargo.toml",
+    "src/nu_plugin/fixtures/non_rust_assets/assets/config.kdl",
+    "src/nu_plugin/fixtures/non_rust_assets/assets/data.json",
+    "src/nu_plugin/fixtures/non_rust_assets/src/lib.rs",
+    "src/nu_plugin/fixtures/nushell_syntax/stub_initializer.nu",
+    "src/nu_plugin/fixtures/out_dir_generator/Cargo.toml",
+    "src/nu_plugin/fixtures/out_dir_generator/build.rs",
+    "src/nu_plugin/fixtures/out_dir_generator/src/lib.rs",
+    "src/nu_plugin/fixtures/proc_macro_consumer/Cargo.toml",
+    "src/nu_plugin/fixtures/proc_macro_consumer/crates/consumer/Cargo.toml",
+    "src/nu_plugin/fixtures/proc_macro_consumer/crates/consumer/src/lib.rs",
+    "src/nu_plugin/fixtures/proc_macro_consumer/crates/demo_macro/Cargo.toml",
+    "src/nu_plugin/fixtures/proc_macro_consumer/crates/demo_macro/src/lib.rs",
+    "src/nu_plugin/fixtures/secret_like/Cargo.toml",
+    "src/nu_plugin/fixtures/secret_like/src/lib.rs",
+    "src/nu_plugin/fixtures/single_simple_crate/Cargo.toml",
+    "src/nu_plugin/fixtures/single_simple_crate/src/lib.rs",
+    "src/nu_plugin/fixtures/symlink/README.md",
+    "src/nu_plugin/fixtures/symlink/symlink_manifest.txt",
+    "src/nu_plugin/fixtures/symlink/target.txt",
+    "src/nu_plugin/fixtures/workspace_two_crates/Cargo.toml",
+    "src/nu_plugin/fixtures/workspace_two_crates/crates/app/Cargo.toml",
+    "src/nu_plugin/fixtures/workspace_two_crates/crates/app/src/lib.rs",
+    "src/nu_plugin/fixtures/workspace_two_crates/crates/helper/Cargo.toml",
+    "src/nu_plugin/fixtures/workspace_two_crates/crates/helper/src/lib.rs",
+    "src/nu_plugin/logs/CDB041-fixtures.log"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB041",
+    "decision": null,
+    "intent_lock_digest": "blake3:ba2258ea13e41096f3654e4aaf786003ca932a33ca16cb7231123c45efaf0037",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB042",
+    "TASK-CDB043",
+    "TASK-CDB044",
+    "TASK-CDB045"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB041",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB041",
+  "depends_on": [
+    "TASK-CDB012",
+    "TASK-CDB013"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "fixtures ready",
+    "deterministic": true,
+    "verification_command": "fixtures present and documented"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:ba2258ea13e41096f3654e4aaf786003ca932a33ca16cb7231123c45efaf0037"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:0e8efb7ca257304fe38e61330e760af3b21d769e5fee05c6d629f42f68d7c732",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB041",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB041"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB041 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/fixture workspace"
+  ],
+  "task_id": "TASK-CDB041",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB041"
+}

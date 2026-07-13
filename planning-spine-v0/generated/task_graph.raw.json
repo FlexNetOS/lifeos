@@ -1,9 +1,9 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-13T06:23:46Z",
+  "generated_at": "2026-07-13T14:46:51Z",
   "source": {
     "format": "csv",
-    "path": "generated/task_graph.source.csv",
+    "path": "planning-spine-v0/generated/task_graph.source.csv",
     "header": [
       "task_id",
       "parent_id",
@@ -3368,7 +3368,7 @@
         "rollback_plan": "Delete rejected scan exports and rescan; physical space unaffected.",
         "status": "Draft",
         "proof_uri": "proof_records/LPS-029.proof.json",
-        "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]"
+        "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T14:46:50Z] OWNER DECISION: physical Polycam LiDAR scan (owner will perform). Downstream FULLY READY + one-command: after scanning, export high-density PLY -> worldsim/scans/room/ -> run `nix develop path:planning-spine-v0/worldsim -c python3 planning-spine-v0/worldsim/scripts/ingest_room_scan.py` -> cleanup->USD->base-layer->acceptance runs on the real scan, composites with the 15-part manufacturer-spec workstation twin, writes LPS-029 proof -> merge+project -> 196/196. Runner verified end-to-end on a sample room (watertight+acceptance pass). Workstation already done from the Hardware Catalog; only the room walls/floor need the scan."
       }
     },
     {

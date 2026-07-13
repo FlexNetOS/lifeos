@@ -1,15 +1,23 @@
 {
   "schema_version": "lifeos-worldsim.manufacturer-spec-twin.v0",
-  "note": "Known manufactured hardware modeled from manufacturer specifications rather than LiDAR scanned. Dimensions in metres (metersPerUnit=1.0), upAxis=Z. Each component is a ground-truth semantic instance (class + instance_id) — no ML segmentation needed for known hardware; the room walls/floor still come from the LPS-029 scan. Masses from manufacturer/representative figures (kg).",
+  "note": "Known manufactured hardware modeled from manufacturer specifications rather than LiDAR scanned. Dimensions in metres (metersPerUnit=1.0), upAxis=Z. Each component is a ground-truth semantic instance (class + instance_id) \u2014 no ML segmentation needed for known hardware; the room walls/floor still come from the LPS-029 scan. Masses from manufacturer/representative figures (kg).",
   "components": [
     {
       "instance_id": "gpu_01",
       "semantic_class": "gpu",
       "manufacturer": "NVIDIA",
       "model": "GeForce RTX 5090 Founders Edition",
-      "dimensions_m": [0.304, 0.137, 0.048],
+      "dimensions_m": [
+        0.304,
+        0.137,
+        0.048
+      ],
       "mass_kg": 2.0,
-      "position_m": [0.0, 0.0, 0.20],
+      "position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
       "source": "NVIDIA RTX 5090 FE spec (304x137mm, 2-slot); 2x present per nvidia-smi"
     },
     {
@@ -17,9 +25,17 @@
       "semantic_class": "gpu",
       "manufacturer": "NVIDIA",
       "model": "GeForce RTX 5090 Founders Edition",
-      "dimensions_m": [0.304, 0.137, 0.048],
+      "dimensions_m": [
+        0.304,
+        0.137,
+        0.048
+      ],
       "mass_kg": 2.0,
-      "position_m": [0.0, 0.06, 0.14],
+      "position_m": [
+        0.0,
+        0.06,
+        0.14
+      ],
       "source": "NVIDIA RTX 5090 FE spec"
     },
     {
@@ -27,9 +43,17 @@
       "semantic_class": "pc_case",
       "manufacturer": "generic-ATX-mid-tower",
       "model": "ATX mid-tower (representative)",
-      "dimensions_m": [0.480, 0.210, 0.450],
+      "dimensions_m": [
+        0.48,
+        0.21,
+        0.45
+      ],
       "mass_kg": 12.0,
-      "position_m": [0.0, 0.0, 0.225],
+      "position_m": [
+        0.0,
+        0.0,
+        0.225
+      ],
       "source": "representative ATX mid-tower envelope; replace with owner's exact case model"
     },
     {
@@ -37,9 +61,17 @@
       "semantic_class": "monitor",
       "manufacturer": "generic-27in",
       "model": "27-inch 16:9 monitor (representative)",
-      "dimensions_m": [0.610, 0.050, 0.365],
+      "dimensions_m": [
+        0.61,
+        0.05,
+        0.365
+      ],
       "mass_kg": 5.0,
-      "position_m": [0.0, 0.55, 0.75],
+      "position_m": [
+        0.0,
+        0.55,
+        0.75
+      ],
       "source": "27in 16:9 panel envelope; replace with owner's exact monitor model"
     },
     {
@@ -47,14 +79,133 @@
       "semantic_class": "desk",
       "manufacturer": "generic",
       "model": "standard desk (representative)",
-      "dimensions_m": [1.400, 0.700, 0.030],
+      "dimensions_m": [
+        1.4,
+        0.7,
+        0.03
+      ],
       "mass_kg": 30.0,
-      "position_m": [0.0, 0.30, 0.735],
+      "position_m": [
+        0.0,
+        0.3,
+        0.735
+      ],
       "source": "standard desk surface 1400x700mm at 750mm height; replace with owner's exact desk"
+    },
+    {
+      "instance_id": "cpu_01",
+      "semantic_class": "cpu",
+      "manufacturer": "AMD",
+      "model": "Ryzen Threadripper PRO (sTR5 / WRX90)",
+      "dimensions_m": [
+        0.0755,
+        0.0565,
+        0.008
+      ],
+      "mass_kg": 0.35,
+      "position_m": [
+        0.0,
+        -0.05,
+        0.2
+      ],
+      "source": "AMD Threadripper PRO sTR5 package envelope (~75.5x56.5mm); confirm exact model (7995WX etc.)"
+    },
+    {
+      "instance_id": "ssd_01",
+      "semantic_class": "ssd",
+      "manufacturer": "Samsung",
+      "model": "4TB NVMe M.2 2280 (e.g. 990 PRO)",
+      "dimensions_m": [
+        0.0802,
+        0.0222,
+        0.0023
+      ],
+      "mass_kg": 0.009,
+      "position_m": [
+        0.02,
+        -0.02,
+        0.18
+      ],
+      "source": "Samsung 4TB M.2 2280 spec (80.15x22.15x2.3mm); 2x present"
+    },
+    {
+      "instance_id": "ssd_02",
+      "semantic_class": "ssd",
+      "manufacturer": "Samsung",
+      "model": "4TB NVMe M.2 2280 (e.g. 990 PRO)",
+      "dimensions_m": [
+        0.0802,
+        0.0222,
+        0.0023
+      ],
+      "mass_kg": 0.009,
+      "position_m": [
+        0.02,
+        -0.02,
+        0.16
+      ],
+      "source": "Samsung 4TB M.2 2280 spec; 2nd unit"
+    },
+    {
+      "instance_id": "hdd_01",
+      "semantic_class": "hdd",
+      "manufacturer": "generic-3.5in",
+      "model": "3.5-inch HDD",
+      "dimensions_m": [
+        0.147,
+        0.1016,
+        0.0261
+      ],
+      "mass_kg": 0.65,
+      "position_m": [
+        -0.1,
+        -0.05,
+        0.1
+      ],
+      "source": "3.5in HDD form factor (147x101.6x26.1mm); 3x present"
+    },
+    {
+      "instance_id": "hdd_02",
+      "semantic_class": "hdd",
+      "manufacturer": "generic-3.5in",
+      "model": "3.5-inch HDD",
+      "dimensions_m": [
+        0.147,
+        0.1016,
+        0.0261
+      ],
+      "mass_kg": 0.65,
+      "position_m": [
+        -0.1,
+        -0.05,
+        0.07
+      ],
+      "source": "3.5in HDD; 2nd unit"
+    },
+    {
+      "instance_id": "hdd_03",
+      "semantic_class": "hdd",
+      "manufacturer": "generic-3.5in",
+      "model": "3.5-inch HDD",
+      "dimensions_m": [
+        0.147,
+        0.1016,
+        0.0261
+      ],
+      "mass_kg": 0.65,
+      "position_m": [
+        -0.1,
+        -0.05,
+        0.04
+      ],
+      "source": "3.5in HDD; 3rd unit"
     }
   ],
   "room_from_scan": {
     "note": "Walls, floor, and ceiling come from the LPS-029 LiDAR scan (irregular geometry manufacturers do not publish). Static structure.",
-    "provisional_floor_m": [4.0, 4.0]
+    "provisional_floor_m": [
+      4.0,
+      4.0
+    ]
   }
 }

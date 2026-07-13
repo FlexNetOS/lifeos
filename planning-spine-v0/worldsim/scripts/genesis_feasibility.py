@@ -29,14 +29,23 @@ import genesis as gs
 
 def build_and_run(spec: dict, steps: int, seed: int) -> tuple[float, str]:
     gs.init(backend=gs.gpu, precision="32", seed=seed, logging_level="warning")
-    scene = gs.Scene(show_viewer=False, show_FPS=False)
+    # Small timestep for numerical stability with thin/dense parts (SSDs ~2mm).
+    scene = gs.Scene(
+        show_viewer=False,
+        sim_options=gs.options.SimOptions(dt=0.005, substeps=4),
+    )
     scene.add_entity(gs.morphs.Plane())  # floor
     entities = []
-    for c in spec["components"]:
-        dx, dy, dz = c["dimensions_m"]
-        px, py, pz = c["position_m"]
+    # Grid layout so parts spawn without overlap/interpenetration; clamp thin
+    # dims to a minimum collision thickness so contacts stay well-conditioned.
+    n = len(spec["components"])
+    cols = max(1, int(n**0.5 + 0.999))
+    for i, c in enumerate(spec["components"]):
+        dx, dy, dz = (max(d, 0.02) for d in c["dimensions_m"])
+        gx = (i % cols) * 0.6 - (cols - 1) * 0.3
+        gy = (i // cols) * 0.6
         e = scene.add_entity(
-            gs.morphs.Box(size=(dx, dy, dz), pos=(px, py, pz + 1.0)),  # drop from +1m
+            gs.morphs.Box(size=(dx, dy, dz), pos=(gx, gy, dz / 2 + 0.05)),
         )
         entities.append(e)
     scene.build()

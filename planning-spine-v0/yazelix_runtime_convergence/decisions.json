@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.yazelix-runtime-convergence.decisions.v0",
-  "generated_at": "2026-07-14T12:22:43Z",
+  "generated_at": "2026-07-14T14:01:31Z",
   "decisions": [
     {
       "id": "DEC-YZXCONV-001",
@@ -14,15 +14,21 @@
     },
     {
       "id": "DEC-YZXCONV-002",
-      "title": "Strict-Nushell routing on both agent shell tools, wrapper-lane convergence as documented fallback",
+      "title": "Strict-Nushell agent routing via nu-MCP + deny-Bash + nu-syntax skill (two swaps + hard gate)",
       "subject_task": "YZXCONV-017",
       "decided_by": "Owner",
       "decided_at": "2026-07-14T12:22:43Z",
-      "decision": "Clause 11 (agents execute shell only through Nushell) targets strict enforcement on BOTH agents: (a) Claude's PreToolUse Bash hook (rtk hook claude) is extended to rewrite every command to `nu -c` through the single rtk_wrappers.nu chokepoint; (b) the Codex codex-harness-hook is extended to rewrite Bash exec to `nu -c`. Where the Codex `bash -lc` exec floor cannot be forced, the documented FALLBACK is wrapper-lane convergence: every agent command still routes through the single RTK/Nushell wrapper, and the bash-exec-wrapping is recorded as the platform floor rather than treated as an open gap. No unverified shell-override claim may be made; the codex-harness-hook rewrite feasibility must be verified against the installed Codex build before implementation (YZXCONV-026).",
+      "refined_at": "2026-07-14T14:01:31Z",
+      "refinement_note": "Refined after the yazelix + nushell-MCP deep-research pass (owner-requested). The original nu -c PreToolUse rewrite mechanism is REPLACED by nu-MCP + deny-Bash + nu-syntax skill; the rewrite hook is demoted to a rejected/documented-broken option. yazelix itself was confirmed NOT to route agent shell through nu (it runs the agent in a nu pane only), so the routing technique comes from the MCP side of the ecosystem, not from yazelix.",
+      "decision": "Clause 11 (agents execute shell only through Nushell) is achieved by the research-proven TWO-SWAPS-PLUS-HARD-GATE model, NOT by a nu -c rewrite hook: (1) SYNTAX SWAP - a vendored nushell-syntax skill so each agent emits Nushell rather than bash; (2) INTERPRETER ROUTING - a profile-owned Nushell MCP execution tool (prefer the built-in nu --mcp from Nushell 0.108+, else a pure-Rust nu-MCP crate that respects the no-C boundary) into which the model writes nu as a typed argument; (3) HARD GATE - deny/disable the built-in Bash tool so no bash escape remains. The nu -c PreToolUse rewrite hook is REJECTED as the primary mechanism: it is broken by claude-code #4535 (dev-null injection), unreliable per #15897/#26506 (updatedInput), and fundamentally hands bash syntax to a non-POSIX nu parser (verified locally on nu 0.113.1: andand, dollar-paren, 2>&1, and heredocs all fail). IRREDUCIBLE FLOOR: this is a feature-swap not a transparent shim - the agent must speak nu; bash-emitting commands fail loudly rather than being translated (no bash-to-nu transpiler exists); syntax enforcement is probabilistic and coverage is bounded (tools that hardcode bash break or slip). Wrapper-lane convergence (interactive nu panes + rtk command rewriting) remains the documented partial fallback. Implemented by YZXCONV-028 under owner approval.",
       "evidence": [
-        "docs.claude.com hooks reference: a PreToolUse Bash hook honors hookSpecificOutput.updatedInput.command to substitute the executed command",
-        "openai/codex config reference: no config key selects a custom shell; [shell_environment_policy] shapes the subprocess environment only, not the interpreter",
-        "openai/codex issues #1708 and #6715: the exec layer force-wraps commands in bash -lc even under experimental_use_profile"
+        "Local verification on nu 0.113.1: bash '&&', '$(...)', '2>&1', and heredocs all fail at the nushell parser when passed to nu -c; nushell is explicitly non-POSIX (nushell.sh cookbook/foreign_shell_scripts)",
+        "anthropics/claude-code #4535: the Bash tool appends '< /dev/null', which breaks any nu -c wrapping",
+        "anthropics/claude-code #15897 and #26506: PreToolUse updatedInput is unreliable / unsupported across paths",
+        "openai/codex #1708 and #4210: exec force-wraps [shell_path, -lc, script] with a bash body; #3823 has no supported shell-selector key",
+        "Nushell 0.108 ships a built-in MCP server (nu --mcp); cablehead/mcp-server-nu (exec) and ck3mp3r/nu-mcp (persistent run) execute model-authored nu",
+        "luccahuguet/yazelix routes the agent into a nu PANE only (agent.command = one executable; shell.program = nu for new panes); it does not route the agent tool through nu",
+        "nushell-prophet/nushell-skills (Claude Code plugin marketplace) and hustcer/nushell-pro (SKILL.md) provide the agent nu-syntax skill - the syntax-swap half"
       ]
     }
   ]

@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T12:23:21Z",
+  "generated_at": "2026-07-14T14:02:39Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 27,
+  "task_count": 28,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T12:23:21Z",
+    "generated_at": "2026-07-14T14:02:39Z",
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
-    "row_count": 27,
+    "row_count": 28,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -1573,53 +1573,56 @@
       "phase": "2-nushell",
       "title": "Design strict Nushell command routing for both agent shell tools",
       "owner_agent": "Shell Authority Agent",
-      "goal": "Design the owner-ratified strict-nu-on-both-agents routing: extend the Claude PreToolUse Bash hook (rtk hook claude) to rewrite every command to nu -c through the single wrapper and extend the Codex codex-harness-hook to rewrite Bash exec to nu -c with documented wrapper-lane convergence as the fallback where the Codex bash -lc exec floor cannot be forced. Web-verified: Claude honors updatedInput.command; Codex exposes no shell selector and force-wraps bash -lc.",
+      "goal": "Design the owner-ratified strict-nu-on-both-agents routing using the research-proven two-swaps-plus-hard-gate model: (1) SYNTAX SWAP a vendored nushell-syntax skill so each agent emits Nushell not bash; (2) INTERPRETER ROUTING a profile-owned Nushell MCP execution tool (prefer built-in nu --mcp from Nushell 0.108+, else a pure-Rust nu-MCP crate honoring the no-C boundary) into which the model writes nu as a typed argument; (3) HARD GATE deny the built-in Bash tool so no bash escape remains. The nu -c PreToolUse rewrite hook is REJECTED as primary: broken by claude-code #4535 (dev-null injection) and #15897/#26506 (updatedInput), and it hands bash syntax to a non-POSIX nu parser (verified locally on nu 0.113.1: andand, dollar-paren, 2>&1, heredocs all fail). Wrapper-lane convergence stays the documented partial fallback.",
       "simulation_required": false,
       "execution_cell": "agent-nu-routing-design-cell",
-      "verification_gate": "The design specifies the concrete nu -c rewrite for the Claude PreToolUse hook and the codex-harness-hook path names the bash -lc platform floor and the wrapper-lane fallback and is referenced by YZXCONV-017 enforcement; no unverified shell-override claim is made.",
+      "verification_gate": "The design specifies the nushell MCP execution path the vendored nu-syntax skill and the Bash-tool deny gate for both agents names the irreducible floor (feature-swap not shim: bash-emitting commands fail loudly, enforcement probabilistic on syntax and bounded on coverage) records the rejected nu -c rewrite with its failure mode cites the claude-code and codex issues and feeds YZXCONV-017 and YZXCONV-028; no unverified shell-override claim is made.",
       "rollback_plan": "Remove only the routing design entry; no hook or agent config is changed.",
       "status": "ready",
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-026.proof.json",
-      "next_action": "Author the strict-nu-routing decision and design and verify the codex-harness-hook rewrite feasibility against the installed Codex build before implementation.",
+      "next_action": "Confirm whether the profile nu is built with the mcp feature, then finalize the MCP+skill+deny-Bash design for YZXCONV-028.",
       "source_columns": {
         "task_id": "YZXCONV-026",
         "parent_id": "YZXCONV-009; YZXCONV-017",
         "phase": "2-nushell",
         "title": "Design strict Nushell command routing for both agent shell tools",
         "owner_agent": "Shell Authority Agent",
-        "goal": "Design the owner-ratified strict-nu-on-both-agents routing: extend the Claude PreToolUse Bash hook (rtk hook claude) to rewrite every command to nu -c through the single wrapper and extend the Codex codex-harness-hook to rewrite Bash exec to nu -c with documented wrapper-lane convergence as the fallback where the Codex bash -lc exec floor cannot be forced. Web-verified: Claude honors updatedInput.command; Codex exposes no shell selector and force-wraps bash -lc.",
-        "inputs": "rtk hook claude PreToolUse mechanism; codex-harness-hook binary; web-verified Codex and Claude shell-routing capability; owner decision 2026-07-14",
-        "target_artifacts": "yazelix_runtime_convergence/decisions.json strict-nu-routing entry; per-agent routing design; fallback disposition",
+        "goal": "Design the owner-ratified strict-nu-on-both-agents routing using the research-proven two-swaps-plus-hard-gate model: (1) SYNTAX SWAP a vendored nushell-syntax skill so each agent emits Nushell not bash; (2) INTERPRETER ROUTING a profile-owned Nushell MCP execution tool (prefer built-in nu --mcp from Nushell 0.108+, else a pure-Rust nu-MCP crate honoring the no-C boundary) into which the model writes nu as a typed argument; (3) HARD GATE deny the built-in Bash tool so no bash escape remains. The nu -c PreToolUse rewrite hook is REJECTED as primary: broken by claude-code #4535 (dev-null injection) and #15897/#26506 (updatedInput), and it hands bash syntax to a non-POSIX nu parser (verified locally on nu 0.113.1: andand, dollar-paren, 2>&1, heredocs all fail). Wrapper-lane convergence stays the documented partial fallback.",
+        "inputs": "nushell MCP options (nu --mcp, cablehead/mcp-server-nu, ck3mp3r/nu-mcp); nushell-pro and nushell-skills skill content; claude-code and codex shell issues; local nu 0.113.1 verification; owner decision 2026-07-14",
+        "target_artifacts": "yazelix_runtime_convergence/decisions.json strict-nu-routing entry; per-agent MCP+skill+deny-Bash design; irreducible-floor note",
         "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
-        "blocked_paths": "editing the Claude hook or codex-harness-hook in this task; agent config mutation; profile mutation",
+        "blocked_paths": "editing agent hooks config or the profile in this task; agent config mutation; profile mutation",
         "simulation_required": "FALSE",
         "execution_cell": "agent-nu-routing-design-cell",
-        "verification_gate": "The design specifies the concrete nu -c rewrite for the Claude PreToolUse hook and the codex-harness-hook path names the bash -lc platform floor and the wrapper-lane fallback and is referenced by YZXCONV-017 enforcement; no unverified shell-override claim is made.",
+        "verification_gate": "The design specifies the nushell MCP execution path the vendored nu-syntax skill and the Bash-tool deny gate for both agents names the irreducible floor (feature-swap not shim: bash-emitting commands fail loudly, enforcement probabilistic on syntax and bounded on coverage) records the rejected nu -c rewrite with its failure mode cites the claude-code and codex issues and feeds YZXCONV-017 and YZXCONV-028; no unverified shell-override claim is made.",
         "rollback_plan": "Remove only the routing design entry; no hook or agent config is changed.",
         "status": "Ready",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-026.proof.json",
-        "next_action": "Author the strict-nu-routing decision and design and verify the codex-harness-hook rewrite feasibility against the installed Codex build before implementation."
+        "next_action": "Confirm whether the profile nu is built with the mcp feature, then finalize the MCP+skill+deny-Bash design for YZXCONV-028."
       },
       "parent_ids": [
         "YZXCONV-009",
         "YZXCONV-017"
       ],
       "inputs": [
-        "rtk hook claude PreToolUse mechanism",
-        "codex-harness-hook binary",
-        "web-verified Codex and Claude shell-routing capability",
+        "nushell MCP options (nu --mcp",
+        "cablehead/mcp-server-nu",
+        "ck3mp3r/nu-mcp)",
+        "nushell-pro and nushell-skills skill content",
+        "claude-code and codex shell issues",
+        "local nu 0.113.1 verification",
         "owner decision 2026-07-14"
       ],
       "target_artifacts": [
         "yazelix_runtime_convergence/decisions.json strict-nu-routing entry",
-        "per-agent routing design",
-        "fallback disposition"
+        "per-agent MCP+skill+deny-Bash design",
+        "irreducible-floor note"
       ],
       "allowed_paths": [
         "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
       ],
       "blocked_paths": [
-        "editing the Claude hook or codex-harness-hook in this task",
+        "editing agent hooks config or the profile in this task",
         "agent config mutation",
         "profile mutation"
       ]
@@ -1679,6 +1682,71 @@
         "auth.json and credentials",
         "sessions and databases",
         "profile mutation"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-028",
+      "source_row_number": 29,
+      "phase": "2-nushell",
+      "title": "Adopt the profile-owned Nushell MCP tool the nu-syntax skill and the Bash-tool deny gate",
+      "owner_agent": "Shell Authority Agent",
+      "goal": "Implement the YZXCONV-026 design: package a profile-owned Nushell MCP execution tool (prefer building the profile nu with the mcp feature for nu --mcp else vendor a pure-Rust nu-MCP crate consistent with the no-C trust boundary), vendor a nushell-syntax skill into agent-skills so both Claude and Codex emit idiomatic nu, and add the deny of the built-in Bash tool to both agents through the envctl agent-env projection so nushell is the only sanctioned shell surface. TDD with negative tests that reject a bash escape and prove a nu command runs through the MCP tool.",
+      "simulation_required": true,
+      "execution_cell": "nushell-mcp-adoption-cell",
+      "verification_gate": "The profile exposes a Nushell MCP execution tool resolving through the one profile; both agents carry the vendored nu-syntax skill and a Bash-tool deny in their projected config; negative tests prove a bash command is rejected and a nu command runs through the MCP tool; the no-C boundary and single-profile ownership are preserved; a second agent-env preview is idempotent.",
+      "rollback_plan": "Restore the prior agent-env source lock and projections through the envctl operation receipt re-enable the Bash tool and remove the MCP tool and skill; no auth or state is moved.",
+      "status": "blocked",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-028.proof.json",
+      "next_action": "Confirm the profile nu mcp-feature status, choose nu --mcp vs a vendored pure-Rust nu-MCP crate, then implement behind agent-env preview under owner approval.",
+      "source_columns": {
+        "task_id": "YZXCONV-028",
+        "parent_id": "YZXCONV-017; YZXCONV-026",
+        "phase": "2-nushell",
+        "title": "Adopt the profile-owned Nushell MCP tool the nu-syntax skill and the Bash-tool deny gate",
+        "owner_agent": "Shell Authority Agent",
+        "goal": "Implement the YZXCONV-026 design: package a profile-owned Nushell MCP execution tool (prefer building the profile nu with the mcp feature for nu --mcp else vendor a pure-Rust nu-MCP crate consistent with the no-C trust boundary), vendor a nushell-syntax skill into agent-skills so both Claude and Codex emit idiomatic nu, and add the deny of the built-in Bash tool to both agents through the envctl agent-env projection so nushell is the only sanctioned shell surface. TDD with negative tests that reject a bash escape and prove a nu command runs through the MCP tool.",
+        "inputs": "YZXCONV-026 design; profile nushell 0.113.1 mcp-feature status; cablehead/mcp-server-nu and ck3mp3r/nu-mcp references; nushell-pro and nushell-skills skill content; envctl agent-env source and lock",
+        "target_artifacts": "profile-owned Nushell MCP tool; vendored nu-syntax skill in agent-skills; Bash-tool deny agent-env projection; negative and positive routing tests",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/meta/src/envctl/home/**; /home/flexnetos/meta/src/envctl/tests/**",
+        "blocked_paths": "adding a C-linked dependency to the trust boundary; global package install; agent auth or state mutation; generated Yazelix runtime hand edits; applying agent-env without preview and review",
+        "simulation_required": "TRUE",
+        "execution_cell": "nushell-mcp-adoption-cell",
+        "verification_gate": "The profile exposes a Nushell MCP execution tool resolving through the one profile; both agents carry the vendored nu-syntax skill and a Bash-tool deny in their projected config; negative tests prove a bash command is rejected and a nu command runs through the MCP tool; the no-C boundary and single-profile ownership are preserved; a second agent-env preview is idempotent.",
+        "rollback_plan": "Restore the prior agent-env source lock and projections through the envctl operation receipt re-enable the Bash tool and remove the MCP tool and skill; no auth or state is moved.",
+        "status": "Blocked",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-028.proof.json",
+        "next_action": "Confirm the profile nu mcp-feature status, choose nu --mcp vs a vendored pure-Rust nu-MCP crate, then implement behind agent-env preview under owner approval."
+      },
+      "parent_ids": [
+        "YZXCONV-017",
+        "YZXCONV-026"
+      ],
+      "inputs": [
+        "YZXCONV-026 design",
+        "profile nushell 0.113.1 mcp-feature status",
+        "cablehead/mcp-server-nu and ck3mp3r/nu-mcp references",
+        "nushell-pro and nushell-skills skill content",
+        "envctl agent-env source and lock"
+      ],
+      "target_artifacts": [
+        "profile-owned Nushell MCP tool",
+        "vendored nu-syntax skill in agent-skills",
+        "Bash-tool deny agent-env projection",
+        "negative and positive routing tests"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/envctl/agent-env.yaml",
+        "/home/flexnetos/meta/src/envctl/agent-skills/**",
+        "/home/flexnetos/meta/src/envctl/home/**",
+        "/home/flexnetos/meta/src/envctl/tests/**"
+      ],
+      "blocked_paths": [
+        "adding a C-linked dependency to the trust boundary",
+        "global package install",
+        "agent auth or state mutation",
+        "generated Yazelix runtime hand edits",
+        "applying agent-env without preview and review"
       ]
     }
   ]

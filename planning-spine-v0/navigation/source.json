@@ -17,6 +17,7 @@
     "EXECUTION_STATUS.md",
     "1.0_VISION/README.md",
     "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE.md",
     "1.0_VISION/Notebooklm/README.md",
     "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
     "task_tables/README.md",
@@ -228,7 +229,8 @@
       "tags": ["tasks", "execution", "status"],
       "entrypoints": ["03_TASK_GRAPH_SCHEMA.md", "EXECUTION_STATUS.md", "generated/task_graph.index.json", "generated/task_graph.status.json"],
       "path_prefixes": ["generated/execution_packets/", "generated/task_families/"],
-      "keywords": ["task graph", "next action", "ready task"]
+      "keywords": ["task graph", "next action", "ready task"],
+      "task_prefixes": ["ARCHBP-"]
     },
     {
       "id": "proof-and-verification",
@@ -247,10 +249,10 @@
       "description": "Raw exports, exact-source captures, normalized claims, evidence, queues, and compatibility corrections.",
       "aliases": ["NotebookLM", "source claims", "blueprint provenance"],
       "tags": ["notebooklm", "provenance", "claims"],
-      "entrypoints": ["1.0_VISION/Notebooklm/README.md", "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md", "generated/notebooklm_source_registry.source.csv"],
+      "entrypoints": ["1.0_VISION/Notebooklm/README.md", "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md", "1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE.md", "generated/notebooklm_source_registry.source.csv"],
       "path_prefixes": ["1.0_VISION/Notebooklm/", "generated/notebooklm_"],
       "keywords": ["NotebookLM", "claim verification", "source provenance"],
-      "task_prefixes": ["NBSOURCE-", "NBSTATED-", "NBVERIFY-"]
+      "task_prefixes": ["NBSOURCE-", "NBSTATED-", "NBVERIFY-", "ARCHBP-"]
     },
     {
       "id": "storage-postgres-ruvector",

@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-13T06:23:46Z",
+  "generated_at": "2026-07-14T07:08:12Z",
   "source_graph_uri": "generated/task_graph.raw.json",
-  "task_count": 196,
+  "task_count": 232,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-13T06:23:46Z",
+    "generated_at": "2026-07-14T07:08:12Z",
     "format": "csv",
     "path": "generated/task_graph.source.csv",
-    "row_count": 196,
+    "row_count": 232,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -8815,9 +8815,9 @@
       "execution_cell": "dev-cell",
       "verification_gate": "Raw maps show global spatial consistency: no ghosting or duplicated planes from SLAM drift; dense coverage with no high-incident-angle gaps.",
       "rollback_plan": "Delete rejected scan exports and rescan; physical space unaffected.",
-      "status": "draft",
+      "status": "blocked",
       "proof_uri": "proof_records/LPS-029.proof.json",
-      "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]",
+      "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T14:46:50Z] OWNER DECISION: physical Polycam LiDAR scan (owner will perform). Downstream FULLY READY + one-command: after scanning, export high-density PLY -> worldsim/scans/room/ -> run `nix develop path:planning-spine-v0/worldsim -c python3 planning-spine-v0/worldsim/scripts/ingest_room_scan.py` -> cleanup->USD->base-layer->acceptance runs on the real scan, composites with the 15-part manufacturer-spec workstation twin, writes LPS-029 proof -> merge+project -> 196/196. Runner verified end-to-end on a sample room (watertight+acceptance pass). Workstation already done from the Hardware Catalog; only the room walls/floor need the scan.",
       "source_columns": {
         "task_id": "LPS-029",
         "parent_id": "LPS-022",
@@ -8833,9 +8833,9 @@
         "execution_cell": "dev-cell",
         "verification_gate": "Raw maps show global spatial consistency: no ghosting or duplicated planes from SLAM drift; dense coverage with no high-incident-angle gaps.",
         "rollback_plan": "Delete rejected scan exports and rescan; physical space unaffected.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "proof_records/LPS-029.proof.json",
-        "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.]"
+        "next_action": "Scan with high viewpoint density and non-repetitive motion; avoid grazing angles. [HARDWARE-DECIDED 2026-07-13T04:02:15Z: GPU corrected to 2x RTX 5090 (32 GB each). PHYSICALLY DEFERRED to owner: LPS-029 requires a real LiDAR room scan (Polycam) that no agent can produce; LPS-031-036 depend on that scan. Scheduled owner task.] [2026-07-13T14:46:50Z] OWNER DECISION: physical Polycam LiDAR scan (owner will perform). Downstream FULLY READY + one-command: after scanning, export high-density PLY -> worldsim/scans/room/ -> run `nix develop path:planning-spine-v0/worldsim -c python3 planning-spine-v0/worldsim/scripts/ingest_room_scan.py` -> cleanup->USD->base-layer->acceptance runs on the real scan, composites with the 15-part manufacturer-spec workstation twin, writes LPS-029 proof -> merge+project -> 196/196. Runner verified end-to-end on a sample room (watertight+acceptance pass). Workstation already done from the Hardware Catalog; only the room walls/floor need the scan."
       },
       "parent_ids": [
         "LPS-022"
@@ -11783,6 +11783,2289 @@
         "peer-repo mutation",
         "secrets/**",
         "generated runtime mutation"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-001",
+      "source_row_number": 198,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Build the native Nushell code-ingestion pipeline",
+      "owner_agent": "CodeDB Agent / Nushell Plugin Agent",
+      "goal": "Use TDD to ingest Nushell AST and source metadata through the native nu_plugin MessagePack protocol, preserve exact bytes and module paths, and apply BLAKE3 content deduplication without claiming zero-copy or vectorization before measurement.",
+      "simulation_required": true,
+      "execution_cell": "codedb-ingestion-cell",
+      "verification_gate": "Red tests precede implementation; bounded .nu, .rs, and .toml fixtures round-trip exact bytes, paths, permissions, AST metadata, and hashes through the native MessagePack plugin; duplicate content is content-addressed once; raw benchmark samples qualify all performance wording.",
+      "rollback_plan": "Revert the bounded ingestion schema and plugin changes, delete only task-created test databases and artifacts by receipt, and preserve original source fixtures.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-001.proof.json",
+      "next_action": "Write the bounded ingestion fixtures and failing protocol, provenance, and deduplication tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-001",
+        "parent_id": "NBVERIFY-003; POSTGRES-004",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Build the native Nushell code-ingestion pipeline",
+        "owner_agent": "CodeDB Agent / Nushell Plugin Agent",
+        "goal": "Use TDD to ingest Nushell AST and source metadata through the native nu_plugin MessagePack protocol, preserve exact bytes and module paths, and apply BLAKE3 content deduplication without claiming zero-copy or vectorization before measurement.",
+        "inputs": "Architecture Blueprint ingestion pillars; NBVERIFY-003 truth matrix; POSTGRES-004 plan; current nu_plugin CodeDB contracts",
+        "target_artifacts": "failing-then-passing ingestion tests; AST and module-path schema; BLAKE3 dedup receipt; protocol benchmark; ARCHBP-001 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "envctl ownership; PostgreSQL mutation; generated Yazelix runtime edits; unmeasured zero-copy or instant-vectorization claims; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "codedb-ingestion-cell",
+        "verification_gate": "Red tests precede implementation; bounded .nu, .rs, and .toml fixtures round-trip exact bytes, paths, permissions, AST metadata, and hashes through the native MessagePack plugin; duplicate content is content-addressed once; raw benchmark samples qualify all performance wording.",
+        "rollback_plan": "Revert the bounded ingestion schema and plugin changes, delete only task-created test databases and artifacts by receipt, and preserve original source fixtures.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-001.proof.json",
+        "next_action": "Write the bounded ingestion fixtures and failing protocol, provenance, and deduplication tests."
+      },
+      "parent_ids": [
+        "NBVERIFY-003",
+        "POSTGRES-004"
+      ],
+      "inputs": [
+        "Architecture Blueprint ingestion pillars",
+        "NBVERIFY-003 truth matrix",
+        "POSTGRES-004 plan",
+        "current nu_plugin CodeDB contracts"
+      ],
+      "target_artifacts": [
+        "failing-then-passing ingestion tests",
+        "AST and module-path schema",
+        "BLAKE3 dedup receipt",
+        "protocol benchmark",
+        "ARCHBP-001 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "envctl ownership",
+        "PostgreSQL mutation",
+        "generated Yazelix runtime edits",
+        "unmeasured zero-copy or instant-vectorization claims",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-002",
+      "source_row_number": 199,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Implement the redb outbox and PostgreSQL RuVector synchronization seam",
+      "owner_agent": "Storage Synchronization Agent",
+      "goal": "Use TDD to make redb the restartable local buffer and explicit application outbox for ordered embedding work, then synchronize idempotently into PostgreSQL plus RuVector without shared-store or authority ambiguity.",
+      "simulation_required": true,
+      "execution_cell": "storage-sync-cell",
+      "verification_gate": "Red tests cover crash at every enqueue, embed, flush, and acknowledge boundary; replay is ordered, idempotent, observable, and lossless; model/version provenance is recorded; PostgreSQL remains macro-state authority and envctl consumes only a versioned export contract.",
+      "rollback_plan": "Disable the synchronizer, replay the append-only outbox from the last acknowledged cursor, remove only task-created test namespaces, and restore the prior adapter version.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-002.proof.json",
+      "next_action": "Begin after ARCHBP-001 proves exact native ingestion.",
+      "source_columns": {
+        "task_id": "ARCHBP-002",
+        "parent_id": "ARCHBP-001; STORE-001",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Implement the redb outbox and PostgreSQL RuVector synchronization seam",
+        "owner_agent": "Storage Synchronization Agent",
+        "goal": "Use TDD to make redb the restartable local buffer and explicit application outbox for ordered embedding work, then synchronize idempotently into PostgreSQL plus RuVector without shared-store or authority ambiguity.",
+        "inputs": "ARCHBP-001; STORE-001; NBVERIFY-002; redb and PostgreSQL authority contracts",
+        "target_artifacts": "outbox schema; crash-recovery tests; embedding job contract; PostgreSQL synchronization receipts; ARCHBP-002 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "shared redb ownership; direct store-internal coupling; silent data loss; production database mutation; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "storage-sync-cell",
+        "verification_gate": "Red tests cover crash at every enqueue, embed, flush, and acknowledge boundary; replay is ordered, idempotent, observable, and lossless; model/version provenance is recorded; PostgreSQL remains macro-state authority and envctl consumes only a versioned export contract.",
+        "rollback_plan": "Disable the synchronizer, replay the append-only outbox from the last acknowledged cursor, remove only task-created test namespaces, and restore the prior adapter version.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-002.proof.json",
+        "next_action": "Begin after ARCHBP-001 proves exact native ingestion."
+      },
+      "parent_ids": [
+        "ARCHBP-001",
+        "STORE-001"
+      ],
+      "inputs": [
+        "ARCHBP-001",
+        "STORE-001",
+        "NBVERIFY-002",
+        "redb and PostgreSQL authority contracts"
+      ],
+      "target_artifacts": [
+        "outbox schema",
+        "crash-recovery tests",
+        "embedding job contract",
+        "PostgreSQL synchronization receipts",
+        "ARCHBP-002 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "shared redb ownership",
+        "direct store-internal coupling",
+        "silent data loss",
+        "production database mutation",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-003",
+      "source_row_number": 200,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Build the live RuVector semantic and hybrid SQL adapter",
+      "owner_agent": "RuVector Agent / PostgreSQL Agent",
+      "goal": "Use TDD to generate provenance-bound embeddings, persist them through the approved PostgreSQL RuVector extension path, and support lexical, relational, vector, dependency, and causal retrieval without treating redb as a geometry engine or adding a vector sidecar.",
+      "simulation_required": true,
+      "execution_cell": "ruvector-semantic-cell",
+      "verification_gate": "Red tests prove deterministic model/version identity, repeatable embeddings within the declared tolerance, hybrid retrieval quality, dependency and causal edge integrity, PostgreSQL transactionality, and no competing vector-store authority.",
+      "rollback_plan": "Roll back the schema migration in the test namespace, remove derived vectors, retain exact source rows and provenance, and restore the prior adapter package.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-003.proof.json",
+      "next_action": "Select the profile-owned embedding model and write failing adapter and hybrid-query tests after ARCHBP-002.",
+      "source_columns": {
+        "task_id": "ARCHBP-003",
+        "parent_id": "ARCHBP-002; POSTGRES-005",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Build the live RuVector semantic and hybrid SQL adapter",
+        "owner_agent": "RuVector Agent / PostgreSQL Agent",
+        "goal": "Use TDD to generate provenance-bound embeddings, persist them through the approved PostgreSQL RuVector extension path, and support lexical, relational, vector, dependency, and causal retrieval without treating redb as a geometry engine or adding a vector sidecar.",
+        "inputs": "ARCHBP-002; POSTGRES-005; RuVector primary source; embedding model decision",
+        "target_artifacts": "adapter implementation; schema migrations; hybrid query tests; model and vector provenance; ARCHBP-003 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "redb vector-engine claim; sidecar vector authority; direct production mutation; model download outside the one profile; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "ruvector-semantic-cell",
+        "verification_gate": "Red tests prove deterministic model/version identity, repeatable embeddings within the declared tolerance, hybrid retrieval quality, dependency and causal edge integrity, PostgreSQL transactionality, and no competing vector-store authority.",
+        "rollback_plan": "Roll back the schema migration in the test namespace, remove derived vectors, retain exact source rows and provenance, and restore the prior adapter package.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-003.proof.json",
+        "next_action": "Select the profile-owned embedding model and write failing adapter and hybrid-query tests after ARCHBP-002."
+      },
+      "parent_ids": [
+        "ARCHBP-002",
+        "POSTGRES-005"
+      ],
+      "inputs": [
+        "ARCHBP-002",
+        "POSTGRES-005",
+        "RuVector primary source",
+        "embedding model decision"
+      ],
+      "target_artifacts": [
+        "adapter implementation",
+        "schema migrations",
+        "hybrid query tests",
+        "model and vector provenance",
+        "ARCHBP-003 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "redb vector-engine claim",
+        "sidecar vector authority",
+        "direct production mutation",
+        "model download outside the one profile",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-004",
+      "source_row_number": 201,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Enforce approval-gated semantic code edit plans",
+      "owner_agent": "Governed Execution Agent / CodeDB Agent",
+      "goal": "Use semantic discovery to propose source-snapshot-bound edits while preserving plan, owner approval, isolated patch, drift detection, materialization, verification, and proof gates; direct SQL source mutation remains forbidden.",
+      "simulation_required": true,
+      "execution_cell": "semantic-edit-cell",
+      "verification_gate": "Red tests reject direct database mutation, stale source snapshots, missing approval, path escape, and unproved apply; an approved bounded plan materializes an isolated patch, runs repository gates, records proof, and leaves canonical source unchanged until normal Git review.",
+      "rollback_plan": "Discard the isolated patch and task-created plan rows, retain rejection evidence, and restore the prior planner schema; canonical source and Git history remain unchanged.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-004.proof.json",
+      "next_action": "Write the negative direct-mutation, drift, approval, and path-isolation tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-004",
+        "parent_id": "ARCHBP-003; POSTGRES-007",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Enforce approval-gated semantic code edit plans",
+        "owner_agent": "Governed Execution Agent / CodeDB Agent",
+        "goal": "Use semantic discovery to propose source-snapshot-bound edits while preserving plan, owner approval, isolated patch, drift detection, materialization, verification, and proof gates; direct SQL source mutation remains forbidden.",
+        "inputs": "ARCHBP-003; POSTGRES-007; CodeDB integration and release contracts; blueprint SQL example correction",
+        "target_artifacts": "semantic edit-plan schema; approval tests; drift and isolation tests; immutable decision receipt; ARCHBP-004 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "blocked_paths": "direct SQL UPDATE of canonical source; unapproved apply; live branch overwrite; autonomous merge; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "semantic-edit-cell",
+        "verification_gate": "Red tests reject direct database mutation, stale source snapshots, missing approval, path escape, and unproved apply; an approved bounded plan materializes an isolated patch, runs repository gates, records proof, and leaves canonical source unchanged until normal Git review.",
+        "rollback_plan": "Discard the isolated patch and task-created plan rows, retain rejection evidence, and restore the prior planner schema; canonical source and Git history remain unchanged.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-004.proof.json",
+        "next_action": "Write the negative direct-mutation, drift, approval, and path-isolation tests."
+      },
+      "parent_ids": [
+        "ARCHBP-003",
+        "POSTGRES-007"
+      ],
+      "inputs": [
+        "ARCHBP-003",
+        "POSTGRES-007",
+        "CodeDB integration and release contracts",
+        "blueprint SQL example correction"
+      ],
+      "target_artifacts": [
+        "semantic edit-plan schema",
+        "approval tests",
+        "drift and isolation tests",
+        "immutable decision receipt",
+        "ARCHBP-004 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**"
+      ],
+      "blocked_paths": [
+        "direct SQL UPDATE of canonical source",
+        "unapproved apply",
+        "live branch overwrite",
+        "autonomous merge",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-005",
+      "source_row_number": 202,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Implement database-native copy-on-write code branches and rollback",
+      "owner_agent": "PostgreSQL Agent / Recovery Agent",
+      "goal": "Use TDD to create isolated copy-on-write semantic code branches, state diffs, concurrent edit handling, deterministic selection, and identity-bound rollback without confusing filesystem replay with database-native branching.",
+      "simulation_required": true,
+      "execution_cell": "database-cow-cell",
+      "verification_gate": "Red tests cover fork, concurrent replacement, ABA identity, merge conflict, branch deletion, and restart; selected branches reconstruct exact source and metadata; rollback removes only identity-matched task artifacts and cannot delete a concurrent replacement.",
+      "rollback_plan": "Retain the immutable branch ledger, mark the failed branch rejected, remove only identity-matched derived rows and projections, and restore the prior branch-schema migration.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-005.proof.json",
+      "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-005",
+        "parent_id": "ARCHBP-004; POSTGRES-005",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Implement database-native copy-on-write code branches and rollback",
+        "owner_agent": "PostgreSQL Agent / Recovery Agent",
+        "goal": "Use TDD to create isolated copy-on-write semantic code branches, state diffs, concurrent edit handling, deterministic selection, and identity-bound rollback without confusing filesystem replay with database-native branching.",
+        "inputs": "ARCHBP-004; POSTGRES-005; existing CodeDB filesystem COW and rollback proof",
+        "target_artifacts": "branch schema; concurrency tests; deterministic selection policy; rollback receipts; ARCHBP-005 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "production branch mutation; implicit winner selection; destructive rollback; source overwrite; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "database-cow-cell",
+        "verification_gate": "Red tests cover fork, concurrent replacement, ABA identity, merge conflict, branch deletion, and restart; selected branches reconstruct exact source and metadata; rollback removes only identity-matched task artifacts and cannot delete a concurrent replacement.",
+        "rollback_plan": "Retain the immutable branch ledger, mark the failed branch rejected, remove only identity-matched derived rows and projections, and restore the prior branch-schema migration.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-005.proof.json",
+        "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests."
+      },
+      "parent_ids": [
+        "ARCHBP-004",
+        "POSTGRES-005"
+      ],
+      "inputs": [
+        "ARCHBP-004",
+        "POSTGRES-005",
+        "existing CodeDB filesystem COW and rollback proof"
+      ],
+      "target_artifacts": [
+        "branch schema",
+        "concurrency tests",
+        "deterministic selection policy",
+        "rollback receipts",
+        "ARCHBP-005 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "production branch mutation",
+        "implicit winner selection",
+        "destructive rollback",
+        "source overwrite",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-006",
+      "source_row_number": 203,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Build the envctl production projection engine",
+      "owner_agent": "envctl Agent / Materialization Agent",
+      "goal": "Use TDD to query a selected approved database branch and deterministically project .rs, .toml, and .nu files with exact bytes, module_path metadata, permissions, safe links, ordering, and disposable output ownership.",
+      "simulation_required": true,
+      "execution_cell": "envctl-projection-cell",
+      "verification_gate": "Red tests prove byte-identical repeated projection of .rs, .toml, and .nu fixtures, correct module paths and permissions, safe relative links, source-version traceability, no canonical overwrite, and complete receipt-driven cleanup.",
+      "rollback_plan": "Delete the derived projection by its receipt, restore the prior projection adapter, and leave source rows, canonical source, and installed runtime unchanged.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-006.proof.json",
+      "next_action": "Define the versioned export contract and failing exact-projection fixtures.",
+      "source_columns": {
+        "task_id": "ARCHBP-006",
+        "parent_id": "ARCHBP-005; POSTGRES-008",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Build the envctl production projection engine",
+        "owner_agent": "envctl Agent / Materialization Agent",
+        "goal": "Use TDD to query a selected approved database branch and deterministically project .rs, .toml, and .nu files with exact bytes, module_path metadata, permissions, safe links, ordering, and disposable output ownership.",
+        "inputs": "ARCHBP-005; POSTGRES-008; envctl projection blueprint; CodeDB round-trip contract",
+        "target_artifacts": "envctl projection command; metadata schema; deterministic replay tests; cleanup receipt; ARCHBP-006 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "canonical source overwrite; direct store-internal reads; generated runtime hand edits; unsafe symlink publication; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "envctl-projection-cell",
+        "verification_gate": "Red tests prove byte-identical repeated projection of .rs, .toml, and .nu fixtures, correct module paths and permissions, safe relative links, source-version traceability, no canonical overwrite, and complete receipt-driven cleanup.",
+        "rollback_plan": "Delete the derived projection by its receipt, restore the prior projection adapter, and leave source rows, canonical source, and installed runtime unchanged.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-006.proof.json",
+        "next_action": "Define the versioned export contract and failing exact-projection fixtures."
+      },
+      "parent_ids": [
+        "ARCHBP-005",
+        "POSTGRES-008"
+      ],
+      "inputs": [
+        "ARCHBP-005",
+        "POSTGRES-008",
+        "envctl projection blueprint",
+        "CodeDB round-trip contract"
+      ],
+      "target_artifacts": [
+        "envctl projection command",
+        "metadata schema",
+        "deterministic replay tests",
+        "cleanup receipt",
+        "ARCHBP-006 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "canonical source overwrite",
+        "direct store-internal reads",
+        "generated runtime hand edits",
+        "unsafe symlink publication",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-007",
+      "source_row_number": 204,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Integrate AgentDB RVF active and passive memory",
+      "owner_agent": "AgentDB Agent / Memory Agent",
+      "goal": "Use TDD to separate passive PostgreSQL macro memory from portable per-agent AgentDB .rvf cognition, including identity, active working state, witness facts, learning traces, lifecycle, export, recovery, and authority boundaries.",
+      "simulation_required": true,
+      "execution_cell": "agentdb-rvf-cell",
+      "verification_gate": "Red tests prove passive/active separation, stable agent identity, portable .rvf export and import, crash recovery, witness-bound feedback, and fail-closed behavior for the observed API defects; no store silently becomes competing macro authority.",
+      "rollback_plan": "Disable the adapter, restore the prior AgentDB package, quarantine only task-created .rvf fixtures, and preserve passive PostgreSQL state and failure evidence.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-007.proof.json",
+      "next_action": "Write failing lifecycle, portability, feedback, witness, and authority tests against current primary source.",
+      "source_columns": {
+        "task_id": "ARCHBP-007",
+        "parent_id": "POSTGRES-006; NBVERIFY-001",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Integrate AgentDB RVF active and passive memory",
+        "owner_agent": "AgentDB Agent / Memory Agent",
+        "goal": "Use TDD to separate passive PostgreSQL macro memory from portable per-agent AgentDB .rvf cognition, including identity, active working state, witness facts, learning traces, lifecycle, export, recovery, and authority boundaries.",
+        "inputs": "POSTGRES-006; NBVERIFY-001; AgentDB and RVF primary source; current feedback and witness API defects",
+        "target_artifacts": "RVF lifecycle adapter; authority tests; feedback and witness defect fixes; portable export and recovery proof; ARCHBP-007 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "PostgreSQL macro-authority duplication; fabricated RVF API; unbounded agent execution; model training; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "agentdb-rvf-cell",
+        "verification_gate": "Red tests prove passive/active separation, stable agent identity, portable .rvf export and import, crash recovery, witness-bound feedback, and fail-closed behavior for the observed API defects; no store silently becomes competing macro authority.",
+        "rollback_plan": "Disable the adapter, restore the prior AgentDB package, quarantine only task-created .rvf fixtures, and preserve passive PostgreSQL state and failure evidence.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-007.proof.json",
+        "next_action": "Write failing lifecycle, portability, feedback, witness, and authority tests against current primary source."
+      },
+      "parent_ids": [
+        "POSTGRES-006",
+        "NBVERIFY-001"
+      ],
+      "inputs": [
+        "POSTGRES-006",
+        "NBVERIFY-001",
+        "AgentDB and RVF primary source",
+        "current feedback and witness API defects"
+      ],
+      "target_artifacts": [
+        "RVF lifecycle adapter",
+        "authority tests",
+        "feedback and witness defect fixes",
+        "portable export and recovery proof",
+        "ARCHBP-007 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "PostgreSQL macro-authority duplication",
+        "fabricated RVF API",
+        "unbounded agent execution",
+        "model training",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-008",
+      "source_row_number": 205,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Integrate ruvllm shared-model edge inference",
+      "owner_agent": "Inference Agent / Runtime Kernel",
+      "goal": "Use TDD to run profile-owned ruvllm inference with a shared frozen base model and isolated RVF cartridges, proving startup, adapter selection, bounded resource ownership, local fallback, and measured latency without asserting unsupported hot-swap performance.",
+      "simulation_required": true,
+      "execution_cell": "ruvllm-inference-cell",
+      "verification_gate": "Red tests prove one frozen model identity, isolated cartridge state, deterministic startup and shutdown, bounded CPU/GPU/RAM use, local failure behavior, and raw latency samples; any adapter hot-swap claim is limited to the measured workload.",
+      "rollback_plan": "Stop the inference service, remove task-created model adapters and RVF fixtures, restore the prior profile package, and retain benchmark and failure receipts.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-008.proof.json",
+      "next_action": "Select the exact profile-owned ruvllm artifact and write failing cartridge lifecycle tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-008",
+        "parent_id": "ARCHBP-007",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Integrate ruvllm shared-model edge inference",
+        "owner_agent": "Inference Agent / Runtime Kernel",
+        "goal": "Use TDD to run profile-owned ruvllm inference with a shared frozen base model and isolated RVF cartridges, proving startup, adapter selection, bounded resource ownership, local fallback, and measured latency without asserting unsupported hot-swap performance.",
+        "inputs": "ARCHBP-007; ruvllm primary source; RVF cartridge contract; one-profile runtime contract",
+        "target_artifacts": "inference adapter; console and cartridge lifecycle tests; resource and latency receipts; ARCHBP-008 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "model download outside profile ownership; shared mutable agent state; fabricated latency; cloud route without policy; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "ruvllm-inference-cell",
+        "verification_gate": "Red tests prove one frozen model identity, isolated cartridge state, deterministic startup and shutdown, bounded CPU/GPU/RAM use, local failure behavior, and raw latency samples; any adapter hot-swap claim is limited to the measured workload.",
+        "rollback_plan": "Stop the inference service, remove task-created model adapters and RVF fixtures, restore the prior profile package, and retain benchmark and failure receipts.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-008.proof.json",
+        "next_action": "Select the exact profile-owned ruvllm artifact and write failing cartridge lifecycle tests."
+      },
+      "parent_ids": [
+        "ARCHBP-007"
+      ],
+      "inputs": [
+        "ARCHBP-007",
+        "ruvllm primary source",
+        "RVF cartridge contract",
+        "one-profile runtime contract"
+      ],
+      "target_artifacts": [
+        "inference adapter",
+        "console and cartridge lifecycle tests",
+        "resource and latency receipts",
+        "ARCHBP-008 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "model download outside profile ownership",
+        "shared mutable agent state",
+        "fabricated latency",
+        "cloud route without policy",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-009",
+      "source_row_number": 206,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Prove MicroLoRA SONA and FastGRNN learning boundaries",
+      "owner_agent": "Learning Substrate Agent",
+      "goal": "Use TDD to integrate only primary-source-supported MicroLoRA, SONA, and FastGRNN components, bind learning state to agent identity and witness provenance, and prove rollback, resource limits, and promotion gates before learned state affects execution.",
+      "simulation_required": true,
+      "execution_cell": "learning-substrate-cell",
+      "verification_gate": "Red tests reject unproven components and unbound state; supported components record exact source/model identity, isolate per-agent updates, respect resource budgets, roll back deterministically, and require witness-backed promotion before execution use.",
+      "rollback_plan": "Disable learned-state promotion, restore the frozen base adapter, quarantine task-created learning state, and keep provenance and rejection evidence.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-009.proof.json",
+      "next_action": "Verify exact component availability and write failing provenance, isolation, promotion, and rollback tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-009",
+        "parent_id": "ARCHBP-008",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Prove MicroLoRA SONA and FastGRNN learning boundaries",
+        "owner_agent": "Learning Substrate Agent",
+        "goal": "Use TDD to integrate only primary-source-supported MicroLoRA, SONA, and FastGRNN components, bind learning state to agent identity and witness provenance, and prove rollback, resource limits, and promotion gates before learned state affects execution.",
+        "inputs": "ARCHBP-008; primary source for MicroLoRA, SONA, and FastGRNN; POSTGRES-006 learning boundary",
+        "target_artifacts": "learning adapters; provenance schema; promotion and rollback tests; resource benchmarks; ARCHBP-009 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "invented algorithms or APIs; unreviewed online learning; model replacement; unsupported absolute-stability claim; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "learning-substrate-cell",
+        "verification_gate": "Red tests reject unproven components and unbound state; supported components record exact source/model identity, isolate per-agent updates, respect resource budgets, roll back deterministically, and require witness-backed promotion before execution use.",
+        "rollback_plan": "Disable learned-state promotion, restore the frozen base adapter, quarantine task-created learning state, and keep provenance and rejection evidence.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-009.proof.json",
+        "next_action": "Verify exact component availability and write failing provenance, isolation, promotion, and rollback tests."
+      },
+      "parent_ids": [
+        "ARCHBP-008"
+      ],
+      "inputs": [
+        "ARCHBP-008",
+        "primary source for MicroLoRA",
+        "SONA",
+        "and FastGRNN",
+        "POSTGRES-006 learning boundary"
+      ],
+      "target_artifacts": [
+        "learning adapters",
+        "provenance schema",
+        "promotion and rollback tests",
+        "resource benchmarks",
+        "ARCHBP-009 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "invented algorithms or APIs",
+        "unreviewed online learning",
+        "model replacement",
+        "unsupported absolute-stability claim",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-010",
+      "source_row_number": 207,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Prove swarm scale and hardware acceptance",
+      "owner_agent": "Performance Agent / Independent QA Agent",
+      "goal": "Replace the blueprint's 50-plus-agent and fixed-latency assertions with reproducible scale tests across declared CPU, GPU, memory, storage, and network cells, including overload, degradation, fairness, recovery, and cost envelopes.",
+      "simulation_required": true,
+      "execution_cell": "swarm-scale-cell",
+      "verification_gate": "The harness publishes raw samples and exact hardware/software identities; runs 1, 8, 16, 32, and at least 50 agents when capacity permits; exercises overload and recovery; reports confidence intervals and honest limits; no architecture claim exceeds measured evidence.",
+      "rollback_plan": "Stop the load cell, remove task-created state, restore resource limits, and retain raw failure samples and capacity findings.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-010.proof.json",
+      "next_action": "Define the workload, resource budgets, failure cases, and red acceptance thresholds.",
+      "source_columns": {
+        "task_id": "ARCHBP-010",
+        "parent_id": "ARCHBP-009; ARCHBP-014",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Prove swarm scale and hardware acceptance",
+        "owner_agent": "Performance Agent / Independent QA Agent",
+        "goal": "Replace the blueprint's 50-plus-agent and fixed-latency assertions with reproducible scale tests across declared CPU, GPU, memory, storage, and network cells, including overload, degradation, fairness, recovery, and cost envelopes.",
+        "inputs": "ARCHBP-009; ARCHBP-014; hardware catalog; claimed agent and latency targets",
+        "target_artifacts": "scale harness; raw samples; failure model; capacity and cost report; ARCHBP-010 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/flexnetos_runner/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "fabricated benchmark; production load; hidden cloud spend; absolute performance claim from one sample; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "swarm-scale-cell",
+        "verification_gate": "The harness publishes raw samples and exact hardware/software identities; runs 1, 8, 16, 32, and at least 50 agents when capacity permits; exercises overload and recovery; reports confidence intervals and honest limits; no architecture claim exceeds measured evidence.",
+        "rollback_plan": "Stop the load cell, remove task-created state, restore resource limits, and retain raw failure samples and capacity findings.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-010.proof.json",
+        "next_action": "Define the workload, resource budgets, failure cases, and red acceptance thresholds."
+      },
+      "parent_ids": [
+        "ARCHBP-009",
+        "ARCHBP-014"
+      ],
+      "inputs": [
+        "ARCHBP-009",
+        "ARCHBP-014",
+        "hardware catalog",
+        "claimed agent and latency targets"
+      ],
+      "target_artifacts": [
+        "scale harness",
+        "raw samples",
+        "failure model",
+        "capacity and cost report",
+        "ARCHBP-010 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/flexnetos_runner/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "fabricated benchmark",
+        "production load",
+        "hidden cloud spend",
+        "absolute performance claim from one sample",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-011",
+      "source_row_number": 208,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Build the ATAS ESN future-timeline research harness",
+      "owner_agent": "Predictive Systems Agent",
+      "goal": "Use TDD research to build a bounded Agentic Temporal Attractor Studio harness with echo-state reservoirs, ensemble simulations, state diffs, resource burn, complexity spikes, and failure-node outputs without promoting forecasts to authority.",
+      "simulation_required": true,
+      "execution_cell": "atas-esn-research-cell",
+      "verification_gate": "Red tests establish deterministic seeded runs, leakage-free datasets, naive baselines, reservoir/readout separation, ensemble outputs, calibrated uncertainty, and explicit non-authority labeling for every timeline.",
+      "rollback_plan": "Remove task-created models and datasets, retain raw evaluation results, and restore the prior research adapter; no operational route changes.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-011.proof.json",
+      "next_action": "Verify primary algorithms and define the leakage-free dataset, naive baselines, and failing forecast tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-011",
+        "parent_id": "POSTGRES-005; NBSOURCE-006",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Build the ATAS ESN future-timeline research harness",
+        "owner_agent": "Predictive Systems Agent",
+        "goal": "Use TDD research to build a bounded Agentic Temporal Attractor Studio harness with echo-state reservoirs, ensemble simulations, state diffs, resource burn, complexity spikes, and failure-node outputs without promoting forecasts to authority.",
+        "inputs": "POSTGRES-005; NBSOURCE-006; ATAS and ESN primary research; current task and proof data",
+        "target_artifacts": "research harness; dataset contract; baseline and ablation tests; future-timeline schema; ARCHBP-011 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "blocked_paths": "production task routing; invented algorithm API; forecast-as-proof; uncontrolled simulation spend; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "atas-esn-research-cell",
+        "verification_gate": "Red tests establish deterministic seeded runs, leakage-free datasets, naive baselines, reservoir/readout separation, ensemble outputs, calibrated uncertainty, and explicit non-authority labeling for every timeline.",
+        "rollback_plan": "Remove task-created models and datasets, retain raw evaluation results, and restore the prior research adapter; no operational route changes.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-011.proof.json",
+        "next_action": "Verify primary algorithms and define the leakage-free dataset, naive baselines, and failing forecast tests."
+      },
+      "parent_ids": [
+        "POSTGRES-005",
+        "NBSOURCE-006"
+      ],
+      "inputs": [
+        "POSTGRES-005",
+        "NBSOURCE-006",
+        "ATAS and ESN primary research",
+        "current task and proof data"
+      ],
+      "target_artifacts": [
+        "research harness",
+        "dataset contract",
+        "baseline and ablation tests",
+        "future-timeline schema",
+        "ARCHBP-011 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**"
+      ],
+      "blocked_paths": [
+        "production task routing",
+        "invented algorithm API",
+        "forecast-as-proof",
+        "uncontrolled simulation spend",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-012",
+      "source_row_number": 209,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Validate temporal strange-attractor claims empirically",
+      "owner_agent": "Predictive Systems Agent / Research QA Agent",
+      "goal": "Determine whether stable attractor-like structures actually appear in the declared software-state embedding and whether they improve out-of-sample forecast or decision quality beyond simpler baselines.",
+      "simulation_required": true,
+      "execution_cell": "temporal-attractor-research-cell",
+      "verification_gate": "Pre-registered tests compare attractor metrics against shuffled and simple-model baselines across seeds; findings report negative as well as positive results; only reproducible out-of-sample gains permit downstream use.",
+      "rollback_plan": "Delete task-created derived models and plots, preserve raw data and negative results, and keep routing disabled if the hypothesis fails.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-012.proof.json",
+      "next_action": "Pre-register the attractor, robustness, null-hypothesis, and out-of-sample tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-012",
+        "parent_id": "ARCHBP-011",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Validate temporal strange-attractor claims empirically",
+        "owner_agent": "Predictive Systems Agent / Research QA Agent",
+        "goal": "Determine whether stable attractor-like structures actually appear in the declared software-state embedding and whether they improve out-of-sample forecast or decision quality beyond simpler baselines.",
+        "inputs": "ARCHBP-011; temporal-attractor sources; seeded timeline corpus",
+        "target_artifacts": "attractor detection tests; robustness and ablation report; out-of-sample comparison; ARCHBP-012 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "blocked_paths": "metaphor promoted as mechanism; training/test leakage; cherry-picked visualization; production routing; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "temporal-attractor-research-cell",
+        "verification_gate": "Pre-registered tests compare attractor metrics against shuffled and simple-model baselines across seeds; findings report negative as well as positive results; only reproducible out-of-sample gains permit downstream use.",
+        "rollback_plan": "Delete task-created derived models and plots, preserve raw data and negative results, and keep routing disabled if the hypothesis fails.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-012.proof.json",
+        "next_action": "Pre-register the attractor, robustness, null-hypothesis, and out-of-sample tests."
+      },
+      "parent_ids": [
+        "ARCHBP-011"
+      ],
+      "inputs": [
+        "ARCHBP-011",
+        "temporal-attractor sources",
+        "seeded timeline corpus"
+      ],
+      "target_artifacts": [
+        "attractor detection tests",
+        "robustness and ablation report",
+        "out-of-sample comparison",
+        "ARCHBP-012 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**"
+      ],
+      "blocked_paths": [
+        "metaphor promoted as mechanism",
+        "training/test leakage",
+        "cherry-picked visualization",
+        "production routing",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-013",
+      "source_row_number": 210,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Implement RuvLTRA proportional local-cloud routing",
+      "owner_agent": "Routing Agent / Cost Governance Agent",
+      "goal": "Use TDD to route workloads proportionally between local and approved cloud execution from measured complexity, confidence, privacy, cost, and resource signals, with an explicit local-only default and no route based solely on forecast prose.",
+      "simulation_required": true,
+      "execution_cell": "ruvltra-routing-cell",
+      "verification_gate": "Red tests cover local-only default, cost ceiling, privacy denial, resource exhaustion, classifier uncertainty, outage fallback, and auditability; offline replay beats declared baselines before any live route is enabled.",
+      "rollback_plan": "Disable cloud routing, force local-only policy, revoke task-scoped credentials, restore the prior classifier, and retain routing decisions and cost evidence.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-013.proof.json",
+      "next_action": "Write failing local-default, privacy, cost, uncertainty, and outage-routing tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-013",
+        "parent_id": "ARCHBP-011; ARCHBP-012",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Implement RuvLTRA proportional local-cloud routing",
+        "owner_agent": "Routing Agent / Cost Governance Agent",
+        "goal": "Use TDD to route workloads proportionally between local and approved cloud execution from measured complexity, confidence, privacy, cost, and resource signals, with an explicit local-only default and no route based solely on forecast prose.",
+        "inputs": "ARCHBP-011; ARCHBP-012; RuvLTRA primary source; secrets broker and cost policies",
+        "target_artifacts": "routing classifier; policy schema; offline replay tests; cost and privacy receipts; ARCHBP-013 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "unapproved cloud call; secret exposure; hidden spend; forecast-only route; invented proportionality claim; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "ruvltra-routing-cell",
+        "verification_gate": "Red tests cover local-only default, cost ceiling, privacy denial, resource exhaustion, classifier uncertainty, outage fallback, and auditability; offline replay beats declared baselines before any live route is enabled.",
+        "rollback_plan": "Disable cloud routing, force local-only policy, revoke task-scoped credentials, restore the prior classifier, and retain routing decisions and cost evidence.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-013.proof.json",
+        "next_action": "Write failing local-default, privacy, cost, uncertainty, and outage-routing tests."
+      },
+      "parent_ids": [
+        "ARCHBP-011",
+        "ARCHBP-012"
+      ],
+      "inputs": [
+        "ARCHBP-011",
+        "ARCHBP-012",
+        "RuvLTRA primary source",
+        "secrets broker and cost policies"
+      ],
+      "target_artifacts": [
+        "routing classifier",
+        "policy schema",
+        "offline replay tests",
+        "cost and privacy receipts",
+        "ARCHBP-013 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "unapproved cloud call",
+        "secret exposure",
+        "hidden spend",
+        "forecast-only route",
+        "invented proportionality claim",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-014",
+      "source_row_number": 211,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Integrate the Ruflo swarm coordinator",
+      "owner_agent": "Swarm Orchestration Agent",
+      "goal": "Use TDD to bind Ruflo coordination to task-graph authority, AgentDB identities, ruvllm cartridges, RuvLTRA routing, cancellation, retry, budget, and proof emission without allowing the coordinator to invent or complete tasks.",
+      "simulation_required": true,
+      "execution_cell": "ruflo-coordination-cell",
+      "verification_gate": "Red tests prove authority-preserving dispatch, idempotent retry, cancellation, timeout, budget exhaustion, partial failure recovery, agent identity binding, and append-only proof emission; only the canonical task graph can authorize work.",
+      "rollback_plan": "Stop dispatch, cancel task-scoped agents, restore the prior coordinator adapter, replay durable events to the last acknowledged point, and leave task status unpromoted.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-014.proof.json",
+      "next_action": "Verify the Ruflo API and write failing authority, retry, cancellation, budget, and recovery tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-014",
+        "parent_id": "ARCHBP-008; ARCHBP-013",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Integrate the Ruflo swarm coordinator",
+        "owner_agent": "Swarm Orchestration Agent",
+        "goal": "Use TDD to bind Ruflo coordination to task-graph authority, AgentDB identities, ruvllm cartridges, RuvLTRA routing, cancellation, retry, budget, and proof emission without allowing the coordinator to invent or complete tasks.",
+        "inputs": "ARCHBP-008; ARCHBP-013; Ruflo primary source; Planning Spine execution gates",
+        "target_artifacts": "coordinator adapter; orchestration state machine; fault and budget tests; proof-emission receipt; ARCHBP-014 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "task invention; unauthorized completion; unbounded retry; hidden cloud route; proof fabrication; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "ruflo-coordination-cell",
+        "verification_gate": "Red tests prove authority-preserving dispatch, idempotent retry, cancellation, timeout, budget exhaustion, partial failure recovery, agent identity binding, and append-only proof emission; only the canonical task graph can authorize work.",
+        "rollback_plan": "Stop dispatch, cancel task-scoped agents, restore the prior coordinator adapter, replay durable events to the last acknowledged point, and leave task status unpromoted.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-014.proof.json",
+        "next_action": "Verify the Ruflo API and write failing authority, retry, cancellation, budget, and recovery tests."
+      },
+      "parent_ids": [
+        "ARCHBP-008",
+        "ARCHBP-013"
+      ],
+      "inputs": [
+        "ARCHBP-008",
+        "ARCHBP-013",
+        "Ruflo primary source",
+        "Planning Spine execution gates"
+      ],
+      "target_artifacts": [
+        "coordinator adapter",
+        "orchestration state machine",
+        "fault and budget tests",
+        "proof-emission receipt",
+        "ARCHBP-014 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "task invention",
+        "unauthorized completion",
+        "unbounded retry",
+        "hidden cloud route",
+        "proof fabrication",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-015",
+      "source_row_number": 212,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Integrate RuVector MinCut dynamic swarm isolation",
+      "owner_agent": "Swarm Defense Agent",
+      "goal": "Use TDD to detect and isolate harmful or inconsistent swarm edges using the exact supported MinCut implementation, with bounded complexity, explainable cut evidence, false-positive analysis, recovery, and no claim of subpolynomial behavior without proof.",
+      "simulation_required": true,
+      "execution_cell": "mincut-defense-cell",
+      "verification_gate": "Red tests cover compromised, noisy, partitioned, and healthy swarms; every cut has reproducible evidence and bounded blast radius; false positives and recovery are measured; complexity wording matches benchmark and primary implementation.",
+      "rollback_plan": "Disable automatic isolation, restore the prior graph, reattach only receipt-identified healthy edges after review, and retain attack and false-positive evidence.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-015.proof.json",
+      "next_action": "Build the attack corpus and write failing isolation, false-positive, recovery, and complexity tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-015",
+        "parent_id": "ARCHBP-014; POSTGRES-005",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Integrate RuVector MinCut dynamic swarm isolation",
+        "owner_agent": "Swarm Defense Agent",
+        "goal": "Use TDD to detect and isolate harmful or inconsistent swarm edges using the exact supported MinCut implementation, with bounded complexity, explainable cut evidence, false-positive analysis, recovery, and no claim of subpolynomial behavior without proof.",
+        "inputs": "ARCHBP-014; POSTGRES-005; RuVector MinCut primary source; swarm failure model",
+        "target_artifacts": "MinCut adapter; attack and false-positive corpus; isolation and recovery tests; complexity benchmark; ARCHBP-015 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "invented complexity guarantee; irreversible agent deletion; unreviewed production isolation; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "mincut-defense-cell",
+        "verification_gate": "Red tests cover compromised, noisy, partitioned, and healthy swarms; every cut has reproducible evidence and bounded blast radius; false positives and recovery are measured; complexity wording matches benchmark and primary implementation.",
+        "rollback_plan": "Disable automatic isolation, restore the prior graph, reattach only receipt-identified healthy edges after review, and retain attack and false-positive evidence.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-015.proof.json",
+        "next_action": "Build the attack corpus and write failing isolation, false-positive, recovery, and complexity tests."
+      },
+      "parent_ids": [
+        "ARCHBP-014",
+        "POSTGRES-005"
+      ],
+      "inputs": [
+        "ARCHBP-014",
+        "POSTGRES-005",
+        "RuVector MinCut primary source",
+        "swarm failure model"
+      ],
+      "target_artifacts": [
+        "MinCut adapter",
+        "attack and false-positive corpus",
+        "isolation and recovery tests",
+        "complexity benchmark",
+        "ARCHBP-015 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "invented complexity guarantee",
+        "irreversible agent deletion",
+        "unreviewed production isolation",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-016",
+      "source_row_number": 213,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Implement witness-chain anti-bluffing receipts",
+      "owner_agent": "Integrity Agent / Cryptography Agent",
+      "goal": "Use TDD and primary cryptographic guidance to bind source, vector, decision, execution, and proof events into tamper-evident witness chains; decide SHAKE256 versus the currently proven digest scheme explicitly instead of copying the blueprint algorithm by assertion.",
+      "simulation_required": true,
+      "execution_cell": "witness-chain-cell",
+      "verification_gate": "Red tests detect event removal, reorder, substitution, replay, algorithm confusion, and partial writes; the chosen primitive and domain separation are documented; verification is independent; claims are limited to tamper evidence and fail-closed policy.",
+      "rollback_plan": "Disable the new writer, preserve and verify the prior ledger, restore the previous schema, and retain task-created invalid-chain fixtures and migration evidence.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-016.proof.json",
+      "next_action": "Record the algorithm decision and write failing tamper, reorder, replay, and partial-write tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-016",
+        "parent_id": "ARCHBP-015",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Implement witness-chain anti-bluffing receipts",
+        "owner_agent": "Integrity Agent / Cryptography Agent",
+        "goal": "Use TDD and primary cryptographic guidance to bind source, vector, decision, execution, and proof events into tamper-evident witness chains; decide SHAKE256 versus the currently proven digest scheme explicitly instead of copying the blueprint algorithm by assertion.",
+        "inputs": "ARCHBP-015; proof-ledger contract; blueprint witness claims; primary cryptographic guidance",
+        "target_artifacts": "algorithm decision; versioned witness schema; tamper and replay tests; migration and verification receipts; ARCHBP-016 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "blocked_paths": "custom cryptography without review; mutable witness history; false mathematical-impossibility claim; secret values; production key mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "witness-chain-cell",
+        "verification_gate": "Red tests detect event removal, reorder, substitution, replay, algorithm confusion, and partial writes; the chosen primitive and domain separation are documented; verification is independent; claims are limited to tamper evidence and fail-closed policy.",
+        "rollback_plan": "Disable the new writer, preserve and verify the prior ledger, restore the previous schema, and retain task-created invalid-chain fixtures and migration evidence.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-016.proof.json",
+        "next_action": "Record the algorithm decision and write failing tamper, reorder, replay, and partial-write tests."
+      },
+      "parent_ids": [
+        "ARCHBP-015"
+      ],
+      "inputs": [
+        "ARCHBP-015",
+        "proof-ledger contract",
+        "blueprint witness claims",
+        "primary cryptographic guidance"
+      ],
+      "target_artifacts": [
+        "algorithm decision",
+        "versioned witness schema",
+        "tamper and replay tests",
+        "migration and verification receipts",
+        "ARCHBP-016 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**"
+      ],
+      "blocked_paths": [
+        "custom cryptography without review",
+        "mutable witness history",
+        "false mathematical-impossibility claim",
+        "secret values",
+        "production key mutation"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-017",
+      "source_row_number": 214,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Enforce causal graph GNN and Cypher authorization guardrails",
+      "owner_agent": "Causal Integrity Agent",
+      "goal": "Use TDD to construct causal and dependency graphs from provenance-bound evidence, evaluate supported GNN signals and Cypher queries as advisory detectors, and require deterministic policy plus witness evidence before any mutation is authorized.",
+      "simulation_required": true,
+      "execution_cell": "causal-guard-cell",
+      "verification_gate": "Red tests cover missing, forged, cyclic, stale, and contradictory edges; Cypher results trace to exact evidence; GNN metrics are compared with baselines; deterministic approval policy remains final and every allow or deny has a witness receipt.",
+      "rollback_plan": "Disable the advisory model and queries, restore deterministic approval-only behavior, remove task-created derived graph rows, and retain adversarial findings.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-017.proof.json",
+      "next_action": "Define the evidence-bound causal schema and failing forgery, staleness, contradiction, and authorization tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-017",
+        "parent_id": "ARCHBP-003; ARCHBP-016",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Enforce causal graph GNN and Cypher authorization guardrails",
+        "owner_agent": "Causal Integrity Agent",
+        "goal": "Use TDD to construct causal and dependency graphs from provenance-bound evidence, evaluate supported GNN signals and Cypher queries as advisory detectors, and require deterministic policy plus witness evidence before any mutation is authorized.",
+        "inputs": "ARCHBP-003; ARCHBP-016; causal graph, GNN, and Cypher primary sources; approval gate",
+        "target_artifacts": "causal schema; query suite; GNN evaluation; deterministic authorization adapter; adversarial tests; ARCHBP-017 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "GNN-only authorization; direct mutation; invented causal edge; opaque rejection; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "causal-guard-cell",
+        "verification_gate": "Red tests cover missing, forged, cyclic, stale, and contradictory edges; Cypher results trace to exact evidence; GNN metrics are compared with baselines; deterministic approval policy remains final and every allow or deny has a witness receipt.",
+        "rollback_plan": "Disable the advisory model and queries, restore deterministic approval-only behavior, remove task-created derived graph rows, and retain adversarial findings.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-017.proof.json",
+        "next_action": "Define the evidence-bound causal schema and failing forgery, staleness, contradiction, and authorization tests."
+      },
+      "parent_ids": [
+        "ARCHBP-003",
+        "ARCHBP-016"
+      ],
+      "inputs": [
+        "ARCHBP-003",
+        "ARCHBP-016",
+        "causal graph",
+        "GNN",
+        "and Cypher primary sources",
+        "approval gate"
+      ],
+      "target_artifacts": [
+        "causal schema",
+        "query suite",
+        "GNN evaluation",
+        "deterministic authorization adapter",
+        "adversarial tests",
+        "ARCHBP-017 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "GNN-only authorization",
+        "direct mutation",
+        "invented causal edge",
+        "opaque rejection",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-018",
+      "source_row_number": 215,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Prove the LifeOS Yazelix UDS and shared-state ownership contract",
+      "owner_agent": "Runtime Kernel / IPC Agent",
+      "goal": "Use TDD to select and prove the LifeOS-to-Yazelix control transport, preferring a versioned authenticated Unix-domain socket unless an explicit shared-redb design proves single-writer ownership, locking, recovery, and upgrade compatibility.",
+      "simulation_required": true,
+      "execution_cell": "lifeos-yazelix-ipc-cell",
+      "verification_gate": "Red tests cover peer authentication, permissions, version skew, restart, concurrent clients, stale socket cleanup, malformed frames, and ownership; installed proof enters through profile yzx and no component silently shares redb write authority.",
+      "rollback_plan": "Stop the task-created service, remove its socket by receipt, restore the prior profile generation and protocol adapter, and preserve config inputs and state databases.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-018.proof.json",
+      "next_action": "Record the UDS-versus-shared-store decision and write failing ownership, authentication, compatibility, and recovery tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-018",
+        "parent_id": "POSTGRES-009; NBVERIFY-004; FOUNDATION-003",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Prove the LifeOS Yazelix UDS and shared-state ownership contract",
+        "owner_agent": "Runtime Kernel / IPC Agent",
+        "goal": "Use TDD to select and prove the LifeOS-to-Yazelix control transport, preferring a versioned authenticated Unix-domain socket unless an explicit shared-redb design proves single-writer ownership, locking, recovery, and upgrade compatibility.",
+        "inputs": "POSTGRES-009; NBVERIFY-004; FOUNDATION-003; active profile runtime and Yazelix layout",
+        "target_artifacts": "IPC decision; protocol schema; authentication and compatibility tests; installed runtime receipt; ARCHBP-018 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "implicit shared-store ownership; unauthenticated socket; generated runtime hand edits; second launcher owner; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "lifeos-yazelix-ipc-cell",
+        "verification_gate": "Red tests cover peer authentication, permissions, version skew, restart, concurrent clients, stale socket cleanup, malformed frames, and ownership; installed proof enters through profile yzx and no component silently shares redb write authority.",
+        "rollback_plan": "Stop the task-created service, remove its socket by receipt, restore the prior profile generation and protocol adapter, and preserve config inputs and state databases.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-018.proof.json",
+        "next_action": "Record the UDS-versus-shared-store decision and write failing ownership, authentication, compatibility, and recovery tests."
+      },
+      "parent_ids": [
+        "POSTGRES-009",
+        "NBVERIFY-004",
+        "FOUNDATION-003"
+      ],
+      "inputs": [
+        "POSTGRES-009",
+        "NBVERIFY-004",
+        "FOUNDATION-003",
+        "active profile runtime and Yazelix layout"
+      ],
+      "target_artifacts": [
+        "IPC decision",
+        "protocol schema",
+        "authentication and compatibility tests",
+        "installed runtime receipt",
+        "ARCHBP-018 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "implicit shared-store ownership",
+        "unauthenticated socket",
+        "generated runtime hand edits",
+        "second launcher owner",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-019",
+      "source_row_number": 216,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Verify the newer upstream ruvnet VM reference",
+      "owner_agent": "Research Agent / Source Provenance Agent",
+      "goal": "Search official upstream sources for the newer ruvnet VM referenced by the owner, capture exact repository, commit, package, target, ABI, release, and execution evidence, and determine whether it changes the current RuVix RVM portability conclusion.",
+      "simulation_required": false,
+      "execution_cell": "upstream-research-cell",
+      "verification_gate": "Every candidate is source-identity and digest bound; target ISA, host ABI, POSIX/filesystem/process support, hardware-switch status, release maturity, and portability relevance are evidenced; absence or mismatch is recorded honestly.",
+      "rollback_plan": "Remove only task-created source receipts and invalidate the disposition if upstream identity changes; no upstream code or runtime is installed.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-019.proof.json",
+      "next_action": "Query official upstream sources and bind each candidate to exact identity before architectural comparison.",
+      "source_columns": {
+        "task_id": "ARCHBP-019",
+        "parent_id": "INTEL-002; NBSOURCE-018",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Verify the newer upstream ruvnet VM reference",
+        "owner_agent": "Research Agent / Source Provenance Agent",
+        "goal": "Search official upstream sources for the newer ruvnet VM referenced by the owner, capture exact repository, commit, package, target, ABI, release, and execution evidence, and determine whether it changes the current RuVix RVM portability conclusion.",
+        "inputs": "INTEL-002; NBSOURCE-018; owner reference; current local meta-ruvector RVM evidence",
+        "target_artifacts": "upstream source receipt; capability matrix; reproducible probe plan; architecture disposition; ARCHBP-019 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**; read-only official upstream source",
+        "blocked_paths": "install; build or execute untrusted source; inferred repository identity; marketplace or cache authority; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "upstream-research-cell",
+        "verification_gate": "Every candidate is source-identity and digest bound; target ISA, host ABI, POSIX/filesystem/process support, hardware-switch status, release maturity, and portability relevance are evidenced; absence or mismatch is recorded honestly.",
+        "rollback_plan": "Remove only task-created source receipts and invalidate the disposition if upstream identity changes; no upstream code or runtime is installed.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-019.proof.json",
+        "next_action": "Query official upstream sources and bind each candidate to exact identity before architectural comparison."
+      },
+      "parent_ids": [
+        "INTEL-002",
+        "NBSOURCE-018"
+      ],
+      "inputs": [
+        "INTEL-002",
+        "NBSOURCE-018",
+        "owner reference",
+        "current local meta-ruvector RVM evidence"
+      ],
+      "target_artifacts": [
+        "upstream source receipt",
+        "capability matrix",
+        "reproducible probe plan",
+        "architecture disposition",
+        "ARCHBP-019 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "read-only official upstream source"
+      ],
+      "blocked_paths": [
+        "install",
+        "build or execute untrusted source",
+        "inferred repository identity",
+        "marketplace or cache authority",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-020",
+      "source_row_number": 217,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Bound and prove the RuVix RVM bare-metal integration rung",
+      "owner_agent": "Bare-Metal Runtime Agent",
+      "goal": "Use TDD research to define the supported RuVix/RVM target, hardware-switch and guest ABI gates, QEMU or hardware bring-up, LifeOS communication boundary, and explicit non-replacement of the host Nix toolchain until executable evidence closes every blocker.",
+      "simulation_required": true,
+      "execution_cell": "ruvix-rvm-cell",
+      "verification_gate": "Red gates prove the declared ISA, guest ABI, scheduler context switch, isolation, communication, boot path, and failure recovery in QEMU or approved hardware; the host Nix replacement claim remains blocked unless real toolchain workloads execute.",
+      "rollback_plan": "Stop the emulator or approved test device, restore the prior boot artifact, remove task-created images, and keep the host-Nix dependency explicit.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-020.proof.json",
+      "next_action": "Use ARCHBP-019 disposition to define failing target, switch, ABI, boot, and recovery tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-020",
+        "parent_id": "ARCHBP-019; INTEL-002",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Bound and prove the RuVix RVM bare-metal integration rung",
+        "owner_agent": "Bare-Metal Runtime Agent",
+        "goal": "Use TDD research to define the supported RuVix/RVM target, hardware-switch and guest ABI gates, QEMU or hardware bring-up, LifeOS communication boundary, and explicit non-replacement of the host Nix toolchain until executable evidence closes every blocker.",
+        "inputs": "ARCHBP-019; INTEL-002; RuVix and RVM primary source; current AArch64 no_std evidence",
+        "target_artifacts": "target and ABI contract; hardware-switch tests; bring-up receipt; host-toolchain non-replacement gate; ARCHBP-020 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "claiming x86_64 or POSIX support from AArch64 libraries; replacing Nix; production boot; destructive firmware or disk operation; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "ruvix-rvm-cell",
+        "verification_gate": "Red gates prove the declared ISA, guest ABI, scheduler context switch, isolation, communication, boot path, and failure recovery in QEMU or approved hardware; the host Nix replacement claim remains blocked unless real toolchain workloads execute.",
+        "rollback_plan": "Stop the emulator or approved test device, restore the prior boot artifact, remove task-created images, and keep the host-Nix dependency explicit.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-020.proof.json",
+        "next_action": "Use ARCHBP-019 disposition to define failing target, switch, ABI, boot, and recovery tests."
+      },
+      "parent_ids": [
+        "ARCHBP-019",
+        "INTEL-002"
+      ],
+      "inputs": [
+        "ARCHBP-019",
+        "INTEL-002",
+        "RuVix and RVM primary source",
+        "current AArch64 no_std evidence"
+      ],
+      "target_artifacts": [
+        "target and ABI contract",
+        "hardware-switch tests",
+        "bring-up receipt",
+        "host-toolchain non-replacement gate",
+        "ARCHBP-020 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "claiming x86_64 or POSIX support from AArch64 libraries",
+        "replacing Nix",
+        "production boot",
+        "destructive firmware or disk operation",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-021",
+      "source_row_number": 218,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Prove full-stack Yazelix musl and portable-closure release",
+      "owner_agent": "Yazelix Packaging Agent / Release Agent",
+      "goal": "Execute the detailed YZXCONV-021 task: prove x86_64-unknown-linux-musl for eligible binaries, classify the non-musl GUI and Nix closure, select a closure-extract, bundle, AppImage-like, nix-user-chroot, or documented host-Nix fallback, and prove a relocatable launch folder without false no-/nix/store claims.",
+      "simulation_required": true,
+      "execution_cell": "portable-release-cell",
+      "verification_gate": "YZXCONV-021 proof is current; eligible binaries are reproducible musl artifacts; every non-musl dependency has an explicit owner and fallback; the release launches from a moved clean prefix in the declared environment; remaining host-Nix dependence is visible and blocks stronger claims.",
+      "rollback_plan": "Delete only task-created release artifacts by manifest, restore the prior package source and profile generation, and invalidate portability claims while preserving raw receipts.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-021.proof.json",
+      "next_action": "Run the YZXCONV-021 red-test design and portability matrix as the detailed owning task.",
+      "source_columns": {
+        "task_id": "ARCHBP-021",
+        "parent_id": "FOUNDATION-003; RELEASE-002; NBVERIFY-030",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Prove full-stack Yazelix musl and portable-closure release",
+        "owner_agent": "Yazelix Packaging Agent / Release Agent",
+        "goal": "Execute the detailed YZXCONV-021 task: prove x86_64-unknown-linux-musl for eligible binaries, classify the non-musl GUI and Nix closure, select a closure-extract, bundle, AppImage-like, nix-user-chroot, or documented host-Nix fallback, and prove a relocatable launch folder without false no-/nix/store claims.",
+        "inputs": "FOUNDATION-003; RELEASE-002; NBVERIFY-030; yazelix_runtime_convergence YZXCONV-021; blueprint portability sections",
+        "target_artifacts": "root coverage receipt for YZXCONV-021; reproducible musl artifacts; closure or bundle; relocation tests; ARCHBP-021 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "blocked_paths": "profile mutation as build proof; global install; generated runtime hand edit; universal-static claim; unproved no-/nix/store claim; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "portable-release-cell",
+        "verification_gate": "YZXCONV-021 proof is current; eligible binaries are reproducible musl artifacts; every non-musl dependency has an explicit owner and fallback; the release launches from a moved clean prefix in the declared environment; remaining host-Nix dependence is visible and blocks stronger claims.",
+        "rollback_plan": "Delete only task-created release artifacts by manifest, restore the prior package source and profile generation, and invalidate portability claims while preserving raw receipts.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-021.proof.json",
+        "next_action": "Run the YZXCONV-021 red-test design and portability matrix as the detailed owning task."
+      },
+      "parent_ids": [
+        "FOUNDATION-003",
+        "RELEASE-002",
+        "NBVERIFY-030"
+      ],
+      "inputs": [
+        "FOUNDATION-003",
+        "RELEASE-002",
+        "NBVERIFY-030",
+        "yazelix_runtime_convergence YZXCONV-021",
+        "blueprint portability sections"
+      ],
+      "target_artifacts": [
+        "root coverage receipt for YZXCONV-021",
+        "reproducible musl artifacts",
+        "closure or bundle",
+        "relocation tests",
+        "ARCHBP-021 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**"
+      ],
+      "blocked_paths": [
+        "profile mutation as build proof",
+        "global install",
+        "generated runtime hand edit",
+        "universal-static claim",
+        "unproved no-/nix/store claim",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-022",
+      "source_row_number": 219,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Make GitKB and Meta release isolation branch-current",
+      "owner_agent": "GitKB Agent / Meta Agent",
+      "goal": "Configure explicit repository discovery and branch-current GitKB code indexes for the relevant peers, preserve Meta coordination without monorepo fusion, and prove that release decisions resolve exact repositories and commits rather than stale or empty indexes.",
+      "simulation_required": true,
+      "execution_cell": "gitkb-meta-cell",
+      "verification_gate": "Red tests fail on empty, stale, wrong-branch, or ambiguous repository indexes; current indexes resolve the exact peers and commits used by release tasks; Meta preserves independent lockfiles and repos; index state is never treated as source authority.",
+      "rollback_plan": "Remove task-created indexes and repository entries, restore the prior KB config, and keep releases blocked until a current index can be rebuilt.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-022.proof.json",
+      "next_action": "Define the repository set and write failing empty, stale, wrong-branch, and ambiguity tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-022",
+        "parent_id": "LPS-023; NBVERIFY-030",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Make GitKB and Meta release isolation branch-current",
+        "owner_agent": "GitKB Agent / Meta Agent",
+        "goal": "Configure explicit repository discovery and branch-current GitKB code indexes for the relevant peers, preserve Meta coordination without monorepo fusion, and prove that release decisions resolve exact repositories and commits rather than stale or empty indexes.",
+        "inputs": "LPS-023; NBVERIFY-030; current empty LifeOS GitKB index and missing repository configuration; Meta capability graph",
+        "target_artifacts": "repository configuration; branch-current index receipts; stale-index negative tests; release-isolation map; ARCHBP-022 proof",
+        "allowed_paths": "/home/flexnetos/meta/.kb/**; /home/flexnetos/meta/src/meta/**; /home/flexnetos/meta/src/lifeos/.kb/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "monorepo workspace fusion; source or release authority assigned to index; unrelated KB history rewrite; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "gitkb-meta-cell",
+        "verification_gate": "Red tests fail on empty, stale, wrong-branch, or ambiguous repository indexes; current indexes resolve the exact peers and commits used by release tasks; Meta preserves independent lockfiles and repos; index state is never treated as source authority.",
+        "rollback_plan": "Remove task-created indexes and repository entries, restore the prior KB config, and keep releases blocked until a current index can be rebuilt.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-022.proof.json",
+        "next_action": "Define the repository set and write failing empty, stale, wrong-branch, and ambiguity tests."
+      },
+      "parent_ids": [
+        "LPS-023",
+        "NBVERIFY-030"
+      ],
+      "inputs": [
+        "LPS-023",
+        "NBVERIFY-030",
+        "current empty LifeOS GitKB index and missing repository configuration",
+        "Meta capability graph"
+      ],
+      "target_artifacts": [
+        "repository configuration",
+        "branch-current index receipts",
+        "stale-index negative tests",
+        "release-isolation map",
+        "ARCHBP-022 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/.kb/**",
+        "/home/flexnetos/meta/src/meta/**",
+        "/home/flexnetos/meta/src/lifeos/.kb/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "monorepo workspace fusion",
+        "source or release authority assigned to index",
+        "unrelated KB history rewrite",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-023",
+      "source_row_number": 220,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Round-trip TEAS work orders status and proof through GitKB",
+      "owner_agent": "Task Integration Agent",
+      "goal": "Use TDD to eliminate the TEAS-to-GitKB write-back seam so canonical task bodies, lifecycle status, and proof references appear consistently in GitKB board, graph, ready, assign, context, and incident views without dual authority.",
+      "simulation_required": true,
+      "execution_cell": "teas-gitkb-cell",
+      "verification_gate": "Red tests cover creation, assignment, running, blocked, complete, proof invalidation, retry, conflict, and restart; one authority is explicit; GitKB views and TEAS agree after replay; contradictions fail closed and remain visible.",
+      "rollback_plan": "Disable the adapter, replay from the last common receipt, restore prior task documents and TEAS rows, and keep contradictory tasks blocked.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-023.proof.json",
+      "next_action": "Choose the authoritative direction and write failing lifecycle, replay, conflict, and invalidation round-trip tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-023",
+        "parent_id": "ARCHBP-022; LPS-024",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Round-trip TEAS work orders status and proof through GitKB",
+        "owner_agent": "Task Integration Agent",
+        "goal": "Use TDD to eliminate the TEAS-to-GitKB write-back seam so canonical task bodies, lifecycle status, and proof references appear consistently in GitKB board, graph, ready, assign, context, and incident views without dual authority.",
+        "inputs": "ARCHBP-022; LPS-024; TEAS ledger and store; GitKB task and incident schemas",
+        "target_artifacts": "versioned adapter; authority decision; round-trip tests; reconciliation report; ARCHBP-023 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta-ruvector/**; /home/flexnetos/meta/src/meta/**; /home/flexnetos/meta/.kb/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "dual task authority; silent status overwrite; proof deletion; KB history rewrite; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "teas-gitkb-cell",
+        "verification_gate": "Red tests cover creation, assignment, running, blocked, complete, proof invalidation, retry, conflict, and restart; one authority is explicit; GitKB views and TEAS agree after replay; contradictions fail closed and remain visible.",
+        "rollback_plan": "Disable the adapter, replay from the last common receipt, restore prior task documents and TEAS rows, and keep contradictory tasks blocked.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-023.proof.json",
+        "next_action": "Choose the authoritative direction and write failing lifecycle, replay, conflict, and invalidation round-trip tests."
+      },
+      "parent_ids": [
+        "ARCHBP-022",
+        "LPS-024"
+      ],
+      "inputs": [
+        "ARCHBP-022",
+        "LPS-024",
+        "TEAS ledger and store",
+        "GitKB task and incident schemas"
+      ],
+      "target_artifacts": [
+        "versioned adapter",
+        "authority decision",
+        "round-trip tests",
+        "reconciliation report",
+        "ARCHBP-023 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta-ruvector/**",
+        "/home/flexnetos/meta/src/meta/**",
+        "/home/flexnetos/meta/.kb/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "dual task authority",
+        "silent status overwrite",
+        "proof deletion",
+        "KB history rewrite",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-024",
+      "source_row_number": 221,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Build CodeDB single-binary export and run full peer consolidation",
+      "owner_agent": "Consolidation Agent / Release Agent",
+      "goal": "Use TDD to implement the bounded CodeDB snapshot export crate and execute a provenance-bound all-peer consolidation rehearsal that preserves independent source repos while producing one reviewable LifeOS release artifact.",
+      "simulation_required": true,
+      "execution_cell": "single-binary-export-cell",
+      "verification_gate": "Red tests prove snapshot verify, list, materialize, license, corruption rejection, deterministic build, and rollback; the rehearsal accounts for every peer capability and preserves each independent repository and lockfile; no release claim exceeds the bounded artifact.",
+      "rollback_plan": "Delete task-created export and rehearsal artifacts by manifest, restore the prior exporter source, and leave peer repositories and canonical release untouched.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-024.proof.json",
+      "next_action": "Write failing exporter integrity, determinism, license, materialization, and rollback tests before the all-peer rehearsal.",
+      "source_columns": {
+        "task_id": "ARCHBP-024",
+        "parent_id": "CONSOLIDATE-003; POSTGRES-008",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Build CodeDB single-binary export and run full peer consolidation",
+        "owner_agent": "Consolidation Agent / Release Agent",
+        "goal": "Use TDD to implement the bounded CodeDB snapshot export crate and execute a provenance-bound all-peer consolidation rehearsal that preserves independent source repos while producing one reviewable LifeOS release artifact.",
+        "inputs": "CONSOLIDATE-003; POSTGRES-008; CDB100 design; envctl replayable migration graph; peer capability ledger",
+        "target_artifacts": "single-binary exporter; embedded snapshot tests; license and provenance report; all-peer rehearsal receipt; ARCHBP-024 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/nu_plugin/**; /home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "monorepo fusion; source-repo deletion; license or provenance omission; production cutover; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "single-binary-export-cell",
+        "verification_gate": "Red tests prove snapshot verify, list, materialize, license, corruption rejection, deterministic build, and rollback; the rehearsal accounts for every peer capability and preserves each independent repository and lockfile; no release claim exceeds the bounded artifact.",
+        "rollback_plan": "Delete task-created export and rehearsal artifacts by manifest, restore the prior exporter source, and leave peer repositories and canonical release untouched.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-024.proof.json",
+        "next_action": "Write failing exporter integrity, determinism, license, materialization, and rollback tests before the all-peer rehearsal."
+      },
+      "parent_ids": [
+        "CONSOLIDATE-003",
+        "POSTGRES-008"
+      ],
+      "inputs": [
+        "CONSOLIDATE-003",
+        "POSTGRES-008",
+        "CDB100 design",
+        "envctl replayable migration graph",
+        "peer capability ledger"
+      ],
+      "target_artifacts": [
+        "single-binary exporter",
+        "embedded snapshot tests",
+        "license and provenance report",
+        "all-peer rehearsal receipt",
+        "ARCHBP-024 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/nu_plugin/**",
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "monorepo fusion",
+        "source-repo deletion",
+        "license or provenance omission",
+        "production cutover",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-025",
+      "source_row_number": 222,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Produce exact-clean-tree public release and detached attestation proof",
+      "owner_agent": "Independent Release Verifier",
+      "goal": "Prove a public release from an exact clean commit with reproducible artifact hashes, source and toolchain provenance, SBOM and license completeness, detached attestation, clean runner state, rollback, and post-publication verification.",
+      "simulation_required": true,
+      "execution_cell": "public-release-proof-cell",
+      "verification_gate": "Two clean builds of the same commit produce the declared identical artifacts; repository, submodule, lock, toolchain, runner, SBOM, license, and checksum identities are bound; detached attestation verifies independently; rollback and compromise procedures execute in the isolated cell.",
+      "rollback_plan": "Revoke and mark the test release invalid, delete only task-created public artifacts where policy permits, restore no mutable tag silently, and retain the incident and attestation evidence.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-025.proof.json",
+      "next_action": "Define the clean-release manifest and failing dirty-tree, provenance, license, attestation, and rollback tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-025",
+        "parent_id": "ARCHBP-021; ARCHBP-024; RELEASE-002",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Produce exact-clean-tree public release and detached attestation proof",
+        "owner_agent": "Independent Release Verifier",
+        "goal": "Prove a public release from an exact clean commit with reproducible artifact hashes, source and toolchain provenance, SBOM and license completeness, detached attestation, clean runner state, rollback, and post-publication verification.",
+        "inputs": "ARCHBP-021; ARCHBP-024; RELEASE-002; CodeDB release contract",
+        "target_artifacts": "clean-tree receipt; reproducible artifact manifest; SBOM and license map; detached attestation; verification and rollback receipt; ARCHBP-025 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/**; owning peer release source; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "dirty-tree release; unsigned mutation; missing license or provenance; secret publication; generated runtime hand edit",
+        "simulation_required": "TRUE",
+        "execution_cell": "public-release-proof-cell",
+        "verification_gate": "Two clean builds of the same commit produce the declared identical artifacts; repository, submodule, lock, toolchain, runner, SBOM, license, and checksum identities are bound; detached attestation verifies independently; rollback and compromise procedures execute in the isolated cell.",
+        "rollback_plan": "Revoke and mark the test release invalid, delete only task-created public artifacts where policy permits, restore no mutable tag silently, and retain the incident and attestation evidence.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-025.proof.json",
+        "next_action": "Define the clean-release manifest and failing dirty-tree, provenance, license, attestation, and rollback tests."
+      },
+      "parent_ids": [
+        "ARCHBP-021",
+        "ARCHBP-024",
+        "RELEASE-002"
+      ],
+      "inputs": [
+        "ARCHBP-021",
+        "ARCHBP-024",
+        "RELEASE-002",
+        "CodeDB release contract"
+      ],
+      "target_artifacts": [
+        "clean-tree receipt",
+        "reproducible artifact manifest",
+        "SBOM and license map",
+        "detached attestation",
+        "verification and rollback receipt",
+        "ARCHBP-025 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/**",
+        "owning peer release source",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "dirty-tree release",
+        "unsigned mutation",
+        "missing license or provenance",
+        "secret publication",
+        "generated runtime hand edit"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-026",
+      "source_row_number": 223,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Prove Home Manager desktop and profile startup ownership",
+      "owner_agent": "Yazelix Home Manager Agent / Desktop Agent",
+      "goal": "Execute the detailed YZXCONV-022 task: keep Home Manager inside the one foundation element, materialize reviewed config inputs, launch profile yzx with the profile Zellij layout, start declared LifeOS and agent services, and remove stale user-local binary and desktop shadows.",
+      "simulation_required": true,
+      "execution_cell": "home-manager-desktop-cell",
+      "verification_gate": "YZXCONV-022 proof is current; Nix evaluation and build show one foundation element; the visible desktop entry launches profile yzx with the profile layout; declared background services start and stop cleanly; stale local shadows are absent; generated runtime matches reviewed inputs.",
+      "rollback_plan": "Reselect the recorded prior profile generation, restore only reviewed editable inputs, stop task-created services, and never restore stale shadows or edit generated runtime.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-026.proof.json",
+      "next_action": "Run YZXCONV-022 as the detailed owning task and link its proof into the root ledger.",
+      "source_columns": {
+        "task_id": "ARCHBP-026",
+        "parent_id": "FOUNDATION-003; EXPERIENCE-002",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Prove Home Manager desktop and profile startup ownership",
+        "owner_agent": "Yazelix Home Manager Agent / Desktop Agent",
+        "goal": "Execute the detailed YZXCONV-022 task: keep Home Manager inside the one foundation element, materialize reviewed config inputs, launch profile yzx with the profile Zellij layout, start declared LifeOS and agent services, and remove stale user-local binary and desktop shadows.",
+        "inputs": "FOUNDATION-003; EXPERIENCE-002; yazelix_runtime_convergence YZXCONV-022; active desktop frontdoor contract",
+        "target_artifacts": "root coverage receipt for YZXCONV-022; Home Manager tests; desktop entry and startup tests; shadow retirement receipt; ARCHBP-026 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "blocked_paths": "second profile owner; manual generated-runtime edit; stale /home/flexnetos/.local/bin/yzx; stale user-local desktop launcher; agent state relocation; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "home-manager-desktop-cell",
+        "verification_gate": "YZXCONV-022 proof is current; Nix evaluation and build show one foundation element; the visible desktop entry launches profile yzx with the profile layout; declared background services start and stop cleanly; stale local shadows are absent; generated runtime matches reviewed inputs.",
+        "rollback_plan": "Reselect the recorded prior profile generation, restore only reviewed editable inputs, stop task-created services, and never restore stale shadows or edit generated runtime.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-026.proof.json",
+        "next_action": "Run YZXCONV-022 as the detailed owning task and link its proof into the root ledger."
+      },
+      "parent_ids": [
+        "FOUNDATION-003",
+        "EXPERIENCE-002"
+      ],
+      "inputs": [
+        "FOUNDATION-003",
+        "EXPERIENCE-002",
+        "yazelix_runtime_convergence YZXCONV-022",
+        "active desktop frontdoor contract"
+      ],
+      "target_artifacts": [
+        "root coverage receipt for YZXCONV-022",
+        "Home Manager tests",
+        "desktop entry and startup tests",
+        "shadow retirement receipt",
+        "ARCHBP-026 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/lifeos/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**"
+      ],
+      "blocked_paths": [
+        "second profile owner",
+        "manual generated-runtime edit",
+        "stale /home/flexnetos/.local/bin/yzx",
+        "stale user-local desktop launcher",
+        "agent state relocation",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-027",
+      "source_row_number": 224,
+      "phase": "13-architecture-blueprint-execution",
+      "title": "Restore durable RULES.md authority and generated projection",
+      "owner_agent": "Agent Environment Agent / Policy Agent",
+      "goal": "Create the missing durable operating-rules source at the documented canonical path, give envctl and Yazelix one reviewed projection route, and add negative tests preventing retired workspace mirrors, generated runtime, caches, or marketplace copies from becoming active authority.",
+      "simulation_required": true,
+      "execution_cell": "rules-authority-cell",
+      "verification_gate": "Red tests fail when RULES.md is missing, duplicated, stale, or sourced from retired mirrors; preview is idempotent; installed checksum traces to one reviewed editable source through envctl and the profile without widening plugins or MCPs.",
+      "rollback_plan": "Restore the prior source and projection receipts, remove only the task-created projection if invalid, and keep agent execution blocked when durable rules are absent.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-027.proof.json",
+      "next_action": "Choose the checked-in source owner and write failing missing, duplicate, stale, and retired-mirror authority tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-027",
+        "parent_id": "FOUNDATION-003; LPS-023",
+        "phase": "13-architecture-blueprint-execution",
+        "title": "Restore durable RULES.md authority and generated projection",
+        "owner_agent": "Agent Environment Agent / Policy Agent",
+        "goal": "Create the missing durable operating-rules source at the documented canonical path, give envctl and Yazelix one reviewed projection route, and add negative tests preventing retired workspace mirrors, generated runtime, caches, or marketplace copies from becoming active authority.",
+        "inputs": "FOUNDATION-003; LPS-023; root AGENTS operating-rules contract; current missing /home/flexnetos/.codex/RULES.md evidence",
+        "target_artifacts": "canonical RULES source decision; projection task; negative authority tests; installed checksum proof; ARCHBP-027 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**; /home/flexnetos/.config/yazelix/**",
+        "blocked_paths": "direct generated-runtime edit; retired workspace .codex mirror; cache or marketplace authority; auth, sessions, databases, or secrets",
+        "simulation_required": "TRUE",
+        "execution_cell": "rules-authority-cell",
+        "verification_gate": "Red tests fail when RULES.md is missing, duplicated, stale, or sourced from retired mirrors; preview is idempotent; installed checksum traces to one reviewed editable source through envctl and the profile without widening plugins or MCPs.",
+        "rollback_plan": "Restore the prior source and projection receipts, remove only the task-created projection if invalid, and keep agent execution blocked when durable rules are absent.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-027.proof.json",
+        "next_action": "Choose the checked-in source owner and write failing missing, duplicate, stale, and retired-mirror authority tests."
+      },
+      "parent_ids": [
+        "FOUNDATION-003",
+        "LPS-023"
+      ],
+      "inputs": [
+        "FOUNDATION-003",
+        "LPS-023",
+        "root AGENTS operating-rules contract",
+        "current missing /home/flexnetos/.codex/RULES.md evidence"
+      ],
+      "target_artifacts": [
+        "canonical RULES source decision",
+        "projection task",
+        "negative authority tests",
+        "installed checksum proof",
+        "ARCHBP-027 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/envctl/agent-env.yaml",
+        "/home/flexnetos/meta/src/envctl/agent-skills/**",
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "/home/flexnetos/.config/yazelix/**"
+      ],
+      "blocked_paths": [
+        "direct generated-runtime edit",
+        "retired workspace .codex mirror",
+        "cache or marketplace authority",
+        "auth",
+        "sessions",
+        "databases",
+        "or secrets"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-028",
+      "source_row_number": 225,
+      "phase": "13-foundation-gap-closure",
+      "title": "Wire Meta exec to dependency-DAG execution order",
+      "owner_agent": "Meta Agent / Fleet Execution Agent",
+      "goal": "Use TDD to make meta exec execute dependency levels sequentially and peers within a level in parallel, preserving independent repositories, deterministic display, filters, failure propagation, cancellation, and cycle rejection.",
+      "simulation_required": true,
+      "execution_cell": "meta-dag-exec-cell",
+      "verification_gate": "Red tests prove dependencies finish before dependents, same-level peers respect the parallel cap, tag filters preserve topology, cycles and unresolved required dependencies fail closed, and cancellation prevents later levels from starting.",
+      "rollback_plan": "Restore the prior alphabetical executor, disable dependency-sensitive fleet actions, and retain failing topology and cancellation evidence.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-028.proof.json",
+      "next_action": "Write failing multi-level, parallel-level, filter, cycle, failure, and cancellation tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-028",
+        "parent_id": "STRUCTURE-005; LPS-028",
+        "phase": "13-foundation-gap-closure",
+        "title": "Wire Meta exec to dependency-DAG execution order",
+        "owner_agent": "Meta Agent / Fleet Execution Agent",
+        "goal": "Use TDD to make meta exec execute dependency levels sequentially and peers within a level in parallel, preserving independent repositories, deterministic display, filters, failure propagation, cancellation, and cycle rejection.",
+        "inputs": "STRUCTURE-005; LPS-028; DependencyGraph execution_order implementation; current alphabetical fan-out evidence",
+        "target_artifacts": "DAG-level scheduler; unit and integration tests; failure and cycle receipts; ARCHBP-028 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "monorepo fusion; cross-repo lockfile; dependency-order bypass; unbounded parallelism; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "meta-dag-exec-cell",
+        "verification_gate": "Red tests prove dependencies finish before dependents, same-level peers respect the parallel cap, tag filters preserve topology, cycles and unresolved required dependencies fail closed, and cancellation prevents later levels from starting.",
+        "rollback_plan": "Restore the prior alphabetical executor, disable dependency-sensitive fleet actions, and retain failing topology and cancellation evidence.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-028.proof.json",
+        "next_action": "Write failing multi-level, parallel-level, filter, cycle, failure, and cancellation tests."
+      },
+      "parent_ids": [
+        "STRUCTURE-005",
+        "LPS-028"
+      ],
+      "inputs": [
+        "STRUCTURE-005",
+        "LPS-028",
+        "DependencyGraph execution_order implementation",
+        "current alphabetical fan-out evidence"
+      ],
+      "target_artifacts": [
+        "DAG-level scheduler",
+        "unit and integration tests",
+        "failure and cycle receipts",
+        "ARCHBP-028 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "monorepo fusion",
+        "cross-repo lockfile",
+        "dependency-order bypass",
+        "unbounded parallelism",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-029",
+      "source_row_number": 226,
+      "phase": "13-foundation-gap-closure",
+      "title": "Decide Rust toolchain bundling versus build-only provenance",
+      "owner_agent": "Runtime Architecture Owner / Release Agent",
+      "goal": "Record a bounded owner decision selecting a relocatable Rust closure inside the release prefix or build-only provenance, with size, licensing, offline rebuild, security-update, rollback, and host-dependency consequences.",
+      "simulation_required": false,
+      "execution_cell": "toolchain-decision-cell",
+      "verification_gate": "The owner records one option or an explicitly bounded hybrid, exact unblock conditions, provenance and update ownership, offline and relocation expectations, rollback, and effects on musl and closure tasks; no release task assumes an undecided model.",
+      "rollback_plan": "Reopen the decision, restore the prior release contract, and keep dependent release tasks blocked; no toolchain or profile state changes.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-029.proof.json",
+      "next_action": "Prepare the option matrix and request the bounded owner decision.",
+      "source_columns": {
+        "task_id": "ARCHBP-029",
+        "parent_id": "FOUNDATION-001; RELEASE-002",
+        "phase": "13-foundation-gap-closure",
+        "title": "Decide Rust toolchain bundling versus build-only provenance",
+        "owner_agent": "Runtime Architecture Owner / Release Agent",
+        "goal": "Record a bounded owner decision selecting a relocatable Rust closure inside the release prefix or build-only provenance, with size, licensing, offline rebuild, security-update, rollback, and host-dependency consequences.",
+        "inputs": "FOUNDATION-001; RELEASE-002; portable prefix model; current open toolchain question",
+        "target_artifacts": "owner decision; decision matrix; release contract update; ARCHBP-029 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta/docs/**; /home/flexnetos/meta/src/yazelix/docs/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/**",
+        "blocked_paths": "toolchain install; profile mutation; ambiguous hybrid ownership; secrets/**",
+        "simulation_required": "FALSE",
+        "execution_cell": "toolchain-decision-cell",
+        "verification_gate": "The owner records one option or an explicitly bounded hybrid, exact unblock conditions, provenance and update ownership, offline and relocation expectations, rollback, and effects on musl and closure tasks; no release task assumes an undecided model.",
+        "rollback_plan": "Reopen the decision, restore the prior release contract, and keep dependent release tasks blocked; no toolchain or profile state changes.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-029.proof.json",
+        "next_action": "Prepare the option matrix and request the bounded owner decision."
+      },
+      "parent_ids": [
+        "FOUNDATION-001",
+        "RELEASE-002"
+      ],
+      "inputs": [
+        "FOUNDATION-001",
+        "RELEASE-002",
+        "portable prefix model",
+        "current open toolchain question"
+      ],
+      "target_artifacts": [
+        "owner decision",
+        "decision matrix",
+        "release contract update",
+        "ARCHBP-029 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta/docs/**",
+        "/home/flexnetos/meta/src/yazelix/docs/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/**"
+      ],
+      "blocked_paths": [
+        "toolchain install",
+        "profile mutation",
+        "ambiguous hybrid ownership",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-030",
+      "source_row_number": 227,
+      "phase": "13-foundation-gap-closure",
+      "title": "Complete envctl root relocation and retire the legacy toolchain bridge",
+      "owner_agent": "envctl Agent / Runtime Kernel",
+      "goal": "Use TDD to make the envctl-owned portable prefix the canonical post-bootstrap runtime root, retire compatibility .toolchains and user-local binary shadows, preserve the one Yazelix profile as current install owner during transition, and prove rollback without split ownership.",
+      "simulation_required": true,
+      "execution_cell": "envctl-root-relocation-cell",
+      "verification_gate": "Red tests reject compatibility paths as canonical, detect split binary/config ownership, and prove a staged source-to-prefix migration, command resolution, data preservation, upgrade, rollback, and eventual retirement criteria without a second active owner.",
+      "rollback_plan": "Restore the recorded prior frontdoor and profile generation, retain the compatibility bridge only as explicitly noncanonical, and remove task-created prefix artifacts by manifest.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-030.proof.json",
+      "next_action": "Write failing canonical-root, split-owner, migration, upgrade, and rollback tests before moving any frontdoor.",
+      "source_columns": {
+        "task_id": "ARCHBP-030",
+        "parent_id": "FOUNDATION-003; RELEASE-002",
+        "phase": "13-foundation-gap-closure",
+        "title": "Complete envctl root relocation and retire the legacy toolchain bridge",
+        "owner_agent": "envctl Agent / Runtime Kernel",
+        "goal": "Use TDD to make the envctl-owned portable prefix the canonical post-bootstrap runtime root, retire compatibility .toolchains and user-local binary shadows, preserve the one Yazelix profile as current install owner during transition, and prove rollback without split ownership.",
+        "inputs": "FOUNDATION-003; RELEASE-002; envctl install and layout contracts; portability G4",
+        "target_artifacts": "root-layout tests; migration plan; shadow retirement receipts; relocated runtime proof; ARCHBP-030 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "profile mutation before proof; generated runtime hand edit; deleting reachable rollback generation; parallel canonical root; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "envctl-root-relocation-cell",
+        "verification_gate": "Red tests reject compatibility paths as canonical, detect split binary/config ownership, and prove a staged source-to-prefix migration, command resolution, data preservation, upgrade, rollback, and eventual retirement criteria without a second active owner.",
+        "rollback_plan": "Restore the recorded prior frontdoor and profile generation, retain the compatibility bridge only as explicitly noncanonical, and remove task-created prefix artifacts by manifest.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-030.proof.json",
+        "next_action": "Write failing canonical-root, split-owner, migration, upgrade, and rollback tests before moving any frontdoor."
+      },
+      "parent_ids": [
+        "FOUNDATION-003",
+        "RELEASE-002"
+      ],
+      "inputs": [
+        "FOUNDATION-003",
+        "RELEASE-002",
+        "envctl install and layout contracts",
+        "portability G4"
+      ],
+      "target_artifacts": [
+        "root-layout tests",
+        "migration plan",
+        "shadow retirement receipts",
+        "relocated runtime proof",
+        "ARCHBP-030 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "profile mutation before proof",
+        "generated runtime hand edit",
+        "deleting reachable rollback generation",
+        "parallel canonical root",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-031",
+      "source_row_number": 228,
+      "phase": "13-foundation-gap-closure",
+      "title": "Consolidate guard-bash and Meta agent guard policy ownership",
+      "owner_agent": "Agent Safety Agent / Meta Agent",
+      "goal": "Use TDD to inventory overlapping guard-bash and meta agent guard behavior, choose one policy source with explicit adapters where required, eliminate contradictory enforcement, and preserve Nushell-only agent execution plus owner-only emergency fallback.",
+      "simulation_required": true,
+      "execution_cell": "agent-guard-cell",
+      "verification_gate": "Red tests expose every overlap and contradiction; one source owns each rule; adapters are traceable; Nushell-only and crash-specific owner approval remain enforced; removal of either legacy route cannot silently disable a control.",
+      "rollback_plan": "Restore the prior guard configuration from receipts, disable agents if enforcement is ambiguous, and retain the contradiction report until one owner is re-established.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-031.proof.json",
+      "next_action": "Build the overlap matrix and write failing duplicate, contradictory, missing-rule, and alternate-shell tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-031",
+        "parent_id": "FOUNDATION-003; LPS-009",
+        "phase": "13-foundation-gap-closure",
+        "title": "Consolidate guard-bash and Meta agent guard policy ownership",
+        "owner_agent": "Agent Safety Agent / Meta Agent",
+        "goal": "Use TDD to inventory overlapping guard-bash and meta agent guard behavior, choose one policy source with explicit adapters where required, eliminate contradictory enforcement, and preserve Nushell-only agent execution plus owner-only emergency fallback.",
+        "inputs": "FOUNDATION-003; LPS-009; current hook and Meta guard inventories; YZXCONV-017 contract",
+        "target_artifacts": "guard capability matrix; owner decision; consolidated policy tests; migration receipt; ARCHBP-031 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/meta/**; /home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "weakened guard; duplicate active policy; agent alternate-shell permission; generated runtime hand edit; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "agent-guard-cell",
+        "verification_gate": "Red tests expose every overlap and contradiction; one source owns each rule; adapters are traceable; Nushell-only and crash-specific owner approval remain enforced; removal of either legacy route cannot silently disable a control.",
+        "rollback_plan": "Restore the prior guard configuration from receipts, disable agents if enforcement is ambiguous, and retain the contradiction report until one owner is re-established.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-031.proof.json",
+        "next_action": "Build the overlap matrix and write failing duplicate, contradictory, missing-rule, and alternate-shell tests."
+      },
+      "parent_ids": [
+        "FOUNDATION-003",
+        "LPS-009"
+      ],
+      "inputs": [
+        "FOUNDATION-003",
+        "LPS-009",
+        "current hook and Meta guard inventories",
+        "YZXCONV-017 contract"
+      ],
+      "target_artifacts": [
+        "guard capability matrix",
+        "owner decision",
+        "consolidated policy tests",
+        "migration receipt",
+        "ARCHBP-031 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/meta/**",
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "weakened guard",
+        "duplicate active policy",
+        "agent alternate-shell permission",
+        "generated runtime hand edit",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-032",
+      "source_row_number": 229,
+      "phase": "13-foundation-gap-closure",
+      "title": "Prevent accidental vault_hub raw-secret commits",
+      "owner_agent": "Security Agent / Vault Agent",
+      "goal": "Add and test repository-owned ignore and pre-commit controls for vault_keeper, .ssh, .env, live KeePass, and other raw-secret paths without reading secret values, and move real material outside the repository when ownership permits.",
+      "simulation_required": true,
+      "execution_cell": "vault-hygiene-cell",
+      "verification_gate": "Tests use synthetic filenames and values only; git status and check-ignore prove every raw-secret path class is excluded; pre-commit rejects forced additions; no secret contents enter logs, proof, Git history, or task artifacts.",
+      "rollback_plan": "Restore the prior ignore and hook files, keep the repository blocked from broad add operations, and never move or delete real secret material without explicit owner approval.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-032.proof.json",
+      "next_action": "Write synthetic failing check-ignore and forced-add rejection tests without reading any real secret value.",
+      "source_columns": {
+        "task_id": "ARCHBP-032",
+        "parent_id": "INTEL-003",
+        "phase": "13-foundation-gap-closure",
+        "title": "Prevent accidental vault_hub raw-secret commits",
+        "owner_agent": "Security Agent / Vault Agent",
+        "goal": "Add and test repository-owned ignore and pre-commit controls for vault_keeper, .ssh, .env, live KeePass, and other raw-secret paths without reading secret values, and move real material outside the repository when ownership permits.",
+        "inputs": "INTEL-003; vault_hub raw-secret-free charter; tracking-status-only finding S-1",
+        "target_artifacts": "ignore rules; negative commit tests; path migration decision; security proof without secret values; ARCHBP-032 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/vault_hub/.gitignore; /home/flexnetos/meta/src/vault_hub/.githooks/**; /home/flexnetos/meta/src/vault_hub/tests/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "reading or printing secret values; git add of raw-secret paths; deleting owner data; secret migration without approval",
+        "simulation_required": "TRUE",
+        "execution_cell": "vault-hygiene-cell",
+        "verification_gate": "Tests use synthetic filenames and values only; git status and check-ignore prove every raw-secret path class is excluded; pre-commit rejects forced additions; no secret contents enter logs, proof, Git history, or task artifacts.",
+        "rollback_plan": "Restore the prior ignore and hook files, keep the repository blocked from broad add operations, and never move or delete real secret material without explicit owner approval.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-032.proof.json",
+        "next_action": "Write synthetic failing check-ignore and forced-add rejection tests without reading any real secret value."
+      },
+      "parent_ids": [
+        "INTEL-003"
+      ],
+      "inputs": [
+        "INTEL-003",
+        "vault_hub raw-secret-free charter",
+        "tracking-status-only finding S-1"
+      ],
+      "target_artifacts": [
+        "ignore rules",
+        "negative commit tests",
+        "path migration decision",
+        "security proof without secret values",
+        "ARCHBP-032 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/vault_hub/.gitignore",
+        "/home/flexnetos/meta/src/vault_hub/.githooks/**",
+        "/home/flexnetos/meta/src/vault_hub/tests/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "reading or printing secret values",
+        "git add of raw-secret paths",
+        "deleting owner data",
+        "secret migration without approval"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-033",
+      "source_row_number": 230,
+      "phase": "13-foundation-gap-closure",
+      "title": "Align strict-link verification with navigation alias resolution",
+      "owner_agent": "Planning Spine QA Agent",
+      "goal": "Use TDD to make strict documentation verification ignore inline-code link examples, resolve wiki aliases through the same maintained navigation index as the generator, preserve repository-relative path safety, and still reject genuinely missing or escaping targets.",
+      "simulation_required": true,
+      "execution_cell": "planning-link-compat-cell",
+      "verification_gate": "Red tests reproduce the inline Markdown example false positive and bare wiki-alias false negative; code spans and fenced examples are ignored; aliases resolve exactly as the generated index; missing, ambiguous, absolute-escape, and parent-escape targets still fail; planning verification and navigation checks agree.",
+      "rollback_plan": "Restore the prior verifier and generator, retain the failing fixtures and receipts, and keep strict documentation verification marked blocked until resolver parity is re-established.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-033.proof.json",
+      "next_action": "Write the failing inline-example, alias, ambiguity, missing-target, and path-escape tests before changing either resolver.",
+      "source_columns": {
+        "task_id": "ARCHBP-033",
+        "parent_id": "LPS-023",
+        "phase": "13-foundation-gap-closure",
+        "title": "Align strict-link verification with navigation alias resolution",
+        "owner_agent": "Planning Spine QA Agent",
+        "goal": "Use TDD to make strict documentation verification ignore inline-code link examples, resolve wiki aliases through the same maintained navigation index as the generator, preserve repository-relative path safety, and still reject genuinely missing or escaping targets.",
+        "inputs": "LPS-023; navigation generator and schemas; verify-planning-spine strict-link implementation; failing 2026-07-14 verification receipts",
+        "target_artifacts": "link-resolution contract; shared resolver or parity adapter; positive and negative fixtures; verifier receipt; ARCHBP-033 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/scripts/verify-planning-spine.mjs; /home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs; /home/flexnetos/meta/src/lifeos/tests/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "weakening path-escape checks; accepting missing targets; generated navigation hand edits; unrelated documentation rewrite; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "planning-link-compat-cell",
+        "verification_gate": "Red tests reproduce the inline Markdown example false positive and bare wiki-alias false negative; code spans and fenced examples are ignored; aliases resolve exactly as the generated index; missing, ambiguous, absolute-escape, and parent-escape targets still fail; planning verification and navigation checks agree.",
+        "rollback_plan": "Restore the prior verifier and generator, retain the failing fixtures and receipts, and keep strict documentation verification marked blocked until resolver parity is re-established.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-033.proof.json",
+        "next_action": "Write the failing inline-example, alias, ambiguity, missing-target, and path-escape tests before changing either resolver."
+      },
+      "parent_ids": [
+        "LPS-023"
+      ],
+      "inputs": [
+        "LPS-023",
+        "navigation generator and schemas",
+        "verify-planning-spine strict-link implementation",
+        "failing 2026-07-14 verification receipts"
+      ],
+      "target_artifacts": [
+        "link-resolution contract",
+        "shared resolver or parity adapter",
+        "positive and negative fixtures",
+        "verifier receipt",
+        "ARCHBP-033 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/scripts/verify-planning-spine.mjs",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs",
+        "/home/flexnetos/meta/src/lifeos/tests/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "weakening path-escape checks",
+        "accepting missing targets",
+        "generated navigation hand edits",
+        "unrelated documentation rewrite",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-034",
+      "source_row_number": 231,
+      "phase": "13-foundation-gap-closure",
+      "title": "Reconcile verifier failure state with proof and task status projections",
+      "owner_agent": "Planning Spine Proof Agent / QA Agent",
+      "goal": "Use TDD to keep runtime, authority, MVP bundle, LPS proof, proof-ledger, and task-status projections mutually consistent when an upstream verification gate fails, including null-safe identity handling and summaries that never claim pass while the structured result is fail or blocked.",
+      "simulation_required": true,
+      "execution_cell": "proof-status-compat-cell",
+      "verification_gate": "Red tests reproduce the strict-link failure cascade; every generated report remains schema-valid; absent identities are represented without fabricated None values; LPS-007 and LPS-008 summaries match blocked structured results; the task-status projection exposes proof invalidation; after ARCHBP-033 passes, rerun restores pass only from new evidence while ledger history remains append-only.",
+      "rollback_plan": "Preserve all failure records, restore the prior generators, append an invalidation or recovery event rather than rewriting ledger history, and keep affected tasks blocked until every projection agrees.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-034.proof.json",
+      "next_action": "Write failing cascade, contradictory-summary, null-identity, ledger-invalidation, and recovery tests before changing projection code.",
+      "source_columns": {
+        "task_id": "ARCHBP-034",
+        "parent_id": "ARCHBP-033; LPS-007; LPS-008",
+        "phase": "13-foundation-gap-closure",
+        "title": "Reconcile verifier failure state with proof and task status projections",
+        "owner_agent": "Planning Spine Proof Agent / QA Agent",
+        "goal": "Use TDD to keep runtime, authority, MVP bundle, LPS proof, proof-ledger, and task-status projections mutually consistent when an upstream verification gate fails, including null-safe identity handling and summaries that never claim pass while the structured result is fail or blocked.",
+        "inputs": "ARCHBP-033; failing state/authority_integrity_report.json; failing state/mvp_bundle_report.json; blocked LPS-007 and LPS-008 proof projections; task status updater; append-only proof ledger",
+        "target_artifacts": "failure-state fixtures; projection reconciliation contract; null-safe summary tests; ledger and status invalidation tests; recovery receipt; ARCHBP-034 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/scripts/verify-planning-spine.mjs; /home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/verify-lps-docs.py; /home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/update-task-graph-status.py; /home/flexnetos/meta/src/lifeos/planning-spine-v0/state/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**; /home/flexnetos/meta/src/lifeos/tests/**",
+        "blocked_paths": "rewriting append-only ledger history; marking blocked proof complete; fabricated executor or verifier identity; deleting failure evidence; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "proof-status-compat-cell",
+        "verification_gate": "Red tests reproduce the strict-link failure cascade; every generated report remains schema-valid; absent identities are represented without fabricated None values; LPS-007 and LPS-008 summaries match blocked structured results; the task-status projection exposes proof invalidation; after ARCHBP-033 passes, rerun restores pass only from new evidence while ledger history remains append-only.",
+        "rollback_plan": "Preserve all failure records, restore the prior generators, append an invalidation or recovery event rather than rewriting ledger history, and keep affected tasks blocked until every projection agrees.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-034.proof.json",
+        "next_action": "Write failing cascade, contradictory-summary, null-identity, ledger-invalidation, and recovery tests before changing projection code."
+      },
+      "parent_ids": [
+        "ARCHBP-033",
+        "LPS-007",
+        "LPS-008"
+      ],
+      "inputs": [
+        "ARCHBP-033",
+        "failing state/authority_integrity_report.json",
+        "failing state/mvp_bundle_report.json",
+        "blocked LPS-007 and LPS-008 proof projections",
+        "task status updater",
+        "append-only proof ledger"
+      ],
+      "target_artifacts": [
+        "failure-state fixtures",
+        "projection reconciliation contract",
+        "null-safe summary tests",
+        "ledger and status invalidation tests",
+        "recovery receipt",
+        "ARCHBP-034 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/scripts/verify-planning-spine.mjs",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/verify-lps-docs.py",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/update-task-graph-status.py",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/state/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "/home/flexnetos/meta/src/lifeos/tests/**"
+      ],
+      "blocked_paths": [
+        "rewriting append-only ledger history",
+        "marking blocked proof complete",
+        "fabricated executor or verifier identity",
+        "deleting failure evidence",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-035",
+      "source_row_number": 232,
+      "phase": "13-foundation-gap-closure",
+      "title": "Resolve duplicate proof-ledger task revision identities without rewriting history",
+      "owner_agent": "Proof Ledger Agent / Independent Verifier",
+      "goal": "Use TDD to reconcile the existing GRAPH-005 revision 1 conflicting-digest ledger entries through an explicit append-only invalidation or conflict-resolution record, and make merge, status, navigation, and audit readers agree on one current proof identity while preserving both historical lines.",
+      "simulation_required": true,
+      "execution_cell": "proof-ledger-conflict-cell",
+      "verification_gate": "Red tests reproduce the existing same-task same-revision different-digest conflict; resolution requires an independent-verifier record naming both identities and the accepted disposition; raw ledger lines remain byte-preserved; merger, status, navigation, and audit readers reject unresolved conflicts and agree after append-only resolution.",
+      "rollback_plan": "Keep the ledger byte-preserved, remove only task-created unaccepted resolution fixtures, restore prior readers, and leave new proof merges blocked while the conflict remains unresolved.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-035.proof.json",
+      "next_action": "Capture both GRAPH-005 revision 1 ledger identities and write failing merger, reader-parity, unresolved-conflict, and append-only-resolution tests.",
+      "source_columns": {
+        "task_id": "ARCHBP-035",
+        "parent_id": "LPS-007",
+        "phase": "13-foundation-gap-closure",
+        "title": "Resolve duplicate proof-ledger task revision identities without rewriting history",
+        "owner_agent": "Proof Ledger Agent / Independent Verifier",
+        "goal": "Use TDD to reconcile the existing GRAPH-005 revision 1 conflicting-digest ledger entries through an explicit append-only invalidation or conflict-resolution record, and make merge, status, navigation, and audit readers agree on one current proof identity while preserving both historical lines.",
+        "inputs": "LPS-007; proof_records/proof_ledger.jsonl conflicting GRAPH-005 revision 1 entries; merge-proof-records.py failure receipt from 2026-07-14",
+        "target_artifacts": "ledger conflict schema or resolution contract; regression fixtures; append-only resolution receipt; reader parity tests; ARCHBP-035 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/merge-proof-records.py; /home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/update-task-graph-status.py; /home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**; /home/flexnetos/meta/src/lifeos/tests/**",
+        "blocked_paths": "deleting or rewriting ledger lines; silently selecting a digest; fabricating proof acceptance; losing either conflicting record; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "proof-ledger-conflict-cell",
+        "verification_gate": "Red tests reproduce the existing same-task same-revision different-digest conflict; resolution requires an independent-verifier record naming both identities and the accepted disposition; raw ledger lines remain byte-preserved; merger, status, navigation, and audit readers reject unresolved conflicts and agree after append-only resolution.",
+        "rollback_plan": "Keep the ledger byte-preserved, remove only task-created unaccepted resolution fixtures, restore prior readers, and leave new proof merges blocked while the conflict remains unresolved.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-035.proof.json",
+        "next_action": "Capture both GRAPH-005 revision 1 ledger identities and write failing merger, reader-parity, unresolved-conflict, and append-only-resolution tests."
+      },
+      "parent_ids": [
+        "LPS-007"
+      ],
+      "inputs": [
+        "LPS-007",
+        "proof_records/proof_ledger.jsonl conflicting GRAPH-005 revision 1 entries",
+        "merge-proof-records.py failure receipt from 2026-07-14"
+      ],
+      "target_artifacts": [
+        "ledger conflict schema or resolution contract",
+        "regression fixtures",
+        "append-only resolution receipt",
+        "reader parity tests",
+        "ARCHBP-035 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/merge-proof-records.py",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/update-task-graph-status.py",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "/home/flexnetos/meta/src/lifeos/tests/**"
+      ],
+      "blocked_paths": [
+        "deleting or rewriting ledger lines",
+        "silently selecting a digest",
+        "fabricating proof acceptance",
+        "losing either conflicting record",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-036",
+      "source_row_number": 233,
+      "phase": "13-foundation-gap-closure",
+      "title": "Derive navigation task counts from the canonical graph",
+      "owner_agent": "Planning Spine Navigation Agent",
+      "goal": "Use TDD to remove hardcoded task-row totals from authored navigation claims and derive or verify every displayed count against generated/task_graph.normalized.json so task additions cannot leave stale agent guidance.",
+      "simulation_required": true,
+      "execution_cell": "navigation-count-cell",
+      "verification_gate": "Red tests reproduce the 249-versus-canonical mismatch; displayed task totals come from or are checked against normalized task_count; adding or removing a fixture task updates or invalidates the claim automatically; navigation generation and check agree without hand-editing generated artifacts.",
+      "rollback_plan": "Restore the prior navigation source and generator, retain the stale-count fixture, and remove the displayed exact count until derived-count verification is restored.",
+      "status": "ready",
+      "proof_uri": "proof_records/ARCHBP-036.proof.json",
+      "next_action": "Write the failing stale-count and task-addition tests before changing authored navigation or generator logic.",
+      "source_columns": {
+        "task_id": "ARCHBP-036",
+        "parent_id": "LPS-003; LPS-023",
+        "phase": "13-foundation-gap-closure",
+        "title": "Derive navigation task counts from the canonical graph",
+        "owner_agent": "Planning Spine Navigation Agent",
+        "goal": "Use TDD to remove hardcoded task-row totals from authored navigation claims and derive or verify every displayed count against generated/task_graph.normalized.json so task additions cannot leave stale agent guidance.",
+        "inputs": "LPS-003; LPS-023; navigation/README.md hardcoded 249-row claim; canonical normalized task graph",
+        "target_artifacts": "count projection contract; generator or verifier update; stale-count fixture; navigation receipt; ARCHBP-036 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/navigation/README.md; /home/flexnetos/meta/src/lifeos/planning-spine-v0/navigation/source.json; /home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs; /home/flexnetos/meta/src/lifeos/tests/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "manual count bump as sole fix; generated navigation hand edits; accepting count drift; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "navigation-count-cell",
+        "verification_gate": "Red tests reproduce the 249-versus-canonical mismatch; displayed task totals come from or are checked against normalized task_count; adding or removing a fixture task updates or invalidates the claim automatically; navigation generation and check agree without hand-editing generated artifacts.",
+        "rollback_plan": "Restore the prior navigation source and generator, retain the stale-count fixture, and remove the displayed exact count until derived-count verification is restored.",
+        "status": "Ready",
+        "proof_uri": "proof_records/ARCHBP-036.proof.json",
+        "next_action": "Write the failing stale-count and task-addition tests before changing authored navigation or generator logic."
+      },
+      "parent_ids": [
+        "LPS-003",
+        "LPS-023"
+      ],
+      "inputs": [
+        "LPS-003",
+        "LPS-023",
+        "navigation/README.md hardcoded 249-row claim",
+        "canonical normalized task graph"
+      ],
+      "target_artifacts": [
+        "count projection contract",
+        "generator or verifier update",
+        "stale-count fixture",
+        "navigation receipt",
+        "ARCHBP-036 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/navigation/README.md",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/navigation/source.json",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs",
+        "/home/flexnetos/meta/src/lifeos/tests/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "manual count bump as sole fix",
+        "generated navigation hand edits",
+        "accepting count drift",
+        "secrets/**"
       ]
     }
   ]

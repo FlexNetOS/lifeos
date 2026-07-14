@@ -6,7 +6,7 @@ type: architecture-cross-reference
 status: verified-with-gaps
 lifecycle: active
 created: 2026-07-12
-updated: 2026-07-12
+updated: 2026-07-14
 review:
   implementation_repository: FlexNetOS/nu_plugin
   baseline_commit: d7cc4d830a5f8c1c51ac6850062b7066b5bbb9d2
@@ -42,6 +42,7 @@ tags:
   - agent-navigation
 related:
   - "[[README]]"
+  - "[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
   - "[[FOUNDATION_ECOSYSTEM_MAP]]"
   - "[[FOUNDATION_META_PORTABILITY_MODEL]]"
   - "[[Notebooklm/Architecture Blueprint - LifeOS Core Foundation]]"
@@ -227,18 +228,27 @@ git-kb code stats --json
 
 The current course is compatible, but the following subjects remain open:
 
-- live RuVector semantic/embedding adapter for CodeDB;
-- end-to-end Nushell → CodeDB → envctl → PostgreSQL/RuVector synchronization;
+- live RuVector semantic/embedding adapter for CodeDB — `ARCHBP-003`;
+- end-to-end Nushell → CodeDB → envctl → PostgreSQL/RuVector synchronization —
+  `ARCHBP-001` through `ARCHBP-003`;
 - database-hosted semantic edit plans that still preserve CodeDB approval and
-  materialization gates;
-- envctl production-branch projection from database rows;
-- AgentDB/`.rvf` and ruvllm runtime integration;
-- SONA/FastGRNN, ATAS/ESN/RuvLTRA, MinCut, and causal-GNN enforcement;
-- LifeOS/Yazelix UDS or shared-store ownership contract;
-- full-stack static-musl or bundled-closure portability proof;
-- a populated, branch-current GitKB code index and explicit repository config;
+  materialization gates — `ARCHBP-004` through `ARCHBP-006`;
+- envctl production-branch projection from database rows — `ARCHBP-006`;
+- AgentDB/`.rvf` and ruvllm runtime integration — `ARCHBP-007` and
+  `ARCHBP-008`;
+- SONA/FastGRNN, ATAS/ESN/RuvLTRA, MinCut, witness-chain, and causal-GNN
+  enforcement — `ARCHBP-009` through `ARCHBP-017`;
+- LifeOS/Yazelix UDS or shared-store ownership contract — `ARCHBP-018`;
+- full-stack static-musl or bundled-closure portability proof —
+  `YZXCONV-021` and `ARCHBP-021`;
+- a populated, branch-current GitKB code index and explicit repository config —
+  `ARCHBP-022`;
 - an exact-clean-tree public release receipt with detached attestation whenever
-  public release readiness is claimed.
+  public release readiness is claimed — `ARCHBP-025`.
+
+The complete heading-by-heading mapping, authoritative corrections, and related
+foundation gaps are maintained in
+[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]].
 
 ## Refresh protocol
 

@@ -72,6 +72,21 @@
         "PLAN.md clauses 1/2/13/14; YZXCONV-021 (musl) and YZXCONV-022 (Home Manager) gates",
         "musl.libc.org/about (static, no external deps); rust x86_64-unknown-linux-musl fully-static target; flake.nix:768-800 musl toolchain wired"
       ]
+    },
+    {
+      "id": "DEC-YZXCONV-006",
+      "title": "agent-env owns only the repo-scoped skills+MCP baseline; the yazelix<->meta connection is the ADR-0006 home symlink farm + nix profile",
+      "subject_task": "YZXCONV-018",
+      "decided_by": "Agent (source-traced integration audit, owner-directed)",
+      "decided_at": "2026-07-14T15:24:05Z",
+      "decision": "Source-traced correction of the 'agent-env is the central control and connection between yazelix and meta' framing. agent-env (envctl, scope: project) writes PLAIN files only into the envctl repo root - .claude/skills, .codex/skills, .mcp.json, .codex/config.toml (agent.rs:240/242/262-281) - dry-run by default, --apply to write, lock-checked (ci/gates/agent-env.sh). It does NOT write into yazelix or the nix profile and does NOT own the nushell runtime config or the live home/.codex|.claude runtime; those are hand-authored home/** sources ADR-0006-symlinked to the live home. agent-env's ONLY relationship to yazelix is a conformance constraint: the MCP baseline must be URL-only (no non-profile local-binary MCPs, 'mirror Yazelix ownership'), enforced by test-agent-mcp-yazelix-mirror.sh. So agent-env centrally controls the agent skills+MCP baseline SURFACE; the actual yazelix<->meta CONNECTION is the ADR-0006 home/** symlink farm (e.g. ~/.config/nushell/config.nu -> home/.config/nushell/config.nu whose line 6 sources the profile-owned rtk_wrappers.nu) plus the yazelix-owned nix profile. meta_plugin_protocol is IN SYNC (envctl path-dep ../../../../meta_plugin_protocol resolves to the meta root; meta-env.rs run_plugin->ExecutionPlan runs the envctl binary; meta_cli consumes it via subprocess_plugins). meta_mcp is a standalone meta_cli-backed MCP server (~30 tools) that builds but is UNWIRED (in no active agent config, absent from agent-env.yaml). meta_git_cli/lib drive real git/gh as subprocesses (no nu-def collision; only the loop_lib $SHELL -c Plan path is a nushell-only caveat). meta_core is the .meta.yaml model + ~/.meta state layer. No live skill/mcp duplication exists (old claude/codex-plugins archived-only; meta-plugins absorbed codex payloads; envctl's 5 skills are name-disjoint). Actionable drift is tracked in YZXCONV-029.",
+      "evidence": [
+        "envctl crates/agent-env/src/agent.rs:240/242/262-281 (project-scope projection targets); fsops.rs:377-383 scope_root; ci/gates/agent-env.sh + scripts/tests/test-agent-mcp-yazelix-mirror.sh",
+        "ADR-0006 home symlink farm: ~/.config/nushell/config.nu -> meta/src/envctl/home/.config/nushell/config.nu (line 6 sources ~/.nix-profile/nushell/config/rtk_wrappers.nu); home/.claude/rules/toolchain.md",
+        "meta_plugin_protocol: envctl crates/cli/Cargo.toml:34 path-dep resolves to /home/flexnetos/meta/meta_plugin_protocol; crates/cli/src/bin/meta-env.rs run_plugin/ExecutionPlan; meta_cli/src/subprocess_plugins.rs + registry.rs:293 resolve_plugin_source",
+        "meta_mcp: /home/flexnetos/meta/meta_mcp bin meta-mcp (~30 tools), depends on meta_cli, unwired in any active agent config",
+        "Verified: no ~/.mcp.json; envctl/.mcp.json = cognitum/cognitum-seed/exa (url-only); active ~/.codex/config.toml = only openaiDeveloperDocs (missing exa, unaccounted); .meta.yaml stale claude-plugins/codex-plugins peers + meta-plugins path drift"
+      ]
     }
   ]
 }

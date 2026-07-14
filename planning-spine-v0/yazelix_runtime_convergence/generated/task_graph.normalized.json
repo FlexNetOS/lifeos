@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T14:54:01Z",
+  "generated_at": "2026-07-14T15:25:02Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 28,
+  "task_count": 29,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T14:54:01Z",
+    "generated_at": "2026-07-14T15:25:02Z",
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
-    "row_count": 28,
+    "row_count": 29,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -1748,6 +1748,71 @@
         "global package install",
         "agent auth or state mutation",
         "generated Yazelix runtime hand edits",
+        "applying agent-env without preview and review"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-029",
+      "source_row_number": 30,
+      "phase": "1-agent-runtime",
+      "title": "Reconcile agent-env meta and yazelix integration drift and ownership gaps",
+      "owner_agent": "Meta envctl Fleet Agent",
+      "goal": "Fix the config-level drift the 2026-07-14 integration audit surfaced: (a) drop the stale claude-plugins and codex-plugins peers from .meta.yaml (archived-only; a meta git update could re-clone the retired plugin repos) and correct the meta-plugins path (declared src/meta-plugins but the live checkout is at the meta root); (b) reconcile the Codex MCP drift where the active ~/.codex/config.toml carries an unaccounted hand-added openaiDeveloperDocs and is missing the agent-env exa, diverging from both the agent-env-generated envctl/.codex/config.toml and the projected home/.codex/config.toml; (c) update the stale CLAUDE.md MCP baseline that still names the retired github context7 memory playwright sequential-thinking servers (enforced baseline is exa cognitum-seed cognitum); (d) record a wire-vs-leave decision for the unwired standalone meta_mcp server; (e) keep the loop_lib $SHELL -c Plan path POSIX-safe or nu-overlay-free under the nushell-only mission (feeds YZXCONV-017).",
+      "simulation_required": false,
+      "execution_cell": "integration-reconcile-cell",
+      "verification_gate": "After the fix: .meta.yaml lists no stale claude-plugins or codex-plugins peers and the meta-plugins path resolves; envctl agent lock --check passes with the Codex baseline matching agent-env (exa cognitum-seed cognitum) and no unaccounted openaiDeveloperDocs; the CLAUDE.md MCP baseline matches agent-env.yaml; a meta_mcp wire-vs-leave decision is recorded; the loop_lib $SHELL -c path is documented POSIX-safe under nushell-only.",
+      "rollback_plan": "Restore the prior .meta.yaml and config projections from the pre-change copies; re-enable any removed peer only from its published receipt; no auth or state is moved.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-029.proof.json",
+      "next_action": "Drop the stale plugin peers and fix the meta-plugins path in .meta.yaml, reconcile the Codex MCP baseline through agent-env, and refresh the CLAUDE.md baseline under owner review.",
+      "source_columns": {
+        "task_id": "YZXCONV-029",
+        "parent_id": "YZXCONV-004; YZXCONV-007",
+        "phase": "1-agent-runtime",
+        "title": "Reconcile agent-env meta and yazelix integration drift and ownership gaps",
+        "owner_agent": "Meta envctl Fleet Agent",
+        "goal": "Fix the config-level drift the 2026-07-14 integration audit surfaced: (a) drop the stale claude-plugins and codex-plugins peers from .meta.yaml (archived-only; a meta git update could re-clone the retired plugin repos) and correct the meta-plugins path (declared src/meta-plugins but the live checkout is at the meta root); (b) reconcile the Codex MCP drift where the active ~/.codex/config.toml carries an unaccounted hand-added openaiDeveloperDocs and is missing the agent-env exa, diverging from both the agent-env-generated envctl/.codex/config.toml and the projected home/.codex/config.toml; (c) update the stale CLAUDE.md MCP baseline that still names the retired github context7 memory playwright sequential-thinking servers (enforced baseline is exa cognitum-seed cognitum); (d) record a wire-vs-leave decision for the unwired standalone meta_mcp server; (e) keep the loop_lib $SHELL -c Plan path POSIX-safe or nu-overlay-free under the nushell-only mission (feeds YZXCONV-017).",
+        "inputs": "integration audit 2026-07-14 findings; .meta.yaml; envctl agent-env.yaml and lock; active and projected codex config; CLAUDE.md",
+        "target_artifacts": "corrected .meta.yaml; reconciled Codex MCP baseline; refreshed CLAUDE.md; meta_mcp wiring decision; loop_lib shell-safety note",
+        "allowed_paths": "/home/flexnetos/meta/.meta.yaml; /home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/CLAUDE.md; /home/flexnetos/meta/src/envctl/home/.codex/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "deleting the archived plugin tarballs; agent auth or state mutation; profile mutation; applying agent-env without preview and review",
+        "simulation_required": "FALSE",
+        "execution_cell": "integration-reconcile-cell",
+        "verification_gate": "After the fix: .meta.yaml lists no stale claude-plugins or codex-plugins peers and the meta-plugins path resolves; envctl agent lock --check passes with the Codex baseline matching agent-env (exa cognitum-seed cognitum) and no unaccounted openaiDeveloperDocs; the CLAUDE.md MCP baseline matches agent-env.yaml; a meta_mcp wire-vs-leave decision is recorded; the loop_lib $SHELL -c path is documented POSIX-safe under nushell-only.",
+        "rollback_plan": "Restore the prior .meta.yaml and config projections from the pre-change copies; re-enable any removed peer only from its published receipt; no auth or state is moved.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-029.proof.json",
+        "next_action": "Drop the stale plugin peers and fix the meta-plugins path in .meta.yaml, reconcile the Codex MCP baseline through agent-env, and refresh the CLAUDE.md baseline under owner review."
+      },
+      "parent_ids": [
+        "YZXCONV-004",
+        "YZXCONV-007"
+      ],
+      "inputs": [
+        "integration audit 2026-07-14 findings",
+        ".meta.yaml",
+        "envctl agent-env.yaml and lock",
+        "active and projected codex config",
+        "CLAUDE.md"
+      ],
+      "target_artifacts": [
+        "corrected .meta.yaml",
+        "reconciled Codex MCP baseline",
+        "refreshed CLAUDE.md",
+        "meta_mcp wiring decision",
+        "loop_lib shell-safety note"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/.meta.yaml",
+        "/home/flexnetos/meta/src/envctl/agent-env.yaml",
+        "/home/flexnetos/meta/src/envctl/CLAUDE.md",
+        "/home/flexnetos/meta/src/envctl/home/.codex/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
+      ],
+      "blocked_paths": [
+        "deleting the archived plugin tarballs",
+        "agent auth or state mutation",
+        "profile mutation",
         "applying agent-env without preview and review"
       ]
     }

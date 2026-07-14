@@ -1,0 +1,397 @@
+{
+  "$id": "https://lifeos.local/schemas/handoff.task.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "allows_dependency_changes": {
+      "const": false
+    },
+    "allows_dependency_install": {
+      "const": false
+    },
+    "allows_network": {
+      "const": false
+    },
+    "blocked_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "blocks": {
+      "items": {
+        "pattern": "^TASK-CDB[0-9]{3}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "companion_gate_ref": {
+      "pattern": "^GATE-CDB[0-9]{3}$",
+      "type": "string"
+    },
+    "completion_gate": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "correlation_id": {
+      "pattern": "^CDB[0-9]{3}$",
+      "type": "string"
+    },
+    "depends_on": {
+      "items": {
+        "pattern": "^TASK-CDB[0-9]{3}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "deterministic": {
+      "const": true
+    },
+    "execution_policy": {
+      "additionalProperties": false,
+      "properties": {
+        "allows_dependency_changes": {
+          "const": false
+        },
+        "allows_dependency_install": {
+          "const": false
+        },
+        "allows_network": {
+          "const": false
+        },
+        "deterministic": {
+          "const": true
+        },
+        "mode": {
+          "const": "review-only"
+        },
+        "source_claims_are_provenance_not_local_proof": {
+          "const": true
+        },
+        "workspace_root_required": {
+          "const": true
+        }
+      },
+      "required": [
+        "mode",
+        "source_claims_are_provenance_not_local_proof",
+        "workspace_root_required",
+        "deterministic",
+        "allows_network",
+        "allows_dependency_install",
+        "allows_dependency_changes"
+      ],
+      "type": "object"
+    },
+    "filesystem_scope": {
+      "const": "src/nu_plugin/**"
+    },
+    "goal": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "human_approval_required": {
+      "const": true
+    },
+    "input_files": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "intent_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "const": "BLAKE3-256"
+        },
+        "canonicalization": {
+          "const": "sorted-key-json-utf8-v1"
+        },
+        "digest": {
+          "pattern": "^blake3:[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "schema": {
+          "const": "lifeos.intent-lock.v1"
+        }
+      },
+      "required": [
+        "schema",
+        "algorithm",
+        "canonicalization",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "phase": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proof_required": {
+      "const": true
+    },
+    "proof_uri": {
+      "type": "null"
+    },
+    "repo_path": {
+      "const": "src/nu_plugin"
+    },
+    "rollback_plan": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "handoff.task.v1"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "commit": {
+          "const": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7"
+        },
+        "csv_row": {
+          "minimum": 2,
+          "type": "integer"
+        },
+        "path": {
+          "pattern": "^execution/.+\\.csv$",
+          "type": "string"
+        },
+        "record": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "commit",
+        "path",
+        "record",
+        "csv_row",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "source_context": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "checklist_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "family": {
+          "enum": [
+            "core",
+            "bidirectional",
+            "polyglot"
+          ]
+        },
+        "first_run_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "gitkb_slug": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "goal_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "governing_docs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "owner_surface": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prd_sections": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "raw_log_paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "safety_constraints": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "source_files": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "source_truth": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stop_condition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stop_condition_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "subgoal_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "family",
+        "owner_surface",
+        "source_truth",
+        "source_files",
+        "checklist_ref",
+        "goal_ref",
+        "subgoal_ref",
+        "prd_sections",
+        "governing_docs",
+        "acceptance_refs",
+        "first_run_refs",
+        "stop_condition_refs",
+        "stop_condition",
+        "evidence_paths",
+        "raw_log_paths",
+        "gitkb_slug",
+        "notes",
+        "safety_constraints"
+      ],
+      "type": "object"
+    },
+    "source_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "const": "review"
+    },
+    "target_files": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "verification_command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "work_order_id": {
+      "pattern": "^TASK-CDB[0-9]{3}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "work_order_id",
+    "correlation_id",
+    "title",
+    "goal",
+    "phase",
+    "source",
+    "source_context",
+    "source_status",
+    "status",
+    "repo_path",
+    "filesystem_scope",
+    "input_files",
+    "target_files",
+    "allowed_paths",
+    "blocked_paths",
+    "depends_on",
+    "blocks",
+    "companion_gate_ref",
+    "verification_command",
+    "completion_gate",
+    "deterministic",
+    "allows_network",
+    "allows_dependency_install",
+    "allows_dependency_changes",
+    "proof_required",
+    "proof_uri",
+    "human_approval_required",
+    "execution_policy",
+    "rollback_plan",
+    "intent_lock"
+  ],
+  "title": "LifeOS review-only task handoff",
+  "type": "object"
+}

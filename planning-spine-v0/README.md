@@ -19,6 +19,7 @@ related:
   - "[[planning-spine-v0/navigation/README]]"
   - "[[planning-spine-v0/00_NORTH_STAR]]"
   - "[[planning-spine-v0/1.0_VISION/README]]"
+  - "[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]]"
 ---
 
 # LifeOS Planning Spine v0
@@ -34,6 +35,10 @@ This package converts the `lifeos-planning-spine v0` source brief into a buildab
 - Blueprint compatibility and session-course audit:
   [`ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md`](./1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) ·
   [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]
+- envctl DB + nu_plugin migration-package landing, truth boundary, and
+  mandatory-capability route:
+  [`ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) ·
+  [[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]]
 - Raw NotebookLM artifact catalog:
   [`1.0_VISION/Notebooklm/README.md`](./1.0_VISION/Notebooklm/README.md) ·
   [[planning-spine-v0/1.0_VISION/Notebooklm/README]]
@@ -89,6 +94,7 @@ Preserved operating assumptions:
 | [`07_MVP_VERTICAL_SLICE.md`](./07_MVP_VERTICAL_SLICE.md) | End-to-end MVP flow |
 | [`08_EXECUTION_GATES.md`](./08_EXECUTION_GATES.md) | Required gates before progress/completion |
 | [`09_OPEN_QUESTIONS.md`](./09_OPEN_QUESTIONS.md) | Explicit unresolved decisions |
+| [`ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) | Reference-package receipt, 26-capability mandatory superset, namespace separation, and actual-human approval boundary |
 | `1.0_VISION/README.md` | Agent-oriented vision, authority, and evidence navigation |
 | `1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md` | Blueprint-to-CodeDB compatibility review and concurrent landing audit |
 | `1.0_VISION/Notebooklm/README.md` | Exact-byte raw artifact catalog and provenance boundary |

@@ -1,0 +1,116 @@
+{
+  "schema": "lifeos.envctl-package-landing-receipt.v1",
+  "status": "landed_as_mandatory_reference",
+  "generated_on": "2026-07-13",
+  "package_path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
+  "landing_contract": "planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+  "pre_adaptation": {
+    "source_repository": "src/envctl",
+    "source_package_path": "envctl-db-nu-plugin-migration-automation-package",
+    "last_package_commit": "c0d672ce59a642e5f1362fd72d5f7ac03f7da083",
+    "source_checkout_head": "b62669c4e32c8de0407aa51ca3add94d529b50b6",
+    "total_file_count": 891,
+    "correct_self_excluding_manifest_coverage": 890,
+    "declared_manifest_entry_count": 733,
+    "payload_sha256": "f854659b111204be3c76f1a632c9165cac9a41cd5a6049475ce1ba66fb5ea767",
+    "root_manifest_sha256": "57c09c926ab1bc14c2fda7d3ea0d73e85c16c6d597620432573a44acdec2925e",
+    "unlisted_file_count": 157,
+    "missing_listed_file_count": 0,
+    "hash_or_size_drift_count": 101,
+    "receipt_policy": "Historical source receipt; never rewritten by landing hardening."
+  },
+  "current_hardened_landing": {
+    "manifest_contract": "self-excluding-root-manifest-v1",
+    "excluded_runtime_directories": [
+      ".git",
+      ".pytest_cache",
+      "__pycache__"
+    ],
+    "declared_source_file_count": 891,
+    "manifest_entry_count": 891,
+    "root_manifest_sha256": "e61468e095933c8b04c011b4cb3694a239a3bc043f3e39ea506a74d56b339bf6",
+    "payload_index_sha256": "f81cc0fdeef30a971ac5cb43dba42c16075bba75f737145d1156dc5e4a57d4a9",
+    "payload_index_algorithm": "sha256-utf8-compact-json-manifest-files-v1",
+    "payload_index_canonicalization": "SHA-256 of UTF-8 JSON.stringify(PACKAGE_MANIFEST.files), preserving manifest array order and stored path,bytes,sha256 key order.",
+    "manifest_check_status": "passed",
+    "manifest_unit_test_count": 3,
+    "manifest_unit_test_status": "passed"
+  },
+  "authority_boundary": {
+    "classification": "mandatory architecture and workflow reference",
+    "package_completion_admissible_as_lifeos_truth": false,
+    "package_status_admissible_as_lifeos_status": false,
+    "package_proof_admissible_as_lifeos_proof": false,
+    "agent_approval_admissible_as_human_approval": false,
+    "actual_human_approval_required": true,
+    "human_approval_gate": "planning-spine-v0/08_EXECUTION_GATES.md",
+    "raw_blueprint_authority": "unverified architecture input",
+    "compatibility_review": "planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md"
+  },
+  "namespaces": [
+    {
+      "namespace": "reference-framework",
+      "task_count": 80,
+      "source": "execution-framework/generated/task_graph.csv",
+      "import_policy": "provenance-only; never merge status, proof, packets, or approvals into LifeOS truth"
+    },
+    {
+      "namespace": "reference-issue-414",
+      "task_count": 12,
+      "source": "execution-framework/generated/issue-414/task_graph.csv",
+      "import_policy": "provenance-only; never merge with the framework or CDB namespace"
+    },
+    {
+      "namespace": "nu-plugin-cdb-handoff",
+      "task_count": 106,
+      "source": "planning-spine-v0/task_tables/canonical/work_orders.json",
+      "import_policy": "review-only WorkOrders; zero status promotions and zero execution proofs"
+    }
+  ],
+  "mandatory_capabilities": {
+    "policy": "Every source-package feature described as optional, should, or may is mandatory LifeOS review scope.",
+    "capability_count": 26,
+    "catalog": "planning-spine-v0/task_tables/workflow/mandatory_capabilities.json",
+    "projection": "planning-spine-v0/task_tables/workflow/mandatory_capabilities.csv",
+    "capability_ids": [
+      "CAP-MIG-001",
+      "CAP-MIG-002",
+      "CAP-MIG-003",
+      "CAP-MIG-004",
+      "CAP-MIG-005",
+      "CAP-MIG-006",
+      "CAP-MIG-007",
+      "CAP-MIG-008",
+      "CAP-MIG-009",
+      "CAP-MIG-010",
+      "CAP-MIG-011",
+      "CAP-MIG-012",
+      "CAP-MIG-013",
+      "CAP-MIG-014",
+      "CAP-MIG-015",
+      "CAP-MIG-016",
+      "CAP-MIG-017",
+      "CAP-MIG-018",
+      "CAP-MIG-019",
+      "CAP-MIG-020",
+      "CAP-MIG-021",
+      "CAP-MIG-022",
+      "CAP-MIG-023",
+      "CAP-MIG-024",
+      "CAP-MIG-025",
+      "CAP-MIG-026"
+    ],
+    "local_status": "review",
+    "product_complete": false
+  },
+  "routes": {
+    "planning_spine": "planning-spine-v0/README.md",
+    "vision_index": "planning-spine-v0/1.0_VISION/README.md",
+    "raw_blueprint": "planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "blueprint_compatibility": "planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "execution_gates": "planning-spine-v0/08_EXECUTION_GATES.md",
+    "task_tables": "planning-spine-v0/task_tables/README.md",
+    "reference_package_audit": "planning-spine-v0/task_tables/workflow/reference_package_audit.json",
+    "namespace_registry": "planning-spine-v0/task_tables/workflow/reference_namespaces.json"
+  }
+}

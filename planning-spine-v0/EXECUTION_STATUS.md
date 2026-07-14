@@ -1,6 +1,6 @@
 # Execution Status — Multi-Repo Implementation Run
 
-Updated 2026-07-12. Records what was closed with proof and the exact owner
+Updated 2026-07-13. Records what was closed with proof and the exact owner
 actions that unblock the remainder. Authoritative machine state:
 `generated/task_graph.status.json` (planning-spine) and
 `../../nu_plugin/execution/*.csv` (CodeDB release inventory).
@@ -9,37 +9,39 @@ actions that unblock the remainder. Authoritative machine state:
 
 | Surface | Start | Now |
 |---|---|---|
-| planning-spine task graph complete | 44 / 190 | **185 / 196** |
+| planning-spine task graph complete | 44 / 190 | **117 / 196** |
 | nu_plugin requirement-proof ledger — evidence verified | 2 / 140 | **140 / 140** (local-release receipt validated end-to-end) |
 | nu_plugin requirement-proof ledger — verified+complete | 2 / 140 | **140 / 140** |
 | nu_plugin TASK_GRAPH complete | 19 / 70 | **66 / 70** |
 | nu_plugin BIDIRECTIONAL complete | 7 / 21 | 7 / 21 (14 active — frozen release gate, see below) |
 
-### 2026-07-13 run — STORE-001 keystone + cascade to 185/196, local-release sealed
+### 2026-07-13 correction — unsupported STORE-001 cascade invalidated append-only
 
-- **STORE-001 decided** (owner-ratified) per the Architecture Blueprint as foundational
-  source of truth: PostgreSQL+RuVector = canonical durable macro-state; redb = transient
-  tier; AgentDB = per-agent cognition; envctl = bridge+projection. This **corrects the
-  prior decision brief's inverted framing** — it had treated CodeDB's transitional
-  durable-on-redb blobs as a permanent capability and mislabeled the migration-to-spec a
-  downgrade. Building to the intended tiered spec is an upgrade; migration uses the verified
-  BlobStore SHA-256 parity cutover (no silent durable→transient reclassification).
-- **Cascade (45 leaf design contracts via parallel sub-agent teams)**: PGAUTH-002..006,
-  POSTGRES-002..010, FOUNDATION-002/003, CONSOLIDATE/INTEL/MVP1/COMPANY/DEVELOP/PERSONAL/
-  HOME/EXPERIENCE/RELEASE/LIVING domain epics, GRAPH-001/005 — each blueprint-grounded,
-  planning-only (no product execution). 45/45 produced, 0 errors.
-- **DECIDE-001..006** ratified to the documented v0 defaults (bounded, reversible, each with
-  an unblock condition + rollback rule recorded in 09_OPEN_QUESTIONS.md).
-- **16 roll-ups**: all 13 LIFEOS North Star epics + PGAUTH-001/POSTGRES-001/FOUNDATION-001.
-- **Hardware decision**: GPU corrected RTX 5080 → 2× RTX 5090 (32 GB each).
+- The raw Architecture Blueprint is architectural input, not owner ratification,
+  simulation evidence, or execution authority. The compatibility ruling is recorded in
+  [`1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md`](./1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md).
+- The prior STORE-001 claim and its unsupported completion cascade affected 68 rows. Their
+  revision-1 proof bytes remain historical evidence; 68 revision-2 `invalidated` records
+  were appended at ledger sequences 218–285. No accepted ledger row was deleted or rewritten.
+- Source truth is restored to 67 `Draft` rows plus `GRAPH-001` at `Running`. The live
+  projection now reports 117 Complete, 77 Draft, 1 Running, and 1 Rolled Back across 196
+  tasks, with the global coverage gate closed.
+- Sixteen revision-1 files that never entered the ledger are preserved byte-for-byte under
+  [`proof_records/invalidated-unmerged/owner-ratification-2026-07-13/`](./proof_records/invalidated-unmerged/owner-ratification-2026-07-13/README.md),
+  outside the immediate proof merge scan. The 52 ledger-accepted revision-1 records are
+  superseded—not removed—by correction records under
+  [`proof_records/corrections/architecture-blueprint-owner-ratification-2026-07-13/`](./proof_records/corrections/architecture-blueprint-owner-ratification-2026-07-13/README.md).
+- The 37 STORE descendants untouched by the unsupported cascade retain their prior state.
+  Design artifacts produced during the invalid run remain conditional proposals and do not
+  prove owner decisions, simulation, product execution, or completion.
+- **Hardware observation**: the recorded host inventory corrected RTX 5080 → 2× RTX 5090
+  (32 GB each); that observation grants no architecture or execution authority.
 - **nu_plugin local-release**: `--local-release` lane validated end-to-end with a genuine
   provider=local receipt (140/140, mode=local-release); default GitHub lane still rejects it.
   Receipt-gen robustness fix (porcelain parsing + runtime side-effect tolerance) merged to
   main nu_plugin (c9c5573); temp-scratch collision fixes were already on main convergently.
-- **11 rows remain genuinely blocked (not fabricated)**: 7 worldsim (LPS-029/031-036 — need a
-  physical LiDAR room scan; owner-deferred) + 4 fleet-integration (LPS-025 rusty-idd build
-  fails; LPS-026 outward cross-repo PR; LPS-027 release tooling; LPS-028 chained).
-- planning-spine:verify + verify-lps-docs green; projection result=pass, forbidden_updates=0.
+- The correction projection itself passes with zero forbidden updates. This statement is
+  limited to correction integrity; it does not reinstate the invalidated completion claims.
 
 The remaining 7 non-evidence-verified ledger rows all reduce to **one thing: a real
 signed release** (a clean commit → `generate_requirement_proof_receipt.py` detached
@@ -57,7 +59,8 @@ Live PostgreSQL was provisioned this run (postgresql 17.10 via nix, disposable
 Unix-socket instance) to close CDB086 / CDB106-AC05 / CDB106-AC09 with real evidence;
 `cargo test --workspace --all-features` passes 245/0 against it.
 
-All test suites green, zero regressions:
+The original run recorded the following test receipts. They are historical observations,
+not evidence that the invalidated planning claims were valid:
 - **nu_plugin**: `cargo test --workspace` 232 pass, 15/15 nu gates, 67 python, validators (`test_task_graph_validator`, `test_requirement_proof_ledger`, `test_requirement_proof_attestation`, `test_truth_surface`) 50 pass + 23 subtests. `git diff --check` clean.
 - **envctl**: 280 workspace tests (250 engine), clippy clean, `git diff --check` clean.
 - **lifeos**: vitest 241/241, `planning-spine:verify` pass, `verify-lps-docs` 12/12.

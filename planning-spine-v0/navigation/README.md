@@ -6,7 +6,7 @@ type: navigation-index
 status: active
 lifecycle: maintained
 created: 2026-07-12
-updated: 2026-07-12
+updated: 2026-07-13
 aliases:
   - Planning spine navigation
   - Agent recall index
@@ -19,6 +19,8 @@ tags:
 related:
   - "[[planning-spine-v0/README]]"
   - "[[planning-spine-v0/1.0_VISION/README]]"
+  - "[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]]"
+  - "[[planning-spine-v0/task_tables/README]]"
   - "[[planning-spine-v0/navigation/generated/navigation_index.json]]"
 ---
 
@@ -44,6 +46,8 @@ Use the profile-owned Bun runtime:
 ```bash
 bun run planning-spine:navigation:query -- "STORE-001"
 bun run planning-spine:navigation:query -- "redb PostgreSQL authority"
+bun run planning-spine:navigation:query -- "TASK-CDB030"
+bun run planning-spine:navigation:query -- "CAP-MIG-001"
 bun run planning-spine:navigation:explain -- "claim:REDB-CLAIM-002"
 bun run planning-spine:navigation:check
 ```
@@ -62,8 +66,30 @@ typed edges.
 | Raw blueprint corrections | [Blueprint Compatibility](../1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |
 | Current work state | [Execution Status](../EXECUTION_STATUS.md) | [[planning-spine-v0/EXECUTION_STATUS]] |
 | Canonical tasks | [Task source](../generated/task_graph.source.csv) and [task index](../generated/task_graph.index.json) | — |
+| Review-only migration work | [Landing contract](../ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) and [task-table handoff](../task_tables/README.md) | [[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]] · [[planning-spine-v0/task_tables/README]] |
 | Accepted completion history | [Proof ledger](../proof_records/proof_ledger.jsonl) | — |
 | Navigation integrity | [Validation report](./generated/navigation.validation_report.json) | — |
+
+## Migration package and imported task tables
+
+The [landing contract](../ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) defines the
+truth boundary for the copied
+[envctl migration package](../envctl-db-nu-plugin-migration-automation-package/README.md).
+Its [106 WorkOrders](../task_tables/projections/work_orders.csv) and
+[26 mandatory capabilities](../task_tables/workflow/mandatory_capabilities.csv)
+are review-only planning records. Upstream completion text and package proof do
+not enter the canonical LifeOS task or proof namespaces.
+
+| Namespace | Exact lookup | Authority boundary |
+|---|---|---|
+| Canonical LifeOS tasks | `by_task_id` | Exactly the 196 task-graph rows; proof-derived lifecycle applies. |
+| Imported WorkOrders | `by_work_order_id` | `TASK-CDB000..105`; local status remains `review`, source status is provenance only. |
+| Mandatory capabilities | `by_mandatory_capability_id` | `CAP-MIG-001..026`; mandatory review scope, never a completion claim. |
+
+Wiki routes: [[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]] ·
+[[planning-spine-v0/task_tables/README]] ·
+[[planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/README]] ·
+[[planning-spine-v0/task_tables/workflow/mandatory_capabilities]]
 
 ## Canonical planning contracts
 
@@ -126,7 +152,9 @@ The generated graph contains:
 - NotebookLM source, claim, verification-queue, and evidence nodes;
 - accepted proof-ledger revisions, including explicitly typed historical tasks;
 - structured North Star anchors, architecture depths, gaps, conflicts, and
-  adopted capabilities; and
+  adopted capabilities;
+- isolated imported WorkOrder and mandatory-capability nodes with exact lookup
+  maps and no canonical task/proof promotion; and
 - curated topic routes that connect architecture language to exact task,
   source, claim, evidence, proof, and file nodes.
 

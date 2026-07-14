@@ -5,6 +5,7 @@ import {
   checkNavigationArtifacts,
   validateNavigationArtifactSchemas
 } from "../planning-spine-v0/scripts/build-navigation-index.mjs";
+import { checkTaskTableArtifacts } from "../planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs";
 
 const repoRoot = process.cwd();
 const pkgRoot = path.join(repoRoot, "planning-spine-v0");
@@ -38,6 +39,7 @@ const authorityIntegrityReport = {
 
 const requiredDocs = [
   "README.md",
+  "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
   "navigation/README.md",
   "navigation/source.json",
   "00_NORTH_STAR.md",
@@ -54,6 +56,10 @@ const requiredDocs = [
   "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
   "1.0_VISION/Notebooklm/README.md",
   "1.0_VISION/Notebooklm/artifacts.meta.json",
+  "generated/envctl_package_landing_receipt.json",
+  "task_tables/README.md",
+  "task_tables/workflow/mandatory_capabilities.json",
+  "task_tables/workflow/mandatory_capabilities.csv",
   "navigation/generated/navigation_graph.json",
   "navigation/generated/navigation_index.json",
   "navigation/generated/navigation.validation_report.json",
@@ -155,46 +161,81 @@ function recordAuthorityCheck(name, detail, passed, context = {}) {
   assert(passed, detail);
 }
 
+function currentObservedAt() {
+  const rawEpoch = process.env.SOURCE_DATE_EPOCH;
+  if (rawEpoch === undefined) return new Date().toISOString();
+  assert(/^\d+$/.test(rawEpoch), "SOURCE_DATE_EPOCH must be a non-negative integer Unix timestamp");
+  const observedAt = new Date(Number(rawEpoch) * 1000);
+  assert(!Number.isNaN(observedAt.getTime()), "SOURCE_DATE_EPOCH is outside the supported date range");
+  return observedAt.toISOString();
+}
+
+function withoutObservedAt(report) {
+  const stable = { ...report };
+  delete stable.observed_at;
+  return stable;
+}
+
+function writeStableReport(reportPath, report) {
+  let existing = null;
+  if (fs.existsSync(reportPath)) {
+    existing = JSON.parse(fs.readFileSync(reportPath, "utf8"));
+  }
+  if (
+    existing
+    && JSON.stringify(withoutObservedAt(existing)) === JSON.stringify(withoutObservedAt(report))
+  ) {
+    report.observed_at = existing.observed_at;
+  } else {
+    report.observed_at = currentObservedAt();
+  }
+
+  const serialized = `${JSON.stringify(report, null, 2)}\n`;
+  if (!existing || fs.readFileSync(reportPath, "utf8") !== serialized) {
+    fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+    fs.writeFileSync(reportPath, serialized, "utf8");
+  }
+}
+
+function portableArg(arg) {
+  if (!path.isAbsolute(arg)) return arg;
+  const relative = path.relative(repoRoot, arg);
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative) ? relative : arg;
+}
+
 function writeRuntimeReport(result, message) {
   const report = {
     command: process.env.npm_lifecycle_event === "planning-spine:verify"
       ? "bun run planning-spine:verify"
       : `bun ${path.relative(repoRoot, process.argv[1] ?? "scripts/verify-planning-spine.mjs")}`,
-    cwd: repoRoot,
-    pkg_root: pkgRoot,
+    cwd: ".",
+    pkg_root: path.relative(repoRoot, pkgRoot),
     executable: process.execPath,
     runtime: {
       name: typeof Bun !== "undefined" ? "bun" : "node",
       version: typeof Bun !== "undefined" ? Bun.version : process.version,
-      argv: process.argv
+      argv: process.argv.map(portableArg)
     },
     lifecycle_event: process.env.npm_lifecycle_event ?? null,
-    observed_at: new Date().toISOString(),
+    observed_at: null,
     performed_checks: performedChecks,
     result,
     message
   };
 
-  fs.mkdirSync(path.dirname(runtimeReportPath), { recursive: true });
-  fs.writeFileSync(runtimeReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  writeStableReport(runtimeReportPath, report);
 }
 
 function writeMvpBundleReport(result, message) {
-  bundleReport.observed_at = new Date().toISOString();
   bundleReport.result = result;
   bundleReport.message = message;
-
-  fs.mkdirSync(path.dirname(mvpBundleReportPath), { recursive: true });
-  fs.writeFileSync(mvpBundleReportPath, `${JSON.stringify(bundleReport, null, 2)}\n`, "utf8");
+  writeStableReport(mvpBundleReportPath, bundleReport);
 }
 
 function writeAuthorityIntegrityReport(result, message) {
-  authorityIntegrityReport.observed_at = new Date().toISOString();
   authorityIntegrityReport.result = result;
   authorityIntegrityReport.message = message;
-
-  fs.mkdirSync(path.dirname(authorityIntegrityReportPath), { recursive: true });
-  fs.writeFileSync(authorityIntegrityReportPath, `${JSON.stringify(authorityIntegrityReport, null, 2)}\n`, "utf8");
+  writeStableReport(authorityIntegrityReportPath, authorityIntegrityReport);
 }
 
 function validate(schema, value, at = "$") {
@@ -286,12 +327,14 @@ function verifyVisionNavigationLinks() {
   recordCheck("vision_navigation_links_resolve");
   const docs = [
     "README.md",
+    "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
     "1.0_VISION/README.md",
     "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
     "1.0_VISION/Notebooklm/README.md",
     "1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md",
     "1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md",
-    "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md"
+    "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+    "task_tables/README.md"
   ];
 
   for (const relativeDoc of docs) {
@@ -321,6 +364,17 @@ function verifyVisionNavigationLinks() {
       assert(fs.existsSync(resolved), `Broken wiki link in ${relativeDoc}: ${target}`);
     }
   }
+}
+
+async function verifyTaskTableHandoff() {
+  recordCheck("nu_plugin_task_table_handoff_is_complete_deterministic_and_review_only");
+  const result = await checkTaskTableArtifacts({ repoRoot });
+  assert(result.ok, `nu_plugin task-table handoff drifted: ${result.errors.join("; ")}`);
+  assert(result.report.status === "passed", "nu_plugin task-table validation report must pass");
+  assert(result.report.counts.total === 428, "nu_plugin task-table source taxonomy must retain all 428 rows");
+  assert(result.report.counts.work_orders === 106, "nu_plugin task-table handoff must retain 106 CDB WorkOrders");
+  assert(result.report.counts.task_execution_proofs === 0, "Imported CDB WorkOrders must not acquire execution proof");
+  assert(result.report.counts.pending_human_approvals === 106, "Every imported CDB WorkOrder must remain human-approval gated");
 }
 
 function verifyAgentNavigationGraph() {
@@ -721,6 +775,7 @@ try {
   verifyDocs();
   verifyVisionArtifactCatalog();
   verifyVisionNavigationLinks();
+  await verifyTaskTableHandoff();
   verifyAgentNavigationGraph();
   verifySchemas();
   verifyExamples();

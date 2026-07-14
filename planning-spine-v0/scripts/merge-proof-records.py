@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -15,6 +16,8 @@ from typing import Any
 
 LEDGER_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.v0"
 REPORT_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.merge-report.v0"
+INVALIDATED_STATUS = "invalidated"
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 class MergeError(Exception):
@@ -29,6 +32,11 @@ class ProofRecord:
     observed_at: str
     revision: str
     sha256: str
+    verified_by: str | None = None
+    verified_at: str | None = None
+    restores_source_status: str | None = None
+    invalidation_reason: str | None = None
+    invalidates: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -71,6 +79,64 @@ def revision_value(data: dict[str, Any], observed_at: str) -> str:
     raise MergeError("revision/proof_revision must be a non-negative integer or non-empty string")
 
 
+def required_text(data: dict[str, Any], field: str, path: Path) -> str:
+    value = data.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise MergeError(f"{path}: invalidated proof requires non-empty {field}")
+    return value.strip()
+
+
+def invalidation_fields(
+    data: dict[str, Any], path: Path, revision: str
+) -> tuple[str, str, str, str, dict[str, Any]]:
+    if not revision.isdigit() or int(revision) < 2:
+        raise MergeError(f"{path}: invalidated proof requires revision 2 or later")
+
+    verified_by = required_text(data, "verified_by", path)
+    verified_at = required_text(data, "verified_at", path)
+    restores_source_status = required_text(data, "restores_source_status", path)
+    invalidation_reason = required_text(data, "invalidation_reason", path)
+    invalidates = data.get("invalidates")
+    if not isinstance(invalidates, dict):
+        raise MergeError(f"{path}: invalidated proof requires an invalidates object")
+
+    prior_revision = invalidates.get("revision")
+    if isinstance(prior_revision, int):
+        prior_revision = str(prior_revision)
+    if not isinstance(prior_revision, str) or not prior_revision.strip():
+        raise MergeError(f"{path}: invalidates.revision is required")
+    proof_uri = invalidates.get("proof_uri")
+    if not isinstance(proof_uri, str) or not proof_uri.strip():
+        raise MergeError(f"{path}: invalidates.proof_uri is required")
+    proof_sha256 = invalidates.get("proof_sha256")
+    if not isinstance(proof_sha256, str) or not SHA256_RE.fullmatch(proof_sha256.strip().lower()):
+        raise MergeError(f"{path}: invalidates.proof_sha256 must be a 64-character SHA-256")
+    ledger_accepted = invalidates.get("ledger_accepted")
+    if not isinstance(ledger_accepted, bool):
+        raise MergeError(f"{path}: invalidates.ledger_accepted must be boolean")
+    ledger_sequence = invalidates.get("ledger_sequence")
+    if ledger_accepted and (not isinstance(ledger_sequence, int) or ledger_sequence < 1):
+        raise MergeError(
+            f"{path}: accepted invalidated proof requires a positive invalidates.ledger_sequence"
+        )
+    if not ledger_accepted and ledger_sequence is not None:
+        raise MergeError(
+            f"{path}: unaccepted invalidated proof requires null invalidates.ledger_sequence"
+        )
+
+    normalized_invalidates = dict(invalidates)
+    normalized_invalidates["revision"] = prior_revision.strip()
+    normalized_invalidates["proof_uri"] = proof_uri.strip()
+    normalized_invalidates["proof_sha256"] = proof_sha256.strip().lower()
+    return (
+        verified_by,
+        verified_at,
+        restores_source_status,
+        invalidation_reason,
+        normalized_invalidates,
+    )
+
+
 def load_proof_record(path: Path) -> ProofRecord:
     data = load_json(path)
     task_id = data.get("task_id")
@@ -86,13 +152,33 @@ def load_proof_record(path: Path) -> ProofRecord:
         revision = revision_value(data, observed_at.strip())
     except MergeError as error:
         raise MergeError(f"{path}: {error}") from error
+    status_text = status.strip()
+    verified_by = None
+    verified_at = None
+    restores_source_status = None
+    invalidation_reason = None
+    invalidates = None
+    if status_text.lower() == INVALIDATED_STATUS:
+        (
+            verified_by,
+            verified_at,
+            restores_source_status,
+            invalidation_reason,
+            invalidates,
+        ) = invalidation_fields(data, path, revision)
+
     return ProofRecord(
         path=path,
         task_id=task_id.strip(),
-        status=status.strip(),
+        status=status_text,
         observed_at=observed_at.strip(),
         revision=revision,
         sha256=sha256_file(path),
+        verified_by=verified_by,
+        verified_at=verified_at,
+        restores_source_status=restores_source_status,
+        invalidation_reason=invalidation_reason,
+        invalidates=invalidates,
     )
 
 
@@ -153,7 +239,7 @@ def check_input_duplicates(records: list[ProofRecord]) -> None:
 
 
 def ledger_entry(record: ProofRecord, sequence: int, generated_at: str) -> dict[str, Any]:
-    return {
+    entry = {
         "schema_version": LEDGER_SCHEMA_VERSION,
         "sequence": sequence,
         "generated_at": generated_at,
@@ -164,6 +250,17 @@ def ledger_entry(record: ProofRecord, sequence: int, generated_at: str) -> dict[
         "proof_uri": str(record.path),
         "proof_sha256": record.sha256,
     }
+    if record.status.lower() == INVALIDATED_STATUS:
+        entry.update(
+            {
+                "verified_by": record.verified_by,
+                "verified_at": record.verified_at,
+                "restores_source_status": record.restores_source_status,
+                "invalidation_reason": record.invalidation_reason,
+                "invalidates": record.invalidates,
+            }
+        )
+    return entry
 
 
 def append_entries(path: Path, entries: list[dict[str, Any]], dry_run: bool) -> None:

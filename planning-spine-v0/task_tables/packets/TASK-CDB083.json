@@ -1,0 +1,72 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/MUTATION_POLICY.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB083",
+    "decision": null,
+    "intent_lock_digest": "blake3:130a25fde8a06ed53ff276cb9bf2fff39d434858aa873106cc2395f75447669a",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB083",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB083",
+  "depends_on": [
+    "TASK-CDB071"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "MCP no-leak denial tests",
+    "deterministic": true,
+    "verification_command": "MCP no-leak denial tests"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:130a25fde8a06ed53ff276cb9bf2fff39d434858aa873106cc2395f75447669a"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:4bd7969dcb54f89109c88de2a8f35e7feb1b324207107fb9c252f8d692999feb",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB083",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB083"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB083 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/MUTATION_POLICY.md"
+  ],
+  "task_id": "TASK-CDB083",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB083"
+}

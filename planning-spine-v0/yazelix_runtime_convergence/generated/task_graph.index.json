@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.index.v0",
-  "generated_at": "2026-07-14T15:40:21Z",
+  "generated_at": "2026-07-14T17:26:44Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 33,
+  "task_count": 35,
   "task_ids": [
     "YZXCONV-001",
     "YZXCONV-002",
@@ -36,7 +36,9 @@
     "YZXCONV-030",
     "YZXCONV-031",
     "YZXCONV-032",
-    "YZXCONV-033"
+    "YZXCONV-033",
+    "YZXCONV-034",
+    "YZXCONV-035"
   ],
   "ready_task_ids": [
     "YZXCONV-003",
@@ -51,7 +53,8 @@
     "YZXCONV-027",
     "YZXCONV-029",
     "YZXCONV-030",
-    "YZXCONV-032"
+    "YZXCONV-032",
+    "YZXCONV-034"
   ],
   "complete_task_ids": [
     "YZXCONV-001",
@@ -460,6 +463,30 @@
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-033.proof.json",
       "execution_cell": "runtime-package-cell"
+    },
+    "YZXCONV-034": {
+      "index": 33,
+      "source_row_number": 35,
+      "phase": "3-runtime",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-033",
+        "YZXCONV-025"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-034.proof.json",
+      "execution_cell": "supply-chain-catalog-cell"
+    },
+    "YZXCONV-035": {
+      "index": 34,
+      "source_row_number": 36,
+      "phase": "3-runtime",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-033",
+        "YZXCONV-034"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-035.proof.json",
+      "execution_cell": "db-in-profile-cell"
     }
   },
   "tasks_by_id": {
@@ -865,6 +892,30 @@
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-033.proof.json",
       "execution_cell": "runtime-package-cell"
+    },
+    "YZXCONV-034": {
+      "index": 33,
+      "source_row_number": 35,
+      "phase": "3-runtime",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-033",
+        "YZXCONV-025"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-034.proof.json",
+      "execution_cell": "supply-chain-catalog-cell"
+    },
+    "YZXCONV-035": {
+      "index": 34,
+      "source_row_number": 36,
+      "phase": "3-runtime",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-033",
+        "YZXCONV-034"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-035.proof.json",
+      "execution_cell": "db-in-profile-cell"
     }
   },
   "tasks_by_status": {
@@ -885,7 +936,8 @@
       "YZXCONV-027",
       "YZXCONV-029",
       "YZXCONV-030",
-      "YZXCONV-032"
+      "YZXCONV-032",
+      "YZXCONV-034"
     ],
     "blocked": [
       "YZXCONV-004",
@@ -905,7 +957,8 @@
       "YZXCONV-022",
       "YZXCONV-028",
       "YZXCONV-031",
-      "YZXCONV-033"
+      "YZXCONV-033",
+      "YZXCONV-035"
     ]
   },
   "tasks_by_phase": {
@@ -950,7 +1003,9 @@
     "3-runtime": [
       "YZXCONV-014",
       "YZXCONV-025",
-      "YZXCONV-033"
+      "YZXCONV-033",
+      "YZXCONV-034",
+      "YZXCONV-035"
     ],
     "4-closure": [
       "YZXCONV-015"
@@ -1093,6 +1148,16 @@
     ],
     "YZXCONV-026": [
       "YZXCONV-028"
+    ],
+    "YZXCONV-033": [
+      "YZXCONV-034",
+      "YZXCONV-035"
+    ],
+    "YZXCONV-025": [
+      "YZXCONV-034"
+    ],
+    "YZXCONV-034": [
+      "YZXCONV-035"
     ]
   },
   "proof_uri_by_task": {
@@ -1128,7 +1193,9 @@
     "YZXCONV-030": "yazelix_runtime_convergence/proof_records/YZXCONV-030.proof.json",
     "YZXCONV-031": "yazelix_runtime_convergence/proof_records/YZXCONV-031.proof.json",
     "YZXCONV-032": "yazelix_runtime_convergence/proof_records/YZXCONV-032.proof.json",
-    "YZXCONV-033": "yazelix_runtime_convergence/proof_records/YZXCONV-033.proof.json"
+    "YZXCONV-033": "yazelix_runtime_convergence/proof_records/YZXCONV-033.proof.json",
+    "YZXCONV-034": "yazelix_runtime_convergence/proof_records/YZXCONV-034.proof.json",
+    "YZXCONV-035": "yazelix_runtime_convergence/proof_records/YZXCONV-035.proof.json"
   },
   "missing_parent_ids": []
 }

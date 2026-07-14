@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.yazelix-runtime-convergence.decisions.v0",
-  "generated_at": "2026-07-14T14:40:02Z",
+  "generated_at": "2026-07-14T17:21:18Z",
   "decisions": [
     {
       "id": "DEC-YZXCONV-001",
@@ -86,6 +86,24 @@
         "meta_plugin_protocol: envctl crates/cli/Cargo.toml:34 path-dep resolves to /home/flexnetos/meta/meta_plugin_protocol; crates/cli/src/bin/meta-env.rs run_plugin/ExecutionPlan; meta_cli/src/subprocess_plugins.rs + registry.rs:293 resolve_plugin_source",
         "meta_mcp: /home/flexnetos/meta/meta_mcp bin meta-mcp (~30 tools), depends on meta_cli, unwired in any active agent config",
         "Verified: no ~/.mcp.json; envctl/.mcp.json = cognitum/cognitum-seed/exa (url-only); active ~/.codex/config.toml = only openaiDeveloperDocs (missing exa, unaccounted); .meta.yaml stale claude-plugins/codex-plugins peers + meta-plugins path drift"
+      ]
+    },
+    {
+      "id": "DEC-YZXCONV-007",
+      "title": "Agent-runtime supply-chain plan: separate three-lane catalog, NO-OPTIONAL law, RuVector=npm-latest, databases MUST be in the yazelix profile",
+      "subject_task": "YZXCONV-034",
+      "decided_by": "Owner",
+      "decided_at": "2026-07-14T17:21:18Z",
+      "north_star": "planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+      "north_star_hash": "sha256:014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827",
+      "decision": "Owner rulings that land the agent-runtime supply-chain plan (brainstorm ratified 2026-07-14; full design in yazelix_runtime_convergence/SUPPLY-CHAIN-DESIGN.md). (1) DATA MODEL: the supply chain is a SEPARATE registry supply_chain.catalog.csv beside task_graph.source.csv with a ONE-WAY task_id foreign key INTO the task graph; the task graph is never given supply-chain columns and is never edited by catalog churn; the reverse task-to-package index is built at generation time (mirrors the existing *.source.csv -> generated/*.json pipeline). (2) NO-OPTIONAL LAW (anti-black-hole; owner CRITICAL warning): the word optional is DELETED - there is no optional, install-later, nice-to-have, or non-blocking state. Every catalog row is BUILT before DONE; optional MEANS install. An agent that treats any row as deferrable/non-blocking has entered a failure loop; optional is banned as a classification value and the catalog validator fails if the token appears. (3) RUVECTOR = NPM LATEST: latest RuVector lives in npm (CI cross-compiles and pushes to npm the moment a branch merges - blueprint lines 89-91), so npm is newest and crates.io LAGS. The latest npm build carries 200+ built-in AI agent tools; an older resource yields only ~80-120; anything but latest = fighting continuous refactoring. crates.io is the blueprint's PURITY fallback that itself admits it misses bleeding-edge features (line 91) and is DEPRIORITIZED; local meta-ruvector is the blueprint's messy scratchpad / napi-rs exhaust (lines 93-99, completely avoid cloning) and is REFERENCE ONLY (~60% stale). (4) ENUMERATION IS OPEN: the COGNITUM guides and meta-ruvector plus worktrees are an OPEN reference to explore if/when needed - do NOT freeze an exhaustive locked package list now. (5) NORTH STAR + KEYS: built to the Architecture Blueprint (hash above); registry keys (npm, crates.io) come from the secretd broker at build time, NEVER baked into the nix store (catalog records only registry_key_scope, never a value). (6) THREE LANES, ALL PROFILE-OWNED (owner correction applied): the seam is runtime shape, not in-profile-versus-out, because the profile owns the ENTIRE stack (blueprint Phase 4: compile the entire stack to musl-static, drop the nix store). LANE path = agent CLIs/tools on PATH via the yazelix runtime closure. LANE service = PostgreSQL PLUS the RuVector extension - these MUST be flake-declared IN the yazelix nix-profile and run as a profile-owned daemon (extension via shared_preload_libraries, data dir outside the store); the owner corrected the current state (no database is in the profile today) to the TARGET (the databases MUST be in the yazelix nix-profile), so DB-in-profile is a tracked GAP (YZXCONV-035), not an out-of-profile lane. LANE app-dep = libraries the app links (ruvector via bun add for the TS/Bun front-end, ruvector-core/ruvllm via cargo for the Rust daemon) - project-local pinned lockfiles built with a profile-owned toolchain; project-local is NOT a global/system install and is compliant. ruvector legitimately spans the service and app-dep lanes as different artifact forms of one project (one row per package x lane). The no-global / no-system-depth law reduces to: everything is either yazelix-profile-owned (path, service, and every toolchain) or project-local-pinned (app-dep); nothing is apt, system-depth, or npm -g. Lands as YZXCONV-034 (build the catalog) and YZXCONV-035 (postgres plus ruvector extension into the profile).",
+      "evidence": [
+        "Architecture Blueprint - LifeOS Core Foundation.md lines 87-91 ('Why use NPM releases first' - CI pushes to npm on merge; crates.io lags) and 93-113 ('napi-rs exhaust', 'Fall back on Crates.io', 'completely avoid cloning the main RuVector (meta-ruvector) GitHub repository', 'might miss out on bleeding-edge features')",
+        "Architecture Blueprint lines 23-42 (Phase 4 Build: 'Use Nix to deterministically compile the entire stack into fully static musl binaries, completely dropping the Nix store dependency') and 68-79 (RuVector operates natively as a PostgreSQL extension, eliminating a sidecar vector DB)",
+        "Owner ruling 2026-07-14: 200+ AI agent tools in the latest ruvector PostgreSQL extension build vs ~80-120 for older resources; 'IT IS CRITICAL TO USE THE LATEST CODE'; local ruvector builds but is ~60% likely not-latest",
+        "Owner correction 2026-07-14: 'none of the databases are in yazelix nix-profile [today]. The Databases MUST be IN the YAZELIX NIX-PROFILE to pull this off'",
+        "README.md artifact catalog: blueprint SHA-256 014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827, 70753 bytes, 707 lines",
+        "Prior chain: DEC-YZXCONV-005 (musl portability + Home Manager single-owner) and DEC-YZXCONV-006 (agent-env repo-scope surface vs ADR-0006 home symlink farm) - the supply-chain lanes ride the same single-profile / no-system-install ethos"
       ]
     }
   ]

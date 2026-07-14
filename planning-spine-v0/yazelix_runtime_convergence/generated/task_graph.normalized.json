@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T15:40:21Z",
+  "generated_at": "2026-07-14T17:26:44Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 33,
+  "task_count": 35,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T15:40:21Z",
+    "generated_at": "2026-07-14T17:26:44Z",
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
-    "row_count": 33,
+    "row_count": 35,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -2064,6 +2064,133 @@
         "user-local bin shadows",
         "profile mutation before build proof",
         "generated Yazelix runtime hand edits"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-034",
+      "source_row_number": 35,
+      "phase": "3-runtime",
+      "title": "Build the three-lane supply-chain catalog (no-optional, latest-npm ruvector)",
+      "owner_agent": "Supply-Chain Catalog Agent",
+      "goal": "Create supply_chain.catalog.csv beside task_graph.source.csv as a SEPARATE registry with a one-way task_id foreign key INTO the task graph (the task graph is never edited and never given supply-chain columns; the reverse task-to-package index is built at generation time). Model three lanes, all yazelix-nix-profile-owned or project-local-pinned and never system or global: path (agent CLIs and tools resolved on PATH via the yazelix runtime closure), service (PostgreSQL plus the RuVector extension, which MUST be flake-declared IN the yazelix nix-profile and run as a profile-owned daemon), and app-dep (libraries the app links, pinned in the app lockfile via a profile-owned toolchain). Keep two independent axes: source_registry (where latest lives) versus install_method (how it is built). Enforce the NO-OPTIONAL LAW: there is no optional, later, or non-blocking state; every row is built before DONE and an agent that defers a row has entered a failure loop; the token optional is illegal as a classification value. Seed ruvector as npm-latest (bun add) in the app-dep lane and as the profile-owned PostgreSQL extension in the service lane; local meta-ruvector and crates.io are reference and lagging fallbacks only. Registry keys come from the secretd broker at build time, never the nix store.",
+      "simulation_required": true,
+      "execution_cell": "supply-chain-catalog-cell",
+      "verification_gate": "The catalog validates: every row has a lane in path/service/app-dep, a source_registry, and an install_method; the token optional never appears as a classification value; every task_id foreign key resolves to an existing task; the ruvector rows are source_registry npm with install_method bun-add-latest (app-dep) and a profile-owned PostgreSQL extension (service); no row is in a deferred or optional state; generated/supply_chain.catalog.json regenerates deterministically and the reverse task-to-package index builds.",
+      "rollback_plan": "Remove supply_chain.catalog.csv and its generated JSON and SUPPLY-CHAIN-DESIGN.md; the task graph is untouched by construction (one-way foreign key), so no task-CSV rollback is needed.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-034.proof.json",
+      "next_action": "Scaffold supply_chain.catalog.csv with the three-lane schema and the rtk and ruvector seed rows, wire the gen-time reverse join, then enumerate further from the open COGNITUM and meta-ruvector references as needed.",
+      "source_columns": {
+        "task_id": "YZXCONV-034",
+        "parent_id": "YZXCONV-033; YZXCONV-025",
+        "phase": "3-runtime",
+        "title": "Build the three-lane supply-chain catalog (no-optional, latest-npm ruvector)",
+        "owner_agent": "Supply-Chain Catalog Agent",
+        "goal": "Create supply_chain.catalog.csv beside task_graph.source.csv as a SEPARATE registry with a one-way task_id foreign key INTO the task graph (the task graph is never edited and never given supply-chain columns; the reverse task-to-package index is built at generation time). Model three lanes, all yazelix-nix-profile-owned or project-local-pinned and never system or global: path (agent CLIs and tools resolved on PATH via the yazelix runtime closure), service (PostgreSQL plus the RuVector extension, which MUST be flake-declared IN the yazelix nix-profile and run as a profile-owned daemon), and app-dep (libraries the app links, pinned in the app lockfile via a profile-owned toolchain). Keep two independent axes: source_registry (where latest lives) versus install_method (how it is built). Enforce the NO-OPTIONAL LAW: there is no optional, later, or non-blocking state; every row is built before DONE and an agent that defers a row has entered a failure loop; the token optional is illegal as a classification value. Seed ruvector as npm-latest (bun add) in the app-dep lane and as the profile-owned PostgreSQL extension in the service lane; local meta-ruvector and crates.io are reference and lagging fallbacks only. Registry keys come from the secretd broker at build time, never the nix store.",
+        "inputs": "yazelix_runtime_convergence/SUPPLY-CHAIN-DESIGN.md; DEC-YZXCONV-007; Architecture Blueprint - LifeOS Core Foundation.md (sha256 014bbebb) lines 87-113; COGNITUM guides (open reference); meta-ruvector plus worktrees (reference); YZXCONV-025 install-gap checklist; YZXCONV-033 packaging pattern",
+        "target_artifacts": "supply_chain.catalog.csv source of truth; generated/supply_chain.catalog.json; the gen-time task-to-package reverse index; per-lane install-method mapping",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "system or global package-manager installs; forcing an app-dep or service item into the path lane or vice versa; nix-profile mutation before build proof; deleting the COGNITUM reference media; agent auth or state mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "supply-chain-catalog-cell",
+        "verification_gate": "The catalog validates: every row has a lane in path/service/app-dep, a source_registry, and an install_method; the token optional never appears as a classification value; every task_id foreign key resolves to an existing task; the ruvector rows are source_registry npm with install_method bun-add-latest (app-dep) and a profile-owned PostgreSQL extension (service); no row is in a deferred or optional state; generated/supply_chain.catalog.json regenerates deterministically and the reverse task-to-package index builds.",
+        "rollback_plan": "Remove supply_chain.catalog.csv and its generated JSON and SUPPLY-CHAIN-DESIGN.md; the task graph is untouched by construction (one-way foreign key), so no task-CSV rollback is needed.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-034.proof.json",
+        "next_action": "Scaffold supply_chain.catalog.csv with the three-lane schema and the rtk and ruvector seed rows, wire the gen-time reverse join, then enumerate further from the open COGNITUM and meta-ruvector references as needed."
+      },
+      "parent_ids": [
+        "YZXCONV-033",
+        "YZXCONV-025"
+      ],
+      "inputs": [
+        "yazelix_runtime_convergence/SUPPLY-CHAIN-DESIGN.md",
+        "DEC-YZXCONV-007",
+        "Architecture Blueprint - LifeOS Core Foundation.md (sha256 014bbebb) lines 87-113",
+        "COGNITUM guides (open reference)",
+        "meta-ruvector plus worktrees (reference)",
+        "YZXCONV-025 install-gap checklist",
+        "YZXCONV-033 packaging pattern"
+      ],
+      "target_artifacts": [
+        "supply_chain.catalog.csv source of truth",
+        "generated/supply_chain.catalog.json",
+        "the gen-time task-to-package reverse index",
+        "per-lane install-method mapping"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
+      ],
+      "blocked_paths": [
+        "system or global package-manager installs",
+        "forcing an app-dep or service item into the path lane or vice versa",
+        "nix-profile mutation before build proof",
+        "deleting the COGNITUM reference media",
+        "agent auth or state mutation"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-035",
+      "source_row_number": 36,
+      "phase": "3-runtime",
+      "title": "Package PostgreSQL and the RuVector extension INTO the yazelix nix-profile (service lane)",
+      "owner_agent": "Yazelix Packaging Agent / Database Runtime Agent",
+      "goal": "Close the owner-identified current-state gap that no database is in the yazelix nix-profile: the databases MUST be in the yazelix nix-profile to pull this off. Declare PostgreSQL and the RuVector PostgreSQL extension as flake outputs in the yazelix runtime closure (the same the-yazelix-way mechanism as rtk), so the single profile owns the whole stack (blueprint Phase 4 build the entire stack, musl-static, drop the nix store). RuVector loads as a profile-provided extension into the profile-provided postgres via shared_preload_libraries with a data dir kept outside the store. Latest RuVector is the npm-published build (200-plus agent tools); crates.io lags and local meta-ruvector is the napi-exhaust scratchpad reference only. No system postgres, no apt, no global install. TDD packaging tests.",
+      "simulation_required": true,
+      "execution_cell": "db-in-profile-cell",
+      "verification_gate": "postgresql and the ruvector extension are flake packages outputs and declared yazelix runtime-closure packages; both resolve through the nix profile (not a system or apt postgres); a profile-owned postgres starts with the ruvector extension loaded (present in pg_available_extensions and CREATE EXTENSION ruvector succeeds) against a data dir outside the store; red-then-green packaging tests prove a reproducible build; the one profile is the sole install owner.",
+      "rollback_plan": "Revert only the flake packaging additions and tests and reselect the prior profile generation; leave any existing external database untouched; no system postgres is introduced.",
+      "status": "blocked",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-035.proof.json",
+      "next_action": "After the catalog service-lane rows exist, add flake package outputs for postgresql and the ruvector extension and a runtime-closure entry the yazelix way, then prove CREATE EXTENSION ruvector from a profile-owned postgres under owner approval.",
+      "source_columns": {
+        "task_id": "YZXCONV-035",
+        "parent_id": "YZXCONV-033; YZXCONV-034",
+        "phase": "3-runtime",
+        "title": "Package PostgreSQL and the RuVector extension INTO the yazelix nix-profile (service lane)",
+        "owner_agent": "Yazelix Packaging Agent / Database Runtime Agent",
+        "goal": "Close the owner-identified current-state gap that no database is in the yazelix nix-profile: the databases MUST be in the yazelix nix-profile to pull this off. Declare PostgreSQL and the RuVector PostgreSQL extension as flake outputs in the yazelix runtime closure (the same the-yazelix-way mechanism as rtk), so the single profile owns the whole stack (blueprint Phase 4 build the entire stack, musl-static, drop the nix store). RuVector loads as a profile-provided extension into the profile-provided postgres via shared_preload_libraries with a data dir kept outside the store. Latest RuVector is the npm-published build (200-plus agent tools); crates.io lags and local meta-ruvector is the napi-exhaust scratchpad reference only. No system postgres, no apt, no global install. TDD packaging tests.",
+        "inputs": "Architecture Blueprint lines 68-79 (RuVector as a PostgreSQL extension) and 23-42 (Phase 4 Nix plus musl); yazelix flake.nix packaging (rtk and yzx as the pattern) and the runtime closure (mkYzx); SUPPLY-CHAIN-DESIGN.md service lane; DEC-YZXCONV-007; the latest RuVector npm and extension build",
+        "target_artifacts": "flake packages outputs for postgresql and the ruvector extension; yazelix runtime-closure entries; a profile-owned postgres-plus-ruvector service proof; a data-dir-outside-the-store layout",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/flake.nix; /home/flexnetos/meta/src/yazelix/packaging/**; /home/flexnetos/meta/src/yazelix/tests/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "system or apt postgres; global installs; profile mutation before build proof; committing a database data dir or secrets into the repo or the nix store; agent auth or state mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "db-in-profile-cell",
+        "verification_gate": "postgresql and the ruvector extension are flake packages outputs and declared yazelix runtime-closure packages; both resolve through the nix profile (not a system or apt postgres); a profile-owned postgres starts with the ruvector extension loaded (present in pg_available_extensions and CREATE EXTENSION ruvector succeeds) against a data dir outside the store; red-then-green packaging tests prove a reproducible build; the one profile is the sole install owner.",
+        "rollback_plan": "Revert only the flake packaging additions and tests and reselect the prior profile generation; leave any existing external database untouched; no system postgres is introduced.",
+        "status": "Blocked",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-035.proof.json",
+        "next_action": "After the catalog service-lane rows exist, add flake package outputs for postgresql and the ruvector extension and a runtime-closure entry the yazelix way, then prove CREATE EXTENSION ruvector from a profile-owned postgres under owner approval."
+      },
+      "parent_ids": [
+        "YZXCONV-033",
+        "YZXCONV-034"
+      ],
+      "inputs": [
+        "Architecture Blueprint lines 68-79 (RuVector as a PostgreSQL extension) and 23-42 (Phase 4 Nix plus musl)",
+        "yazelix flake.nix packaging (rtk and yzx as the pattern) and the runtime closure (mkYzx)",
+        "SUPPLY-CHAIN-DESIGN.md service lane",
+        "DEC-YZXCONV-007",
+        "the latest RuVector npm and extension build"
+      ],
+      "target_artifacts": [
+        "flake packages outputs for postgresql and the ruvector extension",
+        "yazelix runtime-closure entries",
+        "a profile-owned postgres-plus-ruvector service proof",
+        "a data-dir-outside-the-store layout"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/flake.nix",
+        "/home/flexnetos/meta/src/yazelix/packaging/**",
+        "/home/flexnetos/meta/src/yazelix/tests/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
+      ],
+      "blocked_paths": [
+        "system or apt postgres",
+        "global installs",
+        "profile mutation before build proof",
+        "committing a database data dir or secrets into the repo or the nix store",
+        "agent auth or state mutation"
       ]
     }
   ]

@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T21:05:59Z",
+  "generated_at": "2026-07-14T23:24:24Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 53,
+  "task_count": 55,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T21:05:59Z",
+    "generated_at": "2026-07-14T23:24:24Z",
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
-    "row_count": 53,
+    "row_count": 55,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -3437,6 +3437,124 @@
         "pinning a version no reachable source proves",
         "a blanket registry assumption instead of a per-artifact verified leader",
         "global installs",
+        "agent auth or state mutation"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-054",
+      "source_row_number": 55,
+      "phase": "3-runtime",
+      "title": "Yazelix-provision the ICM config so the code model and durable caches survive a full reprovision",
+      "owner_agent": "Env Provisioning Agent",
+      "goal": "The live fix set ~/.config/icm/config.toml to model = jinaai/jina-embeddings-v2-base-code (768d, code-optimized) and yazelix PR 73 moved HF_HOME, TORCH_HOME, PLAYWRIGHT_BROWSERS_PATH, STARSHIP_CACHE and the icm model cache onto durable ~/.cache. Those persist across a reboot but are per-machine home state that a FULL reprovision would wipe - icm would revert to the config/default.toml intfloat/multilingual-e5-base default. Provision the icm config reproducibly from yazelix: render ~/.config/icm/config.toml (or bake the code-optimized model into the fleet icm config/default.toml) plus the durable-cache env, so a freshly reprovisioned box comes up on the code model with a durable, warm embedding cache. No global installs; stay inside the profile.",
+      "simulation_required": true,
+      "execution_cell": "env-provision-cell",
+      "verification_gate": "Red tests first FAIL when a simulated fresh reprovision does not produce ~/.config/icm/config.toml pinning the code-optimized model and the durable-cache env; then yazelix provisioning renders both deterministically and the reprovision comes up on the code model with a durable cache.",
+      "rollback_plan": "Revert the yazelix provisioning change; the per-machine ~/.config/icm/config.toml from the live fix remains as the interim durable state.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-054.proof.json",
+      "next_action": "Provision ~/.config/icm/config.toml (or the fleet icm default) plus the durable-cache env from yazelix and prove it survives a simulated full reprovision.",
+      "source_columns": {
+        "task_id": "YZXCONV-054",
+        "parent_id": "",
+        "phase": "3-runtime",
+        "title": "Yazelix-provision the ICM config so the code model and durable caches survive a full reprovision",
+        "owner_agent": "Env Provisioning Agent",
+        "goal": "The live fix set ~/.config/icm/config.toml to model = jinaai/jina-embeddings-v2-base-code (768d, code-optimized) and yazelix PR 73 moved HF_HOME, TORCH_HOME, PLAYWRIGHT_BROWSERS_PATH, STARSHIP_CACHE and the icm model cache onto durable ~/.cache. Those persist across a reboot but are per-machine home state that a FULL reprovision would wipe - icm would revert to the config/default.toml intfloat/multilingual-e5-base default. Provision the icm config reproducibly from yazelix: render ~/.config/icm/config.toml (or bake the code-optimized model into the fleet icm config/default.toml) plus the durable-cache env, so a freshly reprovisioned box comes up on the code model with a durable, warm embedding cache. No global installs; stay inside the profile.",
+        "inputs": "live fix ~/.config/icm/config.toml = jinaai/jina-embeddings-v2-base-code; yazelix PR 73 (durable HF/torch/playwright/starship + icm cache in nushell/system/volatile_runtime.nu); icm config resolution order ICM_CONFIG then ~/.config/icm/config.toml then baked config/default.toml; fastembed downloads via HF_HOME which is the real model cache",
+        "target_artifacts": "yazelix provisioning that renders the icm config (code-optimized model) and durable-cache env reproducibly; a fresh reprovision yields the code model plus a durable warm cache with no manual step",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/icm/config/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "global or user-home installs outside the profile; committing secrets; agent auth or state mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "env-provision-cell",
+        "verification_gate": "Red tests first FAIL when a simulated fresh reprovision does not produce ~/.config/icm/config.toml pinning the code-optimized model and the durable-cache env; then yazelix provisioning renders both deterministically and the reprovision comes up on the code model with a durable cache.",
+        "rollback_plan": "Revert the yazelix provisioning change; the per-machine ~/.config/icm/config.toml from the live fix remains as the interim durable state.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-054.proof.json",
+        "next_action": "Provision ~/.config/icm/config.toml (or the fleet icm default) plus the durable-cache env from yazelix and prove it survives a simulated full reprovision."
+      },
+      "parent_ids": [],
+      "inputs": [
+        "live fix ~/.config/icm/config.toml = jinaai/jina-embeddings-v2-base-code",
+        "yazelix PR 73 (durable HF/torch/playwright/starship + icm cache in nushell/system/volatile_runtime.nu)",
+        "icm config resolution order ICM_CONFIG then ~/.config/icm/config.toml then baked config/default.toml",
+        "fastembed downloads via HF_HOME which is the real model cache"
+      ],
+      "target_artifacts": [
+        "yazelix provisioning that renders the icm config (code-optimized model) and durable-cache env reproducibly",
+        "a fresh reprovision yields the code model plus a durable warm cache with no manual step"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/icm/config/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
+      ],
+      "blocked_paths": [
+        "global or user-home installs outside the profile",
+        "committing secrets",
+        "agent auth or state mutation"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-055",
+      "source_row_number": 56,
+      "phase": "3-runtime",
+      "title": "Add the ICM PostgreSQL backend option as a durable remote memory store",
+      "owner_agent": "Memory Store Agent",
+      "goal": "icm defaults to a local SQLite memories.db but supports a remote backend via ICM_DB_BACKEND=postgres (per icm embed --db and the store config; opensearch is the other remote option). Evaluate and enable icm on PostgreSQL so memories live in the shared project Postgres instead of a per-home SQLite file, aligning with the blueprint direction of RuVector-in-Postgres and the no-sidecar/no-HTTP runtime. The postgres path MUST honor the envctl no-C trust boundary: pure-Rust ring-only client, libSQL-remote or a C-free postgres driver, no aws-lc, no bundled C SQLite. Keep the SQLite default as fallback; make postgres an opt-in, migration-safe option.",
+      "simulation_required": true,
+      "execution_cell": "memory-store-cell",
+      "verification_gate": "Red tests first FAIL when the ICM PostgreSQL backend is not reachable via ICM_DB_BACKEND=postgres with a C-free client, when the SQLite default is not preserved as fallback, or when the postgres path pulls a banned C dependency; then icm runs on PostgreSQL with a pure-Rust ring-only client, memories migrate from SQLite, and the no-C boundary holds.",
+      "rollback_plan": "Fall back to the default local SQLite memories.db with ICM_DB_BACKEND unset; keep the postgres evaluation report.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-055.proof.json",
+      "next_action": "Evaluate ICM_DB_BACKEND=postgres with a C-free client, prove the no-C boundary, migrate memories from SQLite, and keep SQLite as the fallback default.",
+      "source_columns": {
+        "task_id": "YZXCONV-055",
+        "parent_id": "YZXCONV-054",
+        "phase": "3-runtime",
+        "title": "Add the ICM PostgreSQL backend option as a durable remote memory store",
+        "owner_agent": "Memory Store Agent",
+        "goal": "icm defaults to a local SQLite memories.db but supports a remote backend via ICM_DB_BACKEND=postgres (per icm embed --db and the store config; opensearch is the other remote option). Evaluate and enable icm on PostgreSQL so memories live in the shared project Postgres instead of a per-home SQLite file, aligning with the blueprint direction of RuVector-in-Postgres and the no-sidecar/no-HTTP runtime. The postgres path MUST honor the envctl no-C trust boundary: pure-Rust ring-only client, libSQL-remote or a C-free postgres driver, no aws-lc, no bundled C SQLite. Keep the SQLite default as fallback; make postgres an opt-in, migration-safe option.",
+        "inputs": "icm embed --help (ICM_DB_BACKEND selects postgres or opensearch remote backend; --db overrides SQLite); icm store config in config/default.toml; blueprint Postgres-hosted codebase plus RuVector-as-native-extension direction; envctl no-C boundary (ring-only rustls, libSQL remote, pure-Rust crypto)",
+        "target_artifacts": "an evaluated, documented ICM PostgreSQL backend option (ICM_DB_BACKEND=postgres) with a C-free driver path; a migration from the local SQLite memories.db; SQLite retained as default fallback",
+        "allowed_paths": "/home/flexnetos/meta/src/icm/**; /home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "linking C SQLite or aws-lc into the icm postgres path; global installs; deleting the existing SQLite memories.db before a verified migration; agent auth or state mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "memory-store-cell",
+        "verification_gate": "Red tests first FAIL when the ICM PostgreSQL backend is not reachable via ICM_DB_BACKEND=postgres with a C-free client, when the SQLite default is not preserved as fallback, or when the postgres path pulls a banned C dependency; then icm runs on PostgreSQL with a pure-Rust ring-only client, memories migrate from SQLite, and the no-C boundary holds.",
+        "rollback_plan": "Fall back to the default local SQLite memories.db with ICM_DB_BACKEND unset; keep the postgres evaluation report.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-055.proof.json",
+        "next_action": "Evaluate ICM_DB_BACKEND=postgres with a C-free client, prove the no-C boundary, migrate memories from SQLite, and keep SQLite as the fallback default."
+      },
+      "parent_ids": [
+        "YZXCONV-054"
+      ],
+      "inputs": [
+        "icm embed --help (ICM_DB_BACKEND selects postgres or opensearch remote backend",
+        "--db overrides SQLite)",
+        "icm store config in config/default.toml",
+        "blueprint Postgres-hosted codebase plus RuVector-as-native-extension direction",
+        "envctl no-C boundary (ring-only rustls",
+        "libSQL remote",
+        "pure-Rust crypto)"
+      ],
+      "target_artifacts": [
+        "an evaluated",
+        "documented ICM PostgreSQL backend option (ICM_DB_BACKEND=postgres) with a C-free driver path",
+        "a migration from the local SQLite memories.db",
+        "SQLite retained as default fallback"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/icm/**",
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
+      ],
+      "blocked_paths": [
+        "linking C SQLite or aws-lc into the icm postgres path",
+        "global installs",
+        "deleting the existing SQLite memories.db before a verified migration",
         "agent auth or state mutation"
       ]
     }

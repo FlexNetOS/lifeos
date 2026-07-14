@@ -52,7 +52,7 @@ describe("Yazelix runtime owner contract", () => {
 
   it("adds active tasks for the complete owner-directed runtime contract", () => {
     expect(tasks.map(({ task_id: taskId }) => taskId)).toEqual(
-      Array.from({ length: 49 }, (_, index) => `YZXCONV-${String(index + 1).padStart(3, "0")}`),
+      Array.from({ length: 53 }, (_, index) => `YZXCONV-${String(index + 1).padStart(3, "0")}`),
     );
 
     for (const task of tasks) {

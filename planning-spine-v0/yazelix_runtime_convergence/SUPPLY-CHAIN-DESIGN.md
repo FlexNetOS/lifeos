@@ -139,7 +139,7 @@ npm but the build is a flake/PG-extension (service) or a bun/cargo dep (app-dep)
 | `lane` | runtime shape | `path` \| `service` \| `app-dep` |
 | `source_registry` | where **latest** lives | `npm` \| `crates.io` \| `git` \| `local-path` |
 | `source_locator` | the coordinate | `cratesio/ruvector-core`, `npmjs/ruvector`, `/home/flexnetos/meta/src/meta-ruvector` |
-| `pinned_version` | current pin | `latest` (npm dist-tag) / `0.8.0` |
+| `pinned_version` | **verified-latest** pin (audited to the live leader; no stale pins) | `latest` (npm dist-tag) / `0.10.0` (verified leader) |
 | `install_method` | how it's built | `flake-crate` \| `flake-git` \| `flake-npm` \| `flake-pg-extension` \| `bun-add-latest` \| `cargo-dep` \| `yazelix-runtime` |
 | `nix_output` | flake attr (path/service) | `packages.x86_64-linux.rtk` |
 | `profile_owned` | in the yazelix profile? | `true` (path/service + toolchains) / `false` (app-dep library) |
@@ -244,11 +244,24 @@ named in the north star but not yet wired in code. These populate `YZXCONV-036`.
 | `SC-weave` | weave | cli (sqlite⟷libsql **dual**) | meta-internal (FlexNetOS/weave) | flake-crate | mesh coordination; **genuine dual-backend store** (sqlite default, libsql opt-in). Built from the meta tree — no public registry. |
 | `SC-embed-minilm` | all-MiniLM-L6-v2 | model-asset | HF / git | asset-fetch | local embedding weights; required by envctl's bridge (blueprint 161, 386). A provisioned runtime artifact, not a package. |
 
-### 8d. Audit notes (present but NOT blueprint data stores, or C-boundary caveats)
+### 8d. Audit notes (C-boundary caveats — NOT latest-wins exemptions)
 
-- **`kache`** — content-addressed **compiler cache** (`RUSTC_WRAPPER`), `path` lane;
-  a build accelerator, **not a persistence store**. Fleet decision (`YZXCONV-016`),
-  outside blueprint scope — recorded here so its absence from the data tiers is auditable.
+> **⚠️ UNIVERSAL VERIFIED-LEADER LAW (owner mandate 2026-07-14):** the *entire* supply
+> chain goes through the **verified leader** — **every** artifact in every lane (wild
+> linker, bun, bunx, redb, PostgreSQL, SQLite, rtk, nu, carapace, beads_rust, weave,
+> ruvector-core/sona/postgres, ruvllm, candle, libsql, kache, and the rest) is **audited
+> and updated to its live-verified latest**. There are **NO audit-note exemptions**:
+> being a compiler cache / non-data-store does **not** exempt a tool from latest-verification.
+> Enforced by **`YZXCONV-053`** (whole-chain audit) and the kache trigger **`YZXCONV-052`**.
+
+- **`SC-kache`** — content-addressed **compiler cache** (`RUSTC_WRAPPER`), `path` lane
+  (`YZXCONV-016`). **Latest-wins applies** (it was wrongly exempted before). The profile
+  currently pins **`kache 0.8.0`** (`yazelix/packaging/kache_release.nix:3`,
+  `github:kunobi-ninja/kache`) — **STALE**: the reachable verified leader is **`v0.10.0`**
+  (kunobi-ninja tags + crates.io both top at 0.10.0; npm `kache` 0.1.0 is unrelated). The
+  owner referenced **`v2.1.1`**, which does **not** resolve on any reachable kache source —
+  **source identity must be confirmed before pinning** (`YZXCONV-052`); never bluff a version
+  no source proves. This is the caught precedent for the §8d exemption removal.
 - **`rusqlite 0.32.1 features=["bundled"]`** — **links C SQLite.** Exists ONLY in the
   nested `home/agent-env/codex-harness` sub-workspace (its own `[workspace]`, outside
   envctl's no-C main gate). The catalog must **not** promote this into the profile;

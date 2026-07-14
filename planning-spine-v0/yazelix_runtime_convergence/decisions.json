@@ -218,6 +218,20 @@
         "Task-graph append: YZXCONV-050 (no-HTTP, parents 041;049, Ready), 051 (no-sidecar, parent 035, Blocked), 052 (kache latest-pin + path-lane broadening, parent 016, Ready), 053 (universal whole-chain verified-leader audit, parents 034;052, Ready); owner-contract test bumped 49->53; SUPPLY-CHAIN-DESIGN 8d reframed + universal-law banner + de-staled schema example",
         "Owner universal mandate 2026-07-14: 'The entire supply chain must go through the verified leader (e.g., wild linker, bun, bunx, redb, PostgreSQL, SQLite, and the rest). Everything is audited and updated.' - generalizes DEC-YZXCONV-009 from ruvector-scoped to all lanes/all artifacts"
       ]
+    },
+    {
+      "id": "DEC-YZXCONV-015",
+      "title": "kache source identity resolved (owner): canonical github:kunobi-ninja/kache @ v0.10.0; v2.1.1 was a MayakaApps/Kache name collision",
+      "subject_task": "YZXCONV-052",
+      "decided_by": "Owner",
+      "decided_at": "2026-07-14T21:40:00Z",
+      "decision": "Owner resolves the DEC-YZXCONV-014 kache source-identity flag: 'kache is at github:kunobi-ninja/kache, use that source via v0.10.0. I made a mistake and pulled the wrong Kache via github.com/MayakaApps/Kache.' SETTLED: the canonical kache is the Rust RUSTC_WRAPPER compiler cache at github:kunobi-ninja/kache, and the verified-latest pin target is v0.10.0 (the reachable leader confirmed on both the kunobi-ninja tags and crates.io). The v2.1.1 the owner earlier referenced was a NAME COLLISION with github.com/MayakaApps/Kache - an entirely different project (a Kotlin caching library), REJECTED. YZXCONV-052 is now unambiguous: bump yazelix/packaging/kache_release.nix from 0.8.0 to v0.10.0 (github:kunobi-ninja/kache), rebuild srcHash+cargoHash, remove the section-8d audit-note exemption. LESSON (encoded): this is the THIRD source-identity catch under the verified-leader law - after the rtk name collision (reachingforthejack/rtk 'Rust Type Kit' vs the FlexNetOS token-killer rtk, RTK.md) and the ruvector @ruvnet/ruvector 404 dead handle (DEC-YZXCONV-008) - proving the law must resolve SOURCE IDENTITY (which project/registry is canonical), not merely the newest version string; a higher version number on the wrong project is not 'the latest'. The whole-chain audit (YZXCONV-053) carries this: resolve the canonical source per artifact before trusting any version.",
+      "evidence": [
+        "Owner message 2026-07-14: 'kache is at github:kunobi-ninja/kache, use that source via v0.10.0. I made a mistake and pulled the wrong Kache via github.com/MayakaApps/Kache.'",
+        "Live verification 2026-07-14: github:kunobi-ninja/kache tags top at v0.10.0; crates.io kache tops at 0.10.0; github.com/MayakaApps/Kache is a Kotlin caching library (different ecosystem, name collision) - v2.1.1 belongs to it, not to the Rust RUSTC_WRAPPER kache",
+        "Task-graph update: YZXCONV-052 goal/inputs/verification_gate/next_action/blocked_paths de-ambiguated to pin v0.10.0 from github:kunobi-ninja/kache (never MayakaApps/Kache); SUPPLY-CHAIN-DESIGN 8d kache note updated with the confirmed source + the name-collision lesson",
+        "Precedent chain (source-identity catches): rtk collision (RTK.md reachingforthejack/rtk vs FlexNetOS rtk); ruvector @ruvnet/ruvector 404 (DEC-YZXCONV-008); kache MayakaApps/Kache v2.1.1 (this decision) - the verified-leader law resolves source identity, not just version"
+      ]
     }
   ]
 }

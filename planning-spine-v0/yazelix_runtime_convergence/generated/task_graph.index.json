@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.index.v0",
-  "generated_at": "2026-07-14T00:05:44Z",
+  "generated_at": "2026-07-14T05:22:46Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 15,
+  "task_count": 20,
   "task_ids": [
     "YZXCONV-001",
     "YZXCONV-002",
@@ -18,10 +18,18 @@
     "YZXCONV-012",
     "YZXCONV-013",
     "YZXCONV-014",
-    "YZXCONV-015"
+    "YZXCONV-015",
+    "YZXCONV-016",
+    "YZXCONV-017",
+    "YZXCONV-018",
+    "YZXCONV-019",
+    "YZXCONV-020"
   ],
   "ready_task_ids": [
-    "YZXCONV-002"
+    "YZXCONV-002",
+    "YZXCONV-016",
+    "YZXCONV-017",
+    "YZXCONV-019"
   ],
   "complete_task_ids": [
     "YZXCONV-001"
@@ -207,6 +215,72 @@
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-015.proof.json",
       "execution_cell": "closure-audit-cell"
+    },
+    "YZXCONV-016": {
+      "index": 15,
+      "source_row_number": 17,
+      "phase": "2-cache",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-016.proof.json",
+      "execution_cell": "kache-authority-cell"
+    },
+    "YZXCONV-017": {
+      "index": 16,
+      "source_row_number": 18,
+      "phase": "2-nushell",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-009",
+        "YZXCONV-010",
+        "YZXCONV-011"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-017.proof.json",
+      "execution_cell": "nushell-authority-cell"
+    },
+    "YZXCONV-018": {
+      "index": 17,
+      "source_row_number": 19,
+      "phase": "3-agent-env",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-007",
+        "YZXCONV-016",
+        "YZXCONV-017"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-018.proof.json",
+      "execution_cell": "envctl-owner-contract-cell"
+    },
+    "YZXCONV-019": {
+      "index": 18,
+      "source_row_number": 20,
+      "phase": "4-repository-closure",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-008",
+        "YZXCONV-018"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-019.proof.json",
+      "execution_cell": "repository-closure-cell"
+    },
+    "YZXCONV-020": {
+      "index": 19,
+      "source_row_number": 21,
+      "phase": "5-final-closure",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-014",
+        "YZXCONV-015",
+        "YZXCONV-016",
+        "YZXCONV-017",
+        "YZXCONV-018",
+        "YZXCONV-019"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
+      "execution_cell": "owner-contract-closure-cell"
     }
   },
   "tasks_by_id": {
@@ -390,6 +464,72 @@
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-015.proof.json",
       "execution_cell": "closure-audit-cell"
+    },
+    "YZXCONV-016": {
+      "index": 15,
+      "source_row_number": 17,
+      "phase": "2-cache",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-016.proof.json",
+      "execution_cell": "kache-authority-cell"
+    },
+    "YZXCONV-017": {
+      "index": 16,
+      "source_row_number": 18,
+      "phase": "2-nushell",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-009",
+        "YZXCONV-010",
+        "YZXCONV-011"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-017.proof.json",
+      "execution_cell": "nushell-authority-cell"
+    },
+    "YZXCONV-018": {
+      "index": 17,
+      "source_row_number": 19,
+      "phase": "3-agent-env",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-007",
+        "YZXCONV-016",
+        "YZXCONV-017"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-018.proof.json",
+      "execution_cell": "envctl-owner-contract-cell"
+    },
+    "YZXCONV-019": {
+      "index": 18,
+      "source_row_number": 20,
+      "phase": "4-repository-closure",
+      "status": "ready",
+      "parent_ids": [
+        "YZXCONV-008",
+        "YZXCONV-018"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-019.proof.json",
+      "execution_cell": "repository-closure-cell"
+    },
+    "YZXCONV-020": {
+      "index": 19,
+      "source_row_number": 21,
+      "phase": "5-final-closure",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-014",
+        "YZXCONV-015",
+        "YZXCONV-016",
+        "YZXCONV-017",
+        "YZXCONV-018",
+        "YZXCONV-019"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
+      "execution_cell": "owner-contract-closure-cell"
     }
   },
   "tasks_by_status": {
@@ -397,7 +537,10 @@
       "YZXCONV-001"
     ],
     "ready": [
-      "YZXCONV-002"
+      "YZXCONV-002",
+      "YZXCONV-016",
+      "YZXCONV-017",
+      "YZXCONV-019"
     ],
     "draft": [
       "YZXCONV-003",
@@ -413,6 +556,10 @@
       "YZXCONV-013",
       "YZXCONV-014",
       "YZXCONV-015"
+    ],
+    "blocked": [
+      "YZXCONV-018",
+      "YZXCONV-020"
     ]
   },
   "tasks_by_phase": {
@@ -440,7 +587,8 @@
       "YZXCONV-009",
       "YZXCONV-010",
       "YZXCONV-011",
-      "YZXCONV-012"
+      "YZXCONV-012",
+      "YZXCONV-017"
     ],
     "3-four-repo": [
       "YZXCONV-013"
@@ -450,6 +598,18 @@
     ],
     "4-closure": [
       "YZXCONV-015"
+    ],
+    "2-cache": [
+      "YZXCONV-016"
+    ],
+    "3-agent-env": [
+      "YZXCONV-018"
+    ],
+    "4-repository-closure": [
+      "YZXCONV-019"
+    ],
+    "5-final-closure": [
+      "YZXCONV-020"
     ]
   },
   "children_by_parent": {
@@ -463,14 +623,16 @@
       "YZXCONV-006",
       "YZXCONV-008",
       "YZXCONV-009",
-      "YZXCONV-013"
+      "YZXCONV-013",
+      "YZXCONV-016"
     ],
     "YZXCONV-003": [
       "YZXCONV-004",
       "YZXCONV-005",
       "YZXCONV-006",
       "YZXCONV-009",
-      "YZXCONV-014"
+      "YZXCONV-014",
+      "YZXCONV-016"
     ],
     "YZXCONV-006": [
       "YZXCONV-007",
@@ -481,16 +643,19 @@
       "YZXCONV-007",
       "YZXCONV-010",
       "YZXCONV-012",
-      "YZXCONV-013"
+      "YZXCONV-013",
+      "YZXCONV-019"
     ],
     "YZXCONV-009": [
       "YZXCONV-010",
-      "YZXCONV-014"
+      "YZXCONV-014",
+      "YZXCONV-017"
     ],
     "YZXCONV-010": [
       "YZXCONV-011",
       "YZXCONV-012",
-      "YZXCONV-014"
+      "YZXCONV-014",
+      "YZXCONV-017"
     ],
     "YZXCONV-004": [
       "YZXCONV-014"
@@ -499,10 +664,12 @@
       "YZXCONV-014"
     ],
     "YZXCONV-007": [
-      "YZXCONV-014"
+      "YZXCONV-014",
+      "YZXCONV-018"
     ],
     "YZXCONV-011": [
-      "YZXCONV-014"
+      "YZXCONV-014",
+      "YZXCONV-017"
     ],
     "YZXCONV-012": [
       "YZXCONV-014"
@@ -511,7 +678,26 @@
       "YZXCONV-014"
     ],
     "YZXCONV-014": [
-      "YZXCONV-015"
+      "YZXCONV-015",
+      "YZXCONV-020"
+    ],
+    "YZXCONV-016": [
+      "YZXCONV-018",
+      "YZXCONV-020"
+    ],
+    "YZXCONV-017": [
+      "YZXCONV-018",
+      "YZXCONV-020"
+    ],
+    "YZXCONV-018": [
+      "YZXCONV-019",
+      "YZXCONV-020"
+    ],
+    "YZXCONV-015": [
+      "YZXCONV-020"
+    ],
+    "YZXCONV-019": [
+      "YZXCONV-020"
     ]
   },
   "proof_uri_by_task": {
@@ -529,7 +715,12 @@
     "YZXCONV-012": "yazelix_runtime_convergence/proof_records/YZXCONV-012.proof.json",
     "YZXCONV-013": "yazelix_runtime_convergence/proof_records/YZXCONV-013.proof.json",
     "YZXCONV-014": "yazelix_runtime_convergence/proof_records/YZXCONV-014.proof.json",
-    "YZXCONV-015": "yazelix_runtime_convergence/proof_records/YZXCONV-015.proof.json"
+    "YZXCONV-015": "yazelix_runtime_convergence/proof_records/YZXCONV-015.proof.json",
+    "YZXCONV-016": "yazelix_runtime_convergence/proof_records/YZXCONV-016.proof.json",
+    "YZXCONV-017": "yazelix_runtime_convergence/proof_records/YZXCONV-017.proof.json",
+    "YZXCONV-018": "yazelix_runtime_convergence/proof_records/YZXCONV-018.proof.json",
+    "YZXCONV-019": "yazelix_runtime_convergence/proof_records/YZXCONV-019.proof.json",
+    "YZXCONV-020": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json"
   },
   "missing_parent_ids": []
 }

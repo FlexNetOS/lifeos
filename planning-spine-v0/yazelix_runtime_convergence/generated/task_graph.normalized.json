@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T00:05:44Z",
+  "generated_at": "2026-07-14T05:22:46Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 15,
+  "task_count": 20,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T00:05:38Z",
+    "generated_at": "2026-07-14T05:22:46Z",
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
-    "row_count": 15,
+    "row_count": 20,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -928,6 +928,324 @@
         "unapproved push",
         "deletion of unrelated dirty work",
         "completion with missing proof"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-016",
+      "source_row_number": 17,
+      "phase": "2-cache",
+      "title": "Make Kache the only agent and workspace cache authority",
+      "owner_agent": "Cache Authority Agent",
+      "goal": "Route every agent and workspace cache through Kache, remove or disable competing cache authorities, and keep the Nix store and the one Yazelix profile as install ownership rather than parallel cache ownership.",
+      "simulation_required": true,
+      "execution_cell": "kache-authority-cell",
+      "verification_gate": "A fleet inventory proves every enabled cache path and cache environment variable is owned or mediated by Kache; no agent command creates a competing package build compiler runner or ad hoc cache; all cache and tool binaries resolve through the one profile.",
+      "rollback_plan": "Restore only checksum-backed pre-migration cache settings for a failed component, disable that component's agent execution, and keep the contradiction open until Kache owns it.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-016.proof.json",
+      "next_action": "Inventory every cache producer and write the failing Kache-only contract tests before changing configuration.",
+      "source_columns": {
+        "task_id": "YZXCONV-016",
+        "parent_id": "YZXCONV-002; YZXCONV-003",
+        "phase": "2-cache",
+        "title": "Make Kache the only agent and workspace cache authority",
+        "owner_agent": "Cache Authority Agent",
+        "goal": "Route every agent and workspace cache through Kache, remove or disable competing cache authorities, and keep the Nix store and the one Yazelix profile as install ownership rather than parallel cache ownership.",
+        "inputs": "owner Kache-only directive; Yazelix kache package; fleet cache inventory; runner and package-manager cache settings",
+        "target_artifacts": "Kache authority matrix; migrated cache configuration; competing-cache retirement receipts",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/envctl/**; /home/flexnetos/meta/src/flexnetos_runner/**; owning peer cache configuration; /home/flexnetos/.config/yazelix/**",
+        "blocked_paths": "new npm pnpm Bun sccache ccache runner or ad hoc target cache authority; global package install; generated runtime hand edits",
+        "simulation_required": "TRUE",
+        "execution_cell": "kache-authority-cell",
+        "verification_gate": "A fleet inventory proves every enabled cache path and cache environment variable is owned or mediated by Kache; no agent command creates a competing package build compiler runner or ad hoc cache; all cache and tool binaries resolve through the one profile.",
+        "rollback_plan": "Restore only checksum-backed pre-migration cache settings for a failed component, disable that component's agent execution, and keep the contradiction open until Kache owns it.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-016.proof.json",
+        "next_action": "Inventory every cache producer and write the failing Kache-only contract tests before changing configuration."
+      },
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "inputs": [
+        "owner Kache-only directive",
+        "Yazelix kache package",
+        "fleet cache inventory",
+        "runner and package-manager cache settings"
+      ],
+      "target_artifacts": [
+        "Kache authority matrix",
+        "migrated cache configuration",
+        "competing-cache retirement receipts"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/**",
+        "/home/flexnetos/meta/src/envctl/**",
+        "/home/flexnetos/meta/src/flexnetos_runner/**",
+        "owning peer cache configuration",
+        "/home/flexnetos/.config/yazelix/**"
+      ],
+      "blocked_paths": [
+        "new npm pnpm Bun sccache ccache runner or ad hoc target cache authority",
+        "global package install",
+        "generated runtime hand edits"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-017",
+      "source_row_number": 18,
+      "phase": "2-nushell",
+      "title": "Enforce Nushell as the only agent shell",
+      "owner_agent": "Shell Authority Agent",
+      "goal": "Require every agent shell action to enter through the profile-owned Nushell; reserve Bash sh Zsh Fish and Xonsh for the owner only, with a per-incident owner-authorized emergency fallback allowed solely after a system crash.",
+      "simulation_required": true,
+      "execution_cell": "nushell-authority-cell",
+      "verification_gate": "Agent launchers hooks skills tests and receipts prove profile Nushell is the sole shell route; negative tests reject every other shell; any emergency route requires an explicit owner approval tied to a documented system crash and is removed after recovery.",
+      "rollback_plan": "Restore the prior profile generation if Nushell prevents recovery, disable agents, and permit a temporary alternate shell only when the owner explicitly approves that crash incident.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-017.proof.json",
+      "next_action": "Add failing enforcement tests to Yazelix and envctl before retiring alternate agent shell routes.",
+      "source_columns": {
+        "task_id": "YZXCONV-017",
+        "parent_id": "YZXCONV-009; YZXCONV-010; YZXCONV-011",
+        "phase": "2-nushell",
+        "title": "Enforce Nushell as the only agent shell",
+        "owner_agent": "Shell Authority Agent",
+        "goal": "Require every agent shell action to enter through the profile-owned Nushell; reserve Bash sh Zsh Fish and Xonsh for the owner only, with a per-incident owner-authorized emergency fallback allowed solely after a system crash.",
+        "inputs": "owner Nushell-only directive; shell boundary inventory; RTK nu_shell work; agent launcher and hook configuration",
+        "target_artifacts": "strict agent-shell policy; launcher and hook enforcement; emergency approval receipt schema; negative tests",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/nushell/**; /home/flexnetos/meta/src/yazelix/packaging/**; /home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-skills/**; owning agent launcher configuration",
+        "blocked_paths": "agent invocation of bash sh zsh fish xonsh; inferred fallback permission; alternate shell owner; generated runtime hand edits",
+        "simulation_required": "TRUE",
+        "execution_cell": "nushell-authority-cell",
+        "verification_gate": "Agent launchers hooks skills tests and receipts prove profile Nushell is the sole shell route; negative tests reject every other shell; any emergency route requires an explicit owner approval tied to a documented system crash and is removed after recovery.",
+        "rollback_plan": "Restore the prior profile generation if Nushell prevents recovery, disable agents, and permit a temporary alternate shell only when the owner explicitly approves that crash incident.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-017.proof.json",
+        "next_action": "Add failing enforcement tests to Yazelix and envctl before retiring alternate agent shell routes."
+      },
+      "parent_ids": [
+        "YZXCONV-009",
+        "YZXCONV-010",
+        "YZXCONV-011"
+      ],
+      "inputs": [
+        "owner Nushell-only directive",
+        "shell boundary inventory",
+        "RTK nu_shell work",
+        "agent launcher and hook configuration"
+      ],
+      "target_artifacts": [
+        "strict agent-shell policy",
+        "launcher and hook enforcement",
+        "emergency approval receipt schema",
+        "negative tests"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/nushell/**",
+        "/home/flexnetos/meta/src/yazelix/packaging/**",
+        "/home/flexnetos/meta/src/envctl/agent-env.yaml",
+        "/home/flexnetos/meta/src/envctl/agent-skills/**",
+        "owning agent launcher configuration"
+      ],
+      "blocked_paths": [
+        "agent invocation of bash sh zsh fish xonsh",
+        "inferred fallback permission",
+        "alternate shell owner",
+        "generated runtime hand edits"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-018",
+      "source_row_number": 19,
+      "phase": "3-agent-env",
+      "title": "Encode the owner contract and task graph in envctl agent-env",
+      "owner_agent": "envctl Agent Environment Agent",
+      "goal": "Add YZXCONV-016 through YZXCONV-020 and their Kache Nushell profile and cleanup gates to the canonical envctl agent-env source, lock, generated projections, harness guidance, and validation tests.",
+      "simulation_required": true,
+      "execution_cell": "envctl-owner-contract-cell",
+      "verification_gate": "envctl lock check preview and policy tests pass; the source and generated guidance name YZXCONV-016 through YZXCONV-020; a second preview is idempotent; installed proof resolves through the one profile without widening plugin or MCP authority.",
+      "rollback_plan": "Use the envctl operation receipt to restore the prior source lock and projections, then rerun preview; do not preserve a partial projection as a second authority.",
+      "status": "blocked",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-018.proof.json",
+      "next_action": "Run after the Kache and Nushell red tests define the exact envctl policy surface.",
+      "source_columns": {
+        "task_id": "YZXCONV-018",
+        "parent_id": "YZXCONV-007; YZXCONV-016; YZXCONV-017",
+        "phase": "3-agent-env",
+        "title": "Encode the owner contract and task graph in envctl agent-env",
+        "owner_agent": "envctl Agent Environment Agent",
+        "goal": "Add YZXCONV-016 through YZXCONV-020 and their Kache Nushell profile and cleanup gates to the canonical envctl agent-env source, lock, generated projections, harness guidance, and validation tests.",
+        "inputs": "owner contract; YZXCONV task graph; envctl AGENTS contracts; current agent-env source and lock",
+        "target_artifacts": "reviewed agent-env policy and lock; generated projection receipts; harness tests linked to task IDs",
+        "allowed_paths": "/home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-env.lock; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/meta/src/envctl/home/**; /home/flexnetos/meta/src/envctl/tests/**",
+        "blocked_paths": "direct generated-runtime edits; apply without preview and review; duplicate Codex config authority; task omission",
+        "simulation_required": "TRUE",
+        "execution_cell": "envctl-owner-contract-cell",
+        "verification_gate": "envctl lock check preview and policy tests pass; the source and generated guidance name YZXCONV-016 through YZXCONV-020; a second preview is idempotent; installed proof resolves through the one profile without widening plugin or MCP authority.",
+        "rollback_plan": "Use the envctl operation receipt to restore the prior source lock and projections, then rerun preview; do not preserve a partial projection as a second authority.",
+        "status": "Blocked",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-018.proof.json",
+        "next_action": "Run after the Kache and Nushell red tests define the exact envctl policy surface."
+      },
+      "parent_ids": [
+        "YZXCONV-007",
+        "YZXCONV-016",
+        "YZXCONV-017"
+      ],
+      "inputs": [
+        "owner contract",
+        "YZXCONV task graph",
+        "envctl AGENTS contracts",
+        "current agent-env source and lock"
+      ],
+      "target_artifacts": [
+        "reviewed agent-env policy and lock",
+        "generated projection receipts",
+        "harness tests linked to task IDs"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/envctl/agent-env.yaml",
+        "/home/flexnetos/meta/src/envctl/agent-env.lock",
+        "/home/flexnetos/meta/src/envctl/agent-skills/**",
+        "/home/flexnetos/meta/src/envctl/home/**",
+        "/home/flexnetos/meta/src/envctl/tests/**"
+      ],
+      "blocked_paths": [
+        "direct generated-runtime edits",
+        "apply without preview and review",
+        "duplicate Codex config authority",
+        "task omission"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-019",
+      "source_row_number": 20,
+      "phase": "4-repository-closure",
+      "title": "Settle and purge every worktree stash branch and pull request",
+      "owner_agent": "Repository Closure Agent",
+      "goal": "Commit every valuable stash and worktree change, push every branch through a pull request without cherry-picking, merge all approved work, synchronize origin and main master and develop where those branches exist, then purge merged branches worktrees and stashes.",
+      "simulation_required": true,
+      "execution_cell": "repository-closure-cell",
+      "verification_gate": "Every discovered change is committed and pushed; every branch has a merged pull request or an explicit owner disposition; no cherry-pick appears in the transaction; origin and each existing main master develop ref agree; git status worktree list branch list stash list and open-PR inventory are clean; merged local and remote branches and temporary worktrees are purged.",
+      "rollback_plan": "Stop before deleting any unattributed state; recreate only from the published branch or pull request receipt; never use a stash or cherry-pick as the final recovery mechanism.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-019.proof.json",
+      "next_action": "Preserve each dirty repository independently, publish reviewable pull requests, merge in dependency order, and run the cleanup gate after each merge.",
+      "source_columns": {
+        "task_id": "YZXCONV-019",
+        "parent_id": "YZXCONV-008; YZXCONV-018",
+        "phase": "4-repository-closure",
+        "title": "Settle and purge every worktree stash branch and pull request",
+        "owner_agent": "Repository Closure Agent",
+        "goal": "Commit every valuable stash and worktree change, push every branch through a pull request without cherry-picking, merge all approved work, synchronize origin and main master and develop where those branches exist, then purge merged branches worktrees and stashes.",
+        "inputs": "Meta fleet inventory; all local worktrees branches stashes remotes and open pull requests; repository-owned checks",
+        "target_artifacts": "per-repository commits and pull requests; merge receipts; synchronized branch proofs; clean worktree branch and stash inventory",
+        "allowed_paths": "/home/flexnetos/meta/**; declared peer repositories; repository-owned worktree cleanup source; GitHub branches and pull requests",
+        "blocked_paths": "cherry-pick; silent stash deletion; unpushed change; draft task substitute; force rewrite; deleting unmerged or unattributed work",
+        "simulation_required": "TRUE",
+        "execution_cell": "repository-closure-cell",
+        "verification_gate": "Every discovered change is committed and pushed; every branch has a merged pull request or an explicit owner disposition; no cherry-pick appears in the transaction; origin and each existing main master develop ref agree; git status worktree list branch list stash list and open-PR inventory are clean; merged local and remote branches and temporary worktrees are purged.",
+        "rollback_plan": "Stop before deleting any unattributed state; recreate only from the published branch or pull request receipt; never use a stash or cherry-pick as the final recovery mechanism.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-019.proof.json",
+        "next_action": "Preserve each dirty repository independently, publish reviewable pull requests, merge in dependency order, and run the cleanup gate after each merge."
+      },
+      "parent_ids": [
+        "YZXCONV-008",
+        "YZXCONV-018"
+      ],
+      "inputs": [
+        "Meta fleet inventory",
+        "all local worktrees branches stashes remotes and open pull requests",
+        "repository-owned checks"
+      ],
+      "target_artifacts": [
+        "per-repository commits and pull requests",
+        "merge receipts",
+        "synchronized branch proofs",
+        "clean worktree branch and stash inventory"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/**",
+        "declared peer repositories",
+        "repository-owned worktree cleanup source",
+        "GitHub branches and pull requests"
+      ],
+      "blocked_paths": [
+        "cherry-pick",
+        "silent stash deletion",
+        "unpushed change",
+        "draft task substitute",
+        "force rewrite",
+        "deleting unmerged or unattributed work"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-020",
+      "source_row_number": 21,
+      "phase": "5-final-closure",
+      "title": "Prove the enforced owner contract and close the fleet",
+      "owner_agent": "Independent Owner-Contract Verifier",
+      "goal": "Independently prove Kache-only caching, Nushell-only agent execution, one Yazelix profile ownership, canonical envctl inclusion, and fully synchronized clean repositories before any completion claim.",
+      "simulation_required": false,
+      "execution_cell": "owner-contract-closure-cell",
+      "verification_gate": "All 20 task gates have current proof; Kache is the only cache authority; agents execute shell actions only through profile Nushell; one profile owns binaries runtime and active configs; envctl names every closure task; all repositories and GitHub refs are synchronized clean and purged.",
+      "rollback_plan": "Invalidate this proof and reopen the earliest contradicted task; keep downstream proofs blocked until the installed runtime and fleet return to the exact owner contract.",
+      "status": "blocked",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
+      "next_action": "Execute only after YZXCONV-019 proves every repository and pull request is settled.",
+      "source_columns": {
+        "task_id": "YZXCONV-020",
+        "parent_id": "YZXCONV-014; YZXCONV-015; YZXCONV-016; YZXCONV-017; YZXCONV-018; YZXCONV-019",
+        "phase": "5-final-closure",
+        "title": "Prove the enforced owner contract and close the fleet",
+        "owner_agent": "Independent Owner-Contract Verifier",
+        "goal": "Independently prove Kache-only caching, Nushell-only agent execution, one Yazelix profile ownership, canonical envctl inclusion, and fully synchronized clean repositories before any completion claim.",
+        "inputs": "all YZXCONV proofs; installed runtime; envctl projections; Meta fleet; GitHub merge and cleanup receipts",
+        "target_artifacts": "final owner-contract matrix; installed-runtime receipt; clean synchronized fleet receipt; invalidation map",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**; read-only installed runtime and fleet surfaces; four refreshed Yazelix indexes",
+        "blocked_paths": "new implementation mutation; missing proof; alternate shell or cache authority; dirty or divergent repo; open mergeable cleanup pull request",
+        "simulation_required": "FALSE",
+        "execution_cell": "owner-contract-closure-cell",
+        "verification_gate": "All 20 task gates have current proof; Kache is the only cache authority; agents execute shell actions only through profile Nushell; one profile owns binaries runtime and active configs; envctl names every closure task; all repositories and GitHub refs are synchronized clean and purged.",
+        "rollback_plan": "Invalidate this proof and reopen the earliest contradicted task; keep downstream proofs blocked until the installed runtime and fleet return to the exact owner contract.",
+        "status": "Blocked",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
+        "next_action": "Execute only after YZXCONV-019 proves every repository and pull request is settled."
+      },
+      "parent_ids": [
+        "YZXCONV-014",
+        "YZXCONV-015",
+        "YZXCONV-016",
+        "YZXCONV-017",
+        "YZXCONV-018",
+        "YZXCONV-019"
+      ],
+      "inputs": [
+        "all YZXCONV proofs",
+        "installed runtime",
+        "envctl projections",
+        "Meta fleet",
+        "GitHub merge and cleanup receipts"
+      ],
+      "target_artifacts": [
+        "final owner-contract matrix",
+        "installed-runtime receipt",
+        "clean synchronized fleet receipt",
+        "invalidation map"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "read-only installed runtime and fleet surfaces",
+        "four refreshed Yazelix indexes"
+      ],
+      "blocked_paths": [
+        "new implementation mutation",
+        "missing proof",
+        "alternate shell or cache authority",
+        "dirty or divergent repo",
+        "open mergeable cleanup pull request"
       ]
     }
   ]

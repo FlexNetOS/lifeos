@@ -128,3 +128,24 @@ other peer repositories. Grit, ICM, and Weave have no first-party `.nu` command
 module in their current repository roots; main Yazelix's staged module covers
 only `meta`. The task graph therefore requires classification before retirement
 and native Nu command/extern coverage before any shell route is removed.
+
+## Owner-contract delta — 2026-07-14
+
+- Yazelix owns Kache packaging through `packaging/kache_release.nix` and its
+  flake composition, while envctl and runner sources still expose cache-related
+  policy and execution surfaces. No current fleet proof demonstrates that every
+  enabled package, build, compiler, runner, and temporary cache is Kache-owned.
+- Profile-owned `nu`, `rtk`, `yzx`, Codex, Claude, Meta, Grit, ICM, and Weave
+  are present, but agent and cleanup sources still include `.sh` boundaries.
+  In particular, envctl's worktree reaper is currently
+  `scripts/reap-worktrees.sh`, so the strict Nushell-only agent contract is not
+  yet enforced by source and negative tests.
+- After fetching every declared Meta peer, the baseline contained 13 dirty
+  repositories, LifeOS and meta-ruvector stashes, ahead/behind branches,
+  branches with missing upstreams, and open pull requests. The inventory is a
+  preservation queue: no worktree, stash, or branch may be deleted until its
+  changes are committed, pushed, reviewed, and merged or explicitly disposed
+  by the owner.
+- LifeOS pull request 45 is the accepted PR 41 source-of-truth merge. Task
+  migration history is retained as merge ancestry with conflicts resolved to
+  that source-truth tree; no cherry-pick is part of the integration.

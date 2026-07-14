@@ -30,6 +30,22 @@ Each `ProofRecord` captures:
 - when verification happened,
 - whether the result passed or failed.
 
+## Versioned Proof Boundaries
+
+The connected MVP object and the append-only ledger input are intentionally
+separate, explicit contracts:
+
+- `schemas/proof-record.schema.json` defines the subject-addressed
+  `ProofRecord` used by the connected MVP bundle.
+- `schemas/proof-ledger-record.schema.json` defines the operational
+  task-lifecycle proof consumed by `scripts/merge-proof-records.py`.
+
+The ledger merger validates every input against the operational schema before
+hashing or appending it. Evidence payload fields remain extensible, while task
+identity, observed lifecycle state, revision, and invalidation metadata are
+machine-enforced. Cross-shape inputs fail closed instead of being silently
+accepted under the wrong contract.
+
 ## Ledger Subjects
 
 | Subject | Example |

@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T00:05:44Z",
+  "generated_at": "2026-07-14T00:05:38Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
   "task_count": 15,
   "source": {
@@ -34,7 +34,7 @@
     {
       "task_id": "YZXCONV-001",
       "source_row_number": 2,
-      "phase": "0-evidence",
+      "phase": "0-foundation",
       "title": "Index and query all four Yazelix repositories",
       "owner_agent": "Code Intelligence Agent",
       "goal": "Build fresh GitNexus indexes with PDG and derive repository ownership seams before planning runtime changes.",
@@ -43,12 +43,12 @@
       "verification_gate": "GitNexus status is up-to-date for all four repos and repo-qualified query/context calls return the recorded ownership seams.",
       "rollback_plan": "Remove only the four disposable .gitnexus indexes and this baseline proof; tracked repository source remains unchanged.",
       "status": "complete",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-001.proof.json",
+      "proof_uri": "proof_records/YZXCONV-001.proof.json",
       "next_action": "Ratify the target ownership contract in YZXCONV-002.",
       "source_columns": {
         "task_id": "YZXCONV-001",
-        "parent_id": "",
-        "phase": "0-evidence",
+        "parent_id": "LPS-003",
+        "phase": "0-foundation",
         "title": "Index and query all four Yazelix repositories",
         "owner_agent": "Code Intelligence Agent",
         "goal": "Build fresh GitNexus indexes with PDG and derive repository ownership seams before planning runtime changes.",
@@ -61,10 +61,12 @@
         "verification_gate": "GitNexus status is up-to-date for all four repos and repo-qualified query/context calls return the recorded ownership seams.",
         "rollback_plan": "Remove only the four disposable .gitnexus indexes and this baseline proof; tracked repository source remains unchanged.",
         "status": "Complete",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-001.proof.json",
+        "proof_uri": "proof_records/YZXCONV-001.proof.json",
         "next_action": "Ratify the target ownership contract in YZXCONV-002."
       },
-      "parent_ids": [],
+      "parent_ids": [
+        "LPS-003"
+      ],
       "inputs": [
         "/home/flexnetos/meta/.meta.yaml",
         "four Yazelix peer working trees"
@@ -89,7 +91,7 @@
     {
       "task_id": "YZXCONV-002",
       "source_row_number": 3,
-      "phase": "0-authority",
+      "phase": "1-schema",
       "title": "Ratify one source-to-runtime ownership contract",
       "owner_agent": "Runtime Architecture Owner",
       "goal": "Define exact editable-input, generated-output, runtime-state, profile, fleet, and peer boundaries before implementation.",
@@ -98,12 +100,12 @@
       "verification_gate": "Owner approves the matrix in PLAN.md and every active path has exactly one editable owner, one generator, and one runtime consumer.",
       "rollback_plan": "Revert the decision document and keep all current runtime selectors unchanged.",
       "status": "ready",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-002.proof.json",
+      "proof_uri": "proof_records/YZXCONV-002.proof.json",
       "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule.",
       "source_columns": {
         "task_id": "YZXCONV-002",
         "parent_id": "YZXCONV-001",
-        "phase": "0-authority",
+        "phase": "1-schema",
         "title": "Ratify one source-to-runtime ownership contract",
         "owner_agent": "Runtime Architecture Owner",
         "goal": "Define exact editable-input, generated-output, runtime-state, profile, fleet, and peer boundaries before implementation.",
@@ -116,7 +118,7 @@
         "verification_gate": "Owner approves the matrix in PLAN.md and every active path has exactly one editable owner, one generator, and one runtime consumer.",
         "rollback_plan": "Revert the decision document and keep all current runtime selectors unchanged.",
         "status": "Ready",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-002.proof.json",
+        "proof_uri": "proof_records/YZXCONV-002.proof.json",
         "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule."
       },
       "parent_ids": [
@@ -146,7 +148,7 @@
     {
       "task_id": "YZXCONV-003",
       "source_row_number": 4,
-      "phase": "1-profile",
+      "phase": "2-foundation",
       "title": "Converge to one active Nix/Yazelix profile closure",
       "owner_agent": "Yazelix Packaging Agent",
       "goal": "Make ~/.nix-profile the sole interactive foundation selector and prevent the XDG profile from selecting a different closure or adding a second owner.",
@@ -155,12 +157,12 @@
       "verification_gate": "nix profile list shows one foundation element; ~/.nix-profile is the only PATH owner; any XDG selector resolves to the same closure or is inactive; yzx doctor reports one install owner.",
       "rollback_plan": "Atomically restore the pre-change profile symlink recorded in the migration receipt and keep the prior generation reachable.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-003.proof.json",
+      "proof_uri": "proof_records/YZXCONV-003.proof.json",
       "next_action": "Finish source package contracts, build without profile mutation, then request approval for cutover.",
       "source_columns": {
         "task_id": "YZXCONV-003",
         "parent_id": "YZXCONV-002",
-        "phase": "1-profile",
+        "phase": "2-foundation",
         "title": "Converge to one active Nix/Yazelix profile closure",
         "owner_agent": "Yazelix Packaging Agent",
         "goal": "Make ~/.nix-profile the sole interactive foundation selector and prevent the XDG profile from selecting a different closure or adding a second owner.",
@@ -173,7 +175,7 @@
         "verification_gate": "nix profile list shows one foundation element; ~/.nix-profile is the only PATH owner; any XDG selector resolves to the same closure or is inactive; yzx doctor reports one install owner.",
         "rollback_plan": "Atomically restore the pre-change profile symlink recorded in the migration receipt and keep the prior generation reachable.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-003.proof.json",
+        "proof_uri": "proof_records/YZXCONV-003.proof.json",
         "next_action": "Finish source package contracts, build without profile mutation, then request approval for cutover."
       },
       "parent_ids": [
@@ -204,35 +206,35 @@
     {
       "task_id": "YZXCONV-004",
       "source_row_number": 5,
-      "phase": "1-agent-runtime",
+      "phase": "2-foundation",
       "title": "Converge Codex config authorship while preserving its real runtime home",
       "owner_agent": "Codex Runtime Agent",
-      "goal": "Keep the profile-owned Codex binary and ~/.codex runtime/state home while materializing config.toml from a reviewed Yazelix-owned editable input and eliminating old-profile references.",
+      "goal": "Keep the profile-owned Codex binary and ~/.codex runtime/state home while materializing config.toml and RULES.md from reviewed Yazelix-owned editable inputs and eliminating old-profile references.",
       "simulation_required": true,
       "execution_cell": "codex-runtime-cell",
-      "verification_gate": "codex doctor reports the profile executable, CODEX_HOME=/home/flexnetos/.codex, parseable generated config, and no path into an inactive profile or retired workspace mirror.",
-      "rollback_plan": "Restore the prior config.toml from a checksum-backed copy without moving auth, sessions, or databases.",
+      "verification_gate": "codex doctor reports the profile executable, CODEX_HOME=/home/flexnetos/.codex, parseable generated config, materialized RULES.md checksumming to its reviewed editable input, and no path into an inactive profile or retired workspace mirror.",
+      "rollback_plan": "Restore prior config.toml and RULES.md projections from checksum-backed copies without moving auth, sessions, or databases.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-004.proof.json",
-      "next_action": "Implement the approved config materializer after YZXCONV-003 source proof.",
+      "proof_uri": "proof_records/YZXCONV-004.proof.json",
+      "next_action": "Implement the approved config and RULES materializer after YZXCONV-003 source proof.",
       "source_columns": {
         "task_id": "YZXCONV-004",
         "parent_id": "YZXCONV-002; YZXCONV-003",
-        "phase": "1-agent-runtime",
+        "phase": "2-foundation",
         "title": "Converge Codex config authorship while preserving its real runtime home",
         "owner_agent": "Codex Runtime Agent",
-        "goal": "Keep the profile-owned Codex binary and ~/.codex runtime/state home while materializing config.toml from a reviewed Yazelix-owned editable input and eliminating old-profile references.",
-        "inputs": "Codex doctor receipt; approved input path; Yazelix runtime model",
-        "target_artifacts": "Codex config input; materializer; runtime provenance gate",
-        "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/.config/yazelix/**; /home/flexnetos/.codex/config.toml",
-        "blocked_paths": "/home/flexnetos/.codex/auth.json; /home/flexnetos/.codex/sessions/**; /home/flexnetos/.codex/*.sqlite*; retired workspace .codex mirrors",
+        "goal": "Keep the profile-owned Codex binary and ~/.codex runtime/state home while materializing config.toml and RULES.md from reviewed Yazelix-owned editable inputs and eliminating old-profile references.",
+        "inputs": "Codex doctor receipt; approved input paths; Yazelix runtime model; /home/flexnetos/AGENTS.md RULES authority declaration",
+        "target_artifacts": "Codex config and RULES inputs; materializer; runtime provenance gate",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/.config/yazelix/**; /home/flexnetos/.codex/config.toml; /home/flexnetos/.codex/RULES.md",
+        "blocked_paths": "/home/flexnetos/.codex/auth.json; /home/flexnetos/.codex/sessions/**; /home/flexnetos/.codex/*.sqlite*; retired workspace .codex mirrors; direct runtime-only RULES.md authorship without a reviewed Yazelix/envctl input",
         "simulation_required": "TRUE",
         "execution_cell": "codex-runtime-cell",
-        "verification_gate": "codex doctor reports the profile executable, CODEX_HOME=/home/flexnetos/.codex, parseable generated config, and no path into an inactive profile or retired workspace mirror.",
-        "rollback_plan": "Restore the prior config.toml from a checksum-backed copy without moving auth, sessions, or databases.",
+        "verification_gate": "codex doctor reports the profile executable, CODEX_HOME=/home/flexnetos/.codex, parseable generated config, materialized RULES.md checksumming to its reviewed editable input, and no path into an inactive profile or retired workspace mirror.",
+        "rollback_plan": "Restore prior config.toml and RULES.md projections from checksum-backed copies without moving auth, sessions, or databases.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-004.proof.json",
-        "next_action": "Implement the approved config materializer after YZXCONV-003 source proof."
+        "proof_uri": "proof_records/YZXCONV-004.proof.json",
+        "next_action": "Implement the approved config and RULES materializer after YZXCONV-003 source proof."
       },
       "parent_ids": [
         "YZXCONV-002",
@@ -240,11 +242,12 @@
       ],
       "inputs": [
         "Codex doctor receipt",
-        "approved input path",
-        "Yazelix runtime model"
+        "approved input paths",
+        "Yazelix runtime model",
+        "/home/flexnetos/AGENTS.md RULES authority declaration"
       ],
       "target_artifacts": [
-        "Codex config input",
+        "Codex config and RULES inputs",
         "materializer",
         "runtime provenance gate"
       ],
@@ -253,19 +256,21 @@
         "/home/flexnetos/meta/src/envctl/agent-env.yaml",
         "/home/flexnetos/meta/src/envctl/agent-skills/**",
         "/home/flexnetos/.config/yazelix/**",
-        "/home/flexnetos/.codex/config.toml"
+        "/home/flexnetos/.codex/config.toml",
+        "/home/flexnetos/.codex/RULES.md"
       ],
       "blocked_paths": [
         "/home/flexnetos/.codex/auth.json",
         "/home/flexnetos/.codex/sessions/**",
         "/home/flexnetos/.codex/*.sqlite*",
-        "retired workspace .codex mirrors"
+        "retired workspace .codex mirrors",
+        "direct runtime-only RULES.md authorship without a reviewed Yazelix/envctl input"
       ]
     },
     {
       "task_id": "YZXCONV-005",
       "source_row_number": 6,
-      "phase": "1-agent-runtime",
+      "phase": "2-foundation",
       "title": "Converge Claude settings authorship through the Yazelix/envctl chain",
       "owner_agent": "Claude Runtime Agent",
       "goal": "Keep the profile-owned Claude binary and ~/.claude state home while replacing direct settings authorship with reviewed Yazelix input and envctl-compatible materialization.",
@@ -274,12 +279,12 @@
       "verification_gate": "Claude launches from the one profile, settings checksum back to the approved input, generated hooks contain no stale Bash-to-Nu wrapper, and state remains under ~/.claude.",
       "rollback_plan": "Restore the previous settings.json from a checksum-backed copy without moving credentials or history.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-005.proof.json",
+      "proof_uri": "proof_records/YZXCONV-005.proof.json",
       "next_action": "Implement beside YZXCONV-004 so both runtimes consume one ownership contract.",
       "source_columns": {
         "task_id": "YZXCONV-005",
         "parent_id": "YZXCONV-002; YZXCONV-003",
-        "phase": "1-agent-runtime",
+        "phase": "2-foundation",
         "title": "Converge Claude settings authorship through the Yazelix/envctl chain",
         "owner_agent": "Claude Runtime Agent",
         "goal": "Keep the profile-owned Claude binary and ~/.claude state home while replacing direct settings authorship with reviewed Yazelix input and envctl-compatible materialization.",
@@ -292,7 +297,7 @@
         "verification_gate": "Claude launches from the one profile, settings checksum back to the approved input, generated hooks contain no stale Bash-to-Nu wrapper, and state remains under ~/.claude.",
         "rollback_plan": "Restore the previous settings.json from a checksum-backed copy without moving credentials or history.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-005.proof.json",
+        "proof_uri": "proof_records/YZXCONV-005.proof.json",
         "next_action": "Implement beside YZXCONV-004 so both runtimes consume one ownership contract."
       },
       "parent_ids": [
@@ -325,7 +330,7 @@
     {
       "task_id": "YZXCONV-006",
       "source_row_number": 7,
-      "phase": "1-envctl",
+      "phase": "2-foundation",
       "title": "Package the native envctl agent-env binary in the single profile",
       "owner_agent": "envctl Packaging Agent",
       "goal": "Expose the native envctl binary through Yazelix toolbin/bin and remove the generated /bin/sh Meta wrapper from the active interactive route.",
@@ -334,12 +339,12 @@
       "verification_gate": "command -v envctl resolves under ~/.nix-profile; readlink reaches a native executable; no active envctl route depends on bash/sh/zsh; envctl --version and lock preview pass.",
       "rollback_plan": "Restore the prior Meta wrapper/projection and remove only the new unselected profile generation.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-006.proof.json",
+      "proof_uri": "proof_records/YZXCONV-006.proof.json",
       "next_action": "Build envctl from its clean worktree and consume the proven artifact in Yazelix.",
       "source_columns": {
         "task_id": "YZXCONV-006",
         "parent_id": "YZXCONV-002; YZXCONV-003",
-        "phase": "1-envctl",
+        "phase": "2-foundation",
         "title": "Package the native envctl agent-env binary in the single profile",
         "owner_agent": "envctl Packaging Agent",
         "goal": "Expose the native envctl binary through Yazelix toolbin/bin and remove the generated /bin/sh Meta wrapper from the active interactive route.",
@@ -352,7 +357,7 @@
         "verification_gate": "command -v envctl resolves under ~/.nix-profile; readlink reaches a native executable; no active envctl route depends on bash/sh/zsh; envctl --version and lock preview pass.",
         "rollback_plan": "Restore the prior Meta wrapper/projection and remove only the new unselected profile generation.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-006.proof.json",
+        "proof_uri": "proof_records/YZXCONV-006.proof.json",
         "next_action": "Build envctl from its clean worktree and consume the proven artifact in Yazelix."
       },
       "parent_ids": [
@@ -385,7 +390,7 @@
     {
       "task_id": "YZXCONV-007",
       "source_row_number": 8,
-      "phase": "1-envctl",
+      "phase": "2-foundation",
       "title": "Add preview-first Meta fleet agent-env policy and sync",
       "owner_agent": "Meta envctl Fleet Agent",
       "goal": "Give the Meta root and every declared src peer an explicit agent-env config or exclusion and drive preview/apply only through Meta and envctl frontdoors.",
@@ -394,12 +399,12 @@
       "verification_gate": "Meta-root lock check passes; preview reports every selected peer; reviewed apply has zero broken/failed assets; a second preview is idempotent; exclusions have rationales.",
       "rollback_plan": "Use envctl's operation receipt to restore affected projections and the prior lock; never roll back unrelated peer commits together.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-007.proof.json",
+      "proof_uri": "proof_records/YZXCONV-007.proof.json",
       "next_action": "Implement the active Meta GitKB task as a reviewed fleet transaction.",
       "source_columns": {
         "task_id": "YZXCONV-007",
         "parent_id": "YZXCONV-006; YZXCONV-008",
-        "phase": "1-envctl",
+        "phase": "2-foundation",
         "title": "Add preview-first Meta fleet agent-env policy and sync",
         "owner_agent": "Meta envctl Fleet Agent",
         "goal": "Give the Meta root and every declared src peer an explicit agent-env config or exclusion and drive preview/apply only through Meta and envctl frontdoors.",
@@ -412,7 +417,7 @@
         "verification_gate": "Meta-root lock check passes; preview reports every selected peer; reviewed apply has zero broken/failed assets; a second preview is idempotent; exclusions have rationales.",
         "rollback_plan": "Use envctl's operation receipt to restore affected projections and the prior lock; never roll back unrelated peer commits together.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-007.proof.json",
+        "proof_uri": "proof_records/YZXCONV-007.proof.json",
         "next_action": "Implement the active Meta GitKB task as a reviewed fleet transaction."
       },
       "parent_ids": [
@@ -446,7 +451,7 @@
     {
       "task_id": "YZXCONV-008",
       "source_row_number": 9,
-      "phase": "1-meta-control",
+      "phase": "2-foundation",
       "title": "Codify Meta central control and independent peer mode",
       "owner_agent": "Meta Control-Plane Agent",
       "goal": "Make meta git and meta exec the fleet frontdoors while preserving local Git, issue, test, release, and commit authority in every peer.",
@@ -455,12 +460,12 @@
       "verification_gate": "meta git status covers the fleet; meta exec can target the four Yazelix peers; each peer local git status and repo-specific workflow remains functional and independently committable.",
       "rollback_plan": "Revert only the policy/test commit in its owning repository; peer histories remain untouched.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-008.proof.json",
+      "proof_uri": "proof_records/YZXCONV-008.proof.json",
       "next_action": "Land the dual-mode contract before fleet sync implementation.",
       "source_columns": {
         "task_id": "YZXCONV-008",
         "parent_id": "YZXCONV-002",
-        "phase": "1-meta-control",
+        "phase": "2-foundation",
         "title": "Codify Meta central control and independent peer mode",
         "owner_agent": "Meta Control-Plane Agent",
         "goal": "Make meta git and meta exec the fleet frontdoors while preserving local Git, issue, test, release, and commit authority in every peer.",
@@ -473,7 +478,7 @@
         "verification_gate": "meta git status covers the fleet; meta exec can target the four Yazelix peers; each peer local git status and repo-specific workflow remains functional and independently committable.",
         "rollback_plan": "Revert only the policy/test commit in its owning repository; peer histories remain untouched.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-008.proof.json",
+        "proof_uri": "proof_records/YZXCONV-008.proof.json",
         "next_action": "Land the dual-mode contract before fleet sync implementation."
       },
       "parent_ids": [
@@ -504,7 +509,7 @@
     {
       "task_id": "YZXCONV-009",
       "source_row_number": 10,
-      "phase": "2-nushell",
+      "phase": "3-execution",
       "title": "Implement and select RTK TokenKill nu_shell mode",
       "owner_agent": "RTK TokenKill Agent",
       "goal": "Add a documented native nu_shell configuration mode to rtk-tokenkill and select it in the Yazelix-owned active RTK config.",
@@ -513,12 +518,12 @@
       "verification_gate": "rtk config prints the documented nu_shell selection; native Nu integration tests pass; Codex and Claude commands route through the profile RTK binary without Bash rewrite hooks.",
       "rollback_plan": "Re-select the prior documented RTK mode and restore its config input; keep the previous profile generation available.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-009.proof.json",
+      "proof_uri": "proof_records/YZXCONV-009.proof.json",
       "next_action": "Design the rtk config schema in its independent repo, publish it, then pin it in Yazelix.",
       "source_columns": {
         "task_id": "YZXCONV-009",
         "parent_id": "YZXCONV-002; YZXCONV-003",
-        "phase": "2-nushell",
+        "phase": "3-execution",
         "title": "Implement and select RTK TokenKill nu_shell mode",
         "owner_agent": "RTK TokenKill Agent",
         "goal": "Add a documented native nu_shell configuration mode to rtk-tokenkill and select it in the Yazelix-owned active RTK config.",
@@ -531,7 +536,7 @@
         "verification_gate": "rtk config prints the documented nu_shell selection; native Nu integration tests pass; Codex and Claude commands route through the profile RTK binary without Bash rewrite hooks.",
         "rollback_plan": "Re-select the prior documented RTK mode and restore its config input; keep the previous profile generation available.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-009.proof.json",
+        "proof_uri": "proof_records/YZXCONV-009.proof.json",
         "next_action": "Design the rtk config schema in its independent repo, publish it, then pin it in Yazelix."
       },
       "parent_ids": [
@@ -564,7 +569,7 @@
     {
       "task_id": "YZXCONV-010",
       "source_row_number": 11,
-      "phase": "2-nushell",
+      "phase": "3-execution",
       "title": "Complete the Yazelix native Nushell command catalog",
       "owner_agent": "Yazelix Nushell Agent",
       "goal": "Make yazelix/nushell/config the single interactive command catalog for codex, claude, envctl, meta, grit, icm, weave, nix, bun, bunx, and raw gate escapes.",
@@ -573,12 +578,12 @@
       "verification_gate": "Nu parses every module; command signatures/argv survive; meta/grit/icm/weave/envctl/nix resolve through profile paths; bun/bunx replace npm/npx/pnpm; caret raw gates remain available.",
       "rollback_plan": "Remove the new Nu imports/modules and restore the prior packaged config; do not restore user-bin wrappers.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-010.proof.json",
+      "proof_uri": "proof_records/YZXCONV-010.proof.json",
       "next_action": "Revise the staged wrapper module rather than layering a second command catalog.",
       "source_columns": {
         "task_id": "YZXCONV-010",
         "parent_id": "YZXCONV-006; YZXCONV-008; YZXCONV-009",
-        "phase": "2-nushell",
+        "phase": "3-execution",
         "title": "Complete the Yazelix native Nushell command catalog",
         "owner_agent": "Yazelix Nushell Agent",
         "goal": "Make yazelix/nushell/config the single interactive command catalog for codex, claude, envctl, meta, grit, icm, weave, nix, bun, bunx, and raw gate escapes.",
@@ -591,7 +596,7 @@
         "verification_gate": "Nu parses every module; command signatures/argv survive; meta/grit/icm/weave/envctl/nix resolve through profile paths; bun/bunx replace npm/npx/pnpm; caret raw gates remain available.",
         "rollback_plan": "Remove the new Nu imports/modules and restore the prior packaged config; do not restore user-bin wrappers.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-010.proof.json",
+        "proof_uri": "proof_records/YZXCONV-010.proof.json",
         "next_action": "Revise the staged wrapper module rather than layering a second command catalog."
       },
       "parent_ids": [
@@ -623,35 +628,35 @@
     {
       "task_id": "YZXCONV-011",
       "source_row_number": 12,
-      "phase": "2-nushell",
+      "phase": "3-execution",
       "title": "Retire or explicitly bridge every legacy Bash POSIX and Zsh route",
       "owner_agent": "Shell Boundary Agent",
-      "goal": "Classify every active shell launcher/wrapper; delete stale ones and make each retained POSIX boundary callable and testable from the Yazelix Nu catalog without alternate ownership.",
+      "goal": "Classify every active shell launcher/wrapper, including the packaged desktop launcher; delete stale ones and make each retained POSIX boundary callable and testable from the Yazelix Nu catalog without alternate ownership.",
       "simulation_required": true,
       "execution_cell": "shell-boundary-cell",
-      "verification_gate": "No stale bash-to-nu or user-local wrapper exists; no active Zsh/Bash command lacks a Nu equivalent; retained sh boundaries use fixed code plus structured argv and have exact behavior tests.",
+      "verification_gate": "No stale bash-to-nu or user-local wrapper exists; the profile-owned FlexNetOS Agent desktop entry invokes the profile launcher and profile layout without sh -lc or an alternate shell owner; no active Zsh/Bash command lacks a Nu equivalent; every retained sh boundary uses fixed code plus structured argv and has exact behavior tests.",
       "rollback_plan": "Restore only a removed boundary whose pre-change behavior receipt proves it is required; never reintroduce an alternate profile owner.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-011.proof.json",
-      "next_action": "Create the inventory from Meta canonical repos, excluding caches and runner workdirs.",
+      "proof_uri": "proof_records/YZXCONV-011.proof.json",
+      "next_action": "Create the inventory from Meta canonical repos, including packaging/flake_outputs.nix, while excluding caches and runner workdirs.",
       "source_columns": {
         "task_id": "YZXCONV-011",
         "parent_id": "YZXCONV-010",
-        "phase": "2-nushell",
+        "phase": "3-execution",
         "title": "Retire or explicitly bridge every legacy Bash POSIX and Zsh route",
         "owner_agent": "Shell Boundary Agent",
-        "goal": "Classify every active shell launcher/wrapper; delete stale ones and make each retained POSIX boundary callable and testable from the Yazelix Nu catalog without alternate ownership.",
-        "inputs": "Yazelix shells/{bash,posix,zsh}; Meta usr/bin wrappers; Claude hook inventory",
-        "target_artifacts": "shell boundary inventory; deletions; Nu bridge tests; retained-boundary rationale",
-        "allowed_paths": "/home/flexnetos/meta/src/yazelix/shells/**; /home/flexnetos/meta/src/yazelix/nushell/**; /home/flexnetos/meta/usr/bin/**; owning envctl manifest components",
+        "goal": "Classify every active shell launcher/wrapper, including the packaged desktop launcher; delete stale ones and make each retained POSIX boundary callable and testable from the Yazelix Nu catalog without alternate ownership.",
+        "inputs": "Yazelix shells/{bash,posix,zsh}; Yazelix packaging/flake_outputs.nix desktop launcher; Meta usr/bin wrappers; Claude hook inventory",
+        "target_artifacts": "shell boundary inventory; desktop launcher migration receipt; deletions; Nu bridge tests; retained-boundary rationale",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/shells/**; /home/flexnetos/meta/src/yazelix/nushell/**; /home/flexnetos/meta/src/yazelix/packaging/**; /home/flexnetos/meta/usr/bin/**; owning envctl manifest components",
         "blocked_paths": "unreviewed deletion of platform bootstrap; shell rewrites outside owner repos; generated runtime hand edits",
         "simulation_required": "TRUE",
         "execution_cell": "shell-boundary-cell",
-        "verification_gate": "No stale bash-to-nu or user-local wrapper exists; no active Zsh/Bash command lacks a Nu equivalent; retained sh boundaries use fixed code plus structured argv and have exact behavior tests.",
+        "verification_gate": "No stale bash-to-nu or user-local wrapper exists; the profile-owned FlexNetOS Agent desktop entry invokes the profile launcher and profile layout without sh -lc or an alternate shell owner; no active Zsh/Bash command lacks a Nu equivalent; every retained sh boundary uses fixed code plus structured argv and has exact behavior tests.",
         "rollback_plan": "Restore only a removed boundary whose pre-change behavior receipt proves it is required; never reintroduce an alternate profile owner.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-011.proof.json",
-        "next_action": "Create the inventory from Meta canonical repos, excluding caches and runner workdirs."
+        "proof_uri": "proof_records/YZXCONV-011.proof.json",
+        "next_action": "Create the inventory from Meta canonical repos, including packaging/flake_outputs.nix, while excluding caches and runner workdirs."
       },
       "parent_ids": [
         "YZXCONV-010"
@@ -660,11 +665,13 @@
         "Yazelix shells/{bash",
         "posix",
         "zsh}",
+        "Yazelix packaging/flake_outputs.nix desktop launcher",
         "Meta usr/bin wrappers",
         "Claude hook inventory"
       ],
       "target_artifacts": [
         "shell boundary inventory",
+        "desktop launcher migration receipt",
         "deletions",
         "Nu bridge tests",
         "retained-boundary rationale"
@@ -672,6 +679,7 @@
       "allowed_paths": [
         "/home/flexnetos/meta/src/yazelix/shells/**",
         "/home/flexnetos/meta/src/yazelix/nushell/**",
+        "/home/flexnetos/meta/src/yazelix/packaging/**",
         "/home/flexnetos/meta/usr/bin/**",
         "owning envctl manifest components"
       ],
@@ -684,7 +692,7 @@
     {
       "task_id": "YZXCONV-012",
       "source_row_number": 13,
-      "phase": "2-nushell",
+      "phase": "3-execution",
       "title": "Add Nu surfaces for Meta Grit ICM Weave and canonicalize old flakes",
       "owner_agent": "Fleet Nushell Agent",
       "goal": "Give Meta, Grit, ICM, Weave, and Nix/flake operations first-party Nu externs/modules and classify duplicate or obsolete flake roots through Meta inventory.",
@@ -693,12 +701,12 @@
       "verification_gate": "Nu extern/help smoke tests pass for all five command families; Meta inventory labels every flake canonical/vendor/worktree/runner/stale; only approved stale control paths are retired.",
       "rollback_plan": "Restore retired tracked flake files in their independent repos and remove only the new Nu imports if verification fails.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-012.proof.json",
+      "proof_uri": "proof_records/YZXCONV-012.proof.json",
       "next_action": "Separate canonical peer flakes from worktree, runner, and vendored copies before editing.",
       "source_columns": {
         "task_id": "YZXCONV-012",
         "parent_id": "YZXCONV-008; YZXCONV-010",
-        "phase": "2-nushell",
+        "phase": "3-execution",
         "title": "Add Nu surfaces for Meta Grit ICM Weave and canonicalize old flakes",
         "owner_agent": "Fleet Nushell Agent",
         "goal": "Give Meta, Grit, ICM, Weave, and Nix/flake operations first-party Nu externs/modules and classify duplicate or obsolete flake roots through Meta inventory.",
@@ -711,7 +719,7 @@
         "verification_gate": "Nu extern/help smoke tests pass for all five command families; Meta inventory labels every flake canonical/vendor/worktree/runner/stale; only approved stale control paths are retired.",
         "rollback_plan": "Restore retired tracked flake files in their independent repos and remove only the new Nu imports if verification fails.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-012.proof.json",
+        "proof_uri": "proof_records/YZXCONV-012.proof.json",
         "next_action": "Separate canonical peer flakes from worktree, runner, and vendored copies before editing."
       },
       "parent_ids": [
@@ -746,7 +754,7 @@
     {
       "task_id": "YZXCONV-013",
       "source_row_number": 14,
-      "phase": "3-four-repo",
+      "phase": "11-fleet-integration",
       "title": "Verify and pin the four-repository ownership transaction",
       "owner_agent": "Yazelix Integration Agent",
       "goal": "Ensure main Yazelix consumes reviewed child revisions while Helix, Yazi Assets, and Terminal Support remain independently buildable and narrowly owned.",
@@ -755,12 +763,12 @@
       "verification_gate": "Each child local gate passes; child commits are published before the main pin; main validation passes without override-input; GitNexus confirms the intended ownership seams.",
       "rollback_plan": "Revert only the main input pin to the last published child revisions; preserve independently valid child commits.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-013.proof.json",
+      "proof_uri": "proof_records/YZXCONV-013.proof.json",
       "next_action": "Implement child changes first only where a task proves they are necessary.",
       "source_columns": {
         "task_id": "YZXCONV-013",
         "parent_id": "YZXCONV-002; YZXCONV-008",
-        "phase": "3-four-repo",
+        "phase": "11-fleet-integration",
         "title": "Verify and pin the four-repository ownership transaction",
         "owner_agent": "Yazelix Integration Agent",
         "goal": "Ensure main Yazelix consumes reviewed child revisions while Helix, Yazi Assets, and Terminal Support remain independently buildable and narrowly owned.",
@@ -773,7 +781,7 @@
         "verification_gate": "Each child local gate passes; child commits are published before the main pin; main validation passes without override-input; GitNexus confirms the intended ownership seams.",
         "rollback_plan": "Revert only the main input pin to the last published child revisions; preserve independently valid child commits.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-013.proof.json",
+        "proof_uri": "proof_records/YZXCONV-013.proof.json",
         "next_action": "Implement child changes first only where a task proves they are necessary."
       },
       "parent_ids": [
@@ -805,35 +813,35 @@
     {
       "task_id": "YZXCONV-014",
       "source_row_number": 15,
-      "phase": "3-runtime",
+      "phase": "10-runtime-proof",
       "title": "Build install materialize and test the one-profile runtime",
       "owner_agent": "Runtime Verification Agent",
-      "goal": "Prove the complete source-to-profile-to-generated-runtime chain for yzx, Nu, RTK, Codex, Claude, envctl, Meta, Grit, ICM, Weave, and terminals.",
+      "goal": "Prove the complete source-to-profile-to-generated-runtime chain for yzx, the desktop launcher, Nu, RTK, Codex, Claude, envctl, Meta, Grit, ICM, Weave, and terminals.",
       "simulation_required": true,
       "execution_cell": "installed-runtime-cell",
-      "verification_gate": "Source package checks pass; one profile is selected; yzx doctor/inspect pass; generated Nu loads nu_shell and all command modules; Codex/Claude/envctl provenance is correct; Kitty/Ghostty contract passes.",
-      "rollback_plan": "Atomically reselect the prior profile generation and restore config projections from receipts; retain failure logs outside generated runtime.",
+      "verification_gate": "Source package checks pass; one profile is selected; the visible FlexNetOS Agent desktop entry launches /home/flexnetos/.nix-profile/bin/yzx with the profile layout override and no stale user-local shadow; yzx doctor/inspect pass; generated Nu loads nu_shell and all command modules; Codex config and RULES.md plus Claude/envctl provenance are correct; Kitty/Ghostty contract passes.",
+      "rollback_plan": "Atomically reselect the prior profile generation, restore config projections from receipts, and restore only the archived desktop entry if required; retain failure logs outside generated runtime.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-014.proof.json",
-      "next_action": "Run build proof before requesting the explicit profile/config cutover approval.",
+      "proof_uri": "proof_records/YZXCONV-014.proof.json",
+      "next_action": "Run build proof before requesting the explicit profile/config/desktop cutover approval.",
       "source_columns": {
         "task_id": "YZXCONV-014",
         "parent_id": "YZXCONV-003; YZXCONV-004; YZXCONV-005; YZXCONV-006; YZXCONV-007; YZXCONV-009; YZXCONV-010; YZXCONV-011; YZXCONV-012; YZXCONV-013",
-        "phase": "3-runtime",
+        "phase": "10-runtime-proof",
         "title": "Build install materialize and test the one-profile runtime",
         "owner_agent": "Runtime Verification Agent",
-        "goal": "Prove the complete source-to-profile-to-generated-runtime chain for yzx, Nu, RTK, Codex, Claude, envctl, Meta, Grit, ICM, Weave, and terminals.",
-        "inputs": "all prior task proofs; built foundation closure; approved cutover",
-        "target_artifacts": "installed runtime receipt; generated config checksums; doctor and command evidence",
-        "allowed_paths": "/home/flexnetos/.nix-profile*; /home/flexnetos/.config/yazelix/**; /home/flexnetos/.local/share/yazelix/**; /home/flexnetos/.codex/config.toml; /home/flexnetos/.claude/settings.json",
-        "blocked_paths": "auth and secret files; sessions and databases; manual generated-runtime edits; stale user-bin shadows",
+        "goal": "Prove the complete source-to-profile-to-generated-runtime chain for yzx, the desktop launcher, Nu, RTK, Codex, Claude, envctl, Meta, Grit, ICM, Weave, and terminals.",
+        "inputs": "all prior task proofs; built foundation closure; approved cutover; profile desktop entry and layout",
+        "target_artifacts": "installed runtime receipt; generated config checksums; desktop provenance and stale-shadow receipt; doctor and command evidence",
+        "allowed_paths": "/home/flexnetos/.nix-profile*; /home/flexnetos/.config/yazelix/**; /home/flexnetos/.local/share/yazelix/**; /home/flexnetos/.local/share/applications/**; /home/flexnetos/.codex/config.toml; /home/flexnetos/.codex/RULES.md; /home/flexnetos/.claude/settings.json",
+        "blocked_paths": "auth and secret files; sessions and databases; manual generated-runtime edits; stale user-bin shadows; retaining stale user-local desktop launchers as parallel control paths",
         "simulation_required": "TRUE",
         "execution_cell": "installed-runtime-cell",
-        "verification_gate": "Source package checks pass; one profile is selected; yzx doctor/inspect pass; generated Nu loads nu_shell and all command modules; Codex/Claude/envctl provenance is correct; Kitty/Ghostty contract passes.",
-        "rollback_plan": "Atomically reselect the prior profile generation and restore config projections from receipts; retain failure logs outside generated runtime.",
+        "verification_gate": "Source package checks pass; one profile is selected; the visible FlexNetOS Agent desktop entry launches /home/flexnetos/.nix-profile/bin/yzx with the profile layout override and no stale user-local shadow; yzx doctor/inspect pass; generated Nu loads nu_shell and all command modules; Codex config and RULES.md plus Claude/envctl provenance are correct; Kitty/Ghostty contract passes.",
+        "rollback_plan": "Atomically reselect the prior profile generation, restore config projections from receipts, and restore only the archived desktop entry if required; retain failure logs outside generated runtime.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-014.proof.json",
-        "next_action": "Run build proof before requesting the explicit profile/config cutover approval."
+        "proof_uri": "proof_records/YZXCONV-014.proof.json",
+        "next_action": "Run build proof before requesting the explicit profile/config/desktop cutover approval."
       },
       "parent_ids": [
         "YZXCONV-003",
@@ -850,31 +858,36 @@
       "inputs": [
         "all prior task proofs",
         "built foundation closure",
-        "approved cutover"
+        "approved cutover",
+        "profile desktop entry and layout"
       ],
       "target_artifacts": [
         "installed runtime receipt",
         "generated config checksums",
+        "desktop provenance and stale-shadow receipt",
         "doctor and command evidence"
       ],
       "allowed_paths": [
         "/home/flexnetos/.nix-profile*",
         "/home/flexnetos/.config/yazelix/**",
         "/home/flexnetos/.local/share/yazelix/**",
+        "/home/flexnetos/.local/share/applications/**",
         "/home/flexnetos/.codex/config.toml",
+        "/home/flexnetos/.codex/RULES.md",
         "/home/flexnetos/.claude/settings.json"
       ],
       "blocked_paths": [
         "auth and secret files",
         "sessions and databases",
         "manual generated-runtime edits",
-        "stale user-bin shadows"
+        "stale user-bin shadows",
+        "retaining stale user-local desktop launchers as parallel control paths"
       ]
     },
     {
       "task_id": "YZXCONV-015",
       "source_row_number": 16,
-      "phase": "4-closure",
+      "phase": "11-system-proof-release",
       "title": "Reindex verify and close the convergence graph",
       "owner_agent": "Independent Verification Agent",
       "goal": "Audit every explicit requirement against current source, installed runtime, fleet state, and independent peer state before declaring completion.",
@@ -883,12 +896,12 @@
       "verification_gate": "All 15 task gates have proof; four indexes are current; meta git status and gh open-PR inventory are reconciled; peer local statuses are clean or explicitly attributed; no requirement is missing or indirect.",
       "rollback_plan": "Reopen the first contradicted task and invalidate dependent proof records; do not paper over the contradiction in the final matrix.",
       "status": "draft",
-      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-015.proof.json",
+      "proof_uri": "proof_records/YZXCONV-015.proof.json",
       "next_action": "Execute only after YZXCONV-014 installed-runtime proof passes.",
       "source_columns": {
         "task_id": "YZXCONV-015",
         "parent_id": "YZXCONV-014",
-        "phase": "4-closure",
+        "phase": "11-system-proof-release",
         "title": "Reindex verify and close the convergence graph",
         "owner_agent": "Independent Verification Agent",
         "goal": "Audit every explicit requirement against current source, installed runtime, fleet state, and independent peer state before declaring completion.",
@@ -901,7 +914,7 @@
         "verification_gate": "All 15 task gates have proof; four indexes are current; meta git status and gh open-PR inventory are reconciled; peer local statuses are clean or explicitly attributed; no requirement is missing or indirect.",
         "rollback_plan": "Reopen the first contradicted task and invalidate dependent proof records; do not paper over the contradiction in the final matrix.",
         "status": "Draft",
-        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-015.proof.json",
+        "proof_uri": "proof_records/YZXCONV-015.proof.json",
         "next_action": "Execute only after YZXCONV-014 installed-runtime proof passes."
       },
       "parent_ids": [

@@ -550,6 +550,7 @@ export function buildNavigationArtifacts(options = {}) {
   );
   for (const absolutePath of allAbsoluteFiles) {
     const packagePath = slash(path.relative(pkgRoot, absolutePath));
+    if (path.posix.basename(packagePath) === ".gitkeep") continue;
     if (matchesAny(packagePath, source.excluded_paths)) {
       if (!selfExcludedOutputs.has(packagePath) && !isRuntimeArtifact(packagePath)) {
         excludedExisting.push(packagePath);

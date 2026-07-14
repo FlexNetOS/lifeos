@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/proof-ledger-record.schema.json",
+  "title": "OperationalProofLedgerRecord",
+  "description": "The append-only proof input consumed by merge-proof-records.py. Evidence payload fields are extensible, while lifecycle identity and invalidation fields are schema-enforced. This is deliberately versioned separately from the connected-MVP ProofRecord object in proof-record.schema.json.",
+  "type": "object",
+  "required": ["task_id", "status", "observed_at"],
+  "properties": {
+    "schema_version": { "const": "lifeos-planning-spine.proof-record.v0" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "observed_at": { "type": "string", "minLength": 1 },
+    "revision": {
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "proof_revision": {
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "verified_by": { "type": "string", "minLength": 1 },
+    "verified_at": { "type": "string", "minLength": 1 },
+    "restores_source_status": { "type": "string", "minLength": 1 },
+    "invalidation_reason": { "type": "string", "minLength": 1 },
+    "invalidates": {
+      "type": "object",
+      "required": ["revision", "proof_uri", "proof_sha256", "ledger_accepted", "ledger_sequence"],
+      "properties": {
+        "revision": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "proof_uri": { "type": "string", "minLength": 1 },
+        "proof_sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+        "ledger_accepted": { "type": "boolean" },
+        "ledger_sequence": { "type": ["integer", "null"], "minimum": 1 }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "invalidated" } },
+        "required": ["status"]
+      },
+      "then": {
+        "required": [
+          "revision",
+          "verified_by",
+          "verified_at",
+          "restores_source_status",
+          "invalidation_reason",
+          "invalidates"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

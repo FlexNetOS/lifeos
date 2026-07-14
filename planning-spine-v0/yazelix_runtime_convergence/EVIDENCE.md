@@ -85,6 +85,31 @@ Claude is likewise profile-owned, but `/home/flexnetos/.claude/settings.json`
 is a direct file. Neither direct active config currently has a proved editable
 source under `~/.config/yazelix`.
 
+The home instruction frontdoor declares
+`/home/flexnetos/.codex/RULES.md` as the durable authority for LifeOS,
+Planning Spine, task-graph, pipeline-integrity, Google planning, and GitHub
+protocol work. That file is currently absent. The convergence graph must
+therefore treat `RULES.md` like `config.toml`: a reviewed editable input is
+materialized through the Yazelix/envctl ownership chain into the real Codex
+runtime home. Directly hand-authoring the runtime projection would recreate the
+ownership ambiguity this plan is intended to remove.
+
+## Desktop launcher authority
+
+The active desktop source is not confined to `yazelix/shells/**`.
+`yazelix/packaging/flake_outputs.nix` currently:
+
+- builds `yzx-agent-workspace-launch` with `writeShellScriptBin`; and
+- emits the FlexNetOS Agent desktop entry through an `Exec=sh -lc ...` route.
+
+The required installed contract is the profile-owned
+`/home/flexnetos/.nix-profile/bin/yzx` plus the profile layout
+`/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl`.
+Any user-local desktop entry under `~/.local/share/applications` that shadows
+that profile entry is stale. These observations expand `YZXCONV-011` to the
+packaging source and `YZXCONV-014` to installed desktop provenance and
+stale-shadow cleanup.
+
 ## Nushell and RTK
 
 - `$nu.config-path` is

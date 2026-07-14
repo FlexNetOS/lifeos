@@ -42,6 +42,7 @@ describe("planning-spine agent navigation", () => {
       && Array.isArray(node.aliases)
       && Array.isArray(node.tags)
     ))).toBe(true);
+    expect(graph.nodes.some((node) => node.path?.endsWith("/.gitkeep"))).toBe(false);
 
     const wikiProjection = graph.nodes.find((node) => (
       node.path === "planning-spine-v0/task_tables/visuals/task_graph.wiki.md"
@@ -101,7 +102,7 @@ describe("planning-spine agent navigation", () => {
       (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`,
     );
 
-    expect(Object.keys(index.by_task_id)).toHaveLength(249);
+    expect(Object.keys(index.by_task_id)).toHaveLength(264);
     expect(Object.keys(index.by_work_order_id)).toEqual(expectedWorkOrderIds);
     expect(Object.keys(index.by_mandatory_capability_id)).toEqual(expectedCapabilityIds);
     expect(index.by_task_id["TASK-CDB000"]).toBeUndefined();
@@ -149,7 +150,7 @@ describe("planning-spine agent navigation", () => {
     }));
 
     expect(validation.counts).toMatchObject({
-      tasks: 249,
+      tasks: 264,
       imported_work_orders: 106,
       mandatory_migration_capabilities: 28,
     });

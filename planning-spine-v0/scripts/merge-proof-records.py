@@ -9,8 +9,12 @@ import json
 import re
 import sys
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
+
+from jsonschema import Draft202012Validator
+from jsonschema.exceptions import SchemaError
 
 from reproducible_time import utc_now
 
@@ -19,6 +23,7 @@ LEDGER_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.v0"
 REPORT_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.merge-report.v0"
 INVALIDATED_STATUS = "invalidated"
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+DEFAULT_PROOF_SCHEMA = Path(__file__).resolve().parent.parent / "schemas/proof-ledger-record.schema.json"
 
 
 class MergeError(Exception):
@@ -63,6 +68,29 @@ def load_json(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise MergeError(f"{path}: proof record must be a JSON object")
     return data
+
+
+@lru_cache(maxsize=None)
+def load_proof_validator(path: Path = DEFAULT_PROOF_SCHEMA) -> Draft202012Validator:
+    if not path.exists():
+        raise MergeError(f"operational proof schema does not exist: {path}")
+    schema = load_json(path)
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as error:
+        raise MergeError(f"{path}: invalid operational proof schema: {error.message}") from error
+    return Draft202012Validator(schema)
+
+
+def validate_proof_data(data: dict[str, Any], path: Path, schema_path: Path) -> None:
+    validator = load_proof_validator(schema_path)
+    errors = sorted(validator.iter_errors(data), key=lambda error: list(error.absolute_path))
+    if not errors:
+        return
+    error = errors[0]
+    location = ".".join(str(part) for part in error.absolute_path)
+    suffix = f" at {location}" if location else ""
+    raise MergeError(f"{path}: operational proof schema violation{suffix}: {error.message}")
 
 
 def revision_value(data: dict[str, Any], observed_at: str) -> str:
@@ -134,7 +162,9 @@ def invalidation_fields(
     )
 
 
-def load_proof_record(path: Path) -> ProofRecord:
+def load_proof_record(
+    path: Path, schema_path: Path = DEFAULT_PROOF_SCHEMA
+) -> ProofRecord:
     data = load_json(path)
     task_id = data.get("task_id")
     if not isinstance(task_id, str) or not task_id.strip():
@@ -164,6 +194,7 @@ def load_proof_record(path: Path) -> ProofRecord:
             invalidates,
         ) = invalidation_fields(data, path, revision)
 
+    validate_proof_data(data, path, schema_path)
     return ProofRecord(
         path=path,
         task_id=task_id.strip(),
@@ -274,12 +305,18 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def merge_records(proof_dir: Path, ledger_path: Path, report_path: Path, dry_run: bool) -> dict[str, Any]:
+def merge_records(
+    proof_dir: Path,
+    ledger_path: Path,
+    report_path: Path,
+    dry_run: bool,
+    schema_path: Path = DEFAULT_PROOF_SCHEMA,
+) -> dict[str, Any]:
     proof_paths = discover_proofs(proof_dir)
     if not proof_paths:
         raise MergeError(f"no proof records found in {proof_dir}")
 
-    records = [load_proof_record(path) for path in proof_paths]
+    records = [load_proof_record(path, schema_path) for path in proof_paths]
     check_input_duplicates(records)
     existing_entries, existing_index = load_ledger(ledger_path)
 
@@ -353,10 +390,22 @@ def main() -> int:
         help="Machine-readable merge report output path",
     )
     parser.add_argument("--dry-run", action="store_true", help="Validate and report without appending")
+    parser.add_argument(
+        "--proof-schema",
+        type=Path,
+        default=DEFAULT_PROOF_SCHEMA,
+        help="Operational proof-ledger input JSON Schema",
+    )
     args = parser.parse_args()
 
     try:
-        report = merge_records(args.proof_dir, args.ledger, args.report, args.dry_run)
+        report = merge_records(
+            args.proof_dir,
+            args.ledger,
+            args.report,
+            args.dry_run,
+            args.proof_schema,
+        )
     except MergeError as error:
         print(f"merge-proof-records: error: {error}", file=sys.stderr)
         return 1

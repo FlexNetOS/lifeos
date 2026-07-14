@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.dev/planning-spine/v0/schemas/task-graph-row.schema.json",
+  "title": "OperationalTaskGraphRow",
+  "description": "The normalized operational projection compiled from generated/task_graph.source.csv. This is deliberately versioned separately from the connected-MVP Task object in task.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "source_row_number",
+    "phase",
+    "title",
+    "owner_agent",
+    "goal",
+    "simulation_required",
+    "execution_cell",
+    "verification_gate",
+    "rollback_plan",
+    "status",
+    "proof_uri",
+    "next_action",
+    "source_columns",
+    "parent_ids",
+    "inputs",
+    "target_artifacts",
+    "allowed_paths",
+    "blocked_paths"
+  ],
+  "properties": {
+    "task_id": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*-[0-9]{3}$" },
+    "source_row_number": { "type": "integer", "minimum": 2 },
+    "phase": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "owner_agent": { "type": "string", "minLength": 1 },
+    "goal": { "type": "string", "minLength": 1 },
+    "simulation_required": { "type": "boolean" },
+    "execution_cell": { "type": "string", "minLength": 1 },
+    "verification_gate": { "type": "string", "minLength": 1 },
+    "rollback_plan": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+    "proof_uri": { "type": "string", "minLength": 1 },
+    "next_action": { "type": "string" },
+    "parent_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*-[0-9]{3}$" },
+      "uniqueItems": true
+    },
+    "inputs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "target_artifacts": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "blocked_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "source_columns": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "parent_id",
+        "phase",
+        "title",
+        "owner_agent",
+        "goal",
+        "inputs",
+        "target_artifacts",
+        "allowed_paths",
+        "blocked_paths",
+        "simulation_required",
+        "execution_cell",
+        "verification_gate",
+        "rollback_plan",
+        "status",
+        "proof_uri",
+        "next_action"
+      ],
+      "properties": {
+        "task_id": { "type": "string" },
+        "parent_id": { "type": "string" },
+        "phase": { "type": "string" },
+        "title": { "type": "string" },
+        "owner_agent": { "type": "string" },
+        "goal": { "type": "string" },
+        "inputs": { "type": "string" },
+        "target_artifacts": { "type": "string" },
+        "allowed_paths": { "type": "string" },
+        "blocked_paths": { "type": "string" },
+        "simulation_required": { "type": "string" },
+        "execution_cell": { "type": "string" },
+        "verification_gate": { "type": "string" },
+        "rollback_plan": { "type": "string" },
+        "status": { "type": "string" },
+        "proof_uri": { "type": "string" },
+        "next_action": { "type": "string" }
+      }
+    }
+  }
+}

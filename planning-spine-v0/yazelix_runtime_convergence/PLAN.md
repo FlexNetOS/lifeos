@@ -34,9 +34,9 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
 3. **Codex binary and state are not conflated.** The binary resolves from
    `/home/flexnetos/.nix-profile/toolbin/codex` into the same immutable
    foundation closure. Codex's real runtime/state home remains
-   `/home/flexnetos/.codex`. The active `config.toml` is materialized from a
-   reviewed Yazelix-owned editable input rather than maintained as an unrelated
-   handwritten authority.
+   `/home/flexnetos/.codex`. The active `config.toml` and durable
+   `RULES.md` are materialized from reviewed Yazelix-owned editable inputs
+   rather than maintained as unrelated handwritten authorities.
 4. **Claude mirrors the same model.** The Claude binary is profile-owned, its
    real runtime/state home remains `/home/flexnetos/.claude`, and active settings
    are materialized from the same reviewed Yazelix/envctl ownership chain.
@@ -46,7 +46,9 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
    `rtk-tokenkill` exposes and selects a documented `nu_shell` mode.
 6. **No orphan shell route.** Every retained Bash, POSIX `sh`, or Zsh launcher is
    either deleted as stale or represented by a native Nushell command/extern
-   with an explicit boundary test. No shell wrapper is an alternate owner.
+   with an explicit boundary test. This includes the profile-owned FlexNetOS
+   Agent desktop launcher and layout override. No shell wrapper is an alternate
+   owner.
 7. **Meta keeps dual mode.** `meta git` owns fleet Git inspection/coordination;
    `meta exec -- ...` owns arbitrary fleet fan-out. Each peer still supports
    its own local Git, issue tracker, tests, releases, and commits.
@@ -66,6 +68,9 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
 - Codex and Claude binaries are correctly profile-owned, but active config files
   are direct files under `~/.codex` and `~/.claude` with no proved Yazelix input
   lineage.
+- `/home/flexnetos/AGENTS.md` declares
+  `/home/flexnetos/.codex/RULES.md` as durable operating authority, but that
+  file is absent and has no proved editable-input/materialization chain.
 - Codex doctor proves its real runtime home is `~/.codex`, so moving state into a
   config tree would be incorrect; only config authorship/materialization moves.
 - Active standalone Nushell config is a symlink into
@@ -82,6 +87,10 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
 - Bash, POSIX, and Zsh launch surfaces remain in main Yazelix and Meta-installed
   wrappers. They need classification, migration, and executable proof rather
   than blanket deletion.
+- `yazelix/packaging/flake_outputs.nix` still packages
+  `yzx-agent-workspace-launch` as a shell script and emits a desktop
+  `Exec=sh -lc ...` route. The visible desktop contract therefore belongs in
+  the packaging and installed-runtime gates, not only under `yazelix/shells/**`.
 - Canonical and stale/worktree/runner flake copies coexist under `meta/src`.
   They must be classified through Meta inventory before any retirement.
 
@@ -121,6 +130,7 @@ proof and a clean, reviewable per-repo finish state.
 | `yazelix/nushell/config` | `YZXCONV-010`, `YZXCONV-011`, `YZXCONV-014` |
 | One Nix profile, not split profiles | `YZXCONV-003`, `YZXCONV-014` |
 | Codex and Claude configs in wrong place | `YZXCONV-004`, `YZXCONV-005` |
+| Durable Codex `RULES.md` authority and materialization | `YZXCONV-004`, `YZXCONV-014` |
 | Codex binary and real runtime home | `YZXCONV-004`, `YZXCONV-014` |
 | envctl/agent-env binary and Meta sync | `YZXCONV-006`, `YZXCONV-007` |
 | `meta git` / `meta exec` central control | `YZXCONV-008`, `YZXCONV-015` |
@@ -128,6 +138,7 @@ proof and a clean, reviewable per-repo finish state.
 | Codex not pointed at an old split profile | `YZXCONV-003`, `YZXCONV-004`, `YZXCONV-014` |
 | RTK TokenKill configured to `nu_shell` | `YZXCONV-009`, `YZXCONV-014` |
 | No unowned Bash/Zsh/old wrappers | `YZXCONV-011`, `YZXCONV-014` |
+| Profile desktop launcher/layout and stale desktop shadows | `YZXCONV-011`, `YZXCONV-014` |
 | Meta/Grit/ICM/Weave/old flakes have Nu surfaces | `YZXCONV-010`, `YZXCONV-012` |
 
 ## Completion rule

@@ -16,6 +16,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from jsonschema import Draft202012Validator
+from jsonschema.exceptions import SchemaError
+
 from reproducible_time import utc_now
 
 
@@ -23,6 +26,7 @@ RAW_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.raw.v0"
 NORMALIZED_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.normalized.v0"
 INDEX_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.index.v0"
 REPORT_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.normalize-report.v0"
+DEFAULT_TASK_SCHEMA = Path(__file__).resolve().parent.parent / "schemas/task-graph-row.schema.json"
 
 REQUIRED_COLUMNS = [
     "task_id",
@@ -89,6 +93,42 @@ class ValidationError(Exception):
     def __init__(self, issue: ValidationIssue):
         super().__init__(issue.message)
         self.issue = issue
+
+
+def load_task_validator(path: Path) -> Draft202012Validator:
+    if not path.exists():
+        raise ValidationError(ValidationIssue(f"operational task schema does not exist: {path}"))
+    try:
+        schema = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise ValidationError(
+            ValidationIssue(f"operational task schema is not valid JSON: {error}")
+        ) from error
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as error:
+        raise ValidationError(
+            ValidationIssue(f"operational task schema is invalid: {error.message}")
+        ) from error
+    return Draft202012Validator(schema)
+
+
+def validate_normalized_task(
+    task: dict[str, Any], validator: Draft202012Validator
+) -> None:
+    errors = sorted(validator.iter_errors(task), key=lambda error: list(error.absolute_path))
+    if not errors:
+        return
+    error = errors[0]
+    field = ".".join(str(part) for part in error.absolute_path) or None
+    raise ValidationError(
+        ValidationIssue(
+            f"operational task schema violation: {error.message}",
+            source_row_number=task.get("source_row_number"),
+            task_id=task.get("task_id"),
+            field=field,
+        )
+    )
 
 
 def load_raw(path: Path) -> dict[str, Any]:
@@ -327,10 +367,15 @@ def build_index(tasks: list[dict[str, Any]], generated_at: str, raw_path: Path) 
     }
 
 
-def normalize(raw_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+def normalize(
+    raw_path: Path, task_schema_path: Path = DEFAULT_TASK_SCHEMA
+) -> tuple[dict[str, Any], dict[str, Any]]:
     raw = load_raw(raw_path)
     generated_at = utc_now()
     tasks = [normalize_row(row) for row in raw["rows"]]
+    validator = load_task_validator(task_schema_path)
+    for task in tasks:
+        validate_normalized_task(task, validator)
     index = build_index(tasks, generated_at, raw_path)
 
     normalized = {
@@ -410,11 +455,17 @@ def main() -> int:
         default=Path("generated/task_graph.normalize_report.json"),
         help="Normalization report JSON output path",
     )
+    parser.add_argument(
+        "--task-schema",
+        type=Path,
+        default=DEFAULT_TASK_SCHEMA,
+        help="Operational normalized-task JSON Schema",
+    )
     args = parser.parse_args()
 
     report_generated_at = utc_now()
     try:
-        normalized, index = normalize(args.raw_json)
+        normalized, index = normalize(args.raw_json, args.task_schema)
     except ValidationError as error:
         report = make_report(args.raw_json, report_generated_at, "fail", 0, [error.issue])
         write_json(args.report, report)

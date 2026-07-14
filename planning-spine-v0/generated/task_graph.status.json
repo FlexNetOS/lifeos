@@ -123,7 +123,8 @@
     "NBVERIFY-001",
     "NBVERIFY-002",
     "NBVERIFY-003",
-    "NBVERIFY-004"
+    "NBVERIFY-004",
+    "YZXCONV-001"
   ],
   "draft_task_ids": [
     "LIFEOS-000",
@@ -249,11 +250,24 @@
     "SAFETY-002",
     "SAFETY-003",
     "DOCGOV-001",
-    "DOCGOV-002"
+    "DOCGOV-002",
+    "YZXCONV-003",
+    "YZXCONV-004",
+    "YZXCONV-005",
+    "YZXCONV-006",
+    "YZXCONV-007",
+    "YZXCONV-008",
+    "YZXCONV-009",
+    "YZXCONV-010",
+    "YZXCONV-011",
+    "YZXCONV-012",
+    "YZXCONV-013",
+    "YZXCONV-014",
+    "YZXCONV-015"
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-13T17:51:04Z",
+  "generated_at": "2026-07-14T00:05:38Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [
     "LIFEOS-000",
@@ -325,20 +339,22 @@
     "DECIDE-005",
     "DECIDE-006"
   ],
-  "ledger_entry_count": 323,
+  "ledger_entry_count": 326,
   "lifecycle_counts": {
     "blocked": 0,
-    "complete": 123,
-    "draft": 124,
-    "ready": 0,
+    "complete": 124,
+    "draft": 137,
+    "ready": 1,
     "rolled-back": 1,
     "running": 1,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "1fd8a11387d51daf78c1ea606dbd0f8dbfd467fe69d6aad4eb297da4e998fb50",
+  "proof_ledger_sha256": "c4783e160cffc53e511d91a89ab3b5e139136046986dbb42eb0cb1ac69900bdb",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
-  "ready_task_ids": [],
+  "ready_task_ids": [
+    "YZXCONV-002"
+  ],
   "result": "pass",
   "rolled_back_task_ids": [
     "LPS-025"
@@ -348,9 +364,9 @@
   ],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "b1c1ffa340bc01571a4df3e46ddcffb22cc4afc970544c8d794702520f7b001e",
+  "source_graph_sha256": "4d55107cab6d035b4b6a98eee0cbfa99381d8ef8299ff50be428b3f50c74554d",
   "source_graph_uri": "generated/task_graph.normalized.json",
-  "task_count": 249,
+  "task_count": 264,
   "tasks": [
     {
       "effective": {
@@ -5147,10 +5163,10 @@
       "phase": "1-schema",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": 323,
-        "observed_at": "2026-07-13T17:51:04Z",
-        "revision": "4",
-        "sha256": "bf4a3d41889e25576c95a869a861c4791f9dc481448f8685b8e6f1cfaa3c87ea",
+        "ledger_line_number": 325,
+        "observed_at": "2026-07-14T00:05:38Z",
+        "revision": "5",
+        "sha256": "0c32ce4fc6187f75ffa3342b54ec4a55fdc1cea15b61df265d07f17fa966260a",
         "status": "pass"
       },
       "source": {
@@ -5295,10 +5311,10 @@
       "phase": "3-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": 240,
-        "observed_at": "2026-07-13T04:46:25Z",
-        "revision": "6",
-        "sha256": "b0bb90c21990607363a81994967d0f0311e0f0bdfebe58d0f126860bfdf7de08",
+        "ledger_line_number": 326,
+        "observed_at": "2026-07-14T00:05:38Z",
+        "revision": "7",
+        "sha256": "499276b72f6af96e8cd09c070ab68568421aa4c27d26ce811396d53612112d83",
         "status": "pass"
       },
       "source": {
@@ -10106,6 +10122,481 @@
       "title": "OSS contribution + CLA/DCO governance",
       "updated_fields": [],
       "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Proof accepted from proof_records/YZXCONV-001.proof.json; next child task: YZXCONV-002.",
+        "proof_uri": "proof_records/YZXCONV-001.proof.json",
+        "status": "complete"
+      },
+      "lifecycle_state": "complete",
+      "parent_ids": [
+        "LPS-003"
+      ],
+      "phase": "0-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": 324,
+        "observed_at": "2026-07-14T00:05:38Z",
+        "revision": "1",
+        "sha256": "a8358ef13d1a284935e80dfcda76c0d386024e68590d543f94e604adfead1a15",
+        "status": "pass"
+      },
+      "source": {
+        "next_action": "Ratify the target ownership contract in YZXCONV-002.",
+        "proof_uri": "proof_records/YZXCONV-001.proof.json",
+        "status": "complete"
+      },
+      "source_row_number": 251,
+      "task_id": "YZXCONV-001",
+      "title": "Index and query all four Yazelix repositories",
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Ratify the target ownership contract in YZXCONV-002.",
+          "to": "Proof accepted from proof_records/YZXCONV-001.proof.json; next child task: YZXCONV-002."
+        }
+      }
+    },
+    {
+      "effective": {
+        "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule.",
+        "proof_uri": "proof_records/YZXCONV-002.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "YZXCONV-001"
+      ],
+      "phase": "1-schema",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule.",
+        "proof_uri": "proof_records/YZXCONV-002.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 252,
+      "task_id": "YZXCONV-002",
+      "title": "Ratify one source-to-runtime ownership contract",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Finish source package contracts, build without profile mutation, then request approval for cutover.",
+        "proof_uri": "proof_records/YZXCONV-003.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-002"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Finish source package contracts, build without profile mutation, then request approval for cutover.",
+        "proof_uri": "proof_records/YZXCONV-003.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 253,
+      "task_id": "YZXCONV-003",
+      "title": "Converge to one active Nix/Yazelix profile closure",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Implement the approved config and RULES materializer after YZXCONV-003 source proof.",
+        "proof_uri": "proof_records/YZXCONV-004.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Implement the approved config and RULES materializer after YZXCONV-003 source proof.",
+        "proof_uri": "proof_records/YZXCONV-004.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 254,
+      "task_id": "YZXCONV-004",
+      "title": "Converge Codex config authorship while preserving its real runtime home",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Implement beside YZXCONV-004 so both runtimes consume one ownership contract.",
+        "proof_uri": "proof_records/YZXCONV-005.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Implement beside YZXCONV-004 so both runtimes consume one ownership contract.",
+        "proof_uri": "proof_records/YZXCONV-005.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 255,
+      "task_id": "YZXCONV-005",
+      "title": "Converge Claude settings authorship through the Yazelix/envctl chain",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Build envctl from its clean worktree and consume the proven artifact in Yazelix.",
+        "proof_uri": "proof_records/YZXCONV-006.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Build envctl from its clean worktree and consume the proven artifact in Yazelix.",
+        "proof_uri": "proof_records/YZXCONV-006.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 256,
+      "task_id": "YZXCONV-006",
+      "title": "Package the native envctl agent-env binary in the single profile",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Implement the active Meta GitKB task as a reviewed fleet transaction.",
+        "proof_uri": "proof_records/YZXCONV-007.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-006",
+        "YZXCONV-008"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Implement the active Meta GitKB task as a reviewed fleet transaction.",
+        "proof_uri": "proof_records/YZXCONV-007.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 257,
+      "task_id": "YZXCONV-007",
+      "title": "Add preview-first Meta fleet agent-env policy and sync",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Land the dual-mode contract before fleet sync implementation.",
+        "proof_uri": "proof_records/YZXCONV-008.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-002"
+      ],
+      "phase": "2-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Land the dual-mode contract before fleet sync implementation.",
+        "proof_uri": "proof_records/YZXCONV-008.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 258,
+      "task_id": "YZXCONV-008",
+      "title": "Codify Meta central control and independent peer mode",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Design the rtk config schema in its independent repo, publish it, then pin it in Yazelix.",
+        "proof_uri": "proof_records/YZXCONV-009.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "phase": "3-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Design the rtk config schema in its independent repo, publish it, then pin it in Yazelix.",
+        "proof_uri": "proof_records/YZXCONV-009.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 259,
+      "task_id": "YZXCONV-009",
+      "title": "Implement and select RTK TokenKill nu_shell mode",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Revise the staged wrapper module rather than layering a second command catalog.",
+        "proof_uri": "proof_records/YZXCONV-010.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-006",
+        "YZXCONV-008",
+        "YZXCONV-009"
+      ],
+      "phase": "3-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Revise the staged wrapper module rather than layering a second command catalog.",
+        "proof_uri": "proof_records/YZXCONV-010.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 260,
+      "task_id": "YZXCONV-010",
+      "title": "Complete the Yazelix native Nushell command catalog",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Create the inventory from Meta canonical repos, including packaging/flake_outputs.nix, while excluding caches and runner workdirs.",
+        "proof_uri": "proof_records/YZXCONV-011.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-010"
+      ],
+      "phase": "3-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Create the inventory from Meta canonical repos, including packaging/flake_outputs.nix, while excluding caches and runner workdirs.",
+        "proof_uri": "proof_records/YZXCONV-011.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 261,
+      "task_id": "YZXCONV-011",
+      "title": "Retire or explicitly bridge every legacy Bash POSIX and Zsh route",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Separate canonical peer flakes from worktree, runner, and vendored copies before editing.",
+        "proof_uri": "proof_records/YZXCONV-012.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-008",
+        "YZXCONV-010"
+      ],
+      "phase": "3-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Separate canonical peer flakes from worktree, runner, and vendored copies before editing.",
+        "proof_uri": "proof_records/YZXCONV-012.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 262,
+      "task_id": "YZXCONV-012",
+      "title": "Add Nu surfaces for Meta Grit ICM Weave and canonicalize old flakes",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Implement child changes first only where a task proves they are necessary.",
+        "proof_uri": "proof_records/YZXCONV-013.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-008"
+      ],
+      "phase": "11-fleet-integration",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Implement child changes first only where a task proves they are necessary.",
+        "proof_uri": "proof_records/YZXCONV-013.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 263,
+      "task_id": "YZXCONV-013",
+      "title": "Verify and pin the four-repository ownership transaction",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Run build proof before requesting the explicit profile/config/desktop cutover approval.",
+        "proof_uri": "proof_records/YZXCONV-014.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-003",
+        "YZXCONV-004",
+        "YZXCONV-005",
+        "YZXCONV-006",
+        "YZXCONV-007",
+        "YZXCONV-009",
+        "YZXCONV-010",
+        "YZXCONV-011",
+        "YZXCONV-012",
+        "YZXCONV-013"
+      ],
+      "phase": "10-runtime-proof",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Run build proof before requesting the explicit profile/config/desktop cutover approval.",
+        "proof_uri": "proof_records/YZXCONV-014.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 264,
+      "task_id": "YZXCONV-014",
+      "title": "Build install materialize and test the one-profile runtime",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Execute only after YZXCONV-014 installed-runtime proof passes.",
+        "proof_uri": "proof_records/YZXCONV-015.proof.json",
+        "status": "draft"
+      },
+      "lifecycle_state": "draft",
+      "parent_ids": [
+        "YZXCONV-014"
+      ],
+      "phase": "11-system-proof-release",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Execute only after YZXCONV-014 installed-runtime proof passes.",
+        "proof_uri": "proof_records/YZXCONV-015.proof.json",
+        "status": "draft"
+      },
+      "source_row_number": 265,
+      "task_id": "YZXCONV-015",
+      "title": "Reindex verify and close the convergence graph",
+      "updated_fields": [],
+      "updates": {}
     }
   ],
   "update_policy": {
@@ -10245,7 +10736,6 @@
     "NBSOURCE-003",
     "NBSOURCE-004",
     "NBSOURCE-005",
-    "NBSOURCE-006",
     "NORTHSTAR-001",
     "NORTHSTAR-002",
     "GRAPH-002",
@@ -10308,6 +10798,7 @@
     "DECIDE-003",
     "DECIDE-004",
     "DECIDE-005",
-    "DECIDE-006"
+    "DECIDE-006",
+    "YZXCONV-001"
   ]
 }

@@ -42,6 +42,17 @@ POST_CORRECTION_ENTRIES = [
     (313, "LPS-008", "5", "pass"),
     (314, "LPS-009", "4", "pass"),
     (315, "LPS-011", "5", "pass"),
+    (316, "LPS-000", "7", "pass"),
+    (317, "LPS-031", "1", "pass"),
+    (318, "LPS-032", "1", "pass"),
+    (319, "LPS-033", "1", "pass"),
+    (320, "LPS-034", "1", "pass"),
+    (321, "LPS-035", "1", "pass"),
+    (322, "LPS-036", "1", "pass"),
+    (323, "LPS-003", "4", "pass"),
+    (324, "YZXCONV-001", "1", "pass"),
+    (325, "LPS-003", "5", "pass"),
+    (326, "LPS-007", "7", "pass"),
 ]
 POST_CORRECTION_LEDGER_COUNT = len(POST_CORRECTION_ENTRIES)
 FINAL_LEDGER_COUNT = CORRECTION_END_LEDGER_COUNT + POST_CORRECTION_LEDGER_COUNT
@@ -362,13 +373,13 @@ class IntegratedCorrectionCorpusTests(unittest.TestCase):
         self.assertEqual(
             projection["lifecycle_counts"],
             {
-                "draft": 77,
                 "blocked": 0,
-                "ready": 0,
-                "simulated": 0,
-                "running": 1,
-                "complete": 117,
+                "complete": 124,
+                "draft": 137,
+                "ready": 1,
                 "rolled-back": 1,
+                "running": 1,
+                "simulated": 0,
             },
         )
         self.assertEqual(len(projection["invalidated_task_ids"]), CORRECTION_COUNT)

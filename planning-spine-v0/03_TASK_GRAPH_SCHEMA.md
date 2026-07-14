@@ -16,6 +16,21 @@ Every `Task` must include:
 
 These are mandatory in both the JSON Schema and any real instance.
 
+## Versioned Task Projections
+
+The connected MVP object and the operational graph row are intentionally
+separate, explicit contracts:
+
+- `schemas/task.schema.json` defines the relationship-rich `Task` used by the
+  connected MVP bundle (`id`, `goal_id`, `owner_agent_id`, and object links).
+- `schemas/task-graph-row.schema.json` defines the normalized operational row
+  compiled from `generated/task_graph.source.csv` (`task_id`, `parent_ids`,
+  source provenance, execution scope, and lifecycle fields).
+
+`scripts/normalize-task-graph.py` validates every emitted row against the
+operational schema. Consumers must select the schema for their boundary; they
+must not treat either shape as an unversioned substitute for the other.
+
 ## Task Lifecycle
 
 | Status | Meaning |

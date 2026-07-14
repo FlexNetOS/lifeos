@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-14T00:05:38Z",
+  "generated_at": "2026-07-14T01:37:59Z",
   "source": {
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 15,
+    "row_count": 20,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -53,7 +53,7 @@
       "source_row_number": 3,
       "columns": {
         "task_id": "YZXCONV-002",
-        "parent_id": "YZXCONV-001",
+        "parent_id": "YZXCONV-001; YZXCONV-020",
         "phase": "1-schema",
         "title": "Ratify one source-to-runtime ownership contract",
         "owner_agent": "Runtime Architecture Owner",
@@ -68,7 +68,7 @@
         "rollback_plan": "Revert the decision document and keep all current runtime selectors unchanged.",
         "status": "Ready",
         "proof_uri": "proof_records/YZXCONV-002.proof.json",
-        "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule."
+        "next_action": "Wait for the owner-authorized reconciliation and verification task YZXCONV-020."
       }
     },
     {
@@ -350,11 +350,121 @@
         "blocked_paths": "new implementation mutation; unapproved push; deletion of unrelated dirty work; completion with missing proof",
         "simulation_required": "FALSE",
         "execution_cell": "closure-audit-cell",
-        "verification_gate": "All 15 task gates have proof; four indexes are current; meta git status and gh open-PR inventory are reconciled; peer local statuses are clean or explicitly attributed; no requirement is missing or indirect.",
+        "verification_gate": "All YZXCONV task gates have proof; four indexes are current; meta git status and gh open-PR inventory are reconciled; peer local statuses are clean or explicitly attributed; no requirement is missing or indirect.",
         "rollback_plan": "Reopen the first contradicted task and invalidate dependent proof records; do not paper over the contradiction in the final matrix.",
         "status": "Draft",
         "proof_uri": "proof_records/YZXCONV-015.proof.json",
         "next_action": "Execute only after YZXCONV-014 installed-runtime proof passes."
+      }
+    },
+    {
+      "source_row_number": 17,
+      "columns": {
+        "task_id": "YZXCONV-016",
+        "parent_id": "LPS-003",
+        "phase": "0-foundation",
+        "title": "Land PR #41 from the owner-approved head without follow-up edits",
+        "owner_agent": "LifeOS Integration Agent",
+        "goal": "Preserve the owner-approved PR #41 head byte-for-byte as the merge input; conflict settlement, package restoration, schema repair, task additions, and runtime work must remain separate follow-up tasks and commits.",
+        "inputs": "owner-approved PR #41 head SHA; PR base SHA; GitHub merge metadata; pre-merge branch receipt",
+        "target_artifacts": "as-is merge receipt; approved-head tree comparison; follow-up handoff",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/.git/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "PR branch content rewrite; conflict resolution folded into the PR head; package or canonical graph edits; runtime/profile mutation; unrelated branch cleanup",
+        "simulation_required": "TRUE",
+        "execution_cell": "pr41-as-is-landing-cell",
+        "verification_gate": "The landed merge names the owner-approved PR #41 head, its merged tree is byte-identical to that approved head contribution, and every later reconciliation appears only in dependent tasks and commits.",
+        "rollback_plan": "Revert the merge as one unit without rewriting the approved PR head or mixing follow-up work into the rollback.",
+        "status": "Ready",
+        "proof_uri": "proof_records/YZXCONV-016.proof.json",
+        "next_action": "Capture all conflicts and saved repository state in YZXCONV-017 without applying or disposing of them."
+      }
+    },
+    {
+      "source_row_number": 18,
+      "columns": {
+        "task_id": "YZXCONV-017",
+        "parent_id": "YZXCONV-016",
+        "phase": "0-foundation",
+        "title": "Inventory conflicts stashes and worktrees without disposition",
+        "owner_agent": "Repository State Archivist",
+        "goal": "Record every conflict entry and every saved stash, worktree, branch, and untracked-package object as unresolved owned evidence; do not label it stale, unnecessary, superseded, or safe to delete without an explicit owner decision.",
+        "inputs": "unmerged index stages; stash commit and parents; worktree and branch inventory; untracked package object IDs",
+        "target_artifacts": "immutable reconciliation inventory; ownership and uncertainty fields; owner-decision queue",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "stash apply/pop/drop; worktree remove/prune; branch deletion; reset/checkout; conflict resolution; package mutation; inferred stale or unneeded disposition",
+        "simulation_required": "FALSE",
+        "execution_cell": "saved-state-evidence-cell",
+        "verification_gate": "All 44 conflict paths include exact stage/blob provenance; every stash parent, worktree, branch, and untracked package object is recorded; zero saved state is applied, removed, renamed, or dispositioned; every unresolved item names the owner decision required.",
+        "rollback_plan": "Revert only the authored inventory; preserve every Git object, ref, worktree, and saved file exactly as found.",
+        "status": "Ready",
+        "proof_uri": "proof_records/YZXCONV-017.proof.json",
+        "next_action": "Review task and proof compatibility in YZXCONV-018 using the preserved inventory."
+      }
+    },
+    {
+      "source_row_number": 19,
+      "columns": {
+        "task_id": "YZXCONV-018",
+        "parent_id": "YZXCONV-017",
+        "phase": "1-schema",
+        "title": "Review the focused package against canonical task and proof contracts",
+        "owner_agent": "Planning Spine Contract Reviewer",
+        "goal": "Produce a compatibility and integration plan for the focused task graph and proof package without mutating the canonical graph or append-only ledger.",
+        "inputs": "PR #41 task package; preserved package object; canonical task schemas; proof schemas; canonical graph; proof ledger",
+        "target_artifacts": "task-row compatibility report; proof-shape report; ID parent phase and sequence mapping; deterministic integration plan",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "canonical task graph mutation; canonical proof ledger append; proof rewriting; product source mutation; runtime/profile mutation",
+        "simulation_required": "FALSE",
+        "execution_cell": "task-proof-compatibility-cell",
+        "verification_gate": "Every focused row and proof is classified against the correct versioned contract; task IDs, parents, phases, collisions, proof revisions, ledger sequence, and hash impact are forecast; canonical graph and ledger bytes remain unchanged.",
+        "rollback_plan": "Remove only the review report and leave the focused package, canonical graph, and ledger unchanged.",
+        "status": "Ready",
+        "proof_uri": "proof_records/YZXCONV-018.proof.json",
+        "next_action": "Present the complete review and proposed follow-up tasks for the owner decision in YZXCONV-019."
+      }
+    },
+    {
+      "source_row_number": 20,
+      "columns": {
+        "task_id": "YZXCONV-019",
+        "parent_id": "YZXCONV-001; YZXCONV-018",
+        "phase": "1-schema",
+        "title": "Require an explicit owner decision before any execution task",
+        "owner_agent": "Owner Review Gate",
+        "goal": "End the review after presenting findings and task additions; a review request does not authorize implementation, cleanup, verification loops, GitHub mutation, or execution of any downstream task.",
+        "inputs": "YZXCONV-001 evidence; YZXCONV-016 through YZXCONV-018 review receipts; reviewed task graph diff",
+        "target_artifacts": "approved or denied execution decision; exact authorized task IDs; frozen next action",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "product source; runtime/profile; Git refs or remotes; canonical graph or ledger mutation; cleanup or implementation inferred from review",
+        "simulation_required": "FALSE",
+        "execution_cell": "owner-review-boundary-cell",
+        "verification_gate": "The owner records approve or deny plus the exact authorized task IDs; without that record no downstream Ready task is eligible to execute and every Draft task remains Draft; the review stops without executing, fixing, cleaning, merging, pushing, or verifying those tasks.",
+        "rollback_plan": "Revoke only the decision receipt; all repository and runtime state remains untouched.",
+        "status": "Ready",
+        "proof_uri": "proof_records/YZXCONV-019.proof.json",
+        "next_action": "Stop and wait for the owner's next explicit instruction."
+      }
+    },
+    {
+      "source_row_number": 21,
+      "columns": {
+        "task_id": "YZXCONV-020",
+        "parent_id": "YZXCONV-017; YZXCONV-018; YZXCONV-019",
+        "phase": "1-schema",
+        "title": "Reconcile the preserved PR #41 package into the canonical planning spine",
+        "owner_agent": "Planning Spine Reconciliation Agent",
+        "goal": "Settle all 44 recorded conflicts to the owner-approved PR #41 side, restore the saved package without losing its Git objects, integrate its task rows and proof records into the canonical graph and append-only ledger, repair task/proof schema compatibility, preserve the desktop-launcher and RULES.md gaps as explicit task gates, and rerun the complete planning-spine verification set.",
+        "inputs": "YZXCONV-017 saved-state inventory; YZXCONV-018 compatibility review; YZXCONV-019 explicit owner decision; PR #45 merge metadata; preserved package object IDs; canonical task and proof schemas",
+        "target_artifacts": "conflict-resolution receipt; restored package manifest; canonical task/proof integration diff; schema compatibility report; desktop and RULES.md gate mapping; full verification report",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/.git/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/generated/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/schemas/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/navigation/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/test_schema_compatibility.py; /home/flexnetos/meta/src/lifeos/planning-spine-v0/test_proof_corrections.py; /home/flexnetos/meta/src/lifeos/tests/planning-spine-navigation.spec.js",
+        "blocked_paths": "product or runtime implementation; profile mutation; generated Yazelix runtime edits; stash drop; saved-object deletion; unrelated branch or worktree cleanup; fabricated proof; execution without YZXCONV-019 owner authorization",
+        "simulation_required": "TRUE",
+        "execution_cell": "planning-reconciliation-cell",
+        "verification_gate": "Every recorded conflict selects the owner-approved PR #41 content; the saved package is restored by recorded object identity without dropping or deleting saved state; focused rows equal their canonical rows; every integrated proof validates and preserves ledger revision/hash continuity; task/proof compatibility tests pass; desktop and RULES.md gaps remain explicit gates; planning-spine verification, navigation validation, and diff checks all pass with no unrelated mutation.",
+        "rollback_plan": "Revert the reconciliation commit as one unit while preserving the merged PR, every saved Git object, and the pre-integration ledger; never rewrite accepted proof history.",
+        "status": "Ready",
+        "proof_uri": "proof_records/YZXCONV-020.proof.json",
+        "next_action": "Execute only after the owner explicitly authorizes YZXCONV-020; task creation and review do not authorize execution."
       }
     }
   ]

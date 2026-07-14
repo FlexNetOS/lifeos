@@ -96,6 +96,27 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
 
 ## Execution waves
 
+### Review prerequisite — land, preserve, assess, and stop
+
+`YZXCONV-016` lands the owner-approved PR #41 head without folding follow-up
+work into it. `YZXCONV-017` inventories conflicts and every saved repository
+state without applying, deleting, or assigning a stale/unneeded disposition.
+`YZXCONV-018` reviews task/proof compatibility and proposes integration without
+changing the canonical graph or ledger. `YZXCONV-019` ends the review and waits
+for an explicit owner decision naming the exact tasks authorized to run.
+
+No execution wave begins from a review request. The tasks are Ready, while
+their dependency edges keep execution ordered behind `YZXCONV-019`; the owner
+decision is a graph dependency rather than a prose convention.
+
+### Authorized reconciliation bridge
+
+`YZXCONV-020` is the exact Ready task for the requested reconciliation: settle
+the 44 recorded conflicts to the PR #41 side, restore the saved package,
+integrate canonical task/proof records, repair schema compatibility, preserve
+the desktop and `RULES.md` gaps as explicit gates, and rerun verification. It
+may execute only after `YZXCONV-019` records explicit owner authorization.
+
 ### Wave 0 — Freeze authority and evidence
 
 `YZXCONV-001` and `YZXCONV-002` preserve the graph baseline and ratify exact
@@ -126,6 +147,11 @@ proof and a clean, reviewable per-repo finish state.
 
 | Requested concern | Owning tasks |
 | --- | --- |
+| PR #41 lands from the owner-approved head without follow-up edits | `YZXCONV-016` |
+| Conflicts, stashes, worktrees, branches, and package objects are preserved pending owner disposition | `YZXCONV-017` |
+| Focused task/proof compatibility is reviewed before canonical integration | `YZXCONV-018` |
+| Review stops until the owner names authorized execution tasks | `YZXCONV-019`, `YZXCONV-002` |
+| Conflict settlement, saved-package restoration, canonical integration, schema repair, desktop/`RULES.md` gates, and verification | `YZXCONV-020` |
 | Code intelligence on all four Yazelix repos | `YZXCONV-001`, `YZXCONV-013`, `YZXCONV-015` |
 | `yazelix/nushell/config` | `YZXCONV-010`, `YZXCONV-011`, `YZXCONV-014` |
 | One Nix profile, not split profiles | `YZXCONV-003`, `YZXCONV-014` |

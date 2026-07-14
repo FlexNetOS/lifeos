@@ -267,7 +267,7 @@
   ],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-14T00:05:38Z",
+  "generated_at": "2026-07-14T01:37:59Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [
     "LIFEOS-000",
@@ -344,7 +344,7 @@
     "blocked": 0,
     "complete": 124,
     "draft": 137,
-    "ready": 1,
+    "ready": 6,
     "rolled-back": 1,
     "running": 1,
     "simulated": 0
@@ -353,7 +353,12 @@
   "proof_ledger_sha256": "c4783e160cffc53e511d91a89ab3b5e139136046986dbb42eb0cb1ac69900bdb",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
-    "YZXCONV-002"
+    "YZXCONV-002",
+    "YZXCONV-016",
+    "YZXCONV-017",
+    "YZXCONV-018",
+    "YZXCONV-019",
+    "YZXCONV-020"
   ],
   "result": "pass",
   "rolled_back_task_ids": [
@@ -364,9 +369,9 @@
   ],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "4d55107cab6d035b4b6a98eee0cbfa99381d8ef8299ff50be428b3f50c74554d",
+  "source_graph_sha256": "9a38fb628dab26ba4f751d4e7e2a474de07ef27bccfcb3923492c7d7fcf20e05",
   "source_graph_uri": "generated/task_graph.normalized.json",
-  "task_count": 264,
+  "task_count": 269,
   "tasks": [
     {
       "effective": {
@@ -10162,13 +10167,14 @@
     },
     {
       "effective": {
-        "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule.",
+        "next_action": "Wait for the owner-authorized reconciliation and verification task YZXCONV-020.",
         "proof_uri": "proof_records/YZXCONV-002.proof.json",
         "status": "ready"
       },
       "lifecycle_state": "ready",
       "parent_ids": [
-        "YZXCONV-001"
+        "YZXCONV-001",
+        "YZXCONV-020"
       ],
       "phase": "1-schema",
       "proof": {
@@ -10180,7 +10186,7 @@
         "status": null
       },
       "source": {
-        "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule.",
+        "next_action": "Wait for the owner-authorized reconciliation and verification task YZXCONV-020.",
         "proof_uri": "proof_records/YZXCONV-002.proof.json",
         "status": "ready"
       },
@@ -10595,6 +10601,159 @@
       "source_row_number": 265,
       "task_id": "YZXCONV-015",
       "title": "Reindex verify and close the convergence graph",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Capture all conflicts and saved repository state in YZXCONV-017 without applying or disposing of them.",
+        "proof_uri": "proof_records/YZXCONV-016.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "LPS-003"
+      ],
+      "phase": "0-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Capture all conflicts and saved repository state in YZXCONV-017 without applying or disposing of them.",
+        "proof_uri": "proof_records/YZXCONV-016.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 266,
+      "task_id": "YZXCONV-016",
+      "title": "Land PR #41 from the owner-approved head without follow-up edits",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Review task and proof compatibility in YZXCONV-018 using the preserved inventory.",
+        "proof_uri": "proof_records/YZXCONV-017.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "YZXCONV-016"
+      ],
+      "phase": "0-foundation",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Review task and proof compatibility in YZXCONV-018 using the preserved inventory.",
+        "proof_uri": "proof_records/YZXCONV-017.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 267,
+      "task_id": "YZXCONV-017",
+      "title": "Inventory conflicts stashes and worktrees without disposition",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Present the complete review and proposed follow-up tasks for the owner decision in YZXCONV-019.",
+        "proof_uri": "proof_records/YZXCONV-018.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "YZXCONV-017"
+      ],
+      "phase": "1-schema",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Present the complete review and proposed follow-up tasks for the owner decision in YZXCONV-019.",
+        "proof_uri": "proof_records/YZXCONV-018.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 268,
+      "task_id": "YZXCONV-018",
+      "title": "Review the focused package against canonical task and proof contracts",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Stop and wait for the owner's next explicit instruction.",
+        "proof_uri": "proof_records/YZXCONV-019.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "YZXCONV-001",
+        "YZXCONV-018"
+      ],
+      "phase": "1-schema",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Stop and wait for the owner's next explicit instruction.",
+        "proof_uri": "proof_records/YZXCONV-019.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 269,
+      "task_id": "YZXCONV-019",
+      "title": "Require an explicit owner decision before any execution task",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Execute only after the owner explicitly authorizes YZXCONV-020; task creation and review do not authorize execution.",
+        "proof_uri": "proof_records/YZXCONV-020.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "YZXCONV-017",
+        "YZXCONV-018",
+        "YZXCONV-019"
+      ],
+      "phase": "1-schema",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Execute only after the owner explicitly authorizes YZXCONV-020; task creation and review do not authorize execution.",
+        "proof_uri": "proof_records/YZXCONV-020.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 270,
+      "task_id": "YZXCONV-020",
+      "title": "Reconcile the preserved PR #41 package into the canonical planning spine",
       "updated_fields": [],
       "updates": {}
     }

@@ -153,3 +153,36 @@ other peer repositories. Grit, ICM, and Weave have no first-party `.nu` command
 module in their current repository roots; main Yazelix's staged module covers
 only `meta`. The task graph therefore requires classification before retirement
 and native Nu command/extern coverage before any shell route is removed.
+
+## Task review findings
+
+The PR #41 task package describes itself as planning and proof material only,
+but its original dependency graph moved directly from the completed
+code-intelligence baseline into ownership ratification and runtime execution.
+It did not encode four boundaries required to keep review separate from work:
+
+1. the owner-approved PR head must land without conflict settlement or later
+   task work being folded into that head;
+2. conflicts, stashes, worktrees, branches, and untracked-package objects must
+   remain unresolved evidence until the owner decides their disposition;
+3. focused task rows and proof records must be reviewed against the canonical
+   versioned contracts before any canonical graph or ledger mutation; and
+4. review must terminate at an explicit owner decision that names the exact
+   tasks authorized to execute.
+
+`YZXCONV-016` through `YZXCONV-019` now encode those boundaries. They are Ready
+tasks, not proof that any merge, reconciliation, integration, cleanup, repair,
+or runtime work occurred. `YZXCONV-002` depends on the owner review gate so the
+execution graph cannot advance merely because a review was requested.
+
+Review then found that those four boundary tasks still did not encode the
+requested reconciliation work itself. `YZXCONV-020` is the missing Ready task.
+It owns the exact conflict settlement, saved-package restoration, canonical
+task/proof integration, schema compatibility, desktop and `RULES.md` gates,
+and verification scope. `YZXCONV-002` now depends on `YZXCONV-020`, so none of
+the runtime execution graph advances from task creation or review alone.
+
+The review also caught an unrelated lifecycle promotion in the pending edit:
+`YZXCONV-003` and `YZXCONV-008` had been changed from Draft to Ready without an
+owner decision. Their original Draft statuses are preserved. Only the newly
+created review and reconciliation tasks are Ready.

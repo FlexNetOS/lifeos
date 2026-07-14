@@ -19,7 +19,7 @@ generations.
   code-intelligence baseline in the canonical append-only ledger; later proof
   records are intentionally absent until their tasks run.
 
-The canonical graph is authoritative. Verification compares its 15 YZXCONV
+The canonical graph is authoritative. Verification compares its 20 YZXCONV
 rows field-for-field with this focused projection, validates both graph outputs
 against `../schemas/task-graph-row.schema.json`, and confirms the completed
 baseline proof is present in the canonical ledger.
@@ -40,9 +40,12 @@ python3 scripts/normalize-task-graph.py \
 ```
 
 The focused index intentionally reports `LPS-003` as an external parent.
-That parent resolves in the canonical graph, where all 15 YZXCONV rows are
+That parent resolves in the canonical graph, where all 20 YZXCONV rows are
 rooted in the Planning Spine and covered by the normal lifecycle projection.
 
 The package is complete as a plan when normalization passes and every explicit
 request maps to at least one task and one verification gate. Runtime convergence
-is complete only after `YZXCONV-015` has a passing proof record.
+is complete only after `YZXCONV-015` has a passing proof record. Review is
+complete only when `YZXCONV-019` records the owner's decision. The exact
+reconciliation work is the Ready task `YZXCONV-020`; review alone never
+authorizes its execution.

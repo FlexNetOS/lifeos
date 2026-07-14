@@ -19,7 +19,6 @@ LEDGER_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.v0"
 ALLOWED_UPDATED_FIELDS = {"status", "proof_uri", "next_action"}
 PASSING_PROOF_STATUSES = {"complete", "pass", "passed"}
 ROLLBACK_LEDGER_STATUSES = {"fail", "failed", "rolled-back", "rolled_back", "rollback", "reject", "rejected"}
-INVALIDATING_PROOF_STATUSES = {"invalidated"}
 # Canonical lifecycle states, ordered from non-executable to terminal.
 LIFECYCLE_STATES = ("draft", "blocked", "ready", "simulated", "running", "complete", "rolled-back")
 # Only a genuinely ready task is executable; draft/blocked/running/rolled-back are not.
@@ -157,9 +156,8 @@ def lifecycle_state(source_status: str, ledger_entry: dict[str, Any] | None) -> 
 
     Proof is authoritative: a passing ledger entry projects Complete; a failing or
     rolled-back ledger entry reopens the task as rolled-back (08_EXECUTION_GATES rule 5).
-    An explicit invalidated correction falls back to the non-complete source lifecycle;
-    absent a ledger entry, the source status also governs. A task is executable-ready
-    only when it projects exactly ``ready``.
+    Absent a ledger entry, the source status governs. A task is executable-ready only
+    when it projects exactly ``ready``.
     """
     if ledger_entry is not None:
         ledger_status = str(ledger_entry.get("status", "")).strip().lower()
@@ -167,9 +165,6 @@ def lifecycle_state(source_status: str, ledger_entry: dict[str, Any] | None) -> 
             return "complete"
         if ledger_status in ROLLBACK_LEDGER_STATUSES:
             return "rolled-back"
-        if ledger_status in INVALIDATING_PROOF_STATUSES:
-            normalized = str(source_status).strip().lower()
-            return SOURCE_STATUS_LIFECYCLE.get(normalized, normalized or "unknown")
     normalized = str(source_status).strip().lower()
     return SOURCE_STATUS_LIFECYCLE.get(normalized, normalized or "unknown")
 
@@ -200,7 +195,6 @@ def status_projection(
     updated_task_ids: list[str] = []
     complete_task_ids: list[str] = []
     ready_task_ids: list[str] = []
-    invalidated_task_ids: list[str] = []
     lifecycle_buckets: dict[str, list[str]] = {state: [] for state in LIFECYCLE_STATES}
 
     for task in tasks:
@@ -325,7 +319,6 @@ def status_projection(
         "updated_task_ids": updated_task_ids,
         "complete_task_ids": complete_task_ids,
         "ready_task_ids": ready_task_ids,
-        "invalidated_task_ids": invalidated_task_ids,
         "next_ready_task_id": ready_task_ids[0] if (ready_task_ids and coverage_gate_open) else None,
         "lifecycle_counts": {state: len(lifecycle_buckets.get(state, [])) for state in LIFECYCLE_STATES},
         "draft_task_ids": lifecycle_buckets.get("draft", []),

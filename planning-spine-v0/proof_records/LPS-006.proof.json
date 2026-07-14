@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.proof-record.v0",
   "task_id": "LPS-006",
-  "observed_at": "2026-07-13T06:23:45Z",
-  "revision": 6,
+  "observed_at": "2026-07-13T14:48:35Z",
+  "revision": 1,
   "status": "pass",
   "verification_gate": "Cell schema and example validate; mutation, network, snapshot, rollback, and promotion boundaries are explicit and proven.",
   "gate_result": {
@@ -14,7 +14,7 @@
     "rollback_field_present_in_cell": true,
     "missing_enumerated_boundaries": []
   },
-  "proof_summary": "Cell schema and example validate; allowed/blocked mutation paths, proof-gated promotion, network-denied-by-default behavior, a required pre-execution snapshot, and rollback are explicit. Every enumerated LPS-006 boundary holds.",
+  "proof_summary": "Cell schema and example validate; mutation boundaries (allowed_paths/blocked_paths) and a promotion gate (verification_gate 'proof gate must pass before success') are explicit. However the LPS-006 gate also requires explicit network-denied-by-default, snapshot, and rollback boundaries, and none of these are represented in the cell schema, the cell example, or 05_HERMETIC_CELL_CONTRACT.md. Gate does not fully hold.",
   "artifact_paths": [
     "planning-spine-v0/05_HERMETIC_CELL_CONTRACT.md",
     "planning-spine-v0/examples/cell.json",
@@ -23,7 +23,7 @@
   "checksums": {
     "05_HERMETIC_CELL_CONTRACT.md": "f0cc3f05fde803e9ccd8ea27ced237f9c87fcad602746f76866d031272e7512b",
     "cell.json": "6140568aeb718e848de2a4af4e70dc662de6fc765ad896a00d04fefe19a8e741",
-    "cell.schema.json": "a384d2e374068a349bb586b8e8f94095f18e60927e3d3d6355c0804053b5e1c6"
+    "cell.schema.json": "386701b4ca9deb7244a8096afd52b86f5d48e99856ce7df1123722964aa04bf6"
   },
   "live_commands": [
     {

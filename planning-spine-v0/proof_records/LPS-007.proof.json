@@ -1,19 +1,20 @@
 {
   "schema_version": "lifeos-planning-spine.proof-record.v0",
   "task_id": "LPS-007",
-  "observed_at": "2026-07-13T04:46:25Z",
-  "revision": 6,
+  "observed_at": "2026-07-13T14:48:35Z",
+  "revision": 1,
   "status": "pass",
   "verification_gate": "Proof schema validates; executor and verifier authority are distinct; append-only lineage, checksums, rollback points, and failed checks are preserved.",
   "gate_result": {
     "proof_record_schema_validates": true,
     "result_enum_supports_failed_checks": true,
+    "ledger_entry_count": 240,
     "append_only_sequence_monotonic": true,
     "every_entry_checksum_backed": true,
     "executor_verifier_distinct": true,
     "authority_integrity_report_result": "pass"
   },
-  "proof_summary": "Proof-record schema validates with result enum {pass,fail} preserving failed checks. The append-only ledger is monotonically sequenced and SHA-256-backed, and the shipped authority integrity report (result=pass) proves the verifier agent (agent.verifier) is distinct from the executor (agent.executor) \u2014 proof, not assertion, is the sole completion authority.",
+  "proof_summary": "Proof-record schema validates with result enum {pass,fail} preserving failed checks. The append-only ledger has 240 monotonically sequenced, SHA-256-backed entries, and the shipped authority integrity report (result=pass) proves the verifier agent (agent.verifier) is distinct from the executor (agent.executor) \u2014 proof, not assertion, is the sole completion authority.",
   "artifact_paths": [
     "planning-spine-v0/06_PROOF_LEDGER.md",
     "planning-spine-v0/schemas/proof-record.schema.json",

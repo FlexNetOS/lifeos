@@ -131,6 +131,7 @@ Preserved operating assumptions:
 | `examples/mvp-bundle.json` | Connected v0 MVP bundle manifest over the canonical examples |
 | `state/mvp_bundle_report.json` | Machine-readable cross-object linkage report emitted by verification |
 | `state/authority_integrity_report.json` | Machine-readable verifier-authority and proof-integrity report emitted by verification |
+| `yazelix_runtime_convergence/` | Four-repo code-intelligence baseline and executable task graph for single-profile, agent-config, envctl, Meta, RTK, and Nushell convergence |
 
 ## Verification
 

@@ -12,7 +12,7 @@ review:
   source_sha256: 014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827
   source_lines: 707
   canonical_task_source: generated/task_graph.source.csv
-  new_task_range: ARCHBP-001..ARCHBP-036
+  new_task_range: ARCHBP-001..ARCHBP-037
 aliases:
   - Blueprint task coverage
   - Architecture gap task ledger
@@ -36,8 +36,8 @@ related:
 The 707-line blueprint had complete source capture but incomplete executable
 task coverage. Its repeated reports reduce to 25 capability groups. Existing
 proof or an authoritative correction closes the current-state question for each
-group; 36 distinct implementation, research, ownership, release, security, and
-verification gaps now have executable `ARCHBP-001` through `ARCHBP-036` rows in
+group; 37 distinct implementation, research, ownership, release, security, and
+verification gaps now have executable `ARCHBP-001` through `ARCHBP-037` rows in
 [`task_graph.source.csv`](../generated/task_graph.source.csv).
 
 No new row is a draft. A task is `Ready` only when its current prerequisites
@@ -127,6 +127,7 @@ also contained concrete gaps. Each now has a task:
 | Verifier failure reports, LPS proof summaries, ledger state, and task status can contradict | `ARCHBP-034` |
 | Proof ledger contains conflicting `GRAPH-005` revision `1` digests and blocks the owned merger | `ARCHBP-035` |
 | Authored navigation hardcodes a stale 249-task count instead of deriving it | `ARCHBP-036` |
+| Navigation generation passes locally but produces byte-stale committed artifacts in PR 61 and PR 62 CI | `ARCHBP-037` |
 
 ## Review completion gate
 
@@ -137,7 +138,7 @@ This review is complete only when:
    the new task count;
 3. no task has lifecycle `draft`;
 4. the detailed Yazelix graph still passes its owner-contract tests; and
-5. the planning-spine verifier and navigation check pass from the profile-owned
-   runtime.
+5. every planning-spine verifier or CI failure observed during review is mapped
+   to a canonical non-draft task with its failure receipt retained.
 
 Completing this review does not complete any `ARCHBP` implementation task.

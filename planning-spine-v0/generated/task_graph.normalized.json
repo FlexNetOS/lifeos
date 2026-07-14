@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T07:08:12Z",
+  "generated_at": "2026-07-14T07:17:15Z",
   "source_graph_uri": "generated/task_graph.raw.json",
-  "task_count": 232,
+  "task_count": 233,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T07:08:12Z",
+    "generated_at": "2026-07-14T07:17:11Z",
     "format": "csv",
     "path": "generated/task_graph.source.csv",
-    "row_count": 232,
+    "row_count": 233,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -14065,6 +14065,74 @@
         "manual count bump as sole fix",
         "generated navigation hand edits",
         "accepting count drift",
+        "secrets/**"
+      ]
+    },
+    {
+      "task_id": "ARCHBP-037",
+      "source_row_number": 234,
+      "phase": "13-foundation-gap-closure",
+      "title": "Make navigation generation byte-deterministic across local and CI environments",
+      "owner_agent": "Planning Spine Navigation Agent / QA Agent",
+      "goal": "Use TDD to reproduce and eliminate the local-pass versus CI-stale navigation artifact mismatch so write mode, check mode, and the byte-for-byte regression test use one deterministic clock and environment contract.",
+      "simulation_required": true,
+      "execution_cell": "navigation-determinism-cell",
+      "verification_gate": "A red test reproduces the PR 61 and PR 62 CI failure while the same source passes locally; generation in distinct timezone, path, clock, and commit-time fixtures is byte-identical; write followed by check passes; a real source change still produces detectable drift; CI and local receipts agree.",
+      "rollback_plan": "Restore the prior generator and test, retain the failing cross-environment fixture and CI receipts, and keep navigation publication blocked until byte determinism is restored.",
+      "status": "blocked",
+      "proof_uri": "proof_records/ARCHBP-037.proof.json",
+      "next_action": "Write the failing CI/local parity, clock, timezone, path, repeated-run, and genuine-source-change tests before changing the generator.",
+      "source_columns": {
+        "task_id": "ARCHBP-037",
+        "parent_id": "ARCHBP-033; ARCHBP-036",
+        "phase": "13-foundation-gap-closure",
+        "title": "Make navigation generation byte-deterministic across local and CI environments",
+        "owner_agent": "Planning Spine Navigation Agent / QA Agent",
+        "goal": "Use TDD to reproduce and eliminate the local-pass versus CI-stale navigation artifact mismatch so write mode, check mode, and the byte-for-byte regression test use one deterministic clock and environment contract.",
+        "inputs": "ARCHBP-033; ARCHBP-036; PR 61 and PR 62 CI receipts; build-navigation-index.mjs; planning-spine-navigation.spec.js; SOURCE_DATE_EPOCH and reproducible-build policy",
+        "target_artifacts": "deterministic navigation timestamp contract; cross-environment regression fixtures; repeated-generation receipt; CI/local parity proof; ARCHBP-037 proof",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs; /home/flexnetos/meta/src/lifeos/tests/planning-spine-navigation.spec.js; /home/flexnetos/meta/src/lifeos/.github/workflows/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/navigation/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**",
+        "blocked_paths": "hand-editing generated navigation; relaxing or deleting the byte-drift check; wall-clock-dependent committed bytes; environment-specific golden files; unrelated implementation; secrets/**",
+        "simulation_required": "TRUE",
+        "execution_cell": "navigation-determinism-cell",
+        "verification_gate": "A red test reproduces the PR 61 and PR 62 CI failure while the same source passes locally; generation in distinct timezone, path, clock, and commit-time fixtures is byte-identical; write followed by check passes; a real source change still produces detectable drift; CI and local receipts agree.",
+        "rollback_plan": "Restore the prior generator and test, retain the failing cross-environment fixture and CI receipts, and keep navigation publication blocked until byte determinism is restored.",
+        "status": "Blocked",
+        "proof_uri": "proof_records/ARCHBP-037.proof.json",
+        "next_action": "Write the failing CI/local parity, clock, timezone, path, repeated-run, and genuine-source-change tests before changing the generator."
+      },
+      "parent_ids": [
+        "ARCHBP-033",
+        "ARCHBP-036"
+      ],
+      "inputs": [
+        "ARCHBP-033",
+        "ARCHBP-036",
+        "PR 61 and PR 62 CI receipts",
+        "build-navigation-index.mjs",
+        "planning-spine-navigation.spec.js",
+        "SOURCE_DATE_EPOCH and reproducible-build policy"
+      ],
+      "target_artifacts": [
+        "deterministic navigation timestamp contract",
+        "cross-environment regression fixtures",
+        "repeated-generation receipt",
+        "CI/local parity proof",
+        "ARCHBP-037 proof"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/build-navigation-index.mjs",
+        "/home/flexnetos/meta/src/lifeos/tests/planning-spine-navigation.spec.js",
+        "/home/flexnetos/meta/src/lifeos/.github/workflows/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/navigation/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/proof_records/**"
+      ],
+      "blocked_paths": [
+        "hand-editing generated navigation",
+        "relaxing or deleting the byte-drift check",
+        "wall-clock-dependent committed bytes",
+        "environment-specific golden files",
+        "unrelated implementation",
         "secrets/**"
       ]
     }

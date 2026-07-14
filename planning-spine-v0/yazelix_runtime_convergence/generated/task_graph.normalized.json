@@ -1,14 +1,14 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T19:14:40Z",
+  "generated_at": "2026-07-14T19:33:57Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 38,
+  "task_count": 40,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T19:14:40Z",
+    "generated_at": "2026-07-14T19:33:57Z",
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
-    "row_count": 38,
+    "row_count": 40,
     "empty_rows_skipped": [],
     "required_columns": [
       "task_id",
@@ -1199,7 +1199,7 @@
       "next_action": "Execute only after YZXCONV-019, YZXCONV-021, and YZXCONV-022 have current proof.",
       "source_columns": {
         "task_id": "YZXCONV-020",
-        "parent_id": "YZXCONV-014; YZXCONV-015; YZXCONV-016; YZXCONV-017; YZXCONV-018; YZXCONV-019; YZXCONV-021; YZXCONV-022",
+        "parent_id": "YZXCONV-014; YZXCONV-015; YZXCONV-016; YZXCONV-017; YZXCONV-018; YZXCONV-019; YZXCONV-021; YZXCONV-022; YZXCONV-039; YZXCONV-040",
         "phase": "5-final-closure",
         "title": "Prove the enforced owner contract and close the fleet",
         "owner_agent": "Independent Owner-Contract Verifier",
@@ -1224,7 +1224,9 @@
         "YZXCONV-018",
         "YZXCONV-019",
         "YZXCONV-021",
-        "YZXCONV-022"
+        "YZXCONV-022",
+        "YZXCONV-039",
+        "YZXCONV-040"
       ],
       "inputs": [
         "all YZXCONV proofs",
@@ -2372,6 +2374,158 @@
         "committing model weights into the repo or the nix store",
         "global installs",
         "applying the npm-latest rule to the framework crate",
+        "agent auth or state mutation"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-039",
+      "source_row_number": 40,
+      "phase": "3-profile",
+      "title": "Hard-gate the single nix-profile with failing flake plus live-box checks (close the un-enforced single-owner rule)",
+      "owner_agent": "Yazelix Packaging Agent / Runtime Verification Agent",
+      "goal": "The single-nix-profile rule (PLAN.md clause 1 and 14) is CONVERGED (YZXCONV-003/006/014/022) and audited (YZXCONV-020) but NOT hard-gated by a failing check the way Kache (YZXCONV-016) and Nushell (YZXCONV-017) are, so a live violation is never caught. Deep yazelix review 2026-07-14 proved two gaps: (1) the one derivation-level foundation gate flexnetos_foundation_contracts (flake.nix, asserts exactly one .desktop, no shadow launcher, all runtime paths under ~/.nix-profile) is NEVER built by CI (ci.yml and version_gate.yml omit it; nix flake check --no-build only evaluates, never realizes it), and (2) EVERY check validates the derivation, never the LIVE BOX - nothing runs nix profile list, nothing scans PATH or ~/.local or ~/.cargo or /usr or npm-global for shadow installs, nothing verifies the resolved binary comes from ~/.nix-profile. Close both, red-first per the 016/017 idiom: (A) wire .#checks.x86_64-linux.flexnetos_foundation_contracts and contracts into the ci.yml build list so the one-desktop/no-shadow/profile-path assertions FAIL a PR; (B) add a new derivation flake check single_profile_closure (closureInfo over lifeos_foundation_yzx) asserting the foundation owns the union of yzx plus every flexnetosExecutables key with exactly one yzx and nothing resolving to a non-foundation store path; (C) add a live-box gate nushell/system/profile_guard.nu wired like host_policy.nu into the yazelix_host_policy service that FAILS when nix profile list is not exactly the one foundation profile, when any fixed-set binary resolves outside ~/.nix-profile, when ~/.nix-profile/bin is not PATH-first, or when a second terminal .desktop exists; (D) reuse the repo fakeYazelix and fakeYazelixDesktop negative fixtures to prove the gate itself FAILS on a two-desktop or shadow-binary tree. No profile mutation to force green.",
+      "simulation_required": true,
+      "execution_cell": "yazelix-single-profile-gate-cell",
+      "verification_gate": "Red tests first FAIL when a second nix profile generation exists, when nix profile list is not exactly the one lifeos_foundation_yzx (or Home-Manager-activated) profile, when any interactive-catalog binary (yzx, nu, mars, cargo, rustc, claude, codex, envctl, rtk, meta, grit, icm, weave) resolves outside ~/.nix-profile, when ~/.nix-profile/bin is not first on PATH, or when a second terminal .desktop exists; flexnetos_foundation_contracts and contracts are in the ci.yml build list and FAIL a PR on a shadow launcher or off-profile path; single_profile_closure proves the foundation closure owns the union of yzx plus every flexnetosExecutables key with exactly one yzx and no non-foundation store path; the fakeYazelix and fakeYazelixDesktop negative fixtures make the gate itself FAIL; all pass idempotently with no profile mutation.",
+      "rollback_plan": "Revert the ci.yml additions, the single_profile_closure check, and profile_guard.nu; keep the prior profile generation selected; never add a profile element or shadow path to force green.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-039.proof.json",
+      "next_action": "Write the negative fixtures (second profile, off-profile binary, shadow launcher) as red tests, wire flexnetos_foundation_contracts plus contracts into ci.yml, then add single_profile_closure and profile_guard.nu under owner approval.",
+      "source_columns": {
+        "task_id": "YZXCONV-039",
+        "parent_id": "YZXCONV-003; YZXCONV-014; YZXCONV-022",
+        "phase": "3-profile",
+        "title": "Hard-gate the single nix-profile with failing flake plus live-box checks (close the un-enforced single-owner rule)",
+        "owner_agent": "Yazelix Packaging Agent / Runtime Verification Agent",
+        "goal": "The single-nix-profile rule (PLAN.md clause 1 and 14) is CONVERGED (YZXCONV-003/006/014/022) and audited (YZXCONV-020) but NOT hard-gated by a failing check the way Kache (YZXCONV-016) and Nushell (YZXCONV-017) are, so a live violation is never caught. Deep yazelix review 2026-07-14 proved two gaps: (1) the one derivation-level foundation gate flexnetos_foundation_contracts (flake.nix, asserts exactly one .desktop, no shadow launcher, all runtime paths under ~/.nix-profile) is NEVER built by CI (ci.yml and version_gate.yml omit it; nix flake check --no-build only evaluates, never realizes it), and (2) EVERY check validates the derivation, never the LIVE BOX - nothing runs nix profile list, nothing scans PATH or ~/.local or ~/.cargo or /usr or npm-global for shadow installs, nothing verifies the resolved binary comes from ~/.nix-profile. Close both, red-first per the 016/017 idiom: (A) wire .#checks.x86_64-linux.flexnetos_foundation_contracts and contracts into the ci.yml build list so the one-desktop/no-shadow/profile-path assertions FAIL a PR; (B) add a new derivation flake check single_profile_closure (closureInfo over lifeos_foundation_yzx) asserting the foundation owns the union of yzx plus every flexnetosExecutables key with exactly one yzx and nothing resolving to a non-foundation store path; (C) add a live-box gate nushell/system/profile_guard.nu wired like host_policy.nu into the yazelix_host_policy service that FAILS when nix profile list is not exactly the one foundation profile, when any fixed-set binary resolves outside ~/.nix-profile, when ~/.nix-profile/bin is not PATH-first, or when a second terminal .desktop exists; (D) reuse the repo fakeYazelix and fakeYazelixDesktop negative fixtures to prove the gate itself FAILS on a two-desktop or shadow-binary tree. No profile mutation to force green.",
+        "inputs": "deep yazelix single-profile review 2026-07-14 (flake.nix:932-960 four installable roots, 1236-1364 flexnetos_foundation_contracts, 1203-1231 runtime_contracts, 977-995 fakeYazelix fixtures; ci.yml:45-53; version_gate.yml:50-54; runtime/yzx/doctor.rs; nushell/system/host_policy.nu); PLAN.md clause 1 and 14; the YZXCONV-016 and YZXCONV-017 red-gate idiom; YZXCONV-003/014/022 convergence receipts",
+        "target_artifacts": "ci.yml build-list additions (flexnetos_foundation_contracts plus contracts); a new flake check checks.x86_64-linux.single_profile_closure; a new nushell/system/profile_guard.nu with a check verb wired into yazelix_host_policy; a negative-fixture regression proof; a red-then-green flake-check receipt",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/flake.nix; /home/flexnetos/meta/src/yazelix/.github/workflows/**; /home/flexnetos/meta/src/yazelix/nushell/system/**; /home/flexnetos/meta/src/yazelix/checks/**; /home/flexnetos/meta/src/yazelix/tests/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "adding a second profile element or shadow path to force a green check; deleting profile generations; hand edits under ~/.local/share/yazelix; global or user-local installs; mutating the live profile before the check passes; agent auth or state mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "yazelix-single-profile-gate-cell",
+        "verification_gate": "Red tests first FAIL when a second nix profile generation exists, when nix profile list is not exactly the one lifeos_foundation_yzx (or Home-Manager-activated) profile, when any interactive-catalog binary (yzx, nu, mars, cargo, rustc, claude, codex, envctl, rtk, meta, grit, icm, weave) resolves outside ~/.nix-profile, when ~/.nix-profile/bin is not first on PATH, or when a second terminal .desktop exists; flexnetos_foundation_contracts and contracts are in the ci.yml build list and FAIL a PR on a shadow launcher or off-profile path; single_profile_closure proves the foundation closure owns the union of yzx plus every flexnetosExecutables key with exactly one yzx and no non-foundation store path; the fakeYazelix and fakeYazelixDesktop negative fixtures make the gate itself FAIL; all pass idempotently with no profile mutation.",
+        "rollback_plan": "Revert the ci.yml additions, the single_profile_closure check, and profile_guard.nu; keep the prior profile generation selected; never add a profile element or shadow path to force green.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-039.proof.json",
+        "next_action": "Write the negative fixtures (second profile, off-profile binary, shadow launcher) as red tests, wire flexnetos_foundation_contracts plus contracts into ci.yml, then add single_profile_closure and profile_guard.nu under owner approval."
+      },
+      "parent_ids": [
+        "YZXCONV-003",
+        "YZXCONV-014",
+        "YZXCONV-022"
+      ],
+      "inputs": [
+        "deep yazelix single-profile review 2026-07-14 (flake.nix:932-960 four installable roots",
+        "1236-1364 flexnetos_foundation_contracts",
+        "1203-1231 runtime_contracts",
+        "977-995 fakeYazelix fixtures",
+        "ci.yml:45-53",
+        "version_gate.yml:50-54",
+        "runtime/yzx/doctor.rs",
+        "nushell/system/host_policy.nu)",
+        "PLAN.md clause 1 and 14",
+        "the YZXCONV-016 and YZXCONV-017 red-gate idiom",
+        "YZXCONV-003/014/022 convergence receipts"
+      ],
+      "target_artifacts": [
+        "ci.yml build-list additions (flexnetos_foundation_contracts plus contracts)",
+        "a new flake check checks.x86_64-linux.single_profile_closure",
+        "a new nushell/system/profile_guard.nu with a check verb wired into yazelix_host_policy",
+        "a negative-fixture regression proof",
+        "a red-then-green flake-check receipt"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/flake.nix",
+        "/home/flexnetos/meta/src/yazelix/.github/workflows/**",
+        "/home/flexnetos/meta/src/yazelix/nushell/system/**",
+        "/home/flexnetos/meta/src/yazelix/checks/**",
+        "/home/flexnetos/meta/src/yazelix/tests/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
+      ],
+      "blocked_paths": [
+        "adding a second profile element or shadow path to force a green check",
+        "deleting profile generations",
+        "hand edits under ~/.local/share/yazelix",
+        "global or user-local installs",
+        "mutating the live profile before the check passes",
+        "agent auth or state mutation"
+      ]
+    },
+    {
+      "task_id": "YZXCONV-040",
+      "source_row_number": 41,
+      "phase": "3-profile",
+      "title": "Prove Mars (the withMars GUI terminal, the current default path) is baked INTO the one closure, never a second surface",
+      "owner_agent": "Yazelix Packaging Agent / Runtime Verification Agent",
+      "goal": "Mars is the owner current interactive default (built in, the easy path) yet had ZERO task coverage. The deep review confirmed withMars is a bake-in toggle (the marsPackage store path is baked as a string into the single yzx derivation, flake.nix:528-529), NOT a second package set, and both the yazelix and lifeos_foundation_yzx roots are withMars=true so Mars lives inside the one closure - but nothing ASSERTS it, and the generic yazelix root ships a second share/applications/yzx.desktop launcher (flake.nix:1070-1071), exactly the clause-14 launcher-shadow risk. Prove, red-first: marsPackage IS present in the lifeos_foundation_yzx closure (the positive dual of the runtime_contracts negative grep at flake.nix:1206), exactly one mars binary resolves under ~/.nix-profile, the only terminal .desktop is com.flexnetos.Yazelix.Agent.desktop with Exec pinned to ~/.nix-profile/bin/yzx launch (no generic share/applications/yzx.desktop on the foundation), and the shell Mars execs is the profile-owned ~/.nix-profile/toolbin/nu. This is a Mars-specific reinforcement of the YZXCONV-039 single_profile_closure gate.",
+      "simulation_required": true,
+      "execution_cell": "yazelix-mars-closure-cell",
+      "verification_gate": "Red tests first FAIL when marsPackage is absent from the lifeos_foundation_yzx closure, when a Mars binary resolves outside ~/.nix-profile, when more than one terminal .desktop exists or a generic share/applications/yzx.desktop is present on the foundation, or when the shell Mars execs is not ~/.nix-profile/toolbin/nu; Nix evaluation then proves marsPackage is in the one foundation closure (the positive dual of the runtime negative grep), command -v mars resolves under ~/.nix-profile, the only desktop is com.flexnetos.Yazelix.Agent.desktop with Exec equal to ~/.nix-profile/bin/yzx launch, and the Mars-spawned shell is profile-nu; a shadow-launcher negative fixture makes the gate FAIL.",
+      "rollback_plan": "Revert the Mars-in-closure assertions and any withMars source change; reselect the prior profile generation; never restore a stale Mars launcher or hand-edit Mars generated runtime.",
+      "status": "ready",
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-040.proof.json",
+      "next_action": "Add the Mars-absent and second-launcher red fixtures first, then assert marsPackage in the foundation closure and the single profile-pinned desktop under owner approval.",
+      "source_columns": {
+        "task_id": "YZXCONV-040",
+        "parent_id": "YZXCONV-003; YZXCONV-022; YZXCONV-039",
+        "phase": "3-profile",
+        "title": "Prove Mars (the withMars GUI terminal, the current default path) is baked INTO the one closure, never a second surface",
+        "owner_agent": "Yazelix Packaging Agent / Runtime Verification Agent",
+        "goal": "Mars is the owner current interactive default (built in, the easy path) yet had ZERO task coverage. The deep review confirmed withMars is a bake-in toggle (the marsPackage store path is baked as a string into the single yzx derivation, flake.nix:528-529), NOT a second package set, and both the yazelix and lifeos_foundation_yzx roots are withMars=true so Mars lives inside the one closure - but nothing ASSERTS it, and the generic yazelix root ships a second share/applications/yzx.desktop launcher (flake.nix:1070-1071), exactly the clause-14 launcher-shadow risk. Prove, red-first: marsPackage IS present in the lifeos_foundation_yzx closure (the positive dual of the runtime_contracts negative grep at flake.nix:1206), exactly one mars binary resolves under ~/.nix-profile, the only terminal .desktop is com.flexnetos.Yazelix.Agent.desktop with Exec pinned to ~/.nix-profile/bin/yzx launch (no generic share/applications/yzx.desktop on the foundation), and the shell Mars execs is the profile-owned ~/.nix-profile/toolbin/nu. This is a Mars-specific reinforcement of the YZXCONV-039 single_profile_closure gate.",
+        "inputs": "deep yazelix review 2026-07-14 (flake.nix:167 mars input, 518-588 mkYzxCommand withMars, 528-529 marsPath bake, 644-655 yzxMarsConfig plus desktop, 660 and 921 withMars=true, 1206 runtime negative grep, 1070-1071 generic yzx.desktop, 1268-1278 foundation single-desktop assertions, 1357-1361 doctor mars ok); home-manager/module.nix withMars option; the yzx-config crate withMars fields; defaults/mars/config.toml; the YZXCONV-039 single_profile_closure gate",
+        "target_artifacts": "a Mars-in-closure assertion inside or beside single_profile_closure (marsPackage present in the foundation closure); a single-terminal-.desktop assertion; a Mars-spawned-shell equals profile-nu runtime assertion; a red-then-green receipt",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/flake.nix; /home/flexnetos/meta/src/yazelix/home-manager/**; /home/flexnetos/meta/src/yazelix/crates/yzx-config/**; /home/flexnetos/meta/src/yazelix/defaults/mars/**; /home/flexnetos/meta/src/yazelix/nushell/system/**; /home/flexnetos/meta/src/yazelix/tests/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "a second profile element or a user-local Mars launcher shadow; a global Mars install; installing the generic yazelix root alongside the foundation; hand edits under ~/.local/share/yazelix; mutating the profile before the test passes; agent auth or state mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "yazelix-mars-closure-cell",
+        "verification_gate": "Red tests first FAIL when marsPackage is absent from the lifeos_foundation_yzx closure, when a Mars binary resolves outside ~/.nix-profile, when more than one terminal .desktop exists or a generic share/applications/yzx.desktop is present on the foundation, or when the shell Mars execs is not ~/.nix-profile/toolbin/nu; Nix evaluation then proves marsPackage is in the one foundation closure (the positive dual of the runtime negative grep), command -v mars resolves under ~/.nix-profile, the only desktop is com.flexnetos.Yazelix.Agent.desktop with Exec equal to ~/.nix-profile/bin/yzx launch, and the Mars-spawned shell is profile-nu; a shadow-launcher negative fixture makes the gate FAIL.",
+        "rollback_plan": "Revert the Mars-in-closure assertions and any withMars source change; reselect the prior profile generation; never restore a stale Mars launcher or hand-edit Mars generated runtime.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-040.proof.json",
+        "next_action": "Add the Mars-absent and second-launcher red fixtures first, then assert marsPackage in the foundation closure and the single profile-pinned desktop under owner approval."
+      },
+      "parent_ids": [
+        "YZXCONV-003",
+        "YZXCONV-022",
+        "YZXCONV-039"
+      ],
+      "inputs": [
+        "deep yazelix review 2026-07-14 (flake.nix:167 mars input",
+        "518-588 mkYzxCommand withMars",
+        "528-529 marsPath bake",
+        "644-655 yzxMarsConfig plus desktop",
+        "660 and 921 withMars=true",
+        "1206 runtime negative grep",
+        "1070-1071 generic yzx.desktop",
+        "1268-1278 foundation single-desktop assertions",
+        "1357-1361 doctor mars ok)",
+        "home-manager/module.nix withMars option",
+        "the yzx-config crate withMars fields",
+        "defaults/mars/config.toml",
+        "the YZXCONV-039 single_profile_closure gate"
+      ],
+      "target_artifacts": [
+        "a Mars-in-closure assertion inside or beside single_profile_closure (marsPackage present in the foundation closure)",
+        "a single-terminal-.desktop assertion",
+        "a Mars-spawned-shell equals profile-nu runtime assertion",
+        "a red-then-green receipt"
+      ],
+      "allowed_paths": [
+        "/home/flexnetos/meta/src/yazelix/flake.nix",
+        "/home/flexnetos/meta/src/yazelix/home-manager/**",
+        "/home/flexnetos/meta/src/yazelix/crates/yzx-config/**",
+        "/home/flexnetos/meta/src/yazelix/defaults/mars/**",
+        "/home/flexnetos/meta/src/yazelix/nushell/system/**",
+        "/home/flexnetos/meta/src/yazelix/tests/**",
+        "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**"
+      ],
+      "blocked_paths": [
+        "a second profile element or a user-local Mars launcher shadow",
+        "a global Mars install",
+        "installing the generic yazelix root alongside the foundation",
+        "hand edits under ~/.local/share/yazelix",
+        "mutating the profile before the test passes",
         "agent auth or state mutation"
       ]
     }

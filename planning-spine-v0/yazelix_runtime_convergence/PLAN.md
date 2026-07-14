@@ -72,6 +72,14 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
     a cherry-pick—before merge. Existing `main`, `master`, and `develop` refs
     are synchronized with origin, then merged branches, worktrees, and stashes
     are purged only after their published receipts prove preservation.
+13. **Yazelix portability claims are artifact-proven.** Eligible Rust binaries
+    are tested against `x86_64-unknown-linux-musl`; GUI, Nix, native, and
+    glibc-only dependencies receive an explicit closure or bundle disposition.
+    Static or no-`/nix/store` claims are forbidden without executable proof.
+14. **Home Manager remains inside the one install owner.** It is consumed by
+    the same `lifeos_foundation_yzx` profile element, owns reviewed desktop and
+    layout projection, and may not create a second profile, generated-runtime
+    edit surface, or user-local launcher shadow.
 
 ## Current contradictions that drive the graph
 
@@ -108,6 +116,12 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
 - The fleet currently contains dirty worktrees, stashes, ahead/behind branches,
   missing upstreams, and open pull requests. Those are preserved work inputs,
   not disposable residue, until each has a published merge or owner disposition.
+- The architecture blueprint requires musl portability, but the current package
+  has no executable matrix separating eligible static Rust binaries from GUI,
+  Nix, native, or glibc-only dependencies and no proved fallback closure.
+- Home Manager appears only as an input to the broad profile-convergence task;
+  no dedicated test currently proves it is inside the one foundation element or
+  that its desktop projection cannot become a parallel owner.
 
 ## Execution waves
 
@@ -136,13 +150,17 @@ and installs one proven foundation closure, materializes generated runtime, and
 checks Codex/Claude/Nu/envctl/terminal behavior. `YZXCONV-015` reindexes all four
 repos, runs fleet and peer-local status checks, and closes only with complete
 proof and a clean, reviewable per-repo finish state.
+`YZXCONV-021` proves the eligible musl artifact set and an honest portable
+fallback for the non-musl closure. `YZXCONV-022` makes Home Manager and the
+desktop launch contract part of the same profile owner.
 
 ### Wave 4 — Enforce cache, shell, agent-env, and repository closure
 
 `YZXCONV-016` makes Kache the sole cache authority. `YZXCONV-017` makes
 profile-owned Nushell the sole agent shell and gives the owner exclusive
 control of any crash-only emergency fallback. `YZXCONV-018` encodes these tasks
-and gates in envctl agent-env. `YZXCONV-019` publishes, reviews, merges, syncs,
+and the musl/Home Manager gates in envctl agent-env. `YZXCONV-019` publishes,
+reviews, merges, syncs,
 and purges all worktree, stash, branch, and pull request state without
 cherry-picking. `YZXCONV-020` is the independent final closure gate.
 
@@ -167,6 +185,9 @@ cherry-picking. `YZXCONV-020` is the independent final closure gate.
 | Owner-contract tasks and gates are in agent-env | `YZXCONV-018`, `YZXCONV-020` |
 | Worktrees, stashes, branches, and pull requests are settled | `YZXCONV-019`, `YZXCONV-020` |
 | Existing origin/main/master/develop refs are synchronized | `YZXCONV-019`, `YZXCONV-020` |
+| Yazelix musl support and honest non-musl fallback | `YZXCONV-021`, `YZXCONV-020` |
+| Home Manager inside the one foundation owner | `YZXCONV-022`, `YZXCONV-020` |
+| Profile desktop entry and layout override have one owner | `YZXCONV-022`, `YZXCONV-020` |
 
 ## Completion rule
 

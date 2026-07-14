@@ -52,10 +52,14 @@ describe("Yazelix runtime owner contract", () => {
 
   it("adds active tasks for the complete owner-directed runtime contract", () => {
     expect(tasks.map(({ task_id: taskId }) => taskId)).toEqual(
-      Array.from({ length: 20 }, (_, index) => `YZXCONV-${String(index + 1).padStart(3, "0")}`),
+      Array.from({ length: 22 }, (_, index) => `YZXCONV-${String(index + 1).padStart(3, "0")}`),
     );
 
-    for (const taskId of ["YZXCONV-016", "YZXCONV-017", "YZXCONV-018", "YZXCONV-019", "YZXCONV-020"]) {
+    for (const task of tasks) {
+      expect(task.status.toLowerCase()).not.toBe("draft");
+    }
+
+    for (const taskId of ["YZXCONV-016", "YZXCONV-017", "YZXCONV-018", "YZXCONV-019", "YZXCONV-020", "YZXCONV-021", "YZXCONV-022"]) {
       expect(byId[taskId]).toBeDefined();
       expect(byId[taskId].status.toLowerCase()).not.toBe("draft");
       expect(byId[taskId].verification_gate).toBeTruthy();
@@ -72,6 +76,12 @@ describe("Yazelix runtime owner contract", () => {
     expect(`${byId["YZXCONV-019"].goal} ${byId["YZXCONV-019"].verification_gate}`).toMatch(/branch/i);
     expect(`${byId["YZXCONV-019"].goal} ${byId["YZXCONV-019"].verification_gate}`).toMatch(/pull request|PR/i);
     expect(byId["YZXCONV-020"].parent_id).toContain("YZXCONV-019");
+    expect(byId["YZXCONV-020"].parent_id).toContain("YZXCONV-021");
+    expect(byId["YZXCONV-020"].parent_id).toContain("YZXCONV-022");
+    expect(`${byId["YZXCONV-021"].title} ${byId["YZXCONV-021"].goal} ${byId["YZXCONV-021"].verification_gate}`).toMatch(/musl/i);
+    expect(`${byId["YZXCONV-021"].goal} ${byId["YZXCONV-021"].verification_gate}`).toMatch(/TDD|Red tests/i);
+    expect(`${byId["YZXCONV-022"].title} ${byId["YZXCONV-022"].goal} ${byId["YZXCONV-022"].verification_gate}`).toMatch(/Home Manager/i);
+    expect(`${byId["YZXCONV-022"].goal} ${byId["YZXCONV-022"].verification_gate}`).toMatch(/one.*profile|profile.*one/i);
   });
 
   it("makes YZXCONV-020 the only completion authority for this package", () => {
@@ -84,6 +94,10 @@ describe("Yazelix runtime owner contract", () => {
     expect(plan).toContain("worktree");
     expect(plan).toContain("stash");
     expect(plan).toContain("pull request");
+    expect(plan).toContain("musl");
+    expect(plan).toContain("Home Manager");
+    expect(plan).toContain("YZXCONV-021");
+    expect(plan).toContain("YZXCONV-022");
     expect(plan).toContain("YZXCONV-020");
   });
 

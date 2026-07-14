@@ -259,9 +259,12 @@ named in the north star but not yet wired in code. These populate `YZXCONV-036`.
   currently pins **`kache 0.8.0`** (`yazelix/packaging/kache_release.nix:3`,
   `github:kunobi-ninja/kache`) — **STALE**: the reachable verified leader is **`v0.10.0`**
   (kunobi-ninja tags + crates.io both top at 0.10.0; npm `kache` 0.1.0 is unrelated). The
-  owner referenced **`v2.1.1`**, which does **not** resolve on any reachable kache source —
-  **source identity must be confirmed before pinning** (`YZXCONV-052`); never bluff a version
-  no source proves. This is the caught precedent for the §8d exemption removal.
+  **source identity CONFIRMED (owner, 2026-07-14):** canonical = `github:kunobi-ninja/kache`,
+  pin **`v0.10.0`**; the earlier **`v2.1.1`** was a **name collision** with the wrong project
+  `github.com/MayakaApps/Kache` (a Kotlin caching library) — **rejected**. Bump `0.8.0 → v0.10.0`
+  (`YZXCONV-052`). Third source-identity catch (with the `rtk` collision and the ruvector
+  `@ruvnet/ruvector` dead handle): the verified-leader law resolves **source identity**, not just
+  version. This is the caught precedent for the §8d exemption removal.
 - **`rusqlite 0.32.1 features=["bundled"]`** — **links C SQLite.** Exists ONLY in the
   nested `home/agent-env/codex-harness` sub-workspace (its own `[workspace]`, outside
   envctl's no-C main gate). The catalog must **not** promote this into the profile;

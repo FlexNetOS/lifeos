@@ -1,0 +1,55 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-010",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Entity counts, identities, bytes, metadata, relationships, permissions, history, semantic retrieval, behavior, reconstruction, backup, restore, failback, and observed LifeOS operation all pass before one explicit authority switch; preserved source remains available until retention approval.",
+  "gate_result": {
+    "cutover_plan_artifact": "generated/postgres_authority_cutover_plan.json",
+    "task_family": "generated/task_families/POSTGRES-010.json",
+    "user_space_classes_total": 18,
+    "switching_classes": 14,
+    "non_switching_classes": 4,
+    "every_class_assigned_exactly_one_owner_and_authority_action": true,
+    "parity_dimensions_defined": 14,
+    "entity_counts_check": "PD-01: per-class COUNT(*) of PostgreSQL rows equals the POSTGRES-004 source-inventory count; pass = exact per-class equality across all 14 switching classes.",
+    "identities_check": "PD-02: every source stable identity (SHA-256 blob hash, module_path, task/anchor/proof/edge id) maps bijectively to one PostgreSQL identity and back; pass = zero orphans, zero collisions.",
+    "bytes_check": "PD-03: SHA-256 of every PostgreSQL-stored blob equals the source blob under the BlobStore parity contract; evidence = green live blobstore_parity.rs against a disposable PostgreSQL; pass = all content hashes equal.",
+    "metadata_check": "PD-04: mode/permission bits, timestamps, size, mime, module_path, and ordering preserved via the POSTGRES-004 content-and-metadata checksum; pass = metadata checksum equal per entity.",
+    "relationships_check": "PD-05: containment/dependency/causal edges reconstructed in PostgreSQL+RuVector match the source-derived edge set by endpoints and type; pass = edge-set equality, no dangling or invented edges.",
+    "permissions_check": "PD-06: permission/ACL records reconstruct identical access decisions over a principal x resource matrix; pass = decision diff empty.",
+    "history_check": "PD-07: temporal/provenance history preserved and PostgreSQL PITR reconstructs any prior committed state; source commit/PR lineage retained; pass = history depth equals source and PITR restore reproduces the target state.",
+    "semantic_retrieval_check": "PD-08: RuVector hybrid search (ORDER BY semantic_embedding <->) returns the same top-k targets as a reference query set and re-embedding is reproducible; pass = top-k parity within tolerance; gated on live RuVector-in-PostgreSQL activation.",
+    "behavior_check": "PD-09: LifeOS behavior driven from PostgreSQL equals flat-file-authoritative behavior for the bounded slice (extends the POSTGRES-009 round trip); pass = behavior diff empty.",
+    "reconstruction_check": "PD-10: envctl projection from PostgreSQL reproduces a byte-identical source directory (POSTGRES-008 determinism); pass = projected-tree SHA-256 equals source and repeated projections are byte-identical.",
+    "backup_check": "PD-11: a full checksummed backup of the PostgreSQL authority is captured before Stage 4; pass = backup exists with recorded checksum.",
+    "restore_check": "PD-12: restoring that backup into a disposable namespace yields identical state; pass = restored-state checksum equals source checksum.",
+    "failback_check": "PD-13: rehearsed failback to preserved source authority stops database writes with no data loss and both representations intact; pass = failback rehearsal green, zero unarchived destructive action.",
+    "observed_lifeos_operation_check": "PD-14: LifeOS Mission Control answers a UDS request from the canonical PostgreSQL state with an audit event (POSTGRES-007 path); pass = UDS round trip answered from canonical DB, audit event recorded, no hidden flat-file control-plane detour.",
+    "all_fourteen_parity_dimensions_gate_the_single_switch": true,
+    "one_explicit_authority_switch": "Stage 4 only, owner-approved, gated on PD-01..PD-14 all green plus the STORE-001 verified-cutover invariant; effect = editable authority moves flat-file -> PostgreSQL, flat files become read-only preserved reference + envctl-derived projection.",
+    "preserved_source_available_until_retention_approval": true,
+    "source_deletion_or_history_loss_or_irreversible_cutover": "none — forbidden by blocked_paths; failback retains both representations and every superseded namespace.",
+    "migration_stages_defined": ["STAGE-1 parity decomposition", "STAGE-2 restore rehearsal", "STAGE-3 staged dual-read", "STAGE-4 explicit switch", "STAGE-5 retention decision"],
+    "store_001_alignment": "Single durable writer PostgreSQL; forward-only redb -> envctl -> PostgreSQL sync; verified per-class cutover under one SHA-256 identity via the BlobStore parity contract; retiring flat-file editable authority is building-to-spec (upgrade, not downgrade) because the envctl projection reproduces byte-identical source and the preserved source is retained until retention approval.",
+    "rollback_failback_defined": true,
+    "open_dependencies": [
+      "Live RuVector-in-PostgreSQL extension activation required before the semantic-embeddings class fully cuts over (STORE-001 open dependency; NBVERIFY-001 / REDB-CLAIM-023 remainder).",
+      "Live blobstore_parity.rs green run against a disposable PostgreSQL captures the durable-class cutover proof (STORE-001 open dependency)."
+    ],
+    "authority_state_after_this_task": "unchanged — no switch performed (next_action: keep authority unchanged)",
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-010 defines the staged whole-user-space parity recovery and authority cutover as planning artifacts only; no database was provisioned or mutated and no authority was switched. generated/postgres_authority_cutover_plan.json enumerates the entire user-space as 14 switching classes drawn from the POSTGRES-002 model gate and the STORE-001 state-class decision (USC-FILES, USC-DIRECTORIES, USC-CODE-MODULES, USC-CONFIG, USC-PLANNING, USC-COMMUNICATIONS, USC-APP-STATE, USC-MEDIA-BLOBREFS, USC-IDENTITIES, USC-PERMISSIONS, USC-HISTORY, USC-RELATIONSHIPS, USC-SEMANTIC-EMBEDDINGS, USC-ENVCTL-MIGRATION-STATE) plus 4 non-switching classes that retain their STORE-001 owner (transient redb, per-agent AgentDB cognition, envctl/CodeDB derived projections, and OS-keyring external secrets). Every class is assigned exactly one canonical owner and one authority_action, and the two current durable redb uses (PGREDB-001 CodeDB source_blobs and PGREDB-002 envctl migration_db) are named explicitly so neither is silently reclassified — they migrate only through the BlobStore SHA-256 verified-cutover contract. Each of the 14 gate clauses is bound to a concrete parity dimension PD-01..PD-14 with a check, evidence, and pass criterion. The plan sequences five stages (parity decomposition, restore rehearsal, staged dual-read, explicit switch, retention decision) and permits exactly one explicit owner-approved authority switch (Stage 4) that fires only after all 14 dimensions pass and the STORE-001 verified-cutover invariant holds; at switch, flat files stop being editable authority and become the read-only preserved reference plus the byte-identical envctl projection. Retiring flat-file authority is an upgrade to the intended blueprint spec, preserved via the BlobStore parity mechanism and the deterministic projection path, with the source retained until a separate retention approval. The rollback fails back to preserved source authority, stops database writes, and retains the failed cutover namespace and proof without deleting either representation. Authority is left unchanged; product execution remains closed.",
+  "artifact_paths": [
+    "generated/postgres_authority_cutover_plan.json",
+    "generated/task_families/POSTGRES-010.json",
+    "proof_records/POSTGRES-010.proof.json"
+  ],
+  "checksums": {
+    "generated/postgres_authority_cutover_plan.json": "43b7103556cfab11b60b24037f6a921ba2f44a8d341eaef9c7e90d1467479b0a",
+    "generated/task_families/POSTGRES-010.json": "0f6e82371aeceba8c3940400284519bf42d1ab7dddf9b5f860c81825a78ba89c"
+  },
+  "product_execution_performed": false
+}

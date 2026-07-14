@@ -1,0 +1,65 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-010",
+  "title": "Whole user-space parity recovery and authority cutover defined",
+  "status": "defined",
+  "owner": "Governance Board / LifeOS Data Agent / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the staged migration that proves the entire user-space is represented, reconstructable, recoverable, and operated from PostgreSQL before one explicit owner-approved authority switch retires flat files as editable authority, while retaining preserved history and projections. Authority is kept unchanged; this task only defines the plan, its parity gate, and its rollback.",
+  "work_items": [
+    {
+      "id": "POSTGRES-010-A",
+      "surface": "generated/postgres_authority_cutover_plan.json#user_space_class_set",
+      "owner": "LifeOS Data Agent",
+      "decision": "Enumerate the entire user-space as 14 switching classes (files, directories, code modules, configuration, planning tables, communications, application state, media/blob references, identities, permissions, history, relationships, semantic embeddings, envctl migration state) plus 4 non-switching classes (transient redb, per-agent cognition, derived projections, external secrets). Every class is assigned exactly one canonical target owner and one authority_action per STORE-001; the two current durable redb uses (PGREDB-001, PGREDB-002) are named explicitly so none is silently reclassified."
+    },
+    {
+      "id": "POSTGRES-010-B",
+      "surface": "generated/postgres_authority_cutover_plan.json#parity_dimensions",
+      "owner": "QA Agent",
+      "decision": "Bind each of the 14 gate clauses to a concrete parity dimension PD-01..PD-14 (entity_counts, identities, bytes, metadata, relationships, permissions, history, semantic_retrieval, behavior, reconstruction, backup, restore, failback, observed_lifeos_operation), each with a check, an evidence artifact, and a pass criterion."
+    },
+    {
+      "id": "POSTGRES-010-C",
+      "surface": "generated/postgres_authority_cutover_plan.json#migration_stages",
+      "owner": "Governance Board",
+      "decision": "Sequence the migration as five staged steps with entry/exit gates: (1) parity decomposition, (2) restore rehearsal, (3) staged dual-read, (4) explicit switch, (5) retention decision. Flat files remain the editable authority through Stages 1-3."
+    },
+    {
+      "id": "POSTGRES-010-D",
+      "surface": "generated/postgres_authority_cutover_plan.json#authority_switch_gate",
+      "owner": "Governance Board",
+      "decision": "Permit exactly one explicit owner-approved authority switch (Stage 4), and only after all 14 parity dimensions pass and the STORE-001 verified-cutover invariant is satisfied (green live blobstore_parity.rs for durable classes; RuVector-in-PostgreSQL activation for the semantic class). At switch, flat files become the read-only preserved reference and the envctl-derived projection."
+    },
+    {
+      "id": "POSTGRES-010-E",
+      "surface": "generated/postgres_authority_cutover_plan.json#parity_dimensions PD-11/PD-12/PD-13",
+      "owner": "QA Agent",
+      "decision": "Require backup, restore, and failback to be rehearsed on a disposable namespace before the switch, with both representations retained, so the recovery envelope is proven prior to any authority change."
+    },
+    {
+      "id": "POSTGRES-010-F",
+      "surface": "generated/postgres_authority_cutover_plan.json#retention_policy",
+      "owner": "Governance Board",
+      "decision": "Retain the preserved source (read-only) until a separate explicit retention approval; this task never deletes source, history, or any superseded cutover namespace."
+    },
+    {
+      "id": "POSTGRES-010-G",
+      "surface": "generated/postgres_authority_cutover_plan.json#rollback_failback_plan",
+      "owner": "LifeOS Data Agent",
+      "decision": "On any parity failure, unapproved switch, or post-switch instability, fail back to preserved source authority, stop database writes, and retain the failed cutover namespace and its proof without deleting either representation."
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-010-A",
+    "POSTGRES-010-B",
+    "POSTGRES-010-C",
+    "POSTGRES-010-D",
+    "POSTGRES-010-E",
+    "POSTGRES-010-F",
+    "POSTGRES-010-G"
+  ],
+  "store_001_alignment": "PostgreSQL is the single durable writer; retiring flat files as editable authority is building to the intended blueprint spec (an upgrade), preserved via the BlobStore SHA-256 verified-cutover mechanism and the byte-identical envctl projection path.",
+  "completion_gate": "generated/postgres_authority_cutover_plan.json defines all 14 parity dimensions bound to the gate clauses, every user-space class assigned exactly one owner and authority_action, five migration stages, exactly one explicit authority switch gated on full parity, a retention policy that keeps source available until approval, and a failback rollback; proof_records/POSTGRES-010.proof.json records zero product execution and authority unchanged.",
+  "next_action": "Keep authority unchanged; after graph closure execute parity decomposition, restore rehearsal, staged dual-read, the explicit switch, and the retention decision."
+}

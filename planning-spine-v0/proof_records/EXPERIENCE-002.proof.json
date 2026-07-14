@@ -1,0 +1,77 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "EXPERIENCE-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Each client has bounded capabilities, shared state contract, authentication, privacy, accessibility, offline behavior, notification authority, test matrix, rollback, and proof.",
+  "gate_result": {
+    "task_family": "generated/task_families/EXPERIENCE-002.json",
+    "client_universe": ["desktop", "mobile", "glasses", "ambient"],
+    "client_universe_grounding": "The four clients are exactly the set named in the EXPERIENCE-002 goal ('desktop-first and later approved mobile, glasses, and ambient clients') and LIFEOS-010; none invented.",
+    "clients_defined": 4,
+    "desktop_status": "active contract — desktop-first, proof decomposed first (existing Tauri 2 + Vue 3 app)",
+    "gated_clients": ["mobile", "glasses", "ambient"],
+    "gating_conditions": "Each gated client is deferred until (1) the Rust-native substrate is proven (EXPERIENCE-001 application/state/command/event/plugin/policy/data APIs green + STORE-001 substrate proven) and (2) the owner (David) explicitly approves; ambient additionally waits on HOME-001/002/003.",
+    "gate_clauses_required_per_client": [
+      "bounded capabilities",
+      "shared state contract",
+      "authentication",
+      "privacy",
+      "accessibility",
+      "offline behavior",
+      "notification authority",
+      "test matrix",
+      "rollback",
+      "proof"
+    ],
+    "each_client_has_all_ten_clauses": true,
+    "clause_coverage_matrix": {
+      "bounded_capabilities": "desktop=full presentation+command surface (workspaces, OpenPencil, command palette, AI avatar), owns no logic/authority/durable truth; mobile=view + approve/deny + quick capture, no full editing; glasses=glance one card + explicit voice/gesture confirm of one pre-simulated approval, no editing; ambient=presence render of non-personal state + voice command, per-viewer identity for personal data, no autonomous physical action (HOME-003).",
+      "shared_state_contract": "all four read canonical PostgreSQL + RuVector only through the EXPERIENCE-001 state/data API and read redb-transient status via UDS/mmap (blueprint); none is a second durable writer (STORE-001); one coherent state because all resolve to the same canonical owner (LIFEOS-010).",
+      "authentication": "all four are per-principal with credentials in the OS/platform keyring (desktop keyring service 'lifeos' + env fallback; mobile keystore; glasses via paired host; ambient shared-surface + per-viewer step-up); PostgreSQL holds references/provenance only, redb holds no secrets (STORE-001); David is final authority.",
+      "privacy": "all four inherit the PERSONAL-001 boundary (consent, encryption, local-first, provenance, retention, sharing, deletion, backup, recovery); glasses add capture-off-by-default for always-on sensors; ambient adds default-non-personal shared view + HOME-001 per-asset/telemetry boundary; secrets never in PostgreSQL/redb.",
+      "accessibility": "all four conform to the DESIGN.md model (WCAG AA, axe, Lucide-only, tokens-not-literals, Lexend/JetBrains Mono, dark-first, calm voice); desktop enforces it today (32 axe assertions across 9 views + 4 overlays + 6 component variants, 0 violations, bun run test:a11y); gated clients inherit surface-adapted a11y matrices required before approval.",
+      "offline_behavior": "all four use redb as the application-level WAL during PostgreSQL latency/outage with forward-only redb -> envctl -> PostgreSQL reconcile and PostgreSQL PITR recovery (blueprint redb section; STORE-001 transient tier); desktop persistence no-ops gracefully; glasses/ambient degrade to explicit 'no live state'/non-personal rather than stale-as-authoritative; no client becomes a second durable authority.",
+      "notification_authority": "one authority — governed events on canonical PostgreSQL via the EXPERIENCE-001 event API; clients render and deduplicate across devices and never invent authoritative alerts; redb-transient status pulses are live status only ('status pulses do not count' as the brand glow); ambient gates personal notifications per-viewer and never actuates physically.",
+      "test_matrix": "desktop matrix runs today (Vitest 65+, bun run test:a11y 32 axe, bun run build vue-tsc+vite, dev server mounts #app clean); mobile/glasses/ambient matrices are defined but gated (unit + surface-adapted a11y + offline WAL recovery + command-authority no-direct-durable-write + notification dedup + cross-device/HOME-003 checks) and run only on owner approval + build.",
+      "rollback": "client rollback changes zero durable state because clients are non-authoritative (STORE-001 single durable writer); client-local caches (desktop LIFEOS_PERSIST_KEYS whitelist and equivalents) are disposable/regenerable; canonical restore is PostgreSQL PITR + COW branch discard; the task rollback_plan restores the archived client plan; ambient physical actions (only under HOME-003) roll back via rehearsed reversal + emergency stop.",
+      "proof": "desktop ProofRecord is decomposed FIRST (binds a11y run, Vitest suite, build gate, state-contract check); mobile, glasses, and ambient ProofRecords are deferred until proven substrate + owner approval, so no gated client is marked done here."
+    },
+    "five_coherence_models_present": {
+      "state": "cross_cutting_contract.shared_state_model — one canonical PostgreSQL + RuVector owner, clients read via EXPERIENCE-001 APIs and redb via UDS/mmap.",
+      "identity": "cross_cutting_contract.identity_model — one per-principal model, credentials in keyring, David final authority, no unlimited agent authority.",
+      "command": "cross_cutting_contract.command_model — one command path through the EXPERIENCE-001 command API into the governed spine with the Needs-Human-Approval gate for external effects.",
+      "notification": "cross_cutting_contract.notification_model — one authority (governed PostgreSQL events), deduplicated across devices, status pulses excluded.",
+      "accessibility": "cross_cutting_contract.accessibility_model — one DESIGN.md WCAG-AA model across all surfaces."
+    },
+    "desktop_proof_first_confirmed": "EXPERIENCE-002-A proof is decomposed first per next_action; the existing desktop app already satisfies its a11y (32 axe assertions, 0 violations), test (Vitest 65+), and build gates.",
+    "store_001_alignment": "All four clients resolve to the single canonical PostgreSQL + RuVector durable owner and never become a second durable writer; redb is used only as the transient status/WAL tier via UDS/mmap with forward-only envctl sync and PostgreSQL PITR recovery; secrets stay in the OS/platform keyring while PostgreSQL holds references/provenance only. Because clients own no durable truth, client rollback mutates no canonical state. Defining the presentation layer as replaceable, non-authoritative clients over this tiered substrate is building to the intended blueprint spec — an upgrade, not a downgrade.",
+    "simulation_only": true,
+    "rollback_plan": "Restore the archived client plan; no client or device is changed.",
+    "clients_built_or_deployed": "none",
+    "devices_accounts_or_secrets_accessed": "none",
+    "blocked_paths_respected": "no client implementation, no device deployment, no account access, no production release, no secrets access",
+    "product_execution_performed": false
+  },
+  "proof_summary": "EXPERIENCE-002 defines, as planning artifacts only, the four LifeOS presentation clients and their per-client presentation contracts; no client was implemented, no device was deployed, no account or secret was accessed, and no product code was run. generated/task_families/EXPERIENCE-002.json enumerates exactly the four clients named in the goal — desktop (the existing Tauri 2 + Vue 3 app, decomposed and proven first), and the later-approved, gated mobile, glasses, and ambient clients — and gives each client all ten required gate clauses: bounded capabilities, a shared state contract, authentication, privacy, accessibility, offline behavior, notification authority, a test matrix, rollback, and proof. The five coherence models the goal demands (one state, identity, command, notification, and accessibility model) are factored once into cross_cutting_contract and specialized per client. State coherence is grounded in STORE-001 and LIFEOS-010: all four clients resolve to the single canonical PostgreSQL + RuVector durable owner, read it only through the EXPERIENCE-001 state/data APIs, read the redb transient tier for live status via UDS and the shared memory-mapped file (blueprint), and are never a second durable writer. Identity is per-principal with credentials in the OS/platform keyring (desktop already binds keyring service 'lifeos' with an env fallback) and David as final authority; privacy inherits the PERSONAL-001 boundary, tightened for the glasses' always-on sensors (capture off by default) and the ambient client's shared surface (default non-personal, per-viewer identity for personal data, HOME-001 boundary); accessibility is the one DESIGN.md WCAG-AA model, enforced on desktop today (32 axe assertions across 9 views + 4 overlays + 6 component variants, 0 violations) and inherited as gated a11y matrices by the others; offline behavior uses redb as the application-level WAL with forward-only envctl reconcile and PostgreSQL PITR recovery; notification authority is the single governed PostgreSQL event stream, deduplicated across devices with transient status pulses excluded; test matrices run today on desktop (Vitest 65+, bun run test:a11y, bun run build, clean dev mount) and are defined-but-gated for the others; and rollback is safe because a non-authoritative client owns no durable truth. Desktop's proof is decomposed first per next_action, while mobile, glasses, and ambient proofs are deferred behind a proven substrate and explicit owner approval (ambient additionally behind HOME-001/002/003). The plan is STORE-001-aligned — redb is only the transient WAL/status tier, PostgreSQL is the single canonical owner and recovery source, secrets stay in the keyring, and defining replaceable clients over this substrate is an upgrade to the intended blueprint spec. No client or device was changed and product execution remains closed.",
+  "artifact_paths": [
+    "generated/task_families/EXPERIENCE-002.json",
+    "proof_records/EXPERIENCE-002.proof.json"
+  ],
+  "checksums": {
+    "generated/task_families/EXPERIENCE-002.json": "04a359eb64758022d72fbf134a55ba4be947cda2092cab229e9a4da46c0b7c01"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate the EXPERIENCE-002 client family: the task family JSON parses, exactly the four goal-named clients are defined, every client carries all ten gate clauses, desktop is proof-first and mobile/glasses/ambient are gated, and STORE-001 alignment plus product_execution_performed=false are recorded in this proof.",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (EXPERIENCE-002 client-family gate validation over the task family and this proof)",
+      "exit_status": 0,
+      "output": [
+        "EXPERIENCE-002: family_valid=True clients=4 each_client_has_all_ten_clauses=True desktop_proof_first=True gated_clients=3 store_001_aligned=True product_execution_performed=False"
+      ]
+    }
+  ],
+  "product_execution_performed": false
+}

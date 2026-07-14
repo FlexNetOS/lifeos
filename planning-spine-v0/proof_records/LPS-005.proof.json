@@ -1,0 +1,38 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-005",
+  "observed_at": "2026-07-13T14:48:35Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "SimulationReport validates, emits machine-readable constraint updates, preserves failed-world evidence, and cannot mark tasks complete.",
+  "gate_result": {
+    "simulation_report_schema_and_example_validate": true,
+    "emits_constraint_updates": true,
+    "preserves_evidence": true,
+    "status_enum_has_no_complete": true,
+    "status_enum_supports_failed_world": true,
+    "cannot_mark_task_complete": true
+  },
+  "proof_summary": "SimulationReport validates and emits at least one machine-readable constraint_update while preserving evidence references. Its status enum is {pass,fail,warning} with no 'complete' value and no task-completion field, so simulation can only add or tighten constraints and can never execute or silently complete a task.",
+  "artifact_paths": [
+    "planning-spine-v0/rfcs/RFC-001_DEVWORLD_MIROFISH_ADAPTER.md",
+    "planning-spine-v0/schemas/simulation-report.schema.json",
+    "planning-spine-v0/examples/simulation-report.json"
+  ],
+  "checksums": {
+    "RFC-001": "0411f6bb5a02439409c96100d9b75d048c951cc31070441ff9e559dda145aed9",
+    "simulation-report.json": "6a14f768646e22dbefbace660ff2b759863695507738bc20624f5f51115fd4e0"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-005",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

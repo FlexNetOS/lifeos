@@ -1,0 +1,118 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "DEVELOP-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The family covers source ownership, isolated work, local-first verification, CI receipts, GitHub hygiene, release provenance, installed proof, rollback, and capability learning.",
+  "gate_result": {
+    "task_family": "generated/task_families/DEVELOP-001.json",
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "keystone_decision": "generated/store_relationship_decision.json (STORE-001)",
+    "lifecycle_defined": "intent and specification -> code -> test -> review -> build -> release -> runtime proof -> rollback -> capability learning",
+    "gate_clauses_total": 9,
+    "gate_clauses_covered": 9,
+    "every_clause_covered_exactly_once": true,
+    "clause_coverage": {
+      "source_ownership": {
+        "work_item": "DEVELOP-001-A",
+        "owner": "PostgreSQL + RuVector (single canonical durable owner)",
+        "lifetime": "durable (ACID/PITR); filesystem is a derived projection, redb a transient ingestion buffer",
+        "sync_edge": "Nushell -> nu_plugin CodeDB -> redb -> envctl(embed) -> PostgreSQL (forward-only)",
+        "recovery": "PostgreSQL PITR + reproducible re-embedding + envctl re-projection",
+        "store_relationship": "PG canonical for code/spec/provenance; redb transient; CodeDB blobs canonicalize to PG under SHA-256 verified cutover",
+        "grounding": "Blueprint Section 5 Database-Hosted Codebase + Three Pillars of Ingestion; STORE-001 assignments 1, 3, 5"
+      },
+      "isolated_work": {
+        "work_item": "DEVELOP-001-B",
+        "owner": "ATAS COW branching engine (in-DB) + gitkb/meta orchestrator (repo peers)",
+        "lifetime": "transient COW staging rows until verified merge or discard",
+        "sync_edge": "clone trunk -> isolated COW branch -> verified merge to trunk (forward-only); .meta peer isolation",
+        "recovery": "discard branch and re-clone from trunk; PostgreSQL PITR for trunk",
+        "store_relationship": "PG hosts trunk and branch rows (single durable writer); redb holds agent scratch; no dual durable writer",
+        "grounding": "Blueprint Phase 2/3 COW branching + 'Why Meta? GitHub Peer repo Control Plane'; input preserved development peers"
+      },
+      "local_first_verification": {
+        "work_item": "DEVELOP-001-C",
+        "owner": "LifeOS Development Agent driving local ruvllm/ESN + RuVector MinCut/Witness/Causal-Graph verification",
+        "lifetime": "transient (redb scratchpad for thoughts, traces, test logs); settled outcomes flushed forward",
+        "sync_edge": "local tests + ESN simulation + MinCut/Witness/Causal-Graph -> pass merges / fail discards; significant provenance flushed to PostgreSQL",
+        "recovery": "transient by definition; deterministic re-run of tests and simulation",
+        "store_relationship": "redb transient scratchpad/geometry engine; PG receives settled verification provenance; AgentDB non-authoritative",
+        "covers_lifecycle_stages": ["test", "review"],
+        "grounding": "Blueprint Phase 3 (tests confirm branch stable before merge), Section 6 (MinCut O(n^{o(1)}), SHAKE256 Witness Chains, Causal Graph Verification), ESN 'fail before writing production code'; STORE-001 assignment 3"
+      },
+      "ci_receipts": {
+        "work_item": "DEVELOP-001-D",
+        "owner": "External CI/CD executes; durable receipt promoted one-way into PostgreSQL provenance",
+        "lifetime": "CI run external/ephemeral; receipt durable in PostgreSQL",
+        "sync_edge": "merge -> external CI run -> receipt promoted forward -> PostgreSQL audit/provenance (one-way)",
+        "recovery": "PostgreSQL PITR for receipts; CI re-run reproduces from committed source pins",
+        "store_relationship": "PG durable receipt provenance (assignment 1); CI service external authority (assignment 6); redb never durable authority",
+        "grounding": "Blueprint 'CI/CD pipeline cross-compiles and pushes on merge'; ADOPT-001 'passing CI receipt' per capability; STORE-001 assignments 1 and 6"
+      },
+      "github_hygiene": {
+        "work_item": "DEVELOP-001-E",
+        "owner": "gitkb/meta orchestrator (control plane); GitHub remains external authority",
+        "lifetime": "external durable at GitHub; mirrored as references/provenance in PostgreSQL, never re-owned",
+        "sync_edge": "gitkb/meta coordinates peer repos via .meta; hygiene referenced (not captured) into PostgreSQL; branch recreation only from archived bundle",
+        "recovery": "recreate a deleted branch only from the PRESERVE-001-E archived bundle + recorded commit id",
+        "store_relationship": "external authority (assignment 6); PG stores references/provenance never secrets; redb holds no secrets or repo authority",
+        "grounding": "Blueprint 'Why Meta? GitHub Peer repo Control Plane' (.meta peers); PRESERVE-001-E capture/restore rule; STORE-001 assignment 6"
+      },
+      "release_provenance": {
+        "work_item": "DEVELOP-001-F",
+        "owner": "envctl projection engine (read-only materializer) + Nix musl build; PostgreSQL is the released-source authority",
+        "lifetime": "derived/disposable (materialized dirs and release trees regenerable); provenance record durable in PostgreSQL",
+        "sync_edge": "PostgreSQL -> envctl materialize (module_path) -> filesystem -> meta exec pure-Rust compile -> Nix musl -> artifact (forward-only, byte-exact SHA-256)",
+        "recovery": "re-projection from PostgreSQL + reproducible deterministic Nix build",
+        "store_relationship": "PG canonical source (assignment 1); projection/release derived disposable (assignment 5); CodeDB exact-byte materialization + SHA-256 provenance (ADOPT-001)",
+        "covers_lifecycle_stages": ["build", "release"],
+        "grounding": "Blueprint Phase 4 Materialization/Projection four steps + Nix musl Store-Trap avoidance + gitkb/meta exhaust isolation; STORE-001 assignment 5; ADOPT-001 exact-byte materialization + envctl export contract"
+      },
+      "installed_proof": {
+        "work_item": "DEVELOP-001-G",
+        "owner": "LifeOS runtime + Yazelix foundation; static musl binary is self-contained (no /nix/store)",
+        "lifetime": "runtime / process-lifecycle; shared redb state files are transient runtime state",
+        "sync_edge": "launch -> Yazelix(Zellij/Nushell) -> ruvllm agents(.rvf) -> LifeOS reads shared redb over UDS and renders status (forward render only)",
+        "recovery": "re-launch portable folder (runs on any target, no /nix/store); on corruption re-project from PostgreSQL and rebuild",
+        "store_relationship": "redb transient shared runtime state (assignment 3); AgentDB(.rvf) per-agent cognition in ruvllm (assignment 4); PG untouched by the UI directly",
+        "grounding": "Blueprint Phase 4 runtime: install-in-place portable folder, LifeOS UI + Yazelix background + ruvllm .rvf spin-up, UDS / shared redb rendering; STORE-001 assignments 3 and 4"
+      },
+      "rollback": {
+        "work_item": "DEVELOP-001-H",
+        "owner": "ATAS COW engine (branch discard) + PostgreSQL PITR (durable) + envctl re-projection (derived)",
+        "lifetime": "state returns to last verified durable trunk; discarded branches transient by design",
+        "sync_edge": "failure -> discard COW branch and/or PITR to prior durable point -> re-project; never a back-write of unverified state",
+        "recovery": "PostgreSQL PITR (durable), envctl re-projection (derived), redb transient loss acceptable; verified-cutover invariant prevents landing in an unverified durable state",
+        "store_relationship": "PostgreSQL PITR is the durable recovery authority (assignment 1); COW branch rows transient; consistent with STORE-001 verified-cutover invariant",
+        "plan_level_rollback": "Restore the archived development plan; no repository or CI state is changed (DEVELOP-001 rollback_plan)",
+        "grounding": "Blueprint Phase 3 ('database simply rolls it back... eliminating the dirty repository problem'; deterministic rollbacks), Phase 4 re-projection; STORE-001 recovery + verified-cutover invariant"
+      },
+      "capability_learning": {
+        "work_item": "DEVELOP-001-I",
+        "owner": "AgentDB (.rvf) per agent (STORE-001 assignment 4) — non-authoritative over shared macro-state",
+        "lifetime": "per-agent cognition in .rvf (regenerable from base model + training history); validated knowledge promoted one-way to PostgreSQL knowledge graph",
+        "sync_edge": "runtime outcome -> SONA/AgentDB adjust weights (self-contained) -> one-way promotion of validated knowledge -> PostgreSQL; witness chains root in PG source vectors; no back-write to shared truth",
+        "recovery": "regenerate .rvf from base model + training history; PostgreSQL for promoted knowledge and witness roots",
+        "store_relationship": "AgentDB active cognition owner (assignment 4); PG witness roots + promoted knowledge; redb transient learning traces; MinCut/Witness block hallucinated learning",
+        "grounding": "Blueprint Passive vs Active memory; .rvf components SONA/MicroLoRA/FastGRNN (Thompson Sampling/Q-Learning/PPO); Cryptographic Witness Chains; STORE-001 assignment 4"
+      }
+    },
+    "store_ownership_aligned_with_STORE_001": true,
+    "every_lifecycle_stage_assigned_exactly_once": true,
+    "no_stage_re_owns_durable_truth_by_assumption": true,
+    "single_durable_writer": "PostgreSQL + RuVector",
+    "forward_only_synchronization": "ingest redb -> envctl -> PostgreSQL; project PostgreSQL -> envctl -> filesystem; promote AgentDB/CI -> PostgreSQL; no dual-write",
+    "no_second_implementation_row": true,
+    "simulation_required_satisfied": "policy-cell definition only; no repo mutation, branch creation, CI dispatch, release, or product implementation performed (blocked_paths honored)",
+    "product_execution_performed": false
+  },
+  "proof_summary": "DEVELOP-001 defines the LifeOS development build-and-release operating family as one governed lifecycle (intent and specification -> code -> test -> review -> build -> release -> runtime proof -> rollback -> capability learning) in generated/task_families/DEVELOP-001.json, with nine work items DEVELOP-001-A..I that satisfy the nine gate clauses one-to-one. Source ownership (A) is PostgreSQL+RuVector as the single canonical durable owner of the database-hosted codebase, spec, and provenance, with the filesystem a derived projection and redb a transient ingestion buffer (Blueprint Section 5; STORE-001 assignments 1/3/5). Isolated work (B) is in-database COW staging branches plus gitkb/meta .meta peer isolation of the preserved LifeOS/Yazelix/Ruvnet repos (Blueprint Phase 2/3 + GitHub Peer repo Control Plane). Local-first verification (C) runs automated tests, ESN ensemble simulation, and the MinCut/SHAKE256-Witness/Causal-Graph review gate inside the COW sandbox before any merge, with transient state in the redb scratchpad (Blueprint Phase 3 + Section 6; STORE-001 assignment 3). CI receipts (D) are produced on merge by external CI and promoted one-way into PostgreSQL provenance (Blueprint CI/CD-on-merge; ADOPT-001 passing CI receipt; STORE-001 assignments 1/6). GitHub hygiene (E) treats GitHub as external authority orchestrated via gitkb/meta with the PRESERVE-001-E branch-restore discipline (STORE-001 assignment 6). Release provenance (F) is a deterministic byte-exact envctl projection -> pure-Rust meta exec -> Nix musl static build carrying SHA-256 identity back to source rows, disposable and regenerable (Blueprint Phase 4; STORE-001 assignment 5; ADOPT-001 exact-byte materialization). Installed proof (G) is the musl-static portable folder booting LifeOS + Yazelix(Zellij/Nushell) + ruvllm(.rvf) rendering swarm status over UDS/shared-redb with no /nix/store (Blueprint Phase 4 runtime; STORE-001 assignments 3/4). Rollback (H) is COW branch discard plus PostgreSQL PITR plus envctl re-projection, never landing in an unverified durable state, and at the plan level restores the archived development plan with zero repository or CI mutation (Blueprint Phase 3/4; STORE-001 recovery + verified-cutover invariant; DEVELOP-001 rollback_plan). Capability learning (I) lives in AgentDB(.rvf) as non-authoritative active cognition (SONA/RL) witnessed by SHAKE256 chains rooted in PostgreSQL source vectors, promoting validated knowledge one-way to the knowledge graph (Blueprint Active memory + .rvf components + Witness Chains; STORE-001 assignment 4). Every stage has exactly one owner, lifetime, forward sync edge, recovery source, and store relationship; store authority is inherited from STORE-001 and never re-litigated. This is a policy-cell definition: no repository mutation, branch creation, CI dispatch, release, or product implementation was performed and no store was written.",
+  "store_001_alignment": "All nine work items inherit the STORE-001 tiered authority model without reassigning it: PostgreSQL+RuVector is the single durable writer (source, provenance, receipts, promoted knowledge, PITR recovery); redb is the transient tier (ingestion buffer, dedup cache, scratchpad, shared runtime state); nu_plugin CodeDB is the parser/ingestion path whose BlobStore SHA-256 blobs canonicalize to PostgreSQL only via verified cutover; envctl is the forward-only bridge and projection engine; AgentDB(.rvf) owns per-agent non-authoritative cognition. Forward-only synchronization and the verified-cutover invariant are preserved end to end.",
+  "artifact_paths": [
+    "generated/task_families/DEVELOP-001.json",
+    "proof_records/DEVELOP-001.proof.json"
+  ],
+  "product_execution_performed": false
+}

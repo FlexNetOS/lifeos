@@ -1,0 +1,217 @@
+{
+  "schema": "lifeos-planning-spine.recovery-task-table-receipts.v0",
+  "task_id": "RECOVERY-001",
+  "sealed_at": "2026-07-12T16:36:15Z",
+  "gate": "Every discovered task source has a stable URI, task count, status vocabulary, authority classification, proof surface, and checksum; archived copies are evidence only; no prior task is silently omitted.",
+  "table_count": 16,
+  "notes": "Archived copies are evidence only; peer surfaces read-only. nu_plugin execution CSVs, envctl migration-package task graphs (+ its status projection, which is the 80-row pending-vs-complete conflict), and envctl .handoff task tables are all sealed.",
+  "tables": [
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/BIDIRECTIONAL_TASK_FILE_MAP.csv",
+      "kind": "csv",
+      "row_count": 21,
+      "status_column": null,
+      "status_vocabulary": "n/a (non-status table)",
+      "sha256": "2601389d7e0662a811d804256c2c431d9e0ff559ac7b57888b8f557897ae5003",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)"
+    },
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/BIDIRECTIONAL_TASK_GRAPH.csv",
+      "kind": "csv",
+      "row_count": 21,
+      "status_column": "status",
+      "status_vocabulary": {
+        "complete": 7,
+        "active": 14
+      },
+      "sha256": "19efb7fcc57bd74736eab74cc975a55fa6461805637df590dd58065b01ebc9e5",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)"
+    },
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/COMMAND_LEDGER.csv",
+      "kind": "csv",
+      "row_count": 43,
+      "status_column": null,
+      "status_vocabulary": "n/a (non-status table)",
+      "sha256": "80b5ba59ecc95bb1178d10418cb4fab27aab452f9cbf42286b4e205966f5a0ee",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)"
+    },
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/POLYGLOT_TASK_FILE_MAP.csv",
+      "kind": "csv",
+      "row_count": 15,
+      "status_column": null,
+      "status_vocabulary": "n/a (non-status table)",
+      "sha256": "992c85a81d730c413a187c2454da094bd0f4bf4d3f5559cb6018668d94d22506",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)"
+    },
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/POLYGLOT_TASK_GRAPH.csv",
+      "kind": "csv",
+      "row_count": 15,
+      "status_column": "status",
+      "status_vocabulary": {
+        "complete": 15
+      },
+      "sha256": "2c3e992a7bf68fcb12bc8a006568c29c38b89ee410807e3791a85bea2d21679b",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)"
+    },
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/REQUIREMENT_PROOF_LEDGER.csv",
+      "kind": "csv",
+      "row_count": 140,
+      "status_column": "task_status",
+      "status_vocabulary": {
+        "planned": 51,
+        "active": 87,
+        "complete": 2
+      },
+      "sha256": "0ae973a8c46cc830d45708893eb3ad9f760980c6545ff2fa039ec57281b57ad2",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)",
+      "status_vocabulary_evidence": {
+        "partial": 90,
+        "missing": 48,
+        "verified": 2
+      }
+    },
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/TASK_FILE_MAP.csv",
+      "kind": "csv",
+      "row_count": 70,
+      "status_column": null,
+      "status_vocabulary": "n/a (non-status table)",
+      "sha256": "6dee3cb86058e628f092411fbfde43849b46896d9ffe9c584a9fed1cc32dd843",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)"
+    },
+    {
+      "surface": "nu_plugin.execution",
+      "uri": "/home/flexnetos/meta/src/nu_plugin/execution/TASK_GRAPH.csv",
+      "kind": "csv",
+      "row_count": 70,
+      "status_column": "status",
+      "status_vocabulary": {
+        "complete": 19,
+        "planned": 51
+      },
+      "sha256": "6f45f26126c35fbce063b1d884a8920bb88e3ad67c7223c25e4c5442173dd12b",
+      "authority_class": "prior-product-task-graph",
+      "proof_surface": "logs/CDB*.log + crates/ + tests/*.nu (nu_plugin repo)"
+    },
+    {
+      "surface": "envctl.migration-package",
+      "uri": "/home/flexnetos/meta/src/envctl/envctl-db-nu-plugin-migration-automation-package/execution-framework/generated/task_graph.csv",
+      "kind": "csv",
+      "row_count": 80,
+      "status_column": "status",
+      "status_vocabulary": {
+        "pending": 76,
+        "complete": 4
+      },
+      "sha256": "b752be4c4cf53cb3db3daf5daaef180ec291269ce67a7bb7f0dbb2e835168009",
+      "authority_class": "prior-package-task-graph",
+      "proof_surface": "execution-framework/proof_records/*.proof.json (package proof, NOT product proof)"
+    },
+    {
+      "surface": "envctl.migration-package",
+      "uri": "/home/flexnetos/meta/src/envctl/envctl-db-nu-plugin-migration-automation-package/execution-framework/generated/issue-414/task_graph.csv",
+      "kind": "csv",
+      "row_count": 12,
+      "status_column": "status",
+      "status_vocabulary": {
+        "pending": 12
+      },
+      "sha256": "05c4275e4c79ec10ff5f6076b0c2af26721767c9c730a4843371bb74552802cf",
+      "authority_class": "prior-package-task-graph",
+      "proof_surface": "execution-framework/proof_records/*.proof.json (package proof, NOT product proof)"
+    },
+    {
+      "surface": "envctl.migration-package",
+      "uri": "/home/flexnetos/meta/src/envctl/envctl-db-nu-plugin-migration-automation-package/execution-framework/generated/status_report.json",
+      "kind": "json-projection",
+      "row_count": 80,
+      "status_column": "statuses",
+      "status_vocabulary": {
+        "complete": 80,
+        "pending": 0,
+        "failed": 0
+      },
+      "sha256": "f4010723ffcddfb7c967006c17679d15f7cb183b0d113dc4e78f75b869bb643c",
+      "authority_class": "prior-package-status-projection",
+      "proof_surface": "package execution-framework generator (projection asserts 80/80 complete)",
+      "conflict_note": "Projection asserts complete_count=80 while task_graph.csv shows 76 pending / 4 complete \u2014 the RECOVERY-003 80-row pending-vs-complete conflict."
+    },
+    {
+      "surface": "envctl.handoff",
+      "uri": "/home/flexnetos/meta/src/envctl/.handoff/tasks/*.task.json",
+      "kind": "json-card-collection",
+      "row_count": 55,
+      "status_column": "status",
+      "status_vocabulary": {
+        "done": 54,
+        "backlog": 1
+      },
+      "sha256": "fd53865b8ca45e47ec46268771393edf405cf25159faced6e5082ddec2a3cb12",
+      "checksum_kind": "sha256-of-sorted-per-file-sha256-manifest",
+      "authority_class": "prior-handoff-task-cards",
+      "proof_surface": ".handoff/loop/_done/*, merged PRs, deliveries/"
+    },
+    {
+      "surface": "envctl.handoff",
+      "uri": "/home/flexnetos/meta/src/envctl/.handoff/ledger.events.jsonl",
+      "kind": "jsonl",
+      "row_count": 85,
+      "status_column": null,
+      "status_vocabulary": "handoff append-only event ledger",
+      "sha256": "ed44e572834b5938f3bff0becd475ca152e33bf464ed683930430afa2c60ed9b",
+      "authority_class": "prior-handoff-state",
+      "proof_surface": ".handoff loop artifacts / merged PRs"
+    },
+    {
+      "surface": "envctl.handoff",
+      "uri": "/home/flexnetos/meta/src/envctl/.handoff/loop/loop_state.md",
+      "kind": "markdown",
+      "row_count": null,
+      "status_column": null,
+      "status_vocabulary": "autonomous-loop cycle state (holds TASK-0089 [!] blocked)",
+      "sha256": "4cc9882c13b75b6de13947d5a529ba75a265bbb76d785b2e48982cd96adc0550",
+      "authority_class": "prior-handoff-state",
+      "proof_surface": ".handoff loop artifacts / merged PRs"
+    },
+    {
+      "surface": "envctl.handoff",
+      "uri": "/home/flexnetos/meta/src/envctl/.handoff/loop/backlog.md",
+      "kind": "markdown",
+      "row_count": null,
+      "status_column": null,
+      "status_vocabulary": "loop backlog",
+      "sha256": "64c2764478a08281a4a554f548abd51cce4fd5b6e80617917bed6cb33871b2bc",
+      "authority_class": "prior-handoff-state",
+      "proof_surface": ".handoff loop artifacts / merged PRs"
+    },
+    {
+      "surface": "envctl.handoff",
+      "uri": "/home/flexnetos/meta/src/envctl/.handoff/deliveries/envctl-agenticos-consolidation.delivery.json",
+      "kind": "json",
+      "row_count": null,
+      "status_column": null,
+      "status_vocabulary": "merged-PR delivery record (TASK-0033 PR#207)",
+      "sha256": "0cf7c0e197f22545f700fd3a5bd8855a426cbece6ed23f3121feecbadc0a1b17",
+      "authority_class": "prior-handoff-state",
+      "proof_surface": ".handoff loop artifacts / merged PRs"
+    }
+  ]
+}

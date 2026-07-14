@@ -1,0 +1,144 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "RELEASE-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Tasks cover clean source build, reproducible package hash, signed provenance, isolated install, data migration, runtime behavior, rollback, disaster recovery, and no profile mutation as build proof.",
+  "gate_result": {
+    "clause_1_clean_source_build": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-A",
+      "surface": "clean Ubuntu 26.04+ x86_64 build (env -i, only FOUNDATION-001 profile on PATH, no ambient toolchain shadow)",
+      "chain": "envctl materializes consolidated LifeOS source (CONSOLIDATE-001 single Rust workspace) from PostgreSQL production branch via module_path projection -> Nix build against x86_64-unknown-linux-musl via meta exec on pure-Rust dirs (bypasses napi-rs/wasm exhaust)",
+      "clean_guarantee": "no host rustc/cargo/glibc leak; dev linker (mold, FOUNDATION-002-D) explicitly NOT inherited so static output stays byte-reproducible",
+      "evidence": "Architecture Blueprint §7 Nix+musl + Phase 4 Materialization; FOUNDATION-003-B clean-env resolution; FOUNDATION-002-D linker split"
+    },
+    "clause_2_reproducible_package_hash": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-B",
+      "package": "content-addressed /nix/store/...-lifeos static x86_64-unknown-linux-musl path",
+      "pins": "root flake.nix + flake.lock (MISSING today per state/nix_surface_report.json.root_flake -> closed upstream by FOUNDATION-003-A) + rust-toolchain.toml + Cargo.lock + pinned Yazelix source path:/home/flexnetos/FlexNetOS/src/yazelix",
+      "acceptance": "second Nix build from same pins yields byte-identical store hash (digest equality) + pinned nix-profile generation",
+      "evidence": "Architecture Blueprint Nix+musl deterministic compilation; FOUNDATION-003-C reproducibility chain; state/nix_surface_report.json"
+    },
+    "clause_3_signed_provenance": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-C",
+      "ledger": "manifests/provenance.json (rustc/cargo/target-triple/lockfile-hash/binary-checksums)",
+      "signing": "content-addressed store hash (SHA-256 identity) + committed flake.lock + committed source pins bound into a keyring-signed SLSA-style attestation bundle",
+      "authority": "STORE-001 external-secret / provenance authority class (OS keyring + committed source pins + attestation bundles); PostgreSQL stores references/provenance never raw secrets; redb never holds secrets",
+      "lineage": "every artifact traces to source commit/PR (adopted_capabilities.source.csv)",
+      "evidence": "runner provenance contracts / FOUNDATION-002-F ubuntu-latest CI; FOUNDATION-003-A provenance ledger; STORE-001 state_class_assignments[external-secret/provenance]"
+    },
+    "clause_4_isolated_install": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-E",
+      "surface": "fresh isolated Ubuntu 26.04+ target: disposable container / clean $HOME, NO Nix daemon, NO /nix/store, NO glibc assumption",
+      "acceptance": "static-musl install-in-place folder runs with zero external dependency and zero hardcoded /nix/store RPATH on a machine that never had the build toolchain; reads confined to declared $APPDATA/lifeos/* scope",
+      "evidence": "Architecture Blueprint 'install-in-place' (nix bundle / AppImage / nix-user-chroot); redb Technical Report §7 zero-dependency musl release; CLAUDE.md Tauri FS scope $APPDATA/lifeos/*"
+    },
+    "clause_5_data_migration": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-F",
+      "classes": [
+        "account.json -> accounts table one-time boot migration (insert then rename to account.json.migrated-<ts>, never delete; corrupt JSON -> app still starts)",
+        "embedded sqlx migrations 000N_*.sql run idempotently in tauri::Builder::setup() before any IPC (db_health degraded when applied < embedded; db_migrate recovers)",
+        "redb-durable source-blob store -> PostgreSQL BlobStore parity cutover via codedb_store_pg::PgStore under one SHA-256 identity; class moves off redb-durable ONLY after green live blobstore_parity.rs vs disposable PostgreSQL"
+      ],
+      "no_loss": "SHA-256 identity + source commit/PR lineage preserved; account.json renamed not deleted; verified-cutover invariant honored (STORE-001)",
+      "evidence": "CLAUDE.md storage layer (account.json migration, db_health, db_migrate); STORE-001 durable-relational migration_path; ADOPT-001 BlobStore/PgStore/parity"
+    },
+    "clause_6_runtime_behavior": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-H",
+      "boot_sequence": [
+        "LifeOS opens as the primary UI",
+        "Yazelix initializes Zellij + Nushell in background",
+        "Ruvnet agents spin up on static ruvllm via .rvf files (single frozen model, 50+ MicroLoRA agents)",
+        "LifeOS connects via UDS or shared memory-mapped redb state files (no overlapping state)",
+        "storage init Storage::new -> migrate -> migrate_from_json; db_health status == 'healthy' (applied == embedded); refuse-to-start calm error on failure"
+      ],
+      "acceptance": "UI mounts, background workspace live, >=1 agent reachable over UDS/redb, db_health healthy",
+      "evidence": "Architecture Blueprint Phase 4 §25-26 (LifeOS UI + Yazelix + ruvllm + UDS/redb); CLAUDE.md storage init sequence"
+    },
+    "clause_7_rollback": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-I",
+      "mechanism": "meta git snapshot (multi-repo checkpoint) + nix profile rollback to prior pinned generation + archived-release-plan restore + re-pin prior frontdoor order + PostgreSQL PITR restore for any ran migration",
+      "rollback_plan": "Restore the archived release plan; build, profile, and deployment state remain unchanged.",
+      "guarantee": "prior generation always restorable: retirement is archive-first (no deletion) and blocked_paths forbid build execution / profile mutation / release publication / deployment",
+      "evidence": "task_graph.source.csv RELEASE-002 rollback_plan; FOUNDATION-003-J rollback pattern; meta-destructive-commands snapshot policy"
+    },
+    "clause_8_disaster_recovery": {
+      "satisfied": true,
+      "work_item": "RELEASE-002-J",
+      "recovery_by_class": {
+        "durable_relational_macro_state": "PostgreSQL PITR",
+        "semantic_vector_state": "PostgreSQL PITR + reproducible re-embedding (all-MiniLM-L6-v2)",
+        "transient_redb_state": "transient-by-definition on loss; no durable recovery owed",
+        "per_agent_cognition_rvf": "restore .rvf file or regenerate from base model + training history",
+        "derived_projections_and_release_artifacts": "re-projection from PostgreSQL + deterministic rebuild from committed pins (same content-addressed hash)",
+        "external_secret_provenance": "OS keyring + committed source pins"
+      },
+      "guarantee": "no derived release artifact is a single point of durable loss; durable authority is PostgreSQL alone",
+      "evidence": "STORE-001 state_class_assignments recovery_source fields (all six classes)"
+    },
+    "clause_9_no_profile_mutation_as_build_proof": {
+      "satisfied": true,
+      "work_items": ["RELEASE-002-D", "RELEASE-002-K"],
+      "profile_consumption": "release build consumes FOUNDATION-001 Yazelix plus Nix foundation profile (proven to resolve by FOUNDATION-003-B) read-only as sole provider; correctness shown by consuming a fixed generation, not changing it",
+      "definition_only_envelope": "simulation_required=TRUE; each proof is a machine-checkable gate whose execution is a downstream release-cell task; this family executes no build, mutates no profile, publishes no release, deploys nothing",
+      "blocked_paths_honored": ["build execution", "profile mutation", "release publication", "deployment", "secrets/**"],
+      "evidence": "task_graph.source.csv RELEASE-002 blocked_paths + simulation_required=TRUE + execution_cell=release-cell"
+    },
+    "task_family_work_item_count": 11,
+    "gate_clause_to_work_item_map": {
+      "clean source build": "RELEASE-002-A",
+      "reproducible package hash": "RELEASE-002-B",
+      "signed provenance": "RELEASE-002-C",
+      "isolated install": "RELEASE-002-E",
+      "data migration": "RELEASE-002-F",
+      "runtime behavior": "RELEASE-002-H",
+      "rollback": "RELEASE-002-I",
+      "disaster recovery": "RELEASE-002-J",
+      "no profile mutation as build proof": ["RELEASE-002-D", "RELEASE-002-K"]
+    },
+    "goal_item_coverage": {
+      "source-build": "RELEASE-002-A",
+      "package": "RELEASE-002-B",
+      "profile consumption": "RELEASE-002-D",
+      "clean-install": "RELEASE-002-E",
+      "migration": "RELEASE-002-F",
+      "upgrade": "RELEASE-002-G",
+      "rollback": "RELEASE-002-I",
+      "provenance": "RELEASE-002-C",
+      "runtime proof": "RELEASE-002-H",
+      "ubuntu_26.04+_first_release_gate": "release_gate_target (gatekeeper: no macOS/Windows until Ubuntu succeeds)"
+    },
+    "release_artifact_ledger_entries": 8,
+    "every_artifact_assigned_exactly_once": true,
+    "store_001_alignment": "Release layer maps onto STORE-001 without reclassifying any store: PostgreSQL+RuVector canonical durable (PITR); redb transient high-frequency (loss transient-by-definition); AgentDB .rvf per-agent non-authoritative cognition; materialized source/package/install prefix are derived-projections/derived-build (PostgreSQL canonical, envctl projection read-only, deterministically regenerable); source pins + attestation bundles are external-secret/provenance authority (keyring + committed pins); redb-durable CodeDB blobs migrate to PostgreSQL only via verified BlobStore SHA-256 parity cutover. Building to intended specs is an upgrade, never a downgrade.",
+    "blocked_paths_honored": ["build execution", "profile mutation", "release publication", "deployment", "secrets/**"],
+    "product_execution_performed": false
+  },
+  "proof_summary": "RELEASE-002 defines the Ubuntu 26.04+ x86_64 first-release gate as an 11-item task family (RELEASE-002-A..K), and every one of the verification gate's nine clauses is covered by exactly one work item (with clause 9 'no profile mutation as build proof' split across the profile-consumption item D and the definition-only build-proof envelope K), each grounded in named sources rather than invented. Clean source build (A) materializes the consolidated LifeOS Rust workspace (CONSOLIDATE-001) via envctl projection from the PostgreSQL production branch and compiles it against x86_64-unknown-linux-musl in a clean env with only the FOUNDATION-001 profile on PATH, deliberately not inheriting the mold dev linker so the static output stays byte-reproducible. Reproducible package hash (B) requires a second deterministic Nix build from the same pins to yield the byte-identical content-addressed /nix/store/...-lifeos hash, closing the missing root flake.nix/flake.lock gap recorded in state/nix_surface_report.json via FOUNDATION-003-A. Signed provenance (C) records rustc/cargo/target-triple/lockfile-hash/binary-checksums into manifests/provenance.json and binds the SHA-256 store hash + committed flake.lock + source pins into a keyring-signed SLSA-style attestation bundle owned by the STORE-001 external-secret/provenance authority class. Isolated install (E) proves the static-musl install-in-place folder runs on a fresh Ubuntu 26.04 target with no Nix daemon, no /nix/store, and no glibc assumption. Data migration (F) covers the three real durable-data classes: account.json -> accounts table (rename-never-delete), idempotent sqlx migrations gated by db_health/db_migrate, and the redb-durable CodeDB blob store -> PostgreSQL BlobStore parity cutover under one SHA-256 identity that only cuts over after a green live blobstore_parity.rs run (STORE-001 verified-cutover invariant). Runtime behavior (H) proves the intended boot: LifeOS UI opens, Yazelix initializes Zellij+Nushell, Ruvnet agents spin up on static ruvllm via .rvf, LifeOS connects over UDS/shared redb, and db_health returns healthy after account.json migration. Rollback (I) restores the prior generation via meta git snapshot + nix profile rollback + archived-plan restore + PostgreSQL PITR, leaving build/profile/deployment unchanged. Disaster recovery (J) restores each STORE-001 class from its named recovery source (PostgreSQL PITR, reproducible re-embedding, redb transient-by-definition, .rvf regeneration, deterministic re-derivation of derived artifacts, keyring+pins). The release_artifact_ledger enumerates eight release artifacts/state-classes, each assigned exactly once with owner, lifetime, forward-only sync edge, recovery source, and STORE-001 relationship, so PostgreSQL remains the single durable authority and redb/AgentDB stay non-durable. The upgrade item (G) preserves persisted state and the LIFEOS_PERSIST_KEYS whitelist forward-only with reversible fallback, retiring the prior generation archive-first only after the new one is proven. This is a definition/simulation task only (simulation_required=TRUE, execution_cell=release-cell): no build was executed, no profile mutated, no release published, and nothing deployed; all reads were non-mutating and product_execution_performed is false.",
+  "artifact_paths": [
+    "generated/task_families/RELEASE-002.json",
+    "proof_records/RELEASE-002.proof.json"
+  ],
+  "grounding_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md (Nix+musl static release, Phase 4 Materialization/Portable Release, install-in-place, LifeOS UI + Yazelix + ruvllm + UDS/redb runtime, gitkb/meta exhaust isolation)",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv (canonical vs derived/transient state ownership; Yazelix/Nix musl release row; envctl+nu_plugin materialization row)",
+    "generated/store_relationship_decision.json (STORE-001 six state-class assignments, recovery sources, verified-cutover invariants)",
+    "generated/task_graph.source.csv (RELEASE-002 row: goal, gate, blocked_paths, rollback_plan, execution_cell; RELEASE-001, FOUNDATION-003, FOUNDATION-002 inputs)",
+    "generated/task_families/FOUNDATION-003.json + proof_records/FOUNDATION-003.proof.json (source->package->profile->generated-runtime reproducibility chain, provenance ledger, archive-first rollback)",
+    "generated/task_families/FOUNDATION-002.json (single Rust workspace owner, mold-vs-musl linker split, Ubuntu-first CI runner provenance)",
+    "generated/task_families/CONSOLIDATE-001.json / CONSOLIDATE-002.json / CONSOLIDATE-003.json (consolidated single application, migration waves, installed-runtime validation / parity cutover)",
+    "proof_records/ADOPT-001.proof.json + generated/adopted_capabilities.source.csv (BlobStore trait, redb source-blob store, PgStore parity, SHA-256 identity, exact-byte materialization, envctl export contract)",
+    "state/nix_surface_report.json (Ubuntu host, Determinate Nix 3.21.1 / nix 2.34.7, intended profile, missing root flake reproducibility gap)",
+    "1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md §7 (Ubuntu 26.04+ build is the primary gatekeeper; no macOS/Windows until it succeeds)",
+    "src/lifeos/CLAUDE.md (storage layer: account.json migration, db_health/db_migrate, Storage::migrate init sequence, $APPDATA/lifeos/* FS scope, LIFEOS_PERSIST_KEYS)"
+  ],
+  "product_execution_performed": false
+}

@@ -1,0 +1,113 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "INTEL-003",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every configuration and secret has an owner and reference boundary; learning is proof-derived; failed worlds cannot become baseline; promotion and rollback require explicit gates.",
+  "gate_result": {
+    "task_family": "generated/task_families/INTEL-003.json",
+    "entity_universe": {
+      "configuration_classes": ["CFG-1 materialized source-tree projection", "CFG-2 envctl control flags & transformation rules", "CFG-3 Nix/musl + .meta build config", "CFG-4 swarm routing/model config", "CFG-5 redb transient runtime/system-config buffer"],
+      "secret_classes": ["SEC-1 provider API keys (Anthropic/OpenAI/Gemini)", "SEC-2 attestation bundles & committed source pins", "SEC-3 PostgreSQL secret-reference & provenance rows"],
+      "identity_classes": ["ID-1 relational identity keys & schema fields", "ID-2 per-agent identity & witness roots"],
+      "learning_classes": ["LRN-1 per-agent cognition (SONA/MicroLoRA/RL)", "LRN-2 ATAS failure-node capsules / ESN forecast"],
+      "promotion_gate_surface": ["PROM-1 explicit promotion gate stack"],
+      "rollback_surface": ["RBK-1 COW proven-world rollback baseline"],
+      "total_work_items": 14,
+      "every_entity_assigned_exactly_once": true
+    },
+    "clause_1_every_config_and_secret_has_owner_and_reference_boundary": {
+      "satisfied": true,
+      "configuration_owners": {
+        "CFG-1": "envctl projection engine (truth = PostgreSQL production branch)",
+        "CFG-2": "envctl engine",
+        "CFG-3": "Nix derivations + gitkb/meta .meta file",
+        "CFG-4": "Ruflo meta-harness + ruvllm runtime",
+        "CFG-5": "redb per process (transient, never authority)"
+      },
+      "secret_owners": {
+        "SEC-1": "OS keyring (service 'lifeos', accounts anthropic|openai|gemini) + env fallback",
+        "SEC-2": "committed in-repo source pins + attestation issuer",
+        "SEC-3": "PostgreSQL (reference/provenance rows only)"
+      },
+      "identity_owners": {
+        "ID-1": "PostgreSQL + RuVector",
+        "ID-2": "AgentDB (.rvf) per agent, witness roots owned by PostgreSQL source vectors"
+      },
+      "reference_boundary_rule": "Raw secret bytes live ONLY in the OS keyring/env; PostgreSQL stores references/provenance and NEVER the raw value; redb NEVER holds secrets; projections and build closures never embed keys. Canonical config lives in PostgreSQL rows or committed source; redb/filesystem copies are derived-disposable and hold no authority.",
+      "every_config_has_owner_and_boundary": true,
+      "every_secret_has_owner_and_boundary": true,
+      "postgres_holds_references_only": true,
+      "redb_never_holds_secrets": true
+    },
+    "clause_2_learning_is_proof_derived": {
+      "satisfied": true,
+      "learning_classes_covered": ["LRN-1 (INTEL-003-K)", "LRN-2 (INTEL-003-L)", "witness-rooted identity ID-2 (INTEL-003-J)", "provenance pins SEC-2 (INTEL-003-G)"],
+      "proof_mechanisms": [
+        "SHAKE256 Cryptographic Witness Chains bind every learned fact/edit to a verified PostgreSQL source vector",
+        "Causal Graph Verification (GNN) rejects any adjustment lacking a historical causal edge",
+        "SONA adjusts ranking only from observed agent successes/failures (the failure capsule), never from fabricated outcomes",
+        "ATAS failure nodes are derived from observed past agent failure rates + current PostgreSQL state, validated in isolated COW sandboxes before any production write"
+      ],
+      "no_fabricated_or_rootless_learning_admitted": true
+    },
+    "clause_3_failed_worlds_cannot_become_baseline": {
+      "satisfied": true,
+      "baseline_authority": "PostgreSQL main production trunk",
+      "mechanism": "Agents work only in isolated COW staging branches; a branch merges to the trunk ONLY through the INTEL-003-M gate stack; a failed branch is deterministically rolled back and discarded, so failed rows never touch the trunk (eliminates the 'dirty repository' problem).",
+      "redb_never_durable_authority": true,
+      "redb_wal_role": "subordinate application-level WAL/outbox, forward-only replay-with-ack during PostgreSQL latency/outage; never a second baseline",
+      "verified_cutover_only": "a class leaves redb-durable for PostgreSQL only via a green live blobstore_parity.rs cutover under one preserved SHA-256 identity; a failed/unverified cutover is rejected",
+      "silent_reclassification": false
+    },
+    "clause_4_promotion_and_rollback_require_explicit_gates": {
+      "satisfied": true,
+      "promotion_gates": [
+        "RuVector MinCut immune isolation (agent not severed; O(n^{o(1)}) subpolynomial)",
+        "Causal Graph Verification (historical causal edge present)",
+        "SHAKE256 Cryptographic Witness Chain (bound to a verified source vector)",
+        "ATAS/ESN mathematical-stability score (winning timeline)",
+        "RuvLTRA Proportional-Intelligence escalation of security/architectural validation to a high-tier model",
+        "LifeOS Mission Control human-in-the-loop confirmation for baseline-affecting promotions"
+      ],
+      "autonomous_promotion_permitted": false,
+      "rollback_gate": "COW rollback of un-merged branches + PostgreSQL PITR restore of the baseline",
+      "store_001_reclassification_gate": "green live blobstore_parity.rs under one SHA-256 identity governs any redb-durable -> PostgreSQL reclassification"
+    },
+    "store_001_alignment": {
+      "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+      "classes_mapped": {
+        "external-secret / provenance authority": "SEC-1/SEC-2/SEC-3 (keyring raw, PostgreSQL references only, redb never holds secrets)",
+        "derived projections": "CFG-1 (PostgreSQL source projected by envctl, forward-only, re-projection recovery)",
+        "durable relational macro-state (identities)": "ID-1 (PostgreSQL single durable owner)",
+        "per-agent cognition": "ID-2 / LRN-1 (AgentDB non-authoritative, witnessed by SHAKE256 chains rooted in PostgreSQL)",
+        "transient high-frequency state": "CFG-5 and the redb WAL of RBK-1 (redb transient, never durable authority)"
+      },
+      "invariants_honored": ["single durable writer = PostgreSQL", "forward-only redb -> envctl -> PostgreSQL", "verified cutover only", "no sidecar (RuVector native extension)", "provenance / SHA-256 identity preserved"]
+    },
+    "blocked_paths_respected": {
+      "secret_values": "none written or read",
+      "credential_rotation": "none performed",
+      "config_apply": "none performed (planning classification only)",
+      "autonomous_promotion": "none — every promotion is routed through the INTEL-003-M explicit gate stack",
+      "product_implementation": "none"
+    },
+    "simulation_only_policy_cell": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "INTEL-003 decomposes regenerative configuration, secrets brokerage, identity, failure-capsule learning, guardrail promotion, and proven-world rollback into fourteen work items (INTEL-003-A..N) under the settled STORE-001 tiered-authority model, and generated/task_families/INTEL-003.json assigns every class exactly once. Clause 1 holds: the five configuration classes (materialized source-tree projection owned by envctl over the PostgreSQL production branch; envctl control flags/transformation rules; Nix/musl + gitkb/meta .meta build config; Ruflo/RuvLTRA/ruvllm routing-and-model policy; the redb transient runtime/system-config buffer) and the three secret classes (provider API keys owned by the OS keyring with env fallback; committed attestation bundles and source pins; PostgreSQL reference/provenance rows) each carry an owner and an explicit reference boundary, with raw secret bytes confined to the keyring, PostgreSQL holding references/provenance only, and redb never holding secrets (STORE-001 external-secret and derived-projection classes). Clause 2 holds: learning is proof-derived — SONA/MicroLoRA/RL adjustments in AgentDB and ATAS/ESN failure-node capsules are each bound to SHAKE256 Cryptographic Witness Chains rooted in verified PostgreSQL source vectors, gated by Causal Graph Verification that rejects rootless claims, and derived only from observed successes/failures, never fabricated. Clause 3 holds: the proven-world baseline is the PostgreSQL main trunk, agents work only in isolated COW staging branches, and a failed branch is rolled back and discarded so failed rows never reach the trunk; redb serves only as a subordinate forward-only WAL and a class leaves redb-durable only via a green blobstore_parity.rs SHA-256 cutover, so no failed or unverified world can silently become the baseline. Clause 4 holds: promotion runs through an explicit six-stage gate stack (MinCut, Causal Graph Verification, Witness Chain, ESN stability, RuvLTRA escalation, LifeOS human-in-the-loop) with autonomous promotion forbidden, and rollback is an explicit COW rollback plus PostgreSQL PITR. Every assignment traces to the Architecture Blueprint, the Architecture Context Matrix, or STORE-001; this is planning classification only in the policy-cell — no secret value, credential rotation, config apply, autonomous promotion, model, or baseline was touched.",
+  "artifact_paths": [
+    "generated/task_families/INTEL-003.json",
+    "proof_records/INTEL-003.proof.json"
+  ],
+  "provenance_derived_from": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/adopted_capabilities.source.csv (ADOPT-001/ADOPT-002)",
+    "generated/task_families/PGAUTH-002.json"
+  ],
+  "rollback_plan": "Restore the archived governance and learning plan; no config, secret, model, or baseline is changed.",
+  "product_execution_performed": false
+}

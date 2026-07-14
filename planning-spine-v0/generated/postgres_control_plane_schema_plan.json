@@ -1,0 +1,310 @@
+{
+  "schema_version": "lifeos-planning-spine.postgres-control-plane-schema-plan.v0",
+  "task_id": "POSTGRES-003",
+  "title": "Planning and control tables made database-native",
+  "generated_at": "2026-07-13T03:47:08Z",
+  "owner": "LifeOS Planning Spine / LifeOS Data Agent",
+  "objective": "Define the PostgreSQL-native control plane for the Planning Spine so that every planning question is answered by a SQL query and every accepted answer is an UPDATE to a database row, while the committed CSV, JSON, and Markdown surfaces become deterministic, byte-identical, lossless projections of those rows. This plan assigns a database owner and a deterministic projection contract to every current control-plane column, relation, proof URI, lifecycle transition, North Star anchor, and source provenance with zero information loss.",
+  "grounding": {
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "supporting_sources": [
+      "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+      "1.0_VISION/NORTH_STAR.md",
+      "generated/store_relationship_decision.json",
+      "generated/task_graph.source.csv",
+      "generated/task_graph.normalized.json",
+      "generated/task_graph.status.json",
+      "generated/north_star_coverage.source.csv",
+      "generated/north_star_coverage.control.json",
+      "generated/notebooklm_source_registry.source.csv",
+      "generated/adopted_capabilities.source.csv",
+      "proof_records/proof_ledger.jsonl"
+    ],
+    "parent_task": "POSTGRES-002 (whole user-space relational graph and identity model). This plan reuses the same lossless-identity discipline for the control plane itself rather than user-space content."
+  },
+  "store_alignment": {
+    "store_decision": "STORE-001 (generated/store_relationship_decision.json), owner_decision adopt-intended-tiered-architecture",
+    "control_plane_state_class": "durable relational macro-state (identities, histories, permissions, provenance, causal dependency edges)",
+    "canonical_owner": "PostgreSQL + RuVector",
+    "why": "The Planning Spine control plane is durable relational macro-state (task identities, lifecycle histories, provenance lineage, anchor->task causal edges, proof audit trail). STORE-001 assigns this exact class canonical ownership to PostgreSQL + RuVector; the Architecture Context Matrix (row 1) classifies PostgreSQL as 'Global knowledge base, relational data, and shared knowledge graphs' and 'canonical state', and the Architecture Blueprint tiered-memory table lists PostgreSQL persistence as 'Enterprise ACID / PITR Recovery'.",
+    "projection_class": "derived projections (materialized files regenerated deterministically from PostgreSQL rows via envctl). STORE-001 assigns this class canonical ownership to PostgreSQL projected by envctl (read-only, forward-only, disposable). The committed .csv/.json/.md control surfaces are these projections.",
+    "redb_role": "transient only. Per STORE-001 and the Blueprint, redb is the microsecond forward buffer / WAL used during the one-time ingest (redb -> envctl embed -> PostgreSQL); it is never a second durable writer of any control-plane relation. During normal operation the control plane is written directly to PostgreSQL.",
+    "codedb_role": "nu_plugin CodeDB is the parser/ingestion path only. It parses the current committed CSV/JSON/MD control surfaces into structured blocks buffered in redb; envctl bridges them into PostgreSQL. CodeDB owns no durable control-plane authority.",
+    "ruvector_role": "RuVector (native No-Sidecar PostgreSQL extension) hosts semantic embeddings of goal / verification_gate / proof_summary text so planning questions can be answered by hybrid SQL + vector search ('ORDER BY semantic_embedding <-> ...'), per Blueprint section 5.",
+    "cutover_guard": "This is a PLANNING artifact. The currently committed generated/task_graph.source.csv and proof_records/proof_ledger.jsonl remain the canonical editable authority until POSTGRES-010 proves whole-user-space parity and performs one explicit verified authority switch. No live PostgreSQL was created or mutated; product_execution_performed is false."
+  },
+  "control_plane_inventory": {
+    "note": "The six gate categories, each enumerated from the real current control-plane surfaces. Every item below is assigned a database owner and a deterministic projection contract in the following sections.",
+    "1_columns": {
+      "description": "Every column of every current control-plane relation, with its owning PostgreSQL table.column, lossless representation rule, and projection rule. Multi-value ('; '-delimited) columns are normalized into ordinal child tables and re-serialized byte-identically on projection.",
+      "task_graph_source_csv": {
+        "relation_file": "generated/task_graph.source.csv",
+        "row_count": 196,
+        "stable_ordering_key": "task_node.source_row_number (from generated/task_graph.normalized.json)",
+        "csv_dialect": "RFC4180, QUOTE_ALL (every field quoted), UTF-8, LF line endings, header row verbatim",
+        "columns": [
+          { "csv_column": "task_id", "owner": "task_node.task_id", "type": "text PRIMARY KEY", "lossless_rule": "verbatim identity key", "projection": "direct" },
+          { "csv_column": "parent_id", "owner": "task_dependency(child_task_id, parent_task_id, ordinal)", "type": "edge table", "lossless_rule": "normalized to parent_ids array in normalized.json (multi-parent exists, e.g. LIFEOS-010 -> LIFEOS-007;LIFEOS-008;LIFEOS-009); ordinal preserves order; empty parent stored as zero edges", "projection": "GROUP_CONCAT parent_task_id ORDER BY ordinal SEPARATOR '; '" },
+          { "csv_column": "phase", "owner": "task_node.phase_id -> phase.phase_id", "type": "text FK", "lossless_rule": "27 distinct phases enumerated in phase table verbatim", "projection": "join phase.phase_id" },
+          { "csv_column": "title", "owner": "task_node.title", "type": "text", "lossless_rule": "verbatim", "projection": "direct" },
+          { "csv_column": "owner_agent", "owner": "task_node.owner_agent", "type": "text", "lossless_rule": "verbatim including ' / ' separators (kept as free text, not split, to guarantee byte-identity)", "projection": "direct" },
+          { "csv_column": "goal", "owner": "task_node.goal", "type": "text", "lossless_rule": "verbatim; RuVector embedding stored in task_node.goal_embedding for semantic query", "projection": "direct" },
+          { "csv_column": "inputs", "owner": "task_input(task_id, ordinal, input_ref)", "type": "ordinal child table", "lossless_rule": "split on '; ' into ordered rows; re-joined with '; '", "projection": "GROUP_CONCAT input_ref ORDER BY ordinal SEPARATOR '; '" },
+          { "csv_column": "target_artifacts", "owner": "task_target_artifact(task_id, ordinal, artifact_path)", "type": "ordinal child table (FK -> artifact.artifact_path)", "lossless_rule": "split on '; ' into ordered rows; re-joined with '; '", "projection": "GROUP_CONCAT artifact_path ORDER BY ordinal SEPARATOR '; '" },
+          { "csv_column": "allowed_paths", "owner": "task_allowed_path(task_id, ordinal, path_glob)", "type": "ordinal child table", "lossless_rule": "split on '; ' into ordered rows; re-joined with '; '", "projection": "GROUP_CONCAT path_glob ORDER BY ordinal SEPARATOR '; '" },
+          { "csv_column": "blocked_paths", "owner": "task_blocked_path(task_id, ordinal, blocked_clause)", "type": "ordinal child table", "lossless_rule": "split on '; ' into ordered rows; re-joined with '; '", "projection": "GROUP_CONCAT blocked_clause ORDER BY ordinal SEPARATOR '; '" },
+          { "csv_column": "simulation_required", "owner": "task_node.simulation_required", "type": "boolean", "lossless_rule": "TRUE/FALSE stored as boolean; projected as uppercase literal 'TRUE'/'FALSE' to match current CSV", "projection": "CASE simulation_required WHEN true THEN 'TRUE' ELSE 'FALSE' END" },
+          { "csv_column": "execution_cell", "owner": "task_node.execution_cell_id -> execution_cell.execution_cell_id", "type": "text FK", "lossless_rule": "distinct cells (e.g. policy-cell) enumerated verbatim", "projection": "join execution_cell.execution_cell_id" },
+          { "csv_column": "verification_gate", "owner": "task_node.verification_gate", "type": "text", "lossless_rule": "verbatim; embedding stored in task_node.gate_embedding", "projection": "direct" },
+          { "csv_column": "rollback_plan", "owner": "task_node.rollback_plan", "type": "text", "lossless_rule": "verbatim", "projection": "direct" },
+          { "csv_column": "status", "owner": "task_node.status", "type": "text CHECK IN ('Draft','Running','Complete')", "lossless_rule": "MUTABLE authored field; one of exactly three title-case values observed in the sheet", "projection": "direct" },
+          { "csv_column": "proof_uri", "owner": "task_node.proof_uri", "type": "text (soft FK -> proof_record.proof_uri or source_extract path)", "lossless_rule": "MUTABLE; verbatim path", "projection": "direct" },
+          { "csv_column": "next_action", "owner": "task_node.next_action", "type": "text", "lossless_rule": "MUTABLE; verbatim", "projection": "direct" }
+        ],
+        "mutable_columns": ["status", "proof_uri", "next_action"],
+        "mutable_column_authority": "Mirrors task_graph.status.json update_policy.allowed_updated_fields exactly. All other 14 columns are authored-immutable in the sheet (update_policy.mutates_source_graph = false)."
+      },
+      "north_star_coverage_source_csv": {
+        "relation_file": "generated/north_star_coverage.source.csv",
+        "row_count": 5,
+        "stable_ordering_key": "ns_anchor.anchor_ordinal (canonical order NS-EXTENSION, NS-WHOLE, NS-CLARITY, NS-DIRECTION, NS-PROGRESS)",
+        "columns": [
+          { "csv_column": "anchor_id", "owner": "ns_anchor.anchor_id", "type": "text PRIMARY KEY", "lossless_rule": "verbatim NS-* id", "projection": "direct" },
+          { "csv_column": "source_anchor", "owner": "ns_anchor.source_anchor", "type": "text", "lossless_rule": "verbatim ('NORTH_STAR.md NS-*')", "projection": "direct" },
+          { "csv_column": "required_outcome", "owner": "ns_anchor.required_outcome", "type": "text", "lossless_rule": "verbatim anchor prose from NORTH_STAR.md", "projection": "direct" },
+          { "csv_column": "phase_task_ids", "owner": "anchor_coverage(anchor_id, ordinal, task_id)", "type": "ordinal M:N child table (FK -> task_node.task_id)", "lossless_rule": "split on '; ' into ordered rows; re-joined with '; '", "projection": "GROUP_CONCAT task_id ORDER BY ordinal SEPARATOR '; '" },
+          { "csv_column": "coverage_status", "owner": "ns_anchor.coverage_status", "type": "text", "lossless_rule": "verbatim (e.g. covered-high-level)", "projection": "direct" },
+          { "csv_column": "decomposition_status", "owner": "ns_anchor.decomposition_status", "type": "text", "lossless_rule": "verbatim", "projection": "direct" },
+          { "csv_column": "execution_gate", "owner": "ns_anchor.execution_gate", "type": "text", "lossless_rule": "verbatim (e.g. closed-until-full-graph); drives coverage-control global gate", "projection": "direct" },
+          { "csv_column": "proof_uri", "owner": "ns_anchor.proof_uri", "type": "text", "lossless_rule": "verbatim", "projection": "direct" }
+        ]
+      },
+      "proof_record_json": {
+        "relation_file": "proof_records/*.proof.json",
+        "columns": [
+          { "field": "schema_version", "owner": "proof_record.schema_version" },
+          { "field": "task_id", "owner": "proof_record.task_id (FK -> task_node.task_id)" },
+          { "field": "observed_at", "owner": "proof_record.observed_at (timestamptz)" },
+          { "field": "revision", "owner": "proof_record.revision (int)" },
+          { "field": "status", "owner": "proof_record.status" },
+          { "field": "verification_gate", "owner": "proof_record.verification_gate (must equal task_node.verification_gate)" },
+          { "field": "gate_result", "owner": "proof_record.gate_result (jsonb, lossless)" },
+          { "field": "proof_summary", "owner": "proof_record.proof_summary" },
+          { "field": "artifact_paths", "owner": "proof_artifact(task_id, revision, ordinal, artifact_path)" },
+          { "field": "checksums", "owner": "proof_checksum(task_id, revision, artifact_path, sha256)" },
+          { "field": "live_commands", "owner": "proof_live_command(task_id, revision, ordinal, purpose, cwd, command, exit_status, output jsonb)" }
+        ],
+        "pk": "(task_id, revision)"
+      },
+      "proof_ledger_jsonl": {
+        "relation_file": "proof_records/proof_ledger.jsonl",
+        "row_count": 166,
+        "stable_ordering_key": "proof_ledger_entry.sequence",
+        "columns": [
+          { "field": "sequence", "owner": "proof_ledger_entry.sequence (int PRIMARY KEY)" },
+          { "field": "task_id", "owner": "proof_ledger_entry.task_id" },
+          { "field": "status", "owner": "proof_ledger_entry.status" },
+          { "field": "revision", "owner": "proof_ledger_entry.revision (nullable)" },
+          { "field": "observed_at", "owner": "proof_ledger_entry.observed_at" },
+          { "field": "generated_at", "owner": "proof_ledger_entry.generated_at" },
+          { "field": "proof_uri", "owner": "proof_ledger_entry.proof_uri" },
+          { "field": "proof_sha256", "owner": "proof_ledger_entry.proof_sha256" },
+          { "field": "schema_version", "owner": "proof_ledger_entry.schema_version" }
+        ],
+        "append_only": true
+      },
+      "task_family_json": {
+        "relation_file": "generated/task_families/*.json",
+        "columns": [
+          { "field": "schema_version", "owner": "task_family.schema_version" },
+          { "field": "task_id", "owner": "task_family.task_id (PK, FK -> task_node.task_id)" },
+          { "field": "title", "owner": "task_family.title" },
+          { "field": "status", "owner": "task_family.status" },
+          { "field": "owner", "owner": "task_family.owner" },
+          { "field": "owner_decision_at", "owner": "task_family.owner_decision_at (timestamptz)" },
+          { "field": "objective", "owner": "task_family.objective" },
+          { "field": "work_items", "owner": "task_family_work_item(task_id, item_id, ordinal, surface, owner, decision, capture jsonb, restore text)" },
+          { "field": "execution_order", "owner": "derived: task_family_work_item ORDER BY ordinal" }
+        ]
+      },
+      "source_registry_csv": {
+        "relation_file": "generated/notebooklm_source_registry.source.csv",
+        "row_count": 32,
+        "columns": ["sequence","capture_task_id","notebook_id","object_id","object_type","title","content_sha256","line_count","byte_count","claim_count","mapped_claim_count","verification_required_count","capture_status","mapped_task_ids","proof_uri","next_source_gate"],
+        "owner": "source table (PK object_id) + source_task_map(object_id, ordinal, task_id) for the '; '-delimited mapped_task_ids column"
+      },
+      "adopted_capabilities_csv": {
+        "relation_file": "generated/adopted_capabilities.source.csv",
+        "row_count": 19,
+        "columns": ["capability","adopt_task","source_repo","source_commit_or_pr","current_path","ci_receipt","boundary","known_gap","target_lifeos_owner","parity_gate","store_role","disposition"],
+        "owner": "adopted_capability table (PK capability); store_role FK -> store_class_assignment"
+      },
+      "store_decision_json": {
+        "relation_file": "generated/store_relationship_decision.json",
+        "owner": "store_decision (PK task_id='STORE-001') + store_class_assignment(class, canonical_owner, write_authority, sync_direction, recovery_source, migration_path) + store_invariant(ordinal, text)"
+      }
+    },
+    "2_relations": {
+      "description": "Every current control-plane relation gets an owning PostgreSQL table. 31 tables total (core control plane + ordinal-normalization + provenance).",
+      "tables": [
+        "phase", "execution_cell", "lifecycle_state", "lifecycle_transition",
+        "task_node", "task_dependency", "task_input", "task_target_artifact", "task_allowed_path", "task_blocked_path",
+        "task_status_event", "artifact",
+        "ns_anchor", "anchor_coverage",
+        "proof_record", "proof_artifact", "proof_checksum", "proof_live_command", "proof_ledger_entry",
+        "task_family", "task_family_work_item",
+        "source", "source_task_map", "source_claim", "claim_evidence",
+        "adopted_capability", "store_decision", "store_class_assignment", "store_invariant",
+        "projection_contract", "projection_run"
+      ]
+    },
+    "3_proof_uris": {
+      "description": "Every proof URI referenced by the control plane has a database owner.",
+      "kinds": [
+        { "kind": "task proof_uri -> proof_records/<TASK>.proof.json", "owner": "proof_record (keyed by task_id, revision); the task_node.proof_uri column is a soft FK", "count_reference": "196 task rows each carry a proof_uri; 118 point at accepted proof records" },
+        { "kind": "task proof_uri -> generated/notebooklm_source_extracts/*.md (verbatim source statements)", "owner": "source_claim / source (the NBSTATED-* family points proof_uri at the extract that proves the verbatim capture)", "note": "these are provenance URIs, not proof records; owned by the source relation" },
+        { "kind": "anchor proof_uri -> proof_records/LIFEOS-000.proof.json", "owner": "ns_anchor.proof_uri (soft FK -> proof_record)" },
+        { "kind": "ledger proof_uri -> proof_records/*.proof.json", "owner": "proof_ledger_entry.proof_uri (soft FK -> proof_record) with proof_ledger_entry.proof_sha256 pinning content identity" },
+        { "kind": "source registry proof_uri", "owner": "source.proof_uri" }
+      ],
+      "integrity_rule": "Every proof_uri string that resolves to proof_records/*.proof.json MUST have a matching proof_record row whose recomputed SHA-256 equals the proof_ledger_entry.proof_sha256 for that URI. Dangling proof_uris are a projection-validation failure."
+    },
+    "4_lifecycle_transitions": {
+      "description": "The Planning Spine lifecycle state machine. Seven canonical states (from task_graph.status.json.lifecycle_counts) plus the transition edges are owned in the database; lifecycle_state per task is a DETERMINISTIC DERIVATION (not an authored column), computed from task_node.status + proof presence + rollback events + coverage gate.",
+      "states": [
+        { "state": "draft", "meaning": "authored, not yet eligible or executing", "observed_count": 76 },
+        { "state": "ready", "meaning": "dependencies complete and coverage gate open; eligible to run", "observed_count": 0 },
+        { "state": "running", "meaning": "execution in progress", "observed_count": 1, "example": "GRAPH-001" },
+        { "state": "simulated", "meaning": "simulation_required task whose simulation passed, awaiting proof", "observed_count": 0 },
+        { "state": "complete", "meaning": "accepted proof recorded in the ledger", "observed_count": 118 },
+        { "state": "blocked", "meaning": "a dependency failed or the coverage gate is closed", "observed_count": 0 },
+        { "state": "rolled-back", "meaning": "rollback_plan invoked; prior state reverted", "observed_count": 1, "example": "LPS-025" }
+      ],
+      "csv_status_to_lifecycle_map": {
+        "note": "The task_graph.source.csv status column holds only {Draft, Running, Complete}. The richer 7-state lifecycle is derived. This mapping is owned by the projection layer so both the coarse authored status and the fine derived state round-trip.",
+        "Draft": "draft | ready | blocked (refined by dependency completion + ns_anchor.execution_gate)",
+        "Running": "running | simulated (refined by task_node.simulation_required and simulation result)",
+        "Complete": "complete | rolled-back (refined by presence of a rollback proof_ledger_entry)"
+      },
+      "transitions": [
+        { "from": "draft", "to": "ready", "guard": "all task_dependency parents in state complete AND governing ns_anchor.execution_gate resolves open", "ledger_event": "none (derivation)" },
+        { "from": "draft", "to": "blocked", "guard": "a parent is blocked/rolled-back OR global_coverage_gate = closed", "ledger_event": "none (derivation)" },
+        { "from": "ready", "to": "running", "guard": "executor claims the task; task_node.status set to 'Running'", "ledger_event": "status_event" },
+        { "from": "running", "to": "simulated", "guard": "task_node.simulation_required = true AND simulation passes", "ledger_event": "status_event" },
+        { "from": "running", "to": "complete", "guard": "accepted proof_record inserted; proof_ledger_entry appended; task_node.status set to 'Complete', proof_uri + next_action updated", "ledger_event": "proof_ledger_entry (status in {complete,pass})" },
+        { "from": "simulated", "to": "complete", "guard": "accepted proof_record inserted after simulation", "ledger_event": "proof_ledger_entry" },
+        { "from": "running", "to": "rolled-back", "guard": "rollback_plan invoked before completion", "ledger_event": "proof_ledger_entry (status rolled-back)", "example": "LPS-025" },
+        { "from": "complete", "to": "rolled-back", "guard": "post-hoc rollback per rollback_plan", "ledger_event": "proof_ledger_entry (status rolled-back)" },
+        { "from": "blocked", "to": "ready", "guard": "blocking condition cleared", "ledger_event": "none (derivation)" },
+        { "from": "rolled-back", "to": "draft", "guard": "task re-authored for another attempt", "ledger_event": "status_event" }
+      ],
+      "invariant": "task_status_event and proof_ledger_entry are APPEND-ONLY; a transition is recorded, never overwritten. This preserves full lifecycle history (STORE-001 durable-history class). The blocked_paths clause 'proof history rewrite' is enforced by making proof_ledger_entry insert-only with a monotonic sequence.",
+      "mutable_field_authority": "Only task_node.status, task_node.proof_uri, task_node.next_action may be updated by a transition. Enforced by a row-level trigger mirroring task_graph.status.json update_policy (allowed_updated_fields = [next_action, proof_uri, status], mutates_source_graph = false)."
+    },
+    "5_north_star_anchors": {
+      "description": "All five immutable North Star anchors owned by ns_anchor; each is an immutable authored row (NORTH_STAR.md is 'Locked: 2026-07-10'). anchor_coverage owns the anchor->task causal edges.",
+      "anchors": [
+        { "anchor_id": "NS-EXTENSION", "required_outcome": "LifeOS is a living extension of David's intent.", "covered_task_count": 25 },
+        { "anchor_id": "NS-WHOLE", "required_outcome": "Company, personal, development, and home form one coherent whole.", "covered_task_count": 31 },
+        { "anchor_id": "NS-CLARITY", "required_outcome": "David can see and understand the whole.", "covered_task_count": 45 },
+        { "anchor_id": "NS-DIRECTION", "required_outcome": "David can direct it as one system.", "covered_task_count": 37 },
+        { "anchor_id": "NS-PROGRESS", "required_outcome": "LifeOS advances every domain without fragmenting the whole.", "covered_task_count": 49 }
+      ],
+      "immutability_rule": "ns_anchor rows are insert-once, update-forbidden (NORTH_STAR.md immutable-anchor contract). Only coverage_status / decomposition_status / execution_gate are recomputed as derivations from anchor_coverage + task lifecycle; the anchor identity and required_outcome are frozen.",
+      "this_task_covers": "POSTGRES-003 appears in the phase_task_ids of NS-WHOLE, NS-CLARITY, and NS-DIRECTION; making the control plane database-native directly serves 'see' (CLARITY), 'direct' (DIRECTION), and 'one coherent whole' (WHOLE)."
+    },
+    "6_source_provenance": {
+      "description": "Every source-provenance surface has a database owner; SHA-256 content identity is preserved so no lineage is lost (STORE-001 invariant: 'every migrated class keeps its SHA-256 identity and its source commit/PR lineage').",
+      "surfaces": [
+        { "surface": "generated/notebooklm_source_registry.source.csv (32 NotebookLM source objects)", "owner": "source (PK object_id, carries content_sha256, notebook_id, capture_status, proof_uri) + source_task_map for mapped_task_ids" },
+        { "surface": "generated/notebooklm_source_claims.source.csv", "owner": "source_claim (FK -> source)" },
+        { "surface": "generated/notebooklm_claim_evidence.source.csv", "owner": "claim_evidence (FK -> source_claim)" },
+        { "surface": "generated/adopted_capabilities.source.csv (19 CodeDB capabilities with commit/PR/CI/parity_gate)", "owner": "adopted_capability; source_commit_or_pr + current_path + ci_receipt preserve upstream lineage" },
+        { "surface": "generated/store_relationship_decision.json (STORE-001 keystone)", "owner": "store_decision + store_class_assignment + store_invariant" }
+      ],
+      "identity_rule": "source.content_sha256, adopted_capability.source_commit_or_pr, and proof_ledger_entry.proof_sha256 are the provenance identity keys. A projection is valid only if the recomputed SHA-256 of each projected provenance artifact equals its stored identity."
+    }
+  },
+  "database_schema": {
+    "engine": "PostgreSQL 16 + RuVector native extension (No-Sidecar), STORE-001 canonical owner",
+    "tables": [
+      { "table": "phase", "columns": ["phase_id text PK", "phase_ordinal int"], "note": "27 phases enumerated verbatim from the sheet" },
+      { "table": "execution_cell", "columns": ["execution_cell_id text PK"], "note": "distinct execution cells (e.g. policy-cell)" },
+      { "table": "lifecycle_state", "columns": ["state text PK", "state_ordinal int", "meaning text"], "note": "7 rows: draft, ready, running, simulated, complete, blocked, rolled-back" },
+      { "table": "lifecycle_transition", "columns": ["from_state text FK", "to_state text FK", "guard text", "ledger_event text", "PRIMARY KEY(from_state,to_state)"], "note": "the 10 transition edges enumerated above" },
+      { "table": "task_node", "columns": ["task_id text PK", "source_row_number int UNIQUE NOT NULL", "phase_id text FK", "title text", "owner_agent text", "goal text", "goal_embedding vector", "simulation_required boolean", "execution_cell_id text FK", "verification_gate text", "gate_embedding vector", "rollback_plan text", "status text CHECK IN ('Draft','Running','Complete')", "proof_uri text", "next_action text"], "note": "source_row_number is the deterministic CSV ordering key; goal_embedding/gate_embedding are RuVector columns for semantic planning queries" },
+      { "table": "task_dependency", "columns": ["child_task_id text FK", "parent_task_id text FK", "ordinal int", "PRIMARY KEY(child_task_id,parent_task_id)"], "note": "supports multi-parent (LIFEOS-010); ordinal preserves parent order for byte-identical re-join" },
+      { "table": "task_input", "columns": ["task_id text FK", "ordinal int", "input_ref text", "PRIMARY KEY(task_id,ordinal)"] },
+      { "table": "task_target_artifact", "columns": ["task_id text FK", "ordinal int", "artifact_path text FK -> artifact", "PRIMARY KEY(task_id,ordinal)"] },
+      { "table": "task_allowed_path", "columns": ["task_id text FK", "ordinal int", "path_glob text", "PRIMARY KEY(task_id,ordinal)"] },
+      { "table": "task_blocked_path", "columns": ["task_id text FK", "ordinal int", "blocked_clause text", "PRIMARY KEY(task_id,ordinal)"] },
+      { "table": "task_status_event", "columns": ["event_id bigserial PK", "task_id text FK", "from_state text", "to_state text", "changed_fields jsonb", "observed_at timestamptz"], "note": "APPEND-ONLY lifecycle audit; mirrors status.json.tasks[].updates" },
+      { "table": "artifact", "columns": ["artifact_path text PK", "artifact_kind text", "producing_task_id text FK", "sha256 text"], "note": "registry of all target_artifacts + proof + generated files" },
+      { "table": "ns_anchor", "columns": ["anchor_id text PK", "anchor_ordinal int", "source_anchor text", "required_outcome text", "coverage_status text", "decomposition_status text", "execution_gate text", "proof_uri text"], "note": "insert-once; identity + required_outcome immutable" },
+      { "table": "anchor_coverage", "columns": ["anchor_id text FK", "ordinal int", "task_id text FK", "PRIMARY KEY(anchor_id,ordinal)"], "note": "anchor->task causal edges; ordinal preserves phase_task_ids order" },
+      { "table": "proof_record", "columns": ["task_id text FK", "revision int", "schema_version text", "observed_at timestamptz", "status text", "verification_gate text", "gate_result jsonb", "proof_summary text", "product_execution_performed boolean", "PRIMARY KEY(task_id,revision)"], "note": "verification_gate must equal task_node.verification_gate (enforced by trigger)" },
+      { "table": "proof_artifact", "columns": ["task_id text", "revision int", "ordinal int", "artifact_path text", "PRIMARY KEY(task_id,revision,ordinal)"] },
+      { "table": "proof_checksum", "columns": ["task_id text", "revision int", "artifact_path text", "sha256 text", "PRIMARY KEY(task_id,revision,artifact_path)"] },
+      { "table": "proof_live_command", "columns": ["task_id text", "revision int", "ordinal int", "purpose text", "cwd text", "command text", "exit_status int", "output jsonb", "PRIMARY KEY(task_id,revision,ordinal)"] },
+      { "table": "proof_ledger_entry", "columns": ["sequence int PK", "task_id text FK", "status text", "revision int NULL", "observed_at timestamptz", "generated_at timestamptz", "proof_uri text", "proof_sha256 text", "schema_version text"], "note": "APPEND-ONLY, monotonic sequence; 166 rows; proof_sha256 pins content identity" },
+      { "table": "task_family", "columns": ["task_id text PK FK", "schema_version text", "title text", "status text", "owner text", "owner_decision_at timestamptz", "objective text"] },
+      { "table": "task_family_work_item", "columns": ["task_id text FK", "item_id text", "ordinal int", "surface text", "owner text", "decision text", "capture jsonb", "restore text", "PRIMARY KEY(task_id,item_id)"] },
+      { "table": "source", "columns": ["object_id text PK", "sequence int", "capture_task_id text", "notebook_id text", "object_type text", "title text", "content_sha256 text", "line_count int", "byte_count int", "claim_count int", "mapped_claim_count int", "verification_required_count int", "capture_status text", "proof_uri text", "next_source_gate text"] },
+      { "table": "source_task_map", "columns": ["object_id text FK", "ordinal int", "task_id text", "PRIMARY KEY(object_id,ordinal)"], "note": "normalizes '; '-delimited mapped_task_ids" },
+      { "table": "source_claim", "columns": ["claim_id text PK", "object_id text FK", "claim_text text", "verification_required boolean"] },
+      { "table": "claim_evidence", "columns": ["evidence_id text PK", "claim_id text FK", "verdict text", "evidence_uri text"] },
+      { "table": "adopted_capability", "columns": ["capability text PK", "adopt_task text", "source_repo text", "source_commit_or_pr text", "current_path text", "ci_receipt text", "boundary text", "known_gap text", "target_lifeos_owner text", "parity_gate text", "store_role text FK -> store_class_assignment", "disposition text"] },
+      { "table": "store_decision", "columns": ["task_id text PK", "schema_version text", "title text", "decided_at timestamptz", "owner text", "owner_decision text", "decision_summary text", "foundational_source_of_truth text"] },
+      { "table": "store_class_assignment", "columns": ["class text PK", "canonical_owner text", "role_of_others text", "write_authority text", "sync_direction text", "recovery_source text", "migration_path text"], "note": "the 6 STORE-001 state classes" },
+      { "table": "store_invariant", "columns": ["ordinal int PK", "invariant_text text"], "note": "the 5 STORE-001 invariants" },
+      { "table": "projection_contract", "columns": ["projection_id text PK", "target_file text", "source_query text", "ordering_key text", "serialization text", "expected_sha256 text", "round_trip_test text"], "note": "the deterministic projection registry (see projection_contracts section)" },
+      { "table": "projection_run", "columns": ["run_id bigserial PK", "projection_id text FK", "run_at timestamptz", "produced_sha256 text", "matches_expected boolean"], "note": "records each envctl projection materialization and whether it was byte-identical" }
+    ],
+    "no_second_durable_writer": "Per STORE-001 invariant 1: PostgreSQL owns every control-plane relation exactly once. redb never becomes a second durable writer for any table above."
+  },
+  "projection_contracts": {
+    "description": "Every committed control-plane file is a deterministic, byte-identical, round-trippable projection from PostgreSQL rows via envctl (PostgreSQL -> filesystem, forward-only, disposable). This is the 'deterministic projection contract' the gate requires.",
+    "determinism_rules": [
+      "Stable ORDER BY on a persisted ordinal key (task_node.source_row_number, ns_anchor.anchor_ordinal, proof_ledger_entry.sequence, source.sequence).",
+      "Multi-value columns re-serialized with the exact original delimiter '; ' in ordinal order.",
+      "CSV projections use RFC4180 QUOTE_ALL, UTF-8, LF line endings, header row verbatim (matches current generated/*.source.csv byte layout).",
+      "JSON projections use sorted-or-fixed key order and stable indentation matching the committed file; JSONL preserves one object per line in sequence order.",
+      "Every projection run recomputes SHA-256 and compares against projection_contract.expected_sha256; a mismatch fails the projection (information-loss guard)."
+    ],
+    "contracts": [
+      { "projection_id": "proj_task_graph_csv", "target_file": "generated/task_graph.source.csv", "source_query": "task_node LEFT JOIN task_dependency/task_input/task_target_artifact/task_allowed_path/task_blocked_path (GROUP_CONCAT ... SEPARATOR '; ') ORDER BY source_row_number", "serialization": "RFC4180 QUOTE_ALL, header verbatim", "round_trip_test": "parse projection -> equals task_node + child tables row-for-row" },
+      { "projection_id": "proj_task_graph_normalized_json", "target_file": "generated/task_graph.normalized.json", "source_query": "task_node + arrays (parent_ids, inputs, target_artifacts, allowed_paths, blocked_paths) ORDER BY source_row_number", "serialization": "JSON, schema_version lifeos-planning-spine.task-graph.normalized (fixed key order)", "round_trip_test": "normalized round-trips to the same task_node rows" },
+      { "projection_id": "proj_task_graph_status_json", "target_file": "generated/task_graph.status.json", "source_query": "derive lifecycle_state per task from task_node.status + proof_ledger_entry + lifecycle_transition; aggregate lifecycle_counts, update_policy, ledger sha", "serialization": "JSON, schema_version lifeos-planning-spine.task-graph.status.v0", "round_trip_test": "derived counts match COUNT(*) GROUP BY derived lifecycle_state" },
+      { "projection_id": "proj_ns_coverage_csv", "target_file": "generated/north_star_coverage.source.csv", "source_query": "ns_anchor LEFT JOIN anchor_coverage (GROUP_CONCAT task_id SEPARATOR '; ') ORDER BY anchor_ordinal", "serialization": "RFC4180 QUOTE_ALL", "round_trip_test": "parse -> equals ns_anchor + anchor_coverage" },
+      { "projection_id": "proj_ns_coverage_control_json", "target_file": "generated/north_star_coverage.control.json", "source_query": "ns_anchor + anchor_coverage + phase; owner_execution_approval from ns_anchor.execution_gate", "serialization": "JSON, schema_version lifeos-planning-spine.coverage-control.v0", "round_trip_test": "control anchors equal ns_anchor rows" },
+      { "projection_id": "proj_proof_ledger_jsonl", "target_file": "proof_records/proof_ledger.jsonl", "source_query": "proof_ledger_entry ORDER BY sequence", "serialization": "JSONL, one object per line, key order fixed, schema_version lifeos-planning-spine.proof-ledger.v0", "round_trip_test": "each line parses to the exact proof_ledger_entry row; recomputed file sha256 = task_graph.status.json.proof_ledger_sha256" },
+      { "projection_id": "proj_proof_records", "target_file": "proof_records/<TASK>.proof.json", "source_query": "proof_record + proof_artifact + proof_checksum + proof_live_command WHERE task_id=? and max(revision)", "serialization": "JSON, schema_version lifeos-planning-spine.proof-record.v0", "round_trip_test": "recomputed proof file sha256 = proof_ledger_entry.proof_sha256" },
+      { "projection_id": "proj_task_families", "target_file": "generated/task_families/<TASK>.json", "source_query": "task_family + task_family_work_item ORDER BY ordinal", "serialization": "JSON, schema_version lifeos-planning-spine.task-family.v0", "round_trip_test": "parse -> equals task_family + work items" },
+      { "projection_id": "proj_source_registry_csv", "target_file": "generated/notebooklm_source_registry.source.csv", "source_query": "source LEFT JOIN source_task_map ORDER BY sequence", "serialization": "RFC4180 QUOTE_ALL", "round_trip_test": "parse -> equals source + source_task_map; content_sha256 preserved" },
+      { "projection_id": "proj_adopted_capabilities_csv", "target_file": "generated/adopted_capabilities.source.csv", "source_query": "adopted_capability ORDER BY capability-source-order", "serialization": "RFC4180 QUOTE_ALL", "round_trip_test": "parse -> equals adopted_capability" },
+      { "projection_id": "proj_store_decision_json", "target_file": "generated/store_relationship_decision.json", "source_query": "store_decision + store_class_assignment + store_invariant", "serialization": "JSON, schema_version lifeos-planning-spine.store-relationship-decision.v0", "round_trip_test": "parse -> equals store_decision rows" }
+    ]
+  },
+  "no_information_loss_contract": {
+    "principle": "For each control-plane relation, DB -> projection -> parse -> DB must be an identity (round-trip), and projection bytes must equal the committed file (checksum). Together these prove zero information loss.",
+    "guarantees": [
+      "Ordinal preservation: every '; '-delimited value is stored with an ordinal so re-serialization reproduces original order and delimiter exactly.",
+      "Verbatim free-text: goal, verification_gate, rollback_plan, owner_agent, required_outcome stored verbatim (no re-wrapping, no normalization).",
+      "Boolean fidelity: simulation_required projected as uppercase 'TRUE'/'FALSE' to match the current sheet literal.",
+      "Row order fidelity: source_row_number / sequence / anchor_ordinal reproduce the exact committed row order.",
+      "Content identity: content_sha256, proof_sha256, source_commit_or_pr preserved; a projection whose recomputed hash != stored identity is rejected.",
+      "History fidelity: proof_ledger_entry and task_status_event are append-only; no lifecycle transition is lost or rewritten (blocked_paths 'proof history rewrite' honored)."
+    ]
+  },
+  "invariants": [
+    "PostgreSQL is the single canonical owner of every control-plane relation exactly once (STORE-001 invariant 1).",
+    "The committed CSV/JSON/MD surfaces are derived projections, not second authorities; they regenerate deterministically from PostgreSQL via envctl (STORE-001 derived-projections class).",
+    "Only status, proof_uri, next_action are mutable per task row (task_graph.status.json update_policy); the authored graph is immutable.",
+    "North Star anchor identity and required_outcome are frozen (NORTH_STAR.md immutable-anchor lock 2026-07-10).",
+    "Proof ledger and status events are append-only; proof history is never rewritten.",
+    "redb holds at most a transient forward buffer during the one-time ingest; it is never a durable control-plane writer.",
+    "A projection is valid only if it round-trips AND is byte-identical (checksum) to the committed file."
+  ],
+  "migration_note": "This plan defines the TARGET database ownership and projection contracts. Per the POSTGRES-003 rollback_plan, the currently committed generated/task_graph.source.csv and proof_records/proof_ledger.jsonl remain the canonical editable authority until POSTGRES-010 proves full-user-space parity and executes one explicit verified authority switch. Next action: split one bounded migration task per control-plane table and keep the CSV authoritative until parity passes.",
+  "product_execution_performed": false
+}

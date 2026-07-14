@@ -1,0 +1,162 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "PGAUTH-003",
+  "title": "Per-agent cognition authority contract bounded",
+  "status": "defined",
+  "owner": "LifeOS Memory / Runtime Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "phase": "2-postgres-foundation",
+  "parent_id": "PGAUTH-001",
+  "objective": "Bound the AgentDB (.rvf) cognitive state that is canonical only for a single agent's cognition, learning traces, local adaptations, and witness-bound memory. Decompose the STORE-001 'per-agent cognition' state class into every constituent cognitive state class from the Architecture Blueprint and, for each class, assign an agent identity, a scope, a portability and retention rule, a witness or provenance link, a promotion path to shared state, and a recovery source — while proving that PostgreSQL + RuVector retains sole authority over shared macro-state and that AgentDB can never silently own shared user-space truth.",
+  "grounded_in": {
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "supporting_sources": [
+      "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+      "generated/store_relationship_decision.json",
+      "generated/notebooklm_postgres_context.meta.json"
+    ]
+  },
+  "store_001_alignment": {
+    "decomposes_store_class": "per-agent cognition (MicroLoRA adapters, SONA policy matrices, reinforcement-learning weights)",
+    "store_canonical_owner": "AgentDB (.rvf)",
+    "store_role_of_others": "non-authoritative for shared macro-state; witnessed by Cryptographic Witness Chains (SHAKE256) rooted in PostgreSQL source vectors",
+    "store_write_authority": "AgentDB per agent",
+    "store_recovery_source": "AgentDB .rvf file; regenerable from base model + training history",
+    "store_migration_path": "none; AgentDB is the intended owner of active cognition",
+    "consistency_statement": "PGAUTH-003 refines the single STORE-001 per-agent-cognition class into six non-overlapping constituent cognitive state classes (C1..C6). No assignment contradicts STORE-001: AgentDB remains canonical owner of per-agent cognition, PostgreSQL + RuVector remains the single durable writer of shared macro-state, and every promotable claim roots in a PostgreSQL source vector via the SHAKE256 witness chain."
+  },
+  "cognitive_state_class_roster": [
+    "PGAUTH-003-C1 MicroLoRA adapter deltas",
+    "PGAUTH-003-C2 SONA policy matrix and success-threshold state",
+    "PGAUTH-003-C3 FastGRNN routing graph",
+    "PGAUTH-003-C4 Agent episodic memory and learning traces",
+    "PGAUTH-003-C5 Per-agent causal reasoning graph",
+    "PGAUTH-003-C6 Cryptographic Witness Chain audit trail"
+  ],
+  "work_items": [
+    {
+      "id": "PGAUTH-003-C1",
+      "surface": "MicroLoRA adapter deltas — Rank-1/2 parameter weights that hot-swap (under 1ms) into the frozen ruvllm foundation model to encode this agent's specialized skill set and personality",
+      "owner": "AgentDB (.rvf), single agent",
+      "decision": "Canonical only inside this one agent's .rvf container; the VRAM-resident hot-swapped copy is a disposable derived projection; MicroLoRA weights are never shared user-space truth and never carry a durable PostgreSQL row.",
+      "agent_identity": "Agent ID + .rvf container path; adapter weights keyed to that agent ('Agent ID, .rvf path, adapter weights' — context matrix rows 28, 31).",
+      "scope": "One agent's private cognition; invisible to other agents and to PostgreSQL. Each of the 50+ agents carries its own deltas over a single shared frozen base model on ruvllm.",
+      "portability_and_retention": "Portable single-file .rvf 'save-game cartridge' (install-in-place). Retained for the agent's operational lifetime. The adapter resident in VRAM after hot-swap is transient/derived ('Active LoRA adapter in VRAM' — matrix row 28) and discarded at process exit.",
+      "witness_or_provenance_link": "Adapter provenance traces to the frozen base model plus the SHAKE256-witnessed training history that produced the deltas; an adapter may not assert a capability whose downstream claims are not causal-verified against PostgreSQL source vectors.",
+      "promotion_path": "None by design — private model weights never become shared user-space truth. Only the agent's OUTPUTS (facts, decisions, code edits — class C6) are eligible for promotion, and only through the witnessed forward path.",
+      "recovery_source": "The .rvf file; fully regenerable from the frozen base model plus the recorded MicroLoRA training history (STORE-001 recovery_source for this class).",
+      "non_ownership_proof": "MicroLoRA holds no shared relational or semantic rows and has zero write authority to PostgreSQL durable state; its loss removes only this agent's private specialization, never any shared truth (which persists in PostgreSQL PITR).",
+      "relationship_to_postgres": "Non-authoritative for macro-state; PostgreSQL + RuVector remains the sole canonical owner of shared relational and semantic state. MicroLoRA-specialized inference reads context FROM PostgreSQL via RuVector hybrid search but writes nothing durable there.",
+      "relationship_to_redb": "Orthogonal — redb is the passive transient scratchpad for raw high-frequency thoughts and the f32 geometry cache; MicroLoRA is active cognition living in .rvf. Neither is a durable authority.",
+      "relationship_to_codedb": "None direct — nu_plugin CodeDB ingests source code into PostgreSQL and does not carry agent weights; the PostgreSQL rows CodeDB produces are the source vectors that later witness the agent's claims."
+    },
+    {
+      "id": "PGAUTH-003-C2",
+      "surface": "SONA (Self-Optimizing Neural Architecture) policy matrix and local success-threshold state, updated by reinforcement learning (Thompson Sampling, Q-Learning, PPO) after each terminal outcome to steer the agent away from repeated failure patterns",
+      "owner": "AgentDB (.rvf), single agent",
+      "decision": "Canonical only inside this agent's .rvf as its active self-learning policy. Non-authoritative for any shared state. The per-agent .rvf SONA is explicitly distinct from, and may never overwrite, the RuVector-in-PostgreSQL global SONA learning layer.",
+      "agent_identity": "Agent ID + .rvf path; SONA history logs keyed to the agent ('SONA history logs' — matrix row 13).",
+      "scope": "Per-agent private learning loop; no other agent can read this agent's SONA policy; PostgreSQL never stores this agent's raw SONA weights.",
+      "portability_and_retention": "Travels inside the portable .rvf; retained for the agent lifetime; continuously mutated by the RL loop; no external retention obligation beyond the .rvf.",
+      "witness_or_provenance_link": "Each policy update is rooted in a witnessed episodic outcome (class C4); the success/failure terminal event that drove the update is bound to the SHAKE256 audit trail, so every policy shift is auditable to a real result rather than a bluff.",
+      "promotion_path": "None directly — the policy matrix is private cognition. Only aggregated, settled success/failure telemetry (class C4) may flush forward to PostgreSQL meta-analytics for Ruflo; the raw per-agent policy weights never promote.",
+      "recovery_source": ".rvf file; regenerable by replaying the recorded RL training/outcome history against the frozen base model.",
+      "non_ownership_proof": "SONA adjusts only this agent's ranking behavior; it has no PostgreSQL write authority and encodes no shared user-space fact. The per-agent SONA cannot silently become the global SONA because the global learning layer is a separate PostgreSQL-owned macro-state class (PGAUTH-001 / matrix row 12), written only through the verified forward path.",
+      "relationship_to_postgres": "Reads long-term context from PostgreSQL via RuVector; the RuVector-in-PostgreSQL SONA (matrix row 12) is a DISTINCT global cognitive layer owned by PostgreSQL. The .rvf SONA never writes the global one.",
+      "relationship_to_redb": "redb may buffer the raw terminal traces SONA learns from; those traces are transient in redb until settled and flushed.",
+      "relationship_to_codedb": "None direct."
+    },
+    {
+      "id": "PGAUTH-003-C3",
+      "surface": "FastGRNN routing graph — a lightweight GNN-based representation of this agent's memory that pre-filters and selects the optimal context to feed the LLM before token generation begins",
+      "owner": "AgentDB (.rvf), single agent",
+      "decision": "Canonical only inside this agent's .rvf as a derived attention/routing structure over the agent's own memory; a read-time pre-filter, structurally incapable of authoring shared state.",
+      "agent_identity": "Agent ID + .rvf path; FastGRNN weights keyed to the agent (matrix row 13 'FastGRNN weights').",
+      "scope": "Per-agent private routing; determines what THIS agent attends to before generation; not shared with other agents or PostgreSQL.",
+      "portability_and_retention": "Carried in the portable .rvf; retained for the agent lifetime; rebuildable from the agent's memory graph rather than separately archived.",
+      "witness_or_provenance_link": "Routes only over memory nodes that themselves carry causal edges and witness roots (classes C5, C6); the pre-filter cannot surface a node that lacks a historical root.",
+      "promotion_path": "None — a routing/attention structure is never shared truth; it only selects among already-witnessed nodes, and those nodes (not the router) follow the C6 promotion path.",
+      "recovery_source": ".rvf file; deterministically re-derivable from the agent's stored episodic memory (C4) and per-agent causal graph (C5).",
+      "non_ownership_proof": "FastGRNN produces no durable rows and has no PostgreSQL write path; as a pre-generation context selector it is structurally incapable of committing shared state.",
+      "relationship_to_postgres": "Its selected context may trigger a RuVector hybrid search in PostgreSQL, but FastGRNN only READS; PostgreSQL owns every retrieved row.",
+      "relationship_to_redb": "Orthogonal to redb's f32 distance cache — FastGRNN is graph routing over memory, redb is geometry distance math.",
+      "relationship_to_codedb": "None direct."
+    },
+    {
+      "id": "PGAUTH-003-C4",
+      "surface": "Agent episodic memory and learning traces — the agent's own record of successes, failures, terminal outcomes, intermediate thoughts, and RL feedback events",
+      "owner": "AgentDB (.rvf), single agent — with a defined forward flush of settled aggregates to PostgreSQL",
+      "decision": "Canonical per-agent record in .rvf. The raw high-frequency stream is agent-local and transient in the redb scratchpad; only settled, significant episodes are retained in .rvf and their compressed aggregates flush forward to PostgreSQL. The agent never marks its own episode as shared truth.",
+      "agent_identity": "Agent ID + timestamped log entries ('Log ID, Agent ID, timestamp, thought content' — matrix row 29).",
+      "scope": "Per-agent private history that feeds SONA (C2) and FastGRNN (C3); becomes shared only after envctl forward flush into PostgreSQL analytics.",
+      "portability_and_retention": "Carried in .rvf. High-frequency raw traces first land in the redb scratchpad (transient tier); only 'settled/significant' episodes are retained long-term (blueprint: envctl flushes only significant cognitive states).",
+      "witness_or_provenance_link": "Every retained episode binds to a SHAKE256 witness entry (class C6); agent 'thoughts' are auditable to the actual terminal event that produced them.",
+      "promotion_path": "envctl flushes settled, compressed histories and success/failure telemetry forward into PostgreSQL long-term relational memory / Ruflo meta-analytics (blueprint: 'only significant cognitive states are persisted'). Forward-only, never a dual-write.",
+      "recovery_source": "Settled/promoted episodes: PostgreSQL PITR after flush. Un-flushed raw traces: redb local disk — transient by definition, and their loss is acceptable under the transient contract (STORE-001 transient class).",
+      "non_ownership_proof": "The agent cannot promote its own episode; promotion is performed BY envctl into PostgreSQL, which remains the single durable writer. Until flushed, the episode is explicitly transient (redb-tier), not authoritative shared truth.",
+      "relationship_to_postgres": "Forward-flush source into PostgreSQL long-term relational memory and Ruflo collective telemetry; PostgreSQL owns the persisted analytics rows.",
+      "relationship_to_redb": "Raw high-frequency traces buffer in redb first (blueprint scratchpad and application-level WAL); redb is the transient tier while .rvf holds the agent's retained learning.",
+      "relationship_to_codedb": "None direct — CodeDB ingests code, not agent episodes."
+    },
+    {
+      "id": "PGAUTH-003-C5",
+      "surface": "Per-agent causal reasoning graph — the causal edges this agent maintains linking its facts, code claims, and decisions to their origins for Causal Graph Verification",
+      "owner": "AgentDB (.rvf), single agent — with verified edges promotable to the PostgreSQL global knowledge graph",
+      "decision": "Canonical per-agent in .rvf. Verified causal edges may promote into the PostgreSQL global knowledge graph via Causal Graph Verification, but the agent never writes the global graph directly.",
+      "agent_identity": "Agent ID + causal edge set in the .rvf graph ('causal edges in a graph' — matrix row 4).",
+      "scope": "Per-agent reasoning graph; contributes to, but does not own, the shared PostgreSQL knowledge graph.",
+      "portability_and_retention": "In the portable .rvf; retained for the agent lifetime; reconstructable from witnessed episodes (C4).",
+      "witness_or_provenance_link": "Causal Graph Verification (GNN + Cypher) requires every edge to have a historical root; an edge without a root in the verified PostgreSQL knowledge graph is deterministically rejected (blueprint Section 6, matrix rows 4, 18).",
+      "promotion_path": "Verified causal edges promote into the PostgreSQL + RuVector global knowledge graph only after Causal Graph Verification passes and RuVector MinCut confirms the contributing agent is not drifting/hallucinating; the commit is forward-only via the envctl bridge.",
+      "recovery_source": "Promoted edges: PostgreSQL PITR. Un-promoted edges: .rvf, regenerable from the agent's episodic memory (C4).",
+      "non_ownership_proof": "A hallucinated causal edge with no historical root is deterministically rejected by Causal Graph Verification, so the agent physically cannot inject unrooted 'truth' into the shared graph. PostgreSQL's GNN is the gatekeeper; the .rvf is not.",
+      "relationship_to_postgres": "Contributes verified edges to the PostgreSQL/RuVector global knowledge graph; PostgreSQL owns the shared graph and its GNN gates every incoming edge.",
+      "relationship_to_redb": "Orthogonal — redb is KV-only with no secondary indexing and cannot model a causal graph.",
+      "relationship_to_codedb": "Indirect — the AST/code rows nu_plugin CodeDB ingested into PostgreSQL are among the roots the agent's causal edges must reference."
+    },
+    {
+      "id": "PGAUTH-003-C6",
+      "surface": "Cryptographic Witness Chains — the SHAKE256 audit trail binding every fact, code snippet, or decision the agent stores in its .rvf to the PostgreSQL source vector it derived from",
+      "owner": "AgentDB (.rvf), single agent — rooted at PostgreSQL source vectors",
+      "decision": "Canonical per-agent as the agent's anti-bluffing ledger; it is the PROOF mechanism that forces every promotable claim to root in PostgreSQL truth. This class is what makes silent ownership of shared truth mathematically impossible.",
+      "agent_identity": "Agent ID + SHAKE256 chain rooted at a PostgreSQL source-vector reference ('SHAKE256 witness chains and causal edges' — matrix rows 4, 18).",
+      "scope": "Per-agent audit trail; its referenced roots are shared PostgreSQL rows; the chain itself is private but non-repudiable.",
+      "portability_and_retention": "Carried in .rvf; permanently bound (blueprint: every fact/decision is 'permanently bound to a SHAKE256 cryptographic audit trail'); retained as long as the derived claim is retained.",
+      "witness_or_provenance_link": "This class IS the provenance link — a SHAKE256 root reference to a verified PostgreSQL source vector for every stored claim.",
+      "promotion_path": "A witnessed claim is the ONLY thing eligible to become shared truth: verified claim -> COW staging branch in PostgreSQL -> ATAS/ESN selects the mathematically stable timeline -> RuVector MinCut confirms the agent is not drifting -> commit to PostgreSQL main trunk (blueprint Phase 3).",
+      "recovery_source": "The witness roots live in PostgreSQL (source vectors, PITR); the per-agent chain is regenerable by re-binding retained claims to their PostgreSQL roots.",
+      "non_ownership_proof": "By construction a claim without a witness root in PostgreSQL is rejected; therefore the agent can never author a shared fact PostgreSQL did not already root. The witness chain mathematically forbids AgentDB from silently owning shared user-space truth — PostgreSQL is the root of truth, the .rvf is a witnessed leaf.",
+      "relationship_to_postgres": "Every chain terminates at a PostgreSQL/RuVector source vector; PostgreSQL is the root of truth and the single durable writer.",
+      "relationship_to_redb": "redb never holds witness chains or secrets; witness roots are PostgreSQL-owned.",
+      "relationship_to_codedb": "The AST/code rows CodeDB committed to PostgreSQL are among the source vectors that anchor these chains."
+    }
+  ],
+  "execution_order": [
+    "PGAUTH-003-C1",
+    "PGAUTH-003-C2",
+    "PGAUTH-003-C3",
+    "PGAUTH-003-C4",
+    "PGAUTH-003-C5",
+    "PGAUTH-003-C6"
+  ],
+  "shared_invariants": [
+    "AgentDB is non-authoritative for shared macro-state: PostgreSQL + RuVector owns every shared durable class exactly once (STORE-001 single-durable-writer invariant); AgentDB never becomes a second durable writer for a PostgreSQL-owned class.",
+    "Root-before-share: every promotable AgentDB claim binds to a SHAKE256 witness chain rooted in a PostgreSQL source vector; Causal Graph Verification deterministically rejects any rootless claim.",
+    "Gated, observable promotion: per-agent cognition reaches PostgreSQL only via the forward path (envctl flush of settled states, plus COW staging + ATAS/ESN selection + MinCut for shared code/knowledge). No implicit AgentDB<->PostgreSQL dual-write exists.",
+    "Regenerability: each .rvf is a per-agent portable cartridge regenerable from the frozen base model plus training/outcome history; losing an .rvf loses only that agent's private adaptation, never shared user-space truth (which survives in PostgreSQL PITR).",
+    "Secret isolation: no cognitive class holds external secrets; witness roots reference PostgreSQL provenance rows, never raw credentials (STORE-001 external-secret class stays keyring-owned)."
+  ],
+  "completion_gate": "Every cognitive state class has an agent identity, scope, portability and retention rule, witness or provenance link, promotion path to shared state, recovery source, and proof that AgentDB cannot silently own shared user-space truth.",
+  "boundaries": {
+    "product_execution_performed": false,
+    "blocked": [
+      "live AgentDB mutation",
+      "model training",
+      "agent execution",
+      "PostgreSQL mutation",
+      "product implementation",
+      "secrets/**"
+    ]
+  },
+  "proof_uri": "proof_records/PGAUTH-003.proof.json"
+}

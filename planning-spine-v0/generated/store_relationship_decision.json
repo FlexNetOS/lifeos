@@ -1,0 +1,90 @@
+{
+  "schema_version": "lifeos-planning-spine.store-relationship-decision.v0",
+  "task_id": "STORE-001",
+  "title": "redb, PostgreSQL+RuVector, and nu_plugin CodeDB relationship decided",
+  "decided_at": "2026-07-13T03:47:08Z",
+  "owner": "David / LifeOS Data Agent / Runtime Kernel",
+  "owner_decision": "adopt-intended-tiered-architecture",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "supporting_sources": [
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "1.0_VISION/Notebooklm/PostgreSQL-first LifeOS Architecture Context Table - Table 1.csv",
+    "generated/notebooklm_postgres_context.meta.json",
+    "generated/adopted_capabilities.source.csv"
+  ],
+  "decision_summary": "Adopt the Architecture Blueprint's intended tiered memory hierarchy as the target authority model: PostgreSQL + RuVector is the single canonical owner of durable relational + semantic macro-state; redb is the transient high-frequency tier (buffer / scratchpad / write-ahead log / embedding dedup cache / geometry engine); AgentDB (.rvf) is per-agent non-authoritative active cognition; envctl is the one-directional bridge (redb -> embed -> PostgreSQL) and the projection engine (PostgreSQL -> filesystem); nu_plugin CodeDB is the parser/ingestion path that buffers parsed AST blocks into redb. CodeDB's present durable-on-redb source-blob store is a TRANSITIONAL implementation, not the target; it migrates to PostgreSQL-canonical per data class via the already-implemented BlobStore SHA-256 content-addressed parity contract, one verified swap at a time.",
+  "correction_of_prior_brief": {
+    "prior_artifact": "generated/store_001_decision_brief.md",
+    "prior_recommendation": "corrected layered hybrid that treats current durable-redb usage as a capability to preserve indefinitely, labeling any redb->transient reclassification a downgrade forbidden by PGAUTH-002",
+    "why_it_was_a_mistake": "The prior brief inverted the intended authority direction. The Architecture Blueprint (foundational source of truth) is explicit and repeated: redb's INTENDED role is the transient buffer / local AI scratchpad / application-level WAL / dedup cache / geometry engine (process-lifecycle, local-disk persistence), and PostgreSQL + RuVector is the INTENDED canonical durable owner (enterprise ACID / PITR, relational + knowledge-graph). The Architecture Context Matrix classifies PostgreSQL+RuVector as 'Canonical state' and redb as 'Temporary/derived state'. CodeDB's current durable-on-redb blobs are a transitional artifact of an incomplete build, not the target authority. Building toward the intended spec (redb -> transient, PostgreSQL -> canonical) is completing the design, i.e. an UPGRADE, never a downgrade. Owner directive: 'Building to intended specs is never a downgrade.'",
+    "downgrade_protection_reframed": "Upgrades-not-downgrades is honored by the MIGRATION MECHANISM, not by freezing redb as durable. No durable data is lost because cutover uses the existing BlobStore parity contract (identical SHA-256 identity across backends); a class only moves off redb-durable AFTER its PostgreSQL replacement is verified green. The guardrail is 'no unverified cutover', not 'redb stays canonical'."
+  },
+  "state_class_assignments": [
+    {
+      "class": "durable relational macro-state (identities, histories, permissions, provenance, module_path metadata, code AST/rows, causal dependency edges)",
+      "canonical_owner": "PostgreSQL + RuVector",
+      "role_of_others": "redb may hold a transient forward buffer; envctl is the writer bridge",
+      "write_authority": "PostgreSQL (single writer of durable truth)",
+      "sync_direction": "redb -> envctl(embed) -> PostgreSQL (forward-only)",
+      "recovery_source": "PostgreSQL PITR",
+      "migration_path": "codedb_store_pg::PgStore already implements the BlobStore contract; blobstore_parity.rs proves symmetry; cutover per class is a verified swap under one SHA-256 identity"
+    },
+    {
+      "class": "semantic / vector / knowledge-graph state (embeddings, hybrid search indexes, GNN causal edges)",
+      "canonical_owner": "PostgreSQL + RuVector (native extension, No-Sidecar)",
+      "role_of_others": "redb performs f32 distance math only as a cache; it has no SQL / secondary index / native vector logic (REDB-CLAIM-008/009/010 refuted, 013 qualified)",
+      "write_authority": "PostgreSQL + RuVector",
+      "sync_direction": "embeddings computed by a local model (all-MiniLM-L6-v2) during envctl bridge, stored in PostgreSQL",
+      "recovery_source": "PostgreSQL PITR + reproducible re-embedding",
+      "migration_path": "RuVector-in-PostgreSQL extension activation must be proven locally before this class fully cuts over; until then embeddings may be produced via the proven Bun-loaded ruvector N-API path and committed to PostgreSQL"
+    },
+    {
+      "class": "transient high-frequency state (agent thoughts, terminal traces, intermediate logs, state flags, raw-text BLAKE3 dedup hashes, WAL during PostgreSQL latency/outage)",
+      "canonical_owner": "redb",
+      "role_of_others": "PostgreSQL receives only settled/significant states flushed forward by envctl",
+      "write_authority": "redb (per edge node / process)",
+      "sync_direction": "redb -> envctl flush -> PostgreSQL (only significant states persist)",
+      "recovery_source": "redb local disk (process-lifecycle); on loss, state is transient by definition",
+      "migration_path": "none required; this is redb's intended terminal role"
+    },
+    {
+      "class": "per-agent cognition (MicroLoRA adapters, SONA policy matrices, reinforcement-learning weights)",
+      "canonical_owner": "AgentDB (.rvf)",
+      "role_of_others": "non-authoritative for shared macro-state; witnessed by Cryptographic Witness Chains (SHAKE256) rooted in PostgreSQL source vectors",
+      "write_authority": "AgentDB per agent",
+      "sync_direction": "self-contained; provenance links back to PostgreSQL knowledge graph",
+      "recovery_source": "AgentDB .rvf file; regenerable from base model + training history",
+      "migration_path": "none; AgentDB is the intended owner of active cognition"
+    },
+    {
+      "class": "derived projections (materialized source directories for musl compilation, exported release trees)",
+      "canonical_owner": "PostgreSQL (source of truth) projected by envctl / CodeDB materialization",
+      "role_of_others": "filesystem projections are derived and disposable; regenerated deterministically from PostgreSQL rows via module_path metadata",
+      "write_authority": "envctl projection (read-only from PostgreSQL)",
+      "sync_direction": "PostgreSQL -> envctl materialize -> filesystem (forward-only, derived)",
+      "recovery_source": "re-projection from PostgreSQL",
+      "migration_path": "none; projection is the intended read path"
+    },
+    {
+      "class": "external-secret / provenance authority (API keys, attestation bundles, source pins)",
+      "canonical_owner": "OS keyring + committed source pins (unchanged)",
+      "role_of_others": "PostgreSQL stores references/provenance, never raw secrets; redb never holds secrets",
+      "write_authority": "keyring / owner",
+      "sync_direction": "n/a",
+      "recovery_source": "keyring + committed pins",
+      "migration_path": "none"
+    }
+  ],
+  "invariants": [
+    "Single durable writer: PostgreSQL owns every durable macro-state class exactly once; redb never becomes a second durable writer for a PostgreSQL-owned class.",
+    "Forward-only sync: redb -> PostgreSQL via envctl; no undirected redb<->PostgreSQL dual-write.",
+    "Verified cutover: a class leaves redb-durable only after a green live blobstore_parity.rs run against a disposable PostgreSQL for that class; never by assumption.",
+    "No sidecar: RuVector runs as a native PostgreSQL extension; no separate vector database in the target.",
+    "Provenance preserved: every migrated class keeps its SHA-256 identity and its source commit/PR lineage (adopted_capabilities.source.csv)."
+  ],
+  "unblocks": ["PGAUTH-001", "PGAUTH-002", "PGAUTH-003", "PGAUTH-004", "PGAUTH-005", "PGAUTH-006", "POSTGRES-001", "FOUNDATION-001", "LIFEOS-002"],
+  "open_dependencies": [
+    "Live RuVector-in-PostgreSQL extension activation not yet locally proven; semantic-class full cutover waits on it (NBVERIFY-001 / REDB-CLAIM-023 remainder).",
+    "Live blobstore_parity.rs green run against disposable PostgreSQL captures the durable-class cutover proof (CDB086 / CDB106-AC05 lane; PostgreSQL provisioned this run)."
+  ]
+}

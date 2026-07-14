@@ -1,0 +1,42 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "RECOVERY-003",
+  "observed_at": "2026-07-12T16:36:15Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The 80-row pending-versus-complete projection conflict and 12-row issue-414 pending-versus-merged conflict are resolved by evidence classification; blocked TASK-0089 stays blocked; every valid migration, secret, RuVector, and semantic capability maps once to LifeOS.",
+  "gate_result": {
+    "rows_classified": 148,
+    "distribution": {
+      "planning-only": 56,
+      "partial": 29,
+      "proven-capability": 61,
+      "pending": 2
+    },
+    "eighty_row_pending_vs_complete_resolved": true,
+    "twelve_row_issue414_pending_vs_merged_resolved": true,
+    "task_0089_stays_blocked": true,
+    "package_proof_separated_from_product_proof": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "Classified all 148 envctl rows (80 package task_graph + 12 issue-414 + 55 handoff cards + TASK-0089). Distribution: {'planning-only': 56, 'partial': 29, 'proven-capability': 61, 'pending': 2}. The 80-row conflict is resolved: status_report.json asserts 80/80 complete but that is PACKAGE-artifact proof (proof_class=package-artifact-proof / package-proof-product-partial), not product proof \u2014 REQ-0xx package rows are partial pending product+runtime receipts, EF-/ART-/VER-/REL-/MAINT- are planning-only. The 12 issue-414 rows (CSV=pending) are resolved against merged-PR product evidence in envctl crates (7 proven, 5 partial where engine is unwired: symbol-index/deploy/watch/no-c/nu-surface). TASK-0089 is kept pending+blocked (operator-freeze of meta-ruvector). Package/merged-product/runtime/pending proofs are kept separate via the proof_class column; not collapsed into one Complete.",
+  "artifact_paths": [
+    "generated/recovery_envctl_disposition.csv"
+  ],
+  "checksums": {
+    "recovery_envctl_disposition.csv": "10af31f3efb9c578890615f4b9f477e5e99b62998846229ae895572a7083c1c9"
+  },
+  "live_commands": [
+    {
+      "purpose": "Verify coverage of 80 package + 12 issue-414 + TASK-0089 and proof_class separation",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python validate_recovery.py (RECOVERY-003 section)",
+      "exit_status": 0,
+      "output": [
+        "rows=148",
+        "80 package + 12 issue-414 present",
+        "TASK-0089 pending+blocked"
+      ]
+    }
+  ]
+}

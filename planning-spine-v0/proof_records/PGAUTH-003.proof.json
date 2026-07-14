@@ -1,0 +1,110 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PGAUTH-003",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every cognitive state class has an agent identity, scope, portability and retention rule, witness or provenance link, promotion path to shared state, recovery source, and proof that AgentDB cannot silently own shared user-space truth.",
+  "gate_result": {
+    "cognitive_state_classes_enumerated": 6,
+    "cognitive_state_classes": [
+      "PGAUTH-003-C1 MicroLoRA adapter deltas (skill/persona weights)",
+      "PGAUTH-003-C2 SONA policy matrix and success-threshold state (RL loop)",
+      "PGAUTH-003-C3 FastGRNN routing graph (memory pre-filter)",
+      "PGAUTH-003-C4 Agent episodic memory and learning traces",
+      "PGAUTH-003-C5 Per-agent causal reasoning graph",
+      "PGAUTH-003-C6 Cryptographic Witness Chain audit trail (SHAKE256)"
+    ],
+    "class_source_provenance": {
+      "PGAUTH-003-C1": "Blueprint Section 3 '.rvf Cognitive Container Components' #1 (MicroLoRA); context matrix rows 4, 13, 28",
+      "PGAUTH-003-C2": "Blueprint Section 2 (AgentDB active RL: Thompson Sampling/Q-Learning/PPO) and Section 3 #2 (SONA); context matrix rows 4, 12, 13",
+      "PGAUTH-003-C3": "Blueprint Section 3 #3 (FastGRNN Routing); context matrix rows 12, 13",
+      "PGAUTH-003-C4": "Blueprint Section 2 'Local AI Scratchpad' + AgentDB episodic memory; context matrix rows 4, 13, 20, 29",
+      "PGAUTH-003-C5": "Blueprint Section 6 'Causal Graph Verification' (GNN + Cypher); context matrix rows 4, 18",
+      "PGAUTH-003-C6": "Blueprint Section 6 'Cryptographic Witness Chains (SHAKE256)'; context matrix row 18"
+    },
+    "every_class_has_agent_identity": true,
+    "agent_identity_by_class": {
+      "PGAUTH-003-C1": "Agent ID + .rvf path; adapter weights keyed to the agent",
+      "PGAUTH-003-C2": "Agent ID + .rvf path; SONA history logs keyed to the agent",
+      "PGAUTH-003-C3": "Agent ID + .rvf path; FastGRNN weights keyed to the agent",
+      "PGAUTH-003-C4": "Agent ID + timestamped log entries (Log ID, Agent ID, timestamp)",
+      "PGAUTH-003-C5": "Agent ID + causal edge set in the .rvf graph",
+      "PGAUTH-003-C6": "Agent ID + SHAKE256 chain rooted at a PostgreSQL source-vector reference"
+    },
+    "every_class_has_scope": true,
+    "scope_summary": "C1/C2/C3 are per-agent private cognition (never shared); C4/C5/C6 are per-agent but carry an explicit, gated forward path to shared PostgreSQL state.",
+    "every_class_has_portability_and_retention_rule": true,
+    "portability_and_retention_summary": "All six live in the portable single-file .rvf 'save-game cartridge' (install-in-place). VRAM-resident adapter copies (C1) and raw high-frequency traces (C4 in redb) are transient/derived; only settled state is retained.",
+    "every_class_has_witness_or_provenance_link": true,
+    "witness_or_provenance_summary": "C6 is the SHAKE256 witness-chain root reference to a PostgreSQL source vector; C1-C5 each bind their promotable content to that chain and to Causal Graph Verification, so no class carries unrooted content.",
+    "every_class_has_promotion_path_to_shared_state": true,
+    "promotion_path_by_class": {
+      "PGAUTH-003-C1": "None by design (private weights); only outputs via C6",
+      "PGAUTH-003-C2": "None directly (private policy); only aggregated telemetry via C4",
+      "PGAUTH-003-C3": "None (attention/routing structure; nodes promote via C6)",
+      "PGAUTH-003-C4": "envctl forward-flush of settled/significant histories into PostgreSQL long-term memory / Ruflo analytics",
+      "PGAUTH-003-C5": "Verified causal edges promote to the PostgreSQL global knowledge graph after Causal Graph Verification + MinCut",
+      "PGAUTH-003-C6": "Witnessed claim -> COW staging branch -> ATAS/ESN selection -> MinCut -> commit to PostgreSQL main trunk"
+    },
+    "every_class_has_recovery_source": true,
+    "recovery_source_by_class": {
+      "PGAUTH-003-C1": ".rvf; regenerable from frozen base model + MicroLoRA training history",
+      "PGAUTH-003-C2": ".rvf; regenerable by replaying RL outcome history",
+      "PGAUTH-003-C3": ".rvf; deterministically re-derivable from C4 + C5",
+      "PGAUTH-003-C4": "PostgreSQL PITR after flush for settled episodes; redb local disk for transient traces",
+      "PGAUTH-003-C5": "PostgreSQL PITR for promoted edges; .rvf for un-promoted edges",
+      "PGAUTH-003-C6": "PostgreSQL source vectors (PITR); per-agent chain re-bindable to PostgreSQL roots"
+    },
+    "agentdb_cannot_silently_own_shared_user_space_truth": {
+      "proven": true,
+      "mechanisms": [
+        "Single durable writer (STORE-001 invariant): PostgreSQL + RuVector owns every shared durable macro-state class exactly once; AgentDB is explicitly non-authoritative for shared macro-state and never becomes a second durable writer.",
+        "Root-before-share: every fact/decision stored in .rvf is permanently bound to a SHAKE256 witness chain (C6) rooted in a PostgreSQL source vector, so .rvf content is always downstream of PostgreSQL truth, never its root.",
+        "Causal Graph Verification: the PostgreSQL-side GNN deterministically rejects any claim/edge lacking a historical root in the verified knowledge graph, so a rootless .rvf claim cannot enter shared state.",
+        "Gated, observable promotion only: shared knowledge reaches PostgreSQL via the forward path (envctl flush of settled states, plus COW staging + ATAS/ESN selection + RuVector MinCut for shared code/knowledge); there is no implicit AgentDB<->PostgreSQL dual-write.",
+        "No PostgreSQL write authority: AgentDB write_authority is its own .rvf per agent; PostgreSQL is the single writer of durable shared truth.",
+        "Regenerability: each .rvf is a per-agent cartridge regenerable from base model + training history; losing it loses only that agent's private adaptation, never shared user-space truth (PostgreSQL PITR).",
+        "Global-vs-local separation: the per-agent .rvf SONA (C2) is distinct from the RuVector-in-PostgreSQL global SONA; the local policy can never overwrite the PostgreSQL-owned global learning layer."
+      ]
+    },
+    "core_fields_present_per_class": "id, surface, owner, decision present for all 6 work_items",
+    "relationship_columns_present_per_class": "relationship_to_postgres, relationship_to_redb, relationship_to_codedb present for all 6 work_items",
+    "class_ids_unique": true,
+    "every_class_owned_by_agentdb_rvf": true,
+    "no_second_durable_owner_row": true,
+    "store_001_alignment": {
+      "decomposes_store_class": "per-agent cognition (MicroLoRA adapters, SONA policy matrices, reinforcement-learning weights)",
+      "store_canonical_owner_preserved": "AgentDB (.rvf)",
+      "single_durable_writer_preserved": "PostgreSQL + RuVector",
+      "contradiction_with_store_001": false
+    },
+    "product_execution_performed": false
+  },
+  "proof_summary": "PGAUTH-003 bounds the AgentDB (.rvf) per-agent cognition authority by decomposing the single STORE-001 'per-agent cognition' class into six non-overlapping cognitive state classes drawn directly from the Architecture Blueprint and Context Matrix: C1 MicroLoRA adapter deltas (skill/persona weights), C2 the SONA policy matrix and success-threshold state (Thompson Sampling / Q-Learning / PPO), C3 the FastGRNN routing graph, C4 agent episodic memory and learning traces, C5 the per-agent causal reasoning graph, and C6 the SHAKE256 Cryptographic Witness Chain. For each class the design artifact assigns all seven gate elements with concrete values: an agent identity (Agent ID + .rvf path / SHAKE256 root), a scope (C1-C3 strictly per-agent private; C4-C6 per-agent with an explicit gated forward path), a portability and retention rule (portable single-file .rvf cartridge; VRAM adapter copies and raw redb traces are transient/derived), a witness or provenance link (C6 is the SHAKE256 root reference to a PostgreSQL source vector that anchors C1-C5), a promotion path to shared state (none for private weights C1-C3; envctl forward-flush for C4; Causal Graph Verification + MinCut promotion for C5; COW staging + ATAS/ESN + MinCut commit for C6), and a recovery source (.rvf regeneration from base model + training history, or PostgreSQL PITR for promoted/flushed state). The proof that AgentDB cannot silently own shared user-space truth rests on seven grounded mechanisms: the STORE-001 single-durable-writer invariant, root-before-share witness binding, GNN Causal Graph Verification rejecting rootless claims, gated and observable forward-only promotion (no dual-write), AgentDB having write authority only over its own .rvf, full .rvf regenerability, and the explicit separation of the per-agent .rvf SONA from the PostgreSQL-owned global RuVector SONA. Every assignment traces to the blueprint, the context matrix, or STORE-001; a gate-check script confirmed all six classes carry the full attribute set with unique ids and AgentDB ownership. No AgentDB, model, agent, PostgreSQL, or user-space state was mutated; this is a planning/definition artifact only.",
+  "artifact_paths": [
+    "generated/task_families/PGAUTH-003.json"
+  ],
+  "checksums": {
+    "generated/task_families/PGAUTH-003.json": "26f38b82d53cccece6530c774b31b45cefa402543d07582a2d0c9022d300fb40"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate the PGAUTH-003 cognition contract gate: every cognitive state class carries agent identity, scope, portability/retention, witness/provenance, promotion path, recovery source, non-ownership proof, and the three store relationships; class ids unique; every class AgentDB(.rvf)-owned",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (gate-check over generated/task_families/PGAUTH-003.json)",
+      "exit_status": 0,
+      "output": [
+        "classes: 6",
+        "all_seven_plus_relationships_present: True",
+        "core_fields_present(id/surface/owner/decision): all",
+        "class_ids_unique: True",
+        "every_class_owner_is_agentdb_rvf: True []",
+        "roster_matches_items: True",
+        "sha256: 26f38b82d53cccece6530c774b31b45cefa402543d07582a2d0c9022d300fb40"
+      ]
+    }
+  ],
+  "store_001_reference": "generated/store_relationship_decision.json",
+  "product_execution_performed": false
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PGAUTH-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every current and proposed redb record class has a justified use case, owner, lifetime, durability requirement, identity, synchronization edge, crash-replay rule, recovery source, observability signal, and explicit relationship to PostgreSQL and CodeDB; no existing durable use is silently reclassified.",
+  "gate_result": {
+    "record_class_matrix": "generated/redb_use_case_matrix.json",
+    "record_class_universe": ["PGREDB-001", "PGREDB-002", "PGREDB-003", "PGREDB-004", "PGREDB-005", "PGREDB-006", "PGREDB-007"],
+    "current_classes": ["PGREDB-001 (CodeDB source_blobs)", "PGREDB-002 (envctl migration_db)"],
+    "proposed_classes": ["PGREDB-003 (agent scratchpad)", "PGREDB-004 (embedding/dedup cache + f32 geometry engine)", "PGREDB-005 (application-level WAL/outbox)", "PGREDB-006 (intermediate ingestion buffer)", "PGREDB-007 (shared redb read-view for LifeOS UI)"],
+    "every_class_assigned_exactly_once": true,
+    "geometry_engine_covered": "folded into PGREDB-004 as the f32 distance-math compute role over cached vectors; not a distinct record class",
+    "per_class_clause_coverage": {
+      "justified_use_case": "present for all 7 classes",
+      "owner": "present for all 7 (single-writer per class named)",
+      "lifetime": "present for all 7",
+      "durability_requirement": "present for all 7",
+      "identity": "present for all 7 (SHA-256 blob / envctl run keys / agent-local key / BLAKE3 hash / sequence+idempotency key / shared-file identity)",
+      "synchronization_edge": "present for all 7 (forward-only; no undirected dual-write)",
+      "crash_replay_rule": "present for all 7",
+      "recovery_source": "present for all 7",
+      "observability_signal": "present for all 7",
+      "relationship_to_postgresql": "present and explicit for all 7 (split out from the combined column to satisfy the gate literally)",
+      "relationship_to_codedb": "present and explicit for all 7 (PGREDB-001/006 CodeDB store/buffer; PGREDB-002 explicitly SEPARATE; PGREDB-003/004/005/007 explicitly None or payload-only)"
+    },
+    "no_existing_durable_use_silently_reclassified": {
+      "satisfied": true,
+      "current_durable_uses": ["PGREDB-001", "PGREDB-002"],
+      "how": "Both durable uses are reclassified to durable-TRANSITIONAL and recorded in generated/redb_use_case_matrix.json reclassification_ledger with target owner, migration mechanism, verified cutover proof gate, and a zero-loss guarantee (SHA-256 identity preserved). Each remains redb-durable until its PostgreSQL replacement passes a green live parity/promotion proof. The reclassification is documented, evidence-gated, and rollback-reversible — never silent, never assumed, never lossy.",
+      "silent_flag_on_any_durable_class": false
+    },
+    "store_001_alignment": {
+      "keystone_decision": "STORE-001 (adopt-intended-tiered-architecture)",
+      "matrix_settles_prior_pending": "generated/pgauth_redb_usage_inventory.csv left all classifications 'pending STORE-001'; this matrix applies the now-decided STORE-001 model. redb = transient tier (buffer/scratchpad/WAL/dedup+geometry cache/read-view); PostgreSQL+RuVector = canonical durable owner; migration honored via verified SHA-256 parity cutover, never by freezing redb as durable.",
+      "invariants_applied": ["single durable writer = PostgreSQL", "forward-only redb->envctl->PostgreSQL", "verified cutover only", "no sidecar (RuVector native)", "provenance/SHA-256 identity preserved"],
+      "prior_brief_correction_honored": "The pre-decision claim that any redb->transient demotion is a downgrade 'forbidden by PGAUTH-002' is corrected: building to the intended spec is an upgrade; the guardrail is 'no unverified cutover', not 'redb stays canonical'."
+    },
+    "open_dependencies_declared": ["blobstore_parity.rs green run for PGREDB-001 cutover", "RuVector-in-PostgreSQL activation for PGREDB-004 semantic derivation", "PGREDB-005 outbox protocol design", "PGREDB-007 UDS-vs-shared-file owner decision (PGAUTH-004)"],
+    "product_execution_performed": false
+  },
+  "proof_summary": "PGAUTH-002 bounds redb's use cases and authority under the settled STORE-001 tiered model. generated/redb_use_case_matrix.json enumerates the complete evidence-grounded universe of seven redb record classes — two current (PGREDB-001 CodeDB source_blobs via codedb_store_redb, PGREDB-002 envctl migration_db) and five proposed (PGREDB-003 agent scratchpad, PGREDB-004 embedding/dedup cache which also carries redb's f32 geometry-engine compute role, PGREDB-005 application-level WAL/outbox, PGREDB-006 intermediate ingestion buffer, PGREDB-007 shared redb read-view for the LifeOS UDS UI) — and assigns each exactly once the full clause set the gate demands: justified use case, single-writer owner, lifetime, durability requirement, identity key, forward-only synchronization edge, crash-replay rule, recovery source, observability signal, and separately stated explicit relationships to PostgreSQL and to CodeDB. The two currently-durable uses are NOT silently reclassified: PGREDB-001 becomes durable-transitional with PostgreSQL as the STORE-001 canonical target, migrating only via a green live crates/codedb_store_pg/tests/blobstore_parity.rs cutover under one preserved SHA-256 identity; PGREDB-002 splits into a PostgreSQL-bound durable audit history (forward promotion) and a redb-transient in-flight runtime state, both recovery-preserving. Both are recorded in an explicit reclassification_ledger with a zero-loss guarantee, satisfying the gate's no-silent-reclassification clause. The proposed classes map to redb's intended terminal roles per the Architecture Blueprint (scratchpad, disposable BLAKE3 dedup cache + geometry engine, subordinate application-level WAL, transient ingestion buffer, non-authoritative UI read-view), with PostgreSQL+RuVector as the single durable authority and no redb dual-writer. This matrix also settles the prior pgauth_redb_usage_inventory.csv 'pending STORE-001' column and honors STORE-001's correction of the earlier brief (building to intended specs is an upgrade; the guardrail is verified cutover, not frozen redb durability). No redb, PostgreSQL, runtime, or user-space state was mutated; this is planning classification only, held for STORE-001's gated cutover proofs.",
+  "artifact_paths": [
+    "generated/redb_use_case_matrix.json",
+    "generated/task_families/PGAUTH-002.json",
+    "proof_records/PGAUTH-002.proof.json"
+  ],
+  "provenance_derived_from": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json (STORE-001)",
+    "generated/pgauth_redb_usage_inventory.csv",
+    "generated/adopted_capabilities.source.csv (ADOPT-001/ADOPT-002)",
+    "generated/pgauth_closure_matrix.csv",
+    "generated/notebooklm_postgres_context.meta.json"
+  ],
+  "product_execution_performed": false
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-001",
+  "observed_at": "2026-07-13T14:48:35Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every required object has a valid schema and example; relationships resolve; proof records the verified checksums and commands.",
+  "gate_result": {
+    "all_examples_validate": true,
+    "v0_object_count": 13,
+    "validated_object_count": 13,
+    "every_v0_object_has_valid_schema_and_example": true,
+    "object_model_doc_present": true
+  },
+  "proof_summary": "All 13 v0 object types named in schemas/index.json have a JSON Schema and a canonical example; every example validates against its schema via the ported minimal validator. Object-model relationships in 01_OBJECT_MODEL.md resolve to the same schema set.",
+  "artifact_paths": [
+    "planning-spine-v0/01_OBJECT_MODEL.md",
+    "planning-spine-v0/schemas/index.json",
+    "planning-spine-v0/generated/lps_doc_examples_validation.json"
+  ],
+  "checksums": {
+    "01_OBJECT_MODEL.md": "c7fd20de4a4085f6246e741d5b9653ae0026094ed24e408c6d720b518a727163"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-001",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

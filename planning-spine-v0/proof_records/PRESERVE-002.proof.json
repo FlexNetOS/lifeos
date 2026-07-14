@@ -1,0 +1,67 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "PRESERVE-002",
+  "observed_at": "2026-07-12T11:40:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every accepted peer has source provenance, capability boundaries, baseline commands, expected outputs, dependency edges, and a no-loss parity gate.",
+  "gate_result": {
+    "definition_task_not_execution": true,
+    "peer_root": "/home/flexnetos/meta/src",
+    "live_git_peers_enumerated": 42,
+    "includes_lifeos_consolidation_target_row": true,
+    "accepted_core_peers": 11,
+    "transient_worktrees_inventoried": 9,
+    "every_peer_has_source_provenance": true,
+    "every_peer_has_capability_boundary": true,
+    "every_peer_has_baseline_command": true,
+    "every_peer_has_expected_output": true,
+    "every_peer_has_dependency_edges": true,
+    "every_peer_has_no_loss_parity_gate": true,
+    "head_commits_are_current_40char": true,
+    "upgrade_only_law_encoded_in_parity_gate": true,
+    "license_flagged_unknown_for_followup": ["harness_hub", "loop_lib", "meta-hardware", "meta-plugins", "meta_plugin_protocol", "vault_hub", "teri"],
+    "baseline_execution_deferred_to_adoption_gate": true,
+    "product_execution_performed": false
+  },
+  "proof_summary": "PRESERVE-002 is a definition task (proof-cell, simulation_required FALSE): it defines, per peer, the six gate elements before any capability enters LifeOS. Enumerated all 42 live .git peers under /home/flexnetos/meta/src/ (including the lifeos consolidation-target row, per the validator contract) and emitted one baseline row each in generated/preserve_provenance_baselines.csv, mirrored structurally in generated/preserve_capability_provenance.json. Each row carries source provenance (remote origin URL + 40-char HEAD + branch + clone-vs-worktree kind + dirty/clean state), a capability boundary drawn from each repo's own manifest/README, a baseline verification command by detected toolchain (cargo test / uv+pytest / bun test / nu / nix flake check / git-fsck fallback), the expected passing output, dependency edges to the downstream LifeOS consumer or governing task, license, last-verified evidence, and a no-loss parity gate encoding the North Star upgrade-only law (adopt-in-place at pinned HEAD; peer suite green before AND after any move; no capability removed). 11 accepted-core peers are the ones the gate's 'every accepted peer' clause binds (nu_plugin, envctl, handoff, rusty-idd, meta-ruvector, notebooklm-py, beads_rust, prompt_hub, loop_lib, meta_plugin_protocol, yazelix); candidate/infra/worktree rows are inventoried for completeness. Seven peers have no resolvable SPDX license file and are flagged for resolution before adoption (not a blocker to the definition gate). Note: this task's declared target_artifacts name generated/task_families/PRESERVE-002.json and generated/capability_provenance.json; per the executing lane's file-ownership scope those artifacts are delivered under the preserve_* prefix (preserve_provenance_baselines.csv + preserve_capability_provenance.json) — content-equivalent, filenames diverge from the un-editable CSV row declaration.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/preserve_provenance_baselines.csv",
+    "planning-spine-v0/generated/preserve_capability_provenance.json",
+    "planning-spine-v0/proof_records/PRESERVE-002.proof.json"
+  ],
+  "checksums": {
+    "preserve_provenance_baselines_csv_sha256": "1a37aedf604104bf1d1e88a1080166963e25976d439a5d13b73e190c00ddf705",
+    "preserve_capability_provenance_json_sha256": "6a254f1fd09bdca5545571e314eeaf3da471492c9f76f7df8269a19901c6d153"
+  },
+  "live_commands": [
+    {
+      "purpose": "Enumerate live .git peers under the meta src root (read-only)",
+      "cwd": "/home/flexnetos/meta/src",
+      "command": "for d in */; do [ -e \"$d/.git\" ] && echo \"$d\"; done",
+      "exit_status": 0,
+      "output": [
+        "42 peer directories with .git (clone or worktree), including lifeos as the consolidation target"
+      ]
+    },
+    {
+      "purpose": "Capture per-peer provenance (remote, HEAD, branch, dirty/clean)",
+      "cwd": "/home/flexnetos/meta/src/<peer>",
+      "command": "git remote -v; git rev-parse HEAD; git rev-parse --abbrev-ref HEAD; git status --porcelain",
+      "exit_status": 0,
+      "output": [
+        "One provenance row per peer written to generated/preserve_provenance_baselines.csv"
+      ]
+    },
+    {
+      "purpose": "Verify definition artifacts against the failing-first validator",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "uv run --no-project --with pytest python -m pytest test_preserve_artifacts.py -k provenance",
+      "exit_status": 0,
+      "output": [
+        "test_provenance_csv_exists_and_covers_all_peers PASSED",
+        "test_provenance_csv_head_commits_are_current PASSED"
+      ]
+    }
+  ]
+}

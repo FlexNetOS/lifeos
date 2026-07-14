@@ -1,0 +1,63 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "POSTGRES-009",
+  "title": "Portable projected LifeOS build proven end to end",
+  "status": "defined",
+  "owner": "Runtime Kernel / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define the smallest proof in which one bounded LifeOS source slice completes the full round trip source -> PostgreSQL+RuVector -> envctl projection -> reproducible Nix+musl build -> running binary -> answered LifeOS UDS request, carrying byte, identity, behavior, provenance, rollback, and rebuild proofs, with every entity assigned exactly one canonical owner under STORE-001.",
+  "work_items": [
+    {
+      "id": "POSTGRES-009-A",
+      "surface": "generated/postgres_projection_build_acceptance.json#bounded_source_slice",
+      "owner": "Runtime Kernel",
+      "decision": "The bounded slice is one crate with three content-addressed members (Cargo.toml, src/main.rs, src/uds.rs) and exactly one lifeos.status UDS request. Membership is a checksummed include manifest, not a directory glob; secrets/** and AgentDB .rvf cognition are explicitly excluded. This is the least surface that keeps every round-trip stage non-trivial (blueprint: Three Pillars of Ingestion + LifeOS UDS via Yazelix)."
+    },
+    {
+      "id": "POSTGRES-009-B",
+      "surface": "generated/postgres_projection_build_acceptance.json#round_trip_stages[S1]",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Stage source-to-database uses the blueprint's three pillars: Nushell parses the slice to AST, nu_plugin CodeDB streams blocks into the redb buffer over MessagePack with BLAKE3 dedup, and envctl embeds via all-MiniLM-L6-v2 and commits raw_code + semantic_embedding + module_path + causal edges into a bounded PostgreSQL branch. STORE-001: redb transient/forward-only, PostgreSQL+RuVector canonical; embeddings via the verified Bun ruvector N-API path until the PG extension is locally proven."
+    },
+    {
+      "id": "POSTGRES-009-C",
+      "surface": "generated/postgres_projection_build_acceptance.json#round_trip_stages[S2]",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Stage database-to-projection is envctl's four-step materialization: query the production branch, reconstruct the directory from module_path metadata, concatenate raw_code blocks into whole files, and dump a clean disposable directory into the build input. STORE-001 derived-projections class: PostgreSQL is source of truth, envctl projection is read-only, the tree is disposable and byte-deterministic (POSTGRES-008)."
+    },
+    {
+      "id": "POSTGRES-009-D",
+      "surface": "generated/postgres_projection_build_acceptance.json#round_trip_stages[S3]",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Stage projection-to-reproducible-build compiles the projected crate deterministically with Nix against x86_64-unknown-linux-musl (strict static, no /nix/store RPATHs), scoped by gitkb/meta to the pure Rust directory to bypass napi-rs exhaust, packed into an install-in-place folder. The binary and closure are a derived, regenerable projection — PostgreSQL stays the sole authority."
+    },
+    {
+      "id": "POSTGRES-009-E",
+      "surface": "generated/postgres_projection_build_acceptance.json#round_trip_stages[S4]",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Stage build-to-running-UDS launches the portable folder (Yazelix initializes Zellij + Nushell), binds a Unix Domain Socket, and answers the one lifeos.status request with a deterministic record whose every field resolves to a canonical PostgreSQL identity or a recorded receipt. Per POSTGRES-007: no HTTP/REST, no hidden filesystem control-write, redb-backed views never become a second authority."
+    },
+    {
+      "id": "POSTGRES-009-F",
+      "surface": "generated/postgres_projection_build_acceptance.json#required_proofs",
+      "owner": "QA Agent",
+      "decision": "Six proofs each get concrete acceptance criteria: byte (projected==source SHA-256, projection byte-identical across runs), identity (bijection source-block <-> PG row <-> projected byte-range via module_path+SHA-256), behavior (UDS request answered, fields identity-mapped, clean exit), provenance (commit/PR lineage + SHAKE256 witness + causal edge; zero rootless blocks), rollback (namespace + projection + build folder deleted by receipt id, source/profile unchanged), rebuild (byte-identical binary and reproducible re-embedding from the same PostgreSQL version)."
+    },
+    {
+      "id": "POSTGRES-009-G",
+      "surface": "generated/postgres_projection_build_acceptance.json#receipts_ledger + #rollback",
+      "owner": "Runtime Kernel / QA Agent",
+      "decision": "Each stage emits one receipt (ingestion, projection, build, run) under a single checksummed archive root, and rollback is driven only by those receipt ids: drop the bounded PostgreSQL namespace/branch (COW discard) and remove the derived projection and build folder, verify original source checksums unchanged and installed profile untouched, then write a rollback_receipt recording zero destructive action against source or profile (task rollback_plan honored verbatim)."
+    }
+  ],
+  "execution_order": [
+    "POSTGRES-009-A",
+    "POSTGRES-009-B",
+    "POSTGRES-009-C",
+    "POSTGRES-009-D",
+    "POSTGRES-009-E",
+    "POSTGRES-009-F",
+    "POSTGRES-009-G"
+  ],
+  "completion_gate": "One bounded source slice completes source-to-database-to-projection-to-reproducible-build-to-running-UDS round trip with byte, identity, behavior, provenance, rollback, and rebuild proofs; every entity is assigned exactly one canonical owner under STORE-001; product_execution_performed is false at this definition gate."
+}

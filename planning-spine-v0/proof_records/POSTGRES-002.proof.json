@@ -1,0 +1,75 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-002",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The model covers files, directories, code modules, configuration, planning tables, communications, application state, media and blob references, identities, permissions, history, relationships, and domain records with lossless round-trip keys under the approved store relationship.",
+  "gate_result": {
+    "class_coverage_complete": true,
+    "classes_required": 13,
+    "classes_covered": 13,
+    "per_class_assignment": {
+      "files": {"family": "fs_node", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(root_id, relative_path, node_kind=file, mode, mtime, module_path, ordinal, blob_ref=content_sha256)"},
+      "directories": {"family": "fs_node", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(root_id, relative_path, node_kind=directory, parent_id, mode, ordinal)"},
+      "code modules": {"family": "code_unit", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(module_path, ordinal, raw_code) with raw_code_sha256 parity"},
+      "configuration": {"family": "config_record", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(config_scope, config_key, config_value, value_type, secret_ref)"},
+      "planning tables": {"family": "planning_record", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(record_type, external_id, body, status, phase, projection_target)"},
+      "communications": {"family": "communication", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(thread_id, seq_no, sender, body, attachment_refs, valid_from)"},
+      "application state": {"family": "app_state", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(state_scope, state_key, principal_id, state_value, significance, valid_from)"},
+      "media and blob references": {"family": "blob", "canonical_owner": "PostgreSQL PgStore (redb source-blob store transitional)", "round_trip_key": "content_sha256 -> exact bytes (BlobStore parity)"},
+      "identities": {"family": "principal", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(principal_type, external_ref, display_name, credential_ref, status)"},
+      "permissions": {"family": "grant", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(principal_id, resource_ref, resource_family, capability, grant_source, valid_from, valid_to)"},
+      "history": {"family": "revision", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(target_entity_id, revision_no, branch_id, change_kind, before_sha256, after_sha256, valid_from)"},
+      "relationships": {"family": "graph_edge", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(src_entity_id, dst_entity_id, edge_type, weight, valid_from)"},
+      "domain records": {"family": "domain_record", "canonical_owner": "PostgreSQL + RuVector", "round_trip_key": "(domain, record_type, external_id, body, attachment_refs, valid_from)"}
+    },
+    "every_class_has_single_canonical_owner": true,
+    "every_class_has_lossless_round_trip_key": true,
+    "goal_dimensions_present": {
+      "schemas": "each of the 12 entity_families declares concrete schema_fields plus common_columns_every_durable_family",
+      "stable_identities": "entity_id (UUIDv7) primary key + per-family natural key + SHA-256 cross-backend identity for content-addressed classes",
+      "temporal_relations": "bitemporal (system-time + valid-time) + revision_no/superseded_by chain + COW branch_id, unified in the revision family",
+      "content_addressing": "SHA-256 durable content identity (BlobStore/PgStore parity) distinguished from transient BLAKE3 redb dedup cache",
+      "metadata": "module_path/ordinal structural metadata for projection + extensible metadata jsonb per family",
+      "binary_references": "blob family (SHA-256 content-addressed) referenced by blob_ref/attachment_refs; no inline large binaries",
+      "permissions": "grant family (principal x resource x capability), secret-referencing not secret-embedding",
+      "provenance": "witness_root (SHAKE256) + provenance_source jsonb on every durable row",
+      "graph_edges": "graph_edge family with typed directed edges, MinCut weight, and RuVector semantic_embedding for GNN causal verification"
+    },
+    "under_approved_store_relationship": {
+      "store_decision_source": "generated/store_relationship_decision.json (STORE-001, owner_decision adopt-intended-tiered-architecture)",
+      "single_durable_writer_postgres": true,
+      "forward_only_redb_to_postgres_via_envctl": true,
+      "verified_blobstore_sha256_cutover_only": true,
+      "ruvector_native_no_sidecar": true,
+      "provenance_and_sha256_identity_preserved": true,
+      "secrets_remain_in_keyring_not_in_model": true,
+      "agentdb_cognition_and_filesystem_projection_roles_respected": true
+    },
+    "north_star_domains_enumerated": ["company", "personal", "development", "home"],
+    "north_star_grounding": "NS-WHOLE 'Company, personal, development, and home form one coherent whole' (north_star_coverage.source.csv); POSTGRES-002 anchored to NS-WHOLE / NS-CLARITY / NS-DIRECTION",
+    "context_matrix_resources_referenced": 31,
+    "downstream_handoffs_declared": ["POSTGRES-003", "POSTGRES-004", "POSTGRES-005"],
+    "no_live_schema_mutation": true,
+    "no_user_data_read": true,
+    "no_credential_values": true,
+    "product_execution_performed": false
+  },
+  "store_001_alignment": "Every one of the 13 user-space classes names PostgreSQL + RuVector as its single canonical durable owner exactly once, matching STORE-001 state_class_assignments[0] (durable relational macro-state) and [1] (semantic/vector/knowledge-graph state). redb holds only its intended transient roles (buffer/scratchpad/WAL/BLAKE3 dedup) with forward-only envctl sync; the blob family's redb source-blob store is explicitly transitional and cuts over to PgStore only under the verified SHA-256 BlobStore parity contract; AgentDB (.rvf) is linked as non-authoritative cognition; filesystem trees are derived projections. Secrets stay in the OS keyring per the external-secret class. This honors all five STORE-001 invariants: single durable writer, forward-only sync, verified cutover, no sidecar, and provenance preserved.",
+  "proof_summary": "POSTGRES-002 defines the whole user-space as a PostgreSQL + RuVector relational + knowledge-graph model in generated/postgres_user_space_schema_plan.json. All thirteen gate classes are each assigned exactly one canonical owner: files and directories to fs_node (unified node_kind table with module_path/ordinal projection and blob_ref content identity), code modules to code_unit (AST-fragment rows whose (module_path, ordinal, raw_code) concatenation regenerates exact source files), configuration to config_record (secret values externalized to keyring handles), planning tables to planning_record (projection contract deferred to POSTGRES-003), communications to communication (thread-ordered, only settled traces flushed from redb), application state to app_state (settled checkpoints flushed from the redb scratchpad/WAL, live state read via UDS), media and blob references to the content-addressed blob BlobStore keyed by SHA-256 with redb->PgStore parity cutover, identities to principal (user/account/agent/service/node with keyring credential_ref), permissions to grant (principal x resource x capability, revocation preserved as history), history to the append-only revision spine (bitemporal + COW branch lineage + SHAKE256 witness chain + PITR), relationships to graph_edge (typed directed edges with MinCut weight and RuVector GNN embeddings), and domain records to domain_record across the four North Star whole-life domains company/personal/development/home unified by belongs_to_domain edges. Each class carries a lossless round-trip key (identity + content_sha256 + structural metadata + temporal + provenance) sufficient to reconstruct its original meaning and, for byte-exact classes, its exact bytes via envctl exact-byte materialization and BlobStore parity. The model sits entirely under the STORE-001 approved store relationship: PostgreSQL + RuVector is the single durable writer of every class, redb keeps only its transient buffer/scratchpad/WAL/BLAKE3-dedup roles with forward-only envctl sync, the transitional redb source-blob store migrates to PgStore only after a green blobstore_parity.rs run under one SHA-256 identity, RuVector runs native (No-Sidecar), and secrets never enter the model. No live schema was mutated, no user data was read, no credential values were handled; this is a planning artifact only.",
+  "artifact_paths": [
+    "generated/postgres_user_space_schema_plan.json",
+    "generated/task_families/POSTGRES-002.json",
+    "proof_records/POSTGRES-002.proof.json"
+  ],
+  "grounding_sources": [
+    "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+    "generated/store_relationship_decision.json",
+    "generated/task_families/STORE-001.json",
+    "generated/adopted_capabilities.source.csv",
+    "generated/north_star_coverage.source.csv"
+  ],
+  "product_execution_performed": false
+}

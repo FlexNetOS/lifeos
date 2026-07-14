@@ -1,0 +1,24 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "POSTGRES-001",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every durable, transient, cognitive, projected, and external state family has exactly one canonical owner or explicit subordinate role, synchronization direction, identity boundary, recovery source, and no unresolved dual-write authority; current CodeDB and envctl redb uses are decided rather than erased by assumption.",
+  "gate_result": {
+    "rollup": true,
+    "children": [
+      "PGAUTH-001"
+    ],
+    "all_children_complete": true,
+    "child_count": 1,
+    "child_proofs": [
+      "proof_records/PGAUTH-001.proof.json"
+    ],
+    "product_execution_performed": false
+  },
+  "proof_summary": "POSTGRES-001 (PostgreSQL authority and store boundaries defined) is complete because all 1 child tasks are complete with passing proofs: PGAUTH-001. This roll-up aggregates its children's proofs; no additional product execution was performed at this level.",
+  "artifact_paths": [
+    "proof_records/PGAUTH-001.proof.json"
+  ]
+}

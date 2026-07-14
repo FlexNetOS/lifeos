@@ -1,0 +1,99 @@
+# Planning Spine v0 — Execution Gate Specification (machine-readable)
+#
+# Fail-closed gate model. Every gate defaults to `deny`; a transition or action
+# is only permitted when its named gate's pass_condition is proven. This file is
+# the machine-readable companion to 08_EXECUTION_GATES.md and must stay in sync
+# with the transition matrix documented there.
+schema_version: lifeos-planning-spine.execution-gates.v0
+default_policy: deny            # nothing is permitted unless a gate explicitly passes
+fail_closed: true               # a missing, unknown, or errored gate result denies the transition
+
+# --------------------------------------------------------------------------- #
+# Transition gates — mirror the 08_EXECUTION_GATES.md transition matrix.
+# --------------------------------------------------------------------------- #
+gates:
+  authority_gate:
+    trigger: Before task readiness
+    from_state: draft
+    to_state: ready
+    default: deny
+    pass_condition: assigned agent has role and capability
+    on_fail: hold task in draft
+
+  simulation_gate:
+    trigger: Before execution
+    from_state: ready
+    to_state: simulated
+    default: deny
+    pass_condition: latest DevWorld constraint update applied
+    on_fail: hold task in ready
+
+  cell_gate:
+    trigger: Before running
+    from_state: simulated
+    to_state: running
+    default: deny
+    pass_condition: hermetic cell contract resolved (network denied by default, snapshot boundary set, rollback plan present)
+    on_fail: hold task in simulated
+
+  proof_gate:
+    trigger: Before completion
+    from_state: running
+    to_state: complete
+    default: deny
+    pass_condition: proof record exists and verifies
+    on_fail: reopen task as blocked or rolled back
+
+  decision_gate:
+    trigger: Before recommendation publication
+    from_state: complete
+    to_state: next_action_published
+    default: deny
+    pass_condition: next action derived from verified state
+    on_fail: withhold recommendation
+
+# --------------------------------------------------------------------------- #
+# Human-approval gate class — irreversible or high-consequence work is denied by
+# default and requires explicit, recorded human approval before it may proceed.
+# Every trigger category below is fail-closed: absent approval == deny.
+# --------------------------------------------------------------------------- #
+human_approval_gate:
+  trigger: Before any high-consequence or irreversible action
+  default: deny
+  requires: explicit human approval recorded before the action runs
+  on_fail: block the action; no agent self-approval is permitted
+  trigger_categories:
+    spend:
+      description: Committing money, incurring cost, or authorizing billable resource use.
+      default: deny
+      requires_human_approval: true
+    legal:
+      description: Legal commitments, contracts, license changes, or regulatory-facing actions.
+      default: deny
+      requires_human_approval: true
+    credentials:
+      description: Reading, writing, rotating, or transmitting secrets, tokens, or credentials.
+      default: deny
+      requires_human_approval: true
+    production:
+      description: Deploying to or mutating production systems or user-facing state.
+      default: deny
+      requires_human_approval: true
+    physical_action:
+      description: Actions with physical-world effects (hardware, devices, shipping, robotics).
+      default: deny
+      requires_human_approval: true
+    irreversible_work:
+      description: Non-reversible operations with no rollback path (destructive deletes, external publication).
+      default: deny
+      requires_human_approval: true
+
+# --------------------------------------------------------------------------- #
+# Enforcement principle: no execution path is "done" because an agent says so.
+# Done is a state transition guarded by proof; consequential action is guarded by
+# a human-approval gate. Both default to deny.
+# --------------------------------------------------------------------------- #
+enforcement:
+  done_requires_proof: true
+  consequential_action_requires_human_approval: true
+  agent_self_approval_permitted: false

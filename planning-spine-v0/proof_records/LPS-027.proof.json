@@ -1,0 +1,19 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-027",
+  "observed_at": "2026-07-13T05:54:40Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "meta exec -- verify/status runs across two or more peer repos; release-please dry-run produces expected tags; install-via-profile proven from nix-profile paths.",
+  "gate_result": {
+    "meta_exec_across_peer_repos": true,
+    "release_please_dry_run_produces_tags": true,
+    "outward_mutation": false,
+    "verification": "generated/fleet_verification/LPS-027.verification.json",
+    "product_execution_performed": false
+  },
+  "proof_summary": "LPS-027: meta exec verify/status runs across 2+ peer repos (nu_plugin + envctl, 2 commands complete); release-please manifest-pr --dry-run (read-only, no push) produces the expected release PR/tags from conventional commits with version bump across CHANGELOG/VERSION/Cargo.toml/manifest. No outward mutation \u2014 dry-run only.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/fleet_verification/LPS-027.verification.json"
+  ]
+}

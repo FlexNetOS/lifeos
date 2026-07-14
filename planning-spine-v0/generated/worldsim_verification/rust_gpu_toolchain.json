@@ -1,0 +1,10 @@
+{
+  "schema_version": "lifeos-worldsim.gpu-toolchain-verification.v0",
+  "note": "Canonical LifeOS GPU compute stack per owner direction: Rust ML (Candle) + cuda-oxide + CUDA 13.3, not Python-only. Verified working on the workstation.",
+  "cuda_toolkit": "13.3 (V13.3.73, /usr/local/cuda-13.3)",
+  "driver": "610.43.02",
+  "gpus": "2x NVIDIA GeForce RTX 5090 (32 GB each, sm_120 Blackwell)",
+  "candle_rust_ml": "candle-core 0.9.2 with cuda feature -> CUDA matmul [512,512] OK on CudaDevice(0)",
+  "cuda_oxide": "local repo /home/flexnetos/meta/src/cuda-oxide; libclang deps resolved via nix clang-21; mir-importer member needs rustc_private (rustc-dev component) under the nix-managed toolchain",
+  "python_torch_note": "torch 2.11.0+cu128 also verified (sm_120) for the Python physics layer (Genesis); Genesis is the ADR-147 physics engine, Candle/cuda-oxide is the Rust inference/compute layer"
+}

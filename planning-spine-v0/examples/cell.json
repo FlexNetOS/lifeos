@@ -25,5 +25,14 @@
     "/home/flexnetos/.local",
     "/external"
   ],
+  "network": {
+    "default_policy": "denied",
+    "allowed_hosts": []
+  },
+  "snapshot_boundary": {
+    "mode": "required",
+    "scope": "Snapshot allowed_paths before execution; restore from the snapshot on proof-gate failure."
+  },
+  "rollback_plan": "Restore the pre-execution snapshot of allowed_paths and discard all cell outputs when the verification gate does not pass.",
   "verification_gate": "proof gate must pass before success is reported"
 }

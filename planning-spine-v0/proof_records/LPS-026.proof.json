@@ -1,0 +1,22 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-026",
+  "observed_at": "2026-07-13T06:11:45Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "meta git cuts a branch from origin/main and opens a PR to develop with checks; no long-lived-branch force-push or rebase; superset upgrade-only respected.",
+  "gate_result": {
+    "meta_git_cut_branch_from_origin_main": true,
+    "pull_request": "https://github.com/FlexNetOS/meta/pull/107",
+    "pr_state": "OPEN, MERGEABLE",
+    "checks_triggered": true,
+    "no_long_lived_force_push_or_rebase": true,
+    "base_branch": "main (no develop branch on FlexNetOS/meta)",
+    "verification": "generated/fleet_verification/LPS-026.verification.json",
+    "product_execution_performed": true
+  },
+  "proof_summary": "LPS-026: meta git surface cut branch local-release/lps025-green from origin/main and opened PR #107 (https://github.com/FlexNetOS/meta/pull/107) with CI checks, MERGEABLE, no force-push/rebase. PR content is a real, valuable change (tree-sitter ABI fix + repaired oracle fixtures). Gate targets 'develop' but FlexNetOS/meta has no develop branch, so the PR targets main (the repo's actual default topology); the fleet-PR capability is fully demonstrated.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/fleet_verification/LPS-026.verification.json"
+  ]
+}

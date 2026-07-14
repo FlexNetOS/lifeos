@@ -1,0 +1,36 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-000",
+  "observed_at": "2026-07-13T14:48:35Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "North Star and package layout exist, remain mutually consistent, and are checksum-backed by a passing proof record.",
+  "gate_result": {
+    "north_star_doc_present": true,
+    "readme_present": true,
+    "north_star_declares_v0_rfc_postv0": true,
+    "readme_declares_v0_and_rfc": true,
+    "checksum_backed": true
+  },
+  "proof_summary": "North Star and README package layout exist and remain mutually consistent: both carry the v0 / RFC / post-v0 boundary vocabulary. This proof checksum-binds both governing documents.",
+  "artifact_paths": [
+    "planning-spine-v0/00_NORTH_STAR.md",
+    "planning-spine-v0/README.md"
+  ],
+  "checksums": {
+    "00_NORTH_STAR.md": "0b57df7119c5a00eec3254d3875c8d760d82eadca98004020582268d04daba0f",
+    "README.md": "4ef6961b6626e436b5f5ce446fd1c578726d976e224f3e28257de4847760fe59"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-000",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

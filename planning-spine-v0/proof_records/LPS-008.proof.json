@@ -1,0 +1,72 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-008",
+  "observed_at": "2026-07-13T14:48:35Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The connected bundle resolves intent, authority, task, simulation, cell, proof, decision, action, and artifact with no missing edge or paper completion.",
+  "gate_result": {
+    "bundle_scope_is_v0": true,
+    "bundle_order_matches_required_chain": true,
+    "objects_resolve_and_validate": true,
+    "resolve_errors": [],
+    "cross_object_edges": [
+      {
+        "edge": "intent_to_goal",
+        "result": "pass"
+      },
+      {
+        "edge": "task_to_worldseed",
+        "result": "pass"
+      },
+      {
+        "edge": "worldseed_to_simulation_report",
+        "result": "pass"
+      },
+      {
+        "edge": "task_to_cell",
+        "result": "pass"
+      },
+      {
+        "edge": "cell_to_proof",
+        "result": "pass"
+      },
+      {
+        "edge": "proof_to_decision",
+        "result": "pass"
+      },
+      {
+        "edge": "decision_to_action",
+        "result": "pass"
+      },
+      {
+        "edge": "action_to_artifact",
+        "result": "pass"
+      }
+    ],
+    "all_edges_pass": true,
+    "shipped_bundle_report_result": "pass"
+  },
+  "proof_summary": "The MVP bundle keeps v0 scope and the canonical intent->goal->authority->task->worldseed->simulation->cell->proof->decision->action->artifact order. Every referenced object resolves, validates against its schema, and the end-to-end cross-object edges all connect with no missing link; the shipped state/mvp_bundle_report.json independently reports result=pass.",
+  "artifact_paths": [
+    "planning-spine-v0/07_MVP_VERTICAL_SLICE.md",
+    "planning-spine-v0/examples/mvp-bundle.json",
+    "planning-spine-v0/state/mvp_bundle_report.json"
+  ],
+  "checksums": {
+    "07_MVP_VERTICAL_SLICE.md": "044c3fb1f6fdff950804a4f7e50683ad0e000294103e4ee9fd2dcb7d1a1da5d8",
+    "mvp-bundle.json": "fb258a09f492178ad2cfcdf0306c77bd68a9c2c840e2c717a09aa71c4b167468"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-008",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

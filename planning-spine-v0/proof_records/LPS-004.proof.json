@@ -1,0 +1,37 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-004",
+  "observed_at": "2026-07-13T14:48:35Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "WorldSeed schema and example validate; baseline, constraints, seed, and rollback boundaries are explicit and checksum-backed.",
+  "gate_result": {
+    "worldseed_schema_and_example_validate": true,
+    "baseline_snapshot_explicit": true,
+    "constraints_field_present": true,
+    "seed_identity_present": true,
+    "simulator_version_present": true,
+    "non_mutation_contract_documented": true
+  },
+  "proof_summary": "WorldSeed schema and example validate. Baseline (environment_snapshot), constraints, seed identity, and simulator version are explicit, and 04_WORLDSEED_SCHEMA.md documents the 'must not execute / mutate / mark complete' non-mutation contract that keeps baseline reality frozen.",
+  "artifact_paths": [
+    "planning-spine-v0/04_WORLDSEED_SCHEMA.md",
+    "planning-spine-v0/examples/worldseed.json"
+  ],
+  "checksums": {
+    "04_WORLDSEED_SCHEMA.md": "d04b265aebc4f32513400856250de3d4fbf6616ebeef5e81d835611914a8867e",
+    "worldseed.json": "00d71ab405c8b0f4a4e0a5e208fcbbf86dd9df41db230c5b30926e44d0392580"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate examples against schemas, checksum spine docs 00..09, and evaluate this task's gate",
+      "cwd": "planning-spine-v0",
+      "command": "python3 scripts/verify-lps-docs.py",
+      "exit_status": 0,
+      "output": [
+        "task_id=LPS-004",
+        "gate_status=pass"
+      ]
+    }
+  ]
+}

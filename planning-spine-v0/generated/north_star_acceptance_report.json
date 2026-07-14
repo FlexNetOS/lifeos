@@ -1,0 +1,482 @@
+{
+  "schema_version": "lifeos-planning-spine.north-star-acceptance-report.v0",
+  "task_id": "RELEASE-001",
+  "title": "North Star system acceptance report",
+  "generated_at": "2026-07-13T03:47:08Z",
+  "owner": "Governance Board / QA Agent",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "keystone_decision": "generated/store_relationship_decision.json (STORE-001)",
+  "description": "Machine-readable North Star system acceptance. Recomputes coverage from the proof ledger (not from self-declared CSV coverage), detects missing/conflicting/paper-completion outcomes, verifies rollback and provenance, and FAILS CLOSED unless every North Star anchor and every high-level phase resolves to passing child proofs. This is a planning/acceptance DEFINITION artifact; it performs no product execution, deploys no schema, and writes no live data.",
+  "acceptance_result": "fail-closed",
+  "fail_closed": true,
+  "sum_equals_north_star": false,
+  "inputs": [
+    "generated/task_graph.source.csv (LIFEOS-000..LIFEOS-012 phase anchors + 196 tasks)",
+    "generated/north_star_coverage.source.csv (5 immutable North Star anchors)",
+    "generated/north_star_coverage.control.json (phase->task membership)",
+    "generated/task_graph.status.json (lifecycle_state per task; global_coverage_gate)",
+    "proof_records/proof_ledger.jsonl + proof_ledger.report.json (observed proofs)",
+    "generated/store_relationship_decision.json (STORE-001 store-authority keystone)"
+  ],
+  "north_star_requirements": [
+    {
+      "anchor_id": "NS-EXTENSION",
+      "required_outcome": "LifeOS is a living extension of David's intent."
+    },
+    {
+      "anchor_id": "NS-WHOLE",
+      "required_outcome": "Company, personal, development, and home form one coherent whole."
+    },
+    {
+      "anchor_id": "NS-CLARITY",
+      "required_outcome": "David can see and understand the whole."
+    },
+    {
+      "anchor_id": "NS-DIRECTION",
+      "required_outcome": "David can direct it as one system."
+    },
+    {
+      "anchor_id": "NS-PROGRESS",
+      "required_outcome": "LifeOS advances every domain without fragmenting the whole."
+    }
+  ],
+  "acceptance_contract": {
+    "verification_gate": "Acceptance recomputes coverage from proofs, detects missing or conflicting outcomes, verifies rollback and provenance, and fails closed unless the sum equals the North Star.",
+    "evaluation_rule": "sum_equals_north_star := (every North Star anchor recomputed-resolved) AND (every high-level phase recomputed-resolved) AND (zero missing outcomes) AND (zero unresolved conflicting outcomes) AND (owner_execution_approval == open) AND (global_coverage_gate == open). acceptance_result := accept-release IF sum_equals_north_star ELSE fail-closed.",
+    "coverage_authority": "A child counts as PASS only when its lifecycle_state == complete AND a proof-record file exists at proof_records/<task_id>.proof.json. Self-declared CSV coverage_status ('covered-high-level') is never accepted as a pass.",
+    "checks": [
+      {
+        "id": "C1",
+        "name": "recompute_coverage_from_proofs",
+        "gate_clause": "recomputes coverage from proofs"
+      },
+      {
+        "id": "C2",
+        "name": "detect_missing_outcomes",
+        "gate_clause": "detects missing ... outcomes"
+      },
+      {
+        "id": "C3",
+        "name": "detect_conflicting_outcomes",
+        "gate_clause": "detects ... conflicting outcomes"
+      },
+      {
+        "id": "C4",
+        "name": "detect_paper_completion",
+        "gate_clause": "no ... paper completion (goal)"
+      },
+      {
+        "id": "C5",
+        "name": "verify_rollback",
+        "gate_clause": "verifies rollback"
+      },
+      {
+        "id": "C6",
+        "name": "verify_provenance",
+        "gate_clause": "verifies ... provenance"
+      },
+      {
+        "id": "C7",
+        "name": "fail_closed_unless_sum_equals_north_star",
+        "gate_clause": "fails closed unless the sum equals the North Star"
+      }
+    ]
+  },
+  "C1_coverage_recomputed_from_proofs": {
+    "north_star_anchors": [
+      {
+        "anchor_id": "NS-EXTENSION",
+        "required_outcome": "LifeOS is a living extension of David's intent.",
+        "csv_self_declared_coverage": "covered-high-level",
+        "csv_decomposition_status": "task-families-present-owner-decision-pending",
+        "child_task_count": 25,
+        "children_passing_with_proof_record": 17,
+        "children_complete_without_proof_record": [],
+        "children_still_draft": [
+          "LIFEOS-002",
+          "POSTGRES-001",
+          "POSTGRES-005",
+          "POSTGRES-006",
+          "POSTGRES-007",
+          "LIFEOS-004",
+          "LIFEOS-010",
+          "LIFEOS-012"
+        ],
+        "anchor_proof_uri": "proof_records/LIFEOS-000.proof.json",
+        "anchor_proof_uri_exists": false,
+        "recomputed_resolved": false
+      },
+      {
+        "anchor_id": "NS-WHOLE",
+        "required_outcome": "Company, personal, development, and home form one coherent whole.",
+        "csv_self_declared_coverage": "covered-high-level",
+        "csv_decomposition_status": "task-families-present-owner-decision-pending",
+        "child_task_count": 31,
+        "children_passing_with_proof_record": 20,
+        "children_complete_without_proof_record": [],
+        "children_still_draft": [
+          "LIFEOS-002",
+          "POSTGRES-002",
+          "POSTGRES-003",
+          "POSTGRES-004",
+          "POSTGRES-008",
+          "POSTGRES-010",
+          "LIFEOS-004",
+          "LIFEOS-007",
+          "LIFEOS-008",
+          "LIFEOS-009",
+          "LIFEOS-010"
+        ],
+        "anchor_proof_uri": "proof_records/LIFEOS-000.proof.json",
+        "anchor_proof_uri_exists": false,
+        "recomputed_resolved": false
+      },
+      {
+        "anchor_id": "NS-CLARITY",
+        "required_outcome": "David can see and understand the whole.",
+        "csv_self_declared_coverage": "covered-high-level",
+        "csv_decomposition_status": "task-families-present-source-verification-and-owner-decision-pending",
+        "child_task_count": 45,
+        "children_passing_with_proof_record": 34,
+        "children_complete_without_proof_record": [
+          "NBSOURCE-006"
+        ],
+        "children_still_draft": [
+          "LIFEOS-002",
+          "POSTGRES-002",
+          "POSTGRES-003",
+          "POSTGRES-005",
+          "POSTGRES-007",
+          "LIFEOS-005",
+          "LIFEOS-007",
+          "LIFEOS-008",
+          "LIFEOS-009",
+          "LIFEOS-010"
+        ],
+        "anchor_proof_uri": "proof_records/LIFEOS-000.proof.json",
+        "anchor_proof_uri_exists": false,
+        "recomputed_resolved": false
+      },
+      {
+        "anchor_id": "NS-DIRECTION",
+        "required_outcome": "David can direct it as one system.",
+        "csv_self_declared_coverage": "covered-high-level",
+        "csv_decomposition_status": "task-families-present-source-verification-and-owner-decision-pending",
+        "child_task_count": 37,
+        "children_passing_with_proof_record": 27,
+        "children_complete_without_proof_record": [
+          "NBSOURCE-006"
+        ],
+        "children_still_draft": [
+          "POSTGRES-003",
+          "POSTGRES-005",
+          "POSTGRES-007",
+          "POSTGRES-010",
+          "LIFEOS-003",
+          "LIFEOS-007",
+          "LIFEOS-008",
+          "LIFEOS-009",
+          "LIFEOS-010"
+        ],
+        "anchor_proof_uri": "proof_records/LIFEOS-000.proof.json",
+        "anchor_proof_uri_exists": false,
+        "recomputed_resolved": false
+      },
+      {
+        "anchor_id": "NS-PROGRESS",
+        "required_outcome": "LifeOS advances every domain without fragmenting the whole.",
+        "csv_self_declared_coverage": "covered-high-level",
+        "csv_decomposition_status": "task-families-present-source-verification-and-owner-decision-pending",
+        "child_task_count": 50,
+        "children_passing_with_proof_record": 34,
+        "children_complete_without_proof_record": [
+          "NBSOURCE-006"
+        ],
+        "children_still_draft": [
+          "POSTGRES-004",
+          "POSTGRES-005",
+          "POSTGRES-006",
+          "POSTGRES-008",
+          "POSTGRES-009",
+          "POSTGRES-010",
+          "LIFEOS-003",
+          "LIFEOS-004",
+          "LIFEOS-005",
+          "LIFEOS-006",
+          "LIFEOS-007",
+          "LIFEOS-008",
+          "LIFEOS-009",
+          "LIFEOS-011",
+          "LIFEOS-012"
+        ],
+        "anchor_proof_uri": "proof_records/LIFEOS-000.proof.json",
+        "anchor_proof_uri_exists": false,
+        "recomputed_resolved": false
+      }
+    ],
+    "anchors_resolved": "0/5",
+    "high_level_phases": [
+      {
+        "phase_anchor": "LIFEOS-000",
+        "phase": "0-north-star-graph",
+        "phase_title": "North Star execution graph completed",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 85,
+        "members_passing_with_proof_record": 74,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-001",
+        "phase": "1-preservation",
+        "phase_title": "All valid existing work preserved for consolidation",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 14,
+        "members_passing_with_proof_record": 13,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-002",
+        "phase": "2-postgres-foundation",
+        "phase_title": "PostgreSQL-first user-space foundation proven",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 20,
+        "members_passing_with_proof_record": 3,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-003",
+        "phase": "3-governed-execution",
+        "phase_title": "Governed intent-to-proof execution spine completed",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 1,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-004",
+        "phase": "4-physical-consolidation",
+        "phase_title": "Peer capabilities physically consolidated into LifeOS",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-005",
+        "phase": "5-intelligence-substrate",
+        "phase_title": "Unified memory compute network and learning substrate integrated",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-006",
+        "phase": "6-mvp1-financial-legal",
+        "phase_title": "Financial and legal MVP1 operating domain completed",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-007",
+        "phase": "7-company-development",
+        "phase_title": "Company and development operating environments consolidated",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-008",
+        "phase": "8-personal",
+        "phase_title": "Personal operating environment consolidated",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-009",
+        "phase": "9-home",
+        "phase_title": "Home operating environment consolidated",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-010",
+        "phase": "10-experience",
+        "phase_title": "Coherent LifeOS experience delivered across user interfaces",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": true
+      },
+      {
+        "phase_anchor": "LIFEOS-011",
+        "phase": "11-system-proof-release",
+        "phase_title": "Whole LifeOS product proven and reproducibly released",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": false
+      },
+      {
+        "phase_anchor": "LIFEOS-012",
+        "phase": "12-living-system",
+        "phase_title": "LifeOS continuously improves under governed feedback",
+        "anchor_lifecycle_state": "draft",
+        "phase_member_count": 4,
+        "members_passing_with_proof_record": 0,
+        "recomputed_resolved": false,
+        "named_in_release001_inputs": false
+      }
+    ],
+    "phases_resolved": "0/13",
+    "note": "0 of 5 anchors and 0 of 13 phases resolve to fully-passing child proofs; every anchor still carries draft (unproven) children and every LIFEOS phase anchor is itself Draft."
+  },
+  "C2_missing_outcomes": {
+    "anchor_proof_uris_missing": [
+      "proof_records/LIFEOS-000.proof.json"
+    ],
+    "anchor_proof_uri_note": "All 5 North Star anchors cite proof_records/LIFEOS-000.proof.json, which does not exist on disk -> missing anchor-level proof.",
+    "complete_tasks_without_proof_record_file": [
+      "NBSOURCE-006",
+      "NBVERIFY-030"
+    ],
+    "complete_without_proof_note": "NBSOURCE-006 and NBVERIFY-030 are marked complete but have no proof_records/<id>.proof.json; their evidence lives in source extracts / a bundled proof and is not an independent proof record.",
+    "draft_tasks_without_proof_count": 34,
+    "verdict": "MISSING OUTCOMES PRESENT -> coverage cannot be certified complete."
+  },
+  "C3_conflicting_outcomes": {
+    "tasks_in_multiple_lifecycle_states": [],
+    "revision_superseded_not_conflict": {
+      "proofs": [
+        "NBVERIFY-001",
+        "NBVERIFY-002",
+        "NBVERIFY-003",
+        "NBVERIFY-004",
+        "STRUCTURE-006"
+      ],
+      "rule": "a '-v2' proof record supersedes its '-v1'; the acceptance treats it as a revision, not a divergent outcome."
+    },
+    "rolled_back_terminal": {
+      "tasks": [
+        "LPS-025"
+      ],
+      "rule": "LPS-025 is a clean terminal rollback recorded in the ledger, not an unresolved conflict."
+    },
+    "owner_conflict_on_durable_state": {
+      "status": "none",
+      "basis": "STORE-001 assigns every durable macro-state class exactly one canonical owner (PostgreSQL+RuVector) with redb as transient-only; the single-durable-writer invariant forbids a second durable owner, so no owner conflict exists.",
+      "invariant": "Single durable writer: PostgreSQL owns every durable macro-state class exactly once; redb never becomes a second durable writer for a PostgreSQL-owned class."
+    },
+    "verdict": "No unresolved conflicting outcomes detected; detector ran and classified revisions/rollbacks/owner-authority explicitly."
+  },
+  "C4_paper_completion": {
+    "flagged_anchors": [
+      {
+        "anchor_id": "NS-EXTENSION",
+        "self_declared": "covered-high-level",
+        "actual_decomposition": "task-families-present-owner-decision-pending",
+        "execution_gate": "closed-until-full-graph",
+        "verdict": "downgraded-to-unresolved: coverage self-declared but child proofs incomplete"
+      },
+      {
+        "anchor_id": "NS-WHOLE",
+        "self_declared": "covered-high-level",
+        "actual_decomposition": "task-families-present-owner-decision-pending",
+        "execution_gate": "closed-until-full-graph",
+        "verdict": "downgraded-to-unresolved: coverage self-declared but child proofs incomplete"
+      },
+      {
+        "anchor_id": "NS-CLARITY",
+        "self_declared": "covered-high-level",
+        "actual_decomposition": "task-families-present-source-verification-and-owner-decision-pending",
+        "execution_gate": "closed-until-full-graph",
+        "verdict": "downgraded-to-unresolved: coverage self-declared but child proofs incomplete"
+      },
+      {
+        "anchor_id": "NS-DIRECTION",
+        "self_declared": "covered-high-level",
+        "actual_decomposition": "task-families-present-source-verification-and-owner-decision-pending",
+        "execution_gate": "closed-until-full-graph",
+        "verdict": "downgraded-to-unresolved: coverage self-declared but child proofs incomplete"
+      },
+      {
+        "anchor_id": "NS-PROGRESS",
+        "self_declared": "covered-high-level",
+        "actual_decomposition": "task-families-present-source-verification-and-owner-decision-pending",
+        "execution_gate": "closed-until-full-graph",
+        "verdict": "downgraded-to-unresolved: coverage self-declared but child proofs incomplete"
+      }
+    ],
+    "rule": "Goal forbids 'paper completion'. Any anchor that self-declares coverage while its child proofs are incomplete is downgraded to unresolved. All 5 anchors are currently paper-covered (families present, owner decision / source verification pending) and are NOT accepted as passing.",
+    "verdict": "5/5 anchors downgraded from self-declared coverage to unresolved."
+  },
+  "C5_rollback_verification": {
+    "tasks_total": 196,
+    "tasks_with_rollback_plan": 196,
+    "tasks_missing_rollback_plan": [],
+    "release001_rollback_plan": "Restore the archived acceptance plan and report; execution remains closed.",
+    "executed_rollback_evidence": {
+      "task": "LPS-025",
+      "lifecycle_state": "rolled-back",
+      "meaning": "rollback path is not theoretical; it has been exercised and recorded."
+    },
+    "verdict": "PASS: 196/196 tasks carry a rollback_plan and an executed rollback is present in the ledger."
+  },
+  "C6_provenance_verification": {
+    "keystone": "STORE-001",
+    "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+    "supporting_sources": [
+      "1.0_VISION/Notebooklm/Architecture Context Matrix_ PostgreSQL-First LifeOS Framework - Table 1.csv",
+      "1.0_VISION/Notebooklm/PostgreSQL-first LifeOS Architecture Context Table - Table 1.csv",
+      "generated/notebooklm_postgres_context.meta.json",
+      "generated/adopted_capabilities.source.csv"
+    ],
+    "adopted_capability_provenance": "generated/adopted_capabilities.source.csv + generated/recovery_adoption_map.csv (every adopted capability carries source commit + PR + CI receipt; ADOPT-001 proof).",
+    "integrity_chain": {
+      "proof_ledger_sha256": "fed57120e38516e3b8b44732e281257473bbde60d24930a3c198e4a6967b2ba9",
+      "source_graph_sha256": "e4c42be1df9d9894b3abff60685228c4a7a342477ad90d5d54390b7ac35405fb",
+      "proof_ledger_uri": "proof_records/proof_ledger.jsonl"
+    },
+    "verdict": "PASS: provenance chain intact (foundational blueprint + supporting sources + adoption provenance + sha256 ledger/graph pins)."
+  },
+  "C7_fail_closed_evaluation": {
+    "predicate_inputs": {
+      "every_anchor_resolved": false,
+      "every_phase_resolved": false,
+      "zero_missing_outcomes": false,
+      "zero_conflicting_outcomes": true,
+      "owner_execution_open": false,
+      "global_coverage_gate_open": false
+    },
+    "sum_equals_north_star": false,
+    "acceptance_result": "fail-closed",
+    "execution_state": "closed",
+    "verdict": "FAIL-CLOSED is the correct behavior: the sum does not equal the North Star (0/5 anchors, 0/13 phases resolved; missing anchor proof; owner execution closed; coverage gate closed). The acceptance refuses to certify release. Execution remains closed."
+  },
+  "store_001_alignment": {
+    "decision": "adopt-intended-tiered-architecture",
+    "why_relevant": "System acceptance must not certify a topology that silently reclassifies durable state. STORE-001 fixes the canonical owners (PostgreSQL+RuVector durable; redb transient; AgentDB per-agent cognition; envctl forward bridge/projection; nu_plugin CodeDB ingestion) so 'no capability loss' and 'no owner conflict' are checkable invariants, and any redb->PostgreSQL move is a verified BlobStore SHA-256 parity cutover, never an assumption.",
+    "capability_loss_guard": "Verified cutover: a class leaves redb-durable only after a green live blobstore_parity.rs run against a disposable PostgreSQL for that class; never by assumption.",
+    "single_writer_invariant": "Single durable writer: PostgreSQL owns every durable macro-state class exactly once; redb never becomes a second durable writer for a PostgreSQL-owned class."
+  },
+  "product_execution_performed": false
+}

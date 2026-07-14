@@ -1,0 +1,81 @@
+{
+  "schema_version": "lifeos-planning-spine.task-family.v0",
+  "task_id": "RELEASE-001",
+  "title": "North Star system acceptance family defined",
+  "status": "defined",
+  "owner": "Governance Board / QA Agent",
+  "owner_decision_at": "2026-07-13T03:47:08Z",
+  "objective": "Define machine-readable acceptance that every North Star requirement (the 5 immutable anchors) and every high-level phase (LIFEOS-000..LIFEOS-012) resolves to passing child proofs, recomputed from the proof ledger rather than from self-declared coverage, with no capability loss, no owner conflict, and no paper completion; the acceptance fails closed unless the sum equals the North Star.",
+  "foundational_source_of_truth": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+  "keystone_decision": "generated/store_relationship_decision.json (STORE-001)",
+  "acceptance_report": "generated/north_star_acceptance_report.json",
+  "work_items": [
+    {
+      "id": "RELEASE-001-A",
+      "surface": "North Star anchor NS-EXTENSION -> 25 child tasks (north_star_coverage.source.csv)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Accept 'LifeOS is a living extension of David's intent' only when all 25 mapped children are lifecycle_state==complete with an existing proof record. Recomputed now: 17/25 passing, 8 draft -> unresolved. Self-declared 'covered-high-level' is not accepted as passing."
+    },
+    {
+      "id": "RELEASE-001-B",
+      "surface": "North Star anchor NS-WHOLE -> 31 child tasks (north_star_coverage.source.csv)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Accept 'Company, personal, development, and home form one coherent whole' only on full child-proof coverage. Recomputed now: 20/31 passing, 11 draft -> unresolved."
+    },
+    {
+      "id": "RELEASE-001-C",
+      "surface": "North Star anchor NS-CLARITY -> 45 child tasks (north_star_coverage.source.csv)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Accept 'David can see and understand the whole' only on full child-proof coverage. Recomputed now: 34/45 passing, 10 draft, and NBSOURCE-006 complete-without-proof-record -> unresolved."
+    },
+    {
+      "id": "RELEASE-001-D",
+      "surface": "North Star anchor NS-DIRECTION -> 37 child tasks (north_star_coverage.source.csv)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Accept 'David can direct it as one system' only on full child-proof coverage. Recomputed now: 27/37 passing, 9 draft -> unresolved."
+    },
+    {
+      "id": "RELEASE-001-E",
+      "surface": "North Star anchor NS-PROGRESS -> 50 child tasks (north_star_coverage.source.csv)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Accept 'LifeOS advances every domain without fragmenting the whole' only on full child-proof coverage. Recomputed now: 34/50 passing, 15 draft -> unresolved."
+    },
+    {
+      "id": "RELEASE-001-F",
+      "surface": "High-level phase backbone LIFEOS-000..LIFEOS-012 -> phase membership (north_star_coverage.control.json)",
+      "owner": "Governance Board / QA Agent",
+      "decision": "A phase resolves only when its LIFEOS-N anchor is complete AND every task in phase 'N-*' passes with a proof. Recomputed now: 0/13 phases resolved; all 13 LIFEOS phase anchors are Draft. Phases LIFEOS-000..010 are the ones named in RELEASE-001 inputs; LIFEOS-011 is this phase and LIFEOS-012 follows."
+    },
+    {
+      "id": "RELEASE-001-G",
+      "surface": "Missing / conflicting / paper-completion detector over the proof ledger + coverage CSV",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Fail closed on any missing outcome (anchor proof_records/LIFEOS-000.proof.json absent; NBSOURCE-006 and NBVERIFY-030 complete-without-proof-record; 34 draft tasks without proof), classify -v2 records as revisions and LPS-025 as a clean terminal rollback (not conflicts), and downgrade all 5 self-declared-covered anchors to unresolved. No owner conflict on durable state exists because STORE-001 fixes a single canonical durable owner."
+    },
+    {
+      "id": "RELEASE-001-H",
+      "surface": "Rollback + provenance verifier over task_graph.source.csv rollback_plan column and provenance sources",
+      "owner": "Governance Board / QA Agent",
+      "decision": "Require a rollback_plan on every task (196/196 present, including RELEASE-001's own) with LPS-025 as executed-rollback evidence, and require an intact provenance chain (STORE-001 foundational blueprint + supporting sources, adopted_capabilities provenance, and the proof_ledger/source_graph sha256 pins). Both checks PASS."
+    },
+    {
+      "id": "RELEASE-001-I",
+      "surface": "Fail-closed aggregator: sum_equals_north_star predicate -> generated/north_star_acceptance_report.json",
+      "owner": "Governance Board / QA Agent",
+      "decision": "sum_equals_north_star := every anchor resolved AND every phase resolved AND zero missing AND zero conflicting AND owner_execution_open AND coverage_gate_open. Evaluated False (0/5 anchors, 0/13 phases, missing anchor proof, owner closed, gate closed) -> acceptance_result 'fail-closed'; execution remains closed. Fail-closed on a partial graph IS the correct acceptance behavior."
+    }
+  ],
+  "execution_order": [
+    "RELEASE-001-A",
+    "RELEASE-001-B",
+    "RELEASE-001-C",
+    "RELEASE-001-D",
+    "RELEASE-001-E",
+    "RELEASE-001-F",
+    "RELEASE-001-G",
+    "RELEASE-001-H",
+    "RELEASE-001-I"
+  ],
+  "completion_gate": "generated/north_star_acceptance_report.json recomputes coverage from proofs for all 5 anchors and all 13 phases, enumerates missing/conflicting/paper-completion outcomes, verifies rollback and provenance, and returns acceptance_result 'fail-closed' whenever the sum does not equal the North Star; RELEASE-001.proof.json records that the acceptance machinery is defined and that no product execution occurred.",
+  "product_execution_performed": false
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "LPS-025",
+  "observed_at": "2026-07-13T06:23:27Z",
+  "revision": 2,
+  "status": "pass",
+  "verification_gate": "cargo build/test/fmt/clippy plus cargo audit plus rusty-idd merge-tools verify green; rusty-idd spec status runs; render and deploy --check drift gates pass.",
+  "gate_result": {
+    "cargo_fmt": "rc=0",
+    "cargo_build": "rc=0",
+    "cargo_test": "rc=0 (all pass incl. archive_golden 7/7)",
+    "cargo_clippy": "rc=0",
+    "cargo_audit": "rc=0",
+    "merge_tools_verify": "rc=0",
+    "spec_status": "rc=0",
+    "render_check": "rc=0",
+    "deploy_check": "rc=0",
+    "gate_battery_log": "generated/fleet_verification/LPS-025.gate-battery.log",
+    "pull_request": "https://github.com/FlexNetOS/meta/pull/107",
+    "fixes": [
+      "tree-sitter-rust 0.24->0.23 (ABI 14) -> complexity 8/8",
+      "reconstructed corrupted oracle fixtures 01/02/03/07/08 -> archive_golden 7/7",
+      "ADR-0019 test-allow header on template_agent_surface (matches convention) -> clippy clean",
+      "merge-tools spike/ foreign-manifest allowance -> merge-tools verify green"
+    ],
+    "product_execution_performed": true
+  },
+  "proof_summary": "LPS-025: rusty-idd adopted as the IDD/OpenSpec control binary with the FULL gate battery green \u2014 cargo build/test/fmt/clippy + cargo audit + merge-tools verify + spec status + render/deploy --check all rc=0. Closed the entire red-test backlog: tree-sitter ABI mismatch (complexity 8/8), five corrupted oracle fixtures reconstructed (archive_golden 7/7), the ADR-0019 unwrap/expect test-allow header (repo convention, clippy clean), and the spike/ merge-tools foreign-manifest allowance. All fixes on FlexNetOS/meta PR #107.",
+  "artifact_paths": [
+    "planning-spine-v0/generated/fleet_verification/LPS-025.gate-battery.log"
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "MVP1-003",
+  "observed_at": "2026-07-13T03:47:08Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Acceptance covers real inputs with sanitized fixtures, authority, simulation, execution or deliberate non-action, proof, rollback, next action, and measurable user value.",
+  "gate_result": {
+    "acceptance_artifact": "generated/task_families/MVP1-003.json",
+    "phase": "6-mvp1-financial-legal",
+    "connected_proof": "Two bounded workflows — MVP1-003-FIN (financial) and MVP1-003-LEG (legal) — both traverse the identical governed-execution substrate spine G0..G10 (LIFEOS-003 on LIFEOS-005), differing only in bounded data and their execute/non-act branch.",
+    "same_substrate_verified": {
+      "shared_spine_stages": ["G0 intent", "G1 identity+authority+policy", "G2 task graph", "G3 memory hot/warm/cold", "G4 simulation (COW)", "G5 human-approval", "G6 execution OR deliberate non-action", "G7 proof", "G8 rollback", "G9 next-action", "G10 measurable value + proven-state promotion"],
+      "both_workflows_use_all_stages": true,
+      "store_owner_per_stage_fixed_by_STORE_001": true
+    },
+    "clause_real_inputs_with_sanitized_fixtures": {
+      "satisfied": true,
+      "financial_fixture": "mvp1-003-fin-statement.sanitized — real-shaped bank export (posted_date, description, amount, running_balance) with fabricated ids/amounts, zero PII/credentials, read-only.",
+      "legal_fixture": "mvp1-003-leg-contract.sanitized — real-shaped lease/service contract (term, effective_date, auto_renewal, notice_period_days) with fabricated parties, no signatures, no secrets, read-only and content-hashed for provenance."
+    },
+    "clause_authority": {
+      "satisfied": true,
+      "financial": "read-only aggregation scope; spend/trade prohibited; only a reversible reminder writable; human-approval mandatory (G5).",
+      "legal": "read-only understanding scope; send/sign/file prohibited; commitment is human-only; reversible calendar reminder writable with approval.",
+      "no_unlimited_agent_authority": true,
+      "secrets_in_os_keyring_only": true
+    },
+    "clause_simulation": {
+      "satisfied": true,
+      "mechanism": "Both workflows dry-run in an isolated PostgreSQL COW staging branch before any trunk commit; legal additionally simulates both act and not-act outcomes.",
+      "simulation_required_flag": true,
+      "no_unsimulated_trunk_write": true
+    },
+    "clause_execution_or_deliberate_non_action": {
+      "satisfied": true,
+      "execution_branch": "MVP1-003-FIN commits ONE reversible, non-spending reminder/flag cell on approval — no money moves.",
+      "deliberate_non_action_branch": "MVP1-003-LEG withholds the legal commitment — nothing sent/signed/filed; non-action is the proven outcome.",
+      "both_branches_demonstrated": true
+    },
+    "clause_proof": {
+      "satisfied": true,
+      "mechanism": "Each workflow emits a proof row on canonical PostgreSQL state (proof-cell) bound by a SHAKE256 witness chain to its source fixture with a causal edge; Causal Graph Verification rejects rootless claims.",
+      "no_bluffed_financial_or_legal_fact": true
+    },
+    "clause_rollback": {
+      "satisfied": true,
+      "financial": "reminder cell is COW-discardable by receipt id; fixture bytes unchanged.",
+      "legal": "calendar reminder discardable; deliberate non-action leaves zero external legal state; source document bytes unchanged.",
+      "task_level": "Restore the archived MVP1 acceptance plan; no external state is changed."
+    },
+    "clause_next_action": {
+      "satisfied": true,
+      "financial": "derived from proof: await user-executed funds move; decompose an action-capable transfer-draft task only under a future action gate.",
+      "legal": "derived from proof: hold for explicit human decision; route to a human-authored action-capable legal task if the user elects to send notice.",
+      "derived_not_invented": true,
+      "no_autonomous_escalation_to_action": true
+    },
+    "clause_measurable_user_value": {
+      "satisfied": true,
+      "financial_metric": "dollars_of_fee_avoided (fixture NSF fee) AND lead_time_days = charge_date - reminder_creation_date >= configured threshold.",
+      "legal_metric": "lead_time_days = notice_deadline - surfaced_date >= (notice_period_days + buffer) AND missed_deadlines = 0.",
+      "recheckable_by_deterministic_rerun": true
+    },
+    "store_001_alignment": {
+      "single_durable_writer": "PostgreSQL + RuVector owns authority rows, task graph, aggregated facts, proof rows, provenance, and value metrics exactly once.",
+      "hot_tier": "redb holds intent/traces/WAL/dedup (STORE-001-B), forward-only to PostgreSQL via envctl.",
+      "non_authoritative_cognition": "AgentDB (.rvf) holds only agent routing/skill state; never the financial/legal macro-state.",
+      "secrets": "OS keyring; PostgreSQL stores provenance references, never raw secrets; redb never holds secrets.",
+      "no_silent_reclassification": true,
+      "no_sidecar": "RuVector runs as a native PostgreSQL extension for G3 hybrid retrieval."
+    },
+    "hard_invariants_enforced": {
+      "observation_precedes_action": true,
+      "no_autonomous_spend_or_trading": true,
+      "no_autonomous_legal_commitment": true,
+      "information_advice_action_separated_in_legal": true,
+      "source_documents_preserved_with_provenance": true,
+      "reversible_cells_cow_discardable": true,
+      "only_proven_state_promoted": true
+    },
+    "acceptance_artifact_sha256": "d4be2d6f3bb8e6626b1f76ab1e084fe04dd924d20c4c4cfaaaffeeb7f619369b",
+    "work_items_count": 11,
+    "bounded_workflows_count": 2,
+    "gate_clauses_covered_for_both_workflows": 8,
+    "product_execution_performed": false
+  },
+  "proof_summary": "MVP1-003 defines the connected financial+legal MVP1 acceptance proof in generated/task_families/MVP1-003.json. Two bounded workflows are specified and both are routed through one identical governed-execution substrate spine (G0 intent, G1 identity/authority/policy, G2 task graph, G3 hot/warm/cold memory, G4 COW simulation, G5 human-approval, G6 execution-or-deliberate-non-action, G7 proof, G8 rollback, G9 next-action, G10 measurable value) — the same substrate LIFEOS-003 and LIFEOS-005 define, with per-stage store ownership fixed by STORE-001 (redb hot/transient, PostgreSQL+RuVector canonical, AgentDB non-authoritative, OS keyring for secrets). The financial slice MVP1-003-FIN is a read-only recurring-charge shortfall aggregation that, on explicit approval, writes ONE reversible non-spending reminder cell (the execution branch) and moves no money; its value is dollars_of_fee_avoided plus a lead-time threshold. The legal slice MVP1-003-LEG intakes a preserved contract, extracts the auto-renewal deadline and notice-period obligation with information/advice/action strictly separated, and HOLDS the commitment as deliberate non-action (nothing sent, signed, or filed); its value is a notice-window lead time with zero missed deadlines. Every one of the eight gate clauses — real inputs with sanitized fixtures, authority, simulation, execution-or-deliberate-non-action, proof, rollback, next action, measurable user value — is covered for both workflows with concrete, re-checkable acceptance criteria, and the two clause branches (reversible execution vs. deliberate non-action) are each demonstrated once. Provenance is enforced by SHAKE256 witness chains and Causal Graph Verification so no bluffed financial or legal fact can persist, and only proven state is promoted forward (LIFEOS-005). No financial or legal action was taken, no fixture, bank, legal portal, PostgreSQL row, redb entry, or .rvf file was written, no secrets were touched, and product execution was not performed; the acceptance plan and this proof are the only artifacts produced.",
+  "artifact_paths": [
+    "generated/task_families/MVP1-003.json",
+    "proof_records/MVP1-003.proof.json"
+  ],
+  "checksums": {
+    "generated/task_families/MVP1-003.json": "d4be2d6f3bb8e6626b1f76ab1e084fe04dd924d20c4c4cfaaaffeeb7f619369b"
+  },
+  "live_commands": [
+    {
+      "purpose": "Validate MVP1-003 acceptance gate: JSON well-formed, both workflows present, all 11 work_items carry id/surface/owner/decision, all 8 gate clauses covered, both spine branches demonstrated, no product execution.",
+      "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+      "command": "python3 (MVP1-003 acceptance-gate validation over generated/task_families/MVP1-003.json)",
+      "exit_status": 0,
+      "output": [
+        "MVP1-003: valid_json=True workflows=['MVP1-003-FIN','MVP1-003-LEG'] spine_stages=11 work_items=11 gate_clauses=8 execution_branch=FIN non_action_branch=LEG product_execution_performed=False"
+      ]
+    }
+  ],
+  "store_001_reference": "generated/store_relationship_decision.json (STORE-001) — store ownership per spine stage is inherited, not re-decided here.",
+  "product_execution_performed": false
+}

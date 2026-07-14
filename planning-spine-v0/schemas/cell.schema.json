@@ -14,6 +14,9 @@
     "toolchain",
     "allowed_paths",
     "blocked_paths",
+    "network",
+    "snapshot_boundary",
+    "rollback_plan",
     "verification_gate"
   ],
   "properties": {
@@ -26,6 +29,25 @@
     "toolchain": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "allowed_paths": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "blocked_paths": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_policy", "allowed_hosts"],
+      "properties": {
+        "default_policy": { "type": "string", "enum": ["denied", "allowed"] },
+        "allowed_hosts": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "snapshot_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "scope"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["required", "optional", "disabled"] },
+        "scope": { "type": "string" }
+      }
+    },
+    "rollback_plan": { "type": "string" },
     "verification_gate": { "type": "string" }
   }
 }

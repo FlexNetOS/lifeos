@@ -94,6 +94,33 @@ The blueprint contains a real tension; the owner resolved it. Both are cited fro
 - **Local `meta-ruvector` + worktrees = reference only** (the blueprint's own
   "scratchpad / napi exhaust"; owner's ~60% stale read). Explore if/when needed.
 
+### 3.1 Empirical correction — the leading registry is PER-ARTIFACT (verify at pin time)
+
+> **Flagged to the owner (`DEC-YZXCONV-008`): the July-2026 live registry snapshot
+> contradicts the "npm is newest" mechanism for the RuVector *engine*.** The owner's
+> *intent* — **use the latest code, get the 200+ tools, avoid continuous refactoring**
+> — is preserved and is law. The *mechanism* is corrected to what the registries
+> actually show:
+
+- **crates.io LEADS for the engine:** `ruvector-core` **2.3.0**, `ruvllm` **2.3.0**,
+  `ruvector-postgres` **2.0.5** (pgrx).
+- **npm LAGS / is bindings-only:** the bare `ruvector` npm pkg is **0.2.34** (behind);
+  scoped `@ruvector/*` native pkgs track 2.x via napi-rs prebuilts. **`@ruvnet/ruvector`
+  is a DEAD handle (404)** — the real npm coordinates are unscoped `ruvector` + `@ruvector/*`.
+- **The "200+ AI agent tools" = `ruvector-postgres`'s 230+ SQL functions** (the pgrx
+  PostgreSQL extension) — delivered **crates.io / pgrx** (also a Docker image and an
+  `@ruvector/postgres-cli`), i.e. exactly what **YZXCONV-035** packages. So the owner's
+  goal is served by the *service* lane pulling `ruvector-postgres` latest, **not** by an
+  npm front-end pin.
+
+**LAW (intent-preserving):** *latest code wins; the catalog records the **verified
+leading registry per artifact**, resolved at pin time — not a blanket "npm always
+wins."* Today: engine → crates.io; TS/Bun front-end binding (`ruvector` / `@ruvector/*`)
+→ npm; PG extension (`ruvector-postgres`) → crates.io/pgrx. The DEC-YZXCONV-007 "npm
+latest" ruling applies to the **front-end binding form**, and **must not be
+over-applied** to independent upstream crates (`redb`, `candle`, `sqlx`, `libsql`),
+which take their normal crates.io pins.
+
 ---
 
 ## 4. Catalog schema (columns)
@@ -105,11 +132,11 @@ npm but the build is a flake/PG-extension (service) or a bun/cargo dep (app-dep)
 | column | purpose | example |
 |---|---|---|
 | `pkg_id` | stable slug | `SC-rtk`, `SC-ruvector-ext`, `SC-ruvector-npm` |
-| `name` | canonical name | `rtk`, `ruvector`, `@ruvnet/ruvector` |
+| `name` | canonical name | `rtk`, `ruvector`, `@ruvector/graph-node` |
 | `kind` | what it is | `rust-bin` \| `rust-crate` \| `napi-npm` \| `pg-extension` \| `mcp-server` \| `plugin` |
 | `lane` | runtime shape | `path` \| `service` \| `app-dep` |
 | `source_registry` | where **latest** lives | `npm` \| `crates.io` \| `git` \| `local-path` |
-| `source_locator` | the coordinate | `npmjs/@ruvnet/ruvector`, `/home/flexnetos/meta/src/meta-ruvector` |
+| `source_locator` | the coordinate | `cratesio/ruvector-core`, `npmjs/ruvector`, `/home/flexnetos/meta/src/meta-ruvector` |
 | `pinned_version` | current pin | `latest` (npm dist-tag) / `0.8.0` |
 | `install_method` | how it's built | `flake-crate` \| `flake-git` \| `flake-npm` \| `flake-pg-extension` \| `bun-add-latest` \| `cargo-dep` \| `yazelix-runtime` |
 | `nix_output` | flake attr (path/service) | `packages.x86_64-linux.rtk` |
@@ -138,7 +165,18 @@ profile owns the whole stack:
 - **No** system/apt postgres, **no** global install.
 
 This is tracked as **`YZXCONV-035`** (Blocked until the catalog service rows + flake
-packaging land).
+packaging land). The RuVector extension is where the **200+ AI agent tools** live
+(`ruvector-postgres`'s 230+ SQL functions) — so 035 pulling `ruvector-postgres` latest
+(crates.io/pgrx) is what delivers the owner's "200+ tools" goal.
+
+> **PostgreSQL is NOT the only database.** Postgres is the *consolidation target /
+> permanent source of truth* — but it sits atop a tiered store hierarchy that the
+> catalog must carry in full (see §8): `redb` (microsecond buffer → flushes to
+> Postgres; **dual-mode**: pass-through in the happy path, a durable retaining WAL when
+> Postgres is offline), `AgentDB`/`.rvf` (active RL memory), `libsql`-remote (secrets),
+> `sqlx`/SQLite (LifeOS local), plus the vector/index/inference crates. Every runtime
+> participant in the redb→flush→Postgres pipeline must exist as a catalog row so the
+> consolidation target has its declared upstream (blueprint lines 44–48, 245–252, 424).
 
 ---
 
@@ -160,6 +198,70 @@ not frozen into an exhaustive locked list now:
 - **meta-ruvector** + worktrees (`mrv-reconcile-wt`, `mrv-ci-fix`, `mrv-95-sync`,
   `meta-ruvector-router-wt`, `meta-ruvector-qat-wt`) — reference for the napi/crate reality.
 
-Seed rows (path: `rtk`, `nu`, `bun`, `claude`, `codex`, …; service: `postgres`,
-`ruvector-ext`; app-dep: `ruvector-npm`) go in first; the rest is added as the
-open refs are mined.
+Seed rows go in first (full inventory in §8); the rest is added as the open refs
+are mined.
+
+---
+
+## 8. Database & store inventory (verified 2026-07-14)
+
+Sourced from a codebase scan (dependency manifests + source), a blueprint cross-read,
+and live registry verification. Every row is `classification=required` (NO-OPTIONAL
+law). `verified` = seen in a Cargo.toml/package.json/flake or registry; `blueprint` =
+named in the north star but not yet wired in code. These populate `YZXCONV-036`.
+
+### 8a. `service` lane (profile-owned daemons)
+
+| pkg_id | name | kind | source (leader) | install_method | role / notes |
+|---|---|---|---|---|---|
+| `SC-postgres` | PostgreSQL 18.4 | engine | nixpkgs `postgresql_18` | yazelix-runtime | **consolidation target / permanent source of truth for ALL data** (blueprint 48, 245–252, 424). |
+| `SC-ruvector-postgres` | ruvector-postgres 2.0.5 | pg-extension (pgrx) | crates.io/pgrx | flake-pg-extension | RuVector: **230+ SQL fns = the "200+ agent tools"**; loads into `SC-postgres` via `shared_preload_libraries`. Needs `cargo-pgrx` against a pinned `postgresql_NN`. |
+| `SC-libsql-remote` | libsql 0.9.30 (`remote` only) | sql-remote | crates.io | flake-crate/cargo-dep | secrets-stack `Store` backend; **remote-only, links no C-SQLite** (no-C gate §3a). |
+| `SC-ruvllm` | ruvllm 2.3.0 | inference-engine | crates.io | **LANE TBD → YZXCONV-037** | edge inference; frozen model in shared memory for 50+ agents (Candle). Blueprint shape = a serving daemon (`service`/`path`), not merely a linked lib. |
+
+### 8b. `app-dep` lane (project-local pinned; profile-owned toolchain)
+
+| pkg_id | name | kind | source (leader) | install_method | role / notes |
+|---|---|---|---|---|---|
+| `SC-redb` | redb (4.1 envctl / 2.1 ruvector / 2.6.3 codex-harness) | embedded-kv | crates.io | cargo-dep | **buffer + µs scratchpad + application-level WAL + BLAKE3 dedup + geometry engine. DUAL-MODE:** pass-through in the happy path → durable retaining WAL when Postgres is down (blueprint 44–48, 411). Pure-Rust. Pin **per consumer** (versions differ). |
+| `SC-ruvector-core` | ruvector-core 2.3.0 | vector | crates.io | cargo-dep | pure-Rust vector/HNSW engine (crates.io **leads** npm). |
+| `SC-ruvector-sona` | ruvector-sona | vector (active-learn) | crates.io | cargo-dep | SONA active-learning loops. |
+| `SC-ruvector-npm` | ruvector 0.2.34 + `@ruvector/*` 2.x | napi-npm | npm | bun-add-latest | TS/Bun **front-end binding** (blueprint 91 `bun add`). napi prebuilt — **gnu/musl libc caveat**; pick the variant matching the stdenv. **This is the only row DEC-007 "npm latest" governs.** |
+| `SC-rvf` | rvf-runtime 0.3.0 + rvf-types 0.2.1 | vector/cognition | crates.io | cargo-dep | **AgentDB / `.rvf`** active RL memory (MicroLoRA+SONA+FastGRNN). ⚠️ NOT the `agentdb` crate (different author, **banned**). |
+| `SC-hnsw-rs` | hnsw_rs 0.3 (patched) | vector (ANN) | crates.io (git patch) | cargo-dep | ANN index under RuVector; locally patched. |
+| `SC-sqlx-sqlite` | sqlx 0.8 (`sqlite`,`tls-rustls`) | sql-embedded | crates.io | cargo-dep | LifeOS local storage (Wave 4); rustls (no openssl-sys). |
+| `SC-candle` | candle / ort | inference-fw | crates.io | cargo-dep | runs the embedding model in-binary (blueprint 575: "Candle or ORT"). **Normal crates.io pin — NOT the npm-latest rule.** |
+| `SC-fastembed` | fastembed 5 | embeddings | crates.io | cargo-dep | optional-as-in-**install** embedding backend for the PG ext (pulls ONNX when on). |
+
+### 8c. `path` lane (CLIs / plugins on PATH via the runtime closure)
+
+| pkg_id | name | kind | source (leader) | install_method | role / notes |
+|---|---|---|---|---|---|
+| `SC-nu-plugin-ruvector` | nu_plugin_ruvector | plugin | git FlexNetOS/nu_plugin | flake-crate | **Ingestion Pillar 2**: streams AST → redb via MessagePack (blueprint 143–149). |
+| `SC-beads` | beads_rust 0.2.16 (`br`) | cli (sqlite+jsonl) | git FlexNetOS/beads_rust | flake-crate | agent-first issue tracker (carries its own SQLite+JSONL store). |
+| `SC-weave` | weave | cli (sqlite⟷libsql **dual**) | meta-internal (FlexNetOS/weave) | flake-crate | mesh coordination; **genuine dual-backend store** (sqlite default, libsql opt-in). Built from the meta tree — no public registry. |
+| `SC-embed-minilm` | all-MiniLM-L6-v2 | model-asset | HF / git | asset-fetch | local embedding weights; required by envctl's bridge (blueprint 161, 386). A provisioned runtime artifact, not a package. |
+
+### 8d. Audit notes (present but NOT blueprint data stores, or C-boundary caveats)
+
+- **`kache`** — content-addressed **compiler cache** (`RUSTC_WRAPPER`), `path` lane;
+  a build accelerator, **not a persistence store**. Fleet decision (`YZXCONV-016`),
+  outside blueprint scope — recorded here so its absence from the data tiers is auditable.
+- **`rusqlite 0.32.1 features=["bundled"]`** — **links C SQLite.** Exists ONLY in the
+  nested `home/agent-env/codex-harness` sub-workspace (its own `[workspace]`, outside
+  envctl's no-C main gate). The catalog must **not** promote this into the profile;
+  the sanctioned SQL paths are `redb` (pure-Rust) or `libsql` `remote`.
+- **`agent CLIs`** — `claude-code` (npm `@anthropic-ai/claude-code` 2.1.209),
+  `codex` (npm `@openai/codex` 0.144.4) = `buildNpmPackage`/nixpkgs. **`grit`, `icm`,
+  `weave` are meta-internal** (the public `@getgrit/cli` GritQL is a *different* tool) —
+  built from the meta tree via `buildRustPackage`, never a public fetch.
+
+---
+
+## 9. Open lane rulings (for the owner)
+
+1. **`ruvllm` lane** — app-dep crate, or a profile-owned serving daemon (`service`/`path`)?
+   Blueprint (274–282) argues a daemon holding a frozen model in shared memory →
+   leans `service`. Tracked as **`YZXCONV-037`**.
+2. **Registry mechanism (§3.1)** — confirm the per-artifact "verified leader" law over
+   the blanket "npm latest wins," given crates.io currently leads the RuVector engine.

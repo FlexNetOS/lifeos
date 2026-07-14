@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.index.v0",
-  "generated_at": "2026-07-14T05:22:46Z",
+  "generated_at": "2026-07-14T06:51:25Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 20,
+  "task_count": 22,
   "task_ids": [
     "YZXCONV-001",
     "YZXCONV-002",
@@ -23,7 +23,9 @@
     "YZXCONV-017",
     "YZXCONV-018",
     "YZXCONV-019",
-    "YZXCONV-020"
+    "YZXCONV-020",
+    "YZXCONV-021",
+    "YZXCONV-022"
   ],
   "ready_task_ids": [
     "YZXCONV-002",
@@ -59,7 +61,7 @@
       "index": 2,
       "source_row_number": 4,
       "phase": "1-profile",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002"
       ],
@@ -70,7 +72,7 @@
       "index": 3,
       "source_row_number": 5,
       "phase": "1-agent-runtime",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -82,7 +84,7 @@
       "index": 4,
       "source_row_number": 6,
       "phase": "1-agent-runtime",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -94,7 +96,7 @@
       "index": 5,
       "source_row_number": 7,
       "phase": "1-envctl",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -106,7 +108,7 @@
       "index": 6,
       "source_row_number": 8,
       "phase": "1-envctl",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-006",
         "YZXCONV-008"
@@ -118,7 +120,7 @@
       "index": 7,
       "source_row_number": 9,
       "phase": "1-meta-control",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002"
       ],
@@ -129,7 +131,7 @@
       "index": 8,
       "source_row_number": 10,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -141,7 +143,7 @@
       "index": 9,
       "source_row_number": 11,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-006",
         "YZXCONV-008",
@@ -154,7 +156,7 @@
       "index": 10,
       "source_row_number": 12,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-010"
       ],
@@ -165,7 +167,7 @@
       "index": 11,
       "source_row_number": 13,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-008",
         "YZXCONV-010"
@@ -177,7 +179,7 @@
       "index": 12,
       "source_row_number": 14,
       "phase": "3-four-repo",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-008"
@@ -189,7 +191,7 @@
       "index": 13,
       "source_row_number": 15,
       "phase": "3-runtime",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-003",
         "YZXCONV-004",
@@ -209,7 +211,7 @@
       "index": 14,
       "source_row_number": 16,
       "phase": "4-closure",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-014"
       ],
@@ -277,10 +279,36 @@
         "YZXCONV-016",
         "YZXCONV-017",
         "YZXCONV-018",
-        "YZXCONV-019"
+        "YZXCONV-019",
+        "YZXCONV-021",
+        "YZXCONV-022"
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
       "execution_cell": "owner-contract-closure-cell"
+    },
+    "YZXCONV-021": {
+      "index": 20,
+      "source_row_number": 22,
+      "phase": "3-portability",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-003",
+        "YZXCONV-013"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-021.proof.json",
+      "execution_cell": "yazelix-musl-cell"
+    },
+    "YZXCONV-022": {
+      "index": 21,
+      "source_row_number": 23,
+      "phase": "3-home-manager",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-022.proof.json",
+      "execution_cell": "yazelix-home-manager-cell"
     }
   },
   "tasks_by_id": {
@@ -308,7 +336,7 @@
       "index": 2,
       "source_row_number": 4,
       "phase": "1-profile",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002"
       ],
@@ -319,7 +347,7 @@
       "index": 3,
       "source_row_number": 5,
       "phase": "1-agent-runtime",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -331,7 +359,7 @@
       "index": 4,
       "source_row_number": 6,
       "phase": "1-agent-runtime",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -343,7 +371,7 @@
       "index": 5,
       "source_row_number": 7,
       "phase": "1-envctl",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -355,7 +383,7 @@
       "index": 6,
       "source_row_number": 8,
       "phase": "1-envctl",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-006",
         "YZXCONV-008"
@@ -367,7 +395,7 @@
       "index": 7,
       "source_row_number": 9,
       "phase": "1-meta-control",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002"
       ],
@@ -378,7 +406,7 @@
       "index": 8,
       "source_row_number": 10,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-003"
@@ -390,7 +418,7 @@
       "index": 9,
       "source_row_number": 11,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-006",
         "YZXCONV-008",
@@ -403,7 +431,7 @@
       "index": 10,
       "source_row_number": 12,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-010"
       ],
@@ -414,7 +442,7 @@
       "index": 11,
       "source_row_number": 13,
       "phase": "2-nushell",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-008",
         "YZXCONV-010"
@@ -426,7 +454,7 @@
       "index": 12,
       "source_row_number": 14,
       "phase": "3-four-repo",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-002",
         "YZXCONV-008"
@@ -438,7 +466,7 @@
       "index": 13,
       "source_row_number": 15,
       "phase": "3-runtime",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-003",
         "YZXCONV-004",
@@ -458,7 +486,7 @@
       "index": 14,
       "source_row_number": 16,
       "phase": "4-closure",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "YZXCONV-014"
       ],
@@ -526,10 +554,36 @@
         "YZXCONV-016",
         "YZXCONV-017",
         "YZXCONV-018",
-        "YZXCONV-019"
+        "YZXCONV-019",
+        "YZXCONV-021",
+        "YZXCONV-022"
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
       "execution_cell": "owner-contract-closure-cell"
+    },
+    "YZXCONV-021": {
+      "index": 20,
+      "source_row_number": 22,
+      "phase": "3-portability",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-003",
+        "YZXCONV-013"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-021.proof.json",
+      "execution_cell": "yazelix-musl-cell"
+    },
+    "YZXCONV-022": {
+      "index": 21,
+      "source_row_number": 23,
+      "phase": "3-home-manager",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-002",
+        "YZXCONV-003"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-022.proof.json",
+      "execution_cell": "yazelix-home-manager-cell"
     }
   },
   "tasks_by_status": {
@@ -542,7 +596,7 @@
       "YZXCONV-017",
       "YZXCONV-019"
     ],
-    "draft": [
+    "blocked": [
       "YZXCONV-003",
       "YZXCONV-004",
       "YZXCONV-005",
@@ -555,11 +609,11 @@
       "YZXCONV-012",
       "YZXCONV-013",
       "YZXCONV-014",
-      "YZXCONV-015"
-    ],
-    "blocked": [
+      "YZXCONV-015",
       "YZXCONV-018",
-      "YZXCONV-020"
+      "YZXCONV-020",
+      "YZXCONV-021",
+      "YZXCONV-022"
     ]
   },
   "tasks_by_phase": {
@@ -610,6 +664,12 @@
     ],
     "5-final-closure": [
       "YZXCONV-020"
+    ],
+    "3-portability": [
+      "YZXCONV-021"
+    ],
+    "3-home-manager": [
+      "YZXCONV-022"
     ]
   },
   "children_by_parent": {
@@ -624,7 +684,8 @@
       "YZXCONV-008",
       "YZXCONV-009",
       "YZXCONV-013",
-      "YZXCONV-016"
+      "YZXCONV-016",
+      "YZXCONV-022"
     ],
     "YZXCONV-003": [
       "YZXCONV-004",
@@ -632,7 +693,9 @@
       "YZXCONV-006",
       "YZXCONV-009",
       "YZXCONV-014",
-      "YZXCONV-016"
+      "YZXCONV-016",
+      "YZXCONV-021",
+      "YZXCONV-022"
     ],
     "YZXCONV-006": [
       "YZXCONV-007",
@@ -675,7 +738,8 @@
       "YZXCONV-014"
     ],
     "YZXCONV-013": [
-      "YZXCONV-014"
+      "YZXCONV-014",
+      "YZXCONV-021"
     ],
     "YZXCONV-014": [
       "YZXCONV-015",
@@ -697,6 +761,12 @@
       "YZXCONV-020"
     ],
     "YZXCONV-019": [
+      "YZXCONV-020"
+    ],
+    "YZXCONV-021": [
+      "YZXCONV-020"
+    ],
+    "YZXCONV-022": [
       "YZXCONV-020"
     ]
   },
@@ -720,7 +790,9 @@
     "YZXCONV-017": "yazelix_runtime_convergence/proof_records/YZXCONV-017.proof.json",
     "YZXCONV-018": "yazelix_runtime_convergence/proof_records/YZXCONV-018.proof.json",
     "YZXCONV-019": "yazelix_runtime_convergence/proof_records/YZXCONV-019.proof.json",
-    "YZXCONV-020": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json"
+    "YZXCONV-020": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
+    "YZXCONV-021": "yazelix_runtime_convergence/proof_records/YZXCONV-021.proof.json",
+    "YZXCONV-022": "yazelix_runtime_convergence/proof_records/YZXCONV-022.proof.json"
   },
   "missing_parent_ids": []
 }

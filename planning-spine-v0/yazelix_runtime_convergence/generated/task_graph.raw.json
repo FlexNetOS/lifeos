@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-14T05:22:46Z",
+  "generated_at": "2026-07-14T06:51:25Z",
   "source": {
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 20,
+    "row_count": 22,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -88,7 +88,7 @@
         "execution_cell": "yazelix-nix-profile-cell",
         "verification_gate": "nix profile list shows one foundation element; ~/.nix-profile is the only PATH owner; any XDG selector resolves to the same closure or is inactive; yzx doctor reports one install owner.",
         "rollback_plan": "Atomically restore the pre-change profile symlink recorded in the migration receipt and keep the prior generation reachable.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-003.proof.json",
         "next_action": "Finish source package contracts, build without profile mutation, then request approval for cutover."
       }
@@ -110,7 +110,7 @@
         "execution_cell": "codex-runtime-cell",
         "verification_gate": "codex doctor reports the profile executable, CODEX_HOME=/home/flexnetos/.codex, parseable generated config, and no path into an inactive profile or retired workspace mirror.",
         "rollback_plan": "Restore the prior config.toml from a checksum-backed copy without moving auth, sessions, or databases.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-004.proof.json",
         "next_action": "Implement the approved config materializer after YZXCONV-003 source proof."
       }
@@ -132,7 +132,7 @@
         "execution_cell": "claude-runtime-cell",
         "verification_gate": "Claude launches from the one profile, settings checksum back to the approved input, generated hooks contain no stale Bash-to-Nu wrapper, and state remains under ~/.claude.",
         "rollback_plan": "Restore the previous settings.json from a checksum-backed copy without moving credentials or history.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-005.proof.json",
         "next_action": "Implement beside YZXCONV-004 so both runtimes consume one ownership contract."
       }
@@ -154,7 +154,7 @@
         "execution_cell": "envctl-package-cell",
         "verification_gate": "command -v envctl resolves under ~/.nix-profile; readlink reaches a native executable; no active envctl route depends on bash/sh/zsh; envctl --version and lock preview pass.",
         "rollback_plan": "Restore the prior Meta wrapper/projection and remove only the new unselected profile generation.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-006.proof.json",
         "next_action": "Build envctl from its clean worktree and consume the proven artifact in Yazelix."
       }
@@ -176,7 +176,7 @@
         "execution_cell": "meta-fleet-agent-env-cell",
         "verification_gate": "Meta-root lock check passes; preview reports every selected peer; reviewed apply has zero broken/failed assets; a second preview is idempotent; exclusions have rationales.",
         "rollback_plan": "Use envctl's operation receipt to restore affected projections and the prior lock; never roll back unrelated peer commits together.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-007.proof.json",
         "next_action": "Implement the active Meta GitKB task as a reviewed fleet transaction."
       }
@@ -198,7 +198,7 @@
         "execution_cell": "meta-policy-cell",
         "verification_gate": "meta git status covers the fleet; meta exec can target the four Yazelix peers; each peer local git status and repo-specific workflow remains functional and independently committable.",
         "rollback_plan": "Revert only the policy/test commit in its owning repository; peer histories remain untouched.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-008.proof.json",
         "next_action": "Land the dual-mode contract before fleet sync implementation."
       }
@@ -220,7 +220,7 @@
         "execution_cell": "rtk-nu-shell-cell",
         "verification_gate": "rtk config prints the documented nu_shell selection; native Nu integration tests pass; Codex and Claude commands route through the profile RTK binary without Bash rewrite hooks.",
         "rollback_plan": "Re-select the prior documented RTK mode and restore its config input; keep the previous profile generation available.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-009.proof.json",
         "next_action": "Design the rtk config schema in its independent repo, publish it, then pin it in Yazelix."
       }
@@ -242,7 +242,7 @@
         "execution_cell": "yazelix-nushell-cell",
         "verification_gate": "Nu parses every module; command signatures/argv survive; meta/grit/icm/weave/envctl/nix resolve through profile paths; bun/bunx replace npm/npx/pnpm; caret raw gates remain available.",
         "rollback_plan": "Remove the new Nu imports/modules and restore the prior packaged config; do not restore user-bin wrappers.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-010.proof.json",
         "next_action": "Revise the staged wrapper module rather than layering a second command catalog."
       }
@@ -264,7 +264,7 @@
         "execution_cell": "shell-boundary-cell",
         "verification_gate": "No stale bash-to-nu or user-local wrapper exists; no active Zsh/Bash command lacks a Nu equivalent; retained sh boundaries use fixed code plus structured argv and have exact behavior tests.",
         "rollback_plan": "Restore only a removed boundary whose pre-change behavior receipt proves it is required; never reintroduce an alternate profile owner.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-011.proof.json",
         "next_action": "Create the inventory from Meta canonical repos, excluding caches and runner workdirs."
       }
@@ -286,7 +286,7 @@
         "execution_cell": "fleet-nushell-cell",
         "verification_gate": "Nu extern/help smoke tests pass for all five command families; Meta inventory labels every flake canonical/vendor/worktree/runner/stale; only approved stale control paths are retired.",
         "rollback_plan": "Restore retired tracked flake files in their independent repos and remove only the new Nu imports if verification fails.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-012.proof.json",
         "next_action": "Separate canonical peer flakes from worktree, runner, and vendored copies before editing."
       }
@@ -308,7 +308,7 @@
         "execution_cell": "four-repo-integration-cell",
         "verification_gate": "Each child local gate passes; child commits are published before the main pin; main validation passes without override-input; GitNexus confirms the intended ownership seams.",
         "rollback_plan": "Revert only the main input pin to the last published child revisions; preserve independently valid child commits.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-013.proof.json",
         "next_action": "Implement child changes first only where a task proves they are necessary."
       }
@@ -330,7 +330,7 @@
         "execution_cell": "installed-runtime-cell",
         "verification_gate": "Source package checks pass; one profile is selected; yzx doctor/inspect pass; generated Nu loads nu_shell and all command modules; Codex/Claude/envctl provenance is correct; Kitty/Ghostty contract passes.",
         "rollback_plan": "Atomically reselect the prior profile generation and restore config projections from receipts; retain failure logs outside generated runtime.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-014.proof.json",
         "next_action": "Run build proof before requesting the explicit profile/config cutover approval."
       }
@@ -352,7 +352,7 @@
         "execution_cell": "closure-audit-cell",
         "verification_gate": "All 15 task gates have proof; four indexes are current; meta git status and gh open-PR inventory are reconciled; peer local statuses are clean or explicitly attributed; no requirement is missing or indirect.",
         "rollback_plan": "Reopen the first contradicted task and invalidate dependent proof records; do not paper over the contradiction in the final matrix.",
-        "status": "Draft",
+        "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-015.proof.json",
         "next_action": "Execute only after YZXCONV-014 installed-runtime proof passes."
       }
@@ -409,14 +409,14 @@
         "phase": "3-agent-env",
         "title": "Encode the owner contract and task graph in envctl agent-env",
         "owner_agent": "envctl Agent Environment Agent",
-        "goal": "Add YZXCONV-016 through YZXCONV-020 and their Kache Nushell profile and cleanup gates to the canonical envctl agent-env source, lock, generated projections, harness guidance, and validation tests.",
+        "goal": "Add YZXCONV-016 through YZXCONV-022 and their Kache, Nushell, profile, cleanup, musl, and Home Manager gates to the canonical envctl agent-env source, lock, generated projections, harness guidance, and validation tests.",
         "inputs": "owner contract; YZXCONV task graph; envctl AGENTS contracts; current agent-env source and lock",
         "target_artifacts": "reviewed agent-env policy and lock; generated projection receipts; harness tests linked to task IDs",
         "allowed_paths": "/home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-env.lock; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/meta/src/envctl/home/**; /home/flexnetos/meta/src/envctl/tests/**",
         "blocked_paths": "direct generated-runtime edits; apply without preview and review; duplicate Codex config authority; task omission",
         "simulation_required": "TRUE",
         "execution_cell": "envctl-owner-contract-cell",
-        "verification_gate": "envctl lock check preview and policy tests pass; the source and generated guidance name YZXCONV-016 through YZXCONV-020; a second preview is idempotent; installed proof resolves through the one profile without widening plugin or MCP authority.",
+        "verification_gate": "envctl lock check preview and policy tests pass; the source and generated guidance name YZXCONV-016 through YZXCONV-022; a second preview is idempotent; installed proof resolves through the one profile without widening plugin or MCP authority.",
         "rollback_plan": "Use the envctl operation receipt to restore the prior source lock and projections, then rerun preview; do not preserve a partial projection as a second authority.",
         "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-018.proof.json",
@@ -449,22 +449,66 @@
       "source_row_number": 21,
       "columns": {
         "task_id": "YZXCONV-020",
-        "parent_id": "YZXCONV-014; YZXCONV-015; YZXCONV-016; YZXCONV-017; YZXCONV-018; YZXCONV-019",
+        "parent_id": "YZXCONV-014; YZXCONV-015; YZXCONV-016; YZXCONV-017; YZXCONV-018; YZXCONV-019; YZXCONV-021; YZXCONV-022",
         "phase": "5-final-closure",
         "title": "Prove the enforced owner contract and close the fleet",
         "owner_agent": "Independent Owner-Contract Verifier",
-        "goal": "Independently prove Kache-only caching, Nushell-only agent execution, one Yazelix profile ownership, canonical envctl inclusion, and fully synchronized clean repositories before any completion claim.",
-        "inputs": "all YZXCONV proofs; installed runtime; envctl projections; Meta fleet; GitHub merge and cleanup receipts",
-        "target_artifacts": "final owner-contract matrix; installed-runtime receipt; clean synchronized fleet receipt; invalidation map",
+        "goal": "Independently prove Kache-only caching, Nushell-only agent execution, one Yazelix profile ownership, canonical envctl inclusion, Yazelix musl portability, Home Manager single-owner integration, and fully synchronized clean repositories before any completion claim.",
+        "inputs": "all YZXCONV proofs; installed runtime; envctl projections; musl and closure receipts; Home Manager ownership receipt; Meta fleet; GitHub merge and cleanup receipts",
+        "target_artifacts": "final owner-contract matrix; installed-runtime receipt; portability receipt; Home Manager ownership receipt; clean synchronized fleet receipt; invalidation map",
         "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**; read-only installed runtime and fleet surfaces; four refreshed Yazelix indexes",
-        "blocked_paths": "new implementation mutation; missing proof; alternate shell or cache authority; dirty or divergent repo; open mergeable cleanup pull request",
+        "blocked_paths": "new implementation mutation; missing proof; alternate shell, cache, profile, or Home Manager authority; false universal-static claim; dirty or divergent repo; open mergeable cleanup pull request",
         "simulation_required": "FALSE",
         "execution_cell": "owner-contract-closure-cell",
-        "verification_gate": "All 20 task gates have current proof; Kache is the only cache authority; agents execute shell actions only through profile Nushell; one profile owns binaries runtime and active configs; envctl names every closure task; all repositories and GitHub refs are synchronized clean and purged.",
+        "verification_gate": "All 22 task gates have current proof; Kache is the only cache authority; agents execute shell actions only through profile Nushell; one profile owns binaries, runtime, Home Manager, and active configs; eligible Yazelix binaries have musl proof and the remaining closure has an honest portable fallback; envctl names every closure task; all repositories and GitHub refs are synchronized clean and purged.",
         "rollback_plan": "Invalidate this proof and reopen the earliest contradicted task; keep downstream proofs blocked until the installed runtime and fleet return to the exact owner contract.",
         "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-020.proof.json",
-        "next_action": "Execute only after YZXCONV-019 proves every repository and pull request is settled."
+        "next_action": "Execute only after YZXCONV-019, YZXCONV-021, and YZXCONV-022 have current proof."
+      }
+    },
+    {
+      "source_row_number": 22,
+      "columns": {
+        "task_id": "YZXCONV-021",
+        "parent_id": "YZXCONV-003; YZXCONV-013",
+        "phase": "3-portability",
+        "title": "Prove Yazelix musl portability without false universal-static claims",
+        "owner_agent": "Yazelix Packaging Agent / Release Agent",
+        "goal": "Use TDD to establish x86_64-unknown-linux-musl builds for every eligible Yazelix and LifeOS Rust binary, classify GUI, Nix, native, and glibc-only dependencies that cannot be static-musl, and prove one honest portable closure or bundle fallback for the remaining runtime.",
+        "inputs": "Architecture Blueprint Nix plus musl requirements; ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md; YZXCONV-003; four-repository ownership receipt; current Yazelix flake and release contracts",
+        "target_artifacts": "musl support matrix; failing-then-passing packaging tests; reproducible binary receipts; non-musl dependency disposition; portable closure or bundle receipt",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/flake.nix; /home/flexnetos/meta/src/yazelix/packaging/**; /home/flexnetos/meta/src/yazelix/tests/**; /home/flexnetos/meta/src/yazelix/docs/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "profile mutation before build proof; generated Yazelix runtime edits; global installs; unsupported universal-static claims; replacing the one profile with a second owner",
+        "simulation_required": "TRUE",
+        "execution_cell": "yazelix-musl-cell",
+        "verification_gate": "Red tests first enumerate eligible binaries and unsupported dependencies; every eligible binary builds reproducibly for x86_64-unknown-linux-musl and runs in the declared clean cell; any no-/nix/store or static claim is proven from the artifact; every ineligible component has an explicit closure, bundle, AppImage-like, or documented host-Nix disposition; the one profile remains the install owner.",
+        "rollback_plan": "Revert only the source packaging and tests from this task, retain the pre-task profile generation, and invalidate portability claims; no installed profile or generated runtime is mutated as build proof.",
+        "status": "Blocked",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-021.proof.json",
+        "next_action": "Begin after YZXCONV-003 and YZXCONV-013 establish the single-profile and four-repository source contracts."
+      }
+    },
+    {
+      "source_row_number": 23,
+      "columns": {
+        "task_id": "YZXCONV-022",
+        "parent_id": "YZXCONV-002; YZXCONV-003",
+        "phase": "3-home-manager",
+        "title": "Make Home Manager a component of the one foundation install owner",
+        "owner_agent": "Yazelix Home Manager Agent / Runtime Verification Agent",
+        "goal": "Use TDD to package Home Manager inside the same lifeos_foundation_yzx profile element, materialize only reviewed Yazelix editable inputs, own the profile desktop entry and layout override, and prevent Home Manager, XDG profiles, generated runtime, or user-local launchers from becoming parallel owners.",
+        "inputs": "YZXCONV-002 ownership contract; YZXCONV-003 single-profile task; Yazelix home_manager source; active profile desktop contract; editable and generated path contract",
+        "target_artifacts": "Home Manager package contract; source and evaluation tests; desktop ownership test; migration and rollback receipt; installed single-owner proof",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/flake.nix; /home/flexnetos/meta/src/yazelix/home_manager/**; /home/flexnetos/meta/src/yazelix/packaging/**; /home/flexnetos/meta/src/yazelix/tests/**; /home/flexnetos/meta/src/yazelix/docs/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "hand edits under /home/flexnetos/.local/share/yazelix/**; a second Nix profile element; stale /home/flexnetos/.local/bin/yzx; stale user-local desktop launchers; auth, sessions, databases, or secrets",
+        "simulation_required": "TRUE",
+        "execution_cell": "yazelix-home-manager-cell",
+        "verification_gate": "Red tests first fail when Home Manager is absent, selects a second profile, writes generated runtime as source, or allows a shadow launcher; Nix evaluation and build prove Home Manager is consumed by the one foundation element; the installed desktop entry launches profile yzx with the profile layout override; stale user-local shadows are absent; rollback restores the prior profile generation without moving agent state.",
+        "rollback_plan": "Revert the Home Manager source package and tests, reselect the checksum-recorded prior profile generation, and restore only reviewed editable inputs; never restore stale launchers or hand-edit generated runtime.",
+        "status": "Blocked",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-022.proof.json",
+        "next_action": "Begin after the owner ratifies YZXCONV-002 and the single-profile contract in YZXCONV-003 is ready for source implementation."
       }
     }
   ]

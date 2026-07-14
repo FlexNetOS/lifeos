@@ -1,0 +1,92 @@
+{
+  "schema_version": "lifeos-planning-spine.yazelix-runtime-convergence.decisions.v0",
+  "generated_at": "2026-07-14T14:40:02Z",
+  "decisions": [
+    {
+      "id": "DEC-YZXCONV-001",
+      "title": "Owner ratifies the 14-clause source-to-runtime ownership contract",
+      "subject_task": "YZXCONV-002",
+      "decided_by": "Owner",
+      "decided_at": "2026-07-14T12:22:43Z",
+      "decision": "All 14 non-negotiable target-state clauses in yazelix_runtime_convergence/PLAN.md are ratified as-is. This clears the YZXCONV-002 human-approval gate and unblocks Waves 1-3. Ratification is authority to design and build to the contract; each mutating step (profile closure, agent config, branch publication) still requires its own per-step owner approval and rollback receipt. No blanket apply authority is granted.",
+      "matrix_uri": "yazelix_runtime_convergence/PLAN.md",
+      "matrix_hash": "sha256:3515e211db4f8090d67a9a05da3e42fd2ea860238634cab0f714ae65f9099b86"
+    },
+    {
+      "id": "DEC-YZXCONV-002",
+      "title": "Strict-Nushell agent routing via nu-MCP + deny-Bash + nu-syntax skill (two swaps + hard gate)",
+      "subject_task": "YZXCONV-017",
+      "decided_by": "Owner",
+      "decided_at": "2026-07-14T12:22:43Z",
+      "refined_at": "2026-07-14T14:01:31Z",
+      "refinement_note": "Refined after the yazelix + nushell-MCP deep-research pass (owner-requested). The original nu -c PreToolUse rewrite mechanism is REPLACED by nu-MCP + deny-Bash + nu-syntax skill; the rewrite hook is demoted to a rejected/documented-broken option. yazelix itself was confirmed NOT to route the agent's internal shell tool through nu (it launches the agent in a nu pane only); the routing technique comes from the MCP side of the ecosystem, not from yazelix.",
+      "decision": "Clause 11 (agents execute shell only through Nushell) is achieved by the research-proven TWO-SWAPS-PLUS-HARD-GATE model, NOT by a nu -c rewrite hook: (1) SYNTAX SWAP - a vendored nushell-syntax skill so each agent emits Nushell rather than bash; (2) INTERPRETER ROUTING - a profile-owned Nushell MCP execution tool (prefer the built-in nu --mcp from Nushell 0.108+, else a pure-Rust nu-MCP crate that respects the no-C boundary) into which the model writes nu as a typed argument; (3) HARD GATE - deny/disable the built-in Bash tool so no bash escape remains. The nu -c PreToolUse rewrite hook is REJECTED as the primary mechanism: it is broken by claude-code #4535 (dev-null injection), unreliable per #15897/#26506 (updatedInput), and fundamentally hands bash syntax to a non-POSIX nu parser (verified locally on nu 0.113.1: andand, dollar-paren, 2>&1, and heredocs all fail). IRREDUCIBLE FLOOR: this is a feature-swap not a transparent shim - the agent must speak nu; bash-emitting commands fail loudly rather than being translated (no bash-to-nu transpiler exists); syntax enforcement is probabilistic and coverage is bounded (tools that hardcode bash break or slip). Wrapper-lane convergence (interactive nu panes + rtk command rewriting) remains the documented partial fallback. Implemented by YZXCONV-028 under owner approval.",
+      "evidence": [
+        "Local verification on nu 0.113.1: bash '&&', '$(...)', '2>&1', and heredocs all fail at the nushell parser when passed to nu -c; nushell is explicitly non-POSIX (nushell.sh cookbook/foreign_shell_scripts)",
+        "anthropics/claude-code #4535: the Bash tool appends '< /dev/null', which breaks any nu -c wrapping",
+        "anthropics/claude-code #15897 and #26506: PreToolUse updatedInput is unreliable / unsupported across paths",
+        "openai/codex #1708 and #4210: exec force-wraps [shell_path, -lc, script] with a bash body; #3823 has no supported shell-selector key",
+        "Nushell ships a built-in MCP server (nu --mcp) - CONFIRMED present in the profile nu 0.113.1 on 2026-07-14 (version|get features includes 'mcp'; nu --help shows --mcp, --mcp-transport stdio/http, --mcp-port), so the execution half is already profile-owned with no build or vendored crate needed; external cablehead/mcp-server-nu and ck3mp3r/nu-mcp remain fallbacks",
+        "luccahuguet/yazelix launches the managed-agent popup via TWO real, contract-checked config keys - agent.command (executable-or-auto, default auto) and agent.args (string array, default []) - verified in yazelix source (crates/yzx-config/src/catalog.rs:8-9, root_config.rs agent_command/agent_args/render_agent_popup_kdl, runtime/yzx/runtime.rs:34-35,97-98, ARCHITECTURE.md:113-114, CHANGELOG.md:111-112). This is a declarative LAUNCH lever (command + args) and sets shell.program=nu for new panes; it launches the agent in a nu pane but does NOT reach the agent's INTERNAL Bash tool, so it does not by itself route the agent's tool through nu. Correction: an earlier web-summary agent surfaced only agent.command and missed agent.args.",
+        "nushell-prophet/nushell-skills (Claude Code plugin marketplace) and hustcer/nushell-pro (SKILL.md) provide the agent nu-syntax skill - the syntax-swap half"
+      ]
+    },
+    {
+      "id": "DEC-YZXCONV-003",
+      "title": "The Nushell command catalog wraps external binaries; it does not reimplement them",
+      "subject_task": "YZXCONV-010",
+      "decided_by": "Agent (research-confirmed, owner-directed round)",
+      "decided_at": "2026-07-14T14:40:02Z",
+      "decision": "The native Nushell command catalog (YZXCONV-010/011/012) is a set of Nu externs / thin --wrapped defs + carapace completions that CALL external binaries through the single rtk owner - NOT reimplementations in Nushell or Rust. Canonical shape (rtk_wrappers.nu): `export def --wrapped gh [...rest] { ^rtk gh ...$rest }`; completions come from carapace (`carapace _carapace nushell`), not per-command hand-written externs. Scoping consequence: for every external CLI (gh, meta, grit, icm, weave, nix, docker, bun, ...) the refactor adds a nu extern/wrapper/completion and routes through rtk; it MUST NOT rewrite the tool's logic. gh specifically is a statically-linked Go binary (gh 2.96.0), not bash - the only 'bash' is its unused upstream completion scripts (replaced by carapace) and the bash -lc launcher that YZXCONV-011/017 retire.",
+      "evidence": [
+        "yazelix/nushell/config/rtk_wrappers.nu:18 (gh wrapper) + header lines 1-13 ('one executable owner ... without a second wrapper binary or plugin bridge')",
+        "rtk-tokenkill/src/cmds/git/gh_cmd.rs resolved_command('gh')/run_passthrough('gh'); cmds/README.md:11 ('executes an external command')",
+        "/usr/bin/gh = Go ELF, cli/cli v2.96.0; yazelix/defaults/nu/config.nu:1 sources @carapaceInit@ generated at flake.nix:178",
+        "task_graph.source.csv YZXCONV-010/012 already specify 'native Nu modules and externs' resolving 'through profile paths'"
+      ]
+    },
+    {
+      "id": "DEC-YZXCONV-004",
+      "title": "Yazi Lua plugins are an accepted third-party plugin surface, not language drift",
+      "subject_task": "YZXCONV-011",
+      "decided_by": "Agent (research-confirmed, owner-directed round)",
+      "decided_at": "2026-07-14T14:40:02Z",
+      "decision": "Yazi's plugin API is mandatorily Lua (a Yazi plugin cannot be authored in Rust), so the vendored Yazi Lua plugins and flavor assets are an ACCEPTED third-party plugin surface - the same class as the libSQL lemon.c build-time exception (the upheld tenet is a linkage law - no C library linked into the trust boundary - not a source-language law). yazelix-yazi-assets is itself a Rust package (Cargo.toml, src/lib.rs, serde+toml) that renders/ships the Lua/TOML as payload; the workspace SOURCE stays Rust. Yazi Lua is outside the shell-convergence law (which targets Nushell shell contract + retiring Bash/Zsh routes), so the pure-Rust / no-non-Rust-source drift check MUST NOT flag Yazi Lua plugins.",
+      "evidence": [
+        "yazelix-yazi-assets/plugins/{git,lazygit,starship,auto-layout,smart-tabs}.yazi/main.lua + 23 flavors; yazelix/defaults/yazi/{init.lua,plugins/*.yazi/main.lua}",
+        "yazelix-yazi-assets Cargo.toml (name yazelix_yazi_assets, edition 2024, [lib] src/lib.rs, serde+toml) - a Rust renderer shipping Lua assets",
+        "envctl/crates/secrets-store-libsql/README.md:87,103 lemon.c precedent ('accept it'; 'nothing C is linked')",
+        "AGENTS.md: 'Preserve upstream plugin license files when refreshing vendored plugins'"
+      ]
+    },
+    {
+      "id": "DEC-YZXCONV-005",
+      "title": "Home Manager is the declarative single-owner mechanism; musl proves eligible-binary portability",
+      "subject_task": "YZXCONV-022",
+      "decided_by": "Agent (research-confirmed, owner-directed round)",
+      "decided_at": "2026-07-14T14:40:02Z",
+      "decision": "The clean single-owner path for the whole config surface is the yazelix Home Manager module (yazelix/home-manager/module.nix): set `programs.yazelix.config.settings.shell.program = \"nu\"` declaratively (nu is already the shipped default - only Nushell is supported; the flake's own regression sets shell.program=nu) instead of hand-editing ~/.config/yazelix/config.toml. The module writes NO runtime config unless a key is declared (lib.mkIf cfg.enable + lib.optionalAttrs (settings != null) + filterAttrs (!= null)), and installs via a single `home.packages = [cfg.package]` (singular `package`; there is no plural programs.yazelix.packages option). Use `programs.yazelix.package = inputs.yazelix.packages.${system}.runtime` (the withMars=false headless CLI+config closure, no GUI terminal / no .desktop) to honor input/output separation (clause 2). HM must be consumed INSIDE the one lifeos_foundation_yzx element, never a second profile / edit surface / launcher shadow (clause 14, YZXCONV-022). musl (x86_64-unknown-linux-musl, toolchain already wired at flake.nix:768-800) proves portability for ELIGIBLE pure-Rust CLIs (self-contained, no glibc, no /nix/store - run on the dual-5090 Ubuntu target without Nix); GUI/Nix/native/glibc-only binaries get an explicit closure/bundle fallback, never a false universal-static claim (clause 13, YZXCONV-021).",
+      "evidence": [
+        "yazelix/home-manager/module.nix (options 103-147; config guards 152-168); flake.nix homeManagerModules.default:157, runtime output yzxRuntime:662, runtime-closure checks 1204-1207, HM regression shell.program=nu:1030",
+        "yazelix/docs/configuration.md:35 ('only Nushell is supported'); defaults/config.toml shell.program=nu default",
+        "PLAN.md clauses 1/2/13/14; YZXCONV-021 (musl) and YZXCONV-022 (Home Manager) gates",
+        "musl.libc.org/about (static, no external deps); rust x86_64-unknown-linux-musl fully-static target; flake.nix:768-800 musl toolchain wired"
+      ]
+    },
+    {
+      "id": "DEC-YZXCONV-006",
+      "title": "agent-env owns only the repo-scoped skills+MCP baseline; the yazelix<->meta connection is the ADR-0006 home symlink farm + nix profile",
+      "subject_task": "YZXCONV-018",
+      "decided_by": "Agent (source-traced integration audit, owner-directed)",
+      "decided_at": "2026-07-14T15:24:05Z",
+      "decision": "Source-traced correction of the 'agent-env is the central control and connection between yazelix and meta' framing. agent-env (envctl, scope: project) writes PLAIN files only into the envctl repo root - .claude/skills, .codex/skills, .mcp.json, .codex/config.toml (agent.rs:240/242/262-281) - dry-run by default, --apply to write, lock-checked (ci/gates/agent-env.sh). It does NOT write into yazelix or the nix profile and does NOT own the nushell runtime config or the live home/.codex|.claude runtime; those are hand-authored home/** sources ADR-0006-symlinked to the live home. agent-env's ONLY relationship to yazelix is a conformance constraint: the MCP baseline must be URL-only (no non-profile local-binary MCPs, 'mirror Yazelix ownership'), enforced by test-agent-mcp-yazelix-mirror.sh. So agent-env centrally controls the agent skills+MCP baseline SURFACE; the actual yazelix<->meta CONNECTION is the ADR-0006 home/** symlink farm (e.g. ~/.config/nushell/config.nu -> home/.config/nushell/config.nu whose line 6 sources the profile-owned rtk_wrappers.nu) plus the yazelix-owned nix profile. meta_plugin_protocol is IN SYNC (envctl path-dep ../../../../meta_plugin_protocol resolves to the meta root; meta-env.rs run_plugin->ExecutionPlan runs the envctl binary; meta_cli consumes it via subprocess_plugins). meta_mcp is a standalone meta_cli-backed MCP server (~30 tools) that builds but is UNWIRED (in no active agent config, absent from agent-env.yaml). meta_git_cli/lib drive real git/gh as subprocesses (no nu-def collision; only the loop_lib $SHELL -c Plan path is a nushell-only caveat). meta_core is the .meta.yaml model + ~/.meta state layer. No live skill/mcp duplication exists (old claude/codex-plugins archived-only; meta-plugins absorbed codex payloads; envctl's 5 skills are name-disjoint). Actionable drift is tracked in YZXCONV-029.",
+      "evidence": [
+        "envctl crates/agent-env/src/agent.rs:240/242/262-281 (project-scope projection targets); fsops.rs:377-383 scope_root; ci/gates/agent-env.sh + scripts/tests/test-agent-mcp-yazelix-mirror.sh",
+        "ADR-0006 home symlink farm: ~/.config/nushell/config.nu -> meta/src/envctl/home/.config/nushell/config.nu (line 6 sources ~/.nix-profile/nushell/config/rtk_wrappers.nu); home/.claude/rules/toolchain.md",
+        "meta_plugin_protocol: envctl crates/cli/Cargo.toml:34 path-dep resolves to /home/flexnetos/meta/meta_plugin_protocol; crates/cli/src/bin/meta-env.rs run_plugin/ExecutionPlan; meta_cli/src/subprocess_plugins.rs + registry.rs:293 resolve_plugin_source",
+        "meta_mcp: /home/flexnetos/meta/meta_mcp bin meta-mcp (~30 tools), depends on meta_cli, unwired in any active agent config",
+        "Verified: no ~/.mcp.json; envctl/.mcp.json = cognitum/cognitum-seed/exa (url-only); active ~/.codex/config.toml = only openaiDeveloperDocs (missing exa, unaccounted); .meta.yaml stale claude-plugins/codex-plugins peers + meta-plugins path drift"
+      ]
+    }
+  ]
+}

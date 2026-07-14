@@ -92,6 +92,10 @@ describe("planning-spine agent navigation", () => {
 
   it("indexes migration WorkOrders and mandatory capabilities without promoting them to canonical tasks", () => {
     const { graph, index, validation } = navigation;
+    const expectedCanonicalTaskCount = JSON.parse(fs.readFileSync(
+      path.join(repoRoot, "planning-spine-v0", "generated", "task_graph.normalized.json"),
+      "utf8",
+    )).task_count;
     const expectedWorkOrderIds = Array.from(
       { length: 106 },
       (_, index) => `TASK-CDB${String(index).padStart(3, "0")}`,
@@ -101,7 +105,7 @@ describe("planning-spine agent navigation", () => {
       (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`,
     );
 
-    expect(Object.keys(index.by_task_id)).toHaveLength(249);
+    expect(Object.keys(index.by_task_id)).toHaveLength(expectedCanonicalTaskCount);
     expect(Object.keys(index.by_work_order_id)).toEqual(expectedWorkOrderIds);
     expect(Object.keys(index.by_mandatory_capability_id)).toEqual(expectedCapabilityIds);
     expect(index.by_task_id["TASK-CDB000"]).toBeUndefined();
@@ -149,7 +153,7 @@ describe("planning-spine agent navigation", () => {
     }));
 
     expect(validation.counts).toMatchObject({
-      tasks: 249,
+      tasks: expectedCanonicalTaskCount,
       imported_work_orders: 106,
       mandatory_migration_capabilities: 28,
     });

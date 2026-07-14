@@ -239,7 +239,7 @@ named in the north star but not yet wired in code. These populate `YZXCONV-036`.
 
 | pkg_id | name | kind | source (leader) | install_method | role / notes |
 |---|---|---|---|---|---|
-| `SC-nu-plugin-ruvector` | nu_plugin_ruvector | plugin | git FlexNetOS/nu_plugin | flake-crate | **Ingestion Pillar 2**: streams AST → redb via MessagePack (blueprint 143–149). |
+| `SC-nu-plugin` | nu_plugin_codedb | plugin | git FlexNetOS/nu_plugin (`/home/flexnetos/meta/src/nu_plugin`) | flake-crate | **Ingestion Pillar 2 — the EXISTING plugin, not a new `nu_plugin_ruvector`.** Real Nushell plugin (nu-plugin 0.113.1, MsgPackSerializer, 25 verbs) with a `BlobStore` driver trait over **redb 4.1 + postgres** + capture/materialize verbs. Blueprint line 147: "you already built the FlexNetOS/nu_plugin to work with redb … doesn't require a new … plugin." ⚠️ pg backend as-locked links **aws-lc (C)** via rustls default — ring-pin or gate-off before profile use (YZXCONV-042). |
 | `SC-beads` | beads_rust 0.2.16 (`br`) | cli (sqlite+jsonl) | git FlexNetOS/beads_rust | flake-crate | agent-first issue tracker (carries its own SQLite+JSONL store). |
 | `SC-weave` | weave | cli (sqlite⟷libsql **dual**) | meta-internal (FlexNetOS/weave) | flake-crate | mesh coordination; **genuine dual-backend store** (sqlite default, libsql opt-in). Built from the meta tree — no public registry. |
 | `SC-embed-minilm` | all-MiniLM-L6-v2 | model-asset | HF / git | asset-fetch | local embedding weights; required by envctl's bridge (blueprint 161, 386). A provisioned runtime artifact, not a package. |
@@ -323,7 +323,7 @@ carried as a catalog row / task; **gap** = mandated, no integration yet.
 | RuVector MinCut immune system (206-215, 500-502) | **planned** | `ruvector-mincut` crate present, not wired as a live swarm gate |
 | PostgreSQL + RuVector **No-Sidecar** store (76-79, 241-252, 424) | **GAP** | worktrees moved durable state to SQLite; Postgres/RuVector-ext not wired → `YZXCONV-035` |
 | redb µs buffer / WAL / BLAKE3 dedup (44-48, 141, 406-411) | **GAP** (as live buffer) | present as a dep; not wired as the ingestion buffer in these branches |
-| Nushell → `nu_plugin_ruvector` → redb (MessagePack) (143-149, 320-325) | **GAP** | ingestion Pillar-2 not present in worktrees → `SC-nu-plugin-ruvector` |
+| Nushell → `nu_plugin` → redb (MessagePack) (143-149, 320-325) | **plugin EXISTS; wiring GAP** | `nu_plugin_codedb` (`~src/nu_plugin`) is the plugin; wire it → `YZXCONV-042` (not a new `nu_plugin_ruvector`) |
 | all-MiniLM-L6-v2 via Candle/ORT (161, 575) | **GAP** | → `YZXCONV-038` (`SC-embed-minilm` + `SC-candle`) |
 | envctl projection (rows → `.rs/.toml/.nu` via `module_path`) (56-61, 154-159, 625-630) | **GAP** | not in these branches |
 | Nix + musl `x86_64-unknown-linux-musl` / AppImage (30-42, 632-634) | **GAP** | → `YZXCONV-021` (musl portability) |

@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.index.v0",
-  "generated_at": "2026-07-14T19:44:46Z",
+  "generated_at": "2026-07-14T20:10:24Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
-  "task_count": 41,
+  "task_count": 49,
   "task_ids": [
     "YZXCONV-001",
     "YZXCONV-002",
@@ -44,7 +44,15 @@
     "YZXCONV-038",
     "YZXCONV-039",
     "YZXCONV-040",
-    "YZXCONV-041"
+    "YZXCONV-041",
+    "YZXCONV-042",
+    "YZXCONV-043",
+    "YZXCONV-044",
+    "YZXCONV-045",
+    "YZXCONV-046",
+    "YZXCONV-047",
+    "YZXCONV-048",
+    "YZXCONV-049"
   ],
   "ready_task_ids": [
     "YZXCONV-003",
@@ -571,6 +579,101 @@
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-041.proof.json",
       "execution_cell": "mars-lifeos-binding-cell"
+    },
+    "YZXCONV-042": {
+      "index": 41,
+      "source_row_number": 43,
+      "phase": "1-ingestion",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-036",
+        "YZXCONV-038"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-042.proof.json",
+      "execution_cell": "ingestion-pipeline-cell"
+    },
+    "YZXCONV-043": {
+      "index": 42,
+      "source_row_number": 44,
+      "phase": "2-db-codebase",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-035",
+        "YZXCONV-042"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-043.proof.json",
+      "execution_cell": "db-hosted-codebase-cell"
+    },
+    "YZXCONV-044": {
+      "index": 43,
+      "source_row_number": 45,
+      "phase": "2-edge-exec",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-037",
+        "YZXCONV-038"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-044.proof.json",
+      "execution_cell": "edge-execution-cell"
+    },
+    "YZXCONV-045": {
+      "index": 44,
+      "source_row_number": 46,
+      "phase": "3-swarm-predict",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-043",
+        "YZXCONV-044"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-045.proof.json",
+      "execution_cell": "swarm-prediction-cell"
+    },
+    "YZXCONV-046": {
+      "index": 45,
+      "source_row_number": 47,
+      "phase": "3-defense",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-043",
+        "YZXCONV-044"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-046.proof.json",
+      "execution_cell": "swarm-defense-cell"
+    },
+    "YZXCONV-047": {
+      "index": 46,
+      "source_row_number": 48,
+      "phase": "4-materialize",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-043"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-047.proof.json",
+      "execution_cell": "projection-materialization-cell"
+    },
+    "YZXCONV-048": {
+      "index": 47,
+      "source_row_number": 49,
+      "phase": "4-release",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-021",
+        "YZXCONV-047"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-048.proof.json",
+      "execution_cell": "portable-release-cell"
+    },
+    "YZXCONV-049": {
+      "index": 48,
+      "source_row_number": 50,
+      "phase": "4-lifeos-runtime",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-041",
+        "YZXCONV-035"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-049.proof.json",
+      "execution_cell": "lifeos-ui-cell"
     }
   },
   "tasks_by_id": {
@@ -1075,6 +1178,101 @@
       ],
       "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-041.proof.json",
       "execution_cell": "mars-lifeos-binding-cell"
+    },
+    "YZXCONV-042": {
+      "index": 41,
+      "source_row_number": 43,
+      "phase": "1-ingestion",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-036",
+        "YZXCONV-038"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-042.proof.json",
+      "execution_cell": "ingestion-pipeline-cell"
+    },
+    "YZXCONV-043": {
+      "index": 42,
+      "source_row_number": 44,
+      "phase": "2-db-codebase",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-035",
+        "YZXCONV-042"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-043.proof.json",
+      "execution_cell": "db-hosted-codebase-cell"
+    },
+    "YZXCONV-044": {
+      "index": 43,
+      "source_row_number": 45,
+      "phase": "2-edge-exec",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-037",
+        "YZXCONV-038"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-044.proof.json",
+      "execution_cell": "edge-execution-cell"
+    },
+    "YZXCONV-045": {
+      "index": 44,
+      "source_row_number": 46,
+      "phase": "3-swarm-predict",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-043",
+        "YZXCONV-044"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-045.proof.json",
+      "execution_cell": "swarm-prediction-cell"
+    },
+    "YZXCONV-046": {
+      "index": 45,
+      "source_row_number": 47,
+      "phase": "3-defense",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-043",
+        "YZXCONV-044"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-046.proof.json",
+      "execution_cell": "swarm-defense-cell"
+    },
+    "YZXCONV-047": {
+      "index": 46,
+      "source_row_number": 48,
+      "phase": "4-materialize",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-043"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-047.proof.json",
+      "execution_cell": "projection-materialization-cell"
+    },
+    "YZXCONV-048": {
+      "index": 47,
+      "source_row_number": 49,
+      "phase": "4-release",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-021",
+        "YZXCONV-047"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-048.proof.json",
+      "execution_cell": "portable-release-cell"
+    },
+    "YZXCONV-049": {
+      "index": 48,
+      "source_row_number": 50,
+      "phase": "4-lifeos-runtime",
+      "status": "blocked",
+      "parent_ids": [
+        "YZXCONV-041",
+        "YZXCONV-035"
+      ],
+      "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-049.proof.json",
+      "execution_cell": "lifeos-ui-cell"
     }
   },
   "tasks_by_status": {
@@ -1123,7 +1321,15 @@
       "YZXCONV-035",
       "YZXCONV-037",
       "YZXCONV-038",
-      "YZXCONV-041"
+      "YZXCONV-041",
+      "YZXCONV-042",
+      "YZXCONV-043",
+      "YZXCONV-044",
+      "YZXCONV-045",
+      "YZXCONV-046",
+      "YZXCONV-047",
+      "YZXCONV-048",
+      "YZXCONV-049"
     ]
   },
   "tasks_by_phase": {
@@ -1202,7 +1408,29 @@
       "YZXCONV-040"
     ],
     "4-lifeos-runtime": [
-      "YZXCONV-041"
+      "YZXCONV-041",
+      "YZXCONV-049"
+    ],
+    "1-ingestion": [
+      "YZXCONV-042"
+    ],
+    "2-db-codebase": [
+      "YZXCONV-043"
+    ],
+    "2-edge-exec": [
+      "YZXCONV-044"
+    ],
+    "3-swarm-predict": [
+      "YZXCONV-045"
+    ],
+    "3-defense": [
+      "YZXCONV-046"
+    ],
+    "4-materialize": [
+      "YZXCONV-047"
+    ],
+    "4-release": [
+      "YZXCONV-048"
     ]
   },
   "children_by_parent": {
@@ -1319,7 +1547,8 @@
       "YZXCONV-020"
     ],
     "YZXCONV-021": [
-      "YZXCONV-020"
+      "YZXCONV-020",
+      "YZXCONV-048"
     ],
     "YZXCONV-022": [
       "YZXCONV-020",
@@ -1352,10 +1581,38 @@
       "YZXCONV-035",
       "YZXCONV-037",
       "YZXCONV-038",
-      "YZXCONV-041"
+      "YZXCONV-041",
+      "YZXCONV-042"
     ],
     "YZXCONV-035": [
-      "YZXCONV-037"
+      "YZXCONV-037",
+      "YZXCONV-043",
+      "YZXCONV-049"
+    ],
+    "YZXCONV-038": [
+      "YZXCONV-042",
+      "YZXCONV-044"
+    ],
+    "YZXCONV-042": [
+      "YZXCONV-043"
+    ],
+    "YZXCONV-037": [
+      "YZXCONV-044"
+    ],
+    "YZXCONV-043": [
+      "YZXCONV-045",
+      "YZXCONV-046",
+      "YZXCONV-047"
+    ],
+    "YZXCONV-044": [
+      "YZXCONV-045",
+      "YZXCONV-046"
+    ],
+    "YZXCONV-047": [
+      "YZXCONV-048"
+    ],
+    "YZXCONV-041": [
+      "YZXCONV-049"
     ]
   },
   "proof_uri_by_task": {
@@ -1399,7 +1656,15 @@
     "YZXCONV-038": "yazelix_runtime_convergence/proof_records/YZXCONV-038.proof.json",
     "YZXCONV-039": "yazelix_runtime_convergence/proof_records/YZXCONV-039.proof.json",
     "YZXCONV-040": "yazelix_runtime_convergence/proof_records/YZXCONV-040.proof.json",
-    "YZXCONV-041": "yazelix_runtime_convergence/proof_records/YZXCONV-041.proof.json"
+    "YZXCONV-041": "yazelix_runtime_convergence/proof_records/YZXCONV-041.proof.json",
+    "YZXCONV-042": "yazelix_runtime_convergence/proof_records/YZXCONV-042.proof.json",
+    "YZXCONV-043": "yazelix_runtime_convergence/proof_records/YZXCONV-043.proof.json",
+    "YZXCONV-044": "yazelix_runtime_convergence/proof_records/YZXCONV-044.proof.json",
+    "YZXCONV-045": "yazelix_runtime_convergence/proof_records/YZXCONV-045.proof.json",
+    "YZXCONV-046": "yazelix_runtime_convergence/proof_records/YZXCONV-046.proof.json",
+    "YZXCONV-047": "yazelix_runtime_convergence/proof_records/YZXCONV-047.proof.json",
+    "YZXCONV-048": "yazelix_runtime_convergence/proof_records/YZXCONV-048.proof.json",
+    "YZXCONV-049": "yazelix_runtime_convergence/proof_records/YZXCONV-049.proof.json"
   },
   "missing_parent_ids": []
 }

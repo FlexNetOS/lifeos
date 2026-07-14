@@ -6,7 +6,7 @@ type: navigation-index
 status: active
 lifecycle: maintained
 created: 2026-07-12
-updated: 2026-07-12
+updated: 2026-07-14
 navigation:
   authority_order: source-tests-proof-normalized-claims-architecture-input
   markdown_links: required
@@ -26,6 +26,7 @@ tags:
   - gitkb
 related:
   - "[[ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
+  - "[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
   - "[[FOUNDATION_ECOSYSTEM_MAP]]"
   - "[[FOUNDATION_META_PORTABILITY_MODEL]]"
   - "[[NORTH_STAR]]"
@@ -55,6 +56,7 @@ claim above executable evidence.
 | Repository operating contract | [`AGENTS.md`](../../AGENTS.md) | [[AGENTS]] |
 | Planning-spine contract | [`planning-spine-v0/README.md`](../README.md) | [[planning-spine-v0/README]] |
 | Blueprint compatibility and corrections | [Architecture Blueprint Compatibility](./ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |
+| Blueprint requirement-to-task coverage | [Architecture Blueprint Task Coverage](./ARCHITECTURE_BLUEPRINT_TASK_COVERAGE.md) | [[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]] |
 | Ecosystem ownership and built/planned map | [Foundation Ecosystem Map](./FOUNDATION_ECOSYSTEM_MAP.md) | [[FOUNDATION_ECOSYSTEM_MAP]] |
 | Meta and portability model | [Foundation Meta Portability Model](./FOUNDATION_META_PORTABILITY_MODEL.md) | [[FOUNDATION_META_PORTABILITY_MODEL]] |
 | Product north star | [North Star](./NORTH_STAR.md) | [[NORTH_STAR]] |

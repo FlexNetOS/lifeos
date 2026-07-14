@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.index.v0",
-  "generated_at": "2026-07-13T06:23:46Z",
+  "generated_at": "2026-07-14T07:08:12Z",
   "source_graph_uri": "generated/task_graph.raw.json",
-  "task_count": 196,
+  "task_count": 232,
   "task_ids": [
     "NBSTATED-001",
     "NBSTATED-002",
@@ -199,9 +199,64 @@
     "DECIDE-003",
     "DECIDE-004",
     "DECIDE-005",
-    "DECIDE-006"
+    "DECIDE-006",
+    "ARCHBP-001",
+    "ARCHBP-002",
+    "ARCHBP-003",
+    "ARCHBP-004",
+    "ARCHBP-005",
+    "ARCHBP-006",
+    "ARCHBP-007",
+    "ARCHBP-008",
+    "ARCHBP-009",
+    "ARCHBP-010",
+    "ARCHBP-011",
+    "ARCHBP-012",
+    "ARCHBP-013",
+    "ARCHBP-014",
+    "ARCHBP-015",
+    "ARCHBP-016",
+    "ARCHBP-017",
+    "ARCHBP-018",
+    "ARCHBP-019",
+    "ARCHBP-020",
+    "ARCHBP-021",
+    "ARCHBP-022",
+    "ARCHBP-023",
+    "ARCHBP-024",
+    "ARCHBP-025",
+    "ARCHBP-026",
+    "ARCHBP-027",
+    "ARCHBP-028",
+    "ARCHBP-029",
+    "ARCHBP-030",
+    "ARCHBP-031",
+    "ARCHBP-032",
+    "ARCHBP-033",
+    "ARCHBP-034",
+    "ARCHBP-035",
+    "ARCHBP-036"
   ],
-  "ready_task_ids": [],
+  "ready_task_ids": [
+    "ARCHBP-001",
+    "ARCHBP-007",
+    "ARCHBP-011",
+    "ARCHBP-018",
+    "ARCHBP-019",
+    "ARCHBP-021",
+    "ARCHBP-022",
+    "ARCHBP-024",
+    "ARCHBP-026",
+    "ARCHBP-027",
+    "ARCHBP-028",
+    "ARCHBP-029",
+    "ARCHBP-030",
+    "ARCHBP-031",
+    "ARCHBP-032",
+    "ARCHBP-033",
+    "ARCHBP-035",
+    "ARCHBP-036"
+  ],
   "complete_task_ids": [
     "NBSTATED-001",
     "NBSTATED-002",
@@ -2073,7 +2128,7 @@
       "index": 151,
       "source_row_number": 153,
       "phase": "12-worldsim-ingestion",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "LPS-022"
       ],
@@ -2568,6 +2623,435 @@
       ],
       "proof_uri": "proof_records/DECIDE-006.proof.json",
       "execution_cell": "policy-cell"
+    },
+    "ARCHBP-001": {
+      "index": 196,
+      "source_row_number": 198,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "NBVERIFY-003",
+        "POSTGRES-004"
+      ],
+      "proof_uri": "proof_records/ARCHBP-001.proof.json",
+      "execution_cell": "codedb-ingestion-cell"
+    },
+    "ARCHBP-002": {
+      "index": 197,
+      "source_row_number": 199,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "STORE-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-002.proof.json",
+      "execution_cell": "storage-sync-cell"
+    },
+    "ARCHBP-003": {
+      "index": 198,
+      "source_row_number": 200,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-002",
+        "POSTGRES-005"
+      ],
+      "proof_uri": "proof_records/ARCHBP-003.proof.json",
+      "execution_cell": "ruvector-semantic-cell"
+    },
+    "ARCHBP-004": {
+      "index": 199,
+      "source_row_number": 201,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-003",
+        "POSTGRES-007"
+      ],
+      "proof_uri": "proof_records/ARCHBP-004.proof.json",
+      "execution_cell": "semantic-edit-cell"
+    },
+    "ARCHBP-005": {
+      "index": 200,
+      "source_row_number": 202,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-004",
+        "POSTGRES-005"
+      ],
+      "proof_uri": "proof_records/ARCHBP-005.proof.json",
+      "execution_cell": "database-cow-cell"
+    },
+    "ARCHBP-006": {
+      "index": 201,
+      "source_row_number": 203,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-005",
+        "POSTGRES-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-006.proof.json",
+      "execution_cell": "envctl-projection-cell"
+    },
+    "ARCHBP-007": {
+      "index": 202,
+      "source_row_number": 204,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "POSTGRES-006",
+        "NBVERIFY-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-007.proof.json",
+      "execution_cell": "agentdb-rvf-cell"
+    },
+    "ARCHBP-008": {
+      "index": 203,
+      "source_row_number": 205,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-007"
+      ],
+      "proof_uri": "proof_records/ARCHBP-008.proof.json",
+      "execution_cell": "ruvllm-inference-cell"
+    },
+    "ARCHBP-009": {
+      "index": 204,
+      "source_row_number": 206,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-009.proof.json",
+      "execution_cell": "learning-substrate-cell"
+    },
+    "ARCHBP-010": {
+      "index": 205,
+      "source_row_number": 207,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-009",
+        "ARCHBP-014"
+      ],
+      "proof_uri": "proof_records/ARCHBP-010.proof.json",
+      "execution_cell": "swarm-scale-cell"
+    },
+    "ARCHBP-011": {
+      "index": 206,
+      "source_row_number": 208,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "POSTGRES-005",
+        "NBSOURCE-006"
+      ],
+      "proof_uri": "proof_records/ARCHBP-011.proof.json",
+      "execution_cell": "atas-esn-research-cell"
+    },
+    "ARCHBP-012": {
+      "index": 207,
+      "source_row_number": 209,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-011"
+      ],
+      "proof_uri": "proof_records/ARCHBP-012.proof.json",
+      "execution_cell": "temporal-attractor-research-cell"
+    },
+    "ARCHBP-013": {
+      "index": 208,
+      "source_row_number": 210,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-011",
+        "ARCHBP-012"
+      ],
+      "proof_uri": "proof_records/ARCHBP-013.proof.json",
+      "execution_cell": "ruvltra-routing-cell"
+    },
+    "ARCHBP-014": {
+      "index": 209,
+      "source_row_number": 211,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-008",
+        "ARCHBP-013"
+      ],
+      "proof_uri": "proof_records/ARCHBP-014.proof.json",
+      "execution_cell": "ruflo-coordination-cell"
+    },
+    "ARCHBP-015": {
+      "index": 210,
+      "source_row_number": 212,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-014",
+        "POSTGRES-005"
+      ],
+      "proof_uri": "proof_records/ARCHBP-015.proof.json",
+      "execution_cell": "mincut-defense-cell"
+    },
+    "ARCHBP-016": {
+      "index": 211,
+      "source_row_number": 213,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-015"
+      ],
+      "proof_uri": "proof_records/ARCHBP-016.proof.json",
+      "execution_cell": "witness-chain-cell"
+    },
+    "ARCHBP-017": {
+      "index": 212,
+      "source_row_number": 214,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-003",
+        "ARCHBP-016"
+      ],
+      "proof_uri": "proof_records/ARCHBP-017.proof.json",
+      "execution_cell": "causal-guard-cell"
+    },
+    "ARCHBP-018": {
+      "index": 213,
+      "source_row_number": 215,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "POSTGRES-009",
+        "NBVERIFY-004",
+        "FOUNDATION-003"
+      ],
+      "proof_uri": "proof_records/ARCHBP-018.proof.json",
+      "execution_cell": "lifeos-yazelix-ipc-cell"
+    },
+    "ARCHBP-019": {
+      "index": 214,
+      "source_row_number": 216,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "INTEL-002",
+        "NBSOURCE-018"
+      ],
+      "proof_uri": "proof_records/ARCHBP-019.proof.json",
+      "execution_cell": "upstream-research-cell"
+    },
+    "ARCHBP-020": {
+      "index": 215,
+      "source_row_number": 217,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-019",
+        "INTEL-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-020.proof.json",
+      "execution_cell": "ruvix-rvm-cell"
+    },
+    "ARCHBP-021": {
+      "index": 216,
+      "source_row_number": 218,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "RELEASE-002",
+        "NBVERIFY-030"
+      ],
+      "proof_uri": "proof_records/ARCHBP-021.proof.json",
+      "execution_cell": "portable-release-cell"
+    },
+    "ARCHBP-022": {
+      "index": 217,
+      "source_row_number": 219,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-023",
+        "NBVERIFY-030"
+      ],
+      "proof_uri": "proof_records/ARCHBP-022.proof.json",
+      "execution_cell": "gitkb-meta-cell"
+    },
+    "ARCHBP-023": {
+      "index": 218,
+      "source_row_number": 220,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-022",
+        "LPS-024"
+      ],
+      "proof_uri": "proof_records/ARCHBP-023.proof.json",
+      "execution_cell": "teas-gitkb-cell"
+    },
+    "ARCHBP-024": {
+      "index": 219,
+      "source_row_number": 221,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "CONSOLIDATE-003",
+        "POSTGRES-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-024.proof.json",
+      "execution_cell": "single-binary-export-cell"
+    },
+    "ARCHBP-025": {
+      "index": 220,
+      "source_row_number": 222,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-021",
+        "ARCHBP-024",
+        "RELEASE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-025.proof.json",
+      "execution_cell": "public-release-proof-cell"
+    },
+    "ARCHBP-026": {
+      "index": 221,
+      "source_row_number": 223,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "EXPERIENCE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-026.proof.json",
+      "execution_cell": "home-manager-desktop-cell"
+    },
+    "ARCHBP-027": {
+      "index": 222,
+      "source_row_number": 224,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "LPS-023"
+      ],
+      "proof_uri": "proof_records/ARCHBP-027.proof.json",
+      "execution_cell": "rules-authority-cell"
+    },
+    "ARCHBP-028": {
+      "index": 223,
+      "source_row_number": 225,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "STRUCTURE-005",
+        "LPS-028"
+      ],
+      "proof_uri": "proof_records/ARCHBP-028.proof.json",
+      "execution_cell": "meta-dag-exec-cell"
+    },
+    "ARCHBP-029": {
+      "index": 224,
+      "source_row_number": 226,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-001",
+        "RELEASE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-029.proof.json",
+      "execution_cell": "toolchain-decision-cell"
+    },
+    "ARCHBP-030": {
+      "index": 225,
+      "source_row_number": 227,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "RELEASE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-030.proof.json",
+      "execution_cell": "envctl-root-relocation-cell"
+    },
+    "ARCHBP-031": {
+      "index": 226,
+      "source_row_number": 228,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "LPS-009"
+      ],
+      "proof_uri": "proof_records/ARCHBP-031.proof.json",
+      "execution_cell": "agent-guard-cell"
+    },
+    "ARCHBP-032": {
+      "index": 227,
+      "source_row_number": 229,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "INTEL-003"
+      ],
+      "proof_uri": "proof_records/ARCHBP-032.proof.json",
+      "execution_cell": "vault-hygiene-cell"
+    },
+    "ARCHBP-033": {
+      "index": 228,
+      "source_row_number": 230,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-023"
+      ],
+      "proof_uri": "proof_records/ARCHBP-033.proof.json",
+      "execution_cell": "planning-link-compat-cell"
+    },
+    "ARCHBP-034": {
+      "index": 229,
+      "source_row_number": 231,
+      "phase": "13-foundation-gap-closure",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-033",
+        "LPS-007",
+        "LPS-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-034.proof.json",
+      "execution_cell": "proof-status-compat-cell"
+    },
+    "ARCHBP-035": {
+      "index": 230,
+      "source_row_number": 232,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-007"
+      ],
+      "proof_uri": "proof_records/ARCHBP-035.proof.json",
+      "execution_cell": "proof-ledger-conflict-cell"
+    },
+    "ARCHBP-036": {
+      "index": 231,
+      "source_row_number": 233,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-003",
+        "LPS-023"
+      ],
+      "proof_uri": "proof_records/ARCHBP-036.proof.json",
+      "execution_cell": "navigation-count-cell"
     }
   },
   "tasks_by_id": {
@@ -4244,7 +4728,7 @@
       "index": 151,
       "source_row_number": 153,
       "phase": "12-worldsim-ingestion",
-      "status": "draft",
+      "status": "blocked",
       "parent_ids": [
         "LPS-022"
       ],
@@ -4739,6 +5223,435 @@
       ],
       "proof_uri": "proof_records/DECIDE-006.proof.json",
       "execution_cell": "policy-cell"
+    },
+    "ARCHBP-001": {
+      "index": 196,
+      "source_row_number": 198,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "NBVERIFY-003",
+        "POSTGRES-004"
+      ],
+      "proof_uri": "proof_records/ARCHBP-001.proof.json",
+      "execution_cell": "codedb-ingestion-cell"
+    },
+    "ARCHBP-002": {
+      "index": 197,
+      "source_row_number": 199,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "STORE-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-002.proof.json",
+      "execution_cell": "storage-sync-cell"
+    },
+    "ARCHBP-003": {
+      "index": 198,
+      "source_row_number": 200,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-002",
+        "POSTGRES-005"
+      ],
+      "proof_uri": "proof_records/ARCHBP-003.proof.json",
+      "execution_cell": "ruvector-semantic-cell"
+    },
+    "ARCHBP-004": {
+      "index": 199,
+      "source_row_number": 201,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-003",
+        "POSTGRES-007"
+      ],
+      "proof_uri": "proof_records/ARCHBP-004.proof.json",
+      "execution_cell": "semantic-edit-cell"
+    },
+    "ARCHBP-005": {
+      "index": 200,
+      "source_row_number": 202,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-004",
+        "POSTGRES-005"
+      ],
+      "proof_uri": "proof_records/ARCHBP-005.proof.json",
+      "execution_cell": "database-cow-cell"
+    },
+    "ARCHBP-006": {
+      "index": 201,
+      "source_row_number": 203,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-005",
+        "POSTGRES-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-006.proof.json",
+      "execution_cell": "envctl-projection-cell"
+    },
+    "ARCHBP-007": {
+      "index": 202,
+      "source_row_number": 204,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "POSTGRES-006",
+        "NBVERIFY-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-007.proof.json",
+      "execution_cell": "agentdb-rvf-cell"
+    },
+    "ARCHBP-008": {
+      "index": 203,
+      "source_row_number": 205,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-007"
+      ],
+      "proof_uri": "proof_records/ARCHBP-008.proof.json",
+      "execution_cell": "ruvllm-inference-cell"
+    },
+    "ARCHBP-009": {
+      "index": 204,
+      "source_row_number": 206,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-009.proof.json",
+      "execution_cell": "learning-substrate-cell"
+    },
+    "ARCHBP-010": {
+      "index": 205,
+      "source_row_number": 207,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-009",
+        "ARCHBP-014"
+      ],
+      "proof_uri": "proof_records/ARCHBP-010.proof.json",
+      "execution_cell": "swarm-scale-cell"
+    },
+    "ARCHBP-011": {
+      "index": 206,
+      "source_row_number": 208,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "POSTGRES-005",
+        "NBSOURCE-006"
+      ],
+      "proof_uri": "proof_records/ARCHBP-011.proof.json",
+      "execution_cell": "atas-esn-research-cell"
+    },
+    "ARCHBP-012": {
+      "index": 207,
+      "source_row_number": 209,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-011"
+      ],
+      "proof_uri": "proof_records/ARCHBP-012.proof.json",
+      "execution_cell": "temporal-attractor-research-cell"
+    },
+    "ARCHBP-013": {
+      "index": 208,
+      "source_row_number": 210,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-011",
+        "ARCHBP-012"
+      ],
+      "proof_uri": "proof_records/ARCHBP-013.proof.json",
+      "execution_cell": "ruvltra-routing-cell"
+    },
+    "ARCHBP-014": {
+      "index": 209,
+      "source_row_number": 211,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-008",
+        "ARCHBP-013"
+      ],
+      "proof_uri": "proof_records/ARCHBP-014.proof.json",
+      "execution_cell": "ruflo-coordination-cell"
+    },
+    "ARCHBP-015": {
+      "index": 210,
+      "source_row_number": 212,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-014",
+        "POSTGRES-005"
+      ],
+      "proof_uri": "proof_records/ARCHBP-015.proof.json",
+      "execution_cell": "mincut-defense-cell"
+    },
+    "ARCHBP-016": {
+      "index": 211,
+      "source_row_number": 213,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-015"
+      ],
+      "proof_uri": "proof_records/ARCHBP-016.proof.json",
+      "execution_cell": "witness-chain-cell"
+    },
+    "ARCHBP-017": {
+      "index": 212,
+      "source_row_number": 214,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-003",
+        "ARCHBP-016"
+      ],
+      "proof_uri": "proof_records/ARCHBP-017.proof.json",
+      "execution_cell": "causal-guard-cell"
+    },
+    "ARCHBP-018": {
+      "index": 213,
+      "source_row_number": 215,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "POSTGRES-009",
+        "NBVERIFY-004",
+        "FOUNDATION-003"
+      ],
+      "proof_uri": "proof_records/ARCHBP-018.proof.json",
+      "execution_cell": "lifeos-yazelix-ipc-cell"
+    },
+    "ARCHBP-019": {
+      "index": 214,
+      "source_row_number": 216,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "INTEL-002",
+        "NBSOURCE-018"
+      ],
+      "proof_uri": "proof_records/ARCHBP-019.proof.json",
+      "execution_cell": "upstream-research-cell"
+    },
+    "ARCHBP-020": {
+      "index": 215,
+      "source_row_number": 217,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-019",
+        "INTEL-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-020.proof.json",
+      "execution_cell": "ruvix-rvm-cell"
+    },
+    "ARCHBP-021": {
+      "index": 216,
+      "source_row_number": 218,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "RELEASE-002",
+        "NBVERIFY-030"
+      ],
+      "proof_uri": "proof_records/ARCHBP-021.proof.json",
+      "execution_cell": "portable-release-cell"
+    },
+    "ARCHBP-022": {
+      "index": 217,
+      "source_row_number": 219,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-023",
+        "NBVERIFY-030"
+      ],
+      "proof_uri": "proof_records/ARCHBP-022.proof.json",
+      "execution_cell": "gitkb-meta-cell"
+    },
+    "ARCHBP-023": {
+      "index": 218,
+      "source_row_number": 220,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-022",
+        "LPS-024"
+      ],
+      "proof_uri": "proof_records/ARCHBP-023.proof.json",
+      "execution_cell": "teas-gitkb-cell"
+    },
+    "ARCHBP-024": {
+      "index": 219,
+      "source_row_number": 221,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "CONSOLIDATE-003",
+        "POSTGRES-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-024.proof.json",
+      "execution_cell": "single-binary-export-cell"
+    },
+    "ARCHBP-025": {
+      "index": 220,
+      "source_row_number": 222,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-021",
+        "ARCHBP-024",
+        "RELEASE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-025.proof.json",
+      "execution_cell": "public-release-proof-cell"
+    },
+    "ARCHBP-026": {
+      "index": 221,
+      "source_row_number": 223,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "EXPERIENCE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-026.proof.json",
+      "execution_cell": "home-manager-desktop-cell"
+    },
+    "ARCHBP-027": {
+      "index": 222,
+      "source_row_number": 224,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "LPS-023"
+      ],
+      "proof_uri": "proof_records/ARCHBP-027.proof.json",
+      "execution_cell": "rules-authority-cell"
+    },
+    "ARCHBP-028": {
+      "index": 223,
+      "source_row_number": 225,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "STRUCTURE-005",
+        "LPS-028"
+      ],
+      "proof_uri": "proof_records/ARCHBP-028.proof.json",
+      "execution_cell": "meta-dag-exec-cell"
+    },
+    "ARCHBP-029": {
+      "index": 224,
+      "source_row_number": 226,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-001",
+        "RELEASE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-029.proof.json",
+      "execution_cell": "toolchain-decision-cell"
+    },
+    "ARCHBP-030": {
+      "index": 225,
+      "source_row_number": 227,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "RELEASE-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-030.proof.json",
+      "execution_cell": "envctl-root-relocation-cell"
+    },
+    "ARCHBP-031": {
+      "index": 226,
+      "source_row_number": 228,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "FOUNDATION-003",
+        "LPS-009"
+      ],
+      "proof_uri": "proof_records/ARCHBP-031.proof.json",
+      "execution_cell": "agent-guard-cell"
+    },
+    "ARCHBP-032": {
+      "index": 227,
+      "source_row_number": 229,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "INTEL-003"
+      ],
+      "proof_uri": "proof_records/ARCHBP-032.proof.json",
+      "execution_cell": "vault-hygiene-cell"
+    },
+    "ARCHBP-033": {
+      "index": 228,
+      "source_row_number": 230,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-023"
+      ],
+      "proof_uri": "proof_records/ARCHBP-033.proof.json",
+      "execution_cell": "planning-link-compat-cell"
+    },
+    "ARCHBP-034": {
+      "index": 229,
+      "source_row_number": 231,
+      "phase": "13-foundation-gap-closure",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-033",
+        "LPS-007",
+        "LPS-008"
+      ],
+      "proof_uri": "proof_records/ARCHBP-034.proof.json",
+      "execution_cell": "proof-status-compat-cell"
+    },
+    "ARCHBP-035": {
+      "index": 230,
+      "source_row_number": 232,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-007"
+      ],
+      "proof_uri": "proof_records/ARCHBP-035.proof.json",
+      "execution_cell": "proof-ledger-conflict-cell"
+    },
+    "ARCHBP-036": {
+      "index": 231,
+      "source_row_number": 233,
+      "phase": "13-foundation-gap-closure",
+      "status": "ready",
+      "parent_ids": [
+        "LPS-003",
+        "LPS-023"
+      ],
+      "proof_uri": "proof_records/ARCHBP-036.proof.json",
+      "execution_cell": "navigation-count-cell"
     }
   },
   "tasks_by_status": {
@@ -4939,8 +5852,46 @@
       "DECIDE-005",
       "DECIDE-006"
     ],
-    "draft": [
-      "LPS-029"
+    "blocked": [
+      "LPS-029",
+      "ARCHBP-002",
+      "ARCHBP-003",
+      "ARCHBP-004",
+      "ARCHBP-005",
+      "ARCHBP-006",
+      "ARCHBP-008",
+      "ARCHBP-009",
+      "ARCHBP-010",
+      "ARCHBP-012",
+      "ARCHBP-013",
+      "ARCHBP-014",
+      "ARCHBP-015",
+      "ARCHBP-016",
+      "ARCHBP-017",
+      "ARCHBP-020",
+      "ARCHBP-023",
+      "ARCHBP-025",
+      "ARCHBP-034"
+    ],
+    "ready": [
+      "ARCHBP-001",
+      "ARCHBP-007",
+      "ARCHBP-011",
+      "ARCHBP-018",
+      "ARCHBP-019",
+      "ARCHBP-021",
+      "ARCHBP-022",
+      "ARCHBP-024",
+      "ARCHBP-026",
+      "ARCHBP-027",
+      "ARCHBP-028",
+      "ARCHBP-029",
+      "ARCHBP-030",
+      "ARCHBP-031",
+      "ARCHBP-032",
+      "ARCHBP-033",
+      "ARCHBP-035",
+      "ARCHBP-036"
     ]
   },
   "tasks_by_phase": {
@@ -5193,6 +6144,46 @@
       "LPS-034",
       "LPS-035",
       "LPS-036"
+    ],
+    "13-architecture-blueprint-execution": [
+      "ARCHBP-001",
+      "ARCHBP-002",
+      "ARCHBP-003",
+      "ARCHBP-004",
+      "ARCHBP-005",
+      "ARCHBP-006",
+      "ARCHBP-007",
+      "ARCHBP-008",
+      "ARCHBP-009",
+      "ARCHBP-010",
+      "ARCHBP-011",
+      "ARCHBP-012",
+      "ARCHBP-013",
+      "ARCHBP-014",
+      "ARCHBP-015",
+      "ARCHBP-016",
+      "ARCHBP-017",
+      "ARCHBP-018",
+      "ARCHBP-019",
+      "ARCHBP-020",
+      "ARCHBP-021",
+      "ARCHBP-022",
+      "ARCHBP-023",
+      "ARCHBP-024",
+      "ARCHBP-025",
+      "ARCHBP-026",
+      "ARCHBP-027"
+    ],
+    "13-foundation-gap-closure": [
+      "ARCHBP-028",
+      "ARCHBP-029",
+      "ARCHBP-030",
+      "ARCHBP-031",
+      "ARCHBP-032",
+      "ARCHBP-033",
+      "ARCHBP-034",
+      "ARCHBP-035",
+      "ARCHBP-036"
     ]
   },
   "children_by_parent": {
@@ -5224,7 +6215,8 @@
     ],
     "NBSOURCE-006": [
       "NBSTATED-006",
-      "NBSOURCE-007"
+      "NBSOURCE-007",
+      "ARCHBP-011"
     ],
     "NBSOURCE-007": [
       "NBSTATED-007",
@@ -5272,7 +6264,8 @@
     ],
     "NBSOURCE-018": [
       "NBSTATED-018",
-      "NBSOURCE-019"
+      "NBSOURCE-019",
+      "ARCHBP-019"
     ],
     "NBSOURCE-019": [
       "NBSTATED-019",
@@ -5416,7 +6409,8 @@
       "STRUCTURE-005"
     ],
     "STRUCTURE-005": [
-      "STRUCTURE-006"
+      "STRUCTURE-006",
+      "ARCHBP-028"
     ],
     "LIFEOS-002": [
       "POSTGRES-001",
@@ -5459,7 +6453,8 @@
       "NBVERIFY-001"
     ],
     "STORE-001": [
-      "POSTGRES-002"
+      "POSTGRES-002",
+      "ARCHBP-002"
     ],
     "POSTGRES-002": [
       "POSTGRES-003"
@@ -5468,28 +6463,45 @@
       "POSTGRES-004"
     ],
     "POSTGRES-004": [
-      "POSTGRES-005"
+      "POSTGRES-005",
+      "ARCHBP-001"
     ],
     "POSTGRES-005": [
-      "POSTGRES-006"
+      "POSTGRES-006",
+      "ARCHBP-003",
+      "ARCHBP-005",
+      "ARCHBP-011",
+      "ARCHBP-015"
     ],
     "POSTGRES-006": [
-      "POSTGRES-007"
+      "POSTGRES-007",
+      "ARCHBP-007"
     ],
     "POSTGRES-007": [
-      "POSTGRES-008"
+      "POSTGRES-008",
+      "ARCHBP-004"
     ],
     "FOUNDATION-003": [
-      "POSTGRES-008"
+      "POSTGRES-008",
+      "ARCHBP-018",
+      "ARCHBP-021",
+      "ARCHBP-026",
+      "ARCHBP-027",
+      "ARCHBP-030",
+      "ARCHBP-031"
     ],
     "POSTGRES-008": [
-      "POSTGRES-009"
+      "POSTGRES-009",
+      "ARCHBP-006",
+      "ARCHBP-024"
     ],
     "POSTGRES-009": [
-      "POSTGRES-010"
+      "POSTGRES-010",
+      "ARCHBP-018"
     ],
     "FOUNDATION-001": [
-      "FOUNDATION-002"
+      "FOUNDATION-002",
+      "ARCHBP-029"
     ],
     "FOUNDATION-002": [
       "FOUNDATION-003"
@@ -5504,7 +6516,9 @@
       "INTEL-002"
     ],
     "INTEL-002": [
-      "INTEL-003"
+      "INTEL-003",
+      "ARCHBP-019",
+      "ARCHBP-020"
     ],
     "MVP1-001": [
       "MVP1-002"
@@ -5534,13 +6548,18 @@
       "EXPERIENCE-002"
     ],
     "EXPERIENCE-002": [
-      "EXPERIENCE-003"
+      "EXPERIENCE-003",
+      "ARCHBP-026"
     ],
     "RELEASE-001": [
       "RELEASE-002"
     ],
     "RELEASE-002": [
-      "RELEASE-003"
+      "RELEASE-003",
+      "ARCHBP-021",
+      "ARCHBP-025",
+      "ARCHBP-029",
+      "ARCHBP-030"
     ],
     "LIFEOS-012": [
       "LIVING-001"
@@ -5561,7 +6580,8 @@
       "LPS-003"
     ],
     "LPS-003": [
-      "LPS-004"
+      "LPS-004",
+      "ARCHBP-036"
     ],
     "LPS-004": [
       "LPS-005"
@@ -5573,14 +6593,18 @@
       "LPS-007"
     ],
     "LPS-007": [
-      "LPS-008"
+      "LPS-008",
+      "ARCHBP-034",
+      "ARCHBP-035"
     ],
     "LPS-008": [
       "LPS-009",
-      "LPS-012"
+      "LPS-012",
+      "ARCHBP-034"
     ],
     "LPS-009": [
-      "LPS-010"
+      "LPS-010",
+      "ARCHBP-031"
     ],
     "LPS-010": [
       "LPS-011"
@@ -5637,10 +6661,15 @@
       "LPS-022"
     ],
     "LPS-023": [
-      "LPS-024"
+      "LPS-024",
+      "ARCHBP-022",
+      "ARCHBP-027",
+      "ARCHBP-033",
+      "ARCHBP-036"
     ],
     "LPS-024": [
-      "LPS-025"
+      "LPS-025",
+      "ARCHBP-023"
     ],
     "LPS-025": [
       "LPS-026"
@@ -5676,13 +6705,15 @@
       "LPS-036"
     ],
     "NBVERIFY-001": [
-      "NBVERIFY-002"
+      "NBVERIFY-002",
+      "ARCHBP-007"
     ],
     "NBVERIFY-002": [
       "NBVERIFY-003"
     ],
     "NBVERIFY-003": [
-      "NBVERIFY-004"
+      "NBVERIFY-004",
+      "ARCHBP-001"
     ],
     "LPS-011": [
       "DECIDE-001",
@@ -5691,6 +6722,83 @@
       "DECIDE-004",
       "DECIDE-005",
       "DECIDE-006"
+    ],
+    "ARCHBP-001": [
+      "ARCHBP-002"
+    ],
+    "ARCHBP-002": [
+      "ARCHBP-003"
+    ],
+    "ARCHBP-003": [
+      "ARCHBP-004",
+      "ARCHBP-017"
+    ],
+    "ARCHBP-004": [
+      "ARCHBP-005"
+    ],
+    "ARCHBP-005": [
+      "ARCHBP-006"
+    ],
+    "ARCHBP-007": [
+      "ARCHBP-008"
+    ],
+    "ARCHBP-008": [
+      "ARCHBP-009",
+      "ARCHBP-014"
+    ],
+    "ARCHBP-009": [
+      "ARCHBP-010"
+    ],
+    "ARCHBP-014": [
+      "ARCHBP-010",
+      "ARCHBP-015"
+    ],
+    "ARCHBP-011": [
+      "ARCHBP-012",
+      "ARCHBP-013"
+    ],
+    "ARCHBP-012": [
+      "ARCHBP-013"
+    ],
+    "ARCHBP-013": [
+      "ARCHBP-014"
+    ],
+    "ARCHBP-015": [
+      "ARCHBP-016"
+    ],
+    "ARCHBP-016": [
+      "ARCHBP-017"
+    ],
+    "NBVERIFY-004": [
+      "ARCHBP-018"
+    ],
+    "ARCHBP-019": [
+      "ARCHBP-020"
+    ],
+    "NBVERIFY-030": [
+      "ARCHBP-021",
+      "ARCHBP-022"
+    ],
+    "ARCHBP-022": [
+      "ARCHBP-023"
+    ],
+    "CONSOLIDATE-003": [
+      "ARCHBP-024"
+    ],
+    "ARCHBP-021": [
+      "ARCHBP-025"
+    ],
+    "ARCHBP-024": [
+      "ARCHBP-025"
+    ],
+    "LPS-028": [
+      "ARCHBP-028"
+    ],
+    "INTEL-003": [
+      "ARCHBP-032"
+    ],
+    "ARCHBP-033": [
+      "ARCHBP-034"
     ]
   },
   "proof_uri_by_task": {
@@ -5889,7 +6997,43 @@
     "DECIDE-003": "proof_records/DECIDE-003.proof.json",
     "DECIDE-004": "proof_records/DECIDE-004.proof.json",
     "DECIDE-005": "proof_records/DECIDE-005.proof.json",
-    "DECIDE-006": "proof_records/DECIDE-006.proof.json"
+    "DECIDE-006": "proof_records/DECIDE-006.proof.json",
+    "ARCHBP-001": "proof_records/ARCHBP-001.proof.json",
+    "ARCHBP-002": "proof_records/ARCHBP-002.proof.json",
+    "ARCHBP-003": "proof_records/ARCHBP-003.proof.json",
+    "ARCHBP-004": "proof_records/ARCHBP-004.proof.json",
+    "ARCHBP-005": "proof_records/ARCHBP-005.proof.json",
+    "ARCHBP-006": "proof_records/ARCHBP-006.proof.json",
+    "ARCHBP-007": "proof_records/ARCHBP-007.proof.json",
+    "ARCHBP-008": "proof_records/ARCHBP-008.proof.json",
+    "ARCHBP-009": "proof_records/ARCHBP-009.proof.json",
+    "ARCHBP-010": "proof_records/ARCHBP-010.proof.json",
+    "ARCHBP-011": "proof_records/ARCHBP-011.proof.json",
+    "ARCHBP-012": "proof_records/ARCHBP-012.proof.json",
+    "ARCHBP-013": "proof_records/ARCHBP-013.proof.json",
+    "ARCHBP-014": "proof_records/ARCHBP-014.proof.json",
+    "ARCHBP-015": "proof_records/ARCHBP-015.proof.json",
+    "ARCHBP-016": "proof_records/ARCHBP-016.proof.json",
+    "ARCHBP-017": "proof_records/ARCHBP-017.proof.json",
+    "ARCHBP-018": "proof_records/ARCHBP-018.proof.json",
+    "ARCHBP-019": "proof_records/ARCHBP-019.proof.json",
+    "ARCHBP-020": "proof_records/ARCHBP-020.proof.json",
+    "ARCHBP-021": "proof_records/ARCHBP-021.proof.json",
+    "ARCHBP-022": "proof_records/ARCHBP-022.proof.json",
+    "ARCHBP-023": "proof_records/ARCHBP-023.proof.json",
+    "ARCHBP-024": "proof_records/ARCHBP-024.proof.json",
+    "ARCHBP-025": "proof_records/ARCHBP-025.proof.json",
+    "ARCHBP-026": "proof_records/ARCHBP-026.proof.json",
+    "ARCHBP-027": "proof_records/ARCHBP-027.proof.json",
+    "ARCHBP-028": "proof_records/ARCHBP-028.proof.json",
+    "ARCHBP-029": "proof_records/ARCHBP-029.proof.json",
+    "ARCHBP-030": "proof_records/ARCHBP-030.proof.json",
+    "ARCHBP-031": "proof_records/ARCHBP-031.proof.json",
+    "ARCHBP-032": "proof_records/ARCHBP-032.proof.json",
+    "ARCHBP-033": "proof_records/ARCHBP-033.proof.json",
+    "ARCHBP-034": "proof_records/ARCHBP-034.proof.json",
+    "ARCHBP-035": "proof_records/ARCHBP-035.proof.json",
+    "ARCHBP-036": "proof_records/ARCHBP-036.proof.json"
   },
   "missing_parent_ids": []
 }

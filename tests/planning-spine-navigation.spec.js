@@ -104,7 +104,7 @@ describe("planning-spine agent navigation", () => {
       (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`,
     );
 
-    expect(Object.keys(index.by_task_id)).toHaveLength(264);
+    expect(Object.keys(index.by_task_id)).toHaveLength(269);
     expect(Object.keys(index.by_work_order_id)).toEqual(expectedWorkOrderIds);
     expect(Object.keys(index.by_mandatory_capability_id)).toEqual(expectedCapabilityIds);
     expect(index.by_task_id["TASK-CDB000"]).toBeUndefined();
@@ -152,7 +152,7 @@ describe("planning-spine agent navigation", () => {
     }));
 
     expect(validation.counts).toMatchObject({
-      tasks: 264,
+      tasks: 269,
       imported_work_orders: 106,
       mandatory_migration_capabilities: 28,
     });

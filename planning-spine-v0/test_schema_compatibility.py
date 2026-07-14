@@ -120,7 +120,7 @@ class YazelixConvergenceLandingTests(unittest.TestCase):
             for row in read_csv(ROOT / "generated" / "task_graph.source.csv")
             if row["task_id"].startswith("YZXCONV-")
         ]
-        self.assertEqual(len(focused), 15)
+        self.assertEqual(len(focused), 20)
         self.assertEqual(canonical, focused)
         self.assertEqual(focused[0]["parent_id"], "LPS-003")
 
@@ -131,7 +131,7 @@ class YazelixConvergenceLandingTests(unittest.TestCase):
         actual = read_json(ROOT / "generated" / "north_star_coverage.control.json")
         self.assertEqual(actual, expected)
 
-        yzx_ids = {f"YZXCONV-{index:03d}" for index in range(1, 16)}
+        yzx_ids = {f"YZXCONV-{index:03d}" for index in range(1, 21)}
         anchors = {anchor["anchor_id"]: set(anchor["phase_task_ids"]) for anchor in actual["anchors"]}
         self.assertTrue(yzx_ids.issubset(anchors["NS-DIRECTION"]))
         self.assertTrue(yzx_ids.issubset(anchors["NS-PROGRESS"]))
@@ -169,6 +169,32 @@ class YazelixConvergenceLandingTests(unittest.TestCase):
             rows["YZXCONV-014"]["verification_gate"],
         )
         self.assertIn("profile layout override", rows["YZXCONV-014"]["verification_gate"])
+
+    def test_review_cannot_authorize_or_execute_follow_up_work(self) -> None:
+        rows = {
+            row["task_id"]: row
+            for row in read_csv(ROOT / "yazelix_runtime_convergence" / "task_graph.source.csv")
+        }
+        self.assertEqual(rows["YZXCONV-016"]["status"], "Ready")
+        self.assertIn("owner-approved PR #41 head", rows["YZXCONV-016"]["goal"])
+        self.assertIn("do not label it stale", rows["YZXCONV-017"]["goal"])
+        self.assertIn("canonical graph and ledger bytes remain unchanged", rows["YZXCONV-018"]["verification_gate"])
+        self.assertIn("a review request does not authorize implementation", rows["YZXCONV-019"]["goal"])
+        self.assertIn("YZXCONV-020", rows["YZXCONV-002"]["parent_id"])
+        self.assertEqual(rows["YZXCONV-002"]["status"], "Ready")
+        self.assertEqual(rows["YZXCONV-003"]["status"], "Draft")
+        self.assertEqual(rows["YZXCONV-008"]["status"], "Draft")
+        self.assertTrue(
+            all(rows[f"YZXCONV-{index:03d}"]["status"] == "Ready" for index in range(16, 21))
+        )
+        self.assertIn("Settle all 44 recorded conflicts", rows["YZXCONV-020"]["goal"])
+        self.assertIn("restore the saved package", rows["YZXCONV-020"]["goal"])
+        self.assertIn("append-only ledger", rows["YZXCONV-020"]["goal"])
+        self.assertIn("RULES.md", rows["YZXCONV-020"]["goal"])
+        self.assertIn(
+            "task creation and review do not authorize execution",
+            rows["YZXCONV-020"]["next_action"],
+        )
 
 
 if __name__ == "__main__":

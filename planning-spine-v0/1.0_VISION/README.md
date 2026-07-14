@@ -95,7 +95,7 @@ Use YAML frontmatter with these fields when applicable:
 | `review` | Exact repository, commit range, and verification boundary when the document audits implementation. |
 
 Do not add metadata that cannot be maintained or that implies proof absent a
-receipt. Use dual links when possible: [[WIKI LINK]] for graph navigation and
+receipt. Use dual links when possible: `[[WIKI LINK]]` for graph navigation and
 `[Markdown link](path)` for portable local navigation.
 
 ## GitKB operating note

@@ -363,13 +363,20 @@ function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = fals
   } catch {
     decoded = trimmed;
   }
-  let absolutePath = wiki ? path.resolve(repoRoot, decoded) : path.resolve(path.dirname(sourceAbsolutePath), decoded);
   const wikiExtensions = [".md", ".json", ".csv", ".jsonl", ".yaml", ".yml"];
-  if (wiki && !wikiExtensions.includes(path.extname(absolutePath).toLowerCase())) {
-    const candidates = wikiExtensions
-      .map((extension) => `${absolutePath}${extension}`);
-    absolutePath = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
-  }
+  const candidateBases = wiki
+    ? unique([
+        path.resolve(path.dirname(sourceAbsolutePath), decoded),
+        path.resolve(path.dirname(sourceAbsolutePath), "..", decoded),
+        path.resolve(repoRoot, decoded),
+      ])
+    : [path.resolve(path.dirname(sourceAbsolutePath), decoded)];
+  const candidates = candidateBases.flatMap((candidate) => (
+    wiki && !wikiExtensions.includes(path.extname(candidate).toLowerCase())
+      ? wikiExtensions.map((extension) => `${candidate}${extension}`)
+      : [candidate]
+  ));
+  let absolutePath = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
   let relativeToRepo = path.relative(repoRoot, absolutePath);
   const outside = relativeToRepo.startsWith("..") || path.isAbsolute(relativeToRepo);
   if (!outside && fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
@@ -622,7 +629,7 @@ export function buildNavigationArtifacts(options = {}) {
     }
     const classification = classifyFile(effectivePath, frontmatter, jsonValue, external);
     const basename = path.basename(effectivePath);
-    const stem = basename.replace(/\.[^.]+$/, "");
+    const stem = basename.replace(/\.[^.]+$/, "") || basename;
     let identifiers = text === null
       ? []
       : knownIdentifiers.filter((identifier) => new RegExp(`(^|[^A-Z0-9-])${escapeRegExp(identifier)}([^A-Z0-9-]|$)`).test(text));
@@ -685,7 +692,7 @@ export function buildNavigationArtifacts(options = {}) {
   const addExternalReferenceNode = (repoPath) => {
     if (fileNodeByRepoPath.has(repoPath)) return fileNodeByRepoPath.get(repoPath);
     const basename = path.posix.basename(repoPath);
-    const stem = basename.replace(/\.[^.]+$/, "");
+    const stem = basename.replace(/\.[^.]+$/, "") || basename;
     const nodeId = `external-reference:${repoPath}`;
     addNode({
       id: nodeId,

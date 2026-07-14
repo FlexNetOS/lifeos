@@ -7,9 +7,10 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now
 
 
 NORMALIZED_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.normalized.v0"
@@ -41,10 +42,6 @@ SOURCE_STATUS_LIFECYCLE = {
 
 class StatusError(Exception):
     pass
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def sha256_file(path: Path) -> str:
@@ -216,15 +213,38 @@ def status_projection(
         proof_observed_at = None
         proof_sha256 = None
         proof_revision = None
+        proof_status = None
+        proof_invalidates = None
 
         if ledger_entry is not None:
             proof_observed_at = ledger_entry.get("observed_at")
             proof_sha256 = ledger_entry.get("proof_sha256")
             proof_revision = ledger_entry.get("revision")
+            proof_status = ledger_entry.get("status")
+            proof_invalidates = ledger_entry.get("invalidates")
             effective_proof_uri = str(ledger_entry.get("proof_uri", source_proof_uri)).strip()
+            ledger_status = str(ledger_entry.get("status", "")).strip().lower()
             if passing_status(ledger_entry.get("status")):
                 effective_status = "complete"
                 effective_next_action = next_action_for(task_id, ledger_entry, children)
+            elif ledger_status in INVALIDATING_PROOF_STATUSES:
+                claimed_source_status = ledger_entry.get("restores_source_status")
+                if not isinstance(claimed_source_status, str) or not claimed_source_status.strip():
+                    raise StatusError(
+                        f"{task_id}: invalidated proof requires restores_source_status"
+                    )
+                source_lifecycle = lifecycle_state(source_status, None)
+                claimed_lifecycle = lifecycle_state(claimed_source_status, None)
+                if source_lifecycle != claimed_lifecycle:
+                    raise StatusError(
+                        f"{task_id}: invalidated proof restores_source_status "
+                        f"{claimed_source_status!r} does not match source status {source_status!r}"
+                    )
+                if source_lifecycle == "complete":
+                    raise StatusError(
+                        f"{task_id}: invalidated proof requires a non-complete source status"
+                    )
+                invalidated_task_ids.append(task_id)
 
         changes: dict[str, dict[str, Any]] = {}
         for field, source, effective in (
@@ -269,9 +289,11 @@ def status_projection(
                 },
                 "proof": {
                     "ledger_line_number": ledger_entry.get("_line_number") if ledger_entry else None,
+                    "status": proof_status,
                     "observed_at": proof_observed_at,
                     "revision": proof_revision,
                     "sha256": proof_sha256,
+                    "invalidates": proof_invalidates,
                 },
                 "updated_fields": sorted(changes),
                 "updates": changes,

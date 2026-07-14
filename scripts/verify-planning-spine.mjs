@@ -1,5 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
+import {
+  checkNavigationArtifacts,
+  validateNavigationArtifactSchemas
+} from "../planning-spine-v0/scripts/build-navigation-index.mjs";
+import { checkTaskTableArtifacts } from "../planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs";
 
 const repoRoot = process.cwd();
 const pkgRoot = path.join(repoRoot, "planning-spine-v0");
@@ -33,6 +39,9 @@ const authorityIntegrityReport = {
 
 const requiredDocs = [
   "README.md",
+  "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+  "navigation/README.md",
+  "navigation/source.json",
   "00_NORTH_STAR.md",
   "01_OBJECT_MODEL.md",
   "02_AUTHORITY_GRAPH.md",
@@ -43,6 +52,23 @@ const requiredDocs = [
   "07_MVP_VERTICAL_SLICE.md",
   "08_EXECUTION_GATES.md",
   "09_OPEN_QUESTIONS.md",
+  "1.0_VISION/README.md",
+  "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+  "1.0_VISION/Notebooklm/README.md",
+  "1.0_VISION/Notebooklm/artifacts.meta.json",
+  "generated/envctl_package_landing_receipt.json",
+  "task_tables/README.md",
+  "task_tables/workflow/mandatory_capabilities.json",
+  "task_tables/workflow/mandatory_capabilities.csv",
+  "task_tables/workflow/mandatory_language_inventory.json",
+  "task_tables/workflow/mandatory_language_inventory.csv",
+  "navigation/generated/navigation_graph.json",
+  "navigation/generated/navigation_index.json",
+  "navigation/generated/navigation.validation_report.json",
+  "navigation/schemas/index.json",
+  "navigation/schemas/navigation-graph.schema.json",
+  "navigation/schemas/navigation-index.schema.json",
+  "navigation/schemas/navigation-validation.schema.json",
   "rfcs/RFC-001_DEVWORLD_MIROFISH_ADAPTER.md",
   "rfcs/RFC-002_COMPILED_AGENT_BRAINPACK.md"
 ];
@@ -93,6 +119,27 @@ function recordCheck(name) {
   performedChecks.push(name);
 }
 
+function assertInside(parent, candidate, label) {
+  const relative = path.relative(parent, candidate);
+  assert(
+    relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative),
+    `${label} must stay inside ${parent}`
+  );
+}
+
+function sha256File(filePath) {
+  return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
+}
+
+function countNewlines(filePath) {
+  const bytes = fs.readFileSync(filePath);
+  let count = 0;
+  for (const byte of bytes) {
+    if (byte === 0x0a) count += 1;
+  }
+  return count;
+}
+
 function recordBundleLink(name, from, to, detail, passed) {
   bundleReport.linkage_checks.push({
     name,
@@ -116,46 +163,81 @@ function recordAuthorityCheck(name, detail, passed, context = {}) {
   assert(passed, detail);
 }
 
+function currentObservedAt() {
+  const rawEpoch = process.env.SOURCE_DATE_EPOCH;
+  if (rawEpoch === undefined) return new Date().toISOString();
+  assert(/^\d+$/.test(rawEpoch), "SOURCE_DATE_EPOCH must be a non-negative integer Unix timestamp");
+  const observedAt = new Date(Number(rawEpoch) * 1000);
+  assert(!Number.isNaN(observedAt.getTime()), "SOURCE_DATE_EPOCH is outside the supported date range");
+  return observedAt.toISOString();
+}
+
+function withoutObservedAt(report) {
+  const stable = { ...report };
+  delete stable.observed_at;
+  return stable;
+}
+
+function writeStableReport(reportPath, report) {
+  let existing = null;
+  if (fs.existsSync(reportPath)) {
+    existing = JSON.parse(fs.readFileSync(reportPath, "utf8"));
+  }
+  if (
+    existing
+    && JSON.stringify(withoutObservedAt(existing)) === JSON.stringify(withoutObservedAt(report))
+  ) {
+    report.observed_at = existing.observed_at;
+  } else {
+    report.observed_at = currentObservedAt();
+  }
+
+  const serialized = `${JSON.stringify(report, null, 2)}\n`;
+  if (!existing || fs.readFileSync(reportPath, "utf8") !== serialized) {
+    fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+    fs.writeFileSync(reportPath, serialized, "utf8");
+  }
+}
+
+function portableArg(arg) {
+  if (!path.isAbsolute(arg)) return arg;
+  const relative = path.relative(repoRoot, arg);
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative) ? relative : arg;
+}
+
 function writeRuntimeReport(result, message) {
   const report = {
     command: process.env.npm_lifecycle_event === "planning-spine:verify"
       ? "bun run planning-spine:verify"
       : `bun ${path.relative(repoRoot, process.argv[1] ?? "scripts/verify-planning-spine.mjs")}`,
-    cwd: repoRoot,
-    pkg_root: pkgRoot,
+    cwd: ".",
+    pkg_root: path.relative(repoRoot, pkgRoot),
     executable: process.execPath,
     runtime: {
       name: typeof Bun !== "undefined" ? "bun" : "node",
       version: typeof Bun !== "undefined" ? Bun.version : process.version,
-      argv: process.argv
+      argv: process.argv.map(portableArg)
     },
     lifecycle_event: process.env.npm_lifecycle_event ?? null,
-    observed_at: new Date().toISOString(),
+    observed_at: null,
     performed_checks: performedChecks,
     result,
     message
   };
 
-  fs.mkdirSync(path.dirname(runtimeReportPath), { recursive: true });
-  fs.writeFileSync(runtimeReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  writeStableReport(runtimeReportPath, report);
 }
 
 function writeMvpBundleReport(result, message) {
-  bundleReport.observed_at = new Date().toISOString();
   bundleReport.result = result;
   bundleReport.message = message;
-
-  fs.mkdirSync(path.dirname(mvpBundleReportPath), { recursive: true });
-  fs.writeFileSync(mvpBundleReportPath, `${JSON.stringify(bundleReport, null, 2)}\n`, "utf8");
+  writeStableReport(mvpBundleReportPath, bundleReport);
 }
 
 function writeAuthorityIntegrityReport(result, message) {
-  authorityIntegrityReport.observed_at = new Date().toISOString();
   authorityIntegrityReport.result = result;
   authorityIntegrityReport.message = message;
-
-  fs.mkdirSync(path.dirname(authorityIntegrityReportPath), { recursive: true });
-  fs.writeFileSync(authorityIntegrityReportPath, `${JSON.stringify(authorityIntegrityReport, null, 2)}\n`, "utf8");
+  writeStableReport(authorityIntegrityReportPath, authorityIntegrityReport);
 }
 
 function validate(schema, value, at = "$") {
@@ -206,6 +288,153 @@ function verifyDocs() {
   }
 }
 
+function verifyVisionArtifactCatalog() {
+  recordCheck("vision_artifact_catalog_matches_exact_bytes");
+  const catalog = readJson("1.0_VISION/Notebooklm/artifacts.meta.json");
+  assert(
+    catalog.schema_version === "lifeos-planning-spine.raw-artifact-catalog.v0",
+    "Vision artifact catalog schema version must be recognized"
+  );
+  assert(catalog.status === "cataloged-unverified", "Raw artifact catalog must not imply verification");
+  assert(catalog.authority?.proves_implementation === false, "Raw artifacts must not claim implementation proof");
+  assert(catalog.authority?.grants_decision_authority === false, "Raw artifacts must not claim decision authority");
+  assert(Array.isArray(catalog.artifacts) && catalog.artifacts.length === 4, "Vision artifact catalog must list all four imports");
+
+  const ids = new Set();
+  const paths = new Set();
+  for (const artifact of catalog.artifacts) {
+    assert(typeof artifact.id === "string" && artifact.id.length > 0, "Every vision artifact needs a stable id");
+    assert(!ids.has(artifact.id), `Duplicate vision artifact id: ${artifact.id}`);
+    ids.add(artifact.id);
+
+    assert(typeof artifact.path === "string" && artifact.path.length > 0, `${artifact.id} must define path`);
+    assert(!paths.has(artifact.path), `Duplicate vision artifact path: ${artifact.path}`);
+    paths.add(artifact.path);
+
+    const artifactPath = path.resolve(pkgRoot, artifact.path);
+    assertInside(pkgRoot, artifactPath, `${artifact.id}.path`);
+    assert(fs.existsSync(artifactPath), `Missing vision artifact: ${artifact.path}`);
+    assert(fs.statSync(artifactPath).isFile(), `Vision artifact must be a file: ${artifact.path}`);
+    assert(fs.statSync(artifactPath).size === artifact.byte_count, `${artifact.id} byte count drifted`);
+    assert(sha256File(artifactPath) === artifact.sha256, `${artifact.id} SHA-256 drifted`);
+    assert(countNewlines(artifactPath) === artifact.newline_count, `${artifact.id} newline count drifted`);
+    assert(
+      ["incomplete", "partial"].includes(artifact.provenance?.identity_status),
+      `${artifact.id} must preserve its incomplete provenance state`
+    );
+  }
+}
+
+function verifyVisionNavigationLinks() {
+  recordCheck("vision_navigation_links_resolve");
+  const docs = [
+    "README.md",
+    "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+    "1.0_VISION/README.md",
+    "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "1.0_VISION/Notebooklm/README.md",
+    "1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md",
+    "1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md",
+    "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+    "task_tables/README.md"
+  ];
+
+  for (const relativeDoc of docs) {
+    const docPath = path.join(pkgRoot, relativeDoc);
+    const text = fs.readFileSync(docPath, "utf8");
+
+    const markdownLinks = text.matchAll(/\[[^\]]+\]\((?:<([^>]+)>|([^\s)]+))\)/g);
+    for (const match of markdownLinks) {
+      const target = (match[1] ?? match[2]).split("#", 1)[0];
+      if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target)) continue;
+      const resolved = path.resolve(path.dirname(docPath), decodeURIComponent(target));
+      const fromRepo = path.relative(repoRoot, resolved);
+      if (fromRepo.startsWith("..") || path.isAbsolute(fromRepo)) continue;
+      assert(fs.existsSync(resolved), `Broken Markdown link in ${relativeDoc}: ${target}`);
+    }
+
+    const wikiText = text
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/`[^`\n]*`/g, "");
+    const wikiLinks = wikiText.matchAll(/\[\[([^\]]+)\]\]/g);
+    for (const match of wikiLinks) {
+      const target = match[1].split("|", 1)[0].split("#", 1)[0].trim();
+      if (!target) continue;
+      let resolved = path.resolve(repoRoot, target);
+      const wikiExtensions = [".md", ".json", ".csv", ".jsonl", ".yaml", ".yml"];
+      if (!wikiExtensions.includes(path.extname(resolved).toLowerCase())) {
+        const candidates = wikiExtensions
+          .map((extension) => `${resolved}${extension}`);
+        resolved = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
+      }
+      assertInside(repoRoot, resolved, `Wiki link in ${relativeDoc}`);
+      assert(fs.existsSync(resolved), `Broken wiki link in ${relativeDoc}: ${target}`);
+    }
+  }
+}
+
+async function verifyTaskTableHandoff() {
+  recordCheck("nu_plugin_task_table_handoff_is_complete_deterministic_and_review_only");
+  const result = await checkTaskTableArtifacts({ repoRoot });
+  assert(result.ok, `nu_plugin task-table handoff drifted: ${result.errors.join("; ")}`);
+  assert(result.report.status === "passed", "nu_plugin task-table validation report must pass");
+  assert(result.report.counts.total === 428, "nu_plugin task-table source taxonomy must retain all 428 rows");
+  assert(result.report.counts.work_orders === 106, "nu_plugin task-table handoff must retain 106 CDB WorkOrders");
+  assert(result.report.counts.task_execution_proofs === 0, "Imported CDB WorkOrders must not acquire execution proof");
+  assert(result.report.counts.pending_human_approvals === 106, "Every imported CDB WorkOrder must remain human-approval gated");
+  assert(result.report.counts.mandatory_capabilities === 28, "All 28 migration capabilities must remain mandatory review scope");
+  assert(result.report.counts.mandatory_language_occurrences === 295, "Mandatory-language inventory must retain all 295 scoped occurrences");
+  assert(result.report.counts.mandatory_language_unclassified === 0, "No normative optional/should/may/must occurrence may remain unclassified");
+}
+
+function verifyAgentNavigationGraph() {
+  recordCheck("agent_navigation_graph_is_current_connected_and_queryable");
+  const result = checkNavigationArtifacts({ repoRoot });
+  assert(result.ok, `Agent navigation graph drifted: ${result.drift.join("; ")}`);
+
+  const { graph, index, validation } = result.artifacts;
+  assert(validation.result === "pass", "Agent navigation validation must pass");
+  assert(validation.counts.included_package_files > 0, "Agent navigation must index package files");
+  assert(validation.counts.strict_unresolved_links === 0, "Agent navigation has unresolved gated links");
+  assert(validation.counts.unresolved_links === 0, "Agent navigation has unresolved local links");
+  assert(validation.checks.every((check) => check.result === "pass"), "Every agent navigation validation check must pass");
+  assert(graph.nodes.some((node) => node.id === graph.root_node_id), "Agent navigation root node must resolve");
+  assert(graph.nodes.length === Object.keys(index.records).length, "Graph nodes and compact index records must stay one-to-one");
+  assert(index.entrypoints.every((entrypoint) => entrypoint.node_id), "Every agent navigation entrypoint must resolve");
+  assert(index.by_task_id["STORE-001"] === "task:STORE-001", "STORE-001 must be directly retrievable by task id");
+  assert(index.by_claim_id["REDB-CLAIM-002"] === "claim:REDB-CLAIM-002", "REDB-CLAIM-002 must be directly retrievable by claim id");
+  assert(index.by_source_id["NBSOURCE-001"] === "source:NBSOURCE-001", "NBSOURCE-001 must be directly retrievable by source id");
+
+  recordCheck("navigation_outputs_satisfy_declared_schemas");
+  const schemaValidation = validateNavigationArtifactSchemas(result.artifacts);
+  assert(schemaValidation.ok, `Navigation schema validation failed: ${schemaValidation.errors.join("; ")}`);
+
+  recordCheck("notebooklm_blueprint_is_hash_bound_and_cross_referenced");
+  const blueprintPath = "planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md";
+  const compatibilityPath = "planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md";
+  const blueprintSha256 = "014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827";
+  const blueprintNodeId = index.by_path[blueprintPath];
+  const compatibilityNodeId = index.by_path[compatibilityPath];
+  const rawArtifactNodeId = "raw-artifact:lifeos.vision.notebooklm.architecture-blueprint";
+  const blueprintNode = graph.nodes.find((node) => node.id === blueprintNodeId);
+  const compatibilityNode = graph.nodes.find((node) => node.id === compatibilityNodeId);
+  assert(blueprintNode?.content?.sha256 === blueprintSha256, "Blueprint file node must preserve the cataloged SHA-256");
+  assert(
+    compatibilityNode?.metadata?.frontmatter?.source_artifact?.sha256 === blueprintSha256,
+    "Blueprint compatibility frontmatter must preserve the source SHA-256"
+  );
+  assert(
+    graph.edges.some((edge) => edge.from === rawArtifactNodeId && edge.to === blueprintNodeId && edge.kind === "identifies-bytes"),
+    "Raw Blueprint artifact must identify its exact file node"
+  );
+  for (const linkKind of ["markdown-link", "wiki-link"]) {
+    assert(
+      graph.edges.some((edge) => edge.from === compatibilityNodeId && edge.to === blueprintNodeId && edge.kind === linkKind),
+      `Blueprint compatibility must retain its ${linkKind}`
+    );
+  }
+}
+
 function verifySchemas() {
   recordCheck("schemas_define_required_fields");
   for (const [name, relativePath] of Object.entries(schemaFiles)) {
@@ -218,6 +447,13 @@ function verifySchemas() {
   for (const field of ["allowed_paths", "blocked_paths", "verification_gate", "rollback_plan", "proof_uri"]) {
     assert(taskSchema.required.includes(field), `Task schema must require ${field}`);
   }
+
+  recordCheck("cell_schema_requires_pre_execution_snapshot");
+  const cellSchema = readJson(schemaFiles.Cell);
+  assert(
+    cellSchema.properties?.snapshot_boundary?.properties?.mode?.const === "required",
+    "Cell schema must require snapshot_boundary.mode=required"
+  );
 }
 
 function verifyExamples() {
@@ -554,6 +790,10 @@ function verifyMvpBundle() {
 
 try {
   verifyDocs();
+  verifyVisionArtifactCatalog();
+  verifyVisionNavigationLinks();
+  await verifyTaskTableHandoff();
+  verifyAgentNavigationGraph();
   verifySchemas();
   verifyExamples();
   verifyMvpConstraints();

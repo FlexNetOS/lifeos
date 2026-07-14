@@ -1,0 +1,105 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/.github/workflows/ci.yml",
+    "src/nu_plugin/flake.nix",
+    "src/nu_plugin/docs/AUDIT_UPGRADE_COMPLETION.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/NAVIGATION.json",
+    "src/nu_plugin/DOC_GRAPH.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/execution/TASK_GRAPH.md",
+    "src/nu_plugin/execution/TASK_FILE_MAP.csv",
+    "src/nu_plugin/execution/COMMAND_LEDGER.csv",
+    "src/nu_plugin/execution/WORKLOG.md",
+    "src/nu_plugin/logs/CDB069-audit-upgrade-completion.log",
+    "src/nu_plugin/manifests/PACK_MANIFEST.json",
+    "src/nu_plugin/manifests/CHECKSUMS.sha256",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB069",
+    "decision": null,
+    "intent_lock_digest": "blake3:5a2360a8d64cd7daeb3cdeccff6a0fe55513fff3fe7cbb411052c8cd8e7936f7",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB069",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB069",
+  "depends_on": [
+    "TASK-CDB068"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "audit hardening complete without downgrade",
+    "deterministic": true,
+    "verification_command": "repo truth validates; checksum manifest validates; Nu smoke is wired; devShells.ci exists; Downloads package is documented non-authority"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/docs/original_package_cross_reference.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/execution/TASK_FILE_MAP.csv",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:5a2360a8d64cd7daeb3cdeccff6a0fe55513fff3fe7cbb411052c8cd8e7936f7"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:c4b6f5a6ef45776a0e20f9f4031720dc820b68013e9a046fa98128404d40b9bb",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB069",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB069"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB069 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/AUDIT_UPGRADE_COMPLETION.md",
+    "src/nu_plugin/.github/workflows/ci.yml",
+    "src/nu_plugin/flake.nix",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/NAVIGATION.json",
+    "src/nu_plugin/DOC_GRAPH.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/execution/TASK_GRAPH.md",
+    "src/nu_plugin/execution/TASK_FILE_MAP.csv",
+    "src/nu_plugin/execution/COMMAND_LEDGER.csv",
+    "src/nu_plugin/execution/WORKLOG.md",
+    "src/nu_plugin/logs/CDB069-audit-upgrade-completion.log",
+    "src/nu_plugin/manifests/PACK_MANIFEST.json",
+    "src/nu_plugin/manifests/CHECKSUMS.sha256",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json"
+  ],
+  "task_id": "TASK-CDB069",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB069"
+}

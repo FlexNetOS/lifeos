@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.proof-record.v0",
   "task_id": "LPS-011",
-  "observed_at": "2026-07-13T14:48:35Z",
-  "revision": 1,
+  "observed_at": "2026-07-14T05:34:25Z",
+  "revision": 2,
   "status": "pass",
   "verification_gate": "Every open question has an owner, unblock condition, bounded decision task, rollback or deferral rule, and North Star anchor; no contradiction is silently resolved.",
   "gate_result": {
@@ -12,13 +12,14 @@
     "questions_without_decision_row": [],
     "questions_without_decision_row_or_deferral": []
   },
-  "proof_summary": "Crosswalked all 6 open questions in 09_OPEN_QUESTIONS.md to the task graph. 6 have a bounded owning DECISION row. The gate requires every open question to be converted into an owned, gated task-graph decision row; that conversion has not happened, so the gate does not hold. RFC-Q1/RFC-Q2 have related proof-boundary rows (LPS-005, LPS-010) that only preserve the current deferral, and RFC-Q3 (proof-URI addressing) has neither an owning decision row nor a documented deferral rule. Adding decision rows is outside this lane's file ownership.",
+  "proof_summary": "All 6 open questions in 09_OPEN_QUESTIONS.md map to bounded owning DECISION rows in the generated open-question map. Each row records its owner, unblock condition, rollback or deferral rule, and North Star anchor without silently resolving the question. The LPS-011 gate fully holds.",
   "artifact_paths": [
     "planning-spine-v0/09_OPEN_QUESTIONS.md",
     "planning-spine-v0/generated/lps_doc_open_questions_map.json"
   ],
   "checksums": {
-    "09_OPEN_QUESTIONS.md": "8d19a25a49ef1a560a49ccccb1923e7e642fb763eb516deeba584f010cf9e109"
+    "09_OPEN_QUESTIONS.md": "8d19a25a49ef1a560a49ccccb1923e7e642fb763eb516deeba584f010cf9e109",
+    "lps_doc_open_questions_map.json": "1676e6c9a4b5db0de1538593a4bcbec27df583c340738914ef17e927818e7858"
   },
   "live_commands": [
     {

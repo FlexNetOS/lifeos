@@ -43,6 +43,8 @@ describe("planning-spine agent navigation", () => {
       && Array.isArray(node.tags)
     ))).toBe(true);
     expect(graph.nodes.some((node) => node.path?.endsWith("/.gitkeep"))).toBe(false);
+    expect(graph.nodes.some((node) => node.path?.includes("/dist/"))).toBe(false);
+    expect(graph.nodes.some((node) => node.path?.includes("/generated/fleet_verification/") && node.path.endsWith(".log"))).toBe(false);
 
     const wikiProjection = graph.nodes.find((node) => (
       node.path === "planning-spine-v0/task_tables/visuals/task_graph.wiki.md"
@@ -179,6 +181,12 @@ describe("planning-spine agent navigation", () => {
       const cachePath = path.join(isolatedRoot, "planning-spine-v0", "scripts", "__pycache__", "runtime-only.pyc");
       fs.mkdirSync(path.dirname(cachePath), { recursive: true });
       fs.writeFileSync(cachePath, Buffer.from([0, 1, 2, 3]));
+      const distPath = path.join(isolatedRoot, "planning-spine-v0", "dist", "runtime-only.zip");
+      fs.mkdirSync(path.dirname(distPath), { recursive: true });
+      fs.writeFileSync(distPath, Buffer.from([4, 5, 6, 7]));
+      const logPath = path.join(isolatedRoot, "planning-spine-v0", "generated", "fleet_verification", "runtime-only.log");
+      fs.mkdirSync(path.dirname(logPath), { recursive: true });
+      fs.writeFileSync(logPath, "runtime-only\n");
 
       const isolated = buildNavigationArtifacts({ repoRoot: isolatedRoot });
       expect(renderNavigationArtifacts(isolated)).toEqual(renderNavigationArtifacts(navigation));

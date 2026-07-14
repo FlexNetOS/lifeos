@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-14T19:33:57Z",
+  "generated_at": "2026-07-14T19:44:46Z",
   "source": {
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 40,
+    "row_count": 41,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -905,6 +905,28 @@
         "status": "Ready",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-040.proof.json",
         "next_action": "Add the Mars-absent and second-launcher red fixtures first, then assert marsPackage in the foundation closure and the single profile-pinned desktop under owner approval."
+      }
+    },
+    {
+      "source_row_number": 42,
+      "columns": {
+        "task_id": "YZXCONV-041",
+        "parent_id": "YZXCONV-036; YZXCONV-040",
+        "phase": "4-lifeos-runtime",
+        "title": "Bind the yazelix terminal (Mars) launch to the LifeOS app as the primary UI over UDS or shared-redb (no HTTP/REST)",
+        "owner_agent": "LifeOS Runtime Agent / Yazelix Packaging Agent",
+        "goal": "Cover the blueprint Run phase seam that no task carried: the portable folder / yzx launch opens LifeOS as the PRIMARY user interface while Yazelix initializes the Zellij and Nushell environment in the BACKGROUND (blueprint lines 27 and 691), and the LifeOS front-end (TypeScript on Bun, bun add ruvector, zero network latency, native Rust engine directly in the event loop, blueprint 111) connects to the Yazelix/Zellij terminal workspace via Unix Domain Sockets OR by reading the shared memory-mapped redb state files, NEVER HTTP/REST (blueprint 122-125), rendering the agent-swarm status by reading the exact same mmap redb file the agents are actively writing so overlapping state is impossible. This is the Mars-terminal-to-LifeOS-app binding, distinct from Mars-in-the-profile (YZXCONV-040) and the desktop launcher (YZXCONV-022): here Mars (the profile-owned terminal from 040) HOSTS/launches the LifeOS UI and the two share a transport. Design and red-gate, TDD: yzx launch through the profile Mars terminal opens LifeOS as the primary UI with the Zellij/Nushell workspace backgrounded; the LifeOS-to-Yazelix channel is UDS or shared-redb ONLY and a gate FAILS if any HTTP/REST or TCP listener/client appears on that seam; the redb LifeOS reads is the SAME shared buffer file (YZXCONV-036 SC-redb), not a private copy.",
+        "inputs": "Architecture Blueprint lines 27 (Run phase opens LifeOS as UI, Yazelix background), 111 (Bun front-end bun add ruvector, zero network), 122-125 (LifeOS UDS via Yazelix/Zellij, shared mmap redb, no HTTP/REST), 356-358, 673, 691; YZXCONV-040 Mars-in-closure; YZXCONV-036 SC-redb shared-buffer row; yazelix yzx launch surface (README.md:15, ARCHITECTURE.md:19)",
+        "target_artifacts": "a Mars-to-LifeOS launch binding (yzx launch opens LifeOS as primary UI with Yazelix/Zellij/Nushell backgrounded); a LifeOS-to-Yazelix UDS or shared-redb transport contract; a no-HTTP/REST negative gate on that seam; a shared-mmap-redb read proof against the SC-redb file",
+        "allowed_paths": "/home/flexnetos/meta/src/yazelix/flake.nix; /home/flexnetos/meta/src/yazelix/nushell/**; /home/flexnetos/meta/src/lifeos/**; /home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "introducing an HTTP or REST or TCP listener or client on the LifeOS-to-Yazelix seam; a second profile or launcher shadow; a private redb copy instead of the shared buffer; global installs; agent auth or state mutation",
+        "simulation_required": "TRUE",
+        "execution_cell": "mars-lifeos-binding-cell",
+        "verification_gate": "Red tests first FAIL when yzx launch does not open LifeOS as the primary UI, when Yazelix/Zellij/Nushell is not initialized in the background, when the LifeOS-to-Yazelix channel uses HTTP or REST or any TCP listener/client on the seam, or when LifeOS reads a private redb copy rather than the shared memory-mapped SC-redb file the agents write; then yzx launch via the profile Mars terminal (YZXCONV-040) opens LifeOS as the primary UI with the Zellij/Nushell workspace backgrounded, the LifeOS-to-Yazelix transport is UDS or shared-redb only with no HTTP/REST, and LifeOS renders swarm status by reading the same mmap redb file the agents write; the binding is idempotent and needs no profile mutation.",
+        "rollback_plan": "Revert the launch binding and transport contract; leave the terminal launching a plain yazelix workspace; no agent state moved.",
+        "status": "Blocked",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-041.proof.json",
+        "next_action": "After Mars is proven in the one closure (YZXCONV-040) and the shared redb buffer row exists (YZXCONV-036), design the yzx-launch to LifeOS primary-UI binding and the UDS or shared-redb no-HTTP transport gate under owner approval."
       }
     }
   ]

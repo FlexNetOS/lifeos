@@ -1,11 +1,11 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.normalized.v0",
-  "generated_at": "2026-07-14T14:02:39Z",
+  "generated_at": "2026-07-14T14:41:16Z",
   "source_graph_uri": "yazelix_runtime_convergence/generated/task_graph.raw.json",
   "task_count": 28,
   "source": {
     "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-    "generated_at": "2026-07-14T14:02:39Z",
+    "generated_at": "2026-07-14T14:41:16Z",
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
     "row_count": 28,
@@ -222,7 +222,7 @@
         "title": "Converge Codex config authorship while preserving its real runtime home",
         "owner_agent": "Codex Runtime Agent",
         "goal": "Keep the profile-owned Codex binary and ~/.codex runtime/state home while materializing config.toml from a reviewed Yazelix-owned editable input and eliminating old-profile references.",
-        "inputs": "Codex doctor receipt; approved input path; Yazelix runtime model",
+        "inputs": "Codex doctor receipt; approved input path; Yazelix runtime model; yazelix agent.command and agent.args popup launch keys",
         "target_artifacts": "Codex config input; materializer; runtime provenance gate",
         "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/.config/yazelix/**; /home/flexnetos/.codex/config.toml",
         "blocked_paths": "/home/flexnetos/.codex/auth.json; /home/flexnetos/.codex/sessions/**; /home/flexnetos/.codex/*.sqlite*; retired workspace .codex mirrors",
@@ -241,7 +241,8 @@
       "inputs": [
         "Codex doctor receipt",
         "approved input path",
-        "Yazelix runtime model"
+        "Yazelix runtime model",
+        "yazelix agent.command and agent.args popup launch keys"
       ],
       "target_artifacts": [
         "Codex config input",
@@ -283,7 +284,7 @@
         "title": "Converge Claude settings authorship through the Yazelix/envctl chain",
         "owner_agent": "Claude Runtime Agent",
         "goal": "Keep the profile-owned Claude binary and ~/.claude state home while replacing direct settings authorship with reviewed Yazelix input and envctl-compatible materialization.",
-        "inputs": "Claude binary receipt; approved input path; envctl agent-env contract",
+        "inputs": "Claude binary receipt; approved input path; envctl agent-env contract; yazelix agent.command and agent.args popup launch keys",
         "target_artifacts": "Claude settings input; materializer; runtime provenance gate",
         "allowed_paths": "/home/flexnetos/meta/src/yazelix/**; /home/flexnetos/meta/src/envctl/agent-env.yaml; /home/flexnetos/meta/src/envctl/agent-skills/**; /home/flexnetos/.config/yazelix/**; /home/flexnetos/.claude/settings.json",
         "blocked_paths": "/home/flexnetos/.claude credentials; /home/flexnetos/.claude history and cache; retired workspace .claude mirrors",
@@ -302,7 +303,8 @@
       "inputs": [
         "Claude binary receipt",
         "approved input path",
-        "envctl agent-env contract"
+        "envctl agent-env contract",
+        "yazelix agent.command and agent.args popup launch keys"
       ],
       "target_artifacts": [
         "Claude settings input",

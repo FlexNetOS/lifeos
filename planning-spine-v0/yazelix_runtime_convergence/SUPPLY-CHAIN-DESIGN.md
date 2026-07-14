@@ -109,6 +109,9 @@ The blueprint contains a real tension; the owner resolved it. Both are cited fro
 - **npm LAGS / is bindings-only:** the bare `ruvector` npm pkg is **0.2.34** (behind);
   scoped `@ruvector/*` native pkgs track 2.x via napi-rs prebuilts. **`@ruvnet/ruvector`
   is a DEAD handle (404)** — the real npm coordinates are unscoped `ruvector` + `@ruvector/*`.
+  **CONFIRMED 2026-07-14** (§7.1): the npm publisher `~ruvnet` publishes `ruvector` + the full
+  `@ruvector/*` set (`ruvllm`, `rvf-node`, `graph-node`, `attention`, `gnn`, `router`, `rvf`,
+  `tiny-dancer`), and the engine's crates.io leader is `crates.io/users/ruvnet` — never `@ruvnet/*`.
 - **The "200+ AI agent tools" = `ruvector-postgres`'s 230+ SQL functions** (the pgrx
   PostgreSQL extension) — delivered **crates.io / pgrx** (also a Docker image and an
   `@ruvector/postgres-cli`), i.e. exactly what **YZXCONV-035** packages. So the owner's
@@ -202,6 +205,24 @@ not frozen into an exhaustive locked list now:
 
 Seed rows go in first (full inventory in §8); the rest is added as the open refs
 are mined.
+
+### 7.1 Canonical source handles (owner-confirmed 2026-07-14 — the source-identity anchors)
+
+Per the resolve-source-identity law (`DEC-YZXCONV-009`/`-015`), every ruvnet/cognitum artifact
+resolves against these **authoritative publisher handles** — never a look-alike (the
+`@ruvnet/ruvector` 404 and the `MayakaApps/Kache` collision are why this table exists):
+
+| Handle | URL | Publishes (verified 2026-07-14) |
+|---|---|---|
+| **npm `~ruvnet`** | https://www.npmjs.com/~ruvnet | `ruvector`, `@ruvector/*` (`ruvllm`, `rvf-node`, `graph-node`, `attention`, `gnn`, `router`, `rvf`, `tiny-dancer`, + per-platform `-linux-x64-gnu`), `agentdb`, `agentic-flow`. **Publisher is `ruvnet`; coordinates are `ruvector` + `@ruvector/*`, never `@ruvnet/*`.** |
+| **crates.io `ruvnet`** | https://crates.io/users/ruvnet | the pure-Rust crates — `ruvector-core`, `ruvllm`, `ruvector-sona`, `ruvector-postgres` (the crates.io engine leader). |
+| **github `ruvnet`** | https://github.com/ruvnet | `RuVector`, `ruflo`, `agentdb`, `metaharness`, `ruv-neural`, `agentic-flow`, `RuView`, `worldgraph`, `helix`, … — the "rUv" source of the blueprint stack (the napi-rs "dirty repo"; pull clean crates from crates.io per blueprint 93-113). |
+| **github `cognitum-one`** | https://github.com/cognitum-one | the COGNITUM org — `cogs`, `ruOS`, `cognitum-claude-plugin`, `meta-llm-docs`, `harnessaas-live-verify-*`; source behind the envctl cognitum-seed MCP. |
+| **`cognitum.one`** | https://cognitum.one/ | the COGNITUM site (the §7 COGNITUM guides / seed). |
+
+The whole-chain audit (`YZXCONV-053`) resolves each ruvnet/cognitum artifact against this table
+**before** trusting any version; the `DEC-007` npm-latest rule is scoped to `ruvnet`'s
+`ruvector`/`@ruvector/*`, and the crates.io engine leader is `ruvnet`'s crates.
 
 ---
 

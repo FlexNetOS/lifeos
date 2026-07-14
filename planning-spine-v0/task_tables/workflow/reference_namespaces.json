@@ -1,0 +1,24 @@
+{
+  "collision_policy": "Task IDs are namespace-qualified; reference graphs never become CDB WorkOrders or LifeOS completion proof.",
+  "namespaces": [
+    {
+      "import_policy": "provenance-only; never merge with CDB WorkOrders",
+      "namespace": "reference-framework",
+      "source": "execution-framework/generated/task_graph.csv",
+      "task_count": 80
+    },
+    {
+      "import_policy": "provenance-only; never merge with CDB WorkOrders",
+      "namespace": "reference-issue-414",
+      "source": "execution-framework/generated/issue-414/task_graph.csv",
+      "task_count": 12
+    },
+    {
+      "import_policy": "review-only WorkOrders",
+      "namespace": "nu-plugin-cdb-handoff",
+      "source": "src/nu_plugin/execution/*TASK_GRAPH.csv",
+      "task_count": 106
+    }
+  ],
+  "schema": "lifeos.task-namespace-registry.v1"
+}

@@ -1,0 +1,895 @@
+{
+  "capabilities": [
+    {
+      "capability_id": "CAP-MIG-001",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB030",
+        "TASK-CDB075",
+        "TASK-CDB089"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Model observer, approval-gated, operator, and agent-only as structured modes with explicit authority and transition rules.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 5,
+          "line_start": 5,
+          "path": "prompts/MASTER_PROMPT_ENVCTL_DB_NU_PLUGIN.md",
+          "source_scope": "reference-package",
+          "source_wording": "Your mission is to upgrade the local `envctl` database tooling and the connected `nu_plugin` repository so migration execution becomes a built-in, reproducible, agent-controllable database capability with live human visuals and optional human involvement."
+        },
+        {
+          "line_end": 5,
+          "line_start": 5,
+          "path": "source/current-user-request.md",
+          "source_scope": "reference-package",
+          "source_wording": "Goal: envctl database should provide built-in migration database tooling controllable by CLI agents. Human users should have live visuals and may choose active involvement or passive supervision. envctl database must be able to reproduce the migration operation anytime, making the migration design faster, more secure, more accurate, and repeatable. The package must be additive to current Codex prompts intended for envctl and nu_plugin GitHub issues."
+        }
+      ],
+      "title": "Structured human involvement modes",
+      "verification_gate": "Schema and behavior tests must cover all four modes and prove that mode changes cannot bypass approval or risk policy."
+    },
+    {
+      "capability_id": "CAP-MIG-002",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB000",
+        "TASK-CDB036",
+        "TASK-CDB039"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Require the run-context, package, envctl, nu_plugin, and target inputs applicable to a run; resolve each path and persist a resolved-path receipt.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 19,
+          "line_start": 7,
+          "path": "prompts/MASTER_PROMPT_ENVCTL_DB_NU_PLUGIN.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Input variables\n\nThe runner may provide:\n\n```text\nRUN_CONTEXT_FILE=<path>\nPROMPT_PACKAGE_DIR=<path>\nENVCTL_REPO=<path>\nNU_PLUGIN_REPO=<path>\nFLEXNETOS_PACKAGE=<path>\n```\n\nRead the run context first. Resolve all paths with `realpath` and record the resolved paths in a working note inside the envctl repo."
+        },
+        {
+          "line_end": 18,
+          "line_start": 16,
+          "path": "RUN_WITH_CODEX_ENVCTL.sh",
+          "source_scope": "reference-package",
+          "source_wording": "Optional:\n  --flexnetos-package Path to prior codex-flexnetos-migration-prompt-package.\n  --codex-bin         Codex executable name/path. Default: codex."
+        }
+      ],
+      "title": "Required runtime inputs and resolved-path receipts",
+      "verification_gate": "Missing required inputs, unresolved paths, and path/receipt mismatches must fail closed before planning or execution."
+    },
+    {
+      "capability_id": "CAP-MIG-003",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB035",
+        "TASK-CDB036",
+        "TASK-CDB091",
+        "TASK-CDB092",
+        "TASK-CDB093",
+        "TASK-CDB094",
+        "TASK-CDB095",
+        "TASK-CDB096",
+        "TASK-CDB097",
+        "TASK-CDB098",
+        "TASK-CDB099",
+        "TASK-CDB100",
+        "TASK-CDB101",
+        "TASK-CDB102",
+        "TASK-CDB103",
+        "TASK-CDB104",
+        "TASK-CDB105"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Drive every target through a descriptor, recipe, artifact contract, safety policy, scanner capability map, and output policy without target-specific execution branches.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 75,
+          "line_start": 67,
+          "path": "prompts/UTILIZE_FLEXNETOS_PACKAGE.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Genericization requirement\n\nDo not bake FlexNetOS into envctl. FlexNetOS should be one target descriptor and one package fixture. The same envctl machinery must run against any target with:\n\n- descriptor\n- recipe\n- artifact contract\n- safety policy\n- scanner capability map"
+        }
+      ],
+      "title": "Generic target descriptor and recipe",
+      "verification_gate": "A non-FlexNetOS fixture must traverse the same planner and packet path without conditional target-name logic."
+    },
+    {
+      "capability_id": "CAP-MIG-004",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB072",
+        "TASK-CDB073",
+        "TASK-CDB074",
+        "TASK-CDB075",
+        "TASK-CDB076",
+        "TASK-CDB087",
+        "TASK-CDB088",
+        "TASK-CDB089",
+        "TASK-CDB090",
+        "TASK-CDB102"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Reconcile replay terminology to verify-only, dry-run-plan, execute-safe, and approval-gated-full with explicit destructive-operation approval.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 101,
+          "line_start": 101,
+          "path": "prompts/DATABASE_FEATURE_SPEC.md",
+          "source_scope": "reference-package",
+          "source_wording": "Replay may be `verify-only`, `dry-run-plan`, or `execute-again`. Destructive replay requires explicit approval."
+        },
+        {
+          "line_end": 39,
+          "line_start": 32,
+          "path": "prompts/SECURITY_REPRODUCIBILITY_MODEL.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Replay modes\n\n| Mode | Behavior |\n|---|---|\n| `verify-only` | Recompute hashes and confirm artifacts/evidence still match. |\n| `dry-run-plan` | Reconstruct operation plan without executing target-affecting commands. |\n| `execute-safe` | Re-run R0-R2 operations. |\n| `execute-full` | Requires explicit approval for R3+. |"
+        }
+      ],
+      "title": "Canonical replay modes",
+      "verification_gate": "Protocol and CLI tests must accept only the canonical modes, map legacy wording explicitly, and prove full replay remains approval gated."
+    },
+    {
+      "capability_id": "CAP-MIG-005",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB010",
+        "TASK-CDB033",
+        "TASK-CDB034",
+        "TASK-CDB075",
+        "TASK-CDB089",
+        "TASK-CDB104"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Represent actors, authority levels, and R0-R5 risk classes as structured policy data enforced at every operation boundary.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 105,
+          "line_start": 103,
+          "path": "prompts/DATABASE_FEATURE_SPEC.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Agent control\n\nAgents may create plans, execute safe read-only operations, synthesize artifacts, run validations, and request approvals. Agents may not silently perform destructive operations, mutate production targets, or bypass safety policy."
+        },
+        {
+          "line_end": 38,
+          "line_start": 7,
+          "path": "prompts/AGENT_CONTROL_PROTOCOL.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Actors\n\n```text\nsystem      envctl internal scheduler/runner\nagent       Codex or other automation agent\nhuman       shell user/operator\nplugin      nu_plugin session acting on behalf of a human\nexternal    imported package/helper process\n```\n\n## Authority levels\n\n```text\nread_only          can inspect targets, events, artifacts, and plans\nsafe_execute       can run read-only scanners and artifact generation\napproval_request  can request approval for risky operations\noperator           can approve, deny, pause, resume, or rollback\nadmin              can alter policies/contracts/schemas\n```\n\n## Operation risk classes\n\n```text\nR0 read-only inspection\nR1 writes only to envctl artifact/evidence store\nR2 modifies local working copy artifacts\nR3 modifies target repository code/config\nR4 modifies databases/infrastructure/secrets\nR5 destructive or production-impacting operation\n```\n\nR3+ requires explicit approval unless policy has a pre-approved scoped rule. R4/R5 must default to approval-gated."
+        }
+      ],
+      "title": "Actor authority and R0-R5 policy",
+      "verification_gate": "Authorization tests must prove each actor/authority combination and require explicit approval for R3+ with fail-closed R4/R5 defaults."
+    },
+    {
+      "capability_id": "CAP-MIG-006",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB029",
+        "TASK-CDB030",
+        "TASK-CDB031",
+        "TASK-CDB032",
+        "TASK-CDB103"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Provide status, timeline, operations, approvals, artifacts, graph, validation, and replay views with a plain-terminal fallback.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 82,
+          "line_start": 69,
+          "path": "prompts/NU_PLUGIN_CONTRACT.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Live visuals\n\nThe plugin should support:\n\n- status tables\n- timelines\n- operation queue views\n- approval queue views\n- artifact index views\n- graph edge views\n- validation scorecards\n- replay plan summaries\n\nVisuals must degrade gracefully in plain terminal mode."
+        }
+      ],
+      "title": "Required plugin operational views",
+      "verification_gate": "Contract tests must exercise every view against authoritative records and verify graceful structured output without rich-terminal support."
+    },
+    {
+      "capability_id": "CAP-MIG-007",
+      "coverage_boundary": "Task-level lease primitives exist in this handoff; the required operation-level lease model remains a companion review gap and is not product-complete.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB016",
+        "TASK-CDB061"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Define operation conflict scopes and enforce atomic leases with owner, acquisition, expiry, renewal, release, and live visibility semantics.",
+      "planning_evidence": [
+        "control/lease_registry.json",
+        "import-nu-plugin-task-tables.mjs#acquireTaskLease"
+      ],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 54,
+          "line_start": 47,
+          "path": "prompts/AGENT_CONTROL_PROTOCOL.md",
+          "source_scope": "reference-package",
+          "source_wording": "\n```text\nrun_id + operation_type + target_descriptor_hash + recipe_step_id + input_hash\n```\n\n## Concurrency\n\nMultiple agents may work in parallel only if operations have non-conflicting target scopes or the database obtains a lease/lock. Locks must be visible in live status."
+        }
+      ],
+      "title": "Conflict scope and operation leases",
+      "verification_gate": "Concurrency tests must reject conflicting operations, permit non-conflicting scopes, handle expiry/renewal atomically, and expose the active owner."
+    },
+    {
+      "capability_id": "CAP-MIG-008",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB018",
+        "TASK-CDB035",
+        "TASK-CDB055",
+        "TASK-CDB063",
+        "TASK-CDB085",
+        "TASK-CDB089"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Every projection must carry authoritative source identifiers and digests; inferred display state must never become migration truth.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 30,
+          "line_start": 28,
+          "path": "prompts/LIVE_VISUALS_AND_HUMAN_CONTROL.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Visual correctness rule\n\nThe plugin may format and summarize, but every visual must derive from envctl database records. No plugin-only inferred state should be treated as truth."
+        }
+      ],
+      "title": "Source-bound projections",
+      "verification_gate": "Projection tests must trace every row to source IDs/hashes and reject rows lacking an authoritative record."
+    },
+    {
+      "capability_id": "CAP-MIG-009",
+      "coverage_boundary": "All six surfaces are implemented as deterministic planning projections; runtime product wiring and acceptance remain review-gated.",
+      "coverage_reference_refs": [
+        "nu-plugin-requirement:REQ-061-ARCH11"
+      ],
+      "coverage_work_order_refs": [
+        "TASK-CDB001",
+        "TASK-CDB030",
+        "TASK-CDB103"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Provide Mermaid, Graphviz DOT, TUI dashboard, live event stream, static HTML, and static wiki projections as required surfaces.",
+      "planning_evidence": [
+        "visuals/task_graph.mmd",
+        "visuals/task_graph.dot",
+        "visuals/dashboard.txt",
+        "visuals/event_stream.ndjson",
+        "visuals/task_graph.html",
+        "visuals/task_graph.wiki.md"
+      ],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 51,
+          "line_start": 45,
+          "path": "prompts/LIVE_VISUALS_AND_HUMAN_CONTROL.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Optional richer visuals\n\n- Mermaid graph export.\n- DOT graph export.\n- TUI dashboard if existing repo supports it.\n- Streaming event subscription if existing architecture supports it.\n- Static HTML/wiki export if existing artifact tooling supports it."
+        },
+        {
+          "line_end": 97,
+          "line_start": 97,
+          "path": "raw/REQUIREMENT_PROOF_LEDGER.csv",
+          "source_scope": "task-tables",
+          "source_wording": "REQ-061-ARCH11,REQ-061,Expose agent-first roots refs refactor hooks widgets and optional gated TUI,https://github.com/FlexNetOS/envctl/issues/414,Architecture section 9,../envctl/crates/engine/**,../envctl/crates/engine/tests/**,cargo test --manifest-path ../envctl/Cargo.toml --workspace,stdout:req-061-arch11-stdout;stderr:req-061-arch11-stderr,,verified,complete,\"Schema-4 detached proof binds this exact command to pinned FlexNetOS/envctl b62669c4e32c8de0407aa51ca3add94d529b50b6 and pinned loop_lib/meta_plugin_protocol dependencies; execution must pass without mutating any checkout.\""
+        }
+      ],
+      "title": "Required rich visual surfaces",
+      "verification_gate": "All six projections must be deterministic, receipted, canonical-record-derived, and coverage-equivalent for task and status identity."
+    },
+    {
+      "capability_id": "CAP-MIG-010",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB036",
+        "TASK-CDB070",
+        "TASK-CDB091"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Represent compare_root as nullable with explicit absent, resolved, and path-receipt state rather than an invented path.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 13,
+          "line_start": 7,
+          "path": "prompts/ANY_TARGET_EXTENSION_SPEC.md",
+          "source_scope": "reference-package",
+          "source_wording": "```yaml\nschema_version: 1\ntarget_id: stable-human-readable-id\ntarget_type: codebase | data | infrastructure | integration | mixed\nprimary_root: /absolute/or/repo-relative/path\ncompare_root: /optional/path\noutput_root: migration-artifacts"
+        }
+      ],
+      "title": "Nullable compare-root state",
+      "verification_gate": "Descriptor tests must distinguish absent from resolved values and reject unresolved, unreceipted, or escaped compare roots."
+    },
+    {
+      "capability_id": "CAP-MIG-011",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB010",
+        "TASK-CDB043",
+        "TASK-CDB060",
+        "TASK-CDB104"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Redact credentials and secret material before persisting commands, events, evidence, artifacts, logs, or receipts while recording redaction state.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 13,
+          "line_start": 3,
+          "path": "prompts/SECURITY_REPRODUCIBILITY_MODEL.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Security requirements\n\n- Redact secrets before artifact persistence.\n- Store command strings in redacted form when they may contain credentials.\n- Store raw evidence only in approved evidence locations.\n- Mark evidence as redacted/unredacted.\n- Hash every evidence file and generated artifact.\n- Approval-gate risky operations.\n- Never bypass sandbox/approval controls.\n- Keep plugin mutating commands auditable.\n- Prevent agents from writing directly to production targets without policy."
+        }
+      ],
+      "title": "Redaction before persistence",
+      "verification_gate": "Secret-fixture tests must prove raw values never reach durable output and that redaction metadata and hashes remain verifiable."
+    },
+    {
+      "capability_id": "CAP-MIG-012",
+      "coverage_boundary": "The handoff event chain is implemented and validated locally; the envctl runtime chain and destructive tamper suite remain review-gated product work.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB004",
+        "TASK-CDB055",
+        "TASK-CDB085",
+        "TASK-CDB089"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Persist events in a canonical SHA-256 chain binding each canonical event to the preceding event hash.",
+      "planning_evidence": [
+        "ledgers/events.jsonl",
+        "ledgers/ledger_manifest.json"
+      ],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 47,
+          "line_start": 41,
+          "path": "prompts/SECURITY_REPRODUCIBILITY_MODEL.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Chain integrity\n\nRun events should be chained:\n\n```text\nevent_hash = sha256(previous_event_hash + canonical_event_json)\n```"
+        }
+      ],
+      "title": "Canonical hash-chained events",
+      "verification_gate": "Chain verification and tamper tests must pass for intact ledgers and fail after payload, order, previous-hash, or digest mutation."
+    },
+    {
+      "capability_id": "CAP-MIG-013",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB002",
+        "TASK-CDB028",
+        "TASK-CDB039",
+        "TASK-CDB046",
+        "TASK-CDB064",
+        "TASK-CDB065",
+        "TASK-CDB066",
+        "TASK-CDB067",
+        "TASK-CDB068",
+        "TASK-CDB069",
+        "TASK-CDB090",
+        "TASK-CDB102",
+        "TASK-CDB105"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Completion requires a proof record, executed verification command, passing output, and bound digest; partial, planned, not_run, unapplied, or evidence-free claims must not complete.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 19,
+          "line_start": 1,
+          "path": "prompts/ACCEPTANCE_CRITERIA.md",
+          "source_scope": "reference-package",
+          "source_wording": "# Acceptance criteria\n\nCodex may only claim completion when all applicable criteria pass or are explicitly marked blocked with evidence.\n\n## envctl criteria\n\n- [ ] A target descriptor can be parsed and validated.\n- [ ] The prior FlexNetOS package can be inspected/imported as a package/artifact contract.\n- [ ] A migration recipe can be created from contract phases.\n- [ ] A migration run can be created in the database.\n- [ ] Operations append events.\n- [ ] Evidence records include path/URI, kind, hash, redaction status, and operation link.\n- [ ] Artifact records include artifact ID, status, hash, path, evidence, and links.\n- [ ] Approval requests block risky operations.\n- [ ] Approval decisions are appended as events.\n- [ ] Validation results are queryable.\n- [ ] Replay can reconstruct or verify a run.\n- [ ] Rollback metadata exists for operations that need rollback.\n- [ ] Tests cover the above."
+        }
+      ],
+      "title": "Fail-closed completion proof",
+      "verification_gate": "Negative tests must reject every incomplete evidence state and digest mismatch; only a fully bound passing proof may transition local status."
+    },
+    {
+      "capability_id": "CAP-MIG-014",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB011",
+        "TASK-CDB021",
+        "TASK-CDB051",
+        "TASK-CDB065",
+        "TASK-CDB087"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Capture dependency constraints, incompatibilities, upgrade blockers, and evidence references rather than dependency names alone.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 234,
+          "line_start": 234,
+          "path": "source/previous-migration-artifact-context.md",
+          "source_scope": "reference-package",
+          "source_wording": "For a migration, this should include **version constraints** and **upgrade blockers**."
+        }
+      ],
+      "title": "Dependency constraints and blocker evidence",
+      "verification_gate": "Dependency validation must reject unresolved constraints/blockers and require evidence for every blocked edge."
+    },
+    {
+      "capability_id": "CAP-MIG-015",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB001",
+        "TASK-CDB002",
+        "TASK-CDB003",
+        "TASK-CDB004",
+        "TASK-CDB005",
+        "TASK-CDB006",
+        "TASK-CDB007",
+        "TASK-CDB008",
+        "TASK-CDB009",
+        "TASK-CDB010",
+        "TASK-CDB011",
+        "TASK-CDB012",
+        "TASK-CDB070",
+        "TASK-CDB071",
+        "TASK-CDB072",
+        "TASK-CDB073",
+        "TASK-CDB074",
+        "TASK-CDB075",
+        "TASK-CDB076",
+        "TASK-CDB077",
+        "TASK-CDB078",
+        "TASK-CDB079",
+        "TASK-CDB080",
+        "TASK-CDB081",
+        "TASK-CDB082",
+        "TASK-CDB083",
+        "TASK-CDB084",
+        "TASK-CDB085",
+        "TASK-CDB086",
+        "TASK-CDB087",
+        "TASK-CDB088",
+        "TASK-CDB089",
+        "TASK-CDB090"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Link inventory, dependency, risk, target, migration, validation, cutover, and rollback stages as an ordered evidence-bearing artifact chain.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 435,
+          "line_start": 412,
+          "path": "source/previous-migration-artifact-context.md",
+          "source_scope": "reference-package",
+          "source_wording": "## The artifact hierarchy I would use\n\nFor a migration, artifacts should ladder from **discovery** to **execution**:\n\n```text\n1. Inventory\n   ↓\n2. Dependency Map\n   ↓\n3. Risk Map\n   ↓\n4. Target Design\n   ↓\n5. Migration Plan\n   ↓\n6. Validation Plan\n   ↓\n7. Cutover Plan\n   ↓\n8. Rollback Plan\n   ↓\n9. Operational Runbook\n   ↓\n10. Decommission Plan"
+        }
+      ],
+      "title": "Artifact stage chain",
+      "verification_gate": "Graph validation must prove every required stage exists in order, has traceable links, and cannot advance across a blocked predecessor."
+    },
+    {
+      "capability_id": "CAP-MIG-016",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB002",
+        "TASK-CDB066",
+        "TASK-CDB069",
+        "TASK-CDB070"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "A blocked artifact must identify its blocker and evidence while remaining ineligible for completion claims.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 15,
+          "line_start": 9,
+          "path": "source/codex-flexnetos-migration-prompt-package/prompts/EXECUTION_STYLE.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Model verification\n\nBefore generating any migration finding, Codex must verify the active model/provider state. If `codex-5.4` or `spark-5.3` cannot be resolved by the local setup, Codex must create:\n\n- `migration-artifacts/00-executive-summary/model-resolution-blocker.md`\n\nand stop before creating factual analysis artifacts. It may still create empty scaffolding with `status: blocked`."
+        }
+      ],
+      "title": "Blocked artifact evidence",
+      "verification_gate": "Completion validation must reject blocked artifacts without blocker evidence and reject every blocked artifact presented as complete."
+    },
+    {
+      "capability_id": "CAP-MIG-017",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB001",
+        "TASK-CDB005",
+        "TASK-CDB066",
+        "TASK-CDB070"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Artifact existence and navigation links are required but unknown or partial artifacts remain non-terminal and cannot satisfy completion.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 3,
+          "line_start": 1,
+          "path": "source/codex-flexnetos-migration-prompt-package/expected-output/migration-artifacts-tree.md",
+          "source_scope": "reference-package",
+          "source_wording": "# Expected Migration Artifact Tree\n\nCodex must create this tree under the selected repository/workspace. Files may contain `status: unknown` or `status: partial` when evidence is insufficient, but the files must exist and must be linked from `index.md`."
+        }
+      ],
+      "title": "Unknown or partial artifacts never complete",
+      "verification_gate": "Status tests must keep linked unknown/partial artifacts incomplete until evidence-backed validation passes."
+    },
+    {
+      "capability_id": "CAP-MIG-018",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB009",
+        "TASK-CDB011",
+        "TASK-CDB030",
+        "TASK-CDB035",
+        "TASK-CDB063",
+        "TASK-CDB103"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Select an explicit boundary enum: JSON CLI, shared crate, IPC, or authorized database transaction API, and record rationale plus tests.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 16,
+          "line_start": 3,
+          "path": "specs/envctl-nu-plugin-boundary.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Rule\n\n`nu_plugin` must not independently mutate migration truth. It either calls envctl CLI/API/library methods or uses sanctioned transaction APIs.\n\n## Boundary options Codex may choose after repo inspection\n\n1. Invoke envctl CLI and parse JSON output.\n2. Link a shared Rust crate used by envctl and plugin.\n3. Use local IPC/socket if envctl already has a daemon/service pattern.\n4. Use direct DB connection only if envctl already exposes safe transaction APIs and plugin authorization.\n\n## Recommended default\n\nStart with envctl JSON CLI/API boundary because it keeps ownership clear and avoids duplicating DB access logic in the plugin."
+        }
+      ],
+      "title": "Explicit envctl/nu_plugin boundary",
+      "verification_gate": "Boundary tests must prove nu_plugin cannot mutate durable truth outside the selected authorized interface."
+    },
+    {
+      "capability_id": "CAP-MIG-019",
+      "coverage_boundary": "Named WorkOrders anchor the policy and all 106 WorkOrder path fields are in scope; product enforcement remains review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB010",
+        "TASK-CDB018",
+        "TASK-CDB028",
+        "TASK-CDB032",
+        "TASK-CDB033",
+        "TASK-CDB034",
+        "TASK-CDB043",
+        "TASK-CDB044",
+        "TASK-CDB045",
+        "TASK-CDB057",
+        "TASK-CDB083",
+        "TASK-CDB104"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Apply blocked-first allow/deny evaluation to final resolved paths, deny symlink escapes, and fail closed on unmatched paths.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 50,
+          "line_start": 42,
+          "path": "execution-framework/docs/FILESYSTEM_BOUNDARIES.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Helper Rules\n\n- Blocked patterns take precedence over allowed paths.\n- Background helpers must not read or write paths that match blocked_paths.\n- Background helpers may read and write only paths that match allowed_paths and do not match blocked_paths.\n- ENVCTL_REPO and NU_PLUGIN_REPO are operator-provided roots; if unset, helpers must treat those lanes as unavailable.\n- Helper scratch writes must use execution-framework/state/helpers/${HELPER_ID}/ unless the task packet names a narrower output path.\n- Logs and proof evidence must be redacted using helpers/redaction_patterns.txt before capture.\n- Symlink traversal must be evaluated against the final resolved path and denied when it escapes the matched allowed root."
+        }
+      ],
+      "title": "Fail-closed filesystem policy",
+      "verification_gate": "Path-policy tests must cover blocked precedence, allow matches, unmatched denial, traversal, symlink escape, and all WorkOrder path fields."
+    },
+    {
+      "capability_id": "CAP-MIG-020",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB007",
+        "TASK-CDB009",
+        "TASK-CDB011",
+        "TASK-CDB014",
+        "TASK-CDB051",
+        "TASK-CDB065",
+        "TASK-CDB086",
+        "TASK-CDB092"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Enforce protocol semver with schema-diff, backward-compatibility, default-value, and nullability tests.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 13,
+          "line_start": 7,
+          "path": "execution-framework/docs/SHARED_PROTOCOL_SCHEMAS.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Source Of Truth\n\nenvctl migration database owns durable state; nu_plugin renders records and submits auditable commands.\n\n## Compatibility Rule\n\nMinor versions may add optional fields; removals, type narrowing, and enum removal require a new major protocol version."
+        }
+      ],
+      "title": "Protocol semantic-version compatibility",
+      "verification_gate": "Compatibility tests must allow additive optional minor changes and reject removal, narrowing, enum deletion, and incompatible default/nullability changes without a major version."
+    },
+    {
+      "capability_id": "CAP-MIG-021",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB003",
+        "TASK-CDB039",
+        "TASK-CDB065",
+        "TASK-CDB068"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Each execution packet must be self-contained and narrowly bounded so an executor does not reread or reinterpret the full package.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 25,
+          "line_start": 18,
+          "path": "execution-framework/docs/GOAL_LOOP_PROTOCOL.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Rules\n\n- A task is runnable only when all dependencies are complete.\n- Parallel groups must respect `can_run_parallel` and `max_parallel`.\n- Human approval tasks stop the loop until an approval proof appears.\n- No task can be considered complete without a proof record in `proof_records/proof_ledger.jsonl`.\n- Failed verification stops downstream tasks that depend on the failed node.\n- Execution packets are bounded; no packet should require rereading the full package."
+        }
+      ],
+      "title": "Self-contained bounded execution packets",
+      "verification_gate": "Packet schema and fixture tests must prove required context, scope, dependencies, gates, verification, and rollback are present without package-wide inference."
+    },
+    {
+      "capability_id": "CAP-MIG-022",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB000",
+        "TASK-CDB001",
+        "TASK-CDB002",
+        "TASK-CDB003",
+        "TASK-CDB004",
+        "TASK-CDB005",
+        "TASK-CDB006",
+        "TASK-CDB007",
+        "TASK-CDB008",
+        "TASK-CDB009",
+        "TASK-CDB010",
+        "TASK-CDB011",
+        "TASK-CDB012"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Lock contracts and schemas first, construct their dependency DAG, then open only dependency-safe parallel implementation lanes.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 40,
+          "line_start": 28,
+          "path": "README.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Bottom-line strategy\n\nDo **contract-first parallel implementation**.\n\nDo not fully implement the FlexNetOS prompt package first as a one-off, and do not build envctl tooling blindly without proving it can execute the package. Codex should:\n\n1. Extract and lock the migration artifact contract from the existing FlexNetOS package.\n2. Add envctl database tables, event sourcing, target descriptors, migration recipes, artifact contracts, evidence storage, approvals, checkpoints, rollbacks, replay, and validation records.\n3. Build a thin envctl adapter that can import and run the prior package as an external artifact-generation bundle.\n4. In parallel, build the Nushell plugin protocol/commands that read from and append controlled actions into envctl's migration database.\n5. Replace shell-oriented collectors with native envctl collectors incrementally, only after the adapter proves parity.\n\nThis sequencing avoids the two worst outcomes: a one-off migration package that cannot be reproduced, or a polished database tool that cannot execute the real migration contract."
+        }
+      ],
+      "title": "Contract-first dependency DAG",
+      "verification_gate": "Scheduler tests must block downstream lanes before contract/schema verification and permit only declared independent parallel groups afterward."
+    },
+    {
+      "capability_id": "CAP-MIG-023",
+      "coverage_boundary": "CDB048 anchors the requirement, but actual issue/PR integration and checkout evidence are an explicit companion review gap.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB048"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Bind issue and PR work to actual checkout paths, discovered issue/PR identifiers, and checkout evidence rather than placeholder repository assumptions.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 9,
+          "line_start": 1,
+          "path": "specs/github-issues-index.md",
+          "source_scope": "reference-package",
+          "source_wording": "# GitHub issues index\n\nUse these issue prompts additively:\n\n- `prompts/ISSUE_ENVCTL.md`\n- `prompts/ISSUE_NU_PLUGIN.md`\n- `prompts/ISSUE_SHARED_PROTOCOL.md`\n\nCodex should adapt issue text with actual repo file paths, existing issue numbers if found, and implementation evidence from the current local checkout."
+        }
+      ],
+      "title": "Checkout-bound issue integration",
+      "verification_gate": "Integration validation must reject missing checkout receipts, invented identifiers, stale paths, and issue/PR evidence not tied to the inspected revision."
+    },
+    {
+      "capability_id": "CAP-MIG-024",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB005",
+        "TASK-CDB014",
+        "TASK-CDB015",
+        "TASK-CDB016",
+        "TASK-CDB047",
+        "TASK-CDB055",
+        "TASK-CDB090"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Generate seed records deterministically from bound source IDs and digests and reject invented literal identities.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 12,
+          "line_start": 1,
+          "path": "sql/003_seed_artifact_contract.sql",
+          "source_scope": "reference-package",
+          "source_wording": "-- Seed intent for artifact contract import.\n-- Codex should generate concrete INSERTs only after it computes real IDs/hashes from the bundled package.\n\n-- Required contract name:\n-- full-migration-artifact-contract\n\n-- Required initial package fixture:\n-- codex-flexnetos-migration-prompt-package\n\n-- Required artifacts include all entries from:\n-- source/codex-flexnetos-migration-prompt-package/expected-output/migration-artifacts-tree.md\n-- source/previous-migration-artifact-context.md"
+        }
+      ],
+      "title": "Deterministic seed identity",
+      "verification_gate": "Regeneration must be byte-stable for the same inputs and fail on unbound IDs, missing digests, or hand-authored placeholder literals."
+    },
+    {
+      "capability_id": "CAP-MIG-025",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB015",
+        "TASK-CDB016",
+        "TASK-CDB017",
+        "TASK-CDB018",
+        "TASK-CDB035",
+        "TASK-CDB063",
+        "TASK-CDB072",
+        "TASK-CDB076",
+        "TASK-CDB102"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Treat files as projections while the database owns artifact identity, digest, links, and status.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 31,
+          "line_start": 25,
+          "path": "specs/envctl-db-automation-architecture.md",
+          "source_scope": "reference-package",
+          "source_wording": "## Source of truth\n\nenvctl database owns durable state. Files may hold exported artifacts, but the DB records their identity, hashes, links, and status.\n\n## Package adapter\n\nExternal prompt packages are imported as versioned packages. Execution becomes operations/events; output becomes artifacts/evidence records."
+        }
+      ],
+      "title": "Database-owned artifact truth",
+      "verification_gate": "Reconciliation tests must prove files derive from database records and cannot independently mutate identity, digest, link, or status truth."
+    },
+    {
+      "capability_id": "CAP-MIG-026",
+      "coverage_boundary": "Planning coverage is mapped; product implementation and verification remain review-gated.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB001",
+        "TASK-CDB004",
+        "TASK-CDB005",
+        "TASK-CDB047",
+        "TASK-CDB048"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Maintain a navigation graph, artifact index, persistent migration memory, and receipted update path for every material change.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 73,
+          "line_start": 73,
+          "path": "source/codex-flexnetos-migration-prompt-package/README.md",
+          "source_scope": "reference-package",
+          "source_wording": "The run should create or update a `migration-artifacts/` folder inside the selected repository/workspace and generate a persistent artifact memory file."
+        }
+      ],
+      "title": "Persistent navigable migration memory",
+      "verification_gate": "Navigation tests must find every artifact bidirectionally and require a deterministic update receipt whenever memory or index state changes."
+    },
+    {
+      "capability_id": "CAP-MIG-027",
+      "coverage_boundary": "The source issue task is retained in its provenance namespace; this mandatory mapping does not promote its status, proof, or agent approval into LifeOS completion.",
+      "coverage_reference_refs": [
+        "reference-issue-414:REQ-057_WATCH_INCREMENTAL"
+      ],
+      "coverage_work_order_refs": [],
+      "local_status": "review",
+      "mandatory_requirement": "Provide notify-based incremental invalidation with a polling fallback and explicit large-directory and inotify-limit behavior.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 9,
+          "line_start": 9,
+          "path": "execution-framework/generated/issue-414/task_graph.csv",
+          "source_scope": "reference-package",
+          "source_wording": "REQ-057_WATCH_INCREMENTAL,GH-414,05-envctl-db-upgrade,Incremental index invalidation (watch),envctl db watch --repo-root: notify-based incremental index invalidation with poll fallback and inotify-limit awareness,lane_b_repo_a,envctl-db-upgrade-agent,helper-req-057_watch_incremental,gpt-5.3-spark,codex-cli-background-shell,workspace-write,repo_a,${ENVCTL_REPO},repo,prompts/ISSUE_ENVCTL.md|specs/envctl-nu-plugin-boundary.md|GH-issue-414|crates/engine/src/db_index.rs,crates/engine/src/db_index.rs|crates/cli/src/main.rs,envctl db watch command,${ENVCTL_REPO}/**|${NU_PLUGIN_REPO}/**|execution-framework/**,**/.env|**/secrets/**|**/private_keys/**|**/*.pem|**/*.key,REQ-052_FILE_INDEX,,db_upgrade_watch,true,2,,140,pending,05-envctl-db-upgrade,codex|python3|shell|cargo,codex exec < generated/issue-414/execution_packets/REQ-057_WATCH_INCREMENTAL.json,cargo test -p envctl-engine db_watch,watch invalidates only changed file rows; poll fallback documented,true,execution-framework/proof_records/REQ-057_WATCH_INCREMENTAL.proof.json,execution-framework/heartbeats/REQ-057_WATCH_INCREMENTAL.heartbeat,execution-framework/logs/REQ-057_WATCH_INCREMENTAL.log,git restore + envctl catalog sync --dry-run (fail-closed; exports write new trees),R2,false,Optional/poll fallback where useful; large-dir/inotify limits handled."
+        }
+      ],
+      "title": "Incremental watch fallback and inotify resilience",
+      "verification_gate": "Watcher tests must prove changed-file-only invalidation, forced polling fallback, inotify-limit recovery, bounded resource use, and stable agent-visible status."
+    },
+    {
+      "capability_id": "CAP-MIG-028",
+      "coverage_boundary": "TASK-CDB095 is still review-only and requires an actual human decision plus new LifeOS-local proof before execution or completion.",
+      "coverage_reference_refs": [],
+      "coverage_work_order_refs": [
+        "TASK-CDB095"
+      ],
+      "local_status": "review",
+      "mandatory_requirement": "Define and verify both the Tier-2 parser-backed summary and the Tier-4 parser/indexer boundary; Tier 4 is mandatory planning scope, never a deferred option.",
+      "planning_evidence": [],
+      "product_complete": false,
+      "requirement": "mandatory",
+      "source_refs": [
+        {
+          "line_end": 6,
+          "line_start": 6,
+          "path": "raw/POLYGLOT_TASK_GRAPH.csv",
+          "source_scope": "task-tables",
+          "source_wording": "CDB095,Add Tree-sitter/ast-grep parser-backed summary prototype,planning,complete,CDB091,docs/polyglot-import/parser-and-indexer-tooling-matrix.md,parser/indexer candidates and bounded summary plan documented,no external CLI mandatory for default tests,Defines Tier 2 and optional Tier 4 boundary"
+        }
+      ],
+      "title": "Tier-4 parser and indexer boundary",
+      "verification_gate": "TASK-CDB095 review evidence must identify Tier-2 and Tier-4 contracts, supported and rejected operations, parser/version provenance, bounded output, and deterministic verification fixtures."
+    }
+  ],
+  "capability_count": 28,
+  "catalog_version": "1.1.0",
+  "requirement_policy": "All catalog entries are mandatory; none may be downgraded to optional.",
+  "schema": "lifeos.migration-mandatory-capability-catalog.v1",
+  "status_authority": "Companion planning coverage only. Every entry remains review until product-local verification evidence passes."
+}

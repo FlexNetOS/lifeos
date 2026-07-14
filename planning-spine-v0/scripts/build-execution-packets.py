@@ -7,9 +7,10 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now
 
 
 NORMALIZED_SCHEMA_VERSION = "lifeos-planning-spine.task-graph.normalized.v0"
@@ -38,10 +39,6 @@ PROSE_ONLY_FIELDS = {"goal", "next_action", "source_columns"}
 
 class PacketError(Exception):
     pass
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def load_normalized(path: Path) -> dict[str, Any]:
@@ -147,8 +144,6 @@ def rebuild_packets(
         for task in graph["tasks"]
         if str(task.get("status", "")).strip().lower() == ready_status
     ]
-    if not tasks:
-        raise PacketError(f"normalized graph has no tasks with status {ready_status!r}")
 
     packet_dir.mkdir(parents=True, exist_ok=True)
     for stale_packet in packet_dir.glob("*.json"):

@@ -1,0 +1,339 @@
+{
+  "schema_version": "lifeos-planning-spine.navigation-source.v0",
+  "id": "lifeos.planning-spine.v0.navigation",
+  "title": "LifeOS Planning Spine Agent Navigation",
+  "description": "Authored routing, authority, and lifecycle rules for the deterministic planning-spine knowledge graph.",
+  "package_root": "planning-spine-v0",
+  "root_node_id": "spine:lifeos-planning-spine-v0",
+  "outputs": {
+    "graph": "navigation/generated/navigation_graph.json",
+    "index": "navigation/generated/navigation_index.json",
+    "validation": "navigation/generated/navigation.validation_report.json"
+  },
+  "entrypoints": [
+    "navigation/README.md",
+    "README.md",
+    "00_NORTH_STAR.md",
+    "EXECUTION_STATUS.md",
+    "1.0_VISION/README.md",
+    "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "1.0_VISION/Notebooklm/README.md",
+    "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+    "task_tables/README.md",
+    "envctl-db-nu-plugin-migration-automation-package/README.md",
+    "task_tables/projections/work_orders.csv",
+    "task_tables/workflow/mandatory_capabilities.csv",
+    "task_tables/workflow/mandatory_language_inventory.json",
+    "generated/task_graph.index.json",
+    "generated/notebooklm_source_registry.source.csv",
+    "proof_records/proof_ledger.jsonl"
+  ],
+  "required_artifact_links": [
+    {
+      "artifact_id": "lifeos.vision.notebooklm.architecture-blueprint",
+      "path": "1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md",
+      "sha256": "014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827",
+      "cross_reference": "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md"
+    }
+  ],
+  "strict_link_documents": [
+    "navigation/README.md",
+    "README.md",
+    "1.0_VISION/README.md",
+    "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+    "1.0_VISION/Notebooklm/README.md",
+    "1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md",
+    "1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md",
+    "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+    "task_tables/README.md",
+    "envctl-db-nu-plugin-migration-automation-package/README.md",
+    "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md"
+  ],
+  "external_reference_paths": [
+    "../nu_plugin/docs/INTEGRATION_CONTRACTS.md",
+    "../nu_plugin/docs/RELEASE_GATE.md",
+    "../nu_plugin/docs/ROUND_TRIP_PROOF.md",
+    "../nu_plugin/docs/UNSAFE_CAPTURE_POLICY.md"
+  ],
+  "excluded_paths": [
+    ".pytest_cache/**",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "**/*.pyo",
+    "**/*.pid",
+    "navigation/generated/navigation_graph.json",
+    "navigation/generated/navigation_index.json",
+    "navigation/generated/navigation.validation_report.json"
+  ],
+  "volatile_paths": [
+    "state/authority_integrity_report.json",
+    "state/mvp_bundle_report.json",
+    "state/verification_runtime_report.json"
+  ],
+  "allowed_historical_task_ids": [
+    "CAP-001",
+    "IDD-UNIFY-000",
+    "IDD-UNIFY-001",
+    "IDD-UNIFY-002",
+    "OPS-001",
+    "WEAVE-001"
+  ],
+  "structured_sources": [
+    {
+      "path": "generated/north_star_coverage.source.csv",
+      "kind": "vision-anchor",
+      "id_column": "anchor_id",
+      "title_column": "source_anchor",
+      "description_column": "required_outcome",
+      "task_columns": ["phase_task_ids"]
+    },
+    {
+      "path": "generated/architecture_depth.source.csv",
+      "kind": "architecture-depth",
+      "id_column": "depth_id",
+      "title_column": "required_architecture_or_doctrine",
+      "description_column": "execution_gate",
+      "task_columns": ["phase_task_ids"]
+    },
+    {
+      "path": "generated/current_state_gap.source.csv",
+      "kind": "current-state-gap",
+      "id_column": "gap_id",
+      "title_column": "observed_state",
+      "description_column": "north_star_delta",
+      "task_columns": ["phase_task_ids"]
+    },
+    {
+      "path": "generated/prior_task_conflict.source.csv",
+      "kind": "task-conflict",
+      "id_column": "conflict_id",
+      "title_column": "prior_claim",
+      "description_column": "conflict",
+      "task_columns": ["prior_task_ids", "canonical_task_ids"]
+    },
+    {
+      "path": "generated/adopted_capabilities.source.csv",
+      "kind": "adopted-capability",
+      "id_column": "capability",
+      "title_column": "capability",
+      "description_column": "boundary",
+      "task_columns": ["adopt_task"]
+    },
+    {
+      "path": "task_tables/projections/work_orders.csv",
+      "kind": "imported-work-order",
+      "id_column": "work_order_id",
+      "title_column": "title",
+      "description_column": "completion_gate",
+      "status_column": "status",
+      "expected_count": 106,
+      "authority_class": "review-only-import",
+      "metadata_columns": [
+        "correlation_id",
+        "phase",
+        "source_status",
+        "status",
+        "proof_required",
+        "proof_uri",
+        "human_approval_required",
+        "verification_command",
+        "completion_gate",
+        "rollback_plan"
+      ],
+      "task_columns": [],
+      "work_order_columns": ["depends_on", "blocks"]
+    },
+    {
+      "path": "task_tables/workflow/mandatory_capabilities.csv",
+      "kind": "mandatory-migration-capability",
+      "id_column": "capability_id",
+      "title_column": "title",
+      "description_column": "mandatory_requirement",
+      "status_column": "local_status",
+      "expected_count": 28,
+      "authority_class": "review-only-import",
+      "metadata_columns": [
+        "requirement",
+        "source_refs",
+        "mandatory_requirement",
+        "verification_gate",
+        "coverage_reference_refs",
+        "coverage_boundary",
+        "planning_evidence",
+        "local_status",
+        "product_complete"
+      ],
+      "task_columns": [],
+      "work_order_columns": ["coverage_work_order_refs"]
+    }
+  ],
+  "authority_classes": {
+    "operating-contract": "Repository-level instructions that govern agent behavior.",
+    "maintained-contract": "Authored planning, schema, protocol, or authority contract.",
+    "canonical-input": "Authored source table or manifest from which projections are generated.",
+    "review-only-import": "Pinned upstream planning data isolated from canonical LifeOS task status and proof until separately reviewed and accepted.",
+    "exact-evidence": "Proof, receipt, ledger, or captured exact-source evidence; result must be read from the artifact.",
+    "derived-projection": "Generated or current-state view that is reproducible from stronger sources.",
+    "architecture-input": "Vision or NotebookLM material that informs design but does not prove implementation or grant decision authority.",
+    "example-or-fixture": "Non-authoritative example, test fixture, or simulation input.",
+    "execution-tooling": "Executable generator, verifier, or build surface.",
+    "artifact-bundle": "Packaged derivative intended for distribution or transfer.",
+    "external-reference": "Explicit target outside the LifeOS repository. Its path is indexed without importing mutable sibling-repository bytes."
+  },
+  "lifecycle_classes": {
+    "maintained": "Edited intentionally as an authored source.",
+    "immutable-source": "Preserved byte-for-byte; corrections live in companion documents.",
+    "append-only": "History may only be extended through its owning merger.",
+    "generated": "Regenerate through the declared tool; do not hand-edit.",
+    "executable": "Run and verify as code.",
+    "reference": "Read-only context or an external reference whose target bytes are outside this graph's authority."
+  },
+  "routes": [
+    {
+      "id": "start-here",
+      "title": "Agent start and authority boundary",
+      "description": "The shortest safe route into the planning spine and its truth hierarchy.",
+      "aliases": ["agent quick start", "planning spine entrypoint", "instant recall"],
+      "tags": ["navigation", "authority", "start"],
+      "entrypoints": ["navigation/README.md", "README.md", "1.0_VISION/README.md"],
+      "path_prefixes": [],
+      "keywords": ["authority and truth order", "agent quick navigation", "implementation truth"]
+    },
+    {
+      "id": "north-star-and-vision",
+      "title": "North Star and desired architecture",
+      "description": "Product intent, desired architecture, consolidated vision, and explicit scope boundaries.",
+      "aliases": ["vision", "desired architecture", "north star"],
+      "tags": ["vision", "scope", "architecture"],
+      "entrypoints": ["00_NORTH_STAR.md", "1.0_VISION/NORTH_STAR.md", "1.0_VISION/README.md"],
+      "path_prefixes": ["1.0_VISION/"],
+      "keywords": ["north star", "desired architecture", "vision anchor"]
+    },
+    {
+      "id": "authority-and-decisions",
+      "title": "Authority, ownership, and decisions",
+      "description": "Delegation, durable-state ownership, open questions, and owner-decision gates.",
+      "aliases": ["authority graph", "owner decisions", "PGAUTH"],
+      "tags": ["authority", "governance", "decision"],
+      "entrypoints": ["02_AUTHORITY_GRAPH.md", "09_OPEN_QUESTIONS.md", "docs/authority/PGAUTH-001-durable-state-contract.md"],
+      "path_prefixes": ["docs/authority/"],
+      "keywords": ["owner decision", "authority contract", "durable state"],
+      "task_prefixes": ["PGAUTH-", "DECIDE-", "STORE-"]
+    },
+    {
+      "id": "task-execution",
+      "title": "Task graph and execution state",
+      "description": "Canonical task rows, normalized topology, readiness, packets, and the current execution snapshot.",
+      "aliases": ["task graph", "ready work", "execution status"],
+      "tags": ["tasks", "execution", "status"],
+      "entrypoints": ["03_TASK_GRAPH_SCHEMA.md", "EXECUTION_STATUS.md", "generated/task_graph.index.json", "generated/task_graph.status.json"],
+      "path_prefixes": ["generated/execution_packets/", "generated/task_families/"],
+      "keywords": ["task graph", "next action", "ready task"]
+    },
+    {
+      "id": "proof-and-verification",
+      "title": "Proof, verification, and completion gates",
+      "description": "Proof records, append-only ledger history, verifier authority, and completion rules.",
+      "aliases": ["proof ledger", "verification gate", "completion evidence"],
+      "tags": ["proof", "verification", "gates"],
+      "entrypoints": ["06_PROOF_LEDGER.md", "08_EXECUTION_GATES.md", "proof_records/proof_ledger.jsonl"],
+      "path_prefixes": ["proof_records/", "state/"],
+      "keywords": ["proof record", "verification gate", "append-only ledger"],
+      "task_prefixes": ["NBVERIFY-", "LPS-"]
+    },
+    {
+      "id": "notebooklm-provenance",
+      "title": "NotebookLM provenance, claims, and truth testing",
+      "description": "Raw exports, exact-source captures, normalized claims, evidence, queues, and compatibility corrections.",
+      "aliases": ["NotebookLM", "source claims", "blueprint provenance"],
+      "tags": ["notebooklm", "provenance", "claims"],
+      "entrypoints": ["1.0_VISION/Notebooklm/README.md", "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md", "generated/notebooklm_source_registry.source.csv"],
+      "path_prefixes": ["1.0_VISION/Notebooklm/", "generated/notebooklm_"],
+      "keywords": ["NotebookLM", "claim verification", "source provenance"],
+      "task_prefixes": ["NBSOURCE-", "NBSTATED-", "NBVERIFY-"]
+    },
+    {
+      "id": "storage-postgres-ruvector",
+      "title": "Storage, PostgreSQL, RuVector, and redb",
+      "description": "Durable authority, local buffers, PostgreSQL projections, RuVector semantics, and migration boundaries.",
+      "aliases": ["storage tiers", "PostgreSQL RuVector", "redb authority"],
+      "tags": ["storage", "postgresql", "ruvector", "redb"],
+      "entrypoints": ["docs/authority/PGAUTH-001-durable-state-contract.md", "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md", "generated/pgauth_redb_usage_inventory.csv"],
+      "path_prefixes": [],
+      "keywords": ["PostgreSQL", "RuVector", "redb", "durable macro-state"],
+      "task_prefixes": ["POSTGRES-", "PGAUTH-", "STORE-"]
+    },
+    {
+      "id": "ingestion-and-projection",
+      "title": "Code ingestion, mutation, and projection",
+      "description": "Nushell plugin capture, CodeDB replay, envctl boundaries, semantic editing, and filesystem projection.",
+      "aliases": ["CodeDB", "envctl projection", "Nushell ingestion"],
+      "tags": ["codedb", "envctl", "nushell", "projection"],
+      "entrypoints": ["1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md", "generated/notebooklm_source_extracts/NBSOURCE-030-three-pillars-code-ingestion.md", "generated/notebooklm_source_extracts/NBSOURCE-031-envctl-projection-engine.md"],
+      "path_prefixes": [],
+      "keywords": ["CodeDB", "envctl", "Nushell", "projection engine"],
+      "task_prefixes": ["ADOPT-", "RECOVERY-", "POSTGRES-"]
+    },
+    {
+      "id": "migration-task-tables",
+      "title": "envctl and nu_plugin migration package",
+      "description": "Review-only imported WorkOrders, mandatory migration capabilities, package instructions, and their exact source projections.",
+      "aliases": ["migration package", "CDB WorkOrders", "CAP-MIG"],
+      "tags": ["migration", "work-orders", "capabilities", "review-only"],
+      "entrypoints": [
+        "ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
+        "task_tables/README.md",
+        "envctl-db-nu-plugin-migration-automation-package/README.md",
+        "task_tables/projections/work_orders.csv",
+        "task_tables/workflow/mandatory_capabilities.csv"
+      ],
+      "path_prefixes": [
+        "task_tables/",
+        "envctl-db-nu-plugin-migration-automation-package/"
+      ],
+      "keywords": ["WorkOrder", "TASK-CDB", "CAP-MIG", "mandatory capability", "envctl migration"]
+    },
+    {
+      "id": "cognition-and-simulation",
+      "title": "Agent cognition, simulation, and temporal reasoning",
+      "description": "AgentDB/RVF cognition, WorldSeed, predictive timelines, MinCut, and simulation gates.",
+      "aliases": ["AgentDB cognition", "WorldSeed", "temporal attractors"],
+      "tags": ["cognition", "simulation", "agentdb", "worldseed"],
+      "entrypoints": ["04_WORLDSEED_SCHEMA.md", "07_MVP_VERTICAL_SLICE.md", "worldsim/README.md"],
+      "path_prefixes": ["worldsim/"],
+      "keywords": ["AgentDB", "WorldSeed", "temporal attractor", "MinCut"],
+      "task_prefixes": ["LIFEOS-", "INTEL-", "LIVING-"]
+    },
+    {
+      "id": "portability-and-release",
+      "title": "Portability, hermetic execution, and release",
+      "description": "Nix/Yazelix ownership, Bun execution, hermetic cells, static-build claims, and release boundaries.",
+      "aliases": ["portable foundation", "Yazelix", "hermetic cell"],
+      "tags": ["portability", "nix", "bun", "release"],
+      "entrypoints": ["05_HERMETIC_CELL_CONTRACT.md", "1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md", "1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md"],
+      "path_prefixes": [],
+      "keywords": ["Yazelix", "Nix", "hermetic cell", "portable"],
+      "task_prefixes": ["FOUNDATION-", "RELEASE-", "STRUCTURE-"]
+    },
+    {
+      "id": "current-state-and-capabilities",
+      "title": "Current state, capabilities, and connectors",
+      "description": "Observed repositories, build surfaces, connector state, capability priorities, and convergence gaps.",
+      "aliases": ["system inventory", "current state", "connector status"],
+      "tags": ["inventory", "capabilities", "connectors", "current-state"],
+      "entrypoints": ["1.0_VISION/current_state/SYSTEM_INVENTORY.md", "state/current_state_map.md", "connector_state/connector_current_state.md"],
+      "path_prefixes": ["1.0_VISION/current_state/", "capability_state/", "connector_state/", "connector_proof/"],
+      "keywords": ["current state", "system inventory", "connector", "capability"]
+    },
+    {
+      "id": "schemas-and-examples",
+      "title": "Schemas, examples, and executable tooling",
+      "description": "Machine contracts, valid instances, generation scripts, fixtures, and package verification.",
+      "aliases": ["schema registry", "examples", "planning tooling"],
+      "tags": ["schemas", "examples", "tooling"],
+      "entrypoints": ["01_OBJECT_MODEL.md", "schemas/index.json", "examples/mvp-bundle.json", "scripts/verify-lps-docs.py"],
+      "path_prefixes": ["schemas/", "examples/", "scripts/", "generated/fixtures/"],
+      "keywords": ["schema_version", "validation", "fixture"]
+    }
+  ]
+}

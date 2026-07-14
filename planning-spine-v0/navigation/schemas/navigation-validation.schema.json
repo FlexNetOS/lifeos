@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.local/navigation/schemas/navigation-validation.schema.json",
+  "title": "LifeOS Planning Spine Navigation Validation Report",
+  "description": "Deterministic coverage, connectivity, link, and integrity verdict for agent navigation outputs.",
+  "type": "object",
+  "required": ["schema_version", "source_path", "source_sha256", "inventory_sha256", "result", "deterministic", "generated_at", "counts", "kind_counts", "authority_counts", "checks", "historical_task_ids", "excluded_existing_paths", "unresolved_links", "warnings", "errors"],
+  "properties": {
+    "schema_version": { "const": "lifeos-planning-spine.navigation-validation.v0" },
+    "source_path": { "type": "string" },
+    "source_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "inventory_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "result": { "enum": ["pass", "fail"] },
+    "deterministic": { "const": true },
+    "generated_at": { "type": "null" },
+    "counts": { "type": "object" },
+    "kind_counts": { "type": "object" },
+    "authority_counts": { "type": "object" },
+    "checks": { "type": "array" },
+    "historical_task_ids": { "type": "array", "items": { "type": "string" } },
+    "excluded_existing_paths": { "type": "array", "items": { "type": "string" } },
+    "unresolved_links": { "type": "array" },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "errors": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

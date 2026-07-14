@@ -25,12 +25,13 @@ passing).
 from __future__ import annotations
 
 import csv
-import datetime
 import hashlib
 import json
 import sys
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now as now_utc
 
 PKG_ROOT = Path(__file__).resolve().parent.parent
 REPO_ROOT = PKG_ROOT.parent
@@ -76,10 +77,6 @@ class GateError(Exception):
 # --------------------------------------------------------------------------- #
 # Primitives
 # --------------------------------------------------------------------------- #
-def now_utc() -> str:
-    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
 def read_json(rel: str) -> Any:
     return json.loads((PKG_ROOT / rel).read_text(encoding="utf-8"))
 
@@ -91,6 +88,49 @@ def sha256_file(rel: str) -> str:
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def without_volatile_fields(data: Any, fields: set[str]) -> Any:
+    if not isinstance(data, dict):
+        return data
+    return {key: value for key, value in data.items() if key not in fields}
+
+
+def read_existing_json(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    try:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise GateError(f"{path}: existing generated JSON is invalid: {error}") from error
+    if not isinstance(existing, dict):
+        raise GateError(f"{path}: existing generated JSON must be an object")
+    return existing
+
+
+def write_stable_json(path: Path, data: dict[str, Any]) -> dict[str, Any]:
+    """Avoid timestamp-only rewrites of generated reports."""
+    existing = read_existing_json(path)
+    volatile = {"observed_at"}
+    if existing is not None and without_volatile_fields(existing, volatile) == without_volatile_fields(data, volatile):
+        return existing
+    write_json(path, data)
+    return data
+
+
+def write_monotonic_proof(path: Path, proof: dict[str, Any]) -> dict[str, Any]:
+    """Preserve identical proofs and increment, never reset, changed revisions."""
+    existing = read_existing_json(path)
+    volatile = {"observed_at", "revision"}
+    if existing is not None:
+        if without_volatile_fields(existing, volatile) == without_volatile_fields(proof, volatile):
+            return existing
+        previous_revision = existing.get("revision")
+        if not isinstance(previous_revision, int) or previous_revision < 1:
+            raise GateError(f"{path}: existing proof revision must be a positive integer")
+        proof["revision"] = previous_revision + 1
+    write_json(path, proof)
+    return proof
 
 
 def validate(schema: dict, value: Any, at: str = "$") -> None:
@@ -546,13 +586,17 @@ def gate_lps_006() -> tuple[str, dict, str, list[str], dict]:
         "cell.json": sha256_file("examples/cell.json"),
         "cell.schema.json": sha256_file("schemas/cell.schema.json"),
     }
-    summary = (
-        "Cell schema and example validate; mutation boundaries (allowed_paths/blocked_paths) and a "
-        "promotion gate (verification_gate 'proof gate must pass before success') are explicit. "
-        "However the LPS-006 gate also requires explicit network-denied-by-default, snapshot, and "
-        "rollback boundaries, and none of these are represented in the cell schema, the cell "
-        "example, or 05_HERMETIC_CELL_CONTRACT.md. Gate does not fully hold."
-    )
+    if status == "pass":
+        summary = (
+            "Cell schema and example validate; allowed/blocked mutation paths, proof-gated promotion, "
+            "network-denied-by-default behavior, a required pre-execution snapshot, and rollback are "
+            "explicit. Every enumerated LPS-006 boundary holds."
+        )
+    else:
+        summary = (
+            "The hermetic-cell contract is blocked because these required boundaries are missing: "
+            + "; ".join(missing)
+        )
     return status, checks, summary, [
         "planning-spine-v0/05_HERMETIC_CELL_CONTRACT.md",
         "planning-spine-v0/examples/cell.json",
@@ -578,7 +622,6 @@ def gate_lps_007() -> tuple[str, dict, str, list[str], dict]:
     checks = {
         "proof_record_schema_validates": _validates("schemas/proof-record.schema.json", "examples/proof-record.json"),
         "result_enum_supports_failed_checks": proof_schema["properties"]["result"]["enum"] == ["pass", "fail"],
-        "ledger_entry_count": len(entries),
         "append_only_sequence_monotonic": monotonic,
         "every_entry_checksum_backed": all_hashed,
         "executor_verifier_distinct": bool(executor) and bool(verifier) and executor != verifier,
@@ -598,7 +641,7 @@ def gate_lps_007() -> tuple[str, dict, str, list[str], dict]:
     }
     summary = (
         f"Proof-record schema validates with result enum {{pass,fail}} preserving failed checks. The "
-        f"append-only ledger has {len(entries)} monotonically sequenced, SHA-256-backed entries, and "
+        f"append-only ledger is monotonically sequenced and SHA-256-backed, and "
         f"the shipped authority integrity report (result=pass) proves the verifier agent "
         f"({verifier}) is distinct from the executor ({executor}) — proof, not assertion, is the sole "
         f"completion authority."
@@ -699,13 +742,14 @@ def gate_lps_009() -> tuple[str, dict, str, list[str], dict]:
     checks["missing_gate_requirements"] = missing
     status = "pass" if not missing else "blocked"
     checksums = {"08_EXECUTION_GATES.md": sha256_file("08_EXECUTION_GATES.md")}
-    summary = (
-        "08_EXECUTION_GATES.md documents a fail-closed authority/simulation/cell/proof/decision "
-        "transition matrix. But the LPS-009 gate additionally requires (a) the named machine-readable "
-        "schemas/gates.yaml artifact, which does not exist, and (b) an explicit human-approval gate "
-        "for spend, legal, credentials, production, physical action, and irreversible work, which the "
-        "doc does not define. Gate does not fully hold."
-    )
+    if status == "pass":
+        summary = (
+            "08_EXECUTION_GATES.md and schemas/gates.yaml encode fail-closed authority, simulation, "
+            "cell, proof, and decision transitions. Spend, legal, credentials, production mutation, "
+            "physical action, and irreversible work all require explicit human approval."
+        )
+    else:
+        summary = "The execution-gate contract is blocked: " + "; ".join(missing)
     return status, checks, summary, [
         "planning-spine-v0/08_EXECUTION_GATES.md",
     ], checksums
@@ -758,15 +802,18 @@ def gate_lps_011(crosswalk: dict) -> tuple[str, dict, str, list[str], dict]:
     }
     status = "pass" if crosswalk["all_questions_have_decision_row"] else "blocked"
     checksums = {"09_OPEN_QUESTIONS.md": sha256_file("09_OPEN_QUESTIONS.md")}
-    summary = (
-        f"Crosswalked all {crosswalk['question_count']} open questions in 09_OPEN_QUESTIONS.md to the "
-        f"task graph. {crosswalk['owned_by_decision_row_count']} have a bounded owning DECISION row. "
-        f"The gate requires every open question to be converted into an owned, gated task-graph "
-        f"decision row; that conversion has not happened, so the gate does not hold. RFC-Q1/RFC-Q2 "
-        f"have related proof-boundary rows (LPS-005, LPS-010) that only preserve the current deferral, "
-        f"and RFC-Q3 (proof-URI addressing) has neither an owning decision row nor a documented "
-        f"deferral rule. Adding decision rows is outside this lane's file ownership."
-    )
+    if status == "pass":
+        summary = (
+            f"Crosswalked all {crosswalk['question_count']} open questions in 09_OPEN_QUESTIONS.md to "
+            f"the task graph. All {crosswalk['owned_by_decision_row_count']} have bounded owning "
+            "DECISION rows with explicit rollback or deferral rules; no question is silently resolved."
+        )
+    else:
+        summary = (
+            f"The open-question ownership gate is blocked. Unowned questions: "
+            f"{', '.join(question['id'] for question in unowned) or 'none'}; questions without an "
+            f"owning row or deferral: {', '.join(question['id'] for question in no_deferral) or 'none'}."
+        )
     return status, checks, summary, [
         "planning-spine-v0/09_OPEN_QUESTIONS.md",
         "planning-spine-v0/generated/lps_doc_open_questions_map.json",
@@ -818,9 +865,9 @@ def main() -> int:
     crosswalk = crosswalk_open_questions(rows)
 
     # Emit core generated artifacts (owned: generated/lps_doc_*).
-    write_json(GENERATED / "lps_doc_examples_validation.json", {"observed_at": observed_at, **examples})
-    write_json(GENERATED / "lps_doc_checksums.json", {"observed_at": observed_at, **doc_checks})
-    write_json(GENERATED / "lps_doc_open_questions_map.json", {"observed_at": observed_at, **crosswalk})
+    write_stable_json(GENERATED / "lps_doc_examples_validation.json", {"observed_at": observed_at, **examples})
+    write_stable_json(GENERATED / "lps_doc_checksums.json", {"observed_at": observed_at, **doc_checks})
+    write_stable_json(GENERATED / "lps_doc_open_questions_map.json", {"observed_at": observed_at, **crosswalk})
 
     evaluators = {
         "LPS-000": lambda: gate_lps_000(),
@@ -842,10 +889,10 @@ def main() -> int:
         status, gate_result, summary, artifact_paths, checksums = fn()
         gate_text = gates.get(task_id, "")
         proof = build_proof(task_id, gate_text, observed_at, status, gate_result, summary, artifact_paths, checksums)
-        write_json(PROOF_RECORDS / f"{task_id}.proof.json", proof)
+        write_monotonic_proof(PROOF_RECORDS / f"{task_id}.proof.json", proof)
         verdicts[task_id] = {"status": status, "verification_gate": gate_text, "gate_result": gate_result}
 
-    write_json(GENERATED / "lps_doc_gate_verdicts.json", {"observed_at": observed_at, "verdicts": verdicts})
+    write_stable_json(GENERATED / "lps_doc_gate_verdicts.json", {"observed_at": observed_at, "verdicts": verdicts})
 
     passed = [t for t, v in verdicts.items() if v["status"] == "pass"]
     blocked = [t for t, v in verdicts.items() if v["status"] != "pass"]

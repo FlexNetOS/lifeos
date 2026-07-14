@@ -1,0 +1,295 @@
+{
+  "$id": "https://lifeos.local/schemas/execution-packet.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "approval": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_id": {
+          "pattern": "^APPROVAL-TASK-CDB[0-9]{3}$",
+          "type": "string"
+        },
+        "decision": {
+          "type": "null"
+        },
+        "intent_lock_digest": {
+          "pattern": "^blake3:[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "required": {
+          "const": true
+        },
+        "status": {
+          "const": "pending"
+        }
+      },
+      "required": [
+        "required",
+        "approval_id",
+        "status",
+        "decision",
+        "intent_lock_digest"
+      ],
+      "type": "object"
+    },
+    "blocked_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "blocks": {
+      "items": {
+        "pattern": "^TASK-CDB[0-9]{3}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "checkpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_ref": {
+          "pattern": "^recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB[0-9]{3}$",
+          "type": "string"
+        },
+        "required_before_execution": {
+          "const": true
+        },
+        "status": {
+          "const": "required"
+        }
+      },
+      "required": [
+        "required_before_execution",
+        "catalog_ref",
+        "status"
+      ],
+      "type": "object"
+    },
+    "companion_gate_ref": {
+      "pattern": "^normalized/companion_gates.json#GATE-CDB[0-9]{3}$",
+      "type": "string"
+    },
+    "depends_on": {
+      "items": {
+        "pattern": "^TASK-CDB[0-9]{3}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "execution": {
+      "additionalProperties": false,
+      "properties": {
+        "allows_dependency_changes": {
+          "const": false
+        },
+        "allows_dependency_install": {
+          "const": false
+        },
+        "allows_network": {
+          "const": false
+        },
+        "command_template": {
+          "type": "null"
+        },
+        "completion_gate": {
+          "type": "string"
+        },
+        "deterministic": {
+          "const": true
+        },
+        "verification_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "command_template",
+        "verification_command",
+        "completion_gate",
+        "deterministic",
+        "allows_network",
+        "allows_dependency_install",
+        "allows_dependency_changes"
+      ],
+      "type": "object"
+    },
+    "filesystem_scope": {
+      "const": "src/nu_plugin/**"
+    },
+    "input_files": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "intent_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "const": "BLAKE3-256"
+        },
+        "digest": {
+          "pattern": "^blake3:[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "lease": {
+      "additionalProperties": false,
+      "properties": {
+        "protocol": {
+          "const": "atomic-exclusive-create"
+        },
+        "required": {
+          "const": true
+        },
+        "scope_id": {
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "state": {
+          "const": "available"
+        }
+      },
+      "required": [
+        "required",
+        "scope_id",
+        "protocol",
+        "state"
+      ],
+      "type": "object"
+    },
+    "packet_id": {
+      "pattern": "^PACKET-TASK-CDB[0-9]{3}$",
+      "type": "string"
+    },
+    "proof": {
+      "additionalProperties": false,
+      "properties": {
+        "append_only_ledger": {
+          "const": "ledgers/proofs.jsonl"
+        },
+        "required": {
+          "const": true
+        },
+        "status": {
+          "const": "missing"
+        },
+        "uri": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "required",
+        "uri",
+        "append_only_ledger",
+        "status"
+      ],
+      "type": "object"
+    },
+    "replay": {
+      "additionalProperties": false,
+      "properties": {
+        "apply_allowed": {
+          "const": false
+        },
+        "dry_run_only": {
+          "const": true
+        },
+        "plan_ref": {
+          "pattern": "^recovery/replay_plan.json#REPLAY-TASK-CDB[0-9]{3}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_ref",
+        "dry_run_only",
+        "apply_allowed"
+      ],
+      "type": "object"
+    },
+    "repo_path": {
+      "const": "src/nu_plugin"
+    },
+    "rollback_plan": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "lifeos.execution-packet.v1"
+    },
+    "source_commit": {
+      "const": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7"
+    },
+    "source_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "const": "review"
+    },
+    "target_files": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "task_id": {
+      "pattern": "^TASK-CDB[0-9]{3}$",
+      "type": "string"
+    },
+    "work_order_ref": {
+      "pattern": "^canonical/work_orders.json#TASK-CDB[0-9]{3}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "packet_id",
+    "task_id",
+    "work_order_ref",
+    "source_commit",
+    "source_status",
+    "status",
+    "intent_lock",
+    "repo_path",
+    "filesystem_scope",
+    "input_files",
+    "target_files",
+    "allowed_paths",
+    "blocked_paths",
+    "depends_on",
+    "blocks",
+    "companion_gate_ref",
+    "approval",
+    "lease",
+    "proof",
+    "checkpoint",
+    "replay",
+    "execution",
+    "rollback_plan"
+  ],
+  "title": "LifeOS approval-gated execution packet",
+  "type": "object"
+}

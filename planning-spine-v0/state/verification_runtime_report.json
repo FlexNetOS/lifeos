@@ -1,22 +1,29 @@
 {
-  "command": "bun scripts/verify-planning-spine.mjs",
-  "cwd": "/home/flexnetos/meta/src/lifeos",
-  "pkg_root": "/home/flexnetos/meta/src/lifeos/planning-spine-v0",
+  "command": "bun run planning-spine:verify",
+  "cwd": ".",
+  "pkg_root": "planning-spine-v0",
   "executable": "/nix/store/xklcw145lqbfc06l175q790m17yxqia1-bun-1.3.14/bin/bun",
   "runtime": {
     "name": "bun",
     "version": "1.3.14",
     "argv": [
       "/nix/store/xklcw145lqbfc06l175q790m17yxqia1-bun-1.3.14/bin/bun",
-      "/home/flexnetos/meta/src/lifeos/scripts/verify-planning-spine.mjs"
+      "scripts/verify-planning-spine.mjs"
     ]
   },
-  "lifecycle_event": null,
-  "observed_at": "2026-07-13T04:30:26.838Z",
+  "lifecycle_event": "planning-spine:verify",
+  "observed_at": "2026-07-13T18:13:41.285Z",
   "performed_checks": [
     "required_docs_exist",
+    "vision_artifact_catalog_matches_exact_bytes",
+    "vision_navigation_links_resolve",
+    "nu_plugin_task_table_handoff_is_complete_deterministic_and_review_only",
+    "agent_navigation_graph_is_current_connected_and_queryable",
+    "navigation_outputs_satisfy_declared_schemas",
+    "notebooklm_blueprint_is_hash_bound_and_cross_referenced",
     "schemas_define_required_fields",
     "task_schema_requires_execution_constraints",
+    "cell_schema_requires_pre_execution_snapshot",
     "examples_satisfy_schemas",
     "readme_preserves_scope_boundaries",
     "task_example_preserves_proof_constraints",

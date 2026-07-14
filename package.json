@@ -9,6 +9,12 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
+    "planning-spine:navigation:generate": "bun planning-spine-v0/scripts/build-navigation-index.mjs --write",
+    "planning-spine:navigation:check": "bun planning-spine-v0/scripts/build-navigation-index.mjs --check",
+    "planning-spine:navigation:query": "bun planning-spine-v0/scripts/build-navigation-index.mjs --query",
+    "planning-spine:navigation:explain": "bun planning-spine-v0/scripts/build-navigation-index.mjs --explain",
+    "planning-spine:task-tables:write": "bun planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs --write",
+    "planning-spine:task-tables:check": "bun planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs --check",
     "planning-spine:verify": "bun scripts/verify-planning-spine.mjs",
     "verify:nbverify004:claim001": "bun scripts/verify-nbverify004-claim001.mjs",
     "verify:nbverify004:claim002": "bun scripts/verify-nbverify004-claim002.mjs",
@@ -33,13 +39,15 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "tauri:icons": "bunx --no-install --bun tauri icon public/lifeos-app-icon.png && python3 scripts/canonicalize-icns.py src-tauri/icons/icon.icns",
+    "tauri:icons:check": "python3 scripts/canonicalize-icns.py --check src-tauri/icons/icon.icns",
     "design:lint": "design.md lint DESIGN.md",
     "design:diff": "node scripts/design-diff.mjs",
     "design:export:dtcg": "design.md export --format dtcg DESIGN.md > design-system-reference/exports/tokens.json",
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md > design-system-reference/exports/tailwind.theme.json",
     "design:export": "bun run design:export:dtcg && bun run design:export:tailwind",
     "test:a11y": "vitest run --config vitest.a11y.config.ts",
-    "check": "vue-tsc --noEmit && bun run test && bun run test:a11y && bun run design:lint"
+    "check": "vue-tsc --noEmit && bun run test && bun run test:a11y && bun run design:lint && bun run tauri:icons:check"
   },
   "dependencies": {
     "@lucide/vue": "^1.16.0",
@@ -49,6 +57,7 @@
   },
   "devDependencies": {
     "@google/design.md": "0.1.1",
+    "@noble/hashes": "2.2.0",
     "@ruvector/ruvllm": "2.6.0",
     "@ruvector/rvf": "0.2.3",
     "@ruvector/sona": "0.1.7",
@@ -58,6 +67,7 @@
     "@vitest/coverage-v8": "^4.1.7",
     "@vue/test-utils": "^2.4.10",
     "agentdb": "3.0.0-alpha.17",
+    "ajv": "^8.20.0",
     "axe-core": "^4.11.4",
     "esbuild": "^0.28.0",
     "happy-dom": "^20.9.0",
@@ -66,7 +76,8 @@
     "vite": "^8.0.14",
     "vitest": "^4.1.7",
     "vitest-axe": "^0.1.0",
-    "vue-tsc": "^3.3.1"
+    "vue-tsc": "^3.3.1",
+    "yaml": "^2.8.1"
   },
   "trustedDependencies": [
     "agentdb",

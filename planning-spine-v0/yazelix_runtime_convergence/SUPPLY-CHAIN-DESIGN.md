@@ -96,11 +96,13 @@ The blueprint contains a real tension; the owner resolved it. Both are cited fro
 
 ### 3.1 Empirical correction — the leading registry is PER-ARTIFACT (verify at pin time)
 
-> **Flagged to the owner (`DEC-YZXCONV-008`): the July-2026 live registry snapshot
-> contradicts the "npm is newest" mechanism for the RuVector *engine*.** The owner's
-> *intent* — **use the latest code, get the 200+ tools, avoid continuous refactoring**
-> — is preserved and is law. The *mechanism* is corrected to what the registries
-> actually show:
+> **CONFIRMED by the owner (`DEC-YZXCONV-009`, 2026-07-14): the per-artifact
+> verified-leader rule is now LAW, no longer provisional.** Owner: *"you got my intent —
+> the source with the latest code wins. The code is the source of truth."* The July-2026
+> live registry snapshot contradicts a blanket "npm is newest" for the RuVector *engine*;
+> the owner's *intent* — **use the latest code, get the 200+ tools, avoid continuous
+> refactoring** — is upheld, and the *mechanism* is the verified-leader-per-artifact rule
+> below (which the registries actually show):
 
 - **crates.io LEADS for the engine:** `ruvector-core` **2.3.0**, `ruvllm` **2.3.0**,
   `ruvector-postgres` **2.0.5** (pgrx).
@@ -256,6 +258,37 @@ named in the north star but not yet wired in code. These populate `YZXCONV-036`.
   `weave` are meta-internal** (the public `@getgrit/cli` GritQL is a *different* tool) —
   built from the meta tree via `buildRustPackage`, never a public fetch.
 
+### 8e. `git` source axis — FlexNetOS-org engine crates (leader = branch HEAD, not a public registry)
+
+The blueprint's algorithm/engine layer is being built **right now inside FlexNetOS-org
+repos** (see §11), so for these artifacts the **verified leading registry is the
+FlexNetOS git branch HEAD** — the public crates.io/npm coordinates lag or don't exist.
+The verified-leader law (`DEC-YZXCONV-009`) handles this cleanly: `source_registry=git`,
+`source_locator=github/FlexNetOS/<repo>@<branch>`, pin = the resolved commit. **These
+rows are `pin-at-036` (verify the branch HEAD live before freezing).**
+
+| pkg_id | name | kind | source (leader) | role / blueprint anchor |
+|---|---|---|---|---|
+| `SC-rvagent-engine` | rvAgent/rvagent-engine | rust-crate | git FlexNetOS/meta-ruvector@feat/teas-rvagent-engine | TEAS execution engine + **witnessed proof ledger** ("no-proof-no-done"); consumes `handoff.task.v1` (blueprint 17-21, 331-346). |
+| `SC-rvagent-mcp` | rvagent-mcp | mcp-server | git FlexNetOS/meta-ruvector | engine ops as MCP tools (`teas_run`, `teas_verify_ledger`, `teas_list`); `verify_witness_chain`. |
+| `SC-ruvector-mincut` | ruvector-mincut | rust-crate | git FlexNetOS/meta-ruvector | **RuVector MinCut immune system** — fully-dynamic subpolynomial min-cut (arXiv:2512.13105), blueprint 206-215, 500-502; severs hallucinating agents. |
+| `SC-ruvector-cognitive-container` | ruvector-cognitive-container | rust-crate | git FlexNetOS/meta-ruvector | `.rvf` cognitive container (AgentDB tier, blueprint 127-135, 428-435). |
+| `SC-teas-frontdoor` | prompt_hub teas_frontdoor | rust-crate | git FlexNetOS/prompt_hub@feat/teas-frontdoor-emitter | **Intent front door (seam S1)** — human Intent+ExecutionPlan into `handoff.task.v1` WorkOrders; `IntentLock` BLAKE3 contract hashes (blueprint 5-9, 316-325). |
+| `SC-teri-compute-world` | teri ComputeWorld | rust-crate | git FlexNetOS/teri@feat/teri-compute-world | **ATAS predict-before-execute twin** — deduces a command's effect before it runs (fs/exit/risk + provenance), sim-to-real calibration (blueprint 163-188, 292-310, 494-498). Replaces sandbox/VM/docker. |
+
+**Blueprint-named engine pieces still to pin (source TBD at 036 — verify leader live):**
+`SC-ruvllm`-on-**Candle** (frozen Llama/Qwen base + **MicroLoRA rank-1/2** hot-swap sub-ms,
+blueprint 281-288); `SC-ruvltra` (**RuvLTRA** proportional-routing engine with a trained
+classifier head, 81-85, 192-197); `SC-ruflo` (**Ruflo** meta-harness / swarm coordinator,
+127-129, 190-200); `SC-atas-esn` (**ATAS** Echo-State-Network / Reservoir-Computing
+simulator, 163-188, 465-498 — teri ComputeWorld is the current analog); `SC-ruv-fann`,
+`SC-conformal-prediction` (teri predictor **graduation path**, `compute_predictor.rs`);
+`SC-sha3-shake256` (**SHAKE256 witness chains**, 63-66, 616 — mrv currently uses BLAKE3;
+SHAKE256 is the blueprint target); `SC-gnn-cypher` (**Causal Graph Verification** via
+GNN + Cypher, 202-204, 342, 617); `SC-base-llm` (frozen Llama/Qwen **model asset**, like
+`SC-embed-minilm`). Every one is `classification=required` (NO-OPTIONAL) — documented now,
+**registry+pin resolved and frozen at 036 before any run consumes it**.
+
 ---
 
 ## 9. Open lane rulings (for the owner)
@@ -263,5 +296,98 @@ named in the north star but not yet wired in code. These populate `YZXCONV-036`.
 1. **`ruvllm` lane** — app-dep crate, or a profile-owned serving daemon (`service`/`path`)?
    Blueprint (274–282) argues a daemon holding a frozen model in shared memory →
    leans `service`. Tracked as **`YZXCONV-037`**.
-2. **Registry mechanism (§3.1)** — confirm the per-artifact "verified leader" law over
-   the blanket "npm latest wins," given crates.io currently leads the RuVector engine.
+2. **Registry mechanism (§3.1)** — ✅ **CONFIRMED by the owner (`DEC-YZXCONV-009`).** The
+   per-artifact "verified leader" law is ratified over the blanket "npm latest wins"; the
+   catalog target is set and **frozen before the tasks run** (`YZXCONV-036` re-scoped to a
+   freeze gate; `YZXCONV-035` now depends on it). Owner: *"the source with the latest code
+   wins. The code is the source of truth."*
+3. **Engine-piece lanes (§8e)** — RuvLTRA, Ruflo, ATAS/ESN, MinCut, SHAKE256-witness, and
+   GNN/Cypher causal-verify are blueprint-mandated but not yet lane-classified. Most are
+   in-DB or in-engine (`app-dep`/`service` inside RuVector or ruvllm), but the swarm
+   coordinator (Ruflo) and router (RuvLTRA) may warrant their own `path`/`service` shape.
+   Bundle under `YZXCONV-037` (the edge/engine lane ruling) or split as needed.
+
+---
+
+## 10. Blueprint coverage & gap map (deep re-scan 2026-07-14)
+
+A section-by-section re-read of the north star (all 707 lines) surfaced the full component
+set. **Realized** = evidenced integrated in the FlexNetOS-org worktrees (§11); **planned** =
+carried as a catalog row / task; **gap** = mandated, no integration yet.
+
+| Blueprint mandate (lines) | State | Where |
+|---|---|---|
+| `handoff.task.v1` WorkOrder spine (5-9, 316-325) | **realized** | prompt_hub S1 → rvagent-engine S2/S3 (§11); `e2e_teri_compute_world.rs` dogfood |
+| Witnessed proof ledger / no-proof-no-done (17-21, 331-346) | **realized (BLAKE3)** | rvagent-engine `ledger.rs`/`proof.rs` — **SHAKE256** target still a gap |
+| ATAS predict-before-execute / COW (163-188, 494-498) | **realized (analog)** | teri ComputeWorld; **literal ESN/Reservoir + RuvLTRA router = gap** |
+| RuVector MinCut immune system (206-215, 500-502) | **planned** | `ruvector-mincut` crate present, not wired as a live swarm gate |
+| PostgreSQL + RuVector **No-Sidecar** store (76-79, 241-252, 424) | **GAP** | worktrees moved durable state to SQLite; Postgres/RuVector-ext not wired → `YZXCONV-035` |
+| redb µs buffer / WAL / BLAKE3 dedup (44-48, 141, 406-411) | **GAP** (as live buffer) | present as a dep; not wired as the ingestion buffer in these branches |
+| Nushell → `nu_plugin_ruvector` → redb (MessagePack) (143-149, 320-325) | **GAP** | ingestion Pillar-2 not present in worktrees → `SC-nu-plugin-ruvector` |
+| all-MiniLM-L6-v2 via Candle/ORT (161, 575) | **GAP** | → `YZXCONV-038` (`SC-embed-minilm` + `SC-candle`) |
+| envctl projection (rows → `.rs/.toml/.nu` via `module_path`) (56-61, 154-159, 625-630) | **GAP** | not in these branches |
+| Nix + musl `x86_64-unknown-linux-musl` / AppImage (30-42, 632-634) | **GAP** | → `YZXCONV-021` (musl portability) |
+| LifeOS UI + Bun/bunx FFI + UDS/shared-redb, **no HTTP** (91-111, 122-125, 356-358) | **GAP** | LifeOS/Bun/UDS layer not built |
+| AgentDB active-RL (Thompson/Q-Learning/PPO) + MicroLoRA hot-swap on frozen Llama/Qwen (272, 281-290) | **GAP** | `rvf/` exists; RL hot-swap loop not wired e2e |
+| RuvLTRA proportional routing (81-85, 192-197, 657-659) | **GAP** | no literal router |
+| Ruflo meta-harness (127-129, 190-200) | **GAP** | not evidenced |
+| Causal Graph Verify: GNN + Cypher (202-204, 342, 617) | **GAP** | not wired |
+
+**Read:** the **control spine** (intent → WorkOrder → witnessed execution) is realized across
+three repos; the **data tier** (Postgres+RuVector+redb) and the **runtime tier**
+(LifeOS/Bun/Yazelix/musl) are the two largest unintegrated surfaces — which is exactly what
+`YZXCONV-035/038/021` and the Wave-4 LifeOS tasks target. No blueprint component is dropped:
+each maps to a catalog row (§8/§8e) or a task.
+
+---
+
+## 11. Integration evidence — the TEAS spine (3 FlexNetOS worktrees at `meta/worktrees`)
+
+The owner's "some parts are already integrated with evidence in the 3 folders at
+`/home/flexnetos/meta/worktrees`" resolves to a coordinated cross-repo build of **TEAS**,
+wired by seams **S1-S6** over the shared `handoff.task.v1` contract:
+
+1. **`ph--teas-frontdoor`** — `FlexNetOS/prompt_hub@feat/teas-frontdoor-emitter`. Intent
+   front door (**S1**): `teas_frontdoor.rs` maps Intent+ExecutionPlan → `handoff.task.v1`
+   WorkOrders; `SCHEMA_TAG="handoff.task.v1"`, `#![forbid(unsafe_code)]`, `IntentLock`
+   BLAKE3 hashes. Proof: commit `f26986d4`, `VERIFICATION_REPORT.md` (77/77).
+2. **`mrv--teas-engine`** — `FlexNetOS/meta-ruvector@feat/teas-rvagent-engine`. Execution
+   engine + proof ledger (**S2/S3/S6**): `rvAgent/rvagent-engine` (`ledger.rs`, `proof.rs`,
+   `workorder.rs`, `adapter.rs`), MCP tools in `rvagent-mcp/src/teas.rs`, and the
+   blueprint-named crates on disk (`ruvector-core`, `ruvector-mincut`+`witness/`, `ruvllm`,
+   `rvf`, `ruvector-cognitive-container`). This **is** the meta-ruvector engine home. Proof:
+   commits `dcfa94855`, `446cae29e`, `dab9730a7`, `7448d506e`; `tests/e2e_teri_compute_world.rs`.
+3. **`teri--compute-world`** — `FlexNetOS/teri@feat/teri-compute-world`. Execution-effect
+   twin (**S6-side**): `sim/compute_world.rs` deduces a command's effect before it runs
+   (fs/exit/risk + provenance + confidence), `compute_predictor.rs` graduates to
+   `ruv-fann`/`conformal-prediction`/`sona`/`ruvllm`, with a falsification benchmark. Proof:
+   commits `196d31c`→`6e5891b`.
+
+**Consequence for the catalog:** these are the **`git` source-axis (§8e)** rows — their
+leading registry is the branch HEAD, and `YZXCONV-036` pins them to the resolved commit, not
+a public registry. The realized spine also tells `YZXCONV-035` where the real work is: the
+engine exists; wiring it onto **profile-owned Postgres+RuVector** (off today's SQLite) is the gap.
+
+---
+
+## 12. Realized tier vs. store — why `meta/var`/`meta/usr` are heavy (forensics 2026-07-14)
+
+The packaging plan's "software in the profile, **data dir outside the store**" split is
+validated by the live `$META_ROOT` footprint:
+
+- **`meta/var` = 15G live data tier** (keep OUTSIDE `/nix/store`): two PostgreSQL clusters
+  (`var/lib/postgresql/17` 2.0G + `var/lib/ruvector/pgdata` 47M), ~275M of **redb**
+  code-intel DBs (`codedb-online-node-*.redb`, `kb.redb`), a SQLite `agentdb/reasoningbank.db`,
+  plus build/e2e trees. This is exactly the mutable state the `service`-lane data dirs hold —
+  it must never enter the store or a commit.
+- **`meta/usr` = 190M meta FHS binaries** (`usr/bin` meta/envctl tools, `usr/libexec/envctl`
+  41M) with **real toolchains delegated to the profile-owned nix store** via tiny shims
+  (`nix`, `wild`, `llvm-*` are 67-194B wrappers) — confirming the "no system/user-global
+  installs; toolchains are profile-owned" doctrine already holds for the binary layer.
+- **`/home/flexnetos/workspace` = the pre-refactor design source** (the FlexNetOS v0.1
+  execution pack: *"envctl is env truth: files → Nushell tables → validated envctl tables →
+  generated files; meta is the coordination graph"*), refactored into the live `$META_ROOT`.
+- **`_quarantine/20260630T234500Z/README.md` = refactor-integrity evidence**: a prior pass
+  that faked completion against pack-local files was quarantined; recovery now requires **real**
+  state (real repo/tool/table/generated artifact), which is why this catalog pins **verified**
+  registries, not asserted ones — the same no-fabricate discipline.

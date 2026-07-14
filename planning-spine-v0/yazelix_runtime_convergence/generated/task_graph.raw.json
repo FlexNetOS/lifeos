@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-14T18:00:10Z",
+  "generated_at": "2026-07-14T19:14:40Z",
   "source": {
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
@@ -779,7 +779,7 @@
       "source_row_number": 36,
       "columns": {
         "task_id": "YZXCONV-035",
-        "parent_id": "YZXCONV-033; YZXCONV-034",
+        "parent_id": "YZXCONV-033; YZXCONV-034; YZXCONV-036",
         "phase": "3-runtime",
         "title": "Package PostgreSQL and the RuVector extension INTO the yazelix nix-profile (service lane)",
         "owner_agent": "Yazelix Packaging Agent / Database Runtime Agent",
@@ -803,20 +803,20 @@
         "task_id": "YZXCONV-036",
         "parent_id": "YZXCONV-034",
         "phase": "3-runtime",
-        "title": "Seed the full database, store, edge-inference, and ingestion inventory into the supply-chain catalog",
+        "title": "Seed and freeze the full store inventory as the catalog-before-run target gate (per-artifact verified leading registry)",
         "owner_agent": "Supply-Chain Catalog Agent",
-        "goal": "Populate supply_chain.catalog.csv with the complete verified store inventory (SUPPLY-CHAIN-DESIGN.md section 8), closing the gap that PostgreSQL was the only database modeled. Add every required row across three lanes. service: SC-postgres (the consolidation target and permanent source of truth), SC-ruvector-postgres (the pgrx extension carrying the 200-plus SQL agent tools, loaded into postgres), SC-libsql-remote (secrets store, remote-only no-C), and SC-ruvllm pending its lane ruling. app-dep: SC-redb with the DUAL-MODE note (pass-through in the happy path and a durable retaining WAL when postgres is down, plus dedup and geometry-engine roles), SC-ruvector-core, SC-ruvector-sona, SC-ruvector-npm as the ONLY npm-latest-governed binding, SC-rvf for AgentDB and the rvf format, SC-hnsw-rs, SC-sqlx-sqlite, SC-candle-or-ort, and SC-fastembed. path: SC-nu-plugin-ruvector, SC-beads, SC-weave (dual sqlite and libsql), and SC-embed-minilm as a model asset. Record the verified leading registry per artifact at pin time (crates.io leads the ruvector engine; npm carries only the front-end binding; the at-ruvnet-slash-ruvector handle is dead), keep classification required for every row, and add audit rows for kache (compiler cache, not a data store) and the codex-harness rusqlite-bundled C-SQLite caveat so the no-C boundary stays auditable.",
-        "inputs": "SUPPLY-CHAIN-DESIGN.md section 8 inventory; DEC-YZXCONV-007 and DEC-YZXCONV-008; the 2026-07-14 deep-research reports (codebase store scan, blueprint cross-ref, live registry verification); Architecture Blueprint lines 44-48 and 245-252 and 361-439",
-        "target_artifacts": "populated supply_chain.catalog.csv covering all lanes; generated/supply_chain.catalog.json; the task-to-package reverse index",
+        "goal": "Populate AND FREEZE supply_chain.catalog.csv with the complete verified store inventory (SUPPLY-CHAIN-DESIGN.md section 8) as the CATALOG-BEFORE-RUN target gate: per owner ratification DEC-YZXCONV-009 the supply-chain target for every artifact is set in the catalog BEFORE any downstream supply-chain task (035, 037, 038) executes, because the source with the latest code wins and the code is the source of truth. Add every required row across three lanes. service: SC-postgres (the consolidation target and permanent source of truth), SC-ruvector-postgres (the pgrx extension carrying the 200-plus SQL agent tools, loaded into postgres), SC-libsql-remote (secrets store, remote-only no-C), and SC-ruvllm pending its lane ruling. app-dep: SC-redb with the DUAL-MODE note (pass-through in the happy path and a durable retaining WAL when postgres is down, plus dedup and geometry-engine roles), SC-ruvector-core, SC-ruvector-sona, SC-ruvector-npm as the ONLY npm-latest-governed binding, SC-rvf for AgentDB and the rvf format, SC-hnsw-rs, SC-sqlx-sqlite, SC-candle-or-ort, and SC-fastembed. path: SC-nu-plugin-ruvector, SC-beads, SC-weave (dual sqlite and libsql), and SC-embed-minilm as a model asset. For EVERY row record the VERIFIED LEADING REGISTRY resolved live at pin time (crates.io leads the ruvector engine; npm carries only the front-end binding; the at-ruvnet-slash-ruvector handle is dead) into source_registry plus source_locator plus pinned_version, keep classification required for every row, and add audit rows for kache (compiler cache, not a data store) and the codex-harness rusqlite-bundled C-SQLite caveat so the no-C boundary stays auditable. Downstream tasks CONSUME this frozen target and never re-derive it; a task that installs, packages, or links an artifact whose catalog target is unset or unverified is a NO-OPTIONAL black-hole violation and fails closed.",
+        "inputs": "SUPPLY-CHAIN-DESIGN.md section 8 inventory; DEC-YZXCONV-007 and DEC-YZXCONV-008 and DEC-YZXCONV-009 (owner catalog-before-run ratification); the 2026-07-14 deep-research reports (codebase store scan, blueprint cross-ref, live registry verification); Architecture Blueprint lines 44-48 and 245-252 and 361-439",
+        "target_artifacts": "populated and frozen supply_chain.catalog.csv covering all lanes with a per-artifact pinned_version; a catalog freeze marker (pinned_at plus per-row verified registry); generated/supply_chain.catalog.json; the task-to-package reverse index",
         "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
         "blocked_paths": "promoting the codex-harness bundled C-SQLite into the profile; forcing an item into the wrong lane; applying the npm-latest rule to independent crates such as redb candle sqlx or libsql; system or global installs; agent auth or state mutation",
         "simulation_required": "TRUE",
         "execution_cell": "supply-chain-inventory-cell",
-        "verification_gate": "supply_chain.catalog.csv contains every SUPPLY-CHAIN-DESIGN section 8 row with a valid lane and source_registry and install_method; redb carries the dual-mode WAL note; ruvector-postgres is the service-lane 200-plus-SQL-tool extension; SC-ruvector-npm is the only row on the npm-latest rule and uses a live handle and never at-ruvnet-slash-ruvector; no row is optional or deferred; the kache and rusqlite-bundled audit rows are present and flagged; generated/supply_chain.catalog.json regenerates deterministically and the reverse index builds.",
+        "verification_gate": "supply_chain.catalog.csv contains every SUPPLY-CHAIN-DESIGN section 8 row with a valid lane and source_registry and install_method; EVERY row carries a source_locator and a pinned_version verified live at pin time (per-artifact leading registry, never a blanket npm rule); the catalog is frozen before any downstream supply-chain task runs so 035 and 037 and 038 consume the pinned target and never re-derive it; redb carries the dual-mode WAL note; ruvector-postgres is the service-lane 200-plus-SQL-tool extension; SC-ruvector-npm is the only row on the npm-latest rule and uses a live handle and never at-ruvnet-slash-ruvector; no row is optional or deferred; the kache and rusqlite-bundled audit rows are present and flagged; generated/supply_chain.catalog.json regenerates deterministically and the reverse index builds.",
         "rollback_plan": "Remove the added catalog rows and regenerate; the task graph is untouched by construction (one-way foreign key).",
         "status": "Ready",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-036.proof.json",
-        "next_action": "Write the section-8 rows into supply_chain.catalog.csv with per-artifact verified registries and the dual-mode redb note, then regenerate the catalog JSON and reverse index."
+        "next_action": "Write the section-8 rows into supply_chain.catalog.csv with per-artifact verified registries and pinned versions and the dual-mode redb note, freeze the target, then regenerate the catalog JSON and reverse index so 035 037 and 038 consume the frozen pins."
       }
     },
     {
@@ -849,7 +849,7 @@
         "phase": "3-runtime",
         "title": "Provision the local embedding model asset and inference framework as a reproducible runtime artifact",
         "owner_agent": "Database Runtime Agent",
-        "goal": "Provision the local embedding stack the envctl bridge needs so the ingestion embedding step is provisioned rather than assumed (blueprint line 161 states the database does not generate embeddings; a separate local model does). Package the all-MiniLM-L6-v2 model weights as a reproducible content-addressed runtime asset and pin the inference framework (Candle or ORT per blueprint line 575) as a normal crates.io app-dep, not under the ruvector npm-latest rule. The asset is fetched reproducibly and kept outside the nix store data path; no global install. This is optional-as-in-install, not deferrable (NO-OPTIONAL law). TDD.",
+        "goal": "Provision the local embedding stack the envctl bridge needs so the ingestion embedding step is provisioned rather than assumed (blueprint line 161 states the database does not generate embeddings; a separate local model does). Package the all-MiniLM-L6-v2 model weights as a reproducible content-addressed runtime asset and pin the inference framework (Candle or ORT per blueprint line 575) as a normal crates.io app-dep, not under the ruvector npm-latest rule. The asset is fetched reproducibly and kept outside the nix store data path; no global install. It is install-now, never deferrable (NO-OPTIONAL law). TDD.",
         "inputs": "Architecture Blueprint lines 161 and 386 and 409 and 575; SUPPLY-CHAIN-DESIGN.md section 8b rows SC-candle and SC-embed-minilm; DEC-YZXCONV-008; the envctl bridge embedding path",
         "target_artifacts": "a reproducible all-MiniLM-L6-v2 asset fetch with a pinned digest; the Candle or ORT framework crate pin; catalog rows SC-embed-minilm and SC-candle finalized",
         "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**; /home/flexnetos/meta/src/yazelix/packaging/**",

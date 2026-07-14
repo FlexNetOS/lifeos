@@ -3,7 +3,9 @@ id: lifeos.planning-spine.task-tables.nu-plugin-handoff
 title: nu_plugin Execution Task Tables
 description: Lossless, review-only LifeOS handoff of every CSV record in the nu_plugin execution package, with WorkOrders, packets, dispatch/approval/lease control, append-only ledgers, recovery plans, receipts, and BLAKE3 IntentLocks.
 type: task-table-execution-handoff
-schema: handoff.task.v1
+schema: lifeos.task-table-handoff.v1
+item_schema: handoff.task.v1
+collection_schema: handoff.task.v1.collection
 status: active-review
 lifecycle: maintained
 created: 2026-07-13
@@ -13,7 +15,11 @@ source_commit: c84740532ded2a27ee283ea7a3a5f303eaeb61a7
 source_files: 8
 source_records: 428
 work_orders: 106
-mandatory_capabilities: 26
+mandatory_capabilities: 28
+mandatory_language_sources: 87
+mandatory_language_occurrences: 295
+unclassified_normative_occurrences: 0
+reference_superset: planning-spine-v0/envctl-db-nu-plugin-migration-automation-package
 local_status: review
 aliases:
   - CodeDB task-table handoff
@@ -36,6 +42,7 @@ related:
   - "[[planning-spine-v0/08_EXECUTION_GATES]]"
   - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
   - "[[planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation]]"
+  - "[[planning-spine-v0/task_tables/workflow/mandatory_language_inventory]]"
 ---
 
 # nu_plugin Execution Task Tables
@@ -46,6 +53,12 @@ This directory is the explicit task-table landing zone for the eight CSVs in
 accounts for every record, and translates only the 106 graph rows into
 `handoff.task.v1` WorkOrders. The import is a deterministic planning handoff;
 it does not execute commands, mutate `src/nu_plugin`, or manufacture proof.
+
+`handoff.task.v1` is exactly one review-only WorkOrder envelope.
+`handoff.task.v1.collection` is only the deterministic wrapper around the 106
+review envelopes in this import. Neither schema is the workflow superset.
+The full moved package is the reference superset; this directory is its LifeOS
+control-plane companion for the separate `nu-plugin-cdb-handoff` namespace.
 
 > [!IMPORTANT]
 > Upstream `complete` is not LifeOS completion. Each upstream value is retained
@@ -72,7 +85,8 @@ it does not execute commands, mutate `src/nu_plugin`, or manufacture proof.
 | Inspect atomic lease slots | [Lease registry](./control/lease_registry.json) | 106 available slots |
 | Verify append-only history | [Ledger manifest](./ledgers/ledger_manifest.json) | hash-chained events; zero task proofs |
 | Inspect recovery prerequisites | [Checkpoints](./recovery/checkpoint_catalog.json), [replay](./recovery/replay_plan.json), [rollback](./recovery/rollback_plan.json) | 106 guarded plans each |
-| Review mandatory migration coverage | [Capability catalog](./workflow/mandatory_capabilities.json), [CSV projection](./workflow/mandatory_capabilities.csv) | exactly 26 mandatory, review-only capabilities |
+| Review mandatory migration coverage | [Capability catalog](./workflow/mandatory_capabilities.json), [CSV projection](./workflow/mandatory_capabilities.csv) | exactly 28 mandatory, review-only capabilities |
+| Reverse-audit normative language | [Language inventory](./workflow/mandatory_language_inventory.json), [CSV projection](./workflow/mandatory_language_inventory.csv) | every `optional`/`should`/`may`/`must` occurrence classified; zero unclassified |
 | Render execution state | [Mermaid](./visuals/task_graph.mmd), [DOT](./visuals/task_graph.dot), [TUI](./visuals/dashboard.txt), [event stream](./visuals/event_stream.ndjson), [HTML](./visuals/task_graph.html), [wiki](./visuals/task_graph.wiki.md) | deterministic canonical projections |
 | Audit reference-package bytes and claims | [Reference package audit](./workflow/reference_package_audit.json) | exact manifest plus fail-closed semantic isolation |
 | Verify artifact digests | [Artifact manifest](./receipts/artifact_manifest.json) | includes the external reconciliation projection |
@@ -140,18 +154,21 @@ envctl execution-framework design:
 - an actual BLAKE3-256 IntentLock binds canonical sorted-key JSON for the task
   intent and policy. The validator recomputes all 106 locks.
 
-The schema is [handoff.task.v1.schema.json](./handoff.task.v1.schema.json).
+The item schema is [handoff.task.v1.schema.json](./handoff.task.v1.schema.json):
+one file-constrained, review-only WorkOrder envelope. The
+`handoff.task.v1.collection` record carries 106 envelopes but grants no
+collection-level execution or completion authority.
 Historical command text and source cwd values are preserved only in records
 with `executable: false`; executable WorkOrder path fields contain no historical
 absolute cwd.
 
-## Mandatory execution-framework superset
+## Mandatory LifeOS control-plane companion
 
-The moved
+The full moved
 [[planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/README]]
-is a workflow/design reference, not completion authority. Its formerly
-"optional" execution surfaces are mandatory here and are implemented as a
-safe, review-only superset:
+is the reference superset and remains workflow/design input, not completion
+authority. The following formerly "optional" execution surfaces are mandatory
+in this safe, review-only LifeOS control-plane companion:
 
 1. `canonical/task_graph.normalized.json` preserves the dependency and block
    graph independently from the canonical WorkOrder collection.
@@ -180,19 +197,25 @@ safe, review-only superset:
    table. Every view derives from canonical task, dispatch, approval, lease,
    event, and recovery records; no view has independent status authority.
 10. `workflow/mandatory_capabilities.json` preserves the audited
-    `CAP-MIG-001`–`CAP-MIG-026` requirements as a versioned companion catalog;
+    `CAP-MIG-001`–`CAP-MIG-028` requirements as a versioned companion catalog;
     its CSV sibling is a deterministic projection. Every entry is
     `requirement: mandatory`, `local_status: review`, and
     `product_complete: false`.
+11. `workflow/mandatory_language_inventory.json` reverse-scans scoped normative
+    reference-package sources plus all eight pinned task-table CSVs. Its CSV
+    sibling classifies every `optional`, `should`, `may`, and `must` occurrence
+    as mandatory capability, compatibility/state semantics, or non-normative
+    evidence; any unclassified normative occurrence fails generation.
 
 ## Mandatory capability companion catalog
 
 The [JSON catalog](./workflow/mandatory_capabilities.json) is authoritative for
-the 26 semantic capabilities extracted from the moved reference package. Each
+the 28 semantic capabilities extracted from the moved reference package and
+pinned task tables. Each
 record carries exact source path, line range, and wording; the mandatory
 requirement; its verification gate; mapped `TASK-CDBnnn` coverage; planning
 evidence; and an explicit coverage boundary. The
-[CSV projection](./workflow/mandatory_capabilities.csv) preserves the same 26
+[CSV projection](./workflow/mandatory_capabilities.csv) preserves the same 28
 IDs for fast agent scanning.
 
 Catalog coverage is not a product-completion claim. In particular,
@@ -201,7 +224,10 @@ the handoff's implemented task-lease primitive; `CAP-MIG-009` distinguishes
 the six planning visuals from runtime product wiring; `CAP-MIG-012`
 distinguishes this handoff event chain from envctl runtime tamper coverage; and
 `CAP-MIG-023` keeps checkout-bound issue/PR integration as explicit review
-work.
+work; `CAP-MIG-027` makes the issue-414 polling fallback and inotify resilience
+mandatory without promoting reference status; and `CAP-MIG-028` makes the
+`TASK-CDB095` Tier-4 boundary mandatory review scope. `CAP-MIG-009` also binds
+the unmatched `REQ-061-ARCH11` TUI requirement as mandatory provenance.
 
 The [reference namespace registry](./workflow/reference_namespaces.json) keeps
 three graphs distinct: `reference-framework` (80 tasks),

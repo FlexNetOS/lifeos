@@ -42,7 +42,7 @@ def canonicalize(data: bytes) -> bytes:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("path", type=Path, help="ICNS file produced by the Tauri CLI")
+    parser.add_argument("path", type=Path, help="ICNS file produced by cargo tauri icon")
     parser.add_argument("--check", action="store_true", help="fail unless the file is already canonical")
     args = parser.parse_args()
 

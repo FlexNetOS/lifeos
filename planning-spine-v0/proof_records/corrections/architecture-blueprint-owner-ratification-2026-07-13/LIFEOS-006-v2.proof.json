@@ -2,15 +2,15 @@
   "artifact_paths": [
     "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
     "generated/task_graph.source.csv",
-    "proof_records/invalidated-unmerged/owner-ratification-2026-07-13/LIFEOS-006.proof.json",
+    "proof_records/LIFEOS-006.proof.json",
     "proof_records/corrections/architecture-blueprint-owner-ratification-2026-07-13/LIFEOS-006-v2.proof.json"
   ],
   "gate_result": {
     "blueprint_treated_as_architecture_input_only": true,
     "explicit_owner_ratification_receipt_present": false,
     "ledger_history_rewritten": false,
-    "prior_ledger_sequence": null,
-    "prior_pass_accepted_into_ledger": false,
+    "prior_ledger_sequence": 226,
+    "prior_pass_accepted_into_ledger": true,
     "prior_pass_status_invalidated": true,
     "prior_proof_verifier_acceptance_present": false,
     "prior_revision_preserved": true,
@@ -24,14 +24,20 @@
     "source_status_restored": "Draft"
   },
   "invalidates": {
-    "ledger_accepted": false,
+    "ledger_accepted": true,
     "ledger_hash_matches_observed_bytes": true,
-    "ledger_sequence": null,
+    "ledger_sequence": 226,
     "observed_proof_sha256": "ee644806c9a614ebc27ad11b83986f32e8efa3213b364363681f0e2f67c5175b",
     "original_proof_uri": "proof_records/LIFEOS-006.proof.json",
     "proof_sha256": "ee644806c9a614ebc27ad11b83986f32e8efa3213b364363681f0e2f67c5175b",
-    "proof_uri": "proof_records/invalidated-unmerged/owner-ratification-2026-07-13/LIFEOS-006.proof.json",
+    "proof_uri": "proof_records/LIFEOS-006.proof.json",
     "revision": "1"
+  },
+  "integration_reconciliation": {
+    "base_commit": "ee71a506957b92767591b19b9048840c4d530cb5",
+    "reconciled_at": "2026-07-13T05:57:37Z",
+    "reconciled_by": "Codex integration agent /root",
+    "upstream_ledger_sequence": 226
   },
   "invalidation_reason": "Revision 1 had no verifier acceptance or required simulation receipt and participated in the unsupported STORE-001 owner-ratification cascade.",
   "observed_at": "2026-07-13T05:35:07Z",

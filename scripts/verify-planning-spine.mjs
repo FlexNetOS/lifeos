@@ -60,6 +60,8 @@ const requiredDocs = [
   "task_tables/README.md",
   "task_tables/workflow/mandatory_capabilities.json",
   "task_tables/workflow/mandatory_capabilities.csv",
+  "task_tables/workflow/mandatory_language_inventory.json",
+  "task_tables/workflow/mandatory_language_inventory.csv",
   "navigation/generated/navigation_graph.json",
   "navigation/generated/navigation_index.json",
   "navigation/generated/navigation.validation_report.json",
@@ -359,7 +361,12 @@ function verifyVisionNavigationLinks() {
       const target = match[1].split("|", 1)[0].split("#", 1)[0].trim();
       if (!target) continue;
       let resolved = path.resolve(repoRoot, target);
-      if (path.extname(resolved) === "") resolved += ".md";
+      const wikiExtensions = [".md", ".json", ".csv", ".jsonl", ".yaml", ".yml"];
+      if (!wikiExtensions.includes(path.extname(resolved).toLowerCase())) {
+        const candidates = wikiExtensions
+          .map((extension) => `${resolved}${extension}`);
+        resolved = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
+      }
       assertInside(repoRoot, resolved, `Wiki link in ${relativeDoc}`);
       assert(fs.existsSync(resolved), `Broken wiki link in ${relativeDoc}: ${target}`);
     }
@@ -375,6 +382,9 @@ async function verifyTaskTableHandoff() {
   assert(result.report.counts.work_orders === 106, "nu_plugin task-table handoff must retain 106 CDB WorkOrders");
   assert(result.report.counts.task_execution_proofs === 0, "Imported CDB WorkOrders must not acquire execution proof");
   assert(result.report.counts.pending_human_approvals === 106, "Every imported CDB WorkOrder must remain human-approval gated");
+  assert(result.report.counts.mandatory_capabilities === 28, "All 28 migration capabilities must remain mandatory review scope");
+  assert(result.report.counts.mandatory_language_occurrences === 295, "Mandatory-language inventory must retain all 295 scoped occurrences");
+  assert(result.report.counts.mandatory_language_unclassified === 0, "No normative optional/should/may/must occurrence may remain unclassified");
 }
 
 function verifyAgentNavigationGraph() {
@@ -437,6 +447,13 @@ function verifySchemas() {
   for (const field of ["allowed_paths", "blocked_paths", "verification_gate", "rollback_plan", "proof_uri"]) {
     assert(taskSchema.required.includes(field), `Task schema must require ${field}`);
   }
+
+  recordCheck("cell_schema_requires_pre_execution_snapshot");
+  const cellSchema = readJson(schemaFiles.Cell);
+  assert(
+    cellSchema.properties?.snapshot_boundary?.properties?.mode?.const === "required",
+    "Cell schema must require snapshot_boundary.mode=required"
+  );
 }
 
 function verifyExamples() {

@@ -79,9 +79,14 @@ describe("nu_plugin execution task-table handoff", () => {
   it("materializes exactly 106 schema-conformant review-only WorkOrders", async () => {
     const canonical = await json("canonical/work_orders.json");
     const schema = await json("handoff.task.v1.schema.json");
+    const readme = await readFile(path.join(taskTables, "README.md"), "utf8");
 
     expect(canonical.schema).toBe("handoff.task.v1.collection");
+    expect(canonical.item_schema).toBe("handoff.task.v1");
+    expect(canonical.envelope_count).toBe(106);
+    expect(canonical.scope).toBe("collection of review-only WorkOrder envelopes; not the moved-package reference superset");
     expect(schema.$id).toContain("handoff.task.v1");
+    expect(schema.title).toBe("Single LifeOS review-only WorkOrder envelope");
     expect(canonical.work_orders).toHaveLength(106);
     expect(canonical.work_orders.map(({ work_order_id }) => work_order_id)).toEqual(
       Array.from({ length: 106 }, (_, index) => `TASK-CDB${String(index).padStart(3, "0")}`),
@@ -103,6 +108,10 @@ describe("nu_plugin execution task-table handoff", () => {
       expect(JSON.stringify(workOrder)).not.toContain("/mnt/data/");
       expect(JSON.stringify(workOrder)).not.toContain("/home/flexnetos/");
     }
+
+    expect(readme).toContain("`handoff.task.v1` is exactly one review-only WorkOrder envelope");
+    expect(readme).toContain("The full moved package is the reference superset");
+    expect(readme).not.toContain("## Mandatory execution-framework superset");
   });
 
   it("maps dependency and block IDs and joins companion gates without embedding them", async () => {
@@ -199,24 +208,25 @@ describe("nu_plugin execution task-table handoff", () => {
       rollback_coverage_errors: 0,
       receipt_completeness_errors: 0,
       mandatory_capability_catalog_errors: 0,
+      mandatory_language_inventory_errors: 0,
       reference_completion_isolation_errors: 0,
       visual_artifact_errors: 0,
     });
   });
 
-  it("catalogs all 26 migration capabilities as mandatory review work", async () => {
+  it("catalogs all 28 migration capabilities as mandatory review work", async () => {
     const catalog = await json("workflow/mandatory_capabilities.json");
     const projection = parseCsv(await readFile(path.join(taskTables, "workflow", "mandatory_capabilities.csv"), "utf8"));
     const { work_orders: workOrders } = await json("canonical/work_orders.json");
     const workOrderIds = new Set(workOrders.map(({ work_order_id: workOrderId }) => workOrderId));
-    const expectedIds = Array.from({ length: 26 }, (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`);
+    const expectedIds = Array.from({ length: 28 }, (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`);
 
     expect(catalog.schema).toBe("lifeos.migration-mandatory-capability-catalog.v1");
-    expect(catalog.catalog_version).toBe("1.0.0");
-    expect(catalog.capability_count).toBe(26);
+    expect(catalog.catalog_version).toBe("1.1.0");
+    expect(catalog.capability_count).toBe(28);
     expect(catalog.capabilities.map(({ capability_id: capabilityId }) => capabilityId)).toEqual(expectedIds);
-    expect(new Set(catalog.capabilities.map(({ capability_id: capabilityId }) => capabilityId)).size).toBe(26);
-    expect(projection.records).toHaveLength(26);
+    expect(new Set(catalog.capabilities.map(({ capability_id: capabilityId }) => capabilityId)).size).toBe(28);
+    expect(projection.records).toHaveLength(28);
     expect(projection.records.map(({ capability_id: capabilityId }) => capabilityId)).toEqual(expectedIds);
 
     for (const capability of catalog.capabilities) {
@@ -226,21 +236,43 @@ describe("nu_plugin execution task-table handoff", () => {
       expect(capability.mandatory_requirement).toBeTruthy();
       expect(capability.verification_gate).toBeTruthy();
       expect(capability.source_refs.length).toBeGreaterThan(0);
-      expect(capability.coverage_work_order_refs.length).toBeGreaterThan(0);
+      expect(capability.coverage_work_order_refs.length + capability.coverage_reference_refs.length).toBeGreaterThan(0);
       expect(capability.coverage_work_order_refs.every((workOrderId) => workOrderIds.has(workOrderId))).toBe(true);
       for (const sourceRef of capability.source_refs) {
-        const sourceLines = (await readFile(path.join(referencePackageRoot, sourceRef.path), "utf8")).split(/\r?\n/);
+        const sourceRoot = sourceRef.source_scope === "task-tables" ? taskTables : referencePackageRoot;
+        const sourceLines = (await readFile(path.join(sourceRoot, sourceRef.path), "utf8")).split(/\r?\n/);
         expect(sourceLines.slice(sourceRef.line_start - 1, sourceRef.line_end).join("\n")).toBe(sourceRef.source_wording);
       }
     }
 
     expect(catalog.capabilities.find(({ capability_id }) => capability_id === "CAP-MIG-007").coverage_boundary).toContain("operation-level lease");
-    expect(catalog.capabilities.find(({ capability_id }) => capability_id === "CAP-MIG-009").coverage_boundary).toContain("planning projections");
+    const richVisuals = catalog.capabilities.find(({ capability_id }) => capability_id === "CAP-MIG-009");
+    expect(richVisuals.coverage_boundary).toContain("planning projections");
+    expect(richVisuals.coverage_reference_refs).toContain("nu-plugin-requirement:REQ-061-ARCH11");
+    expect(richVisuals.source_refs).toContainEqual(expect.objectContaining({
+      source_scope: "task-tables",
+      path: "raw/REQUIREMENT_PROOF_LEDGER.csv",
+      line_start: 97,
+    }));
     expect(catalog.capabilities.find(({ capability_id }) => capability_id === "CAP-MIG-012").coverage_boundary).toContain("handoff event chain");
     expect(catalog.capabilities.find(({ capability_id }) => capability_id === "CAP-MIG-023").coverage_boundary).toContain("issue/PR integration");
+    expect(catalog.capabilities.find(({ capability_id }) => capability_id === "CAP-MIG-027")).toMatchObject({
+      requirement: "mandatory",
+      coverage_work_order_refs: [],
+      coverage_reference_refs: ["reference-issue-414:REQ-057_WATCH_INCREMENTAL"],
+      local_status: "review",
+      product_complete: false,
+    });
+    expect(catalog.capabilities.find(({ capability_id }) => capability_id === "CAP-MIG-028")).toMatchObject({
+      requirement: "mandatory",
+      coverage_work_order_refs: ["TASK-CDB095"],
+      coverage_reference_refs: [],
+      local_status: "review",
+      product_complete: false,
+    });
   });
 
-  it("materializes the complete execution-framework superset without dispatching review tasks", async () => {
+  it("materializes the mandatory LifeOS control-plane companion without dispatching review tasks", async () => {
     const graph = await json("canonical/task_graph.normalized.json");
     const manifest = await json("manifests/execution_manifest.json");
     const dispatch = await json("control/dispatch_plan.json");
@@ -268,6 +300,52 @@ describe("nu_plugin execution task-table handoff", () => {
       expect(packet.proof.uri).toBeNull();
       expect(packet.execution.command_template).toBeNull();
     }
+  });
+
+  it("reverse-classifies every normative optional/should/may/must occurrence without gaps", async () => {
+    const inventory = await json("workflow/mandatory_language_inventory.json");
+    const projection = parseCsv(await readFile(path.join(taskTables, "workflow", "mandatory_language_inventory.csv"), "utf8"));
+    const classifications = new Set(["mandatory_capability", "compatibility_or_state_semantics", "non_normative_evidence"]);
+
+    expect(inventory.schema).toBe("lifeos.mandatory-language-inventory.v1");
+    expect(inventory.status).toBe("passed");
+    expect(inventory.unclassified_normative_count).toBe(0);
+    expect(inventory.occurrence_count).toBeGreaterThan(150);
+    expect(projection.records).toHaveLength(inventory.occurrence_count);
+    expect(inventory.occurrences.every(({ classification }) => classifications.has(classification))).toBe(true);
+    expect(inventory.classification_counts.mandatory_capability).toBeGreaterThan(0);
+    expect(inventory.classification_counts.compatibility_or_state_semantics).toBeGreaterThan(0);
+    expect(inventory.classification_counts.non_normative_evidence).toBeGreaterThan(0);
+
+    const req057 = inventory.occurrences.filter(({ source_path: sourcePath, source_text: sourceText }) => (
+      sourcePath === "execution-framework/generated/issue-414/task_graph.csv" && /poll fallback/i.test(sourceText)
+    ));
+    expect(req057.length).toBeGreaterThan(0);
+    expect(req057.every(({ classification, capability_ids: capabilityIds }) => (
+      classification === "mandatory_capability" && capabilityIds.includes("CAP-MIG-027")
+    ))).toBe(true);
+
+    const tier4 = inventory.occurrences.filter(({ source_path: sourcePath, source_text: sourceText }) => (
+      sourcePath === "raw/POLYGLOT_TASK_GRAPH.csv" && /optional Tier 4 boundary/.test(sourceText)
+    ));
+    expect(tier4).toHaveLength(1);
+    expect(tier4[0]).toMatchObject({ classification: "mandatory_capability", capability_ids: ["CAP-MIG-028"] });
+
+    const architectureTui = inventory.occurrences.filter(({ source_path: sourcePath, source_text: sourceText, keyword }) => (
+      sourcePath === "raw/REQUIREMENT_PROOF_LEDGER.csv" && /REQ-061-ARCH11/.test(sourceText) && keyword === "optional"
+    ));
+    expect(architectureTui).toHaveLength(1);
+    expect(architectureTui[0]).toMatchObject({ classification: "mandatory_capability", capability_ids: ["CAP-MIG-009"] });
+
+    expect(inventory.occurrences.some(({ source_path: sourcePath, source_text: sourceText, classification }) => (
+      sourcePath === "raw/TASK_GRAPH.csv"
+      && /CodeDB must be optional/.test(sourceText)
+      && classification === "compatibility_or_state_semantics"
+    ))).toBe(true);
+    expect(inventory.occurrences.some(({ source_path: sourcePath, classification }) => (
+      sourcePath === "execution-framework/docs/AGENT_APPROVAL_GATE.md"
+      && classification === "non_normative_evidence"
+    ))).toBe(true);
   });
 
   it("provides append-only event/proof, checkpoint, replay, rollback, and completeness receipts", async () => {
@@ -420,7 +498,11 @@ describe("nu_plugin execution task-table handoff", () => {
     expect(readme).toContain("[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]");
     expect(readme).toContain("Upstream `complete` is not LifeOS completion");
     expect(readme).toContain("workflow/mandatory_capabilities.json");
-    expect(readme).toContain("exactly 26 mandatory, review-only capabilities");
+    expect(readme).toContain("exactly 28 mandatory, review-only capabilities");
+    expect(readme).toContain("workflow/mandatory_language_inventory.json");
+    expect(readme).toContain("mandatory_language_sources: 87");
+    expect(readme).toContain("mandatory_language_occurrences: 295");
+    expect(readme).toContain("unclassified_normative_occurrences: 0");
     expect(readme).toContain("admissible_as_lifeos_completion: false");
     expect(readme).toContain("bun planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs --check");
   });

@@ -364,7 +364,12 @@ function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = fals
     decoded = trimmed;
   }
   let absolutePath = wiki ? path.resolve(repoRoot, decoded) : path.resolve(path.dirname(sourceAbsolutePath), decoded);
-  if (wiki && !path.extname(absolutePath)) absolutePath += ".md";
+  const wikiExtensions = [".md", ".json", ".csv", ".jsonl", ".yaml", ".yml"];
+  if (wiki && !wikiExtensions.includes(path.extname(absolutePath).toLowerCase())) {
+    const candidates = wikiExtensions
+      .map((extension) => `${absolutePath}${extension}`);
+    absolutePath = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
+  }
   let relativeToRepo = path.relative(repoRoot, absolutePath);
   const outside = relativeToRepo.startsWith("..") || path.isAbsolute(relativeToRepo);
   if (!outside && fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
@@ -539,10 +544,16 @@ export function buildNavigationArtifacts(options = {}) {
   const excludedExisting = [];
   const includedFiles = [];
   const selfExcludedOutputs = new Set(Object.values(source.outputs));
+  const isRuntimeArtifact = (packagePath) => (
+    /(?:^|\/)(?:__pycache__|\.pytest_cache)(?:\/|$)/.test(packagePath)
+    || /\.(?:py[co]|pid)$/.test(packagePath)
+  );
   for (const absolutePath of allAbsoluteFiles) {
     const packagePath = slash(path.relative(pkgRoot, absolutePath));
     if (matchesAny(packagePath, source.excluded_paths)) {
-      if (!selfExcludedOutputs.has(packagePath)) excludedExisting.push(packagePath);
+      if (!selfExcludedOutputs.has(packagePath) && !isRuntimeArtifact(packagePath)) {
+        excludedExisting.push(packagePath);
+      }
     }
     else includedFiles.push({ absolutePath, packagePath });
   }
@@ -1153,7 +1164,7 @@ export function buildNavigationArtifacts(options = {}) {
     (_, index) => `TASK-CDB${String(index).padStart(3, "0")}`
   );
   const expectedCapabilityIds = Array.from(
-    { length: 26 },
+    { length: 28 },
     (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`
   );
   const importedWorkOrderRows = structuredRowsByKind.get("imported-work-order") ?? [];
@@ -1177,7 +1188,7 @@ export function buildNavigationArtifacts(options = {}) {
     && unresolvedWorkOrderReferences === 0
   );
   if (!workOrdersReviewOnly) errors.push("imported WorkOrders must be exactly TASK-CDB000..105 with review status and no promoted proof URI");
-  if (!capabilitiesReviewOnly) errors.push("mandatory migration capabilities must be exactly CAP-MIG-001..026 with review status and product_complete=false");
+  if (!capabilitiesReviewOnly) errors.push("mandatory migration capabilities must be exactly CAP-MIG-001..028 with review status and product_complete=false");
   if (!migrationNamespacesExact) errors.push("migration WorkOrder/capability namespaces must be exact, resolvable, and disjoint from canonical tasks");
   checks.push({
     name: "imported_work_orders_are_review_only",
@@ -1410,9 +1421,7 @@ export function buildNavigationArtifacts(options = {}) {
   if (historicalTaskIds.size) {
     warnings.push(`${historicalTaskIds.size} explicit historical proof subject(s) are absent from the current task graph and retained as historical-task nodes.`);
   }
-  const cacheArtifacts = excludedExisting.filter((item) => /(?:__pycache__|\.py[co]$|\.pid$|\.pytest_cache)/.test(item));
-  if (cacheArtifacts.length) warnings.push(`${cacheArtifacts.length} local cache/process artifact(s) were excluded from navigation.`);
-  warnings.push("GitNexus and GitKB are optional projections, never planning authority; verify each tool's repository and worktree identity before using its results.");
+  warnings.push("GitNexus and GitKB are supplemental projections, never planning authority; verify each tool's repository and worktree identity before using its results.");
 
   const sortedNodes = [...nodes.values()].sort((left, right) => left.id.localeCompare(right.id));
   const inventoryInputs = [...nodes.values()].filter((node) => (

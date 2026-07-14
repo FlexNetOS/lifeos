@@ -74,22 +74,34 @@ describe("envctl DB + nu_plugin package landing", () => {
     });
   });
 
-  it("routes all 26 mandatory capabilities through the landing and task-table catalog", async () => {
+  it("routes all 28 mandatory capabilities and the reverse-language audit through the landing", async () => {
     const receipt = await json("planning-spine-v0/generated/envctl_package_landing_receipt.json");
     const catalog = await json("planning-spine-v0/task_tables/workflow/mandatory_capabilities.json");
     const landing = await text("planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md");
     const planningReadme = await text("planning-spine-v0/README.md");
     const visionReadme = await text("planning-spine-v0/1.0_VISION/README.md");
-    const expectedIds = Array.from({ length: 26 }, (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`);
+    const inventory = await json("planning-spine-v0/task_tables/workflow/mandatory_language_inventory.json");
+    const expectedIds = Array.from({ length: 28 }, (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`);
 
-    expect(receipt.mandatory_capabilities.capability_count).toBe(26);
+    expect(receipt.mandatory_capabilities.capability_count).toBe(28);
     expect(receipt.mandatory_capabilities.capability_ids).toEqual(expectedIds);
     expect(receipt.mandatory_capabilities).toMatchObject({ local_status: "review", product_complete: false });
-    expect(catalog.capability_count).toBe(26);
+    expect(catalog.capability_count).toBe(28);
     expect(catalog.capabilities.map(({ capability_id: capabilityId }) => capabilityId)).toEqual(expectedIds);
     expect(catalog.capabilities.every(({ requirement, local_status: localStatus, product_complete: complete }) => (
       requirement === "mandatory" && localStatus === "review" && complete === false
     ))).toBe(true);
+    expect(inventory).toMatchObject({
+      status: "passed",
+      source_count: 87,
+      occurrence_count: 295,
+      unclassified_normative_count: 0,
+    });
+    expect(receipt.mandatory_capabilities).toMatchObject({
+      mandatory_language_source_count: inventory.source_count,
+      mandatory_language_occurrence_count: inventory.occurrence_count,
+      unclassified_normative_occurrence_count: 0,
+    });
 
     for (const capabilityId of expectedIds) {
       expect(landing).toContain(`\`${capabilityId}\``);
@@ -100,12 +112,31 @@ describe("envctl DB + nu_plugin package landing", () => {
       "./08_EXECUTION_GATES.md",
       "./task_tables/README.md",
       "./task_tables/workflow/mandatory_capabilities.json",
+      "./task_tables/workflow/mandatory_language_inventory.json",
     ]) {
       expect(landing).toContain(route);
     }
     expect(landing).toContain("[[planning-spine-v0/08_EXECUTION_GATES]]");
-    expect(landing).toContain("[[planning-spine-v0/task_tables/workflow/mandatory_capabilities]]");
+    expect(landing).toContain("[[planning-spine-v0/task_tables/workflow/mandatory_capabilities.json]]");
     expect(planningReadme).toContain("./ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md");
     expect(visionReadme).toContain("../ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md");
+  });
+
+  it("keeps configuration inventory details out of CI and agent console logs", async () => {
+    const generator = await text(
+      "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/scripts/generate_config_inventory.py",
+    );
+    const consoleBlock = generator.slice(
+      generator.indexOf('if verification["status"] == "passed":'),
+      generator.indexOf('\n\nif __name__ == "__main__":'),
+    );
+    const consoleKeys = new Set(
+      [...consoleBlock.matchAll(/^\s+"([a-z_]+)":/gm)].map((match) => match[1]),
+    );
+
+    expect(generator).not.toContain("print(json.dumps(verification");
+    expect(generator.match(/\bprint\(/g)).toEqual(["print("]);
+    expect(consoleBlock).toContain("print(json.dumps(console_result, indent=2, sort_keys=False))");
+    expect(consoleKeys).toEqual(new Set(["task_id", "status", "report"]));
   });
 });

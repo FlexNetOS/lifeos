@@ -1,7 +1,7 @@
 ---
 id: lifeos.proof-correction.architecture-blueprint-owner-ratification.2026-07-13
 title: Architecture Blueprint Owner-Ratification Proof Correction
-description: Append-only revision-2 invalidations for 68 unsupported completion claims derived from treating the raw Architecture Blueprint as owner approval.
+description: Append-only invalidations for 68 unsupported completion claims derived from treating the raw Architecture Blueprint as owner approval, reconciled after the current-main ledger prefix.
 type: proof-correction-set
 status: applied
 lifecycle: immutable-after-merge
@@ -22,8 +22,9 @@ related:
 
 # Architecture Blueprint Owner-Ratification Proof Correction
 
-This set contains 68 revision-2 `invalidated` proof records appended to the
-canonical ledger at sequences 218–285. It implements the ruling in
+This set contains 67 revision-2 records plus the collision-free
+`GRAPH-005` revision-4 record, all with status `invalidated`, appended to the
+canonical ledger at sequences 241–308. It implements the ruling in
 [Architecture Blueprint Compatibility](../../../1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md):
 the raw [Architecture Blueprint](<../../../1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md>)
 is architectural input, not an owner decision, simulation receipt, verifier
@@ -31,17 +32,23 @@ acceptance, or authorization to unlock STORE-001 and its dependents.
 
 The correction is append-only:
 
-- the first 217 ledger records remain byte-identical;
-- 52 ledger-accepted revision-1 claims are superseded, never deleted;
-- 16 revision-1 files that never entered the ledger remain byte-identical in
-  [the quarantine](../../invalidated-unmerged/owner-ratification-2026-07-13/README.md);
+- the 240-record `origin/main` ledger prefix at
+  `ee71a506957b92767591b19b9048840c4d530cb5` remains byte-identical;
+- all 68 targeted pass claims remain in ledger history and are superseded,
+  never deleted;
+- 16 revision-1 files accepted upstream at sequences 218 and 220–232, 236,
+  and 237 remain byte-identical at their ledger-bound root proof URIs; their
+  later correction entries, not file relocation, establish the effective state;
 - 67 source tasks return to `Draft`, while `GRAPH-001` returns to `Running`;
 - the 37 STORE descendants that were not part of the unsupported cascade keep
   their prior lifecycle state.
 
-`GRAPH-005-v2.proof.json` records both the SHA-256 accepted at ledger sequence
-185 and the different SHA-256 of the currently observed revision-1 file. The
-missing ledger-bound bytes were not reconstructed or fabricated.
+`GRAPH-005-v4.proof.json` invalidates the latest pass at sequence 238 because
+revision 3 reports the owner-approval gate closed while the task gate requires
+owner approval to pass. It also preserves both the SHA-256 accepted for
+revision 1 at sequence 185 and the different revision-1 SHA-256 observed by the
+original audit. The missing sequence-185 bytes were not reconstructed or
+fabricated.
 
 ## Verification
 
@@ -54,6 +61,12 @@ python3 -m py_compile \
   planning-spine-v0/scripts/update-task-graph-status.py
 ```
 
-The scoped correction merge is idempotent: after sequences 218–285 are present,
-a dry run reports 0 appends and 68 skips. The current status projection is
+The scoped correction merge is idempotent: after sequences 241–308 are present,
+a dry run reports 0 appends and 68 skips. Its dedicated machine receipt is
+[`proof_ledger.correction_merge_report.json`](../../proof_ledger.correction_merge_report.json).
+Sequences 309–315 are later valid LPS documentation/contract proofs:
+`LPS-000` revisions 5–6 followed by current passing proofs for `LPS-001`,
+`LPS-006`, `LPS-008`, `LPS-009`, and `LPS-011`. They do not alter or interleave
+the correction range.
+The current status projection is
 [`generated/task_graph.status.json`](../../../generated/task_graph.status.json).

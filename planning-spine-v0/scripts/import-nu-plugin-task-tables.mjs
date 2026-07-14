@@ -552,7 +552,8 @@ function workOrderSchema() {
   return {
     $schema: "https://json-schema.org/draft/2020-12/schema",
     $id: "https://lifeos.local/schemas/handoff.task.v1.schema.json",
-    title: "LifeOS review-only task handoff",
+    title: "Single LifeOS review-only WorkOrder envelope",
+    description: "Schema for exactly one review-only WorkOrder envelope; collections and the moved-package reference superset use separate contracts.",
     type: "object",
     additionalProperties: false,
     required: [
@@ -1000,6 +1001,7 @@ function referenceGapMatrix() {
     ["completeness", "receipts/completeness_report.json"],
     ["reference_graph_namespaces", "workflow/reference_namespaces.json"],
     ["mandatory_capabilities", "workflow/mandatory_capabilities.json + workflow/mandatory_capabilities.csv"],
+    ["mandatory_language_reverse_coverage", "workflow/mandatory_language_inventory.json + workflow/mandatory_language_inventory.csv"],
     ["mermaid_visual", "visuals/task_graph.mmd"],
     ["graphviz_dot_visual", "visuals/task_graph.dot"],
     ["tui_dashboard", "visuals/dashboard.txt"],
@@ -1037,7 +1039,10 @@ const MANDATORY_CAPABILITY_DEFINITIONS = [
   {
     id: "CAP-MIG-002",
     title: "Required runtime inputs and resolved-path receipts",
-    sources: [["prompts/MASTER_PROMPT_ENVCTL_DB_NU_PLUGIN.md", 7, 19, "Resolve all paths with `realpath`"]],
+    sources: [
+      ["prompts/MASTER_PROMPT_ENVCTL_DB_NU_PLUGIN.md", 7, 19, "Resolve all paths with `realpath`"],
+      ["RUN_WITH_CODEX_ENVCTL.sh", 16, 18, "Optional:"],
+    ],
     mandatoryRequirement: "Require the run-context, package, envctl, nu_plugin, and target inputs applicable to a run; resolve each path and persist a resolved-path receipt.",
     verificationGate: "Missing required inputs, unresolved paths, and path/receipt mismatches must fail closed before planning or execution.",
     coverage: cdbRefs(0, 36, 39),
@@ -1101,10 +1106,14 @@ const MANDATORY_CAPABILITY_DEFINITIONS = [
   {
     id: "CAP-MIG-009",
     title: "Required rich visual surfaces",
-    sources: [["prompts/LIVE_VISUALS_AND_HUMAN_CONTROL.md", 45, 51, "Mermaid graph export"]],
+    sources: [
+      ["prompts/LIVE_VISUALS_AND_HUMAN_CONTROL.md", 45, 51, "Mermaid graph export"],
+      ["raw/REQUIREMENT_PROOF_LEDGER.csv", 97, 97, "REQ-061-ARCH11", "task-tables"],
+    ],
     mandatoryRequirement: "Provide Mermaid, Graphviz DOT, TUI dashboard, live event stream, static HTML, and static wiki projections as required surfaces.",
     verificationGate: "All six projections must be deterministic, receipted, canonical-record-derived, and coverage-equivalent for task and status identity.",
     coverage: cdbRefs(1, 30, 103),
+    coverageReferences: ["nu-plugin-requirement:REQ-061-ARCH11"],
     boundary: "All six surfaces are implemented as deterministic planning projections; runtime product wiring and acceptance remain review-gated.",
     evidence: ["visuals/task_graph.mmd", "visuals/task_graph.dot", "visuals/dashboard.txt", "visuals/event_stream.ndjson", "visuals/task_graph.html", "visuals/task_graph.wiki.md"],
   },
@@ -1248,26 +1257,48 @@ const MANDATORY_CAPABILITY_DEFINITIONS = [
     verificationGate: "Navigation tests must find every artifact bidirectionally and require a deterministic update receipt whenever memory or index state changes.",
     coverage: cdbRefs(1, 4, 5, 47, 48),
   },
+  {
+    id: "CAP-MIG-027",
+    title: "Incremental watch fallback and inotify resilience",
+    sources: [["execution-framework/generated/issue-414/task_graph.csv", 9, 9, "REQ-057_WATCH_INCREMENTAL"]],
+    mandatoryRequirement: "Provide notify-based incremental invalidation with a polling fallback and explicit large-directory and inotify-limit behavior.",
+    verificationGate: "Watcher tests must prove changed-file-only invalidation, forced polling fallback, inotify-limit recovery, bounded resource use, and stable agent-visible status.",
+    coverage: [],
+    coverageReferences: ["reference-issue-414:REQ-057_WATCH_INCREMENTAL"],
+    boundary: "The source issue task is retained in its provenance namespace; this mandatory mapping does not promote its status, proof, or agent approval into LifeOS completion.",
+  },
+  {
+    id: "CAP-MIG-028",
+    title: "Tier-4 parser and indexer boundary",
+    sources: [["raw/POLYGLOT_TASK_GRAPH.csv", 6, 6, "optional Tier 4 boundary", "task-tables"]],
+    mandatoryRequirement: "Define and verify both the Tier-2 parser-backed summary and the Tier-4 parser/indexer boundary; Tier 4 is mandatory planning scope, never a deferred option.",
+    verificationGate: "TASK-CDB095 review evidence must identify Tier-2 and Tier-4 contracts, supported and rejected operations, parser/version provenance, bounded output, and deterministic verification fixtures.",
+    coverage: cdbRefs(95),
+    coverageReferences: [],
+    boundary: "TASK-CDB095 is still review-only and requires an actual human decision plus new LifeOS-local proof before execution or completion.",
+  },
 ];
 
-async function mandatoryCapabilityCatalog(referencePackageRoot, knownWorkOrderIds) {
+async function mandatoryCapabilityCatalog(referencePackageRoot, taskTableRoot, knownWorkOrderIds) {
   const sourceCache = new Map();
   const errors = [];
-  async function sourceLines(sourcePath) {
-    if (!sourceCache.has(sourcePath)) {
-      sourceCache.set(sourcePath, (await readFile(path.join(referencePackageRoot, sourcePath), "utf8")).split(/\r?\n/));
+  async function sourceLines(sourceScope, sourcePath) {
+    const cacheKey = `${sourceScope}:${sourcePath}`;
+    if (!sourceCache.has(cacheKey)) {
+      const sourceRoot = sourceScope === "task-tables" ? taskTableRoot : referencePackageRoot;
+      sourceCache.set(cacheKey, (await readFile(path.join(sourceRoot, sourcePath), "utf8")).split(/\r?\n/));
     }
-    return sourceCache.get(sourcePath);
+    return sourceCache.get(cacheKey);
   }
 
   const capabilities = [];
   for (const definition of MANDATORY_CAPABILITY_DEFINITIONS) {
     const sourceRefs = [];
-    for (const [sourcePath, lineStart, lineEnd, anchor] of definition.sources) {
-      const lines = await sourceLines(sourcePath);
+    for (const [sourcePath, lineStart, lineEnd, anchor, sourceScope = "reference-package"] of definition.sources) {
+      const lines = await sourceLines(sourceScope, sourcePath);
       const sourceWording = lines.slice(lineStart - 1, lineEnd).join("\n");
       if (!sourceWording.includes(anchor)) errors.push(`${definition.id}:source_anchor:${sourcePath}:${lineStart}-${lineEnd}`);
-      sourceRefs.push({ path: sourcePath, line_start: lineStart, line_end: lineEnd, source_wording: sourceWording });
+      sourceRefs.push({ source_scope: sourceScope, path: sourcePath, line_start: lineStart, line_end: lineEnd, source_wording: sourceWording });
     }
     const unknownCoverage = definition.coverage.filter((workOrderId) => !knownWorkOrderIds.has(workOrderId));
     if (unknownCoverage.length) errors.push(`${definition.id}:unknown_work_orders:${unknownCoverage.join("|")}`);
@@ -1279,6 +1310,7 @@ async function mandatoryCapabilityCatalog(referencePackageRoot, knownWorkOrderId
       mandatory_requirement: definition.mandatoryRequirement,
       verification_gate: definition.verificationGate,
       coverage_work_order_refs: definition.coverage,
+      coverage_reference_refs: definition.coverageReferences || [],
       coverage_boundary: definition.boundary || "Planning coverage is mapped; product implementation and verification remain review-gated.",
       planning_evidence: definition.evidence || [],
       local_status: "review",
@@ -1286,21 +1318,223 @@ async function mandatoryCapabilityCatalog(referencePackageRoot, knownWorkOrderId
     });
   }
 
-  const expectedIds = Array.from({ length: 26 }, (_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`);
+  const expectedIds = MANDATORY_CAPABILITY_DEFINITIONS.map((_, index) => `CAP-MIG-${String(index + 1).padStart(3, "0")}`);
   const actualIds = capabilities.map(({ capability_id: capabilityId }) => capabilityId);
-  if (stableJson(actualIds) !== stableJson(expectedIds)) errors.push("capability_ids_not_exact_CAP_MIG_001_026");
+  if (stableJson(actualIds) !== stableJson(expectedIds)) errors.push(`capability_ids_not_exact_CAP_MIG_001_${String(expectedIds.length).padStart(3, "0")}`);
   if (new Set(actualIds).size !== actualIds.length) errors.push("duplicate_capability_ids");
+  if (capabilities.some((capability) => capability.coverage_work_order_refs.length + capability.coverage_reference_refs.length === 0)) errors.push("capability_without_coverage_reference");
   if (capabilities.some((capability) => capability.requirement !== "mandatory")) errors.push("non_mandatory_capability");
   if (capabilities.some((capability) => capability.local_status !== "review" || capability.product_complete !== false)) errors.push("capability_completion_promotion");
 
   return {
     catalog: {
       schema: "lifeos.migration-mandatory-capability-catalog.v1",
-      catalog_version: "1.0.0",
+      catalog_version: "1.1.0",
       requirement_policy: "All catalog entries are mandatory; none may be downgraded to optional.",
       status_authority: "Companion planning coverage only. Every entry remains review until product-local verification evidence passes.",
       capability_count: capabilities.length,
       capabilities,
+    },
+    errors,
+  };
+}
+
+function isNormativeReferencePath(relativePath) {
+  return relativePath === "README.md"
+    || relativePath === "RUN_WITH_CODEX_ENVCTL.sh"
+    || /^prompts\/.+\.md$/.test(relativePath)
+    || /^specs\/.+\.md$/.test(relativePath)
+    || /^sql\/.+\.sql$/.test(relativePath)
+    || relativePath === "source/current-user-request.md"
+    || relativePath === "source/previous-migration-artifact-context.md"
+    || relativePath === "source/codex-flexnetos-migration-prompt-package/README.md"
+    || /^source\/codex-flexnetos-migration-prompt-package\/expected-output\/.+\.md$/.test(relativePath)
+    || /^source\/codex-flexnetos-migration-prompt-package\/prompts\/.+\.md$/.test(relativePath)
+    || /^execution-framework\/docs\/.+\.md$/.test(relativePath)
+    || relativePath === "execution-framework/generated/task_graph.csv"
+    || relativePath === "execution-framework/generated/issue-414/task_graph.csv";
+}
+
+async function normativeReferenceSources(referencePackageRoot) {
+  const sources = [];
+  async function visit(directory, prefix = "") {
+    const entries = await readdir(directory, { withFileTypes: true });
+    for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
+      const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const absolutePath = path.join(directory, entry.name);
+      if (entry.isDirectory()) await visit(absolutePath, relativePath);
+      else if (entry.isFile() && isNormativeReferencePath(relativePath)) {
+        sources.push({ source_scope: "reference-package", source_path: relativePath, text: await readFile(absolutePath, "utf8") });
+      }
+    }
+  }
+  await visit(referencePackageRoot);
+  return sources;
+}
+
+function supplementalCapabilityIds({ sourceScope, sourcePath, sourceText }) {
+  if (sourceScope === "reference-package" && sourcePath === "prompts/spark_helpers/spark-live-visuals.md") return ["CAP-MIG-009"];
+  if (sourceScope === "reference-package" && sourcePath === "source/codex-flexnetos-migration-prompt-package/prompts/MASTER_PROMPT.md" && /runner may provide/i.test(sourceText)) return ["CAP-MIG-002"];
+  if (sourceScope === "reference-package" && sourcePath === "source/codex-flexnetos-migration-prompt-package/prompts/ARTIFACT_CONTRACT_FULL.md") {
+    if (/version constraints|upgrade blockers/i.test(sourceText)) return ["CAP-MIG-014"];
+    if (/artifacts should ladder/i.test(sourceText)) return ["CAP-MIG-015"];
+  }
+  return [];
+}
+
+function classifyMandatoryLanguageOccurrence({ sourceScope, sourcePath, line, column, keyword, sourceText, capabilities }) {
+  const matchingCapabilities = capabilities.filter((capability) => capability.source_refs.some((sourceRef) => (
+    sourceRef.source_scope === sourceScope
+    && sourceRef.path === sourcePath
+    && line >= sourceRef.line_start
+    && line <= sourceRef.line_end
+  )));
+  const capabilityIds = [...new Set([
+    ...matchingCapabilities.map(({ capability_id: capabilityId }) => capabilityId),
+    ...supplementalCapabilityIds({ sourceScope, sourcePath, sourceText }),
+  ])].sort();
+
+  const nonNormativeEvidence = sourceScope === "reference-package" && (
+    sourcePath === "execution-framework/docs/AGENT_APPROVAL_GATE.md"
+    || sourcePath === "execution-framework/docs/NEXT_SESSION_PROMPT.md"
+    || (sourcePath === "source/current-user-request.md" && [9, 10].includes(line))
+  );
+  if (nonNormativeEvidence) {
+    return {
+      classification: "non_normative_evidence",
+      capability_ids: [],
+      work_order_refs: [],
+      reference_refs: [],
+      classification_reason: "Reference-only evidence or an open question; it cannot authorize execution or satisfy a LifeOS human gate.",
+    };
+  }
+
+  const cdb058State = sourceScope === "task-tables"
+    && ["raw/TASK_GRAPH.csv", "raw/REQUIREMENT_PROOF_LEDGER.csv"].includes(sourcePath)
+    && /CDB058/.test(sourceText);
+  const compatibilityOrState = (sourceScope === "reference-package" && sourcePath === "execution-framework/docs/SHARED_PROTOCOL_SCHEMAS.md")
+    || (sourceScope === "reference-package" && sourcePath === "prompts/ANY_TARGET_EXTENSION_SPEC.md" && /optional\/path/.test(sourceText))
+    || (sourceScope === "task-tables" && sourcePath === "raw/TASK_GRAPH.csv" && keyword === "may" && /planned implementation may declare future paths\/globs/.test(sourceText))
+    || cdb058State;
+  if (compatibilityOrState) {
+    return {
+      classification: "compatibility_or_state_semantics",
+      capability_ids: capabilityIds,
+      work_order_refs: cdb058State ? ["TASK-CDB058"] : [],
+      reference_refs: [],
+      classification_reason: cdb058State
+        ? "CodeDB implementation and disabled-mode verification are mandatory; runtime activation remains configurable."
+        : "The wording defines a nullable, permission, or backward-compatible state whose handling is mandatory rather than a deferred feature.",
+    };
+  }
+
+  const cdb034Mandatory = sourceScope === "task-tables"
+    && ["raw/TASK_GRAPH.csv", "raw/REQUIREMENT_PROOF_LEDGER.csv"].includes(sourcePath)
+    && /CDB034/.test(sourceText)
+    && keyword === "optional";
+  if (cdb034Mandatory && !capabilityIds.length) {
+    return {
+      classification: "mandatory_capability",
+      capability_ids: [],
+      work_order_refs: ["TASK-CDB034"],
+      reference_refs: [],
+      classification_reason: "The pinned source wording is preserved, while the linked LifeOS requirement explicitly interprets capture as mandatory review work.",
+    };
+  }
+
+  if (capabilityIds.length) {
+    const coveredCapabilities = capabilities.filter(({ capability_id: capabilityId }) => capabilityIds.includes(capabilityId));
+    return {
+      classification: "mandatory_capability",
+      capability_ids: capabilityIds,
+      work_order_refs: [...new Set(coveredCapabilities.flatMap(({ coverage_work_order_refs: refs }) => refs))].sort(),
+      reference_refs: [...new Set(coveredCapabilities.flatMap(({ coverage_reference_refs: refs }) => refs))].sort(),
+      classification_reason: "The occurrence is reverse-linked to an explicit mandatory, review-only capability catalog record.",
+    };
+  }
+
+  if (keyword === "must") {
+    return {
+      classification: "mandatory_capability",
+      capability_ids: [],
+      work_order_refs: [],
+      reference_refs: [],
+      classification_reason: "The source uses explicit must wording, so the clause is already mandatory and cannot be downgraded to optional.",
+    };
+  }
+
+  return {
+    classification: null,
+    capability_ids: [],
+    work_order_refs: [],
+    reference_refs: [],
+    classification_reason: `Unclassified normative ${keyword} occurrence at column ${column}.`,
+  };
+}
+
+async function mandatoryLanguageInventory({ referencePackageRoot, loaded, capabilities }) {
+  const referenceSources = await normativeReferenceSources(referencePackageRoot);
+  const taskTableSources = loaded.map((file) => ({
+    source_scope: "task-tables",
+    source_path: `raw/${file.name}`,
+    text: file.bytes.toString("utf8"),
+  }));
+  const sources = [...referenceSources, ...taskTableSources]
+    .sort((left, right) => `${left.source_scope}:${left.source_path}`.localeCompare(`${right.source_scope}:${right.source_path}`));
+  const occurrences = [];
+  for (const source of sources) {
+    const lines = source.text.split(/\r?\n/);
+    lines.forEach((sourceText, lineIndex) => {
+      for (const match of sourceText.matchAll(/\b(optional|should|may|must)\b/giu)) {
+        const keyword = match[0].toLowerCase();
+        const classification = classifyMandatoryLanguageOccurrence({
+          sourceScope: source.source_scope,
+          sourcePath: source.source_path,
+          line: lineIndex + 1,
+          column: match.index + 1,
+          keyword,
+          sourceText,
+          capabilities,
+        });
+        occurrences.push({
+          occurrence_id: `LANG-${String(occurrences.length + 1).padStart(4, "0")}`,
+          source_scope: source.source_scope,
+          source_path: source.source_path,
+          line: lineIndex + 1,
+          column: match.index + 1,
+          keyword,
+          source_text: sourceText,
+          ...classification,
+        });
+      }
+    });
+  }
+
+  const unclassified = occurrences.filter(({ classification }) => classification === null);
+  const classificationCounts = Object.fromEntries([
+    "mandatory_capability",
+    "compatibility_or_state_semantics",
+    "non_normative_evidence",
+  ].map((classification) => [classification, occurrences.filter((occurrence) => occurrence.classification === classification).length]));
+  const errors = unclassified.map((occurrence) => `${occurrence.source_scope}:${occurrence.source_path}:${occurrence.line}:${occurrence.column}:${occurrence.keyword}`);
+  return {
+    inventory: {
+      schema: "lifeos.mandatory-language-inventory.v1",
+      inventory_version: "1.0.0",
+      status: errors.length ? "failed" : "passed",
+      source_policy: {
+        reference_package: "README, launcher contract, prompts, specs, SQL seed intent, canonical source prompt package, execution-framework docs, framework graph, and issue-414 graph; generated evidence, logs, proofs, approvals, reviews, combined duplicates, and migration artifacts are excluded.",
+        task_tables: "All eight pinned raw CSV snapshots are scanned byte-for-byte.",
+        keywords: ["optional", "should", "may", "must"],
+      },
+      source_count: sources.length,
+      reference_package_source_count: referenceSources.length,
+      task_table_source_count: taskTableSources.length,
+      occurrence_count: occurrences.length,
+      classification_counts: classificationCounts,
+      unclassified_normative_count: unclassified.length,
+      errors,
+      occurrences,
     },
     errors,
   };
@@ -1480,7 +1714,7 @@ export async function auditReferencePackageManifest(packageRoot) {
   };
 }
 
-async function buildArtifacts(sourceRoot, referencePackageRoot) {
+async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
   const loaded = await readSources(sourceRoot);
   const referenceAudit = await auditReferencePackageManifest(referencePackageRoot);
   const sourceHashDrift = loaded.filter((file) => file.actualHash !== file.sha256);
@@ -1564,29 +1798,63 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
   const rowIndex = sourceRowIndex(loaded, recordIds);
 
   const knownWorkOrderIds = new Set(workOrders.map((task) => task.work_order_id));
-  const { catalog: mandatoryCapabilities, errors: mandatoryCapabilityErrors } = await mandatoryCapabilityCatalog(referencePackageRoot, knownWorkOrderIds);
+  const { catalog: mandatoryCapabilities, errors: mandatoryCapabilityErrors } = await mandatoryCapabilityCatalog(
+    referencePackageRoot,
+    taskTableRoot,
+    knownWorkOrderIds,
+  );
   const mandatoryCapabilityProjection = mandatoryCapabilities.capabilities.map((capability) => ({
     capability_id: capability.capability_id,
     title: capability.title,
     requirement: capability.requirement,
-    source_refs: capability.source_refs.map((sourceRef) => `${sourceRef.path}:L${sourceRef.line_start}-L${sourceRef.line_end}`),
+    source_refs: capability.source_refs.map((sourceRef) => `${sourceRef.source_scope}:${sourceRef.path}:L${sourceRef.line_start}-L${sourceRef.line_end}`),
     source_wording: stableJson(capability.source_refs.map(({ source_wording: sourceWording }) => sourceWording)),
     mandatory_requirement: capability.mandatory_requirement,
     verification_gate: capability.verification_gate,
     coverage_work_order_refs: capability.coverage_work_order_refs,
+    coverage_reference_refs: capability.coverage_reference_refs,
     coverage_boundary: capability.coverage_boundary,
     planning_evidence: capability.planning_evidence,
     local_status: capability.local_status,
     product_complete: capability.product_complete,
   }));
-  executionManifest.companion_catalogs = [{
-    catalog: "mandatory-migration-capabilities",
-    version: mandatoryCapabilities.catalog_version,
-    artifact_uri: "workflow/mandatory_capabilities.json",
-    projection_uri: "workflow/mandatory_capabilities.csv",
-    record_count: mandatoryCapabilities.capability_count,
-    status_authority: "review-only planning coverage",
-  }];
+  const { inventory: mandatoryLanguage, errors: mandatoryLanguageErrors } = await mandatoryLanguageInventory({
+    referencePackageRoot,
+    loaded,
+    capabilities: mandatoryCapabilities.capabilities,
+  });
+  const mandatoryLanguageProjection = mandatoryLanguage.occurrences.map((occurrence) => ({
+    occurrence_id: occurrence.occurrence_id,
+    source_scope: occurrence.source_scope,
+    source_path: occurrence.source_path,
+    line: occurrence.line,
+    column: occurrence.column,
+    keyword: occurrence.keyword,
+    classification: occurrence.classification,
+    capability_ids: occurrence.capability_ids,
+    work_order_refs: occurrence.work_order_refs,
+    reference_refs: occurrence.reference_refs,
+    classification_reason: occurrence.classification_reason,
+    source_text: occurrence.source_text,
+  }));
+  executionManifest.companion_catalogs = [
+    {
+      catalog: "mandatory-migration-capabilities",
+      version: mandatoryCapabilities.catalog_version,
+      artifact_uri: "workflow/mandatory_capabilities.json",
+      projection_uri: "workflow/mandatory_capabilities.csv",
+      record_count: mandatoryCapabilities.capability_count,
+      status_authority: "review-only planning coverage",
+    },
+    {
+      catalog: "mandatory-language-reverse-coverage",
+      version: mandatoryLanguage.inventory_version,
+      artifact_uri: "workflow/mandatory_language_inventory.json",
+      projection_uri: "workflow/mandatory_language_inventory.csv",
+      record_count: mandatoryLanguage.occurrence_count,
+      status_authority: "classification only; never execution or completion authority",
+    },
+  ];
   const referenceImportIsolation = {
     reference_work_order_import_count: workOrders.filter((task) => task.source.commit !== SOURCE_COMMIT || !/^execution\/(?:TASK|BIDIRECTIONAL_TASK|POLYGLOT_TASK)_GRAPH\.csv$/.test(task.source.path)).length,
     reference_proof_import_count: 0,
@@ -1683,6 +1951,7 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
     reference_package_manifest: referenceAudit.status === "passed",
     reference_completion_isolation: referenceCompletionIsolationErrors.length === 0,
     mandatory_capability_catalog: mandatoryCapabilityErrors.length === 0,
+    mandatory_language_inventory: mandatoryLanguageErrors.length === 0,
     artifact_receipts: true,
     mermaid_visual: !visualArtifactErrors.includes("mermaid_node_coverage"),
     graphviz_dot_visual: !visualArtifactErrors.includes("dot_node_coverage"),
@@ -1736,6 +2005,7 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
     reference_package_manifest_errors: referenceAudit.errors.length,
     reference_completion_isolation_errors: referenceCompletionIsolationErrors.length,
     mandatory_capability_catalog_errors: mandatoryCapabilityErrors.length,
+    mandatory_language_inventory_errors: mandatoryLanguageErrors.length,
     visual_artifact_errors: visualArtifactErrors.length,
   };
   const passed = Object.values(checks).every((value) => value === 0);
@@ -1780,6 +2050,8 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
       replay_plans: recovery.replayPlan.tasks.length,
       rollback_plans: recovery.rollbackPlan.tasks.length,
       mandatory_capabilities: mandatoryCapabilities.capability_count,
+      mandatory_language_occurrences: mandatoryLanguage.occurrence_count,
+      mandatory_language_unclassified: mandatoryLanguage.unclassified_normative_count,
       reference_framework_tasks: referenceAudit.namespaces.find((entry) => entry.namespace === "reference-framework").task_count,
       reference_issue_414_tasks: referenceAudit.namespaces.find((entry) => entry.namespace === "reference-issue-414").task_count,
     },
@@ -1804,6 +2076,7 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
       reference_package_manifest_errors: referenceAudit.errors,
       reference_completion_isolation_errors: referenceCompletionIsolationErrors,
       mandatory_capability_catalog_errors: mandatoryCapabilityErrors,
+      mandatory_language_inventory_errors: mandatoryLanguageErrors,
       visual_artifact_errors: visualArtifactErrors,
     },
     guarantees: [
@@ -1816,7 +2089,8 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
       "The import event ledger is append-only and hash chained; the task proof ledger is intentionally empty until LifeOS-local execution produces evidence.",
       "The 80-task reference-framework and 12-task reference-issue-414 graphs remain distinct provenance namespaces from 106 CDB WorkOrders.",
       "The moved reference package manifest must exactly cover every self-excluding package file and digest.",
-      "All 26 migration capabilities are mandatory companion requirements and remain review-gated until product-local verification passes.",
+      "All 28 migration capabilities are mandatory companion requirements and remain review-gated until product-local verification passes.",
+      "Every optional, should, may, or must occurrence in scoped normative package and task-table sources is reverse-classified with zero unclassified normative language.",
       "Reference status, proofs, agent approvals, pass_no_gaps, and local_package_complete claims are inadmissible as LifeOS completion.",
       "Mermaid, Graphviz DOT, TUI dashboard, live event stream, static HTML, and static wiki views derive only from canonical task/control records.",
     ],
@@ -1826,7 +2100,14 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
     [`${TASK_TABLE_ROOT}/source_manifest.json`, prettyJson(manifest)],
     [`${TASK_TABLE_ROOT}/handoff.task.v1.schema.json`, prettyJson(workOrderSchema())],
     [`${TASK_TABLE_ROOT}/schemas/execution-packet.v1.schema.json`, prettyJson(executionPacketSchema())],
-    [`${TASK_TABLE_ROOT}/canonical/work_orders.json`, prettyJson({ schema: "handoff.task.v1.collection", source_commit: SOURCE_COMMIT, work_orders: workOrders })],
+    [`${TASK_TABLE_ROOT}/canonical/work_orders.json`, prettyJson({
+      schema: "handoff.task.v1.collection",
+      item_schema: "handoff.task.v1",
+      envelope_count: workOrders.length,
+      scope: "collection of review-only WorkOrder envelopes; not the moved-package reference superset",
+      source_commit: SOURCE_COMMIT,
+      work_orders: workOrders,
+    })],
     [`${TASK_TABLE_ROOT}/canonical/task_graph.normalized.json`, prettyJson(taskGraph)],
     [`${TASK_TABLE_ROOT}/manifests/execution_manifest.json`, prettyJson(executionManifest)],
     [`${TASK_TABLE_ROOT}/projections/work_orders.csv`, tabulate(workOrders, ["work_order_id", "correlation_id", "title", "phase", "source_status", "status", "repo_path", "depends_on", "blocks", "companion_gate_ref", "source_context", "deterministic", "allows_network", "allows_dependency_install", "allows_dependency_changes", "proof_required", "proof_uri", "human_approval_required", "verification_command", "completion_gate", "rollback_plan", "intent_lock"])],
@@ -1850,7 +2131,9 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
     [`${TASK_TABLE_ROOT}/workflow/reference_namespaces.json`, prettyJson(referenceNamespaces)],
     [`${TASK_TABLE_ROOT}/workflow/reference_package_audit.json`, prettyJson(referenceAudit)],
     [`${TASK_TABLE_ROOT}/workflow/mandatory_capabilities.json`, prettyJson(mandatoryCapabilities)],
-    [`${TASK_TABLE_ROOT}/workflow/mandatory_capabilities.csv`, tabulate(mandatoryCapabilityProjection, ["capability_id", "title", "requirement", "source_refs", "source_wording", "mandatory_requirement", "verification_gate", "coverage_work_order_refs", "coverage_boundary", "planning_evidence", "local_status", "product_complete"])],
+    [`${TASK_TABLE_ROOT}/workflow/mandatory_capabilities.csv`, tabulate(mandatoryCapabilityProjection, ["capability_id", "title", "requirement", "source_refs", "source_wording", "mandatory_requirement", "verification_gate", "coverage_work_order_refs", "coverage_reference_refs", "coverage_boundary", "planning_evidence", "local_status", "product_complete"])],
+    [`${TASK_TABLE_ROOT}/workflow/mandatory_language_inventory.json`, prettyJson(mandatoryLanguage)],
+    [`${TASK_TABLE_ROOT}/workflow/mandatory_language_inventory.csv`, tabulate(mandatoryLanguageProjection, ["occurrence_id", "source_scope", "source_path", "line", "column", "keyword", "classification", "capability_ids", "work_order_refs", "reference_refs", "classification_reason", "source_text"])],
     [`${TASK_TABLE_ROOT}/receipts/completeness_report.json`, prettyJson(completeness)],
     [RECONCILIATION_PATH, tabulate(reconciliation, ["work_order_id", "correlation_id", "source_graph", "source_graph_row", "source_status", "local_status", "companion_gate_id", "requirement_count", "command_count", "intent_lock_blake3"])],
   ]);
@@ -1875,7 +2158,7 @@ async function buildArtifacts(sourceRoot, referencePackageRoot) {
   artifactText.set(`${TASK_TABLE_ROOT}/receipts/artifact_manifest.json`, prettyJson(artifactManifest));
   artifactText.set(`${TASK_TABLE_ROOT}/validation_report.json`, prettyJson(report));
 
-  return { loaded, artifactText, manifest, workOrders, gates, requirements, commands, rowIndex, reconciliation, taskGraph, packets, executionManifest, approvals, leases, dispatch, events, recovery, visualArtifacts, mandatoryCapabilities, completeness, referenceAudit, report };
+  return { loaded, artifactText, manifest, workOrders, gates, requirements, commands, rowIndex, reconciliation, taskGraph, packets, executionManifest, approvals, leases, dispatch, events, recovery, visualArtifacts, mandatoryCapabilities, mandatoryLanguage, completeness, referenceAudit, report };
 }
 
 async function writeIfChanged(filePath, content) {
@@ -1907,7 +2190,7 @@ async function resolveReferencePackageRoot(repoRoot, explicitRoot) {
 
 async function writeArtifacts({ repoRoot, sourceRoot, referencePackageRoot }) {
   const resolvedReferenceRoot = await resolveReferencePackageRoot(repoRoot, referencePackageRoot);
-  const built = await buildArtifacts(sourceRoot, resolvedReferenceRoot);
+  const built = await buildArtifacts(sourceRoot, resolvedReferenceRoot, path.join(repoRoot, TASK_TABLE_ROOT));
   if (built.report.status !== "passed") throw new Error(`Source validation failed:\n${prettyJson(built.report.diagnostics)}`);
   const changed = [];
   for (const file of built.loaded) {
@@ -1926,7 +2209,7 @@ export async function checkTaskTableArtifacts({ repoRoot, sourceRoot, referenceP
   const errors = [];
   try {
     const resolvedReferenceRoot = await resolveReferencePackageRoot(resolvedRepoRoot, referencePackageRoot);
-    const built = await buildArtifacts(rawRoot, resolvedReferenceRoot);
+    const built = await buildArtifacts(rawRoot, resolvedReferenceRoot, path.join(resolvedRepoRoot, TASK_TABLE_ROOT));
     for (const [relative, expected] of built.artifactText) {
       let actual;
       try { actual = await readFile(path.join(resolvedRepoRoot, relative), "utf8"); } catch (error) {

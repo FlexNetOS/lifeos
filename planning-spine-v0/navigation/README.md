@@ -76,15 +76,15 @@ The [landing contract](../ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) defines the
 truth boundary for the copied
 [envctl migration package](../envctl-db-nu-plugin-migration-automation-package/README.md).
 Its [106 WorkOrders](../task_tables/projections/work_orders.csv) and
-[26 mandatory capabilities](../task_tables/workflow/mandatory_capabilities.csv)
+[28 mandatory capabilities](../task_tables/workflow/mandatory_capabilities.csv)
 are review-only planning records. Upstream completion text and package proof do
 not enter the canonical LifeOS task or proof namespaces.
 
 | Namespace | Exact lookup | Authority boundary |
 |---|---|---|
-| Canonical LifeOS tasks | `by_task_id` | Exactly the 196 task-graph rows; proof-derived lifecycle applies. |
+| Canonical LifeOS tasks | `by_task_id` | Exactly the 249 task-graph rows; proof-derived lifecycle applies. |
 | Imported WorkOrders | `by_work_order_id` | `TASK-CDB000..105`; local status remains `review`, source status is provenance only. |
-| Mandatory capabilities | `by_mandatory_capability_id` | `CAP-MIG-001..026`; mandatory review scope, never a completion claim. |
+| Mandatory capabilities | `by_mandatory_capability_id` | `CAP-MIG-001..028`; mandatory review scope, never a completion claim. |
 
 Wiki routes: [[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE]] ·
 [[planning-spine-v0/task_tables/README]] ·
@@ -170,7 +170,7 @@ manifested execution handoff without changing its proof-pinned packager.
 
 ## External index boundary
 
-GitNexus and GitKB are optional accelerators only. The 2026-07-12 audit found
+GitNexus and GitKB are non-authoritative accelerators. The 2026-07-12 audit found
 that GitNexus resolved a stale parent-Meta index; GitKB's worktree-local code
 view reported zero files and symbols while its aggregate doctor reported two
 symbols across 111 files and no configured repositories. These receipts prove

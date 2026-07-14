@@ -37,9 +37,9 @@ export default defineConfig(async () => ({
         // Split vendor code into dedicated chunks. Lucide is ~600 KB on its own;
         // putting it in a separate chunk means the main app chunk stays small AND
         // browsers cache the vendor chunks across releases that don't bump them.
-        // Rolldown's `advancedChunks` is the canonical Vite 8 replacement for
-        // Rollup's `manualChunks` function — it groups vendor packages by name/test.
-        advancedChunks: {
+        // Rolldown's `codeSplitting` groups vendor packages by name/test while
+        // preserving Vite 8's current output contract.
+        codeSplitting: {
           groups: [
             { name: "lucide", test: /[\\/]node_modules[\\/]@lucide[\\/]vue[\\/]/, priority: 40 },
             { name: "vue-router", test: /[\\/]node_modules[\\/]vue-router[\\/]/, priority: 30 },

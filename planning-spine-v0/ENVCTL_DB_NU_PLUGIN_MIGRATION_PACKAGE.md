@@ -20,6 +20,8 @@ landing:
   package_path: planning-spine-v0/envctl-db-nu-plugin-migration-automation-package
   receipt: planning-spine-v0/generated/envctl_package_landing_receipt.json
   capability_catalog: planning-spine-v0/task_tables/workflow/mandatory_capabilities.json
+  mandatory_language_inventory: planning-spine-v0/task_tables/workflow/mandatory_language_inventory.json
+  control_plane_companion: planning-spine-v0/task_tables
   namespace_registry: planning-spine-v0/task_tables/workflow/reference_namespaces.json
 aliases:
   - envctl migration package landing
@@ -41,8 +43,10 @@ related:
   - "[[planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation]]"
   - "[[planning-spine-v0/08_EXECUTION_GATES]]"
   - "[[planning-spine-v0/task_tables/README]]"
-  - "[[planning-spine-v0/task_tables/workflow/mandatory_capabilities]]"
-  - "[[planning-spine-v0/task_tables/workflow/reference_namespaces]]"
+  - "[[planning-spine-v0/task_tables/workflow/mandatory_capabilities.json]]"
+  - "[[planning-spine-v0/task_tables/workflow/mandatory_language_inventory.json]]"
+  - "[[planning-spine-v0/task_tables/workflow/reference_namespaces.json]]"
+  - "[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW]]"
 ---
 
 # envctl DB + nu_plugin Migration Package Landing Contract
@@ -58,10 +62,18 @@ knowledge-graph route. The exact machine receipt is
 [`generated/envctl_package_landing_receipt.json`](./generated/envctl_package_landing_receipt.json).
 
 Wiki routes: [[planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/README]] ·
-[[planning-spine-v0/generated/envctl_package_landing_receipt]] ·
+[[planning-spine-v0/generated/envctl_package_landing_receipt.json]] ·
 [[planning-spine-v0/task_tables/README]] ·
-[[planning-spine-v0/task_tables/workflow/mandatory_capabilities]] ·
-[[planning-spine-v0/task_tables/workflow/reference_namespaces]]
+[[planning-spine-v0/task_tables/workflow/mandatory_capabilities.json]] ·
+[[planning-spine-v0/task_tables/workflow/reference_namespaces.json]] ·
+[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW]]
+
+The value-free [security review](./ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md) ·
+[[planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW]] binds the
+complete staged credential scan to exact reviewed fingerprints. It preserves
+the pre-adaptation receipt, binds every current hardened package byte through
+the refreshed manifest, and permits no rule-wide or path-wide secret-scan
+exclusion.
 
 ## Truth and authority boundary
 
@@ -106,8 +118,8 @@ planning spine; it does not rewrite the historical values.
 | Last source commit touching the package | `c0d672ce59a642e5f1362fd72d5f7ac03f7da083` | preserved as lineage |
 | Total files | `891` | root manifest declares `891` source files, excluding itself and runtime caches |
 | Correct root-manifest coverage | `890` | `891` source entries after landing-hardening files were added |
-| Root manifest SHA-256 | `57c09c926ab1bc14c2fda7d3ea0d73e85c16c6d597620432573a44acdec2925e` | `e61468e095933c8b04c011b4cb3694a239a3bc043f3e39ea506a74d56b339bf6` |
-| Payload SHA-256 | `f854659b111204be3c76f1a632c9165cac9a41cd5a6049475ce1ba66fb5ea767` | manifest-entry payload index: `f81cc0fdeef30a971ac5cb43dba42c16075bba75f737145d1156dc5e4a57d4a9` |
+| Root manifest SHA-256 | `57c09c926ab1bc14c2fda7d3ea0d73e85c16c6d597620432573a44acdec2925e` | `5c7616c712653de1c73d5af372548a51eb22b9f7272b1643640175e0d8d8ba01` |
+| Payload SHA-256 | `f854659b111204be3c76f1a632c9165cac9a41cd5a6049475ce1ba66fb5ea767` | manifest-entry payload index: `34381ea9bfba19082b227539fbab3531f887a694b3e4a66e000026d3b337ba7f` |
 | Unlisted source files | `157` | `0` under the hardened manifest contract |
 | Listed byte/hash drift | `101` | `0` under the hardened manifest contract |
 
@@ -125,7 +137,7 @@ package task was executed successfully in LifeOS.
 ## Namespace separation
 
 The [namespace registry](./task_tables/workflow/reference_namespaces.json) ·
-[[planning-spine-v0/task_tables/workflow/reference_namespaces]] keeps all three
+[[planning-spine-v0/task_tables/workflow/reference_namespaces.json]] keeps all three
 task spaces distinct:
 
 | Namespace | Count | Treatment |
@@ -147,7 +159,15 @@ LifeOS. The authoritative machine catalog is
 [`mandatory_capabilities.csv`](./task_tables/workflow/mandatory_capabilities.csv)
 is its human-readable projection.
 
-Wiki routes: [[planning-spine-v0/task_tables/workflow/mandatory_capabilities]] ·
+The generated [mandatory-language inventory](./task_tables/workflow/mandatory_language_inventory.json) ·
+[[planning-spine-v0/task_tables/workflow/mandatory_language_inventory.json]] reverse-scans
+87 normative package and task-table sources. All 295 `optional`, `should`,
+`may`, and `must` occurrences are classified, with zero unclassified normative
+occurrences. Compatibility and nullable-state wording remains configurable only
+in value; its parsing, validation, fallback, and compatibility behavior is
+mandatory.
+
+Wiki routes: [[planning-spine-v0/task_tables/workflow/mandatory_capabilities.json]] ·
 [[planning-spine-v0/task_tables/workflow/mandatory_capabilities.csv]]
 
 | Capability | Mandatory LifeOS contract |
@@ -178,6 +198,8 @@ Wiki routes: [[planning-spine-v0/task_tables/workflow/mandatory_capabilities]] �
 | `CAP-MIG-024` | Deterministic seeds bound to real IDs and hashes. |
 | `CAP-MIG-025` | Export files remain projections; canonical identity, links, hashes, and status remain in the owning store. |
 | `CAP-MIG-026` | Persistent navigation, artifact index, memory, and update receipts. |
+| `CAP-MIG-027` | Notify-based incremental invalidation with mandatory polling fallback and inotify-limit resilience. |
+| `CAP-MIG-028` | Mandatory Tier-2 and Tier-4 parser/indexer boundary contracts and fixtures. |
 
 Catalog coverage is review completeness, not product completion. Each catalog
 record remains `local_status: review` and `product_complete: false` until its
@@ -188,10 +210,11 @@ own LifeOS verification and proof gates pass.
 | Need | Portable route | Wiki route |
 |---|---|---|
 | Inspect the copied package | [Package README](./envctl-db-nu-plugin-migration-automation-package/README.md) | [[planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/README]] |
-| Verify this landing receipt | [Machine receipt](./generated/envctl_package_landing_receipt.json) | [[planning-spine-v0/generated/envctl_package_landing_receipt]] |
-| Audit current package bytes | [Reference package audit](./task_tables/workflow/reference_package_audit.json) | [[planning-spine-v0/task_tables/workflow/reference_package_audit]] |
-| Inspect all 26 mandatory capabilities | [Capability catalog](./task_tables/workflow/mandatory_capabilities.json) | [[planning-spine-v0/task_tables/workflow/mandatory_capabilities]] |
-| Keep task IDs separate | [Namespace registry](./task_tables/workflow/reference_namespaces.json) | [[planning-spine-v0/task_tables/workflow/reference_namespaces]] |
+| Verify this landing receipt | [Machine receipt](./generated/envctl_package_landing_receipt.json) | [[planning-spine-v0/generated/envctl_package_landing_receipt.json]] |
+| Audit current package bytes | [Reference package audit](./task_tables/workflow/reference_package_audit.json) | [[planning-spine-v0/task_tables/workflow/reference_package_audit.json]] |
+| Inspect all 28 mandatory capabilities | [Capability catalog](./task_tables/workflow/mandatory_capabilities.json) | [[planning-spine-v0/task_tables/workflow/mandatory_capabilities.json]] |
+| Audit every normative modal term | [Mandatory-language inventory](./task_tables/workflow/mandatory_language_inventory.json) | [[planning-spine-v0/task_tables/workflow/mandatory_language_inventory.json]] |
+| Keep task IDs separate | [Namespace registry](./task_tables/workflow/reference_namespaces.json) | [[planning-spine-v0/task_tables/workflow/reference_namespaces.json]] |
 | Inspect 106 review-only WorkOrders | [Task-table handoff](./task_tables/README.md) | [[planning-spine-v0/task_tables/README]] |
 | Enforce proof and human gates | [08 Execution Gates](./08_EXECUTION_GATES.md) | [[planning-spine-v0/08_EXECUTION_GATES]] |
 | Correct Blueprint claims | [Blueprint Compatibility](./1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |

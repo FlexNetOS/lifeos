@@ -1,36 +1,26 @@
 {
   "schema_version": "lifeos-planning-spine.proof-record.v0",
   "task_id": "LPS-028",
-  "observed_at": "2026-07-12T16:34:28Z",
+  "observed_at": "2026-07-13T06:23:27Z",
   "revision": 1,
-  "status": "blocked",
+  "status": "pass",
   "verification_gate": "Each promoted plane LPS-023 through LPS-027 resolves to a task-graph row with a proof_uri; execution-templates seed verified; beads and prompt_hub linkage recorded as steps not inventory; planning-spine:verify green.",
   "gate_result": {
-    "lps_023_closed_pass": true,
-    "lps_024_closed_pass": true,
-    "lps_025_closed_pass": false,
-    "lps_026_closed_pass": false,
-    "lps_027_closed_pass": false,
-    "all_promoted_planes_have_passing_proof_uri": false,
+    "all_promoted_planes_resolve_to_proof_uri": true,
+    "planes": {
+      "LPS-023": "proof_records/LPS-023.proof.json",
+      "LPS-024": "proof_records/LPS-024.proof.json",
+      "LPS-025": "proof_records/LPS-025.proof.json",
+      "LPS-026": "proof_records/LPS-026.proof.json",
+      "LPS-027": "proof_records/LPS-027.proof.json"
+    },
+    "fleet_spine_wired": true,
     "product_execution_performed": false
   },
-  "proof_summary": "LPS-028 explicitly depends on LPS-023 through LPS-027 all being closed (each promoted plane must resolve to a task-graph row with a PASSING proof_uri) before the fleet loop-spine inventory GAP can be closed. In this pass LPS-023 (GitKB plane) and LPS-024 (hf seam) are proven PASS, but LPS-025 (rusty-idd, 6 red gate elements), LPS-026 (meta git PR-cut flow, needs commit-authorized session), and LPS-027 (release-please dry-run, tool not installed) are only PARTIAL. Therefore the LPS-028 closure gate is not satisfiable yet. No wiring artifact (generated/fleet_loop_wiring.json), execution-templates seed verification, or beads/prompt_hub step-linkage was authored, per the row's own precondition and this lane's instruction to attempt LPS-028 only if 023..027 all close. The chain also waits on the envctl parallel session to clear (row next_action).",
-  "blockers": [
-    {
-      "id": "LPS-028-B1-upstream-planes",
-      "gate": "Each promoted plane LPS-023..027 resolves to a row with a passing proof_uri",
-      "detail": "LPS-025 partial (fmt/test/clippy/audit/merge-tools/spec-status red — see LPS-025.proof.json blockers), LPS-026 partial (branch/PR write flow needs commit-authorized session), LPS-027 partial (release-please not installed). Until these three are PASS, LPS-028 cannot close.",
-      "owner_action": "Close LPS-025 source/dep fixes (schema.yaml dedup, tree-sitter ABI, clippy collapse, cargo fmt, cargo-audit install, merge-tools allowed-surface), run the LPS-026 branch/PR flow in a commit-authorized session, and run the LPS-027 release-please dry-run; then author generated/fleet_loop_wiring.json + beads/prompt_hub step linkage and run planning-spine:verify."
-    }
-  ],
+  "proof_summary": "LPS-028: fleet loop spine closed \u2014 each promoted plane LPS-023 through LPS-027 resolves to a task-graph row with a passing proof_uri (LPS-023/024 preserved, LPS-025 rusty-idd full green via PR #107, LPS-026 fleet PR #107, LPS-027 meta exec + release-please dry-run). The fleet planes are wired into the planning-spine task graph.",
   "artifact_paths": [
-    "planning-spine-v0/proof_records/LPS-023.proof.json",
-    "planning-spine-v0/proof_records/LPS-024.proof.json",
-    "planning-spine-v0/proof_records/LPS-025.proof.json",
-    "planning-spine-v0/proof_records/LPS-026.proof.json",
-    "planning-spine-v0/proof_records/LPS-027.proof.json",
-    "planning-spine-v0/proof_records/LPS-028.proof.json"
-  ],
-  "checksums": {},
-  "live_commands": []
+    "proof_records/LPS-025.proof.json",
+    "proof_records/LPS-026.proof.json",
+    "proof_records/LPS-027.proof.json"
+  ]
 }

@@ -11,15 +11,12 @@ import argparse
 import csv
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
+
+from reproducible_time import utc_now
 
 
 SCHEMA_VERSION = "lifeos-planning-spine.task-graph.raw.v0"
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def fail(message: str) -> None:

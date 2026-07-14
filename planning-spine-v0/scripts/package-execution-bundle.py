@@ -6,12 +6,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import stat
 import sys
 import zipfile
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from reproducible_time import utc_now
 
 
 MANIFEST_SCHEMA_VERSION = "lifeos-planning-spine.execution-bundle-manifest.v0"
@@ -89,10 +91,6 @@ class PayloadFile:
     size: int
     sha256: str
     content: bytes | None = None
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def sha256_file(path: Path) -> str:
@@ -253,22 +251,40 @@ def validate_required(root: Path, payload: list[PayloadFile]) -> list[dict[str, 
             raise BundleError(f"required bundle artifact missing: {required_path}")
 
     manifest = load_json(root / "generated/execution_manifest.json")
+    normalized = load_json(root / "generated/task_graph.normalized.json")
+    ready_status = str(manifest.get("ready_status", "ready")).strip().lower()
+    expected_task_ids = sorted(
+        str(task.get("task_id", "")).strip()
+        for task in normalized.get("tasks", [])
+        if str(task.get("status", "")).strip().lower() == ready_status
+    )
+    manifest_task_ids = sorted(
+        str(packet.get("task_id", "")).strip()
+        for packet in manifest.get("packets", [])
+        if isinstance(packet, dict)
+    )
     packet_paths = []
     for packet in manifest.get("packets", []):
         path = packet.get("path")
         if isinstance(path, str):
             packet_paths.append(path)
-    if not packet_paths:
-        raise BundleError("generated/execution_manifest.json has no packet paths")
     missing_packets = [path for path in packet_paths if path not in payload_paths]
+    manifest_matches_graph = (
+        manifest.get("packet_count") == len(packet_paths)
+        and manifest_task_ids == expected_task_ids
+    )
     checks.append(
         {
-            "name": "execution_manifest_packets_present",
-            "result": "pass" if not missing_packets else "fail",
+            "name": "execution_manifest_matches_ready_tasks",
+            "result": "pass" if manifest_matches_graph and not missing_packets else "fail",
             "packet_count": len(packet_paths),
+            "expected_task_ids": expected_task_ids,
+            "manifest_task_ids": manifest_task_ids,
             "missing_packets": missing_packets,
         }
     )
+    if not manifest_matches_graph:
+        raise BundleError("generated/execution_manifest.json does not match normalized ready tasks")
     if missing_packets:
         raise BundleError("bundle is missing packet(s) named by execution manifest: " + ", ".join(missing_packets))
 
@@ -326,7 +342,7 @@ def build_manifest(root: Path, payload: list[PayloadFile], checks: list[dict[str
     return {
         "schema_version": MANIFEST_SCHEMA_VERSION,
         "generated_at": utc_now(),
-        "package_root": str(root),
+        "package_root": ".",
         "payload_file_count": len(payload),
         "roles": sorted({item.role for item in payload}),
         "validation": {
@@ -346,15 +362,22 @@ def build_manifest(root: Path, payload: list[PayloadFile], checks: list[dict[str
 
 
 def write_bundle(root: Path, output_path: Path, payload: list[PayloadFile], manifest: dict[str, Any]) -> None:
+    def write_entry(archive: zipfile.ZipFile, name: str, content: bytes, mode: int = 0o644) -> None:
+        info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+        info.compress_type = zipfile.ZIP_DEFLATED
+        info.create_system = 3
+        info.external_attr = (stat.S_IFREG | mode) << 16
+        archive.writestr(info, content)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode("utf-8")
     with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr("bundle_manifest.json", manifest_bytes)
+        write_entry(archive, "bundle_manifest.json", manifest_bytes)
         for item in payload:
-            if item.content is not None:
-                archive.writestr(item.path.as_posix(), item.content)
-            else:
-                archive.write(root / item.path, item.path.as_posix())
+            source_path = root / item.path
+            content = item.content if item.content is not None else source_path.read_bytes()
+            mode = source_path.stat().st_mode & 0o777
+            write_entry(archive, item.path.as_posix(), content, mode)
 
 
 def validate_zip(path: Path) -> dict[str, Any]:

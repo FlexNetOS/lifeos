@@ -58,6 +58,20 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
    bridge, Yazi Assets owns rendered assets, and Terminal Support owns terminal
    metadata/detection. Main Yazelix consumes pinned child revisions and owns
    runtime composition.
+10. **Kache is the only cache authority.** Agent and workspace package, build,
+    compiler, runner, and temporary caches are disabled or mediated by Kache.
+    The Nix store and the one Yazelix profile remain install/runtime ownership
+    surfaces; they are not competing cache-control paths.
+11. **Agents execute shell actions only through Nushell.** Every agent launcher,
+    hook, harness, and repository operation enters through the profile-owned Nu
+    binary. Bash, `sh`, Zsh, Fish, and Xonsh are owner-only tools. An agent may
+    use one only after a system crash and only with owner-authorized emergency
+    approval tied to that incident and removed after recovery.
+12. **Repository state is published, merged, and removed deliberately.** Every
+    valuable worktree and stash becomes a normal commit and pull request—never
+    a cherry-pick—before merge. Existing `main`, `master`, and `develop` refs
+    are synchronized with origin, then merged branches, worktrees, and stashes
+    are purged only after their published receipts prove preservation.
 
 ## Current contradictions that drive the graph
 
@@ -84,6 +98,16 @@ found the built-in `envctl-agent-env` crate, `envctl agent` command family,
   than blanket deletion.
 - Canonical and stale/worktree/runner flake copies coexist under `meta/src`.
   They must be classified through Meta inventory before any retirement.
+- Kache is packaged by Yazelix, but current fleet and runner configuration does
+  not yet prove that package, build, compiler, runner, and temporary caches all
+  route through it or that competing cache authorities are disabled.
+- Agent guidance contains Nushell routes while active `.sh` launchers, hooks,
+  tests, and cleanup scripts remain. No executable negative gate yet prevents
+  an agent from invoking an alternate shell without the owner's crash-specific
+  emergency approval.
+- The fleet currently contains dirty worktrees, stashes, ahead/behind branches,
+  missing upstreams, and open pull requests. Those are preserved work inputs,
+  not disposable residue, until each has a published merge or owner disposition.
 
 ## Execution waves
 
@@ -113,6 +137,15 @@ checks Codex/Claude/Nu/envctl/terminal behavior. `YZXCONV-015` reindexes all fou
 repos, runs fleet and peer-local status checks, and closes only with complete
 proof and a clean, reviewable per-repo finish state.
 
+### Wave 4 — Enforce cache, shell, agent-env, and repository closure
+
+`YZXCONV-016` makes Kache the sole cache authority. `YZXCONV-017` makes
+profile-owned Nushell the sole agent shell and gives the owner exclusive
+control of any crash-only emergency fallback. `YZXCONV-018` encodes these tasks
+and gates in envctl agent-env. `YZXCONV-019` publishes, reviews, merges, syncs,
+and purges all worktree, stash, branch, and pull request state without
+cherry-picking. `YZXCONV-020` is the independent final closure gate.
+
 ## Requirement-to-task coverage
 
 | Requested concern | Owning tasks |
@@ -129,10 +162,15 @@ proof and a clean, reviewable per-repo finish state.
 | RTK TokenKill configured to `nu_shell` | `YZXCONV-009`, `YZXCONV-014` |
 | No unowned Bash/Zsh/old wrappers | `YZXCONV-011`, `YZXCONV-014` |
 | Meta/Grit/ICM/Weave/old flakes have Nu surfaces | `YZXCONV-010`, `YZXCONV-012` |
+| Kache is the only cache authority | `YZXCONV-016`, `YZXCONV-020` |
+| Agents use Nushell only; owner controls crash fallback | `YZXCONV-017`, `YZXCONV-020` |
+| Owner-contract tasks and gates are in agent-env | `YZXCONV-018`, `YZXCONV-020` |
+| Worktrees, stashes, branches, and pull requests are settled | `YZXCONV-019`, `YZXCONV-020` |
+| Existing origin/main/master/develop refs are synchronized | `YZXCONV-019`, `YZXCONV-020` |
 
 ## Completion rule
 
 The plan does not permit a success claim based only on green package builds.
-`YZXCONV-015` must prove every row above from installed runtime and source state,
+`YZXCONV-020` must prove every row above from installed runtime and source state,
 including both Meta fleet commands and local peer commands. Any missing proof
 keeps the graph active.

@@ -19,19 +19,17 @@ generations.
 
 ## Regeneration
 
-From `planning-spine-v0`:
+From `planning-spine-v0`, invoke the checked-in regenerator with the one
+profile's RTK and Nushell binaries:
 
 ```text
-python3 scripts/extract-task-graph.py \
-  yazelix_runtime_convergence/task_graph.source.csv \
-  --output yazelix_runtime_convergence/generated/task_graph.raw.json
-python3 scripts/normalize-task-graph.py \
-  yazelix_runtime_convergence/generated/task_graph.raw.json \
-  --output yazelix_runtime_convergence/generated/task_graph.normalized.json \
-  --index yazelix_runtime_convergence/generated/task_graph.index.json \
-  --report yazelix_runtime_convergence/generated/task_graph.normalize_report.json
+/home/flexnetos/.nix-profile/bin/rtk proxy \
+  /home/flexnetos/.nix-profile/toolbin/nu \
+  scripts/regenerate-yazelix-runtime-convergence.nu
 ```
 
 The package is complete as a plan when normalization passes and every explicit
-request maps to at least one task and one verification gate. Runtime convergence
-is complete only after `YZXCONV-015` has a passing proof record.
+request maps to at least one task and one verification gate.
+
+Runtime convergence is complete only after `YZXCONV-020` has a passing proof
+record.

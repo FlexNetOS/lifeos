@@ -74,6 +74,7 @@ claim above executable evidence.
 | Claim-level truth testing | [`NBVERIFY-030-032`](../proof_records/NBVERIFY-030-032.proof.json) and its [local evidence](../generated/notebooklm_claim_verification/NBVERIFY-030-032.local-evidence.json) |
 | CodeDB exact replay | [Round-trip proof](../../../nu_plugin/docs/ROUND_TRIP_PROOF.md) |
 | CodeDB mutation boundary | [Unsafe capture policy](../../../nu_plugin/docs/UNSAFE_CAPTURE_POLICY.md) and [release gate](../../../nu_plugin/docs/RELEASE_GATE.md) |
+| envctl DB and Nu plugin migration package | [Migration package](../ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) |
 
 ## Metadata convention for new maintained documents
 

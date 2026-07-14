@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-14T14:41:16Z",
+  "generated_at": "2026-07-14T14:54:01Z",
   "source": {
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
@@ -596,7 +596,7 @@
         "rollback_plan": "Remove only the routing design entry; no hook or agent config is changed.",
         "status": "Ready",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-026.proof.json",
-        "next_action": "Confirm whether the profile nu is built with the mcp feature, then finalize the MCP+skill+deny-Bash design for YZXCONV-028."
+        "next_action": "Verified 2026-07-14: profile Nushell 0.113.1 ships the mcp feature (nu --mcp, --mcp-transport stdio/http, --mcp-port present); finalize the MCP+skill+deny-Bash design for YZXCONV-028 on the built-in nu --mcp."
       }
     },
     {
@@ -640,7 +640,7 @@
         "rollback_plan": "Restore the prior agent-env source lock and projections through the envctl operation receipt re-enable the Bash tool and remove the MCP tool and skill; no auth or state is moved.",
         "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-028.proof.json",
-        "next_action": "Confirm the profile nu mcp-feature status, choose nu --mcp vs a vendored pure-Rust nu-MCP crate, then implement behind agent-env preview under owner approval."
+        "next_action": "Verified 2026-07-14: profile Nushell 0.113.1 ships the mcp feature (nu --mcp present) so no build or vendored crate is needed; implement on the built-in nu --mcp behind agent-env preview under owner approval."
       }
     }
   ]

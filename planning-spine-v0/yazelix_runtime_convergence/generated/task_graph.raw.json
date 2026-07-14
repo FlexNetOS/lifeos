@@ -1,6 +1,6 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-14T06:51:25Z",
+  "generated_at": "2026-07-14T12:23:21Z",
   "source": {
     "format": "csv",
     "path": "yazelix_runtime_convergence/task_graph.source.csv",
@@ -23,7 +23,7 @@
       "proof_uri",
       "next_action"
     ],
-    "row_count": 22,
+    "row_count": 27,
     "empty_rows_skipped": []
   },
   "rows": [
@@ -66,9 +66,9 @@
         "execution_cell": "policy-cell",
         "verification_gate": "Owner approves the matrix in PLAN.md and every active path has exactly one editable owner, one generator, and one runtime consumer.",
         "rollback_plan": "Revert the decision document and keep all current runtime selectors unchanged.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-002.proof.json",
-        "next_action": "Approve exact Codex/Claude input subpaths and the single-profile selector rule."
+        "next_action": "Owner ratified all 14 PLAN.md ownership clauses on 2026-07-14; proceed to YZXCONV-003 single-profile source contract under per-step approval."
       }
     },
     {
@@ -88,7 +88,7 @@
         "execution_cell": "yazelix-nix-profile-cell",
         "verification_gate": "nix profile list shows one foundation element; ~/.nix-profile is the only PATH owner; any XDG selector resolves to the same closure or is inactive; yzx doctor reports one install owner.",
         "rollback_plan": "Atomically restore the pre-change profile symlink recorded in the migration receipt and keep the prior generation reachable.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-003.proof.json",
         "next_action": "Finish source package contracts, build without profile mutation, then request approval for cutover."
       }
@@ -198,7 +198,7 @@
         "execution_cell": "meta-policy-cell",
         "verification_gate": "meta git status covers the fleet; meta exec can target the four Yazelix peers; each peer local git status and repo-specific workflow remains functional and independently committable.",
         "rollback_plan": "Revert only the policy/test commit in its owning repository; peer histories remain untouched.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-008.proof.json",
         "next_action": "Land the dual-mode contract before fleet sync implementation."
       }
@@ -509,6 +509,116 @@
         "status": "Blocked",
         "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-022.proof.json",
         "next_action": "Begin after the owner ratifies YZXCONV-002 and the single-profile contract in YZXCONV-003 is ready for source implementation."
+      }
+    },
+    {
+      "source_row_number": 24,
+      "columns": {
+        "task_id": "YZXCONV-023",
+        "parent_id": "YZXCONV-002",
+        "phase": "2-nushell",
+        "title": "Enumerate every bash POSIX Zsh Fish and Xonsh command site as a reviewed inventory artifact",
+        "owner_agent": "Shell Boundary Agent",
+        "goal": "Produce the file-by-file inventory of every agent-stack shell command site (48 bash files: 20 Claude hooks sharing lib.sh, 23 lifecycle scripts, 2 skill scripts, 3 yazelix shell hooks) classified native-Nu vs route-through-rtk-proxy, plus a Fish and Xonsh discovery sweep, so YZXCONV-011 and YZXCONV-017 refactor from an enumerated list rather than a promised inventory.",
+        "inputs": "envctl home .claude and .codex hooks and settings; assets/scripts and scripts and home/bin; yazelix per-session shell hooks; agent-env-codex skill scripts",
+        "target_artifacts": "yazelix_runtime_convergence/reports/shell_command_inventory.md; per-file native-vs-route classification; Fish and Xonsh sweep result",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "tracked product-source mutation; profile mutation; agent config mutation; generated Yazelix runtime mutation",
+        "simulation_required": "FALSE",
+        "execution_cell": "shell-inventory-cell",
+        "verification_gate": "The inventory lists every active bash sh zsh fish xonsh command site with a path a native-Nu-vs-route-through class and the competing-wrapper flags; a repeat scan finds no unlisted shell command site under the inventoried trees.",
+        "rollback_plan": "Remove only the inventory report and its classification table from the convergence package; no product or config file is touched.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-023.proof.json",
+        "next_action": "Write the enumerated inventory report from the research findings and run the Fish and Xonsh discovery sweep."
+      }
+    },
+    {
+      "source_row_number": 25,
+      "columns": {
+        "task_id": "YZXCONV-024",
+        "parent_id": "YZXCONV-009; YZXCONV-010",
+        "phase": "2-nushell",
+        "title": "Pin the single Nushell wrapper chokepoint design decision",
+        "owner_agent": "Yazelix Nushell Agent",
+        "goal": "Record the binding decision that the profile-owned rtk_wrappers.nu is the single command-routing chokepoint (one executable owner no second command catalog no parallel wrapper binary or plugin bridge) and enumerate the four competing lanes to retire: shell_bash.sh shell_zsh.zsh the shell_nu.nu residue and the .claude/settings.local.json bash -lc permission strings.",
+        "inputs": "rtk_wrappers.nu; shell_bash.sh; shell_zsh.zsh; shell_nu.nu; .claude/settings.local.json",
+        "target_artifacts": "yazelix_runtime_convergence/decisions.json one-wrapper entry; competing-lane retirement list",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "editing rtk_wrappers.nu or the competing lanes in this task; product-source mutation; profile mutation",
+        "simulation_required": "FALSE",
+        "execution_cell": "one-wrapper-decision-cell",
+        "verification_gate": "The decision names rtk_wrappers.nu as the sole chokepoint lists the four competing lanes with a retirement disposition each and is referenced by YZXCONV-010 verification; no second command catalog is introduced.",
+        "rollback_plan": "Remove only the one-wrapper decision entry and the retirement list; no wrapper source is changed.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-024.proof.json",
+        "next_action": "Author the decisions.json one-wrapper entry and cross-link it into YZXCONV-010 and YZXCONV-011."
+      }
+    },
+    {
+      "source_row_number": 26,
+      "columns": {
+        "task_id": "YZXCONV-025",
+        "parent_id": "YZXCONV-003; YZXCONV-006",
+        "phase": "3-runtime",
+        "title": "Enumerate the single-profile PATH binary checklist and install gaps",
+        "owner_agent": "Yazelix Packaging Agent",
+        "goal": "Produce the explicit required-binary checklist for the single nix profile (grit icm rtk git-kb meta weave flexnetos_runner envctl nu_plugin yzx rusty-idd teri hf) with resolve on-profile and has-nu-config status record the install gaps (envctl rusty-idd teri hf and the bare flexnetos_runner nu_plugin yazelix names) the PATH-ordering drift where the profile bin sits behind fifteen store bins and a second default profile and the disposition of the six asset workspace members as runtime-consumed not PATH binaries.",
+        "inputs": "nix-profile bin and toolbin listing; PATH entries; rtk_wrappers.nu nu-config coverage; six asset workspace member repos",
+        "target_artifacts": "yazelix_runtime_convergence/reports/profile_binary_checklist.md; install-gap list; PATH-ordering-drift note; asset-member disposition",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "profile mutation; installing binaries; PATH mutation; product-source mutation",
+        "simulation_required": "FALSE",
+        "execution_cell": "profile-binary-checklist-cell",
+        "verification_gate": "The checklist enumerates every required binary with resolve on-profile and nu-config status lists each install gap and PATH-ordering-drift item and records an explicit disposition for each of the six asset workspace members; it feeds YZXCONV-003 YZXCONV-006 and YZXCONV-014 gates.",
+        "rollback_plan": "Remove only the checklist report; no profile or PATH state is changed.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-025.proof.json",
+        "next_action": "Write the profile-binary checklist from the research findings and confirm the asset-member disposition with the owner."
+      }
+    },
+    {
+      "source_row_number": 27,
+      "columns": {
+        "task_id": "YZXCONV-026",
+        "parent_id": "YZXCONV-009; YZXCONV-017",
+        "phase": "2-nushell",
+        "title": "Design strict Nushell command routing for both agent shell tools",
+        "owner_agent": "Shell Authority Agent",
+        "goal": "Design the owner-ratified strict-nu-on-both-agents routing: extend the Claude PreToolUse Bash hook (rtk hook claude) to rewrite every command to nu -c through the single wrapper and extend the Codex codex-harness-hook to rewrite Bash exec to nu -c with documented wrapper-lane convergence as the fallback where the Codex bash -lc exec floor cannot be forced. Web-verified: Claude honors updatedInput.command; Codex exposes no shell selector and force-wraps bash -lc.",
+        "inputs": "rtk hook claude PreToolUse mechanism; codex-harness-hook binary; web-verified Codex and Claude shell-routing capability; owner decision 2026-07-14",
+        "target_artifacts": "yazelix_runtime_convergence/decisions.json strict-nu-routing entry; per-agent routing design; fallback disposition",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "editing the Claude hook or codex-harness-hook in this task; agent config mutation; profile mutation",
+        "simulation_required": "FALSE",
+        "execution_cell": "agent-nu-routing-design-cell",
+        "verification_gate": "The design specifies the concrete nu -c rewrite for the Claude PreToolUse hook and the codex-harness-hook path names the bash -lc platform floor and the wrapper-lane fallback and is referenced by YZXCONV-017 enforcement; no unverified shell-override claim is made.",
+        "rollback_plan": "Remove only the routing design entry; no hook or agent config is changed.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-026.proof.json",
+        "next_action": "Author the strict-nu-routing decision and design and verify the codex-harness-hook rewrite feasibility against the installed Codex build before implementation."
+      }
+    },
+    {
+      "source_row_number": 28,
+      "columns": {
+        "task_id": "YZXCONV-027",
+        "parent_id": "YZXCONV-004; YZXCONV-005",
+        "phase": "1-agent-runtime",
+        "title": "Bring the agent runtime config files under the reproducible projection",
+        "owner_agent": "Codex Runtime Agent / Claude Runtime Agent",
+        "goal": "Close the reproducibility gap where the active ~/.claude/settings.json and ~/.codex/config.toml are standalone runtime files that diverge from the envctl-home projected sources with a different model and a different hook set; specify that the projection and lock own or symlink these two runtime files so the rtk hook and future nu-routing cannot drift without moving auth or state out of ~/.claude and ~/.codex.",
+        "inputs": "active ~/.claude/settings.json; active ~/.codex/config.toml; envctl home .claude and .codex projected sources; agent-env lock",
+        "target_artifacts": "yazelix_runtime_convergence/reports/agent_config_projection_gap.md; ownership and symlink design for the two runtime files",
+        "allowed_paths": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/yazelix_runtime_convergence/**",
+        "blocked_paths": "editing ~/.claude or ~/.codex in this task; auth.json and credentials; sessions and databases; profile mutation",
+        "simulation_required": "FALSE",
+        "execution_cell": "agent-config-projection-cell",
+        "verification_gate": "The report proves the current divergence between the two standalone runtime files and their projected sources and specifies a projection or symlink ownership design that keeps auth and state in place; it feeds YZXCONV-004 and YZXCONV-005 materializer gates.",
+        "rollback_plan": "Remove only the gap report; no agent config auth or state is touched.",
+        "status": "Ready",
+        "proof_uri": "yazelix_runtime_convergence/proof_records/YZXCONV-027.proof.json",
+        "next_action": "Write the projection-gap report and fold the two runtime files into the YZXCONV-004 and YZXCONV-005 materializer design."
       }
     }
   ]

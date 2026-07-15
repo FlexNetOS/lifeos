@@ -25,11 +25,11 @@ tags:
   - navigation
   - gitkb
 related:
-  - "[[ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
-  - "[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
-  - "[[FOUNDATION_ECOSYSTEM_MAP]]"
-  - "[[FOUNDATION_META_PORTABILITY_MODEL]]"
-  - "[[NORTH_STAR]]"
+  - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]"
+  - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]]"
+  - "[[planning-spine-v0/1.0_VISION/NORTH_STAR]]"
 ---
 
 # LifeOS Vision Navigation Index
@@ -55,14 +55,14 @@ claim above executable evidence.
 |---|---|---|
 | Repository operating contract | [`AGENTS.md`](../../AGENTS.md) | [[AGENTS]] |
 | Planning-spine contract | [`planning-spine-v0/README.md`](../README.md) | [[planning-spine-v0/README]] |
-| Blueprint compatibility and corrections | [Architecture Blueprint Compatibility](./ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |
-| Blueprint requirement-to-task coverage | [Architecture Blueprint Task Coverage](./ARCHITECTURE_BLUEPRINT_TASK_COVERAGE.md) | [[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]] |
-| Ecosystem ownership and built/planned map | [Foundation Ecosystem Map](./FOUNDATION_ECOSYSTEM_MAP.md) | [[FOUNDATION_ECOSYSTEM_MAP]] |
-| Meta and portability model | [Foundation Meta Portability Model](./FOUNDATION_META_PORTABILITY_MODEL.md) | [[FOUNDATION_META_PORTABILITY_MODEL]] |
-| Product north star | [North Star](./NORTH_STAR.md) | [[NORTH_STAR]] |
-| Consolidated strategy | [LifeOS Master Plan](<./LifeOS Master Plan — Consolidated v1 (2026-07-07).md>) | [[LifeOS Master Plan — Consolidated v1 (2026-07-07)]] |
-| Raw NotebookLM architecture input | [Architecture Blueprint](<./Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md>) | [[Notebooklm/Architecture Blueprint - LifeOS Core Foundation]] |
-| Current execution snapshot | [`EXECUTION_STATUS.md`](../EXECUTION_STATUS.md) | [[EXECUTION_STATUS]] |
+| Blueprint compatibility and corrections | [Architecture Blueprint Compatibility](./ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |
+| Blueprint requirement-to-task coverage | [Architecture Blueprint Task Coverage](./ARCHITECTURE_BLUEPRINT_TASK_COVERAGE.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]] |
+| Ecosystem ownership and built/planned map | [Foundation Ecosystem Map](./FOUNDATION_ECOSYSTEM_MAP.md) | [[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]] |
+| Meta and portability model | [Foundation Meta Portability Model](./FOUNDATION_META_PORTABILITY_MODEL.md) | [[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]] |
+| Product north star | [North Star](./NORTH_STAR.md) | [[planning-spine-v0/1.0_VISION/NORTH_STAR]] |
+| Consolidated strategy | [LifeOS Master Plan](<./LifeOS Master Plan — Consolidated v1 (2026-07-07).md>) | [[planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07)]] |
+| Raw NotebookLM architecture input | [Architecture Blueprint](<./Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md>) | [[planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation]] |
+| Current execution snapshot | [`EXECUTION_STATUS.md`](../EXECUTION_STATUS.md) | [[planning-spine-v0/EXECUTION_STATUS]] |
 
 ## Evidence routes
 
@@ -98,7 +98,7 @@ Use YAML frontmatter with these fields when applicable:
 
 Do not add metadata that cannot be maintained or that implies proof absent a
 receipt. Use dual links when possible: `[[WIKI LINK]]` for graph navigation and
-`[Markdown link](path)` for portable local navigation.
+`[Markdown link](README.md)` (a relative path) for portable local navigation.
 
 ## GitKB operating note
 
@@ -127,7 +127,7 @@ git-kb code index planning-spine-v0 --dry-run --index-only \
 ```
 
 Use the exact index-write commands and boundaries in
-[[ARCHITECTURE_BLUEPRINT_COMPATIBILITY#GitKB navigation and index contract]]
+[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY#GitKB navigation and index contract]]
 only after the index mutation is explicitly authorized.
 
 ## Agent retrieval rules

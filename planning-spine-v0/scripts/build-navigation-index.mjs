@@ -352,7 +352,7 @@ function jsonMetadata(value) {
   };
 }
 
-function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = false) {
+export function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = false) {
   const withoutAlias = wiki ? target.split("|", 1)[0] : target;
   const [pathPart, anchor = ""] = withoutAlias.split("#", 2);
   const trimmed = pathPart.trim();
@@ -392,11 +392,24 @@ function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = fals
   };
 }
 
-function extractLinks(text) {
+export function extractLinks(text) {
   const stripped = stripMarkdownCode(text);
   const markdown = [...stripped.matchAll(/\[[^\]]+\]\((?:<([^>]+)>|([^\s)]+))\)/g)].map((match) => match[1] ?? match[2]);
   const wiki = [...stripped.matchAll(/\[\[([^\]]+)\]\]/g)].map((match) => match[1]);
   return { markdown, wiki };
+}
+
+export function bareWikiAliasTarget(target) {
+  const pathPart = String(target).split("|", 1)[0].split("#", 1)[0].trim();
+  if (!pathPart || pathPart.includes("/") || pathPart.startsWith(".") || path.isAbsolute(pathPart)) return null;
+  return pathPart;
+}
+
+export function resolveWikiAliasThroughIndex(index, aliasTarget) {
+  const key = normalizeLookup(aliasTarget ?? "");
+  if (!key) return [];
+  const nodeIds = index?.by_alias?.[key] ?? [];
+  return unique(nodeIds.map((nodeId) => index?.records?.[nodeId]?.path).filter(Boolean)).sort();
 }
 
 function sortObjectOfArrays(value) {
@@ -748,6 +761,7 @@ export function buildNavigationArtifacts(options = {}) {
   }
 
   const strictUnresolved = [];
+  const pendingWikiAliasFindings = [];
   for (const { absolutePath, packagePath } of includedFiles.filter((file) => path.extname(file.packagePath).toLowerCase() === ".md")) {
     const sourceNodeId = fileNodeByPackagePath.get(packagePath);
     const text = fs.readFileSync(absolutePath, "utf8");
@@ -774,6 +788,11 @@ export function buildNavigationArtifacts(options = {}) {
           continue;
         }
         if (!resolved.exists) {
+          const aliasTarget = kind === "wiki-link" ? bareWikiAliasTarget(target) : null;
+          if (aliasTarget !== null) {
+            pendingWikiAliasFindings.push({ sourceNodeId, packagePath, kind, target, aliasTarget, anchor: resolved.anchor });
+            continue;
+          }
           const finding = { source: packagePath, kind, target, reason: "missing" };
           unresolvedLinks.push(finding);
           if (strictLinks.has(packagePath)) strictUnresolved.push(finding);
@@ -784,8 +803,38 @@ export function buildNavigationArtifacts(options = {}) {
       }
     }
   }
+  const nodeIdByAliasPath = new Map();
+  const pathBackedAliasLookup = {};
+  for (const node of nodes.values()) {
+    if (!node.path) continue;
+    nodeIdByAliasPath.set(node.path, node.id);
+    for (const alias of node.aliases) addLookup(pathBackedAliasLookup, normalizeLookup(alias), node.id);
+  }
+  const pathBackedAliasIndex = {
+    by_alias: pathBackedAliasLookup,
+    records: Object.fromEntries(
+      [...nodes.values()].filter((node) => node.path).map((node) => [node.id, { path: node.path }])
+    )
+  };
+  for (const pending of pendingWikiAliasFindings) {
+    const aliasPaths = resolveWikiAliasThroughIndex(pathBackedAliasIndex, pending.aliasTarget);
+    if (aliasPaths.length === 1) {
+      addEdge(pending.sourceNodeId, nodeIdByAliasPath.get(aliasPaths[0]), pending.kind, pending.anchor || null);
+      continue;
+    }
+    const finding = {
+      source: pending.packagePath,
+      kind: pending.kind,
+      target: pending.target,
+      reason: aliasPaths.length ? "ambiguous-alias" : "missing"
+    };
+    unresolvedLinks.push(finding);
+    if (strictLinks.has(pending.packagePath)) strictUnresolved.push(finding);
+  }
   if (strictUnresolved.length) {
-    errors.push(...strictUnresolved.map((finding) => `broken ${finding.kind} in ${finding.source}: ${finding.target}`));
+    errors.push(...strictUnresolved.map((finding) => (
+      `${finding.reason === "ambiguous-alias" ? "ambiguous" : "broken"} ${finding.kind} in ${finding.source}: ${finding.target}`
+    )));
   }
   checks.push({ name: "strict_links_resolve", result: strictUnresolved.length ? "fail" : "pass", observed: strictUnresolved.length });
   const missingExternalReferences = [...allowedExternalReferences].filter((target) => !observedExternalReferences.has(target));
@@ -883,6 +932,34 @@ export function buildNavigationArtifacts(options = {}) {
     if (fileNodeByPackagePath.has(proofPath)) addEdge(`task:${task.task_id}`, fileNodeByPackagePath.get(proofPath), "declares-proof");
   }
   checks.push({ name: "task_parents_resolve", result: errors.some((error) => error.startsWith("unknown task reference")) ? "fail" : "pass", observed: normalizedGraph.tasks.length });
+
+  const canonicalTaskCount = normalizedGraph.tasks.length;
+  const authoredTaskCountClaims = [
+    ...fs.readFileSync(path.join(pkgRoot, "navigation", "README.md"), "utf8").matchAll(/(\d+)\s+task-graph rows/g)
+  ].map((match) => Number(match[1]));
+  const authoredTaskCountErrors = [];
+  if (normalizedGraph.task_count !== canonicalTaskCount) {
+    authoredTaskCountErrors.push(
+      `canonical task_count ${normalizedGraph.task_count} disagrees with its ${canonicalTaskCount} task row(s)`
+    );
+  }
+  if (!authoredTaskCountClaims.length) {
+    authoredTaskCountErrors.push("navigation/README.md must state the canonical total as '<count> task-graph rows'");
+  }
+  for (const claim of authoredTaskCountClaims) {
+    if (claim !== canonicalTaskCount) {
+      authoredTaskCountErrors.push(
+        `navigation/README.md claims ${claim} task-graph rows; the canonical graph has ${canonicalTaskCount}`
+      );
+    }
+  }
+  errors.push(...authoredTaskCountErrors.map((error) => `authored task count: ${error}`));
+  checks.push({
+    name: "authored_task_counts_match_canonical_graph",
+    result: authoredTaskCountErrors.length ? "fail" : "pass",
+    observed: authoredTaskCountClaims.length,
+    expected_task_count: canonicalTaskCount
+  });
 
   for (const [packagePath, fileNodeId] of fileNodeByPackagePath) {
     const node = nodes.get(fileNodeId);

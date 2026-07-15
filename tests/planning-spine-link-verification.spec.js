@@ -180,7 +180,7 @@ describe("strict navigation link verification (ARCHBP-033)", () => {
         `${readmeBefore}`,
         "Alias fixture: [[Fixture Unique Wiki Alias]]",
         "Missing fixture: [[Definitely Absent Fixture Alias]]",
-        "Escape fixture: [[../../fixture-escape-target]]",
+        "Escape fixture: [[../../../fixture-escape-target]]",
         "",
       ].join("\n"));
 

@@ -6,7 +6,7 @@ type: navigation-index
 status: active
 lifecycle: maintained
 created: 2026-07-12
-updated: 2026-07-13
+updated: 2026-07-14
 aliases:
   - Planning spine navigation
   - Agent recall index
@@ -82,7 +82,7 @@ not enter the canonical LifeOS task or proof namespaces.
 
 | Namespace | Exact lookup | Authority boundary |
 |---|---|---|
-| Canonical LifeOS tasks | `by_task_id` | Exactly the 249 task-graph rows; proof-derived lifecycle applies. |
+| Canonical LifeOS tasks | `by_task_id` | Exactly the 233 task-graph rows; proof-derived lifecycle applies. |
 | Imported WorkOrders | `by_work_order_id` | `TASK-CDB000..105`; local status remains `review`, source status is provenance only. |
 | Mandatory capabilities | `by_mandatory_capability_id` | `CAP-MIG-001..028`; mandatory review scope, never a completion claim. |
 

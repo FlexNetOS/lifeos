@@ -12,6 +12,10 @@
 2. When Hermes is added, which of its orchestration primitives become first-class task graph edges?
 3. How far should company hierarchy modeling go before it dilutes CECCA's v0 responsibility boundary?
 
+## Release Questions
+
+1. Is the Rust toolchain bundled as a relocatable closure inside the release prefix (`toolchains/rust/`), or recorded as build-only provenance? (ARCHBP-029 — decided, see DECIDE-007.)
+
 ## Current Default Answers
 
 Until those questions are resolved:
@@ -54,3 +58,11 @@ Recorded 2026-07-13T03:53:34Z by David (owner) ratification. Each is bounded, re
 - **Decision:** CECCA remains the single internal CEO-agent role in v0; company hierarchy modeling stays minimal and does not dilute CECCA's responsibility boundary.
 - **Unblock condition:** A post-v0 RFC expanding company hierarchy modeling with explicit role boundaries and owner sign-off.
 - **Deferral/rollback rule:** Hierarchy modeling reverts to the single CECCA CEO-agent boundary.
+
+### DECIDE-007 — Rust toolchain bundling versus build-only provenance (RELEASE-Q1, ARCHBP-029)
+
+Recorded 2026-07-15T02:29:13Z under owner-delegated bounded mission authority (2026-07-14 delegation); bounded, reversible, evidence and full option matrix in [ARCHBP-029-toolchain-decision.md](1.0_VISION/current_state/ARCHBP-029-toolchain-decision.md).
+
+- **Decision:** Build-only provenance. The Rust toolchain is not bundled into the portable release prefix; `toolchains/rust/` stays unpopulated and the release ledger records rustc/cargo versions, target triple, lockfile hash, and binary checksums in `manifests/provenance.json`. Measured basis: the pinned nu_plugin nightly toolchain closure is 772.8 MiB across 11 store paths with store-RPATH'd glibc/bash (unproven relocation, the ARCHBP-021 blocker), and the deployed prefix never invokes rustc under the blueprint's materialization model.
+- **Unblock condition:** An executed relocation proof of a Rust toolchain closure on a clean non-Nix host, owner sign-off on the size budget, license-map coverage for the added GPL/LGPL components, and a named security-update owner for the bundled toolchain.
+- **Deferral/rollback rule:** Reopening reverts the release-contract row to QUESTION and re-blocks dependent release tasks; the decision is documentation-only, so rollback is a document revert with no toolchain or profile state changes.

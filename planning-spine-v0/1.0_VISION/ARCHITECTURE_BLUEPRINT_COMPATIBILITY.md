@@ -42,10 +42,10 @@ tags:
   - agent-navigation
 related:
   - "[[README]]"
-  - "[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
-  - "[[FOUNDATION_ECOSYSTEM_MAP]]"
-  - "[[FOUNDATION_META_PORTABILITY_MODEL]]"
-  - "[[Notebooklm/Architecture Blueprint - LifeOS Core Foundation]]"
+  - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]]"
+  - "[[planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation]]"
 ---
 
 # Architecture Blueprint Compatibility — CodeDB Foundation Review
@@ -213,11 +213,11 @@ git-kb code stats --json
 1. Read the repository contract: [`AGENTS.md`](../../AGENTS.md).
 2. Read the package entrypoint: [`planning-spine-v0/README.md`](../README.md).
 3. Use this document to separate proof from architectural intent:
-   [[ARCHITECTURE_BLUEPRINT_COMPATIBILITY]].
-4. Open [[FOUNDATION_ECOSYSTEM_MAP]] for built/planned ownership and
-   [[FOUNDATION_META_PORTABILITY_MODEL]] for portability boundaries.
+   [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]].
+4. Open [[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]] for built/planned ownership and
+   [[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]] for portability boundaries.
 5. Read the raw blueprint only for original context:
-   [[Notebooklm/Architecture Blueprint - LifeOS Core Foundation]].
+   [[planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation]].
 6. Follow normalized claims to their proof records before changing status.
 7. Inspect CodeDB's [integration contracts](../../../nu_plugin/docs/INTEGRATION_CONTRACTS.md),
    [round-trip proof](../../../nu_plugin/docs/ROUND_TRIP_PROOF.md), and
@@ -248,7 +248,7 @@ The current course is compatible, but the following subjects remain open:
 
 The complete heading-by-heading mapping, authoritative corrections, and related
 foundation gaps are maintained in
-[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]].
+[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]].
 
 ## Refresh protocol
 

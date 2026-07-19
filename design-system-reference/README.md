@@ -6,10 +6,20 @@
 > that don't fit the token schema. Both sources must stay in sync:
 > `bun run design:lint` catches broken token references.
 
-> **Mission:** LifeOS is the AI agent that runs your home and your life.
-> Work, personal, home automation — one operating system, one assistant.
+> **Mission:** LifeOS is ElementArk's operating system and all-in-one application.
+> Work, Personal, and Home are its three application domains.
 
-A dark-first, gradient-accented design system. The mark is a **tri-node arc emblem** — three nodes at the corners of a triangle, connected by three swooping arcs that hook into each other in 120° rotational symmetry. The form is borrowed from the *Element Ark* emblem style, recoloured in the LifeOS cyan→purple→green spiral gradient. Modelled on the **FlexNetOS/Sidebar** product codebase. This repo contains every token, font, asset, component and screen pattern needed to design new LifeOS surfaces without starting from scratch.
+A dark-first, token-driven design system. The LifeOS product mark is the canonical **tri-node arc emblem**: three domain nodes connected by the approved cyan, purple, and green geometry. The UI uses Lexend, the LIFEOS wordmark uses Rigelstar, and the canonical mark supplies the only approved multicolor brand treatment. Do not add decorative gradients or glow around it.
+
+## Brand architecture
+
+- **ElementArk** is the parent conglomerate.
+- **LifeOS** is the operating system and all-in-one ElementArk application.
+- LifeOS is primary on app icon, splash, login, onboarding, sidebar, app shell, loading, Settings, About, and product-documentation surfaces.
+- ElementArk is primary in corporate, investor, portfolio, conglomerate, and cross-portfolio contexts.
+- Use **LifeOS by ElementArk** as a typographic endorsement where ownership helps. It remains part of one product lockup; it is not a second competing mark.
+- Work, Personal, and Home are navigation pillars inside LifeOS.
+- One brand mark per screen. Never make LifeOS a tagline beneath an ElementArk-led lockup on product surfaces.
 
 ---
 
@@ -22,9 +32,9 @@ A dark-first, gradient-accented design system. The mark is a **tri-node arc embl
 | `fonts/rigel_star/License.txt` | License for Rigelstar. |
 | `assets/lifeos-mark.png` | **The official LifeOS emblem mark** — ElementArk triad on black with neon glow. 1024px. Canonical Tauri icon source. |
 | `assets/lifeos-mark-256.png` | Same mark at 256px (used in-app for 32–64px slots and favicons). |
-| `assets/lifeos-primary-lockup.png` | Full lockup: emblem + ELEMENTARK wordmark + LIFEOS tagline. 1024px. |
-| `assets/lifeos-wordmark-tagline.png` | Wordmark + tagline only (no emblem). |
-| `assets/lifeos-icon-triad.png` | Just the three pillar icons (Work / Personal / Home). |
+| `assets/lifeos-primary-lockup.png` | ElementArk-led corporate / parent lockup with LifeOS descriptor and domain triad. 1024px. Not the default app lockup. |
+| `assets/lifeos-wordmark-tagline.png` | ElementArk corporate wordmark with LifeOS descriptor. Not product-primary on app surfaces. |
+| `assets/lifeos-icon-triad.png` | Raster Work / Personal / Home domain triad. |
 | `assets/icons/work-on-black.png` | Work pillar icon (laptop, cyan). |
 | `assets/icons/personal-on-black.png` | Personal pillar icon (person + heart, purple). |
 | `assets/icons/home-on-black.png` | Home pillar icon (house, green). |

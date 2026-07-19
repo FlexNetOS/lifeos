@@ -54,8 +54,12 @@ ubuntu-lifeos/
 ├── lifeos_app.css              # Component CSS from the React design canon, kept 1:1
 ├── fonts/                      # Rigelstar.ttf (display face)
 ├── public/                     # Vite static assets — served at root URL
-│   ├── lifeos-mark-256.png     # Brand mark used in the sidebar (loaded from / )
-│   ├── lifeos-app-icon.png     # Favicon + Tauri source
+│   ├── lifeos-mark.png         # Primary mark + canonical Tauri icon source
+│   ├── lifeos-mark-256.png     # Sidebar + favicon mark (loaded from / )
+│   ├── lifeos-primary-lockup.png
+│   ├── lifeos-wordmark-tagline.png
+│   ├── lifeos-icon-triad.png
+│   ├── work_personal_home_icons.svg
 │   └── icons/                  # work-on-black, personal-on-black, home-on-black
 ├── src/
 │   ├── main.ts                 # createApp + pinia + router + Tauri nav bridge
@@ -67,7 +71,7 @@ ubuntu-lifeos/
 ├── src-tauri/
 │   ├── Cargo.toml              # tauri 2 + plugin-fs + plugin-shell + tray-icon
 │   ├── tauri.conf.json         # 1280×800 dark window, dark theme, FS scoped to vault
-│   ├── icons/                  # Full Tauri icon set generated from lifeos-app-icon.png
+│   ├── icons/                  # Full Tauri icon set generated from lifeos-mark.png
 │   └── src/main.rs             # Native menu, vault stubs, settings navigation event
 ├── tests/                      # 45 Vitest specs covering every interactive surface
 └── design-system-reference/    # Handoff bundle (read-only reference):

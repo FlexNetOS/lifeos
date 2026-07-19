@@ -102,7 +102,7 @@ async function onResetVault() {
           </span>
         </div>
         <h1 id="login-title" class="login-title">
-          {{ isSignup ? "Create your LifeOS account" : "Welcome back" }}
+          {{ isSignup ? "Welcome to LifeOS" : "Welcome back" }}
         </h1>
         <p class="login-sub">
           <template v-if="isSignup">

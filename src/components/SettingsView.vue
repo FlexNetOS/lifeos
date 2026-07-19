@@ -286,31 +286,12 @@ onMounted(async () => {
         </div>
         <p class="settings-section-desc">
           LifeOS is ElementArk's operating system and all-in-one application for
-          Work, Personal, and Home.
+          Work, Personal, and Home. Its Yazelix workspace uses UDS and shared
+          redb mmap state.
         </p>
         <dl class="settings-meta" data-test="settings-about-meta">
           <div class="settings-meta-row">
-            <dt class="settings-meta-key">Product</dt>
-            <dd class="settings-meta-value">LifeOS</dd>
-          </div>
-          <div class="settings-meta-row">
-            <dt class="settings-meta-key">Parent conglomerate</dt>
-            <dd class="settings-meta-value">ElementArk</dd>
-          </div>
-          <div class="settings-meta-row">
-            <dt class="settings-meta-key">Product role</dt>
-            <dd class="settings-meta-value">Operating system + all-in-one app</dd>
-          </div>
-          <div class="settings-meta-row">
-            <dt class="settings-meta-key">Domains</dt>
-            <dd class="settings-meta-value">Work, Personal, Home</dd>
-          </div>
-          <div class="settings-meta-row">
-            <dt class="settings-meta-key">Workspace state</dt>
-            <dd class="settings-meta-value">UDS + shared redb mmap</dd>
-          </div>
-          <div class="settings-meta-row">
-            <dt class="settings-meta-key">App version</dt>
+            <dt class="settings-meta-key">App</dt>
             <dd class="settings-meta-value">{{ version.app }}</dd>
           </div>
           <div class="settings-meta-row">

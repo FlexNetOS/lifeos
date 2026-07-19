@@ -20,13 +20,11 @@ A dark-first, gradient-accented design system. The mark is a **tri-node arc embl
 | `colors_and_type.css` | All color, type, spacing, radii, shadow, gradient CSS variables. **Import this in every new artifact.** |
 | `fonts/Rigelstar.ttf` | The display face — wordmark, stat numerics. |
 | `fonts/rigel_star/License.txt` | License for Rigelstar. |
-| `assets/lifeos-mark.png` | **The official LifeOS emblem mark** — ElementArk triad on black with neon glow. 1024px. |
-| `assets/lifeos-mark-256.png` | Same mark at 256px (used in-app for 32–64px slots). |
-| `assets/lifeos-app-icon.png` | Squared app-icon variant for tiles / favicons. 512px. |
+| `assets/lifeos-mark.png` | **The official LifeOS emblem mark** — ElementArk triad on black with neon glow. 1024px. Canonical Tauri icon source. |
+| `assets/lifeos-mark-256.png` | Same mark at 256px (used in-app for 32–64px slots and favicons). |
 | `assets/lifeos-primary-lockup.png` | Full lockup: emblem + ELEMENTARK wordmark + LIFEOS tagline. 1024px. |
 | `assets/lifeos-wordmark-tagline.png` | Wordmark + tagline only (no emblem). |
 | `assets/lifeos-icon-triad.png` | Just the three pillar icons (Work / Personal / Home). |
-| `assets/lifeos-companion.svg` | Editable vector approximation of the lockup. Not pixel-exact — use the PNG for production. |
 | `assets/icons/work-on-black.png` | Work pillar icon (laptop, cyan). |
 | `assets/icons/personal-on-black.png` | Personal pillar icon (person + heart, purple). |
 | `assets/icons/home-on-black.png` | Home pillar icon (house, green). |

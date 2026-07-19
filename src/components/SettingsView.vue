@@ -282,14 +282,35 @@ onMounted(async () => {
           <span class="settings-section-ico" aria-hidden="true">
             <Icon name="info" :size="16" />
           </span>
-          <h2 id="settings-about-heading" class="settings-section-title">About</h2>
+          <h2 id="settings-about-heading" class="settings-section-title">About LifeOS</h2>
         </div>
         <p class="settings-section-desc">
-          Runtime metadata for support and bug reports.
+          LifeOS is ElementArk's operating system and all-in-one application for
+          Work, Personal, and Home.
         </p>
         <dl class="settings-meta" data-test="settings-about-meta">
           <div class="settings-meta-row">
-            <dt class="settings-meta-key">App</dt>
+            <dt class="settings-meta-key">Product</dt>
+            <dd class="settings-meta-value">LifeOS</dd>
+          </div>
+          <div class="settings-meta-row">
+            <dt class="settings-meta-key">Parent conglomerate</dt>
+            <dd class="settings-meta-value">ElementArk</dd>
+          </div>
+          <div class="settings-meta-row">
+            <dt class="settings-meta-key">Product role</dt>
+            <dd class="settings-meta-value">Operating system + all-in-one app</dd>
+          </div>
+          <div class="settings-meta-row">
+            <dt class="settings-meta-key">Domains</dt>
+            <dd class="settings-meta-value">Work, Personal, Home</dd>
+          </div>
+          <div class="settings-meta-row">
+            <dt class="settings-meta-key">Workspace state</dt>
+            <dd class="settings-meta-value">UDS + shared redb mmap</dd>
+          </div>
+          <div class="settings-meta-row">
+            <dt class="settings-meta-key">App version</dt>
             <dd class="settings-meta-value">{{ version.app }}</dd>
           </div>
           <div class="settings-meta-row">

@@ -565,7 +565,9 @@ export function buildNavigationArtifacts(options = {}) {
   const includedFiles = [];
   const selfExcludedOutputs = new Set(Object.values(source.outputs));
   const isRuntimeArtifact = (packagePath) => (
-    /(?:^|\/)(?:__pycache__|\.pytest_cache)(?:\/|$)/.test(packagePath)
+    packagePath.startsWith("dist/")
+    || /^generated\/fleet_verification\/[^/]+\.log$/.test(packagePath)
+    || /(?:^|\/)(?:__pycache__|\.pytest_cache)(?:\/|$)/.test(packagePath)
     || /\.(?:py[co]|pid)$/.test(packagePath)
   );
   for (const absolutePath of allAbsoluteFiles) {

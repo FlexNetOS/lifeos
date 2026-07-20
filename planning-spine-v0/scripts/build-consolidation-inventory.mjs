@@ -17,6 +17,14 @@ const volatileProjectionPaths = new Set([
   "state/verification_runtime_report.json"
 ]);
 
+function isMachineRuntimeArtifact(relativePath) {
+  return relativePath.startsWith("dist/")
+    || /^generated\/fleet_verification\/[^/]+\.log$/.test(relativePath)
+    || /(?:^|\/)__pycache__(?:\/|$)/.test(relativePath)
+    || /(?:^|\/)\.pytest_cache(?:\/|$)/.test(relativePath)
+    || /\.(?:py[co]|pid)$/.test(relativePath);
+}
+
 function isVolatileProjection(relativePath) {
   return relativePath.startsWith("navigation/generated/")
     || volatileProjectionPaths.has(relativePath);
@@ -135,7 +143,10 @@ function semanticFields(relativePath, authorityClass, lifecycle, purpose, dispos
 function inventorySpine() {
   const entries = walkFiles(spineRoot)
     .map((absolute) => path.relative(spineRoot, absolute).split(path.sep).join("/"))
-    .filter((relative) => !excludedFromSelfInventory.has(relative))
+    .filter((relative) => (
+      !excludedFromSelfInventory.has(relative)
+      && !isMachineRuntimeArtifact(relative)
+    ))
     .map((relative) => {
       const absolute = path.join(spineRoot, relative);
       const bytes = fs.readFileSync(absolute);

@@ -162,6 +162,8 @@ describe("planning-spine agent navigation", () => {
       expect.objectContaining({ name: "mandatory_migration_capabilities_are_review_only", result: "pass", observed: 28, expected: 28 }),
       expect.objectContaining({ name: "migration_lookup_namespaces_are_exact", result: "pass", observed: 134, expected: 134 }),
     ]));
+    expect(graph.nodes.some((node) => node.path?.startsWith("planning-spine-v0/dist/"))).toBe(false);
+    expect(graph.nodes.some((node) => node.path === "planning-spine-v0/generated/fleet_verification/LPS-025.gate-battery.log")).toBe(false);
     expect(index.entrypoints.map(({ path }) => path)).toEqual(expect.arrayContaining([
       "planning-spine-v0/ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md",
       "planning-spine-v0/task_tables/README.md",

@@ -9,7 +9,7 @@ Read the `README.md` file within this skill, and explore the other available fil
 If creating visual artifacts (slides, mocks, throwaway prototypes, etc), copy assets out of this folder and create static HTML files for the user to view. Always:
 
 1. Link or copy `colors_and_type.css` and use the CSS variables — never hard-code hex values.
-2. Copy `assets/lifeos-mark.png` (1024) or `assets/lifeos-mark-256.png` (256) when you need the brand mark — the emblem has neon glow baked in and renders best on near-black surfaces. For squared tiles (favicon, app launcher) use `assets/lifeos-app-icon.png`. For a full hero use `assets/lifeos-primary-lockup.png`. Copy `fonts/Rigelstar.ttf` when you need the display face.
+2. Copy `assets/lifeos-mark.png` (1024) or `assets/lifeos-mark-256.png` (256) when you need the brand mark — the emblem has neon glow baked in and renders best on near-black surfaces. Use `assets/lifeos-mark-256.png` for favicons and small UI slots; use `assets/lifeos-mark.png` as the Tauri icon source. For a full hero use `assets/lifeos-primary-lockup.png`. Copy `fonts/Rigelstar.ttf` when you need the display face.
 3. Pull components from `ui_kits/lifeos_app/` (Sidebar, Workspace, MenuRow, StatCard, etc) rather than recreating them.
 4. Use Lucide via CDN (`https://unpkg.com/lucide@0.475.0/...`) for iconography.
 5. Default to the dark theme: `var(--bg-0)` page, `var(--bg-2)` cards, `var(--fg-1)` text.

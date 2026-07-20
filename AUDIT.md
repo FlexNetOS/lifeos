@@ -94,7 +94,7 @@ Lift-time infra additions:
 - `src/shims-vue.d.ts` — standard `*.vue` module declaration so `vue-tsc --noEmit` passes during `bun run build`.
 - `src-tauri/src/lib.rs` + `src-tauri/src/main.rs` split — Tauri 2 convention requires the library code in `lib.rs` (so the same crate can target mobile + desktop). The original kit had everything in `main.rs`, which caused `cargo` to fail with `can't find library 'lifeos_lib'`.
 - `src-tauri/capabilities/default.json` — Tauri 2 requires a capabilities file; the original bundle didn't ship one. Wired up core/event/webview/window/menu + shell:default + fs:default.
-- `src-tauri/icons/*` — full Tauri icon set generated from `public/lifeos-app-icon.png` via `cargo-tauri icon` (the bundle didn't include these; `tauri.conf.json` references them).
+- `src-tauri/icons/*` — full Tauri icon set generated from canonical `public/lifeos-mark.png` via `cargo-tauri icon` (the bundle didn't include these; `tauri.conf.json` references them).
 - `.gitignore` — committed `bun.lock` (team's lockfile standard); excluded `node_modules/`, `dist/`, `src-tauri/target/`, etc.
 
 ### Verification gate (Stage 1 closure)

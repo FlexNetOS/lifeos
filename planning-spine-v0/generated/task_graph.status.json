@@ -19,7 +19,16 @@
     "ARCHBP-023",
     "ARCHBP-025",
     "ARCHBP-034",
-    "ARCHBP-037"
+    "ARCHBP-037",
+    "ARCHBP-038",
+    "ARCHBP-039",
+    "ARCHBP-041",
+    "ARCHBP-042",
+    "ARCHBP-043",
+    "ARCHBP-045",
+    "ARCHBP-046",
+    "ARCHBP-047",
+    "ARCHBP-048"
   ],
   "complete_task_ids": [
     "NBSTATED-001",
@@ -216,25 +225,27 @@
     "DECIDE-003",
     "DECIDE-004",
     "DECIDE-005",
-    "DECIDE-006"
+    "DECIDE-006",
+    "ARCHBP-035"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
   "forbidden_updates": [],
-  "generated_at": "2026-07-14T07:17:19Z",
+  "generated_at": "2026-07-20T00:00:00Z",
   "global_coverage_gate": "closed",
-  "ledger_entry_count": 258,
+  "invalidated_task_ids": [],
+  "ledger_entry_count": 278,
   "lifecycle_counts": {
-    "blocked": 20,
-    "complete": 195,
+    "blocked": 29,
+    "complete": 196,
     "draft": 0,
-    "ready": 18,
+    "ready": 19,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "99ac837e5878972069fa679fed21f870d8487967e89ea45eb7eb04b1f4d2b6cf",
+  "proof_ledger_sha256": "d92a4f62c2f19fac3add3cf2deb958bb3ddf950f8bf1eb4978e3313f4f885220",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-001",
@@ -253,17 +264,18 @@
     "ARCHBP-031",
     "ARCHBP-032",
     "ARCHBP-033",
-    "ARCHBP-035",
-    "ARCHBP-036"
+    "ARCHBP-036",
+    "ARCHBP-040",
+    "ARCHBP-044"
   ],
   "result": "pass",
   "rolled_back_task_ids": [],
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "e69bd1174793d670193ce46451e9077f1548076643ec26ab05f12f46ec72ba4b",
+  "source_graph_sha256": "881bb269c8e1b4ca5afdff1bd592c89b1e8124623d91e353ba104cbadc3a4760",
   "source_graph_uri": "generated/task_graph.normalized.json",
-  "task_count": 233,
+  "task_count": 244,
   "tasks": [
     {
       "effective": {
@@ -2915,8 +2927,8 @@
     },
     {
       "effective": {
-        "next_action": "Proof accepted from proof_records/STORE-001.proof.json; next child task: POSTGRES-002.",
-        "proof_uri": "proof_records/STORE-001.proof.json",
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/STORE-001.proof.json; next child task: POSTGRES-002.",
+        "proof_uri": "planning-spine-v0/proof_records/STORE-001.proof.json",
         "status": "complete"
       },
       "lifecycle_state": "complete",
@@ -2928,27 +2940,32 @@
       "phase": "2-postgres-foundation",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": 166,
-        "observed_at": "2026-07-13T03:47:08Z",
-        "revision": "1",
-        "sha256": "314283a997e35c4d69d5021bbe135a9dce81f202f6918d2508bb765ad891f1c0",
+        "ledger_line_number": 260,
+        "observed_at": "2026-07-20T00:00:00Z",
+        "revision": "2",
+        "sha256": "760a1f35d2dcc69cbd22af9c2e8e2b1f4ea4cac3eb517e2db1771f86e233a3a8",
         "status": "pass"
       },
       "source": {
-        "next_action": "Use the claim queue and evidence relations; NotebookLM repetition is corroboration only, local or upstream primary evidence verifies capability, benchmark evidence verifies performance, and David decides architecture.",
+        "next_action": "Decision revision 2 is anchor-reconciled. Execute ARCHBP-038 through ARCHBP-048 in dependency order; do not claim the target runtime until their exact proof gates pass.",
         "proof_uri": "proof_records/STORE-001.proof.json",
         "status": "complete"
       },
       "source_row_number": 69,
       "task_id": "STORE-001",
-      "title": "redb PostgreSQL and nu_plugin CodeDB relationship decided",
+      "title": "redb PostgreSQL RuVector AgentDB envctl and CodeDB relationship decided",
       "updated_fields": [
-        "next_action"
+        "next_action",
+        "proof_uri"
       ],
       "updates": {
         "next_action": {
-          "from": "Use the claim queue and evidence relations; NotebookLM repetition is corroboration only, local or upstream primary evidence verifies capability, benchmark evidence verifies performance, and David decides architecture.",
-          "to": "Proof accepted from proof_records/STORE-001.proof.json; next child task: POSTGRES-002."
+          "from": "Decision revision 2 is anchor-reconciled. Execute ARCHBP-038 through ARCHBP-048 in dependency order; do not claim the target runtime until their exact proof gates pass.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/STORE-001.proof.json; next child task: POSTGRES-002."
+        },
+        "proof_uri": {
+          "from": "proof_records/STORE-001.proof.json",
+          "to": "planning-spine-v0/proof_records/STORE-001.proof.json"
         }
       }
     },
@@ -8900,22 +8917,22 @@
     },
     {
       "effective": {
-        "next_action": "Capture both GRAPH-005 revision 1 ledger identities and write failing merger, reader-parity, unresolved-conflict, and append-only-resolution tests.",
-        "proof_uri": "proof_records/ARCHBP-035.proof.json",
-        "status": "ready"
+        "next_action": "Proof accepted from planning-spine-v0/proof_records/ARCHBP-035.proof.json; no child task is declared in this graph.",
+        "proof_uri": "planning-spine-v0/proof_records/ARCHBP-035.proof.json",
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "LPS-007"
       ],
       "phase": "13-foundation-gap-closure",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 259,
+        "observed_at": "2026-07-20T00:00:00Z",
+        "revision": "1",
+        "sha256": "32d600b9489c78c3295482a05c8928e53ef8d556122e6255a310293f6cd04ff3",
+        "status": "pass"
       },
       "source": {
         "next_action": "Capture both GRAPH-005 revision 1 ledger identities and write failing merger, reader-parity, unresolved-conflict, and append-only-resolution tests.",
@@ -8925,8 +8942,25 @@
       "source_row_number": 232,
       "task_id": "ARCHBP-035",
       "title": "Resolve duplicate proof-ledger task revision identities without rewriting history",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action",
+        "proof_uri",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Capture both GRAPH-005 revision 1 ledger identities and write failing merger, reader-parity, unresolved-conflict, and append-only-resolution tests.",
+          "to": "Proof accepted from planning-spine-v0/proof_records/ARCHBP-035.proof.json; no child task is declared in this graph."
+        },
+        "proof_uri": {
+          "from": "proof_records/ARCHBP-035.proof.json",
+          "to": "planning-spine-v0/proof_records/ARCHBP-035.proof.json"
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
     },
     {
       "effective": {
@@ -8987,6 +9021,352 @@
       "source_row_number": 234,
       "task_id": "ARCHBP-037",
       "title": "Make navigation generation byte-deterministic across local and CI environments",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Begin after ARCHBP-001 proves exact ingestion; enumerate the complete data-class corpus and write failing byte/metadata reconstruction tests.",
+        "proof_uri": "proof_records/ARCHBP-038.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "STORE-001"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Begin after ARCHBP-001 proves exact ingestion; enumerate the complete data-class corpus and write failing byte/metadata reconstruction tests.",
+        "proof_uri": "proof_records/ARCHBP-038.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 235,
+      "task_id": "ARCHBP-038",
+      "title": "Implement byte-complete host ALL-data import and reconstruction",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After ARCHBP-002 defines the outbox seam, write failing single-opener, atomic-publication, replay, and stale-reader tests.",
+        "proof_uri": "proof_records/ARCHBP-039.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-002"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "After ARCHBP-002 defines the outbox seam, write failing single-opener, atomic-publication, replay, and stale-reader tests.",
+        "proof_uri": "proof_records/ARCHBP-039.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 236,
+      "task_id": "ARCHBP-039",
+      "title": "Build the single-owner redb service and atomic mmap live projection",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Write failing envelope-schema, raw-order, binary, invalid-UTF-8, signal, parser-failure, and profile-resolution tests.",
+        "proof_uri": "proof_records/ARCHBP-040.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "NBSOURCE-030",
+        "ARCHBP-001"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Write failing envelope-schema, raw-order, binary, invalid-UTF-8, signal, parser-failure, and profile-resolution tests.",
+        "proof_uri": "proof_records/ARCHBP-040.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 237,
+      "task_id": "ARCHBP-040",
+      "title": "Implement and pin the byte-first rtk_nu adapter",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Begin after ARCHBP-001 and ARCHBP-040; write failing typed-input, raw-linkage, digest, idempotency, and protocol-order tests.",
+        "proof_uri": "proof_records/ARCHBP-041.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "ARCHBP-040"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Begin after ARCHBP-001 and ARCHBP-040; write failing typed-input, raw-linkage, digest, idempotency, and protocol-order tests.",
+        "proof_uri": "proof_records/ARCHBP-041.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 238,
+      "task_id": "ARCHBP-041",
+      "title": "Add typed codedb ingest-envelope with canonical raw-object linkage",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After the owner and envelope seams pass, write failing privilege-bypass, crash-boundary, idempotency, acknowledgement-order, and return-projection tests.",
+        "proof_uri": "proof_records/ARCHBP-042.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-039",
+        "ARCHBP-041"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "After the owner and envelope seams pass, write failing privilege-bypass, crash-boundary, idempotency, acknowledgement-order, and return-projection tests.",
+        "proof_uri": "proof_records/ARCHBP-042.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 239,
+      "task_id": "ARCHBP-042",
+      "title": "Enforce envctl-only durable commit and bidirectional reconciliation",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After ARCHBP-018, ARCHBP-039, and ARCHBP-042, write failing PTY argv, channel-order, byte-fidelity, mmap-generation, reconnect, and no-HTTP tests.",
+        "proof_uri": "proof_records/ARCHBP-043.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-018",
+        "ARCHBP-039",
+        "ARCHBP-042"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "After ARCHBP-018, ARCHBP-039, and ARCHBP-042, write failing PTY argv, channel-order, byte-fidelity, mmap-generation, reconnect, and no-HTTP tests.",
+        "proof_uri": "proof_records/ARCHBP-043.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 240,
+      "task_id": "ARCHBP-043",
+      "title": "Embed the real Yazelix Engine Room in the Vue Tauri LifeOS Glass",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Write synthetic failing custody, lease, relay-replay, rotation, revocation, recovery, keyring-transition, and plaintext-non-leak tests.",
+        "proof_uri": "proof_records/ARCHBP-044.proof.json",
+        "status": "ready"
+      },
+      "lifecycle_state": "ready",
+      "parent_ids": [
+        "INTEL-003",
+        "STORE-001"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Write synthetic failing custody, lease, relay-replay, rotation, revocation, recovery, keyring-transition, and plaintext-non-leak tests.",
+        "proof_uri": "proof_records/ARCHBP-044.proof.json",
+        "status": "ready"
+      },
+      "source_row_number": 241,
+      "task_id": "ARCHBP-044",
+      "title": "Implement protected secret custody and the six-part lifecycle",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After POSTGRES-010 and ARCHBP-038, write failing backup-integrity, selected-LSN, extension-drift, byte-equality, and full-reconstruction tests.",
+        "proof_uri": "proof_records/ARCHBP-045.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "POSTGRES-010",
+        "ARCHBP-038"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "After POSTGRES-010 and ARCHBP-038, write failing backup-integrity, selected-LSN, extension-drift, byte-equality, and full-reconstruction tests.",
+        "proof_uri": "proof_records/ARCHBP-045.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 242,
+      "task_id": "ARCHBP-045",
+      "title": "Prove PostgreSQL WAL replication PITR restore and zero-loss reconstruction",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After host import and durable reconciliation, write failing unauthorized-dispatch, missing-capture, unapproved-merge, split-authority, rollback, and result-return tests.",
+        "proof_uri": "proof_records/ARCHBP-046.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-038",
+        "ARCHBP-042"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "After host import and durable reconciliation, write failing unauthorized-dispatch, missing-capture, unapproved-merge, split-authority, rollback, and result-return tests.",
+        "proof_uri": "proof_records/ARCHBP-046.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 243,
+      "task_id": "ARCHBP-046",
+      "title": "Move repository task context refactor and multi-merge operations under database control",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "After all mapped implementation tasks pass, write the complete negative path-walk, ownership, byte-lineage, privilege, recovery, and unsupported-claim fixture suite.",
+        "proof_uri": "proof_records/ARCHBP-047.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-039",
+        "ARCHBP-040",
+        "ARCHBP-041",
+        "ARCHBP-042",
+        "ARCHBP-043",
+        "ARCHBP-044",
+        "ARCHBP-045",
+        "ARCHBP-046"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "After all mapped implementation tasks pass, write the complete negative path-walk, ownership, byte-lineage, privilege, recovery, and unsupported-claim fixture suite.",
+        "proof_uri": "proof_records/ARCHBP-047.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 244,
+      "task_id": "ARCHBP-047",
+      "title": "Enforce anchor topology path-walk and operational invariant release gates",
+      "updated_fields": [],
+      "updates": {}
+    },
+    {
+      "effective": {
+        "next_action": "Remain blocked until ARCHBP-047 proves the complete topology; then prepare the exact owner-approved cutover and rollback runbook.",
+        "proof_uri": "proof_records/ARCHBP-048.proof.json",
+        "status": "blocked"
+      },
+      "lifecycle_state": "blocked",
+      "parent_ids": [
+        "ARCHBP-047"
+      ],
+      "phase": "13-architecture-blueprint-execution",
+      "proof": {
+        "invalidates": null,
+        "ledger_line_number": null,
+        "observed_at": null,
+        "revision": null,
+        "sha256": null,
+        "status": null
+      },
+      "source": {
+        "next_action": "Remain blocked until ARCHBP-047 proves the complete topology; then prepare the exact owner-approved cutover and rollback runbook.",
+        "proof_uri": "proof_records/ARCHBP-048.proof.json",
+        "status": "blocked"
+      },
+      "source_row_number": 245,
+      "task_id": "ARCHBP-048",
+      "title": "Cut over the PostgreSQL RuVector operational runtime and retire transitional authorities",
       "updated_fields": [],
       "updates": {}
     }
@@ -9194,6 +9574,7 @@
     "DECIDE-003",
     "DECIDE-004",
     "DECIDE-005",
-    "DECIDE-006"
+    "DECIDE-006",
+    "ARCHBP-035"
   ]
 }

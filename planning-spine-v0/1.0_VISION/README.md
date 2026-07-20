@@ -6,9 +6,9 @@ type: navigation-index
 status: active
 lifecycle: maintained
 created: 2026-07-12
-updated: 2026-07-14
+updated: 2026-07-20
 navigation:
-  authority_order: source-tests-proof-normalized-claims-architecture-input
+  authority_order: owner-contracts-expanded-anchors-canonical-inputs-proof-legacy-generated
   markdown_links: required
   wiki_links: required
 gitkb:
@@ -40,11 +40,17 @@ navigation path.
 
 ## Truth and authority order
 
-1. Checked implementation source and executable tests.
-2. Exact receipts and [`proof_records/`](../proof_records/).
-3. Normalized claims under [`generated/`](../generated/).
-4. Maintained architecture maps and compatibility reviews.
-5. NotebookLM artifacts and consolidated vision documents as design input.
+1. Current owner instructions and applicable repository operating contracts.
+2. The two exact-byte expanded [Architecture Anchors](./Architecture_Anchors/README.md)
+   for target topology and implementation requirements.
+3. Canonical maintained Planning Spine task inputs, authority contracts, and
+   accepted proof history.
+4. Legacy handoff and historical material as migration evidence only.
+5. Generated navigation and task views as deterministic projections.
+
+Within current-state claims, checked implementation and executable tests outrank
+planning assertions. The anchors specify the target; they do not prove that the
+target exists.
 
 Repetition, a diagram, or a polished architecture narrative does not promote a
 claim above executable evidence.
@@ -55,6 +61,8 @@ claim above executable evidence.
 |---|---|---|
 | Repository operating contract | [`AGENTS.md`](../../AGENTS.md) | [[AGENTS]] |
 | Planning-spine contract | [`planning-spine-v0/README.md`](../README.md) | [[planning-spine-v0/README]] |
+| Immutable expanded blueprint and graph | [Architecture Anchors](./Architecture_Anchors/README.md) | [[planning-spine-v0/1.0_VISION/Architecture_Anchors/README]] |
+| Legacy handoff and proof-shadow consolidation | [Consolidation record](../consolidation/README.md) | [[planning-spine-v0/consolidation/README]] |
 | Blueprint compatibility and corrections | [Architecture Blueprint Compatibility](./ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |
 | Blueprint requirement-to-task coverage | [Architecture Blueprint Task Coverage](./ARCHITECTURE_BLUEPRINT_TASK_COVERAGE.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]] |
 | Ecosystem ownership and built/planned map | [Foundation Ecosystem Map](./FOUNDATION_ECOSYSTEM_MAP.md) | [[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]] |
@@ -97,8 +105,8 @@ Use YAML frontmatter with these fields when applicable:
 | `review` | Exact repository, commit range, and verification boundary when the document audits implementation. |
 
 Do not add metadata that cannot be maintained or that implies proof absent a
-receipt. Use dual links when possible: `[[WIKI LINK]]` for graph navigation and
-`[Markdown link](README.md)` (a relative path) for portable local navigation.
+receipt. Use dual links when possible: a wiki link for graph navigation and a
+Markdown link with a real relative path for portable local navigation.
 
 ## GitKB operating note
 

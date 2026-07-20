@@ -1,8 +1,8 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.index.v0",
-  "generated_at": "2026-07-14T07:17:15Z",
-  "source_graph_uri": "generated/task_graph.raw.json",
-  "task_count": 233,
+  "generated_at": "2026-07-20T15:05:04Z",
+  "source_graph_uri": "planning-spine-v0/generated/task_graph.raw.json",
+  "task_count": 244,
   "task_ids": [
     "NBSTATED-001",
     "NBSTATED-002",
@@ -236,7 +236,18 @@
     "ARCHBP-034",
     "ARCHBP-035",
     "ARCHBP-036",
-    "ARCHBP-037"
+    "ARCHBP-037",
+    "ARCHBP-038",
+    "ARCHBP-039",
+    "ARCHBP-040",
+    "ARCHBP-041",
+    "ARCHBP-042",
+    "ARCHBP-043",
+    "ARCHBP-044",
+    "ARCHBP-045",
+    "ARCHBP-046",
+    "ARCHBP-047",
+    "ARCHBP-048"
   ],
   "ready_task_ids": [
     "ARCHBP-001",
@@ -256,7 +267,9 @@
     "ARCHBP-032",
     "ARCHBP-033",
     "ARCHBP-035",
-    "ARCHBP-036"
+    "ARCHBP-036",
+    "ARCHBP-040",
+    "ARCHBP-044"
   ],
   "complete_task_ids": [
     "NBSTATED-001",
@@ -3065,6 +3078,143 @@
       ],
       "proof_uri": "proof_records/ARCHBP-037.proof.json",
       "execution_cell": "navigation-determinism-cell"
+    },
+    "ARCHBP-038": {
+      "index": 233,
+      "source_row_number": 235,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "STORE-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-038.proof.json",
+      "execution_cell": "host-all-data-cell"
+    },
+    "ARCHBP-039": {
+      "index": 234,
+      "source_row_number": 236,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-039.proof.json",
+      "execution_cell": "redb-owner-cell"
+    },
+    "ARCHBP-040": {
+      "index": 235,
+      "source_row_number": 237,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "NBSOURCE-030",
+        "ARCHBP-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-040.proof.json",
+      "execution_cell": "rtk-nu-adapter-cell"
+    },
+    "ARCHBP-041": {
+      "index": 236,
+      "source_row_number": 238,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "ARCHBP-040"
+      ],
+      "proof_uri": "proof_records/ARCHBP-041.proof.json",
+      "execution_cell": "codedb-envelope-cell"
+    },
+    "ARCHBP-042": {
+      "index": 237,
+      "source_row_number": 239,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-039",
+        "ARCHBP-041"
+      ],
+      "proof_uri": "proof_records/ARCHBP-042.proof.json",
+      "execution_cell": "envctl-durable-bridge-cell"
+    },
+    "ARCHBP-043": {
+      "index": 238,
+      "source_row_number": 240,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-018",
+        "ARCHBP-039",
+        "ARCHBP-042"
+      ],
+      "proof_uri": "proof_records/ARCHBP-043.proof.json",
+      "execution_cell": "lifeos-engine-room-cell"
+    },
+    "ARCHBP-044": {
+      "index": 239,
+      "source_row_number": 241,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "INTEL-003",
+        "STORE-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-044.proof.json",
+      "execution_cell": "secret-custody-cell"
+    },
+    "ARCHBP-045": {
+      "index": 240,
+      "source_row_number": 242,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "POSTGRES-010",
+        "ARCHBP-038"
+      ],
+      "proof_uri": "proof_records/ARCHBP-045.proof.json",
+      "execution_cell": "postgres-recovery-cell"
+    },
+    "ARCHBP-046": {
+      "index": 241,
+      "source_row_number": 243,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-038",
+        "ARCHBP-042"
+      ],
+      "proof_uri": "proof_records/ARCHBP-046.proof.json",
+      "execution_cell": "database-controlled-work-cell"
+    },
+    "ARCHBP-047": {
+      "index": 242,
+      "source_row_number": 244,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-039",
+        "ARCHBP-040",
+        "ARCHBP-041",
+        "ARCHBP-042",
+        "ARCHBP-043",
+        "ARCHBP-044",
+        "ARCHBP-045",
+        "ARCHBP-046"
+      ],
+      "proof_uri": "proof_records/ARCHBP-047.proof.json",
+      "execution_cell": "anchor-conformance-cell"
+    },
+    "ARCHBP-048": {
+      "index": 243,
+      "source_row_number": 245,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-047"
+      ],
+      "proof_uri": "proof_records/ARCHBP-048.proof.json",
+      "execution_cell": "postgres-operational-cutover-cell"
     }
   },
   "tasks_by_id": {
@@ -5677,6 +5827,143 @@
       ],
       "proof_uri": "proof_records/ARCHBP-037.proof.json",
       "execution_cell": "navigation-determinism-cell"
+    },
+    "ARCHBP-038": {
+      "index": 233,
+      "source_row_number": 235,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "STORE-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-038.proof.json",
+      "execution_cell": "host-all-data-cell"
+    },
+    "ARCHBP-039": {
+      "index": 234,
+      "source_row_number": 236,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-002"
+      ],
+      "proof_uri": "proof_records/ARCHBP-039.proof.json",
+      "execution_cell": "redb-owner-cell"
+    },
+    "ARCHBP-040": {
+      "index": 235,
+      "source_row_number": 237,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "NBSOURCE-030",
+        "ARCHBP-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-040.proof.json",
+      "execution_cell": "rtk-nu-adapter-cell"
+    },
+    "ARCHBP-041": {
+      "index": 236,
+      "source_row_number": 238,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-001",
+        "ARCHBP-040"
+      ],
+      "proof_uri": "proof_records/ARCHBP-041.proof.json",
+      "execution_cell": "codedb-envelope-cell"
+    },
+    "ARCHBP-042": {
+      "index": 237,
+      "source_row_number": 239,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-039",
+        "ARCHBP-041"
+      ],
+      "proof_uri": "proof_records/ARCHBP-042.proof.json",
+      "execution_cell": "envctl-durable-bridge-cell"
+    },
+    "ARCHBP-043": {
+      "index": 238,
+      "source_row_number": 240,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-018",
+        "ARCHBP-039",
+        "ARCHBP-042"
+      ],
+      "proof_uri": "proof_records/ARCHBP-043.proof.json",
+      "execution_cell": "lifeos-engine-room-cell"
+    },
+    "ARCHBP-044": {
+      "index": 239,
+      "source_row_number": 241,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "ready",
+      "parent_ids": [
+        "INTEL-003",
+        "STORE-001"
+      ],
+      "proof_uri": "proof_records/ARCHBP-044.proof.json",
+      "execution_cell": "secret-custody-cell"
+    },
+    "ARCHBP-045": {
+      "index": 240,
+      "source_row_number": 242,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "POSTGRES-010",
+        "ARCHBP-038"
+      ],
+      "proof_uri": "proof_records/ARCHBP-045.proof.json",
+      "execution_cell": "postgres-recovery-cell"
+    },
+    "ARCHBP-046": {
+      "index": 241,
+      "source_row_number": 243,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-038",
+        "ARCHBP-042"
+      ],
+      "proof_uri": "proof_records/ARCHBP-046.proof.json",
+      "execution_cell": "database-controlled-work-cell"
+    },
+    "ARCHBP-047": {
+      "index": 242,
+      "source_row_number": 244,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-039",
+        "ARCHBP-040",
+        "ARCHBP-041",
+        "ARCHBP-042",
+        "ARCHBP-043",
+        "ARCHBP-044",
+        "ARCHBP-045",
+        "ARCHBP-046"
+      ],
+      "proof_uri": "proof_records/ARCHBP-047.proof.json",
+      "execution_cell": "anchor-conformance-cell"
+    },
+    "ARCHBP-048": {
+      "index": 243,
+      "source_row_number": 245,
+      "phase": "13-architecture-blueprint-execution",
+      "status": "blocked",
+      "parent_ids": [
+        "ARCHBP-047"
+      ],
+      "proof_uri": "proof_records/ARCHBP-048.proof.json",
+      "execution_cell": "postgres-operational-cutover-cell"
     }
   },
   "tasks_by_status": {
@@ -5897,7 +6184,16 @@
       "ARCHBP-023",
       "ARCHBP-025",
       "ARCHBP-034",
-      "ARCHBP-037"
+      "ARCHBP-037",
+      "ARCHBP-038",
+      "ARCHBP-039",
+      "ARCHBP-041",
+      "ARCHBP-042",
+      "ARCHBP-043",
+      "ARCHBP-045",
+      "ARCHBP-046",
+      "ARCHBP-047",
+      "ARCHBP-048"
     ],
     "ready": [
       "ARCHBP-001",
@@ -5917,7 +6213,9 @@
       "ARCHBP-032",
       "ARCHBP-033",
       "ARCHBP-035",
-      "ARCHBP-036"
+      "ARCHBP-036",
+      "ARCHBP-040",
+      "ARCHBP-044"
     ]
   },
   "tasks_by_phase": {
@@ -6198,7 +6496,18 @@
       "ARCHBP-024",
       "ARCHBP-025",
       "ARCHBP-026",
-      "ARCHBP-027"
+      "ARCHBP-027",
+      "ARCHBP-038",
+      "ARCHBP-039",
+      "ARCHBP-040",
+      "ARCHBP-041",
+      "ARCHBP-042",
+      "ARCHBP-043",
+      "ARCHBP-044",
+      "ARCHBP-045",
+      "ARCHBP-046",
+      "ARCHBP-047",
+      "ARCHBP-048"
     ],
     "13-foundation-gap-closure": [
       "ARCHBP-028",
@@ -6340,7 +6649,8 @@
     ],
     "NBSOURCE-030": [
       "NBSTATED-030",
-      "NBSOURCE-031"
+      "NBSOURCE-031",
+      "ARCHBP-040"
     ],
     "NBSOURCE-031": [
       "NBSTATED-031",
@@ -6358,7 +6668,8 @@
       "LIFEOS-002"
     ],
     "POSTGRES-010": [
-      "LIFEOS-003"
+      "LIFEOS-003",
+      "ARCHBP-045"
     ],
     "LIFEOS-003": [
       "LIFEOS-004",
@@ -6481,7 +6792,9 @@
     ],
     "STORE-001": [
       "POSTGRES-002",
-      "ARCHBP-002"
+      "ARCHBP-002",
+      "ARCHBP-038",
+      "ARCHBP-044"
     ],
     "POSTGRES-002": [
       "POSTGRES-003"
@@ -6751,10 +7064,14 @@
       "DECIDE-006"
     ],
     "ARCHBP-001": [
-      "ARCHBP-002"
+      "ARCHBP-002",
+      "ARCHBP-038",
+      "ARCHBP-040",
+      "ARCHBP-041"
     ],
     "ARCHBP-002": [
-      "ARCHBP-003"
+      "ARCHBP-003",
+      "ARCHBP-039"
     ],
     "ARCHBP-003": [
       "ARCHBP-004",
@@ -6822,7 +7139,8 @@
       "ARCHBP-028"
     ],
     "INTEL-003": [
-      "ARCHBP-032"
+      "ARCHBP-032",
+      "ARCHBP-044"
     ],
     "ARCHBP-033": [
       "ARCHBP-034",
@@ -6830,6 +7148,46 @@
     ],
     "ARCHBP-036": [
       "ARCHBP-037"
+    ],
+    "ARCHBP-040": [
+      "ARCHBP-041",
+      "ARCHBP-047"
+    ],
+    "ARCHBP-039": [
+      "ARCHBP-042",
+      "ARCHBP-043",
+      "ARCHBP-047"
+    ],
+    "ARCHBP-041": [
+      "ARCHBP-042",
+      "ARCHBP-047"
+    ],
+    "ARCHBP-018": [
+      "ARCHBP-043"
+    ],
+    "ARCHBP-042": [
+      "ARCHBP-043",
+      "ARCHBP-046",
+      "ARCHBP-047"
+    ],
+    "ARCHBP-038": [
+      "ARCHBP-045",
+      "ARCHBP-046"
+    ],
+    "ARCHBP-043": [
+      "ARCHBP-047"
+    ],
+    "ARCHBP-044": [
+      "ARCHBP-047"
+    ],
+    "ARCHBP-045": [
+      "ARCHBP-047"
+    ],
+    "ARCHBP-046": [
+      "ARCHBP-047"
+    ],
+    "ARCHBP-047": [
+      "ARCHBP-048"
     ]
   },
   "proof_uri_by_task": {
@@ -7065,7 +7423,18 @@
     "ARCHBP-034": "proof_records/ARCHBP-034.proof.json",
     "ARCHBP-035": "proof_records/ARCHBP-035.proof.json",
     "ARCHBP-036": "proof_records/ARCHBP-036.proof.json",
-    "ARCHBP-037": "proof_records/ARCHBP-037.proof.json"
+    "ARCHBP-037": "proof_records/ARCHBP-037.proof.json",
+    "ARCHBP-038": "proof_records/ARCHBP-038.proof.json",
+    "ARCHBP-039": "proof_records/ARCHBP-039.proof.json",
+    "ARCHBP-040": "proof_records/ARCHBP-040.proof.json",
+    "ARCHBP-041": "proof_records/ARCHBP-041.proof.json",
+    "ARCHBP-042": "proof_records/ARCHBP-042.proof.json",
+    "ARCHBP-043": "proof_records/ARCHBP-043.proof.json",
+    "ARCHBP-044": "proof_records/ARCHBP-044.proof.json",
+    "ARCHBP-045": "proof_records/ARCHBP-045.proof.json",
+    "ARCHBP-046": "proof_records/ARCHBP-046.proof.json",
+    "ARCHBP-047": "proof_records/ARCHBP-047.proof.json",
+    "ARCHBP-048": "proof_records/ARCHBP-048.proof.json"
   },
   "missing_parent_ids": []
 }

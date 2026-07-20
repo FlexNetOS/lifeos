@@ -1,0 +1,1159 @@
+{
+  "schema_version": "lifeos-planning-spine.architecture-anchor-section-inventory.v1",
+  "coverage_rule": "Every source line belongs to exactly one contiguous section; section digests supplement and never replace the immutable full-file digest.",
+  "anchors": [
+    {
+      "anchor_id": "ARCHANCHOR-001",
+      "path": "1.0_VISION/Architecture_Anchors/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "total_lines": 6340,
+      "section_count": 108,
+      "coverage": {
+        "first_line": 1,
+        "last_line": 6340,
+        "contiguous": true,
+        "complete": true
+      },
+      "sections": [
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-001",
+          "level": 0,
+          "title": "Preamble",
+          "start_line": 1,
+          "end_line": 2,
+          "line_count": 2,
+          "sha256": "6cd4f51f2ddc4491ac1465e9bb206f3ed2f3b8cf90a837fd7406fcd3b9f22c8d"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-002",
+          "level": 1,
+          "title": "Architecture & Data Pipeline Blueprint — RuVector Fully Expanded",
+          "start_line": 3,
+          "end_line": 8,
+          "line_count": 6,
+          "sha256": "d95885ef625531f44ace153b3d6d460c4a88a40b63cf8cfa09af0002c98bbe6b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-003",
+          "level": 2,
+          "title": "HARD EXECUTION RULES — READ FIRST",
+          "start_line": 9,
+          "end_line": 32,
+          "line_count": 24,
+          "sha256": "7a294c494c471df0842faf74b5da5b6e3363b9ab4b25c0ba615195501caf5629"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-004",
+          "level": 2,
+          "title": "1. Two-phase architecture",
+          "start_line": 33,
+          "end_line": 34,
+          "line_count": 2,
+          "sha256": "c2dd3ad404f17a2ade58404e33a76bc850c4fffd25b1d71a4f981ad1c40bf114"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-005",
+          "level": 3,
+          "title": "1.1 Bootstrap phase",
+          "start_line": 35,
+          "end_line": 40,
+          "line_count": 6,
+          "sha256": "3aaeed2c21c7ec6004cd6738f933bb6cae0e43714cdb0e900800e8b5ce18f590"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-006",
+          "level": 3,
+          "title": "1.2 Operational phase",
+          "start_line": 41,
+          "end_line": 46,
+          "line_count": 6,
+          "sha256": "3cbccaf0501d48b097c9c4f0a7116582ec5b19b5da8b2fe919211c4c1a379ab9"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-007",
+          "level": 2,
+          "title": "2. Host ALL-data contract",
+          "start_line": 47,
+          "end_line": 61,
+          "line_count": 15,
+          "sha256": "1d96930bba2971b01d5d9096937eaf494a41fc4a8e95dd826ea29ea437691a7c"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-008",
+          "level": 2,
+          "title": "3. Bidirectional operational front door",
+          "start_line": 62,
+          "end_line": 63,
+          "line_count": 2,
+          "sha256": "56b3a66282b1eee7487dc36ffe047170a9f235b891eb89d9aae813e6fd1ea644"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-009",
+          "level": 3,
+          "title": "3.1 Glass/Engine ownership and terminal contract",
+          "start_line": 64,
+          "end_line": 69,
+          "line_count": 6,
+          "sha256": "f581145f4b8cdded839c5c3f98bf24b405dac1315d25148f4678a139f0e94100"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-010",
+          "level": 3,
+          "title": "3.2 Exact physical pipelines and ownership boundaries",
+          "start_line": 70,
+          "end_line": 86,
+          "line_count": 17,
+          "sha256": "430334d3450c49dfd4e7d4ed15d487f19c433f24cee55445b770a4ea3e22859b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-011",
+          "level": 3,
+          "title": "3.3 redb ownership, notification, crash, and replay contract",
+          "start_line": 87,
+          "end_line": 94,
+          "line_count": 8,
+          "sha256": "b84ab661eeace6f7712c325aa6f888cb201108ec71827fbe4c1914326c101683"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-012",
+          "level": 3,
+          "title": "3.4 rtk, `rtk_nu`, Nu, plugin, and raw-byte contract",
+          "start_line": 95,
+          "end_line": 103,
+          "line_count": 9,
+          "sha256": "51ded402da285c170e4dd48910c83659f7b55eaba5cdf47227ee144501951154"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-013",
+          "level": 1,
+          "title": "Canonical streaming envelope: one JSON object per line.",
+          "start_line": 104,
+          "end_line": 106,
+          "line_count": 3,
+          "sha256": "0deb82bb177c81489d1085621f3796c69e4e6ce4a97d2c8eaaffc8cc7f5abf36"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-014",
+          "level": 1,
+          "title": "A single JSON envelope.",
+          "start_line": 107,
+          "end_line": 109,
+          "line_count": 3,
+          "sha256": "6635752a31fd8030dd29ba127583a95dbdfae6a506d9987bd74d86276e6b6c96"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-015",
+          "level": 1,
+          "title": "A single Nuon record/list/table envelope.",
+          "start_line": 110,
+          "end_line": 115,
+          "line_count": 6,
+          "sha256": "b94e083f01b3131ca601f1ea458e07df257d0d768adb51fc80c5efb78bf02b02"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-016",
+          "level": 3,
+          "title": "3.5 Anchor-authoritative diagram index and atlas",
+          "start_line": 116,
+          "end_line": 146,
+          "line_count": 31,
+          "sha256": "6137ee8fe2dc68e4eb349f22f0518546508ea8962875ed3e8880936cf449a9d7"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-017",
+          "level": 4,
+          "title": "D01 — PostgreSQL/RuVector authority and complete topology",
+          "start_line": 147,
+          "end_line": 176,
+          "line_count": 30,
+          "sha256": "f377557a59ffa7df73c04ed3d1442a2c121734e80e79269da13062797fa85df6"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-018",
+          "level": 4,
+          "title": "D02 — Bootstrap-to-operational cutover",
+          "start_line": 177,
+          "end_line": 193,
+          "line_count": 17,
+          "sha256": "4f8d6c2b049b324b0ee1f8a73eeb93e13482c785519615b66b2ad8c74c1c9e65"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-019",
+          "level": 4,
+          "title": "D03 — LifeOS Glass and Yazelix Engine ownership",
+          "start_line": 194,
+          "end_line": 220,
+          "line_count": 27,
+          "sha256": "ec72c859ed95dee66c4d46a08fe45fbf21e4caff80d0c3eaf855cea5beb4abf1"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-020",
+          "level": 4,
+          "title": "D04 — PTY, Zellij session, and terminal lifecycle",
+          "start_line": 221,
+          "end_line": 243,
+          "line_count": 23,
+          "sha256": "d131c37273daccb11dbed7ecd28bea1b852af97992375f17f205dd10849a73f4"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-021",
+          "level": 4,
+          "title": "D05 — Exact logical front-door trace",
+          "start_line": 244,
+          "end_line": 260,
+          "line_count": 17,
+          "sha256": "dbebe8ec9ec393785847d34a0da8e8fd1b56a8c57ecfcf84faa2d110c32fa126"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-022",
+          "level": 4,
+          "title": "D06 — Physically executable LifeOS control action",
+          "start_line": 261,
+          "end_line": 279,
+          "line_count": 19,
+          "sha256": "e046617324dc9330c2982d0549407d25cc35bf71fe31db0c4293f3ca9babaab9"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-023",
+          "level": 4,
+          "title": "D07 — Legacy-output ingestion",
+          "start_line": 280,
+          "end_line": 295,
+          "line_count": 16,
+          "sha256": "883e7d4e0dacd85b974be2218349ea8895996d20b7ccdc2a74bb283c08e0ce37"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-024",
+          "level": 4,
+          "title": "D08 — Native Nushell ingestion",
+          "start_line": 296,
+          "end_line": 306,
+          "line_count": 11,
+          "sha256": "bfb783de499f2a824242c445609655fca14500ad1fa18652eaee8cf2ca445b7c"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-025",
+          "level": 4,
+          "title": "D09 — Nu child-plugin and CodeDB ingress boundary",
+          "start_line": 307,
+          "end_line": 325,
+          "line_count": 19,
+          "sha256": "89945652eb85ab25b74dc1edb572ad30558a96b9e21a209c0b44d6ccb4055e64"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-026",
+          "level": 4,
+          "title": "D10 — redb live mmap projection and notification",
+          "start_line": 326,
+          "end_line": 341,
+          "line_count": 16,
+          "sha256": "a4d9a47ef70c4d84a57e1a4161c3a87035b29df7fb86488e23989b6af799887f"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-027",
+          "level": 4,
+          "title": "D11 — envctl-only durable commit",
+          "start_line": 342,
+          "end_line": 357,
+          "line_count": 16,
+          "sha256": "10d7c773ea0a70fe5079eafb5ef084bbd6ca34a0419c1e4a8565a411cf631c91"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-028",
+          "level": 4,
+          "title": "D12 — Database-to-Engine/Glass return and acknowledgement",
+          "start_line": 358,
+          "end_line": 373,
+          "line_count": 16,
+          "sha256": "50e1a6773dd609844be84986956ef1887a627e9c3a060cdad85b118d7e0ad5f1"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-029",
+          "level": 4,
+          "title": "D13 — Raw-byte and derived-representation lineage",
+          "start_line": 374,
+          "end_line": 394,
+          "line_count": 21,
+          "sha256": "d2af31a4ba2eed22efe1f13c4fe3201bcea18bebe731b9ceb68d57cb8198837a"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-030",
+          "level": 4,
+          "title": "D14 — Crash, spool, replay, and reconciliation",
+          "start_line": 395,
+          "end_line": 411,
+          "line_count": 17,
+          "sha256": "0903bce5acbc8924b71faa5e3f76929ad2256bba11f229a620fb08887b369a61"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-031",
+          "level": 4,
+          "title": "D15 — Database-hosted semantic SQL trigger loop",
+          "start_line": 412,
+          "end_line": 426,
+          "line_count": 15,
+          "sha256": "bed75298e308ceccbbe12739a4f2ce7141287f5af9ef418f5cd123b56759a958"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-032",
+          "level": 4,
+          "title": "D16 — RuVector cognition loop",
+          "start_line": 427,
+          "end_line": 440,
+          "line_count": 14,
+          "sha256": "18836ac2cd6bf95c5a9b4cf9531a955582b9d833a3cc47db90fc5b8b2edafc8a"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-033",
+          "level": 4,
+          "title": "D17 — COW, MinCut, witness, promotion, and rollback",
+          "start_line": 441,
+          "end_line": 455,
+          "line_count": 15,
+          "sha256": "f483076092130e93c6fa6353fe1bfa76b810c61c3ef1d2d7a826bdacc227d4ab"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-034",
+          "level": 4,
+          "title": "D18 — Edge inference, memory, learning, and forecasting",
+          "start_line": 456,
+          "end_line": 472,
+          "line_count": 17,
+          "sha256": "d84b28f270d90d84785fffc2ba17334bed85b59476ad10afc0da607da377858e"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-035",
+          "level": 4,
+          "title": "D19 — Tenant, identity, branch, lease, commit, and witness continuity",
+          "start_line": 473,
+          "end_line": 488,
+          "line_count": 16,
+          "sha256": "9571e677b7a7bc7aedbb4ae06b4ced5a21ee322a50ee773c536c24efa85f6a21"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-036",
+          "level": 4,
+          "title": "D20 — Secret lifecycle and audit",
+          "start_line": 489,
+          "end_line": 504,
+          "line_count": 16,
+          "sha256": "33dacf871b75ec1d0c1b33f644dbadc70d3539f8e74dc83f31b756d6d54bb75a"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-037",
+          "level": 4,
+          "title": "D21 — Repository, memory, task, context, and runner coordination",
+          "start_line": 505,
+          "end_line": 538,
+          "line_count": 34,
+          "sha256": "2735c97a307802b37f68df36fa92f7127e68a4309f30d1dd7fd21eff673dd978"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-038",
+          "level": 4,
+          "title": "D22 — Import, transformation, export, and reconstruction loop",
+          "start_line": 539,
+          "end_line": 553,
+          "line_count": 15,
+          "sha256": "5157234291260bea5df79be9e09261150b31de57712f98b438c52bdc0da8eaf8"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-039",
+          "level": 4,
+          "title": "D23 — Build, release, activation, reload, and rollback",
+          "start_line": 554,
+          "end_line": 569,
+          "line_count": 16,
+          "sha256": "8256a697b8c59a43e3720a3a449c4785f0adf9d59759bbcb6a62b207d9ec3b15"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-040",
+          "level": 4,
+          "title": "D24 — WAL, replication, PITR, restore, and reconstruction",
+          "start_line": 570,
+          "end_line": 585,
+          "line_count": 16,
+          "sha256": "f94d1a4e59fb12769f79ac7ce36b077c779ded4a501c1fc5891c4bd86186893a"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-041",
+          "level": 2,
+          "title": "4. Component scopes",
+          "start_line": 586,
+          "end_line": 587,
+          "line_count": 2,
+          "sha256": "8df1f9d42484d8a8b0533e41c0f3ce26fc333f540f62001acac3df9cf80b1019"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-042",
+          "level": 3,
+          "title": "4.1 PostgreSQL and RuVector",
+          "start_line": 588,
+          "end_line": 591,
+          "line_count": 4,
+          "sha256": "29b0cf55fc34461ed50ecd56be7520656d8b66ae188525c5736ee3bfce6e565c"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-043",
+          "level": 3,
+          "title": "4.2 LifeOS and Codex",
+          "start_line": 592,
+          "end_line": 595,
+          "line_count": 4,
+          "sha256": "2deed47f8d3a314172315b50b29df7b6158a35e5d5df73a6c4c96719cb2471ad"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-044",
+          "level": 3,
+          "title": "4.3 Yazelix, Zellij, editors, and file navigation",
+          "start_line": 596,
+          "end_line": 599,
+          "line_count": 4,
+          "sha256": "c8d78908c2ad0c9a391ce69c3cb89fe1a1e1b94b2df7c820ba84f04bf271356e"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-045",
+          "level": 3,
+          "title": "4.4 Nushell, rtk, and rtk_nu",
+          "start_line": 600,
+          "end_line": 603,
+          "line_count": 4,
+          "sha256": "34996d946a27d9a82a4d078a76795154b853527a170a1ef018d3f0892fd9a882"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-046",
+          "level": 3,
+          "title": "4.5 nu_plugin / CodeDB",
+          "start_line": 604,
+          "end_line": 607,
+          "line_count": 4,
+          "sha256": "950a5d80901bb44b48d9d79a8d6c5dd5eea41092baca0f68c97685eaf1bc81c5"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-047",
+          "level": 3,
+          "title": "4.6 redb",
+          "start_line": 608,
+          "end_line": 611,
+          "line_count": 4,
+          "sha256": "1448369f467eea1b6fe2a082dd7b1782f4de0d6caa7d7ac7d3a76684fe4a2729"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-048",
+          "level": 3,
+          "title": "4.7 envctl",
+          "start_line": 612,
+          "end_line": 615,
+          "line_count": 4,
+          "sha256": "a3104b222edad90a7ed5711b4a39297a93ddf6074d0f7115fb7ed41913a8e0f6"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-049",
+          "level": 3,
+          "title": "4.8 Git, memory, tasks, context, and coordination",
+          "start_line": 616,
+          "end_line": 619,
+          "line_count": 4,
+          "sha256": "6f5080711c44b46fd4bb943272062ad98f10f1f02b32a6cf3ec04fab394f3226"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-050",
+          "level": 3,
+          "title": "4.9 Nix, runners, compilers, network, and devices",
+          "start_line": 620,
+          "end_line": 623,
+          "line_count": 4,
+          "sha256": "b4d456f51f9deec68f217905ddab12567bc4d5e4d0ce966b8397a43b676b06fe"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-051",
+          "level": 3,
+          "title": "4.10 ruvllm, AgentDB, RVF, SONA, Ruflo, RuvLTRA, and ATAS",
+          "start_line": 624,
+          "end_line": 627,
+          "line_count": 4,
+          "sha256": "abe9c2ecc661b40697af15cdadb07fbdba1cae383f228ab1ff30a698b840b6a7"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-052",
+          "level": 2,
+          "title": "5. envctl security architecture",
+          "start_line": 628,
+          "end_line": 655,
+          "line_count": 28,
+          "sha256": "9fa4c89943d3af98f4825727f4f953a57b790d16a7964eaac4eb84dfa0f5bb88"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-053",
+          "level": 2,
+          "title": "RUVECTOR/RUVNET FULL COMPONENT ARCHITECTURE",
+          "start_line": 656,
+          "end_line": 657,
+          "line_count": 2,
+          "sha256": "dcfd85b37e326e0c41f038728f64ea06d91bf3dfa33e3a8fd864750d4ae48c05"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-054",
+          "level": 3,
+          "title": "1. Complete RuVector/ruvnet ecosystem map",
+          "start_line": 658,
+          "end_line": 676,
+          "line_count": 19,
+          "sha256": "8d86669a2ee2cc191186e24e60a2236a90ea980f64e0e704c88ec24e8414cc92"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-055",
+          "level": 3,
+          "title": "2. Complete repository, crate, package, extension, binding, and runtime inventory",
+          "start_line": 677,
+          "end_line": 678,
+          "line_count": 2,
+          "sha256": "28a7c723a509ceb70d99b6b495746aa874092bdf7b37f3855ae615593b568e8f"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-056",
+          "level": 4,
+          "title": "2.1 Pinned repository revisions and distribution versions",
+          "start_line": 679,
+          "end_line": 704,
+          "line_count": 26,
+          "sha256": "0d3586b33ef278a80052601b67a7f670f0f2d9de4134499288d22d880c8c8a57"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-057",
+          "level": 4,
+          "title": "2.2 RuVector core, service, routing, and distribution packages",
+          "start_line": 705,
+          "end_line": 711,
+          "line_count": 7,
+          "sha256": "6fc66194081b7c48d9cefc5c7509e9da08d33b168bb06011d4365f99b3d64c3f"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-058",
+          "level": 4,
+          "title": "2.3 Retrieval, index, compression, and geometry packages",
+          "start_line": 712,
+          "end_line": 715,
+          "line_count": 4,
+          "sha256": "71eddc9868d7b5235863a87914030817f68fd7d4aed95ac3646c61833b61c7ca"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-059",
+          "level": 4,
+          "title": "2.4 Graph, GNN, attention, causal, MinCut, and cognition packages",
+          "start_line": 716,
+          "end_line": 719,
+          "line_count": 4,
+          "sha256": "a2daf882fd126e357f4a7b74782f2c63c4c9685f26d7d49cbe3f504e21f37185"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-060",
+          "level": 4,
+          "title": "2.5 Learning, mathematics, temporal, model, and forecast packages",
+          "start_line": 720,
+          "end_line": 725,
+          "line_count": 6,
+          "sha256": "68f258d43bf56b7f67c6de791ad2ff197f873542cbbd3a7f31d8ad162faa2bc4"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-061",
+          "level": 4,
+          "title": "2.6 RVF, agent, proof, edge, and hardware packages",
+          "start_line": 726,
+          "end_line": 736,
+          "line_count": 11,
+          "sha256": "e1abfb1cc29a1e0aceb7e29c63f882bc6365db545ea6aedc0e288c2e8ba748be"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-062",
+          "level": 4,
+          "title": "2.7 Exact RuVector root workspace member inventory",
+          "start_line": 737,
+          "end_line": 820,
+          "line_count": 84,
+          "sha256": "9406fbd34dade81e973a26ec2b10ee97d6c8fd0bc658e61051879dd331b18955"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-063",
+          "level": 4,
+          "title": "2.8 Exact additional RuVector manifest and named-surface inventory",
+          "start_line": 821,
+          "end_line": 824,
+          "line_count": 4,
+          "sha256": "690e7cf083374edf910d0accf64581aa043a45b2f64c571af55ec813aa93d302"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-064",
+          "level": 5,
+          "title": "Agentic robotics (6)",
+          "start_line": 825,
+          "end_line": 833,
+          "line_count": 9,
+          "sha256": "a531523d27bd3dbe974be205fd45b7e87c4a5f0fe825de54ff6143b905b22fba"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-065",
+          "level": 5,
+          "title": "Other RuVector crates (17)",
+          "start_line": 834,
+          "end_line": 853,
+          "line_count": 20,
+          "sha256": "5c7e131129629504316b7524be7281e99b10e97b5add42295daf75c05361962b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-066",
+          "level": 5,
+          "title": "RuVix (12)",
+          "start_line": 854,
+          "end_line": 868,
+          "line_count": 15,
+          "sha256": "7c488388f5f83f9426be8d96b8fb2a905e39031ca6a72e41da4def6270b3fb57"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-067",
+          "level": 5,
+          "title": "RVF (25)",
+          "start_line": 869,
+          "end_line": 896,
+          "line_count": 28,
+          "sha256": "0955052189542c43b677b75c3b376c2086dbd6eb58360a705de365821e99ad4c"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-068",
+          "level": 5,
+          "title": "RVM (17)",
+          "start_line": 897,
+          "end_line": 916,
+          "line_count": 20,
+          "sha256": "338994552c89819be5f3c1988fdd461a92e7399918734d12fefa954c22f1d9e2"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-069",
+          "level": 5,
+          "title": "Support/test/patch (4)",
+          "start_line": 917,
+          "end_line": 923,
+          "line_count": 7,
+          "sha256": "86cb332ba4247092e9ccdb56c059ae518a07a993b5af75f2c7398cb5c356d24b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-070",
+          "level": 5,
+          "title": "Other examples (15)",
+          "start_line": 924,
+          "end_line": 941,
+          "line_count": 18,
+          "sha256": "e54d72875e3d8c06c98d474223bc98b042d8a6c94dd2f4c35d75f2cd1c930bc5"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-071",
+          "level": 5,
+          "title": "Data (5)",
+          "start_line": 942,
+          "end_line": 949,
+          "line_count": 8,
+          "sha256": "b6e3ca37d49b5f40be83b3536ba5b01d7c4999ed15f62771cd22faeb90ef6d84"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-072",
+          "level": 5,
+          "title": "Exo-AI-2025 (21)",
+          "start_line": 950,
+          "end_line": 973,
+          "line_count": 24,
+          "sha256": "647e4472e9f3dbbd43882a5be250a3116bf965be806545cbd057429234c99fd5"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-073",
+          "level": 5,
+          "title": "ruvLLM examples (3)",
+          "start_line": 974,
+          "end_line": 979,
+          "line_count": 6,
+          "sha256": "8789f0e6bd532cf129cb6ec50d2ce1ab84d6829e54597e8ee3a3ede09d787b1b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-074",
+          "level": 5,
+          "title": "Vibecast/7Sense (12)",
+          "start_line": 980,
+          "end_line": 994,
+          "line_count": 15,
+          "sha256": "03a512a55f1d5a66f2120f9a0842f124a36b050ad2d0e31a7521ecfe1ff45791"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-075",
+          "level": 5,
+          "title": "Exact named executable, binding, CLI, and WASM surfaces (14)",
+          "start_line": 995,
+          "end_line": 1011,
+          "line_count": 17,
+          "sha256": "bb60a4d7d0df9dd15ba0faef31d2e8252e911d19106fcd87c10b803bd7c2e65d"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-076",
+          "level": 4,
+          "title": "2.9 FlexNetOS workspace inventories",
+          "start_line": 1012,
+          "end_line": 1023,
+          "line_count": 12,
+          "sha256": "9d70bb43f7b9f902d774bf037af993a27834571bd27ec4f4be241fec29632d09"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-077",
+          "level": 3,
+          "title": "3. Complete PostgreSQL extension and SQL-function surface",
+          "start_line": 1024,
+          "end_line": 1029,
+          "line_count": 6,
+          "sha256": "3579ab4e6054a610e393d16ee045d69eb7e66b88ff87969884a31516ce4cdbef"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-078",
+          "level": 4,
+          "title": "3.1 Operators, types, and access methods",
+          "start_line": 1030,
+          "end_line": 1036,
+          "line_count": 7,
+          "sha256": "51746388cbf6200d89ef7a45227df4de7618ececa2f7509b312b5042c7140379"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-079",
+          "level": 4,
+          "title": "3.2 Native SQL family catalog",
+          "start_line": 1037,
+          "end_line": 1062,
+          "line_count": 26,
+          "sha256": "9fb72de252d2dc26e6880f50420cdc20f1ed79d8e8f7c38e51568ebdfecbbf4b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-080",
+          "level": 3,
+          "title": "4. Complete retrieval and indexing architecture",
+          "start_line": 1063,
+          "end_line": 1085,
+          "line_count": 23,
+          "sha256": "2aab49aad7bc6c2b34c6ce8260c0f7851c8bfdb9b75ac3fe9c8c38be32b82f80"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-081",
+          "level": 3,
+          "title": "5. Complete graph, GNN, causal, and MinCut architecture",
+          "start_line": 1086,
+          "end_line": 1100,
+          "line_count": 15,
+          "sha256": "1b658d9013050d0b3db14064f75a13987617ce96b37d7499f1c4f5f6d59c5542"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-082",
+          "level": 3,
+          "title": "6. Complete copy-on-write branching architecture",
+          "start_line": 1101,
+          "end_line": 1115,
+          "line_count": 15,
+          "sha256": "28cb3634b50b1e26ce3434305a005d8df9366750c85eeaa51c89b000dc6758b6"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-083",
+          "level": 3,
+          "title": "7. Complete AgentDB and RVF architecture",
+          "start_line": 1116,
+          "end_line": 1141,
+          "line_count": 26,
+          "sha256": "f5f9c631b0300ff201452d15a791f474f316bda5fecc2a6ebba6bb86c32032f6"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-084",
+          "level": 3,
+          "title": "8. Complete ruvllm architecture",
+          "start_line": 1142,
+          "end_line": 1151,
+          "line_count": 10,
+          "sha256": "adfb290a685f2d5edbfc5fc8fac8e584b3447e9d4c786ea2be01f46defa948ba"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-085",
+          "level": 3,
+          "title": "9. Complete SONA, MicroLoRA, FastGRNN, and reinforcement-learning architecture",
+          "start_line": 1152,
+          "end_line": 1171,
+          "line_count": 20,
+          "sha256": "aac61de047906a9de1f3d43baf9ebdea60a7501e3abe5ac00c96ef9a951e0c1e"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-086",
+          "level": 3,
+          "title": "10. Complete witness-chain and anti-bluff architecture",
+          "start_line": 1172,
+          "end_line": 1185,
+          "line_count": 14,
+          "sha256": "4635f42cb9678226a59bbc98a6a8a5e2e006f1566786425d12349747e70a8099"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-087",
+          "level": 3,
+          "title": "11. Complete Ruflo, RuvLTRA, and ATAS forecasting architecture",
+          "start_line": 1186,
+          "end_line": 1199,
+          "line_count": 14,
+          "sha256": "742f06cdae9539236ab4af6fb93a9bcad30b93b334aece5f09c16f3a2f17fae4"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-088",
+          "level": 3,
+          "title": "12. Complete redb geometry, caching, WAL, and buffering architecture",
+          "start_line": 1200,
+          "end_line": 1221,
+          "line_count": 22,
+          "sha256": "98751f2fa8d9c5972be9537684f5eff5b19765aa126ca79b5bcb35dc07d15bd6"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-089",
+          "level": 3,
+          "title": "13. Complete envctl bidirectional integration",
+          "start_line": 1222,
+          "end_line": 1232,
+          "line_count": 11,
+          "sha256": "2d6cea5f05b82eb67f497fc8ba6c50aad74067d8e0912222e5b80845d4289d00"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-090",
+          "level": 3,
+          "title": "14. Complete nu_plugin / CodeDB byte-complete integration",
+          "start_line": 1233,
+          "end_line": 1252,
+          "line_count": 20,
+          "sha256": "fc58db326ff5fcb7f1a43139b94a511801a45dbfea0178870ae9bc1e3671f7c6"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-091",
+          "level": 3,
+          "title": "15. Complete Nix, build, packaging, and release integration",
+          "start_line": 1253,
+          "end_line": 1363,
+          "line_count": 111,
+          "sha256": "e9c8221ffd58cf22a9f1b76e63ff0fffa93af6321aa16e02165885e78ffb5ec4"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-092",
+          "level": 3,
+          "title": "16. Complete data schema",
+          "start_line": 1364,
+          "end_line": 1367,
+          "line_count": 4,
+          "sha256": "89cbb5c01fc97afbb61dad9d42c7f27a28709f50cda002553384329bca2d367a"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-093",
+          "level": 4,
+          "title": "16.1 Canonical table catalog",
+          "start_line": 1368,
+          "end_line": 1384,
+          "line_count": 17,
+          "sha256": "daeb7ca09b3fa2ac34ed5a4c4711719e404f7c630058d8984e89f3f601dae35b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-094",
+          "level": 4,
+          "title": "16.2 Core byte, semantic, graph, request, branch, and witness DDL",
+          "start_line": 1385,
+          "end_line": 1664,
+          "line_count": 280,
+          "sha256": "851178de859e1b674335431c25d977b53664b39c3f7be4fb9815aabf521ab3a5"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-095",
+          "level": 4,
+          "title": "16.2.1 Full catalog migration, constraints, and row security",
+          "start_line": 1665,
+          "end_line": 2836,
+          "line_count": 1172,
+          "sha256": "c3080eb6e174c346e61a40f57ac9aa4c9d16cdeb9f5b1d004017111af9ee5aa6"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-096",
+          "level": 4,
+          "title": "16.3 Stored procedures, triggers, and background work",
+          "start_line": 2837,
+          "end_line": 5564,
+          "line_count": 2728,
+          "sha256": "067cc7f395d454e5a077a774d8ea8bfadf3519a44777c2187d7761182000bb52"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-097",
+          "level": 4,
+          "title": "16.4 Migration, backup, replication, and reconstruction",
+          "start_line": 5565,
+          "end_line": 5570,
+          "line_count": 6,
+          "sha256": "f2660063f28f593945a543abedb7d343a1deab30b2b854ca3c233f408994254b"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-098",
+          "level": 3,
+          "title": "17. Complete installation and activation order",
+          "start_line": 5571,
+          "end_line": 5590,
+          "line_count": 20,
+          "sha256": "989ad4ba48c390e12c5957a5cd403ea3fa43f3278b74f03e4a0cf16539a42b33"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-099",
+          "level": 3,
+          "title": "18. Complete bidirectional graph",
+          "start_line": 5591,
+          "end_line": 5655,
+          "line_count": 65,
+          "sha256": "d53e5333302404fd09852e767b72b59542ce96737a29df3518fd127cc25a8c67"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-100",
+          "level": 3,
+          "title": "19. Complete byte-capture and reconciliation contract",
+          "start_line": 5656,
+          "end_line": 5675,
+          "line_count": 20,
+          "sha256": "80ee37d26048276aee45e95e67bca6b36820ac2b54d610981ab1f1664d3d10c2"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-101",
+          "level": 3,
+          "title": "20. Additional official and FlexNetOS components integrated by additive research",
+          "start_line": 5676,
+          "end_line": 5686,
+          "line_count": 11,
+          "sha256": "d57486a5a5c599452bcf109d8882d6278e0438e8aa0a37183dbeffeff978ea54"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-102",
+          "level": 2,
+          "title": "Complete supplied capability register",
+          "start_line": 5687,
+          "end_line": 5704,
+          "line_count": 18,
+          "sha256": "a9fedc5db0118bb299dce1dc29af920cb8b923cac7b5a0847e447981a6b5a464"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-103",
+          "level": 2,
+          "title": "Complete component integration table",
+          "start_line": 5705,
+          "end_line": 6257,
+          "line_count": 553,
+          "sha256": "0a7b56bb480d00b9318a42935122686c43437ba15753a5ac5c7eb91d5c19ceb4"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-104",
+          "level": 2,
+          "title": "Import, transformation, export, and release contract",
+          "start_line": 6258,
+          "end_line": 6263,
+          "line_count": 6,
+          "sha256": "ba009f2354e50c36227e3c92fc5d6cf92e49361c325ff12a3b2be20b914887ed"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-105",
+          "level": 2,
+          "title": "Anchor conformance ledger",
+          "start_line": 6264,
+          "end_line": 6285,
+          "line_count": 22,
+          "sha256": "90dcb5b9f61f9ed9e224be5b576096148c8e926ac1642291e783b4f064f7aef7"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-106",
+          "level": 2,
+          "title": "Review ledger",
+          "start_line": 6286,
+          "end_line": 6308,
+          "line_count": 23,
+          "sha256": "cf8fe3dd458ed7d5e6d0bbd7eb3b0ad9f101dc285cd3628bd35cf38cea13b1a9"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-107",
+          "level": 2,
+          "title": "FlexNetOS operating doctrine and release gate",
+          "start_line": 6309,
+          "end_line": 6319,
+          "line_count": 11,
+          "sha256": "f364a250271eb3afa22b70210f53d89ba2a69b35f1cb2702fb6092678b32005e"
+        },
+        {
+          "section_id": "ARCHANCHOR-001-SECTION-108",
+          "level": 2,
+          "title": "Operational invariants and acceptance",
+          "start_line": 6320,
+          "end_line": 6340,
+          "line_count": 21,
+          "sha256": "6740380279b1d9e5a79c3b0e4f755f8d2f1f6da6b9ae7707062c51c5542258f8"
+        }
+      ]
+    },
+    {
+      "anchor_id": "ARCHANCHOR-002",
+      "path": "1.0_VISION/Architecture_Anchors/Architecture_Data_Pipeline_Graph_ANCHORED_VERIFIED.md",
+      "total_lines": 560,
+      "section_count": 17,
+      "coverage": {
+        "first_line": 1,
+        "last_line": 560,
+        "contiguous": true,
+        "complete": true
+      },
+      "sections": [
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-001",
+          "level": 0,
+          "title": "Preamble",
+          "start_line": 1,
+          "end_line": 3,
+          "line_count": 3,
+          "sha256": "1c3155919df1f820b9ec29e9bbe83cd73a18c38f26d7c571219070f17e77df9a"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-002",
+          "level": 1,
+          "title": "Architecture & Data Pipeline Graph — Anchored Projection",
+          "start_line": 4,
+          "end_line": 9,
+          "line_count": 6,
+          "sha256": "f614a2b79230f9d2323cef484868e4c115d84c697f6a32c3add2ec56bce5c4bc"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-003",
+          "level": 2,
+          "title": "1. Compact top-level graph",
+          "start_line": 10,
+          "end_line": 53,
+          "line_count": 44,
+          "sha256": "7ba7a7d947ddabf0853d95487b408248796e7f236f520681f5a86f9d2a4c34fe"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-004",
+          "level": 2,
+          "title": "2. PostgreSQL/RuVector authority and control flow",
+          "start_line": 54,
+          "end_line": 90,
+          "line_count": 37,
+          "sha256": "6e6e2a108267f4859adf9e50f996ffa8a45c18c727f1c064969858ba7f53b449"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-005",
+          "level": 2,
+          "title": "3. Logical front-door request flow",
+          "start_line": 91,
+          "end_line": 138,
+          "line_count": 48,
+          "sha256": "fcf6ec956ef2451be3c0b969cfd0084ec643c2ee7150ff39b3b87660c9473032"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-006",
+          "level": 2,
+          "title": "4. Physical process wiring",
+          "start_line": 139,
+          "end_line": 209,
+          "line_count": 71,
+          "sha256": "ef923dff9595463cde4730c9e4b0ab7172a737d360175b1666cf79b3c4197ac8"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-007",
+          "level": 2,
+          "title": "5. nu_plugin / CodeDB byte-complete ingress contract",
+          "start_line": 210,
+          "end_line": 231,
+          "line_count": 22,
+          "sha256": "0a261c6a790d3698335979bba0722b19d64c41335000520896b0f471828d1972"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-008",
+          "level": 2,
+          "title": "6. Physical execution and result return flow",
+          "start_line": 232,
+          "end_line": 277,
+          "line_count": 46,
+          "sha256": "15645de62dcfc274d98465f1ff09c73458d113258742c8aee3045877a84516a0"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-009",
+          "level": 2,
+          "title": "7. redb live-boundary graph",
+          "start_line": 278,
+          "end_line": 300,
+          "line_count": 23,
+          "sha256": "7a45efc75f4ef35542e14ced2a1ccd98da2165b66c908b6929b6bcdf167d745c"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-010",
+          "level": 2,
+          "title": "8. envctl bidirectional bridge graph",
+          "start_line": 301,
+          "end_line": 331,
+          "line_count": 31,
+          "sha256": "a185adbce06b44ece8c410a113c4a8cec62974797258e9d1f931df57f8222c4b"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-011",
+          "level": 2,
+          "title": "9. envctl secret lifecycle graph",
+          "start_line": 332,
+          "end_line": 383,
+          "line_count": 52,
+          "sha256": "1d4f3853da0fbe279580c27923385b3766264099257a775d35a7cb84977091a1"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-012",
+          "level": 2,
+          "title": "10. PostgreSQL + RuVector cognition and graph runtime",
+          "start_line": 384,
+          "end_line": 420,
+          "line_count": 37,
+          "sha256": "1984fb6fbd2e58b6c247e3f77ea9c44e50b6df718a17c48350e7c07cec7b4984"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-013",
+          "level": 2,
+          "title": "11. Edge inference and forecasting graph",
+          "start_line": 421,
+          "end_line": 454,
+          "line_count": 34,
+          "sha256": "910c8477272bdf889c8002ac867190afb666086a8735332b04006ffda3a3f610"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-014",
+          "level": 2,
+          "title": "12. Repository, task, and coordination surfaces",
+          "start_line": 455,
+          "end_line": 474,
+          "line_count": 20,
+          "sha256": "c554f702252ef5cef1462037adcf3ecc94c27a436727bd25abc646b19fda3dd1"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-015",
+          "level": 2,
+          "title": "13. Import, transformation, and export loop",
+          "start_line": 475,
+          "end_line": 506,
+          "line_count": 32,
+          "sha256": "bddcb1323d7f6ac3e5d25acf213eacfa3b5c568489ec62a1202e1e04a1d7d4d9"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-016",
+          "level": 2,
+          "title": "14. Release and materialization graph",
+          "start_line": 507,
+          "end_line": 548,
+          "line_count": 42,
+          "sha256": "663362a37f5e1a784bf5377d33a1b1c1ffff4ff80d894a32cefa7c1c4be86747"
+        },
+        {
+          "section_id": "ARCHANCHOR-002-SECTION-017",
+          "level": 2,
+          "title": "15. Operational invariants",
+          "start_line": 549,
+          "end_line": 560,
+          "line_count": 12,
+          "sha256": "9b4e7cf236fafc9317effb9ed360d26959ef74504f366c1c49bdee1aedb3c3b0"
+        }
+      ]
+    }
+  ]
+}

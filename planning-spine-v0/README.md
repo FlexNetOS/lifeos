@@ -6,7 +6,7 @@ type: planning-contract
 status: active
 lifecycle: maintained
 created: 2026-07-03
-updated: 2026-07-13
+updated: 2026-07-20
 aliases:
   - LifeOS planning spine
   - Planning spine v0
@@ -33,6 +33,13 @@ This package converts the `lifeos-planning-spine v0` source brief into a buildab
   [`navigation/README.md`](./navigation/README.md) · [[planning-spine-v0/navigation/README]]
 - Vision index: [`1.0_VISION/README.md`](./1.0_VISION/README.md) ·
   [[planning-spine-v0/1.0_VISION/README]]
+- Immutable expanded architecture anchors, receipts, conflicts, and claim/task
+  crosswalk:
+  [`Architecture_Anchors/README.md`](./1.0_VISION/Architecture_Anchors/README.md) ·
+  [[planning-spine-v0/1.0_VISION/Architecture_Anchors/README]]
+- Legacy `.handoff` disposition, complete inventory, and recoverable archive:
+  [`consolidation/README.md`](./consolidation/README.md) ·
+  [[planning-spine-v0/consolidation/README]]
 - Blueprint compatibility and session-course audit:
   [`ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md`](./1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) ·
   [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]]
@@ -53,11 +60,13 @@ This package converts the `lifeos-planning-spine v0` source brief into a buildab
   [`FOUNDATION_META_PORTABILITY_MODEL.md`](./1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md) ·
   [[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]]
 
-Desired architecture and implementation truth are separate axes. Explicit owner
-decisions govern desired targets. Checked source/tests, exact proof, normalized
-claims, maintained reviews, and raw NotebookLM inputs govern current-state truth
-in that order. Read the compatibility review before treating blueprint wording
-as implementation state.
+Desired architecture and implementation truth are separate axes. Authority
+orders as: current owner/contracts; the two immutable expanded anchors;
+canonical maintained tasks/contracts and accepted proof history; legacy inputs
+as migration evidence; generated navigation as projection. Checked source and
+accepted proof still determine present implementation state. Read the anchor
+conflict ledger and compatibility review before treating target wording as a
+current runtime fact.
 
 ## Mandatory Feature Policy
 
@@ -117,11 +126,13 @@ Preserved operating assumptions:
 | [`ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_PACKAGE.md) | Reference-package superset receipt, 28-capability mandatory catalog, namespace separation, and actual-human approval boundary |
 | [`ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md`](./ENVCTL_DB_NU_PLUGIN_MIGRATION_SECURITY_REVIEW.md) | Value-free classification and exact-fingerprint baseline for credential-shaped package fixtures and proof identifiers |
 | `1.0_VISION/README.md` | Agent-oriented vision, authority, and evidence navigation |
+| `1.0_VISION/Architecture_Anchors/` | Exact-byte expanded blueprint/graph, receipts, full section inventory, conflict ledger, and claim/task crosswalk |
 | `1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md` | Blueprint-to-CodeDB compatibility review and concurrent landing audit |
 | `1.0_VISION/Notebooklm/README.md` | Exact-byte raw artifact catalog and provenance boundary |
 | `1.0_VISION/Notebooklm/artifacts.meta.json` | Machine-readable artifact hashes, sizes, types, and lineage gaps |
 | `1.0_VISION/FOUNDATION_ECOSYSTEM_MAP.md` | Built/planned ecosystem ownership map |
 | `1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL.md` | Meta coordination and portability boundaries |
+| `consolidation/` | Complete Planning Spine inventory, legacy handoff crosswalk/manifests, retired shadow manifest, and archive receipt |
 | [`navigation/generated/navigation_graph.json`](./navigation/generated/navigation_graph.json) | Full deterministic file/entity graph with typed edges and backlinks |
 | [`navigation/generated/navigation_index.json`](./navigation/generated/navigation_index.json) | Compact task/claim/source/path/alias/tag/topic lookup index |
 | [`navigation/generated/navigation.validation_report.json`](./navigation/generated/navigation.validation_report.json) | Connectivity, metadata, link, ledger, and inventory verdict |
@@ -139,6 +150,7 @@ Run:
 
 ```bash
 bun run planning-spine:navigation:query -- "STORE-001"
+bun run planning-spine:navigation:query -- "redb PostgreSQL authority"
 bun run planning-spine:navigation:explain -- "claim:REDB-CLAIM-002"
 bun run planning-spine:navigation:check
 bun run planning-spine:verify
@@ -153,6 +165,10 @@ That frontdoor is Bun-backed in this repo; it does not require a standalone `nod
 That verifier checks:
 
 - all required package files exist,
+- both immutable architecture anchors match their SHA-256, size, line count,
+  and full section-coverage receipts,
+- all Planning Spine and legacy consolidation manifests are current with zero
+  unclassified or unresolved items,
 - the committed agent-navigation graph/index/report are deterministic and
   current, every included resource has rich metadata, every node is reachable,
   and task/claim/source lookup keys resolve,

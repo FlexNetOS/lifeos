@@ -1,0 +1,204 @@
+{
+  "schema_version": "lifeos-planning-spine.legacy-handoff-manifest.v1",
+  "requested_retired_path": {
+    "path": "/home/flexnetos/lifeos/.handoff",
+    "status": "absent-at-inventory-time",
+    "action": "not-recreated"
+  },
+  "materialized_migration_source": {
+    "path": ".handoff",
+    "status": "tracked-legacy-payload",
+    "git_origin_commits": [
+      "dc5051e",
+      "2c6e438"
+    ]
+  },
+  "summary": {
+    "file_count": 8,
+    "total_bytes": 11084,
+    "substantive_item_count": 12,
+    "unclassified_count": 0,
+    "unresolved_count": 0
+  },
+  "entries": [
+    {
+      "path": "README.md",
+      "bytes": 729,
+      "sha256": "118c5325a69da35a40856f33530b39c0c533d42e802c39223aeff13bd7dbe5cb",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "historical-or-empty",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "navigation/README.md",
+        "06_PROOF_LEDGER.md",
+        "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md"
+      ],
+      "dependencies": [],
+      "purpose": "Legacy fleet continuity-layer instructions and precedence claims",
+      "substantive_items": [
+        "Git > witnessed ledger > task cards",
+        "Planning lives on the KB board",
+        "hf-generated cards and packets are derived views"
+      ],
+      "canonical_destinations": [
+        "navigation/README.md",
+        "06_PROOF_LEDGER.md",
+        "docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md"
+      ],
+      "final_disposition": "superseded-and-archived"
+    },
+    {
+      "path": "context/capsule.json",
+      "bytes": 720,
+      "sha256": "d8a7a4bb7ff413efa9b9d7971462da5ec92a722451f02559e5579eea92ff5d74",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "historical-or-empty",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "../AGENTS.md",
+        "README.md",
+        "navigation/README.md"
+      ],
+      "dependencies": [],
+      "purpose": "Historical LifeOS identity and next-command capsule",
+      "substantive_items": [
+        "LifeOS is a Vue 3 + Tauri 2 application",
+        "Cargo workspace includes lifeos-core and lifeos-daemon",
+        "Knowledge and planning must survive session resets"
+      ],
+      "canonical_destinations": [
+        "../AGENTS.md",
+        "README.md",
+        "navigation/README.md"
+      ],
+      "final_disposition": "merged-as-historical-provenance-and-archived"
+    },
+    {
+      "path": "hooks/hooks.toml",
+      "bytes": 3881,
+      "sha256": "41ade473358102d3bc5bfd925d93bf7d7ce06ee8bf6658ce302c38754e377ff1",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "obsolete-runtime-hook",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "repository operating contracts",
+        "profile-owned agent hook policy"
+      ],
+      "dependencies": [],
+      "purpose": "Obsolete hf continuity hook declarations",
+      "substantive_items": [
+        "Session lifecycle attempted to run hf resume/checkpoint/export/sync/reap",
+        "Several referenced hf verbs were unimplemented"
+      ],
+      "canonical_destinations": [
+        "repository operating contracts",
+        "profile-owned agent hook policy"
+      ],
+      "final_disposition": "superseded-obsolete-and-archived"
+    },
+    {
+      "path": "hooks/loop-entry.sh",
+      "bytes": 2998,
+      "sha256": "a844890c604623414aba2390d831d354f260c45dcee4378ad1383992b126a403",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "obsolete-runtime-hook",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "repository operating contracts",
+        "ICM recall",
+        "navigation/README.md"
+      ],
+      "dependencies": [],
+      "purpose": "Obsolete Claude SessionStart hf launcher",
+      "substantive_items": [
+        "Attempted hf binary discovery and resume",
+        "Attempted automatic handoff-loop continuation"
+      ],
+      "canonical_destinations": [
+        "repository operating contracts",
+        "ICM recall",
+        "navigation/README.md"
+      ],
+      "final_disposition": "superseded-obsolete-and-archived"
+    },
+    {
+      "path": "hooks/session-end.sh",
+      "bytes": 2756,
+      "sha256": "7269ec4c97761f527254c08d5085681c0bf1068c4e79b3a73a684e4c9c9fd04c",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "obsolete-runtime-hook",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "repository operating contracts",
+        "proof ledger",
+        "Git branch-hygiene policy"
+      ],
+      "dependencies": [],
+      "purpose": "Obsolete Claude SessionEnd hf checkpoint and reap hook",
+      "substantive_items": [
+        "Attempted hf checkpoint/handoff/export/sync",
+        "Attempted worktree reap through envctl"
+      ],
+      "canonical_destinations": [
+        "repository operating contracts",
+        "proof ledger",
+        "Git branch-hygiene policy"
+      ],
+      "final_disposition": "superseded-obsolete-and-archived"
+    },
+    {
+      "path": "ledger.events.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "historical-or-empty",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "proof_records/proof_ledger.jsonl"
+      ],
+      "dependencies": [],
+      "purpose": "Empty legacy continuity-ledger export",
+      "substantive_items": [],
+      "canonical_destinations": [
+        "proof_records/proof_ledger.jsonl"
+      ],
+      "final_disposition": "empty-duplicate-archived"
+    },
+    {
+      "path": "packets/.gitkeep",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "historical-or-empty",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "generated/execution_packets/"
+      ],
+      "dependencies": [],
+      "purpose": "Empty placeholder for hf resume packets",
+      "substantive_items": [],
+      "canonical_destinations": [
+        "generated/execution_packets/"
+      ],
+      "final_disposition": "empty-duplicate-archived"
+    },
+    {
+      "path": "tasks/.gitkeep",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "authority_level": "legacy-migration-evidence",
+      "implementation_status": "historical-or-empty",
+      "proof_status": "exact-byte-hash-only",
+      "duplicates_or_overlaps": [
+        "generated/task_graph.source.csv"
+      ],
+      "dependencies": [],
+      "purpose": "Empty placeholder for hf task cards",
+      "substantive_items": [],
+      "canonical_destinations": [
+        "generated/task_graph.source.csv"
+      ],
+      "final_disposition": "empty-duplicate-archived"
+    }
+  ]
+}

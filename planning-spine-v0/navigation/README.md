@@ -6,7 +6,7 @@ type: navigation-index
 status: active
 lifecycle: maintained
 created: 2026-07-12
-updated: 2026-07-13
+updated: 2026-07-20
 aliases:
   - Planning spine navigation
   - Agent recall index
@@ -39,6 +39,14 @@ them easier to find; it does not promote them to decisions or implementation
 proof. Follow [Blueprint Compatibility](../1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md)
 before acting on a blueprint claim.
 
+The two owner-named expanded anchors are preserved as immutable exact-byte
+architecture inputs under [Architecture Anchors](../1.0_VISION/Architecture_Anchors/README.md).
+Their [conflict ledger](../1.0_VISION/Architecture_Anchors/anchor_conflict_ledger.csv)
+and [claim/task crosswalk](../1.0_VISION/Architecture_Anchors/anchor_claim_task_crosswalk.csv)
+control interpretation. The [consolidation record](../consolidation/README.md)
+proves the legacy `.handoff` and pre-reset proof shadow are no longer active
+planning surfaces.
+
 ## Instant recall
 
 Use the profile-owned Bun runtime:
@@ -63,6 +71,8 @@ typed edges.
 | Repository operating contract | [Root AGENTS](../../AGENTS.md) | [[./AGENTS]] |
 | Planning package boundary | [Planning Spine README](../README.md) | [[planning-spine-v0/README]] |
 | Desired architecture and current truth order | [Vision Index](../1.0_VISION/README.md) | [[planning-spine-v0/1.0_VISION/README]] |
+| Immutable expanded architecture anchors | [Architecture Anchors](../1.0_VISION/Architecture_Anchors/README.md) | [[planning-spine-v0/1.0_VISION/Architecture_Anchors/README]] |
+| Legacy handoff disposition and archive | [Consolidation record](../consolidation/README.md) | [[planning-spine-v0/consolidation/README]] |
 | Raw blueprint corrections | [Blueprint Compatibility](../1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) | [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]] |
 | Current work state | [Execution Status](../EXECUTION_STATUS.md) | [[planning-spine-v0/EXECUTION_STATUS]] |
 | Canonical tasks | [Task source](../generated/task_graph.source.csv) and [task index](../generated/task_graph.index.json) | — |
@@ -82,7 +92,7 @@ not enter the canonical LifeOS task or proof namespaces.
 
 | Namespace | Exact lookup | Authority boundary |
 |---|---|---|
-| Canonical LifeOS tasks | `by_task_id` | Exactly the 249 task-graph rows; proof-derived lifecycle applies. |
+| Canonical LifeOS tasks | `by_task_id` | Exactly the rows in `generated/task_graph.source.csv`; the generator derives the count and proof-derived lifecycle. |
 | Imported WorkOrders | `by_work_order_id` | `TASK-CDB000..105`; local status remains `review`, source status is provenance only. |
 | Mandatory capabilities | `by_mandatory_capability_id` | `CAP-MIG-001..028`; mandatory review scope, never a completion claim. |
 
@@ -114,6 +124,8 @@ preserving its proof-bound bytes.
 | Resource | Authority boundary | Wiki link |
 |---|---|---|
 | [Vision Index](../1.0_VISION/README.md) | Maintained navigation and truth ordering | [[planning-spine-v0/1.0_VISION/README]] |
+| [Expanded Architecture Anchors](../1.0_VISION/Architecture_Anchors/README.md) | Exact-byte target topology inputs plus controlling conflict/task crosswalks | [[planning-spine-v0/1.0_VISION/Architecture_Anchors/README]] |
+| [Legacy Consolidation](../consolidation/README.md) | Complete handoff/shadow disposition and recoverable archive receipt | [[planning-spine-v0/consolidation/README]] |
 | [Vision North Star](../1.0_VISION/NORTH_STAR.md) | Desired architecture input | [[planning-spine-v0/1.0_VISION/NORTH_STAR]] |
 | [Master Plan](<../1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md>) | Consolidated vision input | [[planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07)]] |
 | [Project Artifacts](<../1.0_VISION/VISION - Project Artifacts.md>) | Vision artifact inventory | [[planning-spine-v0/1.0_VISION/VISION - Project Artifacts]] |

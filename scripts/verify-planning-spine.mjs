@@ -2,7 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import {
+  bareWikiAliasTarget,
   checkNavigationArtifacts,
+  extractLinks,
+  resolvePathWithinRepo,
+  resolveWikiAliasThroughIndex,
   validateNavigationArtifactSchemas
 } from "../planning-spine-v0/scripts/build-navigation-index.mjs";
 import { checkTaskTableArtifacts } from "../planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs";
@@ -54,9 +58,23 @@ const requiredDocs = [
   "09_OPEN_QUESTIONS.md",
   "1.0_VISION/README.md",
   "1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md",
+  "1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE.md",
+  "1.0_VISION/Architecture_Anchors/README.md",
+  "1.0_VISION/Architecture_Anchors/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "1.0_VISION/Architecture_Anchors/Architecture_Data_Pipeline_Graph_ANCHORED_VERIFIED.md",
+  "1.0_VISION/Architecture_Anchors/receipts.json",
+  "1.0_VISION/Architecture_Anchors/section_inventory.json",
+  "1.0_VISION/Architecture_Anchors/anchor_claim_task_crosswalk.csv",
+  "1.0_VISION/Architecture_Anchors/anchor_conflict_ledger.csv",
   "1.0_VISION/Notebooklm/README.md",
   "1.0_VISION/Notebooklm/artifacts.meta.json",
   "generated/envctl_package_landing_receipt.json",
+  "consolidation/README.md",
+  "consolidation/planning_spine_inventory.json",
+  "consolidation/legacy_handoff_manifest.json",
+  "consolidation/legacy_handoff_crosswalk.csv",
+  "consolidation/retired_shadow_manifest.json",
+  "consolidation/archive_receipt.json",
   "task_tables/README.md",
   "task_tables/workflow/mandatory_capabilities.json",
   "task_tables/workflow/mandatory_capabilities.csv",
@@ -325,7 +343,41 @@ function verifyVisionArtifactCatalog() {
   }
 }
 
-function verifyVisionNavigationLinks() {
+export function collectNavigationLinkFindings({ repoRoot, docPath, text, index, allowedExternalReferences }) {
+  const findings = [];
+  const links = extractLinks(text);
+  for (const [kind, targets] of [["markdown-link", links.markdown], ["wiki-link", links.wiki]]) {
+    for (const target of targets) {
+      const resolved = resolvePathWithinRepo(repoRoot, docPath, target, kind === "wiki-link");
+      if (!resolved) continue;
+      if (resolved.outside) {
+        if (!allowedExternalReferences.has(resolved.repoPath)) {
+          findings.push({ kind, target, reason: "escapes-repository", detail: resolved.repoPath });
+        }
+        continue;
+      }
+      if (resolved.exists) continue;
+      if (kind === "wiki-link") {
+        const aliasTarget = bareWikiAliasTarget(target);
+        if (aliasTarget !== null) {
+          const aliasPaths = resolveWikiAliasThroughIndex(index, aliasTarget);
+          if (aliasPaths.length === 1) continue;
+          findings.push({
+            kind,
+            target,
+            reason: aliasPaths.length ? "ambiguous-alias" : "missing",
+            detail: aliasPaths.length ? aliasPaths.join(", ") : resolved.repoPath
+          });
+          continue;
+        }
+      }
+      findings.push({ kind, target, reason: "missing", detail: resolved.repoPath });
+    }
+  }
+  return findings;
+}
+
+function verifyVisionNavigationLinks(navigationArtifacts) {
   recordCheck("vision_navigation_links_resolve");
   const docs = [
     "README.md",
@@ -339,38 +391,17 @@ function verifyVisionNavigationLinks() {
     "task_tables/README.md"
   ];
 
+  const index = navigationArtifacts?.index ?? { records: {}, by_alias: {} };
+  const allowedExternalReferences = new Set(navigationArtifacts?.source?.external_reference_paths ?? []);
+  const failures = [];
   for (const relativeDoc of docs) {
     const docPath = path.join(pkgRoot, relativeDoc);
     const text = fs.readFileSync(docPath, "utf8");
-
-    const markdownLinks = text.matchAll(/\[[^\]]+\]\((?:<([^>]+)>|([^\s)]+))\)/g);
-    for (const match of markdownLinks) {
-      const target = (match[1] ?? match[2]).split("#", 1)[0];
-      if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target)) continue;
-      const resolved = path.resolve(path.dirname(docPath), decodeURIComponent(target));
-      const fromRepo = path.relative(repoRoot, resolved);
-      if (fromRepo.startsWith("..") || path.isAbsolute(fromRepo)) continue;
-      assert(fs.existsSync(resolved), `Broken Markdown link in ${relativeDoc}: ${target}`);
-    }
-
-    const wikiText = text
-      .replace(/```[\s\S]*?```/g, "")
-      .replace(/`[^`\n]*`/g, "");
-    const wikiLinks = wikiText.matchAll(/\[\[([^\]]+)\]\]/g);
-    for (const match of wikiLinks) {
-      const target = match[1].split("|", 1)[0].split("#", 1)[0].trim();
-      if (!target) continue;
-      let resolved = path.resolve(repoRoot, target);
-      const wikiExtensions = [".md", ".json", ".csv", ".jsonl", ".yaml", ".yml"];
-      if (!wikiExtensions.includes(path.extname(resolved).toLowerCase())) {
-        const candidates = wikiExtensions
-          .map((extension) => `${resolved}${extension}`);
-        resolved = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
-      }
-      assertInside(repoRoot, resolved, `Wiki link in ${relativeDoc}`);
-      assert(fs.existsSync(resolved), `Broken wiki link in ${relativeDoc}: ${target}`);
+    for (const finding of collectNavigationLinkFindings({ repoRoot, docPath, text, index, allowedExternalReferences })) {
+      failures.push(`${finding.reason} ${finding.kind} in ${relativeDoc}: ${finding.target}`);
     }
   }
+  assert(failures.length === 0, `Navigation links failed strict verification: ${failures.join("; ")}`);
 }
 
 async function verifyTaskTableHandoff() {
@@ -387,9 +418,8 @@ async function verifyTaskTableHandoff() {
   assert(result.report.counts.mandatory_language_unclassified === 0, "No normative optional/should/may/must occurrence may remain unclassified");
 }
 
-function verifyAgentNavigationGraph() {
+function verifyAgentNavigationGraph(result) {
   recordCheck("agent_navigation_graph_is_current_connected_and_queryable");
-  const result = checkNavigationArtifacts({ repoRoot });
   assert(result.ok, `Agent navigation graph drifted: ${result.drift.join("; ")}`);
 
   const { graph, index, validation } = result.artifacts;
@@ -788,24 +818,31 @@ function verifyMvpBundle() {
   );
 }
 
-try {
-  verifyDocs();
-  verifyVisionArtifactCatalog();
-  verifyVisionNavigationLinks();
-  await verifyTaskTableHandoff();
-  verifyAgentNavigationGraph();
-  verifySchemas();
-  verifyExamples();
-  verifyMvpConstraints();
-  verifyMvpBundle();
-  writeMvpBundleReport("pass", "planning-spine-v0 MVP bundle verification passed");
-  writeAuthorityIntegrityReport("pass", "planning-spine-v0 verifier authority integrity passed");
-  writeRuntimeReport("pass", "planning-spine-v0 verification passed");
-  console.log("planning-spine-v0 verification passed");
-} catch (error) {
-  writeMvpBundleReport("fail", `planning-spine-v0 MVP bundle verification failed: ${error.message}`);
-  writeAuthorityIntegrityReport("fail", `planning-spine-v0 verifier authority integrity failed: ${error.message}`);
-  writeRuntimeReport("fail", `planning-spine-v0 verification failed: ${error.message}`);
-  console.error(`planning-spine-v0 verification failed: ${error.message}`);
-  process.exit(1);
+async function main() {
+  try {
+    verifyDocs();
+    verifyVisionArtifactCatalog();
+    const navigationCheck = checkNavigationArtifacts({ repoRoot });
+    verifyVisionNavigationLinks(navigationCheck.artifacts);
+    await verifyTaskTableHandoff();
+    verifyAgentNavigationGraph(navigationCheck);
+    verifySchemas();
+    verifyExamples();
+    verifyMvpConstraints();
+    verifyMvpBundle();
+    writeMvpBundleReport("pass", "planning-spine-v0 MVP bundle verification passed");
+    writeAuthorityIntegrityReport("pass", "planning-spine-v0 verifier authority integrity passed");
+    writeRuntimeReport("pass", "planning-spine-v0 verification passed");
+    console.log("planning-spine-v0 verification passed");
+  } catch (error) {
+    writeMvpBundleReport("fail", `planning-spine-v0 MVP bundle verification failed: ${error.message}`);
+    writeAuthorityIntegrityReport("fail", `planning-spine-v0 verifier authority integrity failed: ${error.message}`);
+    writeRuntimeReport("fail", `planning-spine-v0 verification failed: ${error.message}`);
+    console.error(`planning-spine-v0 verification failed: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+if (import.meta.main) {
+  await main();
 }

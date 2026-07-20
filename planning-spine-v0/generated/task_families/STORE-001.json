@@ -5,7 +5,7 @@
   "status": "decided",
   "owner": "David / LifeOS Data Agent / Runtime Kernel",
   "owner_decision_at": "2026-07-13T03:47:08Z",
-  "objective": "Make the explicit owner decision assigning every macro-state data class exactly once across redb, PostgreSQL+RuVector, and nu_plugin CodeDB, with synchronization direction, durability, recovery, and a safe transition path, grounded in the Architecture Blueprint as the intended spec.",
+  "objective": "Maintain the explicit owner decision assigning every LifeOS product data class exactly once across PostgreSQL+RuVector, redb, AgentDB, envctl, CodeDB, rtk_nu, and protected secret custody, with directional reconciliation, durability, recovery, and a proof-gated transition path grounded in both immutable expanded architecture anchors.",
   "decision_artifact": "generated/store_relationship_decision.json",
   "work_items": [
     {
@@ -19,7 +19,7 @@
       "id": "STORE-001-B",
       "surface": "transient high-frequency state (thoughts, traces, WAL, dedup cache, geometry math)",
       "owner": "redb",
-      "decision": "intended transient tier; forward-only flush to PostgreSQL via envctl; never a second durable writer",
+      "decision": "intended transient/pass-through tier; one supervised database opener; complete ordered reconciliation to PostgreSQL through envctl; separate atomic read-only mmap generations and ordered UDS events; never a second durable writer",
       "restore": "local disk (process-lifecycle); transient by definition"
     },
     {
@@ -42,7 +42,21 @@
       "owner": "envctl / CodeDB materialization from PostgreSQL",
       "decision": "derived and disposable; re-projected deterministically from PostgreSQL via module_path",
       "restore": "re-projection"
+    },
+    {
+      "id": "STORE-001-F",
+      "surface": "protected secret bytes, policies, grants, leases, custody, and audit",
+      "owner": "PostgreSQL + RuVector under the six-part secret lifecycle",
+      "decision": "encrypted bytes and complete custody history are durable; plaintext exists only at an authorized lease-bound target and never in redb, logs, UI, model context, proof, or Git",
+      "restore": "PostgreSQL PITR plus owner-controlled root material and tested custody recovery"
+    },
+    {
+      "id": "STORE-001-G",
+      "surface": "repository, task, context, refactor, format, consolidation, upgrade, and multi-merge operations after cutover",
+      "owner": "PostgreSQL + RuVector operational coordinator and complete record",
+      "decision": "Git, Meta, GitKB, ICM, runners, and editors remain governed physical executors or projections; they do not become parallel durable planning authorities",
+      "restore": "database job/lease/witness record plus exact Git and artifact receipts"
     }
   ],
-  "corrects": "generated/store_001_decision_brief.md (prior brief inverted redb/PostgreSQL authority direction; see store_relationship_decision.json.correction_of_prior_brief)"
+  "corrects": "generated/store_001_decision_brief.md and pre-anchor keyring/envctl assumptions (see store_relationship_decision.json and 1.0_VISION/Architecture_Anchors/anchor_conflict_ledger.csv)"
 }

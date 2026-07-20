@@ -352,7 +352,7 @@ function jsonMetadata(value) {
   };
 }
 
-function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = false) {
+export function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = false) {
   const withoutAlias = wiki ? target.split("|", 1)[0] : target;
   const [pathPart, anchor = ""] = withoutAlias.split("#", 2);
   const trimmed = pathPart.trim();
@@ -392,11 +392,24 @@ function resolvePathWithinRepo(repoRoot, sourceAbsolutePath, target, wiki = fals
   };
 }
 
-function extractLinks(text) {
+export function extractLinks(text) {
   const stripped = stripMarkdownCode(text);
   const markdown = [...stripped.matchAll(/\[[^\]]+\]\((?:<([^>]+)>|([^\s)]+))\)/g)].map((match) => match[1] ?? match[2]);
   const wiki = [...stripped.matchAll(/\[\[([^\]]+)\]\]/g)].map((match) => match[1]);
   return { markdown, wiki };
+}
+
+export function bareWikiAliasTarget(target) {
+  const pathPart = String(target).split("|", 1)[0].split("#", 1)[0].trim();
+  if (!pathPart || pathPart.includes("/") || pathPart.startsWith(".") || path.isAbsolute(pathPart)) return null;
+  return pathPart;
+}
+
+export function resolveWikiAliasThroughIndex(index, aliasTarget) {
+  const key = normalizeLookup(aliasTarget ?? "");
+  if (!key) return [];
+  const nodeIds = index?.by_alias?.[key] ?? [];
+  return unique(nodeIds.map((nodeId) => index?.records?.[nodeId]?.path).filter(Boolean)).sort();
 }
 
 function sortObjectOfArrays(value) {
@@ -552,7 +565,9 @@ export function buildNavigationArtifacts(options = {}) {
   const includedFiles = [];
   const selfExcludedOutputs = new Set(Object.values(source.outputs));
   const isRuntimeArtifact = (packagePath) => (
-    /(?:^|\/)(?:__pycache__|\.pytest_cache)(?:\/|$)/.test(packagePath)
+    packagePath.startsWith("dist/")
+    || /^generated\/fleet_verification\/[^/]+\.log$/.test(packagePath)
+    || /(?:^|\/)(?:__pycache__|\.pytest_cache)(?:\/|$)/.test(packagePath)
     || /\.(?:py[co]|pid)$/.test(packagePath)
   );
   for (const absolutePath of allAbsoluteFiles) {
@@ -748,6 +763,7 @@ export function buildNavigationArtifacts(options = {}) {
   }
 
   const strictUnresolved = [];
+  const pendingWikiAliasFindings = [];
   for (const { absolutePath, packagePath } of includedFiles.filter((file) => path.extname(file.packagePath).toLowerCase() === ".md")) {
     const sourceNodeId = fileNodeByPackagePath.get(packagePath);
     const text = fs.readFileSync(absolutePath, "utf8");
@@ -774,6 +790,11 @@ export function buildNavigationArtifacts(options = {}) {
           continue;
         }
         if (!resolved.exists) {
+          const aliasTarget = kind === "wiki-link" ? bareWikiAliasTarget(target) : null;
+          if (aliasTarget !== null) {
+            pendingWikiAliasFindings.push({ sourceNodeId, packagePath, kind, target, aliasTarget, anchor: resolved.anchor });
+            continue;
+          }
           const finding = { source: packagePath, kind, target, reason: "missing" };
           unresolvedLinks.push(finding);
           if (strictLinks.has(packagePath)) strictUnresolved.push(finding);
@@ -784,8 +805,38 @@ export function buildNavigationArtifacts(options = {}) {
       }
     }
   }
+  const nodeIdByAliasPath = new Map();
+  const pathBackedAliasLookup = {};
+  for (const node of nodes.values()) {
+    if (!node.path) continue;
+    nodeIdByAliasPath.set(node.path, node.id);
+    for (const alias of node.aliases) addLookup(pathBackedAliasLookup, normalizeLookup(alias), node.id);
+  }
+  const pathBackedAliasIndex = {
+    by_alias: pathBackedAliasLookup,
+    records: Object.fromEntries(
+      [...nodes.values()].filter((node) => node.path).map((node) => [node.id, { path: node.path }])
+    )
+  };
+  for (const pending of pendingWikiAliasFindings) {
+    const aliasPaths = resolveWikiAliasThroughIndex(pathBackedAliasIndex, pending.aliasTarget);
+    if (aliasPaths.length === 1) {
+      addEdge(pending.sourceNodeId, nodeIdByAliasPath.get(aliasPaths[0]), pending.kind, pending.anchor || null);
+      continue;
+    }
+    const finding = {
+      source: pending.packagePath,
+      kind: pending.kind,
+      target: pending.target,
+      reason: aliasPaths.length ? "ambiguous-alias" : "missing"
+    };
+    unresolvedLinks.push(finding);
+    if (strictLinks.has(pending.packagePath)) strictUnresolved.push(finding);
+  }
   if (strictUnresolved.length) {
-    errors.push(...strictUnresolved.map((finding) => `broken ${finding.kind} in ${finding.source}: ${finding.target}`));
+    errors.push(...strictUnresolved.map((finding) => (
+      `${finding.reason === "ambiguous-alias" ? "ambiguous" : "broken"} ${finding.kind} in ${finding.source}: ${finding.target}`
+    )));
   }
   checks.push({ name: "strict_links_resolve", result: strictUnresolved.length ? "fail" : "pass", observed: strictUnresolved.length });
   const missingExternalReferences = [...allowedExternalReferences].filter((target) => !observedExternalReferences.has(target));
@@ -883,6 +934,30 @@ export function buildNavigationArtifacts(options = {}) {
     if (fileNodeByPackagePath.has(proofPath)) addEdge(`task:${task.task_id}`, fileNodeByPackagePath.get(proofPath), "declares-proof");
   }
   checks.push({ name: "task_parents_resolve", result: errors.some((error) => error.startsWith("unknown task reference")) ? "fail" : "pass", observed: normalizedGraph.tasks.length });
+
+  const canonicalTaskCount = normalizedGraph.tasks.length;
+  const authoredTaskCountClaims = [
+    ...fs.readFileSync(path.join(pkgRoot, "navigation", "README.md"), "utf8").matchAll(/(\d+)\s+task-graph rows/g)
+  ].map((match) => Number(match[1]));
+  const taskCountErrors = [];
+  if (normalizedGraph.task_count !== canonicalTaskCount) {
+    taskCountErrors.push(
+      `canonical task_count ${normalizedGraph.task_count} disagrees with its ${canonicalTaskCount} task row(s)`
+    );
+  }
+  for (const claim of authoredTaskCountClaims) {
+    taskCountErrors.push(
+      `navigation/README.md must not hard-code ${claim} task-graph rows; derive the count from the canonical graph`
+    );
+  }
+  errors.push(...taskCountErrors.map((error) => `canonical task count: ${error}`));
+  checks.push({
+    name: "canonical_task_counts_are_derived",
+    result: taskCountErrors.length ? "fail" : "pass",
+    observed: canonicalTaskCount,
+    expected_task_count: normalizedGraph.task_count,
+    authored_claim_count: authoredTaskCountClaims.length
+  });
 
   for (const [packagePath, fileNodeId] of fileNodeByPackagePath) {
     const node = nodes.get(fileNodeId);
@@ -1282,6 +1357,82 @@ export function buildNavigationArtifacts(options = {}) {
     }
   }
   checks.push({ name: "ledger_uris_and_latest_digests_resolve", result: errors.some((error) => error.startsWith("ledger sequence") || error.startsWith("latest ledger")) ? "fail" : "pass", observed: ledgerRows.length });
+
+  // Duplicate task/revision identities: fail closed unless a later
+  // conflict-resolved record names every identity and accepts exactly one.
+  // Mirrors merge-proof-records.py / update-task-graph-status.py so all
+  // ledger readers apply the identical append-only resolution contract.
+  {
+    const ledgerResolutionProblems = [];
+    const proofLinesByKey = new Map();
+    const acceptanceByKey = new Map();
+    const keyOf = (row) => `${row.task_id}\u0000${String(row.revision ?? row.observed_at ?? "")}`;
+    const validateResolutionRow = (row, priorLines) => {
+      const resolves = row.resolves;
+      if (!resolves || typeof resolves !== "object" || Array.isArray(resolves)) return "a resolves object naming every conflicting identity is required";
+      if (resolves.task_id !== row.task_id || String(resolves.revision ?? "") !== String(row.revision ?? "")) return "resolves.task_id/revision must match the record task_id/revision";
+      const identities = resolves.identities;
+      if (!Array.isArray(identities) || identities.length < 2) return "resolves.identities must name at least two ledger identities";
+      const named = new Set();
+      const accepted = [];
+      for (const item of identities) {
+        if (!item || typeof item !== "object") return "each resolves identity must be an object";
+        if (!Number.isInteger(item.sequence)) return "each resolves identity requires an integer sequence";
+        if (typeof item.proof_sha256 !== "string" || !/^[0-9a-f]{64}$/.test(item.proof_sha256)) return "each resolves identity requires a 64-character proof_sha256";
+        if (item.disposition !== "accepted" && item.disposition !== "superseded") return "each resolves identity disposition must be accepted or superseded";
+        named.add(`${item.sequence}:${item.proof_sha256}`);
+        if (item.disposition === "accepted") accepted.push(item);
+      }
+      if (accepted.length !== 1) return "exactly one resolves identity must carry the accepted disposition";
+      const actual = new Set(priorLines.map((line) => `${line.sequence}:${line.proof_sha256}`));
+      if (named.size !== identities.length || named.size !== actual.size || [...named].some((value) => !actual.has(value))) return "resolves.identities must exactly match the ledger's recorded identities";
+      if (new Set(priorLines.map((line) => line.proof_sha256)).size < 2) return "the named identities carry no digest conflict to resolve";
+      if (resolves.accepted_sequence !== accepted[0].sequence) return "resolves.accepted_sequence must match the accepted identity";
+      if (resolves.accepted_proof_sha256 !== accepted[0].proof_sha256) return "resolves.accepted_proof_sha256 must match the accepted identity";
+      if (row.proof_sha256 !== accepted[0].proof_sha256) return "record proof_sha256 must equal the accepted digest";
+      const acceptedLine = priorLines.find((line) => line.sequence === accepted[0].sequence);
+      if (row.proof_uri !== acceptedLine.proof_uri) return "record proof_uri must equal the accepted identity's proof_uri";
+      for (const field of ["verified_by", "verified_at", "resolution_reason"]) {
+        if (typeof row[field] !== "string" || !row[field].trim()) return `an independent-verifier ${field} is required`;
+      }
+      return null;
+    };
+    for (const row of ledgerRows) {
+      const key = keyOf(row);
+      if (String(row.status ?? "").toLowerCase() === "conflict-resolved") {
+        const problem = validateResolutionRow(row, proofLinesByKey.get(key) ?? []);
+        if (problem) ledgerResolutionProblems.push(`ledger conflict resolution invalid at sequence ${row.sequence} for ${row.task_id} revision ${row.revision}: ${problem}`);
+        else acceptanceByKey.set(key, { sequence: row.sequence, acceptedSha: row.resolves.accepted_proof_sha256 });
+        continue;
+      }
+      if (row.resolves !== undefined) {
+        ledgerResolutionProblems.push(`ledger conflict resolution invalid at sequence ${row.sequence} for ${row.task_id} revision ${row.revision}: only conflict-resolved records may carry a resolves object`);
+        continue;
+      }
+      const lines = proofLinesByKey.get(key) ?? [];
+      lines.push({ sequence: row.sequence, proof_sha256: row.proof_sha256, proof_uri: row.proof_uri });
+      proofLinesByKey.set(key, lines);
+    }
+    let conflictedKeyCount = 0;
+    for (const [key, lines] of [...proofLinesByKey.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+      const [taskId, revision] = key.split("\u0000");
+      const acceptance = acceptanceByKey.get(key);
+      const identityText = lines.map((line) => `sequence ${line.sequence} digest ${line.proof_sha256}`).join(", ");
+      if (acceptance) {
+        conflictedKeyCount += 1;
+        if (lines.some((line) => line.sequence > acceptance.sequence && line.proof_sha256 !== acceptance.acceptedSha)) {
+          ledgerResolutionProblems.push(`ledger revision conflict unresolved for ${taskId} revision ${revision}: ${identityText}`);
+        }
+        continue;
+      }
+      if (new Set(lines.map((line) => line.proof_sha256)).size > 1) {
+        conflictedKeyCount += 1;
+        ledgerResolutionProblems.push(`ledger revision conflict unresolved for ${taskId} revision ${revision}: ${identityText}`);
+      }
+    }
+    errors.push(...ledgerResolutionProblems);
+    checks.push({ name: "ledger_revision_conflicts_resolved", result: ledgerResolutionProblems.length ? "fail" : "pass", observed: conflictedKeyCount });
+  }
 
   const artifactCatalogPath = "1.0_VISION/Notebooklm/artifacts.meta.json";
   const artifactCatalog = JSON.parse(fs.readFileSync(path.join(pkgRoot, artifactCatalogPath), "utf8"));

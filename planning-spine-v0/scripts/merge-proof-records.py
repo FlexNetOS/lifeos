@@ -18,6 +18,12 @@ from reproducible_time import utc_now
 LEDGER_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.v0"
 REPORT_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.merge-report.v0"
 INVALIDATED_STATUS = "invalidated"
+RESOLUTION_STATUS = "conflict-resolved"
+ACCEPTED_DISPOSITION = "accepted"
+SUPERSEDED_DISPOSITION = "superseded"
+RESOLUTIONS_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.conflict-resolutions.v0"
+RESOLUTION_REPORT_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.resolution-report.v0"
+AUDIT_REPORT_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.audit-report.v0"
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -185,12 +191,88 @@ def discover_proofs(proof_dir: Path) -> list[Path]:
     return sorted(path for path in proof_dir.glob("*.proof.json") if path.is_file())
 
 
-def load_ledger(path: Path) -> tuple[list[dict[str, Any]], dict[tuple[str, str], LedgerRecord]]:
-    if not path.exists():
-        return [], {}
+@dataclass
+class LedgerAnalysis:
+    entries: list[dict[str, Any]]
+    max_sequence: int
+    proof_lines: dict[tuple[str, str], list[dict[str, Any]]]
+    resolutions: dict[tuple[str, str], dict[str, Any]]
+    resolved_conflicts: list[dict[str, Any]]
+    unresolved_conflicts: list[dict[str, Any]]
+    errors: list[str]
+    effective_index: dict[tuple[str, str], LedgerRecord]
 
+
+def validate_resolution_record(
+    entry: dict[str, Any], key: tuple[str, str], prior_identities: list[dict[str, Any]]
+) -> str | None:
+    """Return a problem description when a conflict-resolved record is invalid."""
+    resolves = entry.get("resolves")
+    if not isinstance(resolves, dict):
+        return "a resolves object naming every conflicting identity is required"
+    if resolves.get("task_id") != key[0] or str(resolves.get("revision", "")).strip() != key[1]:
+        return "resolves.task_id/revision must match the record task_id/revision"
+    identities = resolves.get("identities")
+    if not isinstance(identities, list) or len(identities) < 2:
+        return "resolves.identities must name at least two ledger identities"
+    named: list[tuple[int, str]] = []
+    accepted: list[tuple[int, str]] = []
+    for item in identities:
+        if not isinstance(item, dict):
+            return "each resolves identity must be an object"
+        sequence = item.get("sequence")
+        digest = item.get("proof_sha256")
+        disposition = item.get("disposition")
+        if not isinstance(sequence, int):
+            return "each resolves identity requires an integer sequence"
+        if not isinstance(digest, str) or not SHA256_RE.fullmatch(digest.strip().lower()):
+            return "each resolves identity requires a 64-character proof_sha256"
+        if disposition not in (ACCEPTED_DISPOSITION, SUPERSEDED_DISPOSITION):
+            return "each resolves identity disposition must be accepted or superseded"
+        named.append((sequence, digest.strip().lower()))
+        if disposition == ACCEPTED_DISPOSITION:
+            accepted.append((sequence, digest.strip().lower()))
+    if len(accepted) != 1:
+        return "exactly one resolves identity must carry the accepted disposition"
+    actual = {(line["sequence"], line["proof_sha256"]) for line in prior_identities}
+    if set(named) != actual or len(named) != len(set(named)):
+        return "resolves.identities must exactly match the ledger's recorded identities"
+    if len({digest for _, digest in actual}) < 2:
+        return "the named identities carry no digest conflict to resolve"
+    accepted_sequence, accepted_digest = accepted[0]
+    if resolves.get("accepted_sequence") != accepted_sequence:
+        return "resolves.accepted_sequence must match the accepted identity"
+    if resolves.get("accepted_proof_sha256") != accepted_digest:
+        return "resolves.accepted_proof_sha256 must match the accepted identity"
+    if entry.get("proof_sha256") != accepted_digest:
+        return "record proof_sha256 must equal the accepted digest"
+    accepted_line = next(line for line in prior_identities if line["sequence"] == accepted_sequence)
+    if entry.get("proof_uri") != accepted_line["proof_uri"]:
+        return "record proof_uri must equal the accepted identity's proof_uri"
+    for field in ("verified_by", "verified_at", "resolution_reason"):
+        value = entry.get(field)
+        if not isinstance(value, str) or not value.strip():
+            return f"an independent-verifier {field} is required"
+    return None
+
+
+def analyze_ledger(path: Path) -> LedgerAnalysis:
+    """Parse the append-only ledger and reconcile duplicate task/revision identities.
+
+    Proof lines sharing (task_id, revision) but disagreeing on proof_sha256 form a
+    conflict. A conflict is resolved only by a later conflict-resolved record whose
+    resolves object names every recorded identity and accepts exactly one of them.
+    Raw lines are never rewritten; resolution is strictly append-only.
+    """
     entries: list[dict[str, Any]] = []
-    index: dict[tuple[str, str], LedgerRecord] = {}
+    proof_lines: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    acceptance: dict[tuple[str, str], dict[str, Any]] = {}
+    resolutions: dict[tuple[str, str], dict[str, Any]] = {}
+    errors: list[str] = []
+    max_sequence = 0
+    if not path.exists():
+        return LedgerAnalysis([], 0, {}, {}, [], [], [], {})
+
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip():
             continue
@@ -212,12 +294,134 @@ def load_ledger(path: Path) -> tuple[list[dict[str, Any]], dict[tuple[str, str],
         if not isinstance(proof_sha256, str) or not proof_sha256.strip():
             raise MergeError(f"{path}:{line_number}: proof_sha256 is required")
 
+        sequence = entry.get("sequence")
+        if not isinstance(sequence, int):
+            sequence = line_number
+        max_sequence = max(max_sequence, sequence)
         key = (task_id.strip(), revision.strip())
-        if key in index and index[key].proof_sha256 != proof_sha256.strip():
-            raise MergeError(f"{path}:{line_number}: conflicting ledger entry for {key[0]} revision {key[1]}")
-        index[key] = LedgerRecord(key[0], key[1], proof_sha256.strip())
+        status = str(entry.get("status", "")).strip().lower()
         entries.append(entry)
-    return entries, index
+
+        if status == RESOLUTION_STATUS:
+            problem = validate_resolution_record(entry, key, proof_lines.get(key, []))
+            if problem is not None:
+                errors.append(
+                    f"{path}:{line_number}: invalid conflict-resolution record for "
+                    f"{key[0]} revision {key[1]}: {problem}"
+                )
+                continue
+            resolves = entry["resolves"]
+            acceptance[key] = {
+                "sequence": sequence,
+                "accepted_sequence": resolves["accepted_sequence"],
+                "accepted_proof_sha256": resolves["accepted_proof_sha256"],
+            }
+            resolutions[key] = {
+                "task_id": key[0],
+                "revision": key[1],
+                "identities": [dict(item) for item in resolves["identities"]],
+                "accepted_sequence": resolves["accepted_sequence"],
+                "accepted_proof_sha256": resolves["accepted_proof_sha256"],
+                "resolution_sequence": sequence,
+                "verified_by": entry["verified_by"],
+                "verified_at": entry["verified_at"],
+                "resolution_reason": entry["resolution_reason"],
+            }
+            continue
+
+        if "resolves" in entry:
+            errors.append(
+                f"{path}:{line_number}: only conflict-resolved records may carry a resolves object"
+            )
+            continue
+        proof_lines.setdefault(key, []).append(
+            {
+                "sequence": sequence,
+                "proof_sha256": proof_sha256.strip(),
+                "proof_uri": str(entry.get("proof_uri", "")).strip(),
+                "line_number": line_number,
+                "status": str(entry.get("status", "")).strip(),
+            }
+        )
+
+    resolved_conflicts: list[dict[str, Any]] = []
+    unresolved_conflicts: list[dict[str, Any]] = []
+    effective_index: dict[tuple[str, str], LedgerRecord] = {}
+    for key in sorted(set(proof_lines) | set(acceptance)):
+        lines = proof_lines.get(key, [])
+        accepted = acceptance.get(key)
+        if accepted is not None:
+            diverged = [
+                line
+                for line in lines
+                if line["sequence"] > accepted["sequence"]
+                and line["proof_sha256"] != accepted["accepted_proof_sha256"]
+            ]
+            if diverged:
+                unresolved_conflicts.append(
+                    {
+                        "task_id": key[0],
+                        "revision": key[1],
+                        "identities": [
+                            {"sequence": line["sequence"], "proof_sha256": line["proof_sha256"]}
+                            for line in lines
+                        ],
+                    }
+                )
+                continue
+            resolved_conflicts.append(resolutions[key])
+            effective_index[key] = LedgerRecord(key[0], key[1], accepted["accepted_proof_sha256"])
+            continue
+        digests = {line["proof_sha256"] for line in lines}
+        if len(digests) > 1:
+            unresolved_conflicts.append(
+                {
+                    "task_id": key[0],
+                    "revision": key[1],
+                    "identities": [
+                        {"sequence": line["sequence"], "proof_sha256": line["proof_sha256"]}
+                        for line in lines
+                    ],
+                }
+            )
+            continue
+        if lines:
+            effective_index[key] = LedgerRecord(key[0], key[1], lines[-1]["proof_sha256"])
+
+    return LedgerAnalysis(
+        entries=entries,
+        max_sequence=max_sequence,
+        proof_lines=proof_lines,
+        resolutions=resolutions,
+        resolved_conflicts=resolved_conflicts,
+        unresolved_conflicts=unresolved_conflicts,
+        errors=errors,
+        effective_index=effective_index,
+    )
+
+
+def unresolved_conflict_text(conflict: dict[str, Any]) -> str:
+    identities = ", ".join(
+        f"sequence {item['sequence']} digest {item['proof_sha256']}"
+        for item in conflict["identities"]
+    )
+    return f"{conflict['task_id']} revision {conflict['revision']} ({identities})"
+
+
+def load_ledger(path: Path) -> tuple[list[dict[str, Any]], dict[tuple[str, str], LedgerRecord]]:
+    analysis = analyze_ledger(path)
+    if analysis.errors:
+        raise MergeError("; ".join(analysis.errors))
+    if analysis.unresolved_conflicts:
+        details = "; ".join(
+            unresolved_conflict_text(conflict) for conflict in analysis.unresolved_conflicts
+        )
+        raise MergeError(
+            "unresolved ledger conflict(s): "
+            f"{details} — append an independent-verifier conflict-resolved record "
+            "naming every identity before merging"
+        )
+    return analysis.entries, analysis.effective_index
 
 
 def check_input_duplicates(records: list[ProofRecord]) -> None:
@@ -331,6 +535,186 @@ def merge_records(proof_dir: Path, ledger_path: Path, report_path: Path, dry_run
     return report
 
 
+def audit_ledger(ledger_path: Path) -> dict[str, Any]:
+    """Read-only conflict audit of the append-only ledger."""
+    analysis = analyze_ledger(ledger_path)
+    resolution_count = sum(
+        1
+        for entry in analysis.entries
+        if str(entry.get("status", "")).strip().lower() == RESOLUTION_STATUS
+    )
+    return {
+        "schema_version": AUDIT_REPORT_SCHEMA_VERSION,
+        "generated_at": utc_now(),
+        "ledger_path": str(ledger_path),
+        "entry_count": len(analysis.entries),
+        "proof_entry_count": len(analysis.entries) - resolution_count,
+        "resolution_entry_count": resolution_count,
+        "resolved_conflicts": sorted(
+            analysis.resolved_conflicts,
+            key=lambda item: (item["task_id"], item["revision"]),
+        ),
+        "unresolved_conflicts": sorted(
+            analysis.unresolved_conflicts,
+            key=lambda item: (item["task_id"], item["revision"]),
+        ),
+        "errors": analysis.errors,
+        "result": "pass" if not analysis.errors and not analysis.unresolved_conflicts else "fail",
+    }
+
+
+def resolve_conflicts(
+    resolutions_path: Path,
+    proof_dir: Path,
+    ledger_path: Path,
+    report_path: Path,
+    dry_run: bool,
+) -> dict[str, Any]:
+    """Append independent-verifier conflict-resolution records to the ledger."""
+    document = load_json(resolutions_path)
+    if document.get("schema_version") != RESOLUTIONS_SCHEMA_VERSION:
+        raise MergeError(
+            f"{resolutions_path}: schema_version must be {RESOLUTIONS_SCHEMA_VERSION!r}"
+        )
+    verified_by = required_text(document, "verified_by", resolutions_path)
+    verified_at = required_text(document, "verified_at", resolutions_path)
+    items = document.get("resolutions")
+    if not isinstance(items, list) or not items:
+        raise MergeError(f"{resolutions_path}: resolutions must be a non-empty array")
+
+    analysis = analyze_ledger(ledger_path)
+    if analysis.errors:
+        raise MergeError("; ".join(analysis.errors))
+    unresolved_keys = {
+        (conflict["task_id"], conflict["revision"]): conflict
+        for conflict in analysis.unresolved_conflicts
+    }
+    latest_sequence_by_task: dict[str, int] = {}
+    for key, lines in analysis.proof_lines.items():
+        for line in lines:
+            latest_sequence_by_task[key[0]] = max(
+                latest_sequence_by_task.get(key[0], 0), line["sequence"]
+            )
+
+    generated_at = utc_now()
+    appendable: list[dict[str, Any]] = []
+    applied: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    next_sequence = analysis.max_sequence + 1
+
+    def item_key(item: dict[str, Any]) -> tuple[str, str]:
+        return (str(item.get("task_id", "")).strip(), str(item.get("revision", "")).strip())
+
+    for item in sorted(items, key=item_key):
+        if not isinstance(item, dict):
+            raise MergeError(f"{resolutions_path}: each resolution must be an object")
+        key = item_key(item)
+        if not key[0] or not key[1]:
+            raise MergeError(f"{resolutions_path}: each resolution requires task_id and revision")
+        lines = analysis.proof_lines.get(key, [])
+        if not lines:
+            raise MergeError(
+                f"{resolutions_path}: {key[0]} revision {key[1]} has no ledger identities"
+            )
+        existing = analysis.resolutions.get(key)
+        if existing is not None and key not in unresolved_keys:
+            if existing["accepted_proof_sha256"] == item.get("accepted_proof_sha256"):
+                skipped.append(
+                    {"task_id": key[0], "revision": key[1], "reason": "already resolved"}
+                )
+                continue
+            raise MergeError(
+                f"{resolutions_path}: {key[0]} revision {key[1]} is already resolved "
+                "with a different accepted identity"
+            )
+        if key not in unresolved_keys:
+            raise MergeError(
+                f"{resolutions_path}: {key[0]} revision {key[1]} has no unresolved digest conflict"
+            )
+        accepted_sequence = item.get("accepted_sequence")
+        accepted_line = next(
+            (line for line in lines if line["sequence"] == accepted_sequence), None
+        )
+        if accepted_line is None:
+            raise MergeError(
+                f"{resolutions_path}: {key[0]} revision {key[1]}: accepted_sequence "
+                f"{accepted_sequence!r} does not name a recorded ledger identity"
+            )
+        if latest_sequence_by_task.get(key[0]) == accepted_line["sequence"]:
+            proof_path = proof_dir / Path(accepted_line["proof_uri"]).name
+            if not proof_path.is_file():
+                raise MergeError(
+                    f"{resolutions_path}: {key[0]} revision {key[1]}: accepted proof "
+                    f"artifact does not exist at {proof_path}"
+                )
+            on_disk = sha256_file(proof_path)
+            if on_disk != item.get("accepted_proof_sha256"):
+                raise MergeError(
+                    f"{resolutions_path}: {key[0]} revision {key[1]}: accepted digest "
+                    f"{item.get('accepted_proof_sha256')!r} does not match the on-disk "
+                    f"proof artifact {proof_path} ({on_disk})"
+                )
+        entry = {
+            "schema_version": LEDGER_SCHEMA_VERSION,
+            "sequence": next_sequence,
+            "generated_at": generated_at,
+            "task_id": key[0],
+            "status": RESOLUTION_STATUS,
+            "observed_at": verified_at,
+            "revision": key[1],
+            "proof_uri": accepted_line["proof_uri"],
+            "proof_sha256": item.get("accepted_proof_sha256"),
+            "verified_by": verified_by,
+            "verified_at": verified_at,
+            "resolution_reason": str(item.get("reason", "")).strip(),
+            "resolves": {
+                "task_id": key[0],
+                "revision": key[1],
+                "identities": item.get("identities"),
+                "accepted_sequence": accepted_sequence,
+                "accepted_proof_sha256": item.get("accepted_proof_sha256"),
+            },
+        }
+        problem = validate_resolution_record(entry, key, lines)
+        if problem is not None:
+            raise MergeError(f"{resolutions_path}: {key[0]} revision {key[1]}: {problem}")
+        appendable.append(entry)
+        applied.append(
+            {
+                "task_id": key[0],
+                "revision": key[1],
+                "sequence": next_sequence,
+                "accepted_sequence": accepted_sequence,
+                "accepted_proof_sha256": item.get("accepted_proof_sha256"),
+            }
+        )
+        next_sequence += 1
+
+    covered = {(item["task_id"], item["revision"]) for item in applied}
+    remaining = sorted(key for key in unresolved_keys if key not in covered)
+    append_entries(ledger_path, appendable, dry_run)
+    report = {
+        "schema_version": RESOLUTION_REPORT_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "ledger_path": str(ledger_path),
+        "resolutions_path": str(resolutions_path),
+        "dry_run": dry_run,
+        "verified_by": verified_by,
+        "verified_at": verified_at,
+        "applied_count": len(applied),
+        "skipped_count": len(skipped),
+        "applied": applied,
+        "skipped": skipped,
+        "remaining_unresolved": [
+            {"task_id": task_id, "revision": revision} for task_id, revision in remaining
+        ],
+        "appended_entries": appendable,
+        "result": "pass" if not remaining else "fail",
+    }
+    write_json(report_path, report)
+    return report
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Append proof_records/*.proof.json into proof_ledger.jsonl.")
     parser.add_argument(
@@ -349,14 +733,48 @@ def main() -> int:
     parser.add_argument(
         "--report",
         type=Path,
-        default=Path("proof_records/proof_ledger.merge_report.json"),
-        help="Machine-readable merge report output path",
+        default=None,
+        help="Machine-readable report output path",
     )
     parser.add_argument("--dry-run", action="store_true", help="Validate and report without appending")
+    parser.add_argument(
+        "--audit",
+        action="store_true",
+        help="Read-only audit of duplicate-revision digest conflicts; fails while any conflict is unresolved",
+    )
+    parser.add_argument(
+        "--resolve",
+        type=Path,
+        default=None,
+        metavar="RESOLUTIONS_JSON",
+        help="Append independent-verifier conflict-resolved records described by RESOLUTIONS_JSON",
+    )
     args = parser.parse_args()
+    if args.audit and args.resolve is not None:
+        parser.error("--audit and --resolve are mutually exclusive")
 
     try:
-        report = merge_records(args.proof_dir, args.ledger, args.report, args.dry_run)
+        if args.audit:
+            report = audit_ledger(args.ledger)
+            print(json.dumps(report, indent=2, sort_keys=True))
+            if args.report is not None:
+                write_json(args.report, report)
+            return 0 if report["result"] == "pass" else 1
+        if args.resolve is not None:
+            report_path = args.report or Path("proof_records/proof_ledger.resolution_report.json")
+            report = resolve_conflicts(
+                args.resolve, args.proof_dir, args.ledger, report_path, args.dry_run
+            )
+            verb = "would append" if args.dry_run else "appended"
+            print(
+                f"merge-proof-records: {verb} {report['applied_count']} resolution record(s), "
+                f"skipped {report['skipped_count']} already-resolved, "
+                f"{len(report['remaining_unresolved'])} conflict(s) still unresolved, "
+                f"ledger {args.ledger}"
+            )
+            return 0 if report["result"] == "pass" else 1
+        report_path = args.report or Path("proof_records/proof_ledger.merge_report.json")
+        report = merge_records(args.proof_dir, args.ledger, report_path, args.dry_run)
     except MergeError as error:
         print(f"merge-proof-records: error: {error}", file=sys.stderr)
         return 1

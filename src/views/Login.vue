@@ -87,20 +87,26 @@ async function onResetVault() {
 <template>
   <div class="lifeos-login" role="dialog" aria-modal="true" aria-labelledby="login-title">
     <div v-if="isLoading" class="login-loading" aria-live="polite">
-      Preparing your vault…
+      <img src="/lifeos-mark-256.png" alt="" />
+      <span class="login-loading-wordmark">LIFEOS</span>
+      <small>by ElementArk · Preparing your local vault</small>
     </div>
 
     <form v-else class="login-card" novalidate @submit.prevent="onSubmit">
       <header class="login-head">
-        <div class="login-mark" aria-hidden="true">
-          <Icon :name="isSignup ? 'sparkles' : 'shield-check'" :size="22" />
+        <div class="login-lockup" aria-label="LifeOS by ElementArk">
+          <img class="login-mark" src="/lifeos-mark-256.png" alt="" />
+          <span class="login-brand-copy">
+            <span class="login-wordmark">LIFEOS</span>
+            <span class="login-endorsement">by ElementArk</span>
+          </span>
         </div>
         <h1 id="login-title" class="login-title">
           {{ isSignup ? "Welcome to LifeOS" : "Welcome back" }}
         </h1>
         <p class="login-sub">
           <template v-if="isSignup">
-            Set up your local vault. Credentials stay on this device — no network calls.
+            Set up your local LifeOS vault. Credentials stay on this device — no network calls.
           </template>
           <template v-else>
             <strong data-test="login-account-email">{{ auth.account?.email }}</strong>
@@ -267,8 +273,30 @@ async function onResetVault() {
 }
 
 .login-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   color: var(--fg-3);
   font-size: 14px;
+}
+
+.login-loading img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.login-loading-wordmark {
+  font-family: var(--font-display);
+  color: var(--fg-0);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.login-loading small {
+  color: var(--fg-3);
+  font-size: 12px;
 }
 
 .login-card {
@@ -291,15 +319,36 @@ async function onResetVault() {
   gap: 10px;
 }
 
+.login-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .login-mark {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--lifeos-cyan), var(--lifeos-purple), var(--lifeos-green));
-  color: var(--bg-0);
-  box-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.login-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-wordmark {
+  font-family: var(--font-display);
+  color: var(--fg-0);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.login-endorsement {
+  color: var(--fg-3);
+  font-size: 11px;
+  line-height: 1.2;
 }
 
 .login-title {

@@ -98,7 +98,7 @@ Use YAML frontmatter with these fields when applicable:
 
 Do not add metadata that cannot be maintained or that implies proof absent a
 receipt. Use dual links when possible: `[[WIKI LINK]]` for graph navigation and
-a relative Markdown link for portable local navigation.
+`[Markdown link](README.md)` (a relative path) for portable local navigation.
 
 ## GitKB operating note
 

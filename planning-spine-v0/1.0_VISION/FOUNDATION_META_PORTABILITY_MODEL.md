@@ -256,8 +256,11 @@ The bundle is a **layered prefix**, not a git-vendored cargo dir:
 - **Relocatability**: the prefix must be relocatable unless a `file-map.json` entry marks a path
   non-relocatable with reason/owner/mitigation (`lifeos-release-filesystem-layout.md:128-136`).
 
-**OPEN QUESTION (undecided):** whether the **Rust toolchain** is bundled as a closure under
-`toolchains/rust/` or merely recorded as **build-only provenance** (`lifeos-toolchain-and-dependency-bundle.md:19`).
+**DECIDED (ARCHBP-029 / DECIDE-007, 2026-07-15):** the **Rust toolchain** is recorded as
+**build-only provenance**; `toolchains/rust/` is not populated. The source row
+(`lifeos-toolchain-and-dependency-bundle.md:19`) is superseded by
+[ARCHBP-029-toolchain-decision.md](current_state/ARCHBP-029-toolchain-decision.md)
+(bounded, reversible via its unblock condition).
 
 ---
 

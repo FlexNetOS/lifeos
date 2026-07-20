@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+git_bin="${LIFEOS_REAL_GIT:-$(command -v git)}"
+repo="$("$git_bin" rev-parse --show-toplevel)"
+git_dir="$("$git_bin" -C "$repo" rev-parse --absolute-git-dir)"
+block_dir="$git_dir/lifeos-empty-hooks"
+
+[[ ! -L "$block_dir" ]] || { echo "Refusing symlinked hook blocker directory" >&2; exit 70; }
+mkdir -p "$block_dir"
+chmod 700 "$block_dir"
+if find "$block_dir" -mindepth 1 -print -quit | grep -q .; then
+  echo "Refusing non-empty hook blocker directory: $block_dir" >&2
+  exit 70
+fi
+
+export LIFEOS_HOOKS_BLOCKED=1
+exec "$git_bin" -C "$repo" -c core.hooksPath="$block_dir" "$@"

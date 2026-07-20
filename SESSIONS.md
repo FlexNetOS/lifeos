@@ -1,8 +1,6 @@
 # Agent sessions
 
-Auto-appended record of Claude Code sessions in this repo. Each entry is written by `.claude/hooks/session-log.mjs` on the `Stop` hook and is idempotent — re-fires update the existing entry for that `session_id` rather than duplicating. Newest at top.
-
-Disable by removing the `Stop` block from `.claude/settings.json` or deleting the script.
+Historical Claude Code session records. Repository-owned session hooks are intentionally absent; this file is retained as inert evidence only.
 
 ---
 

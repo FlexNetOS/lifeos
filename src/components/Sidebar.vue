@@ -96,10 +96,10 @@ onBeforeUnmount(() => {
 <template>
   <aside class="rail">
     <button :class="['rail-brand', { collapsed: lifeos.wsCollapsed }]"
-            :title="lifeos.wsCollapsed ? 'Open workspace panel' : 'Close workspace panel'"
-            aria-label="Toggle workspace panel"
+            :title="lifeos.wsCollapsed ? 'Open LifeOS workspace panel' : 'Close LifeOS workspace panel'"
+            aria-label="Toggle LifeOS workspace panel"
             @click="lifeos.toggleWs()">
-      <img src="/lifeos-mark-256.png" alt="LifeOS" />
+      <img src="/lifeos-mark-256.png" alt="" />
     </button>
 
     <button class="rail-ai-toggle"

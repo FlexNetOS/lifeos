@@ -7,6 +7,17 @@ Cross-platform desktop app built on **Vue 3 + Vite + Pinia + vue-router** with a
 
 This repo is the **production implementation** of the [LifeOS Design System](./design-system-reference/README.md) handoff bundle. The bundle's authoritative tokens, fonts, brand assets, and component-level CSS are folded into this repo so it is fully self-contained.
 
+## Brand architecture
+
+- **ElementArk** is the parent conglomerate.
+- **LifeOS** is ElementArk's operating system and all-in-one application.
+- LifeOS leads on app icons, splash, login, onboarding, sidebar, app shell, loading, Settings, and About surfaces.
+- ElementArk leads in corporate, investor, portfolio, and cross-portfolio contexts.
+- **Work, Personal, and Home** are navigation domains inside LifeOS, not separate parent brands.
+- Product endorsement uses **LifeOS by ElementArk** as typography within one lockup. Do not place competing LifeOS and ElementArk marks on the same screen.
+
+The ElementArk-led canonical lockups remain source assets for corporate and parent-brand contexts. They are not the default LifeOS app lockup.
+
 ---
 
 ## Quick start
@@ -54,8 +65,12 @@ ubuntu-lifeos/
 ├── lifeos_app.css              # Component CSS from the React design canon, kept 1:1
 ├── fonts/                      # Rigelstar.ttf (display face)
 ├── public/                     # Vite static assets — served at root URL
-│   ├── lifeos-mark-256.png     # Brand mark used in the sidebar (loaded from / )
-│   ├── lifeos-app-icon.png     # Favicon + Tauri source
+│   ├── lifeos-mark.png         # Primary mark + canonical Tauri icon source
+│   ├── lifeos-mark-256.png     # Sidebar + favicon mark (loaded from / )
+│   ├── lifeos-primary-lockup.png # ElementArk-led corporate / parent lockup
+│   ├── lifeos-wordmark-tagline.png # ElementArk wordmark + LifeOS descriptor
+│   ├── lifeos-icon-triad.png
+│   ├── work_personal_home_icons.svg
 │   └── icons/                  # work-on-black, personal-on-black, home-on-black
 ├── src/
 │   ├── main.ts                 # createApp + pinia + router + Tauri nav bridge
@@ -67,7 +82,7 @@ ubuntu-lifeos/
 ├── src-tauri/
 │   ├── Cargo.toml              # tauri 2 + plugin-fs + plugin-shell + tray-icon
 │   ├── tauri.conf.json         # 1280×800 dark window, dark theme, FS scoped to vault
-│   ├── icons/                  # Full Tauri icon set generated from lifeos-app-icon.png
+│   ├── icons/                  # Full Tauri icon set generated from lifeos-mark.png
 │   └── src/main.rs             # Native menu, vault stubs, settings navigation event
 ├── tests/                      # 45 Vitest specs covering every interactive surface
 └── design-system-reference/    # Handoff bundle (read-only reference):
@@ -113,9 +128,9 @@ These come from `design-system-reference/README.md`. Read it once front-to-back 
 - **Tokens, not literals.** All color/spacing/radii/shadow values come from `colors_and_type.css` CSS variables. Never hard-code a hex.
 - **Dark-first.** `var(--bg-0)` page, `var(--bg-2)` cards, `var(--fg-1)` text. The signature spiral gradient (`--gradient-spiral`) is the only chromatic moment — never as a full background wash.
 - **Lexend everywhere** except the Rigelstar wordmark. JetBrains Mono for shortcuts/timestamps/hex.
-- **Lucide icons only.** No emoji, no unicode-as-icon, no PNG iconography in the UI.
-- **One brand mark per screen, max.** The `lifeos-mark-*.png` already carries glow — only show it on near-black surfaces.
-- **One brand glow per viewport, max.** Status pulses don't count toward this budget.
+- **Lucide icons for interface glyphs.** The canonical LifeOS product mark is the only PNG exception in the UI.
+- **One brand mark per screen, max.** A LifeOS emblem + wordmark + typographic ElementArk endorsement counts as one lockup.
+- **No added brand glow.** The canonical mark's baked treatment is sufficient; do not add CSS gradients, shadows, or decorative glow around it.
 
 Every workspace must be calm, second-person, present-tense, sentence-case. AI suggestions are prefaced with `LifeOS suggests:`.
 

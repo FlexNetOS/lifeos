@@ -279,15 +279,17 @@ components:
 
 ## Overview
 
-LifeOS is a personal AI operating system — an OS-level product that manages work, personal, and home-automation surfaces from a single cohesive shell. Its visual identity is **calm, dark-first, and precision-toned**: the UI recedes so that content and AI guidance can surface cleanly.
+LifeOS is ElementArk's operating system and all-in-one application. It manages Work, Personal, and Home surfaces from a single cohesive shell. Its visual identity is **calm, dark-first, and precision-toned**: the UI recedes so that content and AI guidance can surface cleanly.
+
+**Brand architecture**: LifeOS leads on product surfaces. ElementArk remains the visible parent and leads in corporate, investor, portfolio, and cross-portfolio contexts. Use the typographic endorsement "LifeOS by ElementArk" when ownership helps, while keeping one brand lockup per screen.
 
 **Brand personality**: Focused, intelligent, trustworthy. Never loud. LifeOS does not shout — it whispers. Every surface exists to reduce cognitive load, not add to it.
 
 **Target emotional response**: The user should feel in control and supported — as if the system is quietly competent and always ready, not demanding attention. The interface should disappear into the task.
 
-**Visual DNA**: A deep-black page (near `#0A0A0A`) with a single chromatic moment: the **spiral gradient** — a 135° linear sweep from cyan (#00D4FF) through purple (#9B7BFF) to green (#00E676). This gradient appears as a brand mark, a text treatment, and a glow source. It never floods the background. All other color is utilitarian (status, metadata, interaction feedback).
+**Visual DNA**: A deep-black page (near `#0A0A0A`) with the approved cyan, purple, and green direction concentrated in the canonical tri-node mark and domain accents. Do not invent gradient fields, generic technology symbols, or decorative brand glow. All other color is utilitarian (status, metadata, interaction feedback).
 
-**The tri-node arc mark**: The Rigelstar wordmark and a stylised three-node arc are the two brand marks. One per screen. One brand glow per viewport.
+**LifeOS product lockup**: The canonical tri-node emblem and Rigelstar LIFEOS wordmark may form one lockup. ElementArk appears as a typographic endorsement, not a competing second emblem. Use one lockup per screen.
 
 **Scale**: Desktop-first (1280×800 minimum) but responsive to mobile and tablet via breakpoints. The Tauri shell hosts the desktop surface; iOS/Android and Pi targets share the same token vocabulary.
 
@@ -445,6 +447,8 @@ The soft variant (`brand-spiral-gradient-soft`, 18% opacity) is safe to use as a
 
 ### Do
 
+- **Do** lead with LifeOS on app icon, splash, login, onboarding, sidebar, app shell, loading, Settings, and About surfaces.
+- **Do** use ElementArk as the parent endorsement on product surfaces and as the primary identity in corporate contexts.
 - **Do** use the surface scale in order. A card (#1A1A1A) lives on a panel (#121212) on the page (#0A0A0A). Never invert.
 - **Do** reserve the spiral gradient for brand moments — wordmark, AIAvatar, section-level accent borders. Maximum one gradient element per viewport section.
 - **Do** use the focus ring (`ring-focus`) on every interactive element. The doubled ring (dark inner + cyan outer) is visible on all surface levels.
@@ -455,6 +459,8 @@ The soft variant (`brand-spiral-gradient-soft`, 18% opacity) is safe to use as a
 
 ### Don't
 
+- **Don't** use the ElementArk-led corporate lockup as the default LifeOS app identity.
+- **Don't** place separate LifeOS and ElementArk emblems on the same screen.
 - **Don't** use the spiral gradient as a full-bleed background wash. It appears as an accent, never as wallpaper.
 - **Don't** use more than one brand glow (cyan/purple/green box-shadow) per viewport.
 - **Don't** use raw hex literals in component styles — always reference CSS variables (`var(--lifeos-cyan)`) or the token paths.

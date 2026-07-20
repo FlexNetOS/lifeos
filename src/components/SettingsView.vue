@@ -282,10 +282,12 @@ onMounted(async () => {
           <span class="settings-section-ico" aria-hidden="true">
             <Icon name="info" :size="16" />
           </span>
-          <h2 id="settings-about-heading" class="settings-section-title">About</h2>
+          <h2 id="settings-about-heading" class="settings-section-title">About LifeOS</h2>
         </div>
         <p class="settings-section-desc">
-          Runtime metadata for support and bug reports.
+          LifeOS is ElementArk's operating system and all-in-one application for
+          Work, Personal, and Home. Its Yazelix workspace uses UDS and shared
+          redb mmap state.
         </p>
         <dl class="settings-meta" data-test="settings-about-meta">
           <div class="settings-meta-row">

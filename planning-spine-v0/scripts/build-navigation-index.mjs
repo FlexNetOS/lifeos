@@ -1308,43 +1308,6 @@ export function buildNavigationArtifacts(options = {}) {
 
   const ledgerPath = path.join(pkgRoot, "proof_records/proof_ledger.jsonl");
   const ledgerRows = fs.readFileSync(ledgerPath, "utf8").split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
-  const ledgerGroups = new Map();
-  for (const row of ledgerRows) {
-    const key = `${row.task_id}\u0000${String(row.revision ?? row.observed_at)}`;
-    if (!ledgerGroups.has(key)) ledgerGroups.set(key, []);
-    ledgerGroups.get(key).push(row);
-  }
-  const ledgerResolutions = ledgerRows.flatMap((row) => [
-    ...(row.ledger_conflict_resolution && typeof row.ledger_conflict_resolution === "object"
-      ? [row.ledger_conflict_resolution]
-      : []),
-    ...(Array.isArray(row.ledger_conflict_resolutions) ? row.ledger_conflict_resolutions : [])
-  ]);
-  let resolvedLedgerConflictCount = 0;
-  for (const [key, members] of ledgerGroups) {
-    const digests = new Set(members.map((row) => String(row.proof_sha256).toLowerCase()));
-    if (digests.size < 2) continue;
-    const [subjectTaskId, revision] = key.split("\u0000");
-    const observed = new Set(members.map((row) => `${row.sequence}\u0000${String(row.proof_sha256).toLowerCase()}`));
-    const valid = ledgerResolutions.filter((resolution) => {
-      if (resolution.subject_task_id !== subjectTaskId || String(resolution.revision) !== revision) return false;
-      const declared = new Set((resolution.entries ?? []).map((entry) => `${entry.ledger_sequence}\u0000${entry.proof_sha256}`));
-      const accepted = `${resolution.accepted?.ledger_sequence}\u0000${resolution.accepted?.proof_sha256}`;
-      return declared.size === observed.size
-        && [...declared].every((identity) => observed.has(identity))
-        && observed.has(accepted);
-    });
-    if (valid.length !== 1) {
-      errors.push(`unresolved proof-ledger conflict: ${subjectTaskId} revision ${revision}`);
-    } else {
-      resolvedLedgerConflictCount += 1;
-    }
-  }
-  checks.push({
-    name: "proof_ledger_revision_conflicts_are_explicitly_resolved",
-    result: errors.some((error) => error.startsWith("unresolved proof-ledger conflict")) ? "fail" : "pass",
-    observed: resolvedLedgerConflictCount
-  });
   const portableProofPath = (proofUri) => {
     const value = String(proofUri ?? "");
     if (path.isAbsolute(value)) return `proof_records/${path.basename(value)}`;
@@ -1392,6 +1355,82 @@ export function buildNavigationArtifacts(options = {}) {
     }
   }
   checks.push({ name: "ledger_uris_and_latest_digests_resolve", result: errors.some((error) => error.startsWith("ledger sequence") || error.startsWith("latest ledger")) ? "fail" : "pass", observed: ledgerRows.length });
+
+  // Duplicate task/revision identities: fail closed unless a later
+  // conflict-resolved record names every identity and accepts exactly one.
+  // Mirrors merge-proof-records.py / update-task-graph-status.py so all
+  // ledger readers apply the identical append-only resolution contract.
+  {
+    const ledgerResolutionProblems = [];
+    const proofLinesByKey = new Map();
+    const acceptanceByKey = new Map();
+    const keyOf = (row) => `${row.task_id}\u0000${String(row.revision ?? row.observed_at ?? "")}`;
+    const validateResolutionRow = (row, priorLines) => {
+      const resolves = row.resolves;
+      if (!resolves || typeof resolves !== "object" || Array.isArray(resolves)) return "a resolves object naming every conflicting identity is required";
+      if (resolves.task_id !== row.task_id || String(resolves.revision ?? "") !== String(row.revision ?? "")) return "resolves.task_id/revision must match the record task_id/revision";
+      const identities = resolves.identities;
+      if (!Array.isArray(identities) || identities.length < 2) return "resolves.identities must name at least two ledger identities";
+      const named = new Set();
+      const accepted = [];
+      for (const item of identities) {
+        if (!item || typeof item !== "object") return "each resolves identity must be an object";
+        if (!Number.isInteger(item.sequence)) return "each resolves identity requires an integer sequence";
+        if (typeof item.proof_sha256 !== "string" || !/^[0-9a-f]{64}$/.test(item.proof_sha256)) return "each resolves identity requires a 64-character proof_sha256";
+        if (item.disposition !== "accepted" && item.disposition !== "superseded") return "each resolves identity disposition must be accepted or superseded";
+        named.add(`${item.sequence}:${item.proof_sha256}`);
+        if (item.disposition === "accepted") accepted.push(item);
+      }
+      if (accepted.length !== 1) return "exactly one resolves identity must carry the accepted disposition";
+      const actual = new Set(priorLines.map((line) => `${line.sequence}:${line.proof_sha256}`));
+      if (named.size !== identities.length || named.size !== actual.size || [...named].some((value) => !actual.has(value))) return "resolves.identities must exactly match the ledger's recorded identities";
+      if (new Set(priorLines.map((line) => line.proof_sha256)).size < 2) return "the named identities carry no digest conflict to resolve";
+      if (resolves.accepted_sequence !== accepted[0].sequence) return "resolves.accepted_sequence must match the accepted identity";
+      if (resolves.accepted_proof_sha256 !== accepted[0].proof_sha256) return "resolves.accepted_proof_sha256 must match the accepted identity";
+      if (row.proof_sha256 !== accepted[0].proof_sha256) return "record proof_sha256 must equal the accepted digest";
+      const acceptedLine = priorLines.find((line) => line.sequence === accepted[0].sequence);
+      if (row.proof_uri !== acceptedLine.proof_uri) return "record proof_uri must equal the accepted identity's proof_uri";
+      for (const field of ["verified_by", "verified_at", "resolution_reason"]) {
+        if (typeof row[field] !== "string" || !row[field].trim()) return `an independent-verifier ${field} is required`;
+      }
+      return null;
+    };
+    for (const row of ledgerRows) {
+      const key = keyOf(row);
+      if (String(row.status ?? "").toLowerCase() === "conflict-resolved") {
+        const problem = validateResolutionRow(row, proofLinesByKey.get(key) ?? []);
+        if (problem) ledgerResolutionProblems.push(`ledger conflict resolution invalid at sequence ${row.sequence} for ${row.task_id} revision ${row.revision}: ${problem}`);
+        else acceptanceByKey.set(key, { sequence: row.sequence, acceptedSha: row.resolves.accepted_proof_sha256 });
+        continue;
+      }
+      if (row.resolves !== undefined) {
+        ledgerResolutionProblems.push(`ledger conflict resolution invalid at sequence ${row.sequence} for ${row.task_id} revision ${row.revision}: only conflict-resolved records may carry a resolves object`);
+        continue;
+      }
+      const lines = proofLinesByKey.get(key) ?? [];
+      lines.push({ sequence: row.sequence, proof_sha256: row.proof_sha256, proof_uri: row.proof_uri });
+      proofLinesByKey.set(key, lines);
+    }
+    let conflictedKeyCount = 0;
+    for (const [key, lines] of [...proofLinesByKey.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+      const [taskId, revision] = key.split("\u0000");
+      const acceptance = acceptanceByKey.get(key);
+      const identityText = lines.map((line) => `sequence ${line.sequence} digest ${line.proof_sha256}`).join(", ");
+      if (acceptance) {
+        conflictedKeyCount += 1;
+        if (lines.some((line) => line.sequence > acceptance.sequence && line.proof_sha256 !== acceptance.acceptedSha)) {
+          ledgerResolutionProblems.push(`ledger revision conflict unresolved for ${taskId} revision ${revision}: ${identityText}`);
+        }
+        continue;
+      }
+      if (new Set(lines.map((line) => line.proof_sha256)).size > 1) {
+        conflictedKeyCount += 1;
+        ledgerResolutionProblems.push(`ledger revision conflict unresolved for ${taskId} revision ${revision}: ${identityText}`);
+      }
+    }
+    errors.push(...ledgerResolutionProblems);
+    checks.push({ name: "ledger_revision_conflicts_resolved", result: ledgerResolutionProblems.length ? "fail" : "pass", observed: conflictedKeyCount });
+  }
 
   const artifactCatalogPath = "1.0_VISION/Notebooklm/artifacts.meta.json";
   const artifactCatalog = JSON.parse(fs.readFileSync(path.join(pkgRoot, artifactCatalogPath), "utf8"));

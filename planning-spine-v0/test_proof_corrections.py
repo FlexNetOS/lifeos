@@ -39,7 +39,12 @@ CONSOLIDATION_ENTRIES = [
     (259, "ARCHBP-035", "1", "pass"),
     (260, "STORE-001", "2", "pass"),
 ]
-ACTIVE_LEDGER_COUNT = ACTIVE_PRE_CONSOLIDATION_PREFIX_COUNT + len(CONSOLIDATION_ENTRIES)
+CONFLICT_RESOLUTION_COUNT = 18
+ACTIVE_LEDGER_COUNT = (
+    ACTIVE_PRE_CONSOLIDATION_PREFIX_COUNT
+    + len(CONSOLIDATION_ENTRIES)
+    + CONFLICT_RESOLUTION_COUNT
+)
 
 
 def load_script(name: str, filename: str):
@@ -264,17 +269,22 @@ class IntegratedCorrectionCorpusTests(unittest.TestCase):
         self.assertEqual(
             hashlib.sha256(prefix).hexdigest(), ACTIVE_PRE_CONSOLIDATION_PREFIX_SHA256
         )
+        tail = entries[ACTIVE_PRE_CONSOLIDATION_PREFIX_COUNT:]
         self.assertEqual(
             [
-                (
-                    entry["sequence"],
-                    entry["task_id"],
-                    str(entry["revision"]),
-                    entry["status"],
-                )
-                for entry in entries[ACTIVE_PRE_CONSOLIDATION_PREFIX_COUNT:]
+                (entry["sequence"], entry["task_id"], str(entry["revision"]), entry["status"])
+                for entry in tail[: len(CONSOLIDATION_ENTRIES)]
             ],
             CONSOLIDATION_ENTRIES,
+        )
+        resolution_entries = tail[len(CONSOLIDATION_ENTRIES):]
+        self.assertEqual(len(resolution_entries), CONFLICT_RESOLUTION_COUNT)
+        self.assertEqual(
+            [entry["sequence"] for entry in resolution_entries],
+            list(range(261, ACTIVE_LEDGER_COUNT + 1)),
+        )
+        self.assertTrue(
+            all(entry["status"] == "conflict-resolved" for entry in resolution_entries)
         )
 
     def test_historical_corrections_retain_target_receipts_but_are_not_active(self) -> None:

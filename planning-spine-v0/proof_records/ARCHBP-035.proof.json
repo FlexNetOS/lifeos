@@ -1,0 +1,54 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-035",
+  "observed_at": "2026-07-20T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "An independent-verifier record names every same-task same-revision conflicting ledger identity and its accepted disposition; raw ledger lines remain byte-preserved; merger, status, navigation, and audit readers reject unresolved conflicts and agree after append-only resolution.",
+  "gate_result": {
+    "conflicting_revision_identity_count": 18,
+    "conflicting_ledger_line_count": 36,
+    "historical_line_preserved": true,
+    "accepted_line_preserved": true,
+    "accepted_digest_matches_current_proof_artifact": true,
+    "merger_rejects_unresolved_conflict": true,
+    "status_reader_rejects_unresolved_conflict": true,
+    "navigation_reader_rejects_unresolved_conflict": true,
+    "append_only_resolution_supported": true,
+    "product_execution_performed": false
+  },
+  "ledger_conflict_resolution_set": {
+    "verified_by": "LifeOS Proof Ledger Agent / Independent Verifier",
+    "verified_at": "2026-07-20T00:00:00Z",
+    "reason": "For every duplicate revision identity, the later ledger digest matches the current checked proof artifact byte-for-byte. Earlier lines remain immutable historical evidence and are superseded only for current identity selection; no completion is inferred beyond the selected artifact bytes.",
+    "conflicts": [
+      {"conflict_id":"LPS-000-REVISION-1","subject_task_id":"LPS-000","revision":"1","entries":[{"ledger_sequence":110,"proof_sha256":"42fdc861a759518b2bf8d4868b0f5e85f758854ae7d9e775744146bcafb2ccfa","disposition":"superseded-historical"},{"ledger_sequence":242,"proof_sha256":"c959297c64b1229d791fde9787a794ea7ffe8874e52f738fe11e1e9602d6e50b","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-001-REVISION-1","subject_task_id":"LPS-001","revision":"1","entries":[{"ledger_sequence":111,"proof_sha256":"3d83b58da3864a07649c7092c76b2278fe075480c9b00455a0404f83046fa393","disposition":"superseded-historical"},{"ledger_sequence":243,"proof_sha256":"649af5d9df9ebf44ec3a17059ab6457d64e23401562fa054514dc04282545c91","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-002-REVISION-1","subject_task_id":"LPS-002","revision":"1","entries":[{"ledger_sequence":112,"proof_sha256":"4b0e75bc825d7fd418bbd74c25e6f3a9c5f71e4cf65422c00f5a1c8094b047c3","disposition":"superseded-historical"},{"ledger_sequence":244,"proof_sha256":"f4954940baef1b5c97bc2618e6014c89d2ac10bdc8f70fcd6924b013719f2e08","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-003-REVISION-1","subject_task_id":"LPS-003","revision":"1","entries":[{"ledger_sequence":113,"proof_sha256":"d658848f17367f9b722df9bbe7121b10d5a8ad2a4251c2d06fcf6a72176e76e2","disposition":"superseded-historical"},{"ledger_sequence":245,"proof_sha256":"41c18c2370d2669d99bee0eb6a6e274a00bdefd94f9adb1997524aa5114f68e5","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-004-REVISION-1","subject_task_id":"LPS-004","revision":"1","entries":[{"ledger_sequence":114,"proof_sha256":"80dbba9a9bdf9c61a8750c20b23431b4b509b7519cdaeeddd7ea8fa01183cbc3","disposition":"superseded-historical"},{"ledger_sequence":246,"proof_sha256":"6b7bd6e307c31dcfd63bcc70375b353f065796dad1d07daa9d125044f9384456","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-005-REVISION-1","subject_task_id":"LPS-005","revision":"1","entries":[{"ledger_sequence":115,"proof_sha256":"ceb8716a05f48090e15c74cf220e51d0e2a18a69e236f31c48a5cdc5c5d215de","disposition":"superseded-historical"},{"ledger_sequence":247,"proof_sha256":"135047df969630323d1b23b5d7cb1fd0b9036e9b461b5eccd70992cb169d7f8d","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-006-REVISION-2","subject_task_id":"LPS-006","revision":"2","entries":[{"ledger_sequence":141,"proof_sha256":"516ae8680930c5ec3ac4c6d392cef5ca5f3c27452ad25ed9673a4af186fea9e7","disposition":"superseded-historical"},{"ledger_sequence":248,"proof_sha256":"0f24c821db43a119be98b104f37fb12e81fbf51613ce007293eacef343a453f0","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-007-REVISION-1","subject_task_id":"LPS-007","revision":"1","entries":[{"ledger_sequence":117,"proof_sha256":"37943ca81cf1ae63de4764fd17510537ea76f3a30441940d7c34134cc21e2bf7","disposition":"superseded-historical"},{"ledger_sequence":249,"proof_sha256":"e219555bc9a5ca69c93c4463c0cf899c46573bb5fae73f66c034e0542cebeb63","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-008-REVISION-1","subject_task_id":"LPS-008","revision":"1","entries":[{"ledger_sequence":118,"proof_sha256":"5b541c0f477a5b490d51526b58dedb35f8ab6486a90eeaef1a0ff7a746a5c547","disposition":"superseded-historical"},{"ledger_sequence":250,"proof_sha256":"942900c05c09cd25ee736b33548f1db2bca9610cfd6529eba79547ddeac043a3","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-009-REVISION-2","subject_task_id":"LPS-009","revision":"2","entries":[{"ledger_sequence":144,"proof_sha256":"eb69da327ed695a6d74c11b7d9ab8476fe0f155715bc920bce22561e4f87e741","disposition":"superseded-historical"},{"ledger_sequence":251,"proof_sha256":"dab27edd6a2fc8138db2a54ca4b003404fd682444373f45bb64e59594b501365","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-010-REVISION-1","subject_task_id":"LPS-010","revision":"1","entries":[{"ledger_sequence":120,"proof_sha256":"e46bd9338e601a2a4a5641d20b39cb55e7cb2133e0a61510ad46e114baad12fc","disposition":"superseded-historical"},{"ledger_sequence":252,"proof_sha256":"9b62ef30b892bc6f1a69fd5b17e25d31eb0792cca6bed0bfb583715f6e388b43","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-011-REVISION-2","subject_task_id":"LPS-011","revision":"2","entries":[{"ledger_sequence":146,"proof_sha256":"cd0cd7cc0e2461c54b3247ae83c500e79f99894f69dea9b19c004a8df283174b","disposition":"superseded-historical"},{"ledger_sequence":253,"proof_sha256":"9fead41ce32eecee3044be08e067648ef7010e8d61da1ac9400ef93f6ed43ffd","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-026-REVISION-1","subject_task_id":"LPS-026","revision":"1","entries":[{"ledger_sequence":125,"proof_sha256":"a237d397db6d6d144beb6871c46e5a9f613216008ec3d7af59ae2966c6761020","disposition":"superseded-historical"},{"ledger_sequence":254,"proof_sha256":"eb8025fbc043cae5da4ba8a6c95fcc0843d0373f3f54cae821035e47127ad896","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-027-REVISION-1","subject_task_id":"LPS-027","revision":"1","entries":[{"ledger_sequence":126,"proof_sha256":"e7275b22e559b72120ae54c77e1d78dd2c405d7edd136bdb14a18b10cd71f956","disposition":"superseded-historical"},{"ledger_sequence":255,"proof_sha256":"68c618e7524b4cff61cc1d079e6057f65da9b65970a1a05feb285e89896a9d0d","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-028-REVISION-1","subject_task_id":"LPS-028","revision":"1","entries":[{"ledger_sequence":127,"proof_sha256":"10819f19feb30dfcdf0846b2166c2f453326211999107c71b0f86ce0b5a06162","disposition":"superseded-historical"},{"ledger_sequence":256,"proof_sha256":"47ba788b8e24a9e59dbb190b270d7b1cffb09ad9d57955424f4b260b9d9a1164","disposition":"accepted-current"}]},
+      {"conflict_id":"GRAPH-005-REVISION-1","subject_task_id":"GRAPH-005","revision":"1","entries":[{"ledger_sequence":185,"proof_sha256":"1d06edc08b843edf17684b6ca2caf7ac5cd32c2615cee3da2ffed3f598ac4e3c","disposition":"superseded-historical"},{"ledger_sequence":241,"proof_sha256":"e991b760e43417667dc47c45131be4c50f74aaa9d15c28270feee6393b666efa","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-032-REVISION-1","subject_task_id":"LPS-032","revision":"1","entries":[{"ledger_sequence":238,"proof_sha256":"55ff43fa861796988512d3dda76f258cb0b4091b8f26ab2eb87528a32d0f27bf","disposition":"superseded-historical"},{"ledger_sequence":257,"proof_sha256":"fb53eb83ad718b073b5e0b0f4bbbf404dbac45d457f408ced62a2e1ddfb08fde","disposition":"accepted-current"}]},
+      {"conflict_id":"LPS-036-REVISION-1","subject_task_id":"LPS-036","revision":"1","entries":[{"ledger_sequence":239,"proof_sha256":"7b0c66f373cdb1ae8e035bb5aae23ab3096dd8a571002445fc5643c1d3664e2a","disposition":"superseded-historical"},{"ledger_sequence":258,"proof_sha256":"0ac16763ccb6b8b88cbfd737812a364ce0646461e2967e6e3262e6cb616245f7","disposition":"accepted-current"}]}
+    ]
+  },
+  "proof_summary": "ARCHBP-035 resolves all 18 pre-existing duplicate-digest revision identities without deleting or rewriting any of the 36 append-only ledger lines. The independent-verifier set names each sequence and digest, accepts the later line only after its digest matches the current checked proof artifact, and retains every earlier line as superseded historical evidence. Merger, status, and navigation readers now fail closed on unresolved duplicate revisions and accept exactly one fully matching resolution per subject and revision.",
+  "artifact_paths": [
+    "scripts/merge-proof-records.py",
+    "scripts/update-task-graph-status.py",
+    "scripts/build-navigation-index.mjs",
+    "test_proof_ledger_conflicts.py",
+    "proof_records/ARCHBP-035.proof.json",
+    "proof_records/proof_ledger.jsonl"
+  ]
+}

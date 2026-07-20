@@ -6,13 +6,13 @@ type: architecture-cross-reference
 status: active
 lifecycle: maintained
 created: 2026-07-14
-updated: 2026-07-14
+updated: 2026-07-20
 review:
   source_artifact: 1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation.md
   source_sha256: 014bbebb8afceee7f8deea236ed3b9425b61be3840fba47aee7c131f77268827
   source_lines: 707
   canonical_task_source: generated/task_graph.source.csv
-  new_task_range: ARCHBP-001..ARCHBP-037
+  new_task_range: ARCHBP-001..ARCHBP-048
 aliases:
   - Blueprint task coverage
   - Architecture gap task ledger
@@ -30,6 +30,33 @@ related:
 ---
 
 # Architecture Blueprint Task Coverage
+
+## Expanded-anchor coverage supplement
+
+The exact-byte 6340-line expanded blueprint and 560-line anchored graph add 11
+implementation and cutover tasks beyond the original 707-line review. Their
+complete section/diagram grouping is maintained in
+[`anchor_claim_task_crosswalk.csv`](./Architecture_Anchors/anchor_claim_task_crosswalk.csv);
+their contradictions are resolved in
+[`anchor_conflict_ledger.csv`](./Architecture_Anchors/anchor_conflict_ledger.csv).
+
+| Expanded requirement | Canonical tasks | Current state |
+|---|---|---|
+| Host all-data byte retention, typed records, and zero-loss reconstruction | `ARCHBP-038` | blocked on exact ingestion foundation |
+| One redb owner, authenticated UDS commands, atomic mmap generations, ordered events, replay | `ARCHBP-039` | unimplemented |
+| Byte-first pinned `rtk_nu` JSONL/JSON/Nuon adapter | `ARCHBP-040` | ready; component absent |
+| Typed CodeDB `ingest-envelope` and canonical raw-object linkage | `ARCHBP-041` | blocked on ingestion and `rtk_nu` |
+| envctl-exclusive commit, idempotency, receipts, and database return projection | `ARCHBP-042` | unimplemented/blocked |
+| Real profile `yzx enter`/Zellij PTY inside Vue 3 + Tauri 2 Glass | `ARCHBP-043` | unimplemented/blocked |
+| Six-part protected secret custody lifecycle | `ARCHBP-044` | ready for synthetic-only proof; current keyring path is transitional |
+| WAL, replication, PITR, extension/data verification, and total reconstruction | `ARCHBP-045` | unimplemented/blocked |
+| Database-controlled repository/task/context/refactor/format/consolidation/upgrade/multi-merge work | `ARCHBP-046` | unimplemented/blocked |
+| Machine-enforced anchor conformance and physical path-walk release gates | `ARCHBP-047` | blocked on all implementation tasks |
+| Final owner-approved cutover and retirement of transitional authorities | `ARCHBP-048` | blocked on complete conformance proof |
+
+The new task rows preserve `STORE-001` as a completed owner decision while
+keeping every target mechanism and cutover explicitly unproven until its proof
+record passes.
 
 ## Review verdict
 
@@ -125,7 +152,7 @@ also contained concrete gaps. Each now has a task:
 | `vault_hub` raw-secret paths not protected from accidental broad add | `ARCHBP-032` |
 | Strict-link verifier and generated navigation use incompatible wiki/example resolution | `ARCHBP-033` |
 | Verifier failure reports, LPS proof summaries, ledger state, and task status can contradict | `ARCHBP-034` |
-| Proof ledger contains conflicting `GRAPH-005` revision `1` digests and blocks the owned merger | `ARCHBP-035` |
+| Proof ledger contained 18 same-task same-revision conflicting digest identities (including `GRAPH-005` revision `1`) and blocked the owned merger; revision-selection now uses one append-only independent-verifier resolution set while preserving all 36 historical lines | `ARCHBP-035` complete |
 | Authored navigation hardcodes a stale 249-task count instead of deriving it | `ARCHBP-036` |
 | Navigation generation passes locally but produces byte-stale committed artifacts in PR 61 and PR 62 CI | `ARCHBP-037` |
 

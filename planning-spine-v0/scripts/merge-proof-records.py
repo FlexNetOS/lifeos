@@ -38,6 +38,7 @@ class ProofRecord:
     restores_source_status: str | None = None
     invalidation_reason: str | None = None
     invalidates: dict[str, Any] | None = None
+    ledger_conflict_resolutions: tuple[dict[str, Any], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -134,6 +135,86 @@ def invalidation_fields(
     )
 
 
+def normalize_conflict_resolution(resolution: Any, path: Path) -> dict[str, Any]:
+    if not isinstance(resolution, dict):
+        raise MergeError(f"{path}: ledger conflict resolution must be an object")
+    required = ("conflict_id", "subject_task_id", "revision", "verified_by", "verified_at", "reason")
+    normalized = dict(resolution)
+    for field in required:
+        value = normalized.get(field)
+        if not isinstance(value, str) or not value.strip():
+            raise MergeError(f"{path}: ledger_conflict_resolution.{field} is required")
+        normalized[field] = value.strip()
+
+    entries = normalized.get("entries")
+    if not isinstance(entries, list) or len(entries) < 2:
+        raise MergeError(f"{path}: ledger_conflict_resolution.entries requires at least two entries")
+    normalized_entries = []
+    seen = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise MergeError(f"{path}: ledger_conflict_resolution entry must be an object")
+        sequence = entry.get("ledger_sequence")
+        digest = entry.get("proof_sha256")
+        disposition = entry.get("disposition")
+        if not isinstance(sequence, int) or sequence < 1:
+            raise MergeError(f"{path}: conflict entry ledger_sequence must be positive")
+        if not isinstance(digest, str) or not SHA256_RE.fullmatch(digest.strip().lower()):
+            raise MergeError(f"{path}: conflict entry proof_sha256 must be SHA-256")
+        if disposition not in {"accepted-current", "superseded-historical"}:
+            raise MergeError(f"{path}: conflict entry disposition is invalid")
+        identity = (sequence, digest.strip().lower())
+        if identity in seen:
+            raise MergeError(f"{path}: duplicate conflict entry identity")
+        seen.add(identity)
+        normalized_entries.append(
+            {"ledger_sequence": sequence, "proof_sha256": identity[1], "disposition": disposition}
+        )
+    accepted = [entry for entry in normalized_entries if entry["disposition"] == "accepted-current"]
+    if len(accepted) != 1:
+        raise MergeError(f"{path}: conflict resolution requires exactly one accepted-current entry")
+    normalized["entries"] = normalized_entries
+    normalized["accepted"] = {
+        "ledger_sequence": accepted[0]["ledger_sequence"],
+        "proof_sha256": accepted[0]["proof_sha256"],
+    }
+    return normalized
+
+
+def conflict_resolution_fields(data: dict[str, Any], path: Path) -> tuple[dict[str, Any], ...]:
+    singular = data.get("ledger_conflict_resolution")
+    plural = data.get("ledger_conflict_resolutions")
+    resolution_set = data.get("ledger_conflict_resolution_set")
+    if sum(value is not None for value in (singular, plural, resolution_set)) > 1:
+        raise MergeError(f"{path}: use only one ledger conflict resolution field")
+    if singular is not None:
+        values = [singular]
+    elif plural is not None:
+        if not isinstance(plural, list) or not plural:
+            raise MergeError(f"{path}: ledger_conflict_resolutions must be a non-empty array")
+        values = plural
+    elif resolution_set is not None:
+        if not isinstance(resolution_set, dict):
+            raise MergeError(f"{path}: ledger_conflict_resolution_set must be an object")
+        common = {}
+        for field in ("verified_by", "verified_at", "reason"):
+            value = resolution_set.get(field)
+            if not isinstance(value, str) or not value.strip():
+                raise MergeError(f"{path}: ledger_conflict_resolution_set.{field} is required")
+            common[field] = value.strip()
+        conflicts = resolution_set.get("conflicts")
+        if not isinstance(conflicts, list) or not conflicts:
+            raise MergeError(f"{path}: ledger_conflict_resolution_set.conflicts must be non-empty")
+        values = [{**conflict, **common} if isinstance(conflict, dict) else conflict for conflict in conflicts]
+    else:
+        return ()
+    normalized = tuple(normalize_conflict_resolution(value, path) for value in values)
+    keys = [(item["subject_task_id"], item["revision"]) for item in normalized]
+    if len(keys) != len(set(keys)):
+        raise MergeError(f"{path}: duplicate subject/revision conflict resolution")
+    return normalized
+
+
 def load_proof_record(path: Path) -> ProofRecord:
     data = load_json(path)
     task_id = data.get("task_id")
@@ -155,6 +236,7 @@ def load_proof_record(path: Path) -> ProofRecord:
     restores_source_status = None
     invalidation_reason = None
     invalidates = None
+    ledger_conflict_resolutions = conflict_resolution_fields(data, path)
     if status_text.lower() == INVALIDATED_STATUS:
         (
             verified_by,
@@ -176,6 +258,7 @@ def load_proof_record(path: Path) -> ProofRecord:
         restores_source_status=restores_source_status,
         invalidation_reason=invalidation_reason,
         invalidates=invalidates,
+        ledger_conflict_resolutions=ledger_conflict_resolutions,
     )
 
 
@@ -185,12 +268,15 @@ def discover_proofs(proof_dir: Path) -> list[Path]:
     return sorted(path for path in proof_dir.glob("*.proof.json") if path.is_file())
 
 
-def load_ledger(path: Path) -> tuple[list[dict[str, Any]], dict[tuple[str, str], LedgerRecord]]:
+def load_ledger(
+    path: Path,
+    pending_resolutions: list[dict[str, Any]] | None = None,
+) -> tuple[list[dict[str, Any]], dict[tuple[str, str], LedgerRecord]]:
     if not path.exists():
         return [], {}
 
     entries: list[dict[str, Any]] = []
-    index: dict[tuple[str, str], LedgerRecord] = {}
+    groups: dict[tuple[str, str], list[tuple[int, str]]] = {}
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip():
             continue
@@ -213,10 +299,47 @@ def load_ledger(path: Path) -> tuple[list[dict[str, Any]], dict[tuple[str, str],
             raise MergeError(f"{path}:{line_number}: proof_sha256 is required")
 
         key = (task_id.strip(), revision.strip())
-        if key in index and index[key].proof_sha256 != proof_sha256.strip():
-            raise MergeError(f"{path}:{line_number}: conflicting ledger entry for {key[0]} revision {key[1]}")
-        index[key] = LedgerRecord(key[0], key[1], proof_sha256.strip())
+        groups.setdefault(key, []).append((line_number, proof_sha256.strip().lower()))
         entries.append(entry)
+
+    resolutions = []
+    for entry in entries:
+        if isinstance(entry.get("ledger_conflict_resolution"), dict):
+            resolutions.append(entry["ledger_conflict_resolution"])
+        if isinstance(entry.get("ledger_conflict_resolutions"), list):
+            resolutions.extend(entry["ledger_conflict_resolutions"])
+    resolutions.extend(pending_resolutions or [])
+    index: dict[tuple[str, str], LedgerRecord] = {}
+    for key, members in groups.items():
+        digests = {digest for _, digest in members}
+        selected = members[-1][1]
+        if len(digests) > 1:
+            matching = [
+                resolution
+                for resolution in resolutions
+                if resolution.get("subject_task_id") == key[0]
+                and str(resolution.get("revision")) == key[1]
+            ]
+            observed = {(sequence, digest) for sequence, digest in members}
+            valid = []
+            for resolution in matching:
+                declared = {
+                    (item.get("ledger_sequence"), item.get("proof_sha256"))
+                    for item in resolution.get("entries", [])
+                }
+                accepted = resolution.get("accepted", {})
+                accepted_identity = (
+                    accepted.get("ledger_sequence"),
+                    accepted.get("proof_sha256"),
+                )
+                if declared == observed and accepted_identity in observed:
+                    valid.append((resolution, accepted_identity[1]))
+            if len(valid) != 1:
+                raise MergeError(
+                    f"{path}: unresolved conflicting ledger entries for {key[0]} revision {key[1]}"
+                )
+            selected = valid[0][1]
+        index[key] = LedgerRecord(key[0], key[1], selected)
     return entries, index
 
 
@@ -257,6 +380,8 @@ def ledger_entry(record: ProofRecord, sequence: int, generated_at: str) -> dict[
                 "invalidates": record.invalidates,
             }
         )
+    if record.ledger_conflict_resolutions:
+        entry["ledger_conflict_resolutions"] = list(record.ledger_conflict_resolutions)
     return entry
 
 
@@ -281,7 +406,10 @@ def merge_records(proof_dir: Path, ledger_path: Path, report_path: Path, dry_run
 
     records = [load_proof_record(path) for path in proof_paths]
     check_input_duplicates(records)
-    existing_entries, existing_index = load_ledger(ledger_path)
+    existing_entries, existing_index = load_ledger(
+        ledger_path,
+        [resolution for record in records for resolution in record.ledger_conflict_resolutions],
+    )
 
     generated_at = utc_now()
     appendable: list[dict[str, Any]] = []

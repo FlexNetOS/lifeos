@@ -19,6 +19,7 @@ LEDGER_SCHEMA_VERSION = "lifeos-planning-spine.proof-ledger.v0"
 ALLOWED_UPDATED_FIELDS = {"status", "proof_uri", "next_action"}
 PASSING_PROOF_STATUSES = {"complete", "pass", "passed"}
 ROLLBACK_LEDGER_STATUSES = {"fail", "failed", "rolled-back", "rolled_back", "rollback", "reject", "rejected"}
+INVALIDATING_PROOF_STATUSES = {"invalidated"}
 # Canonical lifecycle states, ordered from non-executable to terminal.
 LIFECYCLE_STATES = ("draft", "blocked", "ready", "simulated", "running", "complete", "rolled-back")
 # Only a genuinely ready task is executable; draft/blocked/running/rolled-back are not.
@@ -101,7 +102,7 @@ def load_latest_ledger(path: Path) -> tuple[list[dict[str, Any]], dict[str, dict
         raise StatusError(f"proof ledger does not exist: {path}")
 
     entries: list[dict[str, Any]] = []
-    latest: dict[str, dict[str, Any]] = {}
+    groups: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip():
             continue
@@ -124,16 +125,75 @@ def load_latest_ledger(path: Path) -> tuple[list[dict[str, Any]], dict[str, dict
             raise StatusError(f"{path}:{line_number}: proof_uri is required")
         entry["_line_number"] = line_number
         entries.append(entry)
-
-        current = latest.get(task_id.strip())
-        if current is None or ledger_sort_key(entry, line_number) > ledger_sort_key(
-            current,
-            int(current.get("_line_number", 0)),
-        ):
-            latest[task_id.strip()] = entry
+        raw_revision = entry.get("revision")
+        if raw_revision is None:
+            raw_revision = entry.get("observed_at")
+        _, revision = revision_rank(raw_revision)
+        if not revision:
+            raise StatusError(f"{path}:{line_number}: revision or observed_at is required")
+        groups.setdefault((task_id.strip(), revision), []).append(entry)
 
     if not entries:
         raise StatusError(f"proof ledger has no entries: {path}")
+
+    resolutions = []
+    for entry in entries:
+        if isinstance(entry.get("ledger_conflict_resolution"), dict):
+            resolutions.append(entry["ledger_conflict_resolution"])
+        if isinstance(entry.get("ledger_conflict_resolutions"), list):
+            resolutions.extend(entry["ledger_conflict_resolutions"])
+    selected_entries: list[dict[str, Any]] = []
+    for key, members in groups.items():
+        digests = {str(member.get("proof_sha256", "")).strip().lower() for member in members}
+        selected = members[-1]
+        if len(digests) > 1:
+            observed = {
+                (
+                    member.get("sequence", member["_line_number"]),
+                    str(member.get("proof_sha256", "")).strip().lower(),
+                )
+                for member in members
+            }
+            valid = []
+            for resolution in resolutions:
+                if resolution.get("subject_task_id") != key[0] or str(resolution.get("revision")) != key[1]:
+                    continue
+                declared = {
+                    (item.get("ledger_sequence"), item.get("proof_sha256"))
+                    for item in resolution.get("entries", [])
+                }
+                accepted = resolution.get("accepted", {})
+                accepted_identity = (accepted.get("ledger_sequence"), accepted.get("proof_sha256"))
+                if declared == observed and accepted_identity in observed:
+                    valid.append(accepted_identity)
+            if len(valid) != 1:
+                raise StatusError(
+                    f"{path}: unresolved conflicting ledger entries for {key[0]} revision {key[1]}"
+                )
+            accepted_sequence, accepted_digest = valid[0]
+            selected = next(
+                member
+                for member in members
+                if member.get("sequence", member["_line_number"]) == accepted_sequence
+                and str(member.get("proof_sha256", "")).strip().lower() == accepted_digest
+            )
+        selected_entries.append(selected)
+
+    latest: dict[str, dict[str, Any]] = {}
+    for entry in selected_entries:
+        task_id = str(entry["task_id"]).strip()
+        current = latest.get(task_id)
+        if current is None:
+            latest[task_id] = entry
+            continue
+        entry_rank = revision_rank(entry.get("revision"))
+        current_rank = revision_rank(current.get("revision"))
+        if entry_rank > current_rank or (
+            entry_rank == current_rank
+            and ledger_sort_key(entry, int(entry["_line_number"]))
+            > ledger_sort_key(current, int(current["_line_number"]))
+        ):
+            latest[task_id] = entry
     return entries, latest
 
 
@@ -195,6 +255,7 @@ def status_projection(
     updated_task_ids: list[str] = []
     complete_task_ids: list[str] = []
     ready_task_ids: list[str] = []
+    invalidated_task_ids: list[str] = []
     lifecycle_buckets: dict[str, list[str]] = {state: [] for state in LIFECYCLE_STATES}
 
     for task in tasks:
@@ -326,6 +387,7 @@ def status_projection(
         "running_task_ids": lifecycle_buckets.get("running", []),
         "simulated_task_ids": lifecycle_buckets.get("simulated", []),
         "rolled_back_task_ids": lifecycle_buckets.get("rolled-back", []),
+        "invalidated_task_ids": invalidated_task_ids,
         "forbidden_update_count": len(forbidden_updates),
         "forbidden_updates": forbidden_updates,
         "tasks": status_tasks,

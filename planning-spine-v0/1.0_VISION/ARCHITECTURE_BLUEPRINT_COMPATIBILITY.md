@@ -6,7 +6,7 @@ type: architecture-cross-reference
 status: verified-with-gaps
 lifecycle: active
 created: 2026-07-12
-updated: 2026-07-14
+updated: 2026-07-20
 review:
   implementation_repository: FlexNetOS/nu_plugin
   baseline_commit: d7cc4d830a5f8c1c51ac6850062b7066b5bbb9d2
@@ -41,14 +41,57 @@ tags:
   - source-provenance
   - agent-navigation
 related:
-  - "[[README]]"
-  - "[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
-  - "[[FOUNDATION_ECOSYSTEM_MAP]]"
-  - "[[FOUNDATION_META_PORTABILITY_MODEL]]"
-  - "[[Notebooklm/Architecture Blueprint - LifeOS Core Foundation]]"
+  - "[[planning-spine-v0/README]]"
+  - "[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]]"
+  - "[[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]]"
+  - "[[planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation]]"
 ---
 
 # Architecture Blueprint Compatibility — CodeDB Foundation Review
+
+## 2026-07-20 expanded-anchor reconciliation
+
+The original 707-line NotebookLM blueprint review below remains historical
+current-state analysis. It is now supplemented—not overwritten—by two immutable
+owner-named target-architecture anchors:
+
+| Anchor | SHA-256 | Bytes | Lines | Role |
+|---|---|---:|---:|---|
+| [Fully Expanded RuVector Blueprint](./Architecture_Anchors/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md) | `c54063110be8bebb07469cbc0f76fecab142cd636e98950a36a3ee02b766a62c` | 974321 | 6340 | Complete desired execution, schema, security, recovery, and cutover scope |
+| [Anchored Pipeline Graph](./Architecture_Anchors/Architecture_Data_Pipeline_Graph_ANCHORED_VERIFIED.md) | `abd36f1c2bd9d62e4fdb522e5290d93d4e7017b1b478c13dbf0a5da939c5b663` | 34773 | 560 | Corrected physical topology, owners, paths, return edges, and invariants |
+
+The [receipt](./Architecture_Anchors/receipts.json) fixes exact file identity;
+the [section inventory](./Architecture_Anchors/section_inventory.json) hashes
+contiguous ranges covering every line. The
+[conflict ledger](./Architecture_Anchors/anchor_conflict_ledger.csv) records 12
+resolved contradictions with both sides and controlling authority. The
+[claim/task crosswalk](./Architecture_Anchors/anchor_claim_task_crosswalk.csv)
+maps 16 requirement groups to implementation state, proof, and stable tasks.
+
+Controlling reconciliation:
+
+- PostgreSQL + RuVector owns all durable LifeOS product bytes and macro-state;
+  original bytes remain beside derivatives.
+- redb is a single-owner transient/pass-through tier. The owner publishes a
+  separate atomic checksummed read-only mmap generation and ordered UDS events;
+  clients never map or open the database file.
+- AgentDB owns per-agent cognition only.
+- envctl is the exclusive production PostgreSQL commit and controlled return-
+  projection bridge; that complete loop is a target, not current proof.
+- CodeDB plus the missing `rtk_nu` adapter owns byte-complete typed ingress.
+- Protected encrypted secret bytes and custody history are durable in
+  PostgreSQL; plaintext is lease-bound to an exact target and excluded from
+  redb, logs, UI, model context, proof, and Git.
+- After proof-gated cutover, repository/task/context/refactor/format/
+  consolidation/upgrade/multi-merge work is PostgreSQL-controlled, while Git,
+  Meta, GitKB, ICM, editors, terminals, devices, models, and runners remain
+  governed physical executors or projections whose effects return to the DB.
+- The anchor's Svelte wording does not override the current Vue 3 + Tauri 2
+  owner contract; the Glass/Engine behavior is implemented in Vue/Tauri.
+
+These are ratified target assignments, not completion claims. The missing
+runtime and proof are tracked by `ARCHBP-038..048`.
 
 ## Verdict
 
@@ -213,11 +256,11 @@ git-kb code stats --json
 1. Read the repository contract: [`AGENTS.md`](../../AGENTS.md).
 2. Read the package entrypoint: [`planning-spine-v0/README.md`](../README.md).
 3. Use this document to separate proof from architectural intent:
-   [[ARCHITECTURE_BLUEPRINT_COMPATIBILITY]].
-4. Open [[FOUNDATION_ECOSYSTEM_MAP]] for built/planned ownership and
-   [[FOUNDATION_META_PORTABILITY_MODEL]] for portability boundaries.
+   [[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_COMPATIBILITY]].
+4. Open [[planning-spine-v0/1.0_VISION/FOUNDATION_ECOSYSTEM_MAP]] for built/planned ownership and
+   [[planning-spine-v0/1.0_VISION/FOUNDATION_META_PORTABILITY_MODEL]] for portability boundaries.
 5. Read the raw blueprint only for original context:
-   [[Notebooklm/Architecture Blueprint - LifeOS Core Foundation]].
+   [[planning-spine-v0/1.0_VISION/Notebooklm/Architecture Blueprint - LifeOS Core Foundation]].
 6. Follow normalized claims to their proof records before changing status.
 7. Inspect CodeDB's [integration contracts](../../../nu_plugin/docs/INTEGRATION_CONTRACTS.md),
    [round-trip proof](../../../nu_plugin/docs/ROUND_TRIP_PROOF.md), and
@@ -248,7 +291,7 @@ The current course is compatible, but the following subjects remain open:
 
 The complete heading-by-heading mapping, authoritative corrections, and related
 foundation gaps are maintained in
-[[ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]].
+[[planning-spine-v0/1.0_VISION/ARCHITECTURE_BLUEPRINT_TASK_COVERAGE]].
 
 ## Refresh protocol
 

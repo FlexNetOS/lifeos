@@ -1,18 +1,18 @@
 {
   "schema_version": "lifeos-planning-spine.navigation-validation.v0",
   "source_path": "planning-spine-v0/navigation/source.json",
-  "source_sha256": "ac67fc493d1491e294522afab19dc295d894a4721681383594777be6437a77c0",
-  "inventory_sha256": "fd3f23efd0ad667f96ce7b68e0b488bf441563c9d33bb68d84447520cab94175",
+  "source_sha256": "f18b23b368383d27098fa49c95025380df1a520acc848cfe037b656a2fc90658",
+  "inventory_sha256": "55028acc0455f86f10da9babdaf8b26d5266a0d024ae3d45e4959c2f4bb461c1",
   "result": "pass",
   "deterministic": true,
   "generated_at": null,
   "counts": {
-    "included_package_files": 1706,
+    "included_package_files": 1723,
     "repository_local_link_targets": 1,
     "external_link_targets": 4,
-    "nodes": 3627,
-    "edges": 28053,
-    "tasks": 233,
+    "nodes": 3660,
+    "edges": 28924,
+    "tasks": 244,
     "imported_work_orders": 106,
     "mandatory_migration_capabilities": 28,
     "historical_tasks": 6,
@@ -20,15 +20,15 @@
     "claims": 396,
     "verification_queue_items": 396,
     "evidence_records": 135,
-    "proof_ledger_entries": 258,
-    "semantic_routes": 13,
+    "proof_ledger_entries": 260,
+    "semantic_routes": 14,
     "unresolved_links": 0,
     "strict_unresolved_links": 0,
     "excluded_existing_paths": 0
   },
   "kind_counts": {
     "adopted-capability": 19,
-    "architecture-cross-reference": 4,
+    "architecture-cross-reference": 5,
     "architecture-depth": 20,
     "artifact-bundle": 4,
     "authority-contract": 4,
@@ -39,9 +39,9 @@
     "current-state-gap": 45,
     "current-state-projection": 5,
     "derived-task-view": 1,
-    "directory": 165,
+    "directory": 167,
     "example": 17,
-    "execution-tool": 116,
+    "execution-tool": 119,
     "external-reference": 4,
     "gate-contract": 1,
     "generated-navigation-output": 3,
@@ -59,43 +59,43 @@
     "planning-spine": 1,
     "proof-correction-set": 1,
     "proof-ledger": 1,
-    "proof-ledger-entry": 258,
-    "proof-record": 276,
+    "proof-ledger-entry": 260,
+    "proof-record": 277,
     "protocol-or-runbook": 3,
     "raw-artifact": 4,
     "raw-artifact-catalog": 1,
     "raw-composite-report": 1,
     "raw-data-table": 3,
     "reference-package-landing-contract": 1,
-    "resource": 792,
+    "resource": 794,
     "rfc": 2,
     "schema": 18,
     "security-review": 1,
-    "semantic-route": 13,
+    "semantic-route": 14,
     "simulation-environment": 13,
     "simulation-runbook": 3,
     "source-artifact-catalog": 1,
-    "structured-resource": 173,
-    "task": 233,
+    "structured-resource": 177,
+    "task": 244,
     "task-conflict": 42,
     "task-table-execution-handoff": 1,
     "test-fixture": 19,
     "verification-evidence": 28,
     "verification-queue-item": 396,
     "vision-anchor": 5,
-    "vision-artifact": 7,
-    "vision-input": 7
+    "vision-artifact": 11,
+    "vision-input": 9
   },
   "authority_counts": {
-    "architecture-input": 24,
+    "architecture-input": 30,
     "artifact-bundle": 4,
-    "canonical-input": 1182,
-    "derived-projection": 326,
-    "exact-evidence": 768,
+    "canonical-input": 1194,
+    "derived-projection": 328,
+    "exact-evidence": 771,
     "example-or-fixture": 36,
-    "execution-tooling": 129,
+    "execution-tooling": 132,
     "external-reference": 4,
-    "maintained-contract": 1019,
+    "maintained-contract": 1026,
     "operating-contract": 1,
     "review-only-import": 134
   },
@@ -114,13 +114,13 @@
     {
       "name": "task_status_projection_covers_canonical_tasks",
       "result": "pass",
-      "observed": 233,
-      "expected": 233
+      "observed": 244,
+      "expected": 244
     },
     {
       "name": "task_parents_resolve",
       "result": "pass",
-      "observed": 233
+      "observed": 244
     },
     {
       "name": "imported_work_orders_are_review_only",
@@ -141,9 +141,14 @@
       "expected": 134
     },
     {
+      "name": "proof_ledger_revision_conflicts_are_explicitly_resolved",
+      "result": "pass",
+      "observed": 18
+    },
+    {
       "name": "ledger_uris_and_latest_digests_resolve",
       "result": "pass",
-      "observed": 258
+      "observed": 260
     },
     {
       "name": "required_artifacts_are_hash_bound_and_cross_referenced",
@@ -153,12 +158,12 @@
     {
       "name": "semantic_routes_have_entrypoints_and_resources",
       "result": "pass",
-      "observed": 13
+      "observed": 14
     },
     {
       "name": "every_node_has_rich_metadata",
       "result": "pass",
-      "observed": 3627
+      "observed": 3660
     },
     {
       "name": "all_nodes_reachable_from_root",
@@ -168,8 +173,8 @@
     {
       "name": "every_included_file_has_one_node",
       "result": "pass",
-      "observed": 1706,
-      "expected": 1706
+      "observed": 1723,
+      "expected": 1723
     },
     {
       "name": "generated_artifacts_match_declared_schemas",

@@ -225,3 +225,5 @@ The Rust side (`src-tauri/src/lib.rs`) exposes two commands plus a shared `state
 `lights_state_read` / `lights_state_write` route through the same helper, now pointing at `lighting.json`.
 
 Persisted keys (whitelist in `LIFEOS_PERSIST_KEYS`): `activeId`, `wsCollapsed`, `sectionByWs`, `aiAvatarHidden`, `aiChatOpen`, `avatarPos`, `aiProvider`, `teamOrder`, `sectionOrder`, `itemOrder`. Transient (`aiMessages`), URL-driven (`activeSub`, `pendingExpand`), and ephemeral UI (`cmdkOpen`, `cmdkSeed`, `extraItems`, `extraSections`) are intentionally excluded — `aiMessages` would replay stale chat, the URL surfaces re-derive `activeSub`/`pendingExpand` on every nav, and `cmdkOpen` is a transient overlay. Writes are debounced (default 300ms) so rapid mutations coalesce into a single disk hit.
+
+@RTK.md

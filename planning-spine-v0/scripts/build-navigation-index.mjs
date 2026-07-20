@@ -1235,6 +1235,43 @@ export function buildNavigationArtifacts(options = {}) {
 
   const ledgerPath = path.join(pkgRoot, "proof_records/proof_ledger.jsonl");
   const ledgerRows = fs.readFileSync(ledgerPath, "utf8").split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
+  const ledgerGroups = new Map();
+  for (const row of ledgerRows) {
+    const key = `${row.task_id}\u0000${String(row.revision ?? row.observed_at)}`;
+    if (!ledgerGroups.has(key)) ledgerGroups.set(key, []);
+    ledgerGroups.get(key).push(row);
+  }
+  const ledgerResolutions = ledgerRows.flatMap((row) => [
+    ...(row.ledger_conflict_resolution && typeof row.ledger_conflict_resolution === "object"
+      ? [row.ledger_conflict_resolution]
+      : []),
+    ...(Array.isArray(row.ledger_conflict_resolutions) ? row.ledger_conflict_resolutions : [])
+  ]);
+  let resolvedLedgerConflictCount = 0;
+  for (const [key, members] of ledgerGroups) {
+    const digests = new Set(members.map((row) => String(row.proof_sha256).toLowerCase()));
+    if (digests.size < 2) continue;
+    const [subjectTaskId, revision] = key.split("\u0000");
+    const observed = new Set(members.map((row) => `${row.sequence}\u0000${String(row.proof_sha256).toLowerCase()}`));
+    const valid = ledgerResolutions.filter((resolution) => {
+      if (resolution.subject_task_id !== subjectTaskId || String(resolution.revision) !== revision) return false;
+      const declared = new Set((resolution.entries ?? []).map((entry) => `${entry.ledger_sequence}\u0000${entry.proof_sha256}`));
+      const accepted = `${resolution.accepted?.ledger_sequence}\u0000${resolution.accepted?.proof_sha256}`;
+      return declared.size === observed.size
+        && [...declared].every((identity) => observed.has(identity))
+        && observed.has(accepted);
+    });
+    if (valid.length !== 1) {
+      errors.push(`unresolved proof-ledger conflict: ${subjectTaskId} revision ${revision}`);
+    } else {
+      resolvedLedgerConflictCount += 1;
+    }
+  }
+  checks.push({
+    name: "proof_ledger_revision_conflicts_are_explicitly_resolved",
+    result: errors.some((error) => error.startsWith("unresolved proof-ledger conflict")) ? "fail" : "pass",
+    observed: resolvedLedgerConflictCount
+  });
   const portableProofPath = (proofUri) => {
     const value = String(proofUri ?? "");
     if (path.isAbsolute(value)) return `proof_records/${path.basename(value)}`;

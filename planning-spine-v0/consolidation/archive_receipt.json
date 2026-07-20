@@ -1,0 +1,36 @@
+{
+  "schema_version": "lifeos-planning-spine.consolidation-archive-receipt.v1",
+  "created_on": "2026-07-20",
+  "archive_policy_source": "/home/flexnetos/meta/docs/flexnetos-root-authority.md:24",
+  "archive_root": "/home/flexnetos/.local/state/meta/archives/lifeos-planning-spine-consolidation-20260720",
+  "recoverable": true,
+  "authority_class": "Meta-owned historical archive; never an active LifeOS planning root",
+  "payloads": [
+    {
+      "source": ".handoff",
+      "archive_path": "/home/flexnetos/.local/state/meta/archives/lifeos-planning-spine-consolidation-20260720/legacy-active-repo-handoff",
+      "file_count": 8,
+      "total_bytes": 11084,
+      "manifest": "consolidation/legacy_handoff_manifest.json",
+      "manifest_sha256": "9e2f898a9eff3af29d731ba852d166d261472cd33ff07132f412bdad8bc1a088",
+      "source_after_archive": "removed from active repository"
+    },
+    {
+      "source": "planning-spine-v0/proof-ledger-pre-reset-20260713T171233Z",
+      "archive_path": "/home/flexnetos/.local/state/meta/archives/lifeos-planning-spine-consolidation-20260720/proof-ledger-pre-reset-20260713T171233Z",
+      "file_count": 442,
+      "total_bytes": 7202679,
+      "manifest": "consolidation/retired_shadow_manifest.json",
+      "manifest_sha256": "3c95eaf4e96972f1af7de26a73841710a9760d7f2c25ce5bc94dd1964496d46b",
+      "source_after_archive": "removed from active Planning Spine"
+    }
+  ],
+  "verification": {
+    "algorithm": "SHA-256",
+    "files_checked": 450,
+    "mismatches": 0,
+    "result": "pass",
+    "archive_total_bytes": 7213763
+  },
+  "recovery": "Copy only the required historical file from the archive after verifying its SHA-256 against the repository manifest. Do not restore either directory as an active authority surface; import any still-relevant fact through a reviewed canonical Planning Spine source and regenerate projections."
+}

@@ -229,7 +229,8 @@
     "ARCHBP-001",
     "ARCHBP-033",
     "ARCHBP-035",
-    "ARCHBP-036"
+    "ARCHBP-036",
+    "ARCHBP-040"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
@@ -237,18 +238,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 295,
+  "ledger_entry_count": 296,
   "lifecycle_counts": {
     "blocked": 29,
-    "complete": 199,
+    "complete": 200,
     "draft": 0,
-    "ready": 16,
+    "ready": 15,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "c1e4a029142df22e8bf95215847a99a8d2059df5533ef6d976c51273d0d10c63",
+  "proof_ledger_sha256": "b04e21d1d0ab25c27a9f7833c940bef1db466080cd290b1bb809a38a63d4fa57",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-007",
@@ -265,7 +266,6 @@
     "ARCHBP-030",
     "ARCHBP-031",
     "ARCHBP-032",
-    "ARCHBP-040",
     "ARCHBP-044"
   ],
   "result": "pass",
@@ -9123,11 +9123,11 @@
     },
     {
       "effective": {
-        "next_action": "Write failing envelope-schema, raw-order, binary, invalid-UTF-8, signal, parser-failure, and profile-resolution tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-040.proof.json; next child task: ARCHBP-041.",
         "proof_uri": "proof_records/ARCHBP-040.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "NBSOURCE-030",
         "ARCHBP-001"
@@ -9135,11 +9135,11 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 296,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "682a6d54def00a866e1d104545c71c0489edb877767ed14a60716157d366bb20",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write failing envelope-schema, raw-order, binary, invalid-UTF-8, signal, parser-failure, and profile-resolution tests.",
@@ -9149,8 +9149,20 @@
       "source_row_number": 237,
       "task_id": "ARCHBP-040",
       "title": "Implement and pin the byte-first rtk_nu adapter",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write failing envelope-schema, raw-order, binary, invalid-UTF-8, signal, parser-failure, and profile-resolution tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-040.proof.json; next child task: ARCHBP-041."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
     },
     {
       "effective": {
@@ -9614,6 +9626,7 @@
     "ARCHBP-001",
     "ARCHBP-033",
     "ARCHBP-035",
-    "ARCHBP-036"
+    "ARCHBP-036",
+    "ARCHBP-040"
   ]
 }

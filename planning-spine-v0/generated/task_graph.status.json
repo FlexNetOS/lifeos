@@ -227,7 +227,8 @@
     "ARCHBP-036",
     "ARCHBP-039",
     "ARCHBP-040",
-    "ARCHBP-041"
+    "ARCHBP-041",
+    "ARCHBP-042"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
@@ -235,18 +236,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 299,
+  "ledger_entry_count": 300,
   "lifecycle_counts": {
     "blocked": 23,
-    "complete": 203,
+    "complete": 204,
     "draft": 0,
-    "ready": 18,
+    "ready": 17,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "b5a5e56c3b3af2fa06305abb3e35c8732415877b88e59c2c75eec18a37e8935e",
+  "proof_ledger_sha256": "975e9c8205e0d799cb24008f80772724526fe0d78942eda4c294a051809e1100",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -265,7 +266,6 @@
     "ARCHBP-031",
     "ARCHBP-032",
     "ARCHBP-038",
-    "ARCHBP-042",
     "ARCHBP-044"
   ],
   "result": "pass",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "b74de4d2050afbb4d370efd402c6b652142f60299950c151737e9dfa81966bd7",
+  "source_graph_sha256": "68459c7382e4de03d6c2435912d6c40a447dbd21121d5324007dc2aaae667a8a",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -9218,11 +9218,11 @@
     },
     {
       "effective": {
-        "next_action": "After the owner and envelope seams pass, write failing privilege-bypass, crash-boundary, idempotency, acknowledgement-order, and return-projection tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-042.proof.json; next child task: ARCHBP-043.",
         "proof_uri": "proof_records/ARCHBP-042.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-039",
         "ARCHBP-041"
@@ -9230,22 +9230,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 300,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "6e45feecbdd5545e9978f4bfd69cf086bba29105a584af9fca5cbdfea6e68a71",
+        "status": "pass"
       },
       "source": {
         "next_action": "After the owner and envelope seams pass, write failing privilege-bypass, crash-boundary, idempotency, acknowledgement-order, and return-projection tests.",
         "proof_uri": "proof_records/ARCHBP-042.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 239,
       "task_id": "ARCHBP-042",
       "title": "Enforce envctl-only durable commit and bidirectional reconciliation",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After the owner and envelope seams pass, write failing privilege-bypass, crash-boundary, idempotency, acknowledgement-order, and return-projection tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-042.proof.json; next child task: ARCHBP-043."
+        }
+      }
     },
     {
       "effective": {
@@ -9651,6 +9658,7 @@
     "ARCHBP-036",
     "ARCHBP-039",
     "ARCHBP-040",
-    "ARCHBP-041"
+    "ARCHBP-041",
+    "ARCHBP-042"
   ]
 }

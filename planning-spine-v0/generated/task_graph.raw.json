@@ -4510,7 +4510,7 @@
         "execution_cell": "ruvllm-inference-cell",
         "verification_gate": "Red tests prove one frozen model identity, isolated cartridge state, deterministic startup and shutdown, bounded CPU/GPU/RAM use, local failure behavior, and raw latency samples; any adapter hot-swap claim is limited to the measured workload.",
         "rollback_plan": "Stop the inference service, remove task-created model adapters and RVF fixtures, restore the prior profile package, and retain benchmark and failure receipts.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-008.proof.json",
         "next_action": "Select the exact profile-owned ruvllm artifact and write failing cartridge lifecycle tests."
       }
@@ -4532,7 +4532,7 @@
         "execution_cell": "learning-substrate-cell",
         "verification_gate": "Red tests reject unproven components and unbound state; supported components record exact source/model identity, isolate per-agent updates, respect resource budgets, roll back deterministically, and require witness-backed promotion before execution use.",
         "rollback_plan": "Disable learned-state promotion, restore the frozen base adapter, quarantine task-created learning state, and keep provenance and rejection evidence.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "proof_records/ARCHBP-009.proof.json",
         "next_action": "Verify exact component availability and write failing provenance, isolation, promotion, and rollback tests."
       }

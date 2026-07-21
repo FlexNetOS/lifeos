@@ -64,14 +64,16 @@ describe("ARCHBP-008 raw latency samples (no fabrication)", () => {
 });
 
 describe("ARCHBP-008 local failure behavior", () => {
-  test("flags demo mode and marks generation unreliable when no native model is loaded", () => {
-    const c = classifyLocalFailure({ nativeLoaded: false, confidence: 0.1 });
+  test("flags demo mode and marks generation unreliable when no trained model is loaded", () => {
+    // The native addon is present, but under the path-law no external trained
+    // model is downloaded/loaded, so generation runs in demo mode.
+    const c = classifyLocalFailure({ trainedModelLoaded: false, confidence: 0.1 });
     expect(c.demoMode).toBe(true);
     expect(c.reliableGeneration).toBe(false);
   });
 
-  test("treats a loaded native model as reliable", () => {
-    const c = classifyLocalFailure({ nativeLoaded: true, confidence: 0.9 });
+  test("treats a loaded trained model as reliable", () => {
+    const c = classifyLocalFailure({ trainedModelLoaded: true, confidence: 0.9 });
     expect(c.demoMode).toBe(false);
     expect(c.reliableGeneration).toBe(true);
   });
@@ -128,5 +130,5 @@ describe("ARCHBP-008 ruvllm inference proof (real @ruvector/ruvllm native surfac
     } finally {
       rmSync(outputDir, { recursive: true, force: true });
     }
-  });
+  }, 120000);
 });

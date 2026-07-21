@@ -218,6 +218,7 @@
     "DECIDE-006",
     "ARCHBP-001",
     "ARCHBP-002",
+    "ARCHBP-003",
     "ARCHBP-011",
     "ARCHBP-019",
     "ARCHBP-022",
@@ -245,21 +246,20 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 313,
+  "ledger_entry_count": 314,
   "lifecycle_counts": {
     "blocked": 19,
-    "complete": 217,
+    "complete": 218,
     "draft": 0,
-    "ready": 8,
+    "ready": 7,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "eeb008fb6b73377452f555930487c01fc25c8bd0926ebe4352f2f4cff1c085f3",
+  "proof_ledger_sha256": "2e23f475f3add679e36934135947e1421540fadfe1c8cda17d43974b9039b1c6",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
-    "ARCHBP-003",
     "ARCHBP-007",
     "ARCHBP-018",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "40a11b4931980cf1c8a3d822c40d675a04b38058732dba748cfbed39d3dfc589",
+  "source_graph_sha256": "da85c4f70b257f8da65dc2982dc11f13967f26a66f8672a6538e6dc1b7866ca5",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -7946,11 +7946,11 @@
     },
     {
       "effective": {
-        "next_action": "Select the profile-owned embedding model and write failing adapter and hybrid-query tests after ARCHBP-002.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-003.proof.json; next child task: ARCHBP-004.",
         "proof_uri": "proof_records/ARCHBP-003.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-002",
         "POSTGRES-005"
@@ -7958,22 +7958,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 314,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "9763739cc0affdcc150da6572940e7027f8ebc829777097b6eea3491c70f4ecf",
+        "status": "pass"
       },
       "source": {
         "next_action": "Select the profile-owned embedding model and write failing adapter and hybrid-query tests after ARCHBP-002.",
         "proof_uri": "proof_records/ARCHBP-003.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 200,
       "task_id": "ARCHBP-003",
       "title": "Build the live RuVector semantic and hybrid SQL adapter",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Select the profile-owned embedding model and write failing adapter and hybrid-query tests after ARCHBP-002.",
+          "to": "Proof accepted from proof_records/ARCHBP-003.proof.json; next child task: ARCHBP-004."
+        }
+      }
     },
     {
       "effective": {
@@ -9744,6 +9751,7 @@
     "DECIDE-006",
     "ARCHBP-001",
     "ARCHBP-002",
+    "ARCHBP-003",
     "ARCHBP-011",
     "ARCHBP-019",
     "ARCHBP-022",

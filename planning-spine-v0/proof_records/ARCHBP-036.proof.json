@@ -1,0 +1,29 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-036",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests reproduce the 249-versus-canonical mismatch; displayed task totals come from or are checked against normalized task_count; adding or removing a fixture task updates or invalidates the claim automatically; navigation generation and check agree without hand-editing generated artifacts.",
+  "gate_result": {
+    "red_tests_precede_implementation": true,
+    "red_commit": "bcf267d test(planning-spine): red specs for strict-link parity and derived navigation counts",
+    "green_commit": "0734001 fix(planning-spine): derived navigation counts",
+    "stale_249_versus_canonical_mismatch_reproduced": true,
+    "authored_navigation_free_of_hardcoded_totals": true,
+    "displayed_totals_derived_from_normalized_task_count": true,
+    "fixture_task_change_invalidates_claim_automatically": true,
+    "generation_fails_on_hardcoded_prose_count_or_task_count_drift": true,
+    "navigation_generation_and_check_agree_without_hand_edits": true,
+    "navigation_receipt": "build-navigation-index.mjs --check passes (3711 nodes, 29417 edges) on the same tree where the canonical graph projects 244 tasks; tests/planning-spine-navigation-counts.spec.js 3/3 pass",
+    "product_execution_performed": false
+  },
+  "proof_summary": "ARCHBP-036's navigation task totals are derived from the canonical normalized graph rather than hand-authored, proven red-first (bcf267d reproduced the stale 249-versus-canonical mismatch, 0734001 made generation derive and enforce the count): authored navigation carries no hard-coded totals, generation and check both recompute the canonical task_count (244 on this branch) and fail when prose hard-codes a number or the canonical count drifts, so adding or removing a task invalidates stale claims automatically. The navigation receipt holds: generation and the byte-current check agree with zero drift and no generated artifact was hand-edited.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-036.proof.json",
+    "tests/planning-spine-navigation-counts.spec.js",
+    "planning-spine-v0/scripts/build-navigation-index.mjs",
+    "planning-spine-v0/navigation/README.md",
+    "planning-spine-v0/navigation/generated/navigation.validation_report.json"
+  ]
+}

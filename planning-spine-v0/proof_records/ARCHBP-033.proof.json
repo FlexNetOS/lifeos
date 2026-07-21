@@ -1,0 +1,32 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-033",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests reproduce the inline Markdown example false positive and bare wiki-alias false negative; code spans and fenced examples are ignored; aliases resolve exactly as the generated index; missing, ambiguous, absolute-escape, and parent-escape targets still fail; planning verification and navigation checks agree.",
+  "gate_result": {
+    "red_tests_precede_implementation": true,
+    "red_commit": "bcf267d test(planning-spine): red specs for strict-link parity and derived navigation counts",
+    "green_commit": "0734001 fix(planning-spine): align strict-link verifier with generator",
+    "inline_markdown_example_false_positive_reproduced_and_ignored": true,
+    "bare_wiki_alias_false_negative_reproduced_and_resolved": true,
+    "code_spans_and_fenced_examples_ignored": true,
+    "aliases_resolve_exactly_as_generated_index": true,
+    "missing_targets_still_fail": true,
+    "ambiguous_targets_still_fail": true,
+    "absolute_escape_targets_still_fail": true,
+    "parent_escape_targets_still_fail": true,
+    "planning_verification_and_navigation_checks_agree": true,
+    "verifier_receipt": "scripts/verify-planning-spine.mjs passes and build-navigation-index.mjs --check passes on the same tree (3711 nodes, 29417 edges); tests/planning-spine-link-verification.spec.js 8/8 pass",
+    "product_execution_performed": false
+  },
+  "proof_summary": "ARCHBP-033's strict-link verifier and the navigation generator now share one alias-resolution contract, proven red-first (bcf267d red specs, 0734001 green alignment): inline Markdown examples inside code spans and fenced blocks no longer false-positive, bare wiki aliases resolve through the maintained navigation index exactly as the generator resolves them, and missing, ambiguous, absolute-escape, and parent-escape targets all still fail closed. On this branch the full verifier receipt holds: planning verification and the navigation byte-current check agree with zero drift, and the 8-test link-verification suite passes.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-033.proof.json",
+    "tests/planning-spine-link-verification.spec.js",
+    "scripts/verify-planning-spine.mjs",
+    "planning-spine-v0/scripts/build-navigation-index.mjs",
+    "planning-spine-v0/navigation/generated/navigation.validation_report.json"
+  ]
+}

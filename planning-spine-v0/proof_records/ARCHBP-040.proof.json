@@ -1,0 +1,38 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-040",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove ordered raw teeing for stdout/stderr/binary, invalid UTF-8, partial lines, signals, nonzero exits, parser failure, large-stream chunking, digest and offset integrity, compact-view linkage, and exact profile-owned package resolution.",
+  "gate_result": {
+    "adapter_exists_and_is_byte_first": true,
+    "adapter_origin": "rtk-tokenkill e822928 'feat(rtk): add byte-exact rtk_nu adapter (#11)' — the blueprint's 2026-07-19 pin 44cf84e7 predates it and correctly recorded rtk_nu as absent then; the adapter landed the next day and the pin advanced",
+    "ordered_raw_teeing_stdout_stderr_binary": true,
+    "invalid_utf8_preserved": true,
+    "partial_lines_preserved_with_monotonic_frames": true,
+    "signals_reported_truthfully_with_frames_preserved": true,
+    "signal_fix": "genuine red: rtk proxy laundered child signal death into exit 128+sig plus a stderr diagnostic inside the captured stream; fixed by faithful signal re-raise in the proxy arm (rtk-tokenkill 3af59d0, PR FlexNetOS/rtk-tokenkill#13); envelope now records code=null signal=6 with byte-exact frames",
+    "nonzero_exits_reported": true,
+    "parser_failure_bytes_retained_status_declared": true,
+    "large_stream_chunking_multi_frame": true,
+    "digest_and_offset_integrity": true,
+    "compact_view_linkage_supplements_never_replaces": true,
+    "no_native_nu_coercion": true,
+    "no_plugin_invocation_from_rtk_nu": true,
+    "exact_profile_owned_package_resolution": "yazelix flake.nix pins github:FlexNetOS/rtk-tokenkill/0dd13a48b81ac083d8a39351a6a72ca4e7b715c0 (flake.lock agrees); ~/.nix-profile/toolbin/rtk_nu -> /nix/store/18igz92r0gj7dfd7zr09h0p784ylgsn5-rtk-0.43.0/bin/rtk_nu; the yazelix foundation gate asserts the binary and its envelope help text",
+    "envelope_schema_version": "flexnetos.rtk_nu.envelope.v1",
+    "full_suite": "cargo test: 2504 passed, 0 failed",
+    "product_execution_performed": true
+  },
+  "proof_summary": "ARCHBP-040's byte-first rtk_nu adapter is implemented, pinned, and gate-complete. The adapter (rtk-tokenkill e822928, pinned into the profile via yazelix at 0dd13a4 with the binary resolving from the nix store) tees ordered raw stdout/stderr frames with per-frame sha256 digests and contiguous offsets before any transformation, emits versioned JSONL/JSON/Nuon envelopes, declares parser and rtk-filter linkage without coercing native Nu values or invoking the plugin, and preserves invalid UTF-8, partial lines, binary bytes, and nonzero exits. Gate closure (PR FlexNetOS/rtk-tokenkill#13) added the four uncovered cases and surfaced one genuine defect red-first: rtk proxy converted child signal deaths into exit 128+sig and corrupted captured stderr with a diagnostic; the proxy now re-raises the fatal signal so envelopes record the true signal with byte-exact frames. Full suite 2504/0.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-040.proof.json",
+    "https://github.com/FlexNetOS/rtk-tokenkill/pull/13",
+    "rtk-tokenkill:src/rtk_nu_main.rs",
+    "rtk-tokenkill:tests/rtk_nu_envelope_test.rs",
+    "rtk-tokenkill:tests/fixtures/rtk_nu_test_fixture.rs",
+    "rtk-tokenkill:docs/rtk_nu.md",
+    "yazelix:flake.nix"
+  ]
+}

@@ -115,8 +115,17 @@ function walkFiles(root) {
   const visit = (directory) => {
     for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
       const absolutePath = path.join(directory, entry.name);
-      if (entry.isDirectory()) visit(absolutePath);
-      else if (entry.isFile()) output.push(absolutePath);
+      if (entry.isDirectory()) {
+        // Python bytecode caches and the git-ignored bundle output are
+        // runtime side-effects, not navigation content; including them makes
+        // local regeneration diverge from a clean CI checkout.
+        if (entry.name === "__pycache__") continue;
+        if (entry.name === "dist" && directory === root) continue;
+        visit(absolutePath);
+      } else if (entry.isFile()) {
+        if (entry.name.endsWith(".pyc")) continue;
+        output.push(absolutePath);
+      }
     }
   };
   visit(root);

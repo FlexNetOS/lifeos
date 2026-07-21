@@ -1,0 +1,37 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-007",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove passive/active separation, stable agent identity, portable .rvf export and import, crash recovery, witness-bound feedback, and fail-closed behavior for the observed API defects; no store silently becomes competing macro authority.",
+  "gate_result": {
+    "red_first": "contracts committed red at lifeos dacb924 (7/7 failing: stub adapter throws on every pure clause and the lifecycle proof emitter exits non-zero), implementation green at HEAD (7/7); full workspace suite 315/315 (55 files)",
+    "blocker_cleared_not_faked": "The prior 'RVF surface absent' finding was a wrong-node-context probe of agentdb's top-level exports. The real RVF-first backend is the subpath export agentdb/backends/self-learning -> SelfLearningRvfBackend, backed by @ruvector/rvf@0.2.3 with the native binding @ruvector/rvf-node and the platform binary @ruvector/rvf-node-linux-x64-gnu, all already resolved in the repo install (verified by NBVERIFY-001 node authority). No RVF API was fabricated.",
+    "passive_active_separation": true,
+    "separation_evidence": "The active plane is the per-agent portable .rvf via SelfLearningRvfBackend (rvfBackend 'node'); the passive durable macro authority is PostgreSQL/RuVector, owned externally by the live cluster and the ARCHBP-003 RuVector adapter. The adapter declares PASSIVE_MACRO_AUTHORITY='postgresql+ruvector' and ACTIVE_PLANE='rvf' as distinct planes and never writes agent working state into the macro plane.",
+    "stable_agent_identity": true,
+    "identity_evidence": "getBackend().fileId() is a stable 32-hex identifier (parentId all-zeros for a root store, lineageDepth 0) that is byte-preserved across close, file copy, and reopen — the exported/reimported .rvf reports the identical fileId (recovery.recovered=true).",
+    "portable_export_and_import": true,
+    "portability_evidence": "exportTo(path) flushes and copies the .rvf to a new location (exportBytes>0); AgentRvfMemory.importFrom(path) reopens the copied file from a fresh handle in another process, preserving identity and returning the remembered vectors — the .rvf is a self-contained portable artifact.",
+    "crash_recovery": true,
+    "recovery_evidence": "after the owning handle is destroyed, opening the persisted .rvf recovers all active vectors and the stable fileId; the witness segments persist in the reopened store.",
+    "witness_bound_feedback": true,
+    "witness_evidence": "recordFeedback + recordMutationWitness bind feedback to the store; forceLearn drives a learning trace (learningStats.solverTrainCount increments > 0); every insert/mutation persists a tamper-evident 'witness' segment in the .rvf (witnessSegmentCount > 0, substratePresent=true), confirmed by segments().",
+    "fail_closed_on_observed_defects": true,
+    "defect_evidence": "TWO real API defects are handled fail-closed, not papered over. (1) Chain-level witness verification is unavailable on the installed surface: getWitnessChain() and verifyWitnessChain() return null and the legacy getBackend().verifyWitness() is 'not a function'; evaluateWitness reports {verified:false, reason:'witness-chain-unavailable'} and NEVER claims verified without a real chain that verifies. (2) agentdb RvfBackend.status() omits file size entirely (fileSizeBytesRaw=null); correctStatusBytes supplies the real on-disk size via fs.stat (fileSizeBytes>0) and flags corrected=true. A verified state is reported only when a non-empty chain verifies successfully.",
+    "no_competing_macro_authority": true,
+    "authority_evidence": "AgentRvfMemory.macroAuthority throws AuthorityViolationError (the active .rvf is never the durable macro authority) and assertNotMacroAuthority(PASSIVE_MACRO_AUTHORITY) fails closed; the lifecycle proof records macroAuthorityGuardThrew=true. PostgreSQL/RuVector remains the sole passive macro authority.",
+    "sourcing_conformance": "npm-first per owner policy: @ruvector/rvf, @ruvector/rvf-node, @ruvector/rvf-node-linux-x64-gnu, and agentdb are the proven ruvnet npm packages already owned by the root Bun manifest (trustedDependencies includes agentdb); no third-party substitution.",
+    "full_suite": "ARCHBP-007 spec 7/7; full workspace vitest 315 passed / 0 failed across 55 files (172s), including the native node-authority subprocess proof.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The lifecycle proof runs the real SelfLearningRvfBackend against real .rvf files on this host (linux-x64-gnu native binding): real inserts, real HNSW search, real feedback/learning cycle, real witness segments, real export/reopen with identity preservation. The spec spawns the proof emitter via bun and asserts on its emitted JSON, mirroring the established NBVERIFY-001 node-authority convention."
+  },
+  "proof_summary": "ARCHBP-007 is complete: the AgentDB RVF active/passive memory lifecycle adapter (lifeos scripts/agentdb-rvf-lifecycle.mjs + tests/archbp-007-agentdb-rvf-lifecycle.spec.ts, red dacb924 -> green HEAD, 7/7, full suite 315/315) separates passive PostgreSQL/RuVector macro memory from portable per-agent .rvf cognition over the real @ruvector/rvf@0.2.3 + agentdb/backends/self-learning native surface. It proves stable agent identity (a 32-hex fileId byte-preserved across export/reopen), portable .rvf export and import, crash recovery of vectors and identity, and witness-bound feedback (recordFeedback + recordMutationWitness + forceLearn persist tamper-evident witness segments and advance the learning trace). It fixes the two observed API defects fail-closed: the unavailable chain-level witness verification is reported {verified:false, reason:'witness-chain-unavailable'} and never optimistically passed, and the omitted status file size is corrected from disk. The active .rvf never becomes competing macro authority — the macro-authority guard throws AuthorityViolationError and PostgreSQL/RuVector stays the sole passive macro authority. The prior 'RVF surface absent' blocker was a wrong-export-path probe, not a missing dependency; no RVF API was fabricated.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-007.proof.json",
+    "scripts/agentdb-rvf-lifecycle.mjs",
+    "tests/archbp-007-agentdb-rvf-lifecycle.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

@@ -127,8 +127,10 @@ describe("ARCHBP-007 RVF lifecycle proof (real @ruvector/rvf + agentdb native su
       expect(r.feedback.recorded).toBe(true);
       expect(r.feedback.solverTrainCount).toBeGreaterThan(0);
 
-      // observed status defect corrected
-      expect(r.status.fileSizeBytesRaw).toBe(0);
+      // observed status defect corrected: agentdb's RvfBackend.status() omits
+      // file size entirely, so the raw value is absent (null); the adapter
+      // supplies the real on-disk size and flags the correction.
+      expect(r.status.fileSizeBytesRaw).toBeNull();
       expect(r.status.fileSizeBytes).toBeGreaterThan(0);
       expect(r.status.corrected).toBe(true);
 

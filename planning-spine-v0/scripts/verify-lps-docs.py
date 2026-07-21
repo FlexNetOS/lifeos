@@ -606,13 +606,33 @@ def gate_lps_007() -> tuple[str, dict, str, list[str], dict]:
         "06_PROOF_LEDGER.md": sha256_file("06_PROOF_LEDGER.md"),
         "proof-record.schema.json": sha256_file("schemas/proof-record.schema.json"),
     }
-    summary = (
-        f"Proof-record schema validates with result enum {{pass,fail}} preserving failed checks. The "
-        f"append-only ledger's entries are monotonically sequenced and SHA-256-backed, and "
-        f"the shipped authority integrity report (result=pass) proves the verifier agent "
-        f"({verifier}) is distinct from the executor ({executor}) — proof, not assertion, is the sole "
-        f"completion authority."
-    )
+    # Summaries mirror the structured result: a blocked gate never reads as
+    # a pass, and absent identities are described, never interpolated as
+    # fabricated None values (ARCHBP-034).
+    verifier_label = verifier if verifier else "an undeclared verifier"
+    executor_label = executor if executor else "an undeclared executor"
+    if status == "pass":
+        summary = (
+            f"Proof-record schema validates with result enum {{pass,fail}} preserving failed checks. The "
+            f"append-only ledger's entries are monotonically sequenced and SHA-256-backed, and "
+            f"the shipped authority integrity report (result=pass) proves the verifier agent "
+            f"({verifier_label}) is distinct from the executor ({executor_label}) — proof, not assertion, is the sole "
+            f"completion authority."
+        )
+    else:
+        failing = sorted(
+            name
+            for name, ok in checks.items()
+            if isinstance(ok, bool) and not ok
+        )
+        report_result = checks["authority_integrity_report_result"]
+        summary = (
+            f"LPS-007 is blocked: the proof-ledger authority gate does not currently hold. "
+            f"The shipped authority integrity report reports result={report_result!r}, the gate "
+            f"attributes execution to {executor_label} and verification to {verifier_label}, and the "
+            f"failing structured checks are: {', '.join(failing) if failing else 'shipped-report result only'}. "
+            f"No completion authority exists until new shipped evidence restores every check."
+        )
     return status, checks, summary, [
         "planning-spine-v0/06_PROOF_LEDGER.md",
         "planning-spine-v0/schemas/proof-record.schema.json",
@@ -678,12 +698,35 @@ def gate_lps_008() -> tuple[str, dict, str, list[str], dict]:
         "07_MVP_VERTICAL_SLICE.md": sha256_file("07_MVP_VERTICAL_SLICE.md"),
         "mvp-bundle.json": sha256_file("examples/mvp-bundle.json"),
     }
-    summary = (
-        "The MVP bundle keeps v0 scope and the canonical intent->goal->authority->task->worldseed->"
-        "simulation->cell->proof->decision->action->artifact order. Every referenced object resolves, "
-        "validates against its schema, and the end-to-end cross-object edges all connect with no "
-        "missing link; the shipped state/mvp_bundle_report.json independently reports result=pass."
-    )
+    # Condition-aware summary (ARCHBP-034): blocked structured results are
+    # described as blocked, never narrated as a pass.
+    if status == "pass":
+        summary = (
+            "The MVP bundle keeps v0 scope and the canonical intent->goal->authority->task->worldseed->"
+            "simulation->cell->proof->decision->action->artifact order. Every referenced object resolves, "
+            "validates against its schema, and the end-to-end cross-object edges all connect with no "
+            "missing link; the shipped state/mvp_bundle_report.json independently reports result=pass."
+        )
+    else:
+        failing_edges = sorted(e["edge"] for e in edges if e["result"] != "pass")
+        problems = []
+        if not checks["bundle_scope_is_v0"]:
+            problems.append("bundle scope is not v0")
+        if not checks["bundle_order_matches_required_chain"]:
+            problems.append("bundle order breaks the canonical chain")
+        if resolve_errors:
+            problems.append(f"{len(resolve_errors)} object(s) fail to resolve or validate")
+        if failing_edges:
+            problems.append(f"broken edges: {', '.join(failing_edges)}")
+        if bundle_report.get("result") != "pass":
+            problems.append(
+                f"the shipped state/mvp_bundle_report.json reports result={bundle_report.get('result')!r}"
+            )
+        summary = (
+            "LPS-008 is blocked: the MVP vertical slice does not currently connect end to end — "
+            + "; ".join(problems)
+            + ". The bundle regains its pass only from new shipped evidence."
+        )
     return status, checks, summary, [
         "planning-spine-v0/07_MVP_VERTICAL_SLICE.md",
         "planning-spine-v0/examples/mvp-bundle.json",

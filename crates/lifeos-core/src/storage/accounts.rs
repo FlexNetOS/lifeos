@@ -1,57 +1,53 @@
-use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sha2::{Digest, Sha256};
+use sqlx::PgPool;
 use std::path::Path;
 
 use super::StorageError;
 
-/// A row from the `accounts` table.
+/// A row from the canonical `lifeos_security.identity` table.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct AccountRow {
     pub id: i64,
     pub email: String,
     pub display_name: String,
     pub password_hash: String,
-    /// Unix timestamp seconds.
+    /// Unix timestamp seconds, projected from the canonical timestamptz.
     pub created_at: i64,
-    /// Unix timestamp seconds.
+    /// Unix timestamp seconds, projected from the canonical timestamptz.
     pub updated_at: i64,
 }
 
+const ACCOUNT_COLUMNS: &str = "id, email, display_name, password_hash,
+    EXTRACT(EPOCH FROM created_at)::BIGINT AS created_at,
+    EXTRACT(EPOCH FROM updated_at)::BIGINT AS updated_at";
+
 /// Insert a new account and return the inserted row.
-///
-/// Maps a UNIQUE violation on `email` to `StorageError::DuplicateEmail`.
 pub async fn insert(
-    pool: &SqlitePool,
+    pool: &PgPool,
     email: &str,
     display_name: &str,
     password_hash: &str,
 ) -> Result<AccountRow, StorageError> {
-    let now = Utc::now().timestamp();
-    let row = sqlx::query_as::<_, AccountRow>(
-        "INSERT INTO accounts (email, display_name, password_hash, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?)
-         RETURNING *",
-    )
+    let row = sqlx::query_as::<_, AccountRow>(&format!(
+        "INSERT INTO lifeos_security.identity (email, display_name, password_hash)
+         VALUES ($1, $2, $3)
+         RETURNING {ACCOUNT_COLUMNS}"
+    ))
     .bind(email)
     .bind(display_name)
     .bind(password_hash)
-    .bind(now)
-    .bind(now)
     .fetch_one(pool)
     .await?;
     Ok(row)
 }
 
-/// Look up an account by email (case-sensitive, matches the UNIQUE index).
-pub async fn get_by_email(
-    pool: &SqlitePool,
-    email: &str,
-) -> Result<Option<AccountRow>, StorageError> {
-    let row = sqlx::query_as::<_, AccountRow>(
-        "SELECT id, email, display_name, password_hash, created_at, updated_at
-         FROM accounts WHERE email = ?",
-    )
+/// Look up an account by email (case-sensitive, matching the unique key).
+pub async fn get_by_email(pool: &PgPool, email: &str) -> Result<Option<AccountRow>, StorageError> {
+    let row = sqlx::query_as::<_, AccountRow>(&format!(
+        "SELECT {ACCOUNT_COLUMNS}
+         FROM lifeos_security.identity WHERE email = $1"
+    ))
     .bind(email)
     .fetch_optional(pool)
     .await?;
@@ -60,51 +56,50 @@ pub async fn get_by_email(
 
 /// Return the first (and typically only) account. Used by auth commands that
 /// operate on the single local account without knowing its email in advance.
-pub async fn get_first(pool: &SqlitePool) -> Result<Option<AccountRow>, StorageError> {
-    let row = sqlx::query_as::<_, AccountRow>(
-        "SELECT id, email, display_name, password_hash, created_at, updated_at
-         FROM accounts LIMIT 1",
-    )
+pub async fn get_first(pool: &PgPool) -> Result<Option<AccountRow>, StorageError> {
+    let row = sqlx::query_as::<_, AccountRow>(&format!(
+        "SELECT {ACCOUNT_COLUMNS}
+         FROM lifeos_security.identity ORDER BY id LIMIT 1"
+    ))
     .fetch_optional(pool)
     .await?;
     Ok(row)
 }
 
-/// Update the password hash for an account and bump `updated_at`.
-pub async fn update_password(
-    pool: &SqlitePool,
-    id: i64,
-    new_hash: &str,
-) -> Result<(), StorageError> {
-    let now = Utc::now().timestamp();
-    sqlx::query("UPDATE accounts SET password_hash = ?, updated_at = ? WHERE id = ?")
-        .bind(new_hash)
-        .bind(now)
-        .bind(id)
-        .execute(pool)
-        .await?;
+/// Update the password hash and canonical update timestamp.
+pub async fn update_password(pool: &PgPool, id: i64, new_hash: &str) -> Result<(), StorageError> {
+    sqlx::query(
+        "UPDATE lifeos_security.identity
+         SET password_hash = $1, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $2",
+    )
+    .bind(new_hash)
+    .bind(id)
+    .execute(pool)
+    .await?;
     Ok(())
 }
 
-/// Delete all accounts. Returns the number of rows removed.
-/// Called by `auth_reset_vault` to wipe the local credential store.
-pub async fn delete_all(pool: &SqlitePool) -> Result<u64, StorageError> {
-    let result = sqlx::query("DELETE FROM accounts").execute(pool).await?;
+/// Delete all accounts. Called only by the explicit vault-reset command.
+pub async fn delete_all(pool: &PgPool) -> Result<u64, StorageError> {
+    let result = sqlx::query("DELETE FROM lifeos_security.identity")
+        .execute(pool)
+        .await?;
     Ok(result.rows_affected())
 }
 
 // ---------------------------------------------------------------------------
-// JSON migration helpers
+// Legacy JSON import
 // ---------------------------------------------------------------------------
 
 /// Outcome of a `migrate_from_json` call.
 #[derive(Debug, PartialEq, Eq)]
 pub enum MigrateOutcome {
-    /// Account was successfully migrated from the JSON file.
+    /// Account plus immutable original source bytes were migrated.
     Migrated,
-    /// The `accounts` table already had rows — nothing was done.
+    /// The identity table already had rows — nothing needed importing.
     AlreadyMigrated,
-    /// No `account.json` file was found — nothing was done.
+    /// No legacy `account.json` source file was found.
     NoSource,
 }
 
@@ -150,87 +145,107 @@ struct LegacyAccountJson {
     created_at: String,
 }
 
-/// One-time migration: if the `accounts` table is empty and
-/// `<app_data_dir>/account.json` exists, parse it and INSERT the account, then
-/// rename the JSON file to `account.json.migrated-<RFC3339-UTC>` (colons
-/// replaced with hyphens for cross-platform filename safety).
-///
-/// Runs inside a transaction so a parse/insert failure leaves both the DB and
-/// filesystem untouched.
+/// One-time migration of `<app_data_dir>/account.json`. The original bytes are
+/// inserted into `lifeos_blob.object` in the same PostgreSQL transaction as
+/// the identity. Only after commit is the legacy file removed, preventing a
+/// second durable authority from surviving migration.
 pub async fn migrate_from_json(
-    pool: &SqlitePool,
+    pool: &PgPool,
     app_data_dir: &Path,
 ) -> Result<MigrateOutcome, MigrateError> {
-    // Guard: non-empty table means migration already ran.
-    let (count,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM accounts")
+    let json_path = app_data_dir.join("account.json");
+    let (count,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM lifeos_security.identity")
         .fetch_one(pool)
         .await?;
     if count > 0 {
+        retire_captured_legacy_source(pool, &json_path).await?;
         return Ok(MigrateOutcome::AlreadyMigrated);
     }
-
-    let json_path = app_data_dir.join("account.json");
     if !json_path.exists() {
         return Ok(MigrateOutcome::NoSource);
     }
 
-    let raw = std::fs::read_to_string(&json_path)?;
+    let raw = std::fs::read(&json_path)?;
+    let text = std::str::from_utf8(&raw).map_err(|_| MigrateError::CorruptJson)?;
     let legacy: LegacyAccountJson =
-        serde_json::from_str(&raw).map_err(|_| MigrateError::CorruptJson)?;
-
-    // Parse "epoch:<n>" to recover a Unix timestamp for `created_at`.
+        serde_json::from_str(text).map_err(|_| MigrateError::CorruptJson)?;
     let created_ts = legacy
         .created_at
         .strip_prefix("epoch:")
         .and_then(|s| s.parse::<i64>().ok())
-        .unwrap_or_else(|| Utc::now().timestamp());
-    let now = Utc::now().timestamp();
+        .unwrap_or_else(|| chrono::Utc::now().timestamp());
+    let sha256 = format!("{:x}", Sha256::digest(&raw));
 
-    // Wrap insert in a transaction: failure leaves both DB and file untouched.
     let mut tx = pool.begin().await?;
     sqlx::query(
-        "INSERT INTO accounts (email, display_name, password_hash, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO lifeos_blob.object (sha256, byte_length, raw_bytes, source_kind)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (sha256) DO NOTHING",
+    )
+    .bind(&sha256)
+    .bind(raw.len() as i64)
+    .bind(&raw)
+    .bind("legacy-account-json")
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query(
+        "INSERT INTO lifeos_security.identity
+           (email, display_name, password_hash, created_at, updated_at)
+         VALUES ($1, $2, $3, to_timestamp($4), CURRENT_TIMESTAMP)",
     )
     .bind(&legacy.email)
     .bind(&legacy.display_name)
     .bind(&legacy.password_hash)
-    .bind(created_ts)
-    .bind(now)
+    .bind(created_ts as f64)
     .execute(&mut *tx)
     .await?;
     tx.commit().await?;
 
-    // Archive the JSON file: colons → hyphens for cross-platform safety.
-    let ts = Utc::now().format("%Y-%m-%dT%H-%M-%SZ").to_string();
-    let archive_name = format!("account.json.migrated-{ts}");
-    std::fs::rename(&json_path, app_data_dir.join(&archive_name))?;
-
+    std::fs::remove_file(&json_path)?;
     Ok(MigrateOutcome::Migrated)
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
+async fn retire_captured_legacy_source(
+    pool: &PgPool,
+    json_path: &Path,
+) -> Result<(), MigrateError> {
+    if !json_path.exists() {
+        return Ok(());
+    }
+    let raw = std::fs::read(json_path)?;
+    let sha256 = format!("{:x}", Sha256::digest(&raw));
+    let captured = sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS(SELECT 1 FROM lifeos_blob.object WHERE sha256 = $1)",
+    )
+    .bind(sha256)
+    .fetch_one(pool)
+    .await?;
+    if !captured {
+        return Err(MigrateError::Sqlx(sqlx::Error::Protocol(
+            "legacy account source exists but is not captured in PostgreSQL".into(),
+        )));
+    }
+    std::fs::remove_file(json_path)?;
+    Ok(())
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::storage::Storage;
+    use serial_test::serial;
     use std::fs;
     use tempfile::tempdir;
 
     async fn setup() -> Storage {
-        let s = Storage::new_in_memory().await.unwrap();
-        s.migrate().await.unwrap();
-        s
+        Storage::new_for_test().await.unwrap()
     }
 
     #[tokio::test]
+    #[serial(lifeos_postgres)]
     async fn round_trip() {
-        let s = setup().await;
-        let pool = s.pool();
-
+        let storage = setup().await;
+        let pool = storage.pool();
         let row = insert(pool, "alex@lifeos.ai", "Alex", "hash1")
             .await
             .unwrap();
@@ -238,18 +253,12 @@ mod tests {
         assert_eq!(row.display_name, "Alex");
         assert!(row.updated_at >= row.created_at);
 
-        // get_by_email
         let found = get_by_email(pool, "alex@lifeos.ai").await.unwrap().unwrap();
         assert_eq!(found.id, row.id);
-
-        // update_password bumps updated_at
-        // Sleep 1s is too slow for tests; just verify the call succeeds and
-        // the hash changed.
         update_password(pool, row.id, "newhash").await.unwrap();
         let updated = get_by_email(pool, "alex@lifeos.ai").await.unwrap().unwrap();
         assert_eq!(updated.password_hash, "newhash");
 
-        // duplicate email returns DuplicateEmail
         let err = insert(pool, "alex@lifeos.ai", "Alex2", "hash2")
             .await
             .unwrap_err();
@@ -257,48 +266,52 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn migrate_from_json_test() {
-        let s = setup().await;
-        let pool = s.pool();
+    #[serial(lifeos_postgres)]
+    async fn migrate_from_json_captures_original_bytes_and_retires_file() {
+        let storage = setup().await;
+        let pool = storage.pool();
         let dir = tempdir().unwrap();
+        assert_eq!(
+            migrate_from_json(pool, dir.path()).await.unwrap(),
+            MigrateOutcome::NoSource
+        );
 
-        // No JSON → NoSource
-        let outcome = migrate_from_json(pool, dir.path()).await.unwrap();
-        assert_eq!(outcome, MigrateOutcome::NoSource);
-
-        // Write a valid account.json
-        let json = r#"{"email":"j@x.com","display_name":"J","password_hash":"ph","created_at":"epoch:1000000"}"#;
+        let json = br#"{"email":"j@x.com","display_name":"J","password_hash":"ph","created_at":"epoch:1000000"}"#;
         fs::write(dir.path().join("account.json"), json).unwrap();
-
-        let outcome = migrate_from_json(pool, dir.path()).await.unwrap();
-        assert_eq!(outcome, MigrateOutcome::Migrated);
-
-        // Verify row inserted
+        assert_eq!(
+            migrate_from_json(pool, dir.path()).await.unwrap(),
+            MigrateOutcome::Migrated
+        );
         let row = get_by_email(pool, "j@x.com").await.unwrap().unwrap();
-        assert_eq!(row.created_at, 1000000);
-
-        // Archive file exists; JSON file removed
-        let entries: Vec<_> = fs::read_dir(dir.path())
-            .unwrap()
-            .map(|e| e.unwrap().file_name().to_string_lossy().to_string())
-            .collect();
-        assert!(entries
-            .iter()
-            .any(|n| n.starts_with("account.json.migrated-")));
+        assert_eq!(row.created_at, 1_000_000);
         assert!(!dir.path().join("account.json").exists());
 
-        // Second call → AlreadyMigrated
-        let outcome = migrate_from_json(pool, dir.path()).await.unwrap();
-        assert_eq!(outcome, MigrateOutcome::AlreadyMigrated);
+        let captured: (i64, Vec<u8>) = sqlx::query_as(
+            "SELECT byte_length, raw_bytes FROM lifeos_blob.object WHERE source_kind = $1",
+        )
+        .bind("legacy-account-json")
+        .fetch_one(pool)
+        .await
+        .unwrap();
+        assert_eq!(captured.0, json.len() as i64);
+        assert_eq!(captured.1, json);
+        assert_eq!(
+            migrate_from_json(pool, dir.path()).await.unwrap(),
+            MigrateOutcome::AlreadyMigrated
+        );
+    }
 
-        // Corrupt JSON → CorruptJson; file left in place
+    #[tokio::test]
+    #[serial(lifeos_postgres)]
+    async fn corrupt_json_is_not_deleted() {
+        let storage = setup().await;
+        let dir = tempdir().unwrap();
         let bad_path = dir.path().join("account.json");
         fs::write(&bad_path, b"not json at all").unwrap();
-        // Insert a new DB to be empty for the corrupt-JSON test
-        let s2 = Storage::new_in_memory().await.unwrap();
-        s2.migrate().await.unwrap();
-        let err = migrate_from_json(s2.pool(), dir.path()).await.unwrap_err();
-        assert!(matches!(err, MigrateError::CorruptJson));
-        assert!(bad_path.exists(), "corrupt JSON must be left in place");
+        assert!(matches!(
+            migrate_from_json(storage.pool(), dir.path()).await,
+            Err(MigrateError::CorruptJson)
+        ));
+        assert!(bad_path.exists());
     }
 }

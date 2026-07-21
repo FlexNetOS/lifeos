@@ -4,7 +4,7 @@
 # src-tauri
 
 ## Purpose
-Tauri 2 native shell. Wraps the Vite-built `../dist` bundle in a 1280×800 dark window, exposes a small set of `#[tauri::command]` functions for vault stubs, UI/lights state persistence, AI provider routing, system telemetry, and app metadata. Builds .deb / .AppImage / .dmg / .msi / .nsis / .rpm bundles.
+Tauri 2 native shell. Wraps the Vite-built `../dist` bundle in a 1280×800 dark window, exposes a small set of `#[tauri::command]` functions for vault stubs, PostgreSQL-backed UI/lights persistence, AI provider routing, system telemetry, and app metadata. Builds .deb / .AppImage / .dmg / .msi / .nsis / .rpm bundles.
 
 ## Key Files
 | File | Description |
@@ -27,7 +27,7 @@ Tauri 2 native shell. Wraps the Vite-built `../dist` bundle in a 1280×800 dark 
 
 ### Working In This Directory
 - **Never pull in `openssl-sys`.** All HTTP must stay on `reqwest` with `rustls-tls`. The host already has webkit2gtk-4.1 / libsoup-3.0 / gtk-3 / libxdo / ayatana-appindicator3 / librsvg2 / build-essential installed (Linux).
-- FS scope is intentionally narrow. The capability JSON enables `fs:default` but `tauri.conf.json → plugins.fs.requireLiteralLeadingDot: false` is the only relaxation. Any directory access must be requested through a `#[tauri::command]` that builds its path off `app.path().app_data_dir()` — never accept a raw path from the frontend.
+- FS scope is intentionally narrow. The capability JSON enables `fs:default` but `tauri.conf.json → plugins.fs.requireLiteralLeadingDot: false` is the only relaxation. Product state belongs in PostgreSQL/RuVector; app-data paths are limited to controlled legacy import sources and must never be accepted as raw frontend paths or recreated as durable state.
 - Every new `#[tauri::command]` must be added to the `invoke_handler!` registration list in `src/lib.rs → run()` AND have a matching `invoke("...")` call (typically guarded by `tauriInvoke()`) in the frontend.
 - Tauri builds are slow. Run `bun run tauri:build` only on demand, never as a routine verification step.
 

@@ -51,7 +51,8 @@ pub struct TelemetrySnapshot {
 }
 
 /// Identifies which third-party AI service the user has routed `ai_complete`
-/// to. Mirrors the JSON string in `<app_data_dir>/ai.json`. Future variants
+/// to. Mirrors the JSON value in the canonical PostgreSQL `ai-provider`
+/// projection. Future variants
 /// (e.g. an Exo peer) extend this enum; today the desktop shell wires three.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "lowercase")]
@@ -63,7 +64,7 @@ pub enum AiProvider {
 
 impl AiProvider {
     /// Stable wire identifier — must stay in lockstep with the JSON written to
-    /// `<app_data_dir>/ai.json` and the value read by `read_provider()` in the
+    /// the canonical `ai-provider` projection and the value read by `read_provider()` in the
     /// shell. Kept as `&'static str` so `serde_json` round-trips match.
     pub const fn as_str(&self) -> &'static str {
         match self {
@@ -89,7 +90,7 @@ impl AiProvider {
     /// the dropdown.
     pub const ALL: &'static [Self] = &[Self::Claude, Self::Openai, Self::Gemini];
 
-    /// Default provider when `ai.json` is missing, unparseable, or names an
+    /// Default provider when the canonical projection is missing, unparseable, or names an
     /// unsupported value. Matches the historical shell behavior.
     pub const fn default_provider() -> Self {
         Self::Claude

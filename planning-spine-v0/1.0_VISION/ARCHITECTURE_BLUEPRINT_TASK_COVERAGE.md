@@ -44,7 +44,7 @@ their contradictions are resolved in
 |---|---|---|
 | Host all-data byte retention, typed records, and zero-loss reconstruction | `ARCHBP-038` | blocked on exact ingestion foundation |
 | One redb owner, authenticated UDS commands, atomic mmap generations, ordered events, replay | `ARCHBP-039` | unimplemented |
-| Byte-first pinned `rtk_nu` JSONL/JSON/Nuon adapter | `ARCHBP-040` | ready; component absent |
+| Byte-first pinned `rtk_nu` JSONL/JSON/Nuon adapter | `ARCHBP-040`; GitKB `tasks/architecture-rtk-nu-adapter` | implemented in `FlexNetOS/rtk-tokenkill` commit `71393632412ca5d5a1fc5c92b378a2cf1a641de7`; raw-byte, binary, nonzero, partial-output, JSONL/JSON/Nuon, and native-Nu-bypass boundary proof passes |
 | Typed CodeDB `ingest-envelope` and canonical raw-object linkage | `ARCHBP-041` | blocked on ingestion and `rtk_nu` |
 | envctl-exclusive commit, idempotency, receipts, and database return projection | `ARCHBP-042` | unimplemented/blocked |
 | Real profile `yzx enter`/Zellij PTY inside Vue 3 + Tauri 2 Glass | `ARCHBP-043` | unimplemented/blocked |

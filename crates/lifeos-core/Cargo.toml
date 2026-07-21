@@ -48,10 +48,10 @@ reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"
 # synchronously, and pulling futures-util through here for no reason would
 # slow the default-features `cargo check` even though the dep is optional.
 mlua = { version = "0.11", default-features = false, features = ["luau", "send", "vendored"], optional = true }
-# Wave 4 (storage): async SQLite via sqlx. rustls feature set matches reqwest —
-# no openssl-sys in the graph. Optional behind the `storage` feature so
-# no_std / ESP32 consumers keep a clean dependency tree.
-sqlx = { version = "0.8", default-features = false, features = ["sqlite", "tls-rustls", "macros", "migrate", "runtime-tokio", "chrono"], optional = true }
+# Durable product state is PostgreSQL/RuVector. rustls keeps the client free of
+# OpenSSL; `storage` remains optional so no_std / ESP32 consumers keep a clean
+# dependency tree.
+sqlx = { version = "0.8", default-features = false, features = ["postgres", "tls-rustls", "macros", "migrate", "runtime-tokio", "chrono"], optional = true }
 # tokio listed explicitly so storage code can call tokio::* without relying on
 # sqlx's transitive re-export. The Tauri shell owns the actual runtime; we only
 # need the feature tag here so async storage functions compile.
@@ -59,6 +59,9 @@ tokio = { version = "1", default-features = false, features = ["rt-multi-thread"
 # Timestamp formatting for migration archive filenames and DB timestamps.
 # Optional, pulled in by the `storage` feature only.
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"], optional = true }
+# Legacy file imports are retained byte-for-byte in PostgreSQL with a stable
+# SHA-256 identity before their source file is retired.
+sha2 = { version = "0.10", optional = true }
 
 [features]
 # Default keeps the HTTP transport on — daemon + Tauri shell both need it.
@@ -70,11 +73,16 @@ mcp-http = ["dep:reqwest"]
 # workspace build doesn't pay the vendored Luau C compile cost; the Tauri
 # shell enables it explicitly in `src-tauri/Cargo.toml`.
 plugin-host = ["dep:mlua"]
-# Wave 4: SQLite-backed local storage. Default-on for desktop + daemon; ESP32
-# consumers turn it off with `default-features = false`.
-storage = ["dep:sqlx", "dep:tokio", "dep:chrono"]
+# PostgreSQL/RuVector canonical storage. ESP32 consumers turn it off with
+# `default-features = false`.
+storage = ["dep:sqlx", "dep:tokio", "dep:chrono", "dep:sha2"]
+# One-way, read-only SQLite import used only to retire pre-cutover app-data
+# databases into PostgreSQL. It is deliberately separate from `storage`: no
+# new product record may be written to SQLite after the import completes.
+legacy-sqlite-import = ["storage", "sqlx/sqlite"]
 
 [dev-dependencies]
 # storage tests run against sqlx with tokio runtime
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 tempfile = "3"
+serial_test = "3"

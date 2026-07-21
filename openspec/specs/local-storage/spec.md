@@ -1,111 +1,78 @@
-## ADDED Requirements
+## Requirements
 
-### Requirement: Storage initialization
+### Requirement: PostgreSQL/RuVector initialization
 
-The system SHALL construct a `Storage` instance from a database URL during application startup, before any Tauri command handler can be invoked. On failure, the application SHALL abort with a calm, user-facing error message and SHALL NOT register any command handlers.
+The system SHALL construct `Storage` from `LIFEOS_DATABASE_URL` before Tauri
+command handlers are registered. The URL SHALL be PostgreSQL; SQLite URLs
+SHALL be rejected. Startup SHALL migrate the application schemas and verify
+that `ruvector` is installed in schema `extensions`.
 
-#### Scenario: Fresh launch creates the database file
+#### Scenario: Missing or non-PostgreSQL configuration fails closed
 
-- **WHEN** the application launches with no existing `<app_data_dir>/lifeos.db` file
-- **THEN** `Storage::new("sqlite:<path>?mode=rwc")` SHALL create the file and return a usable `Storage` instance
+- **WHEN** `LIFEOS_DATABASE_URL` is absent or is a SQLite URL
+- **THEN** startup SHALL fail before command registration
+- **AND** the user-facing initialization error SHALL not expose credentials
 
-#### Scenario: Re-launch reopens existing database without data loss
+#### Scenario: Bootstraped PostgreSQL opens safely
 
-- **WHEN** the application launches with a pre-existing `<app_data_dir>/lifeos.db` containing rows
-- **THEN** `Storage::new` SHALL open the file without truncation
-- **AND** previously inserted rows SHALL remain readable
+- **WHEN** the installation owner has run
+  `bootstrap-postgres-ruvector.sql` and supplied a runtime role URL
+- **THEN** `Storage::from_runtime_env`, migrations, and extension verification
+  SHALL succeed without creating a local durable database file
 
-#### Scenario: Initialization failure aborts startup with calm message
+### Requirement: Administrative extension bootstrap
 
-- **WHEN** `Storage::new` returns an error (permission denied, disk full, corrupt file)
-- **THEN** Tauri's `setup()` callback SHALL return that error
-- **AND** the user SHALL see the calm string `"LifeOS couldn't initialize storage at <db_path> — see logs."`
-- **AND** no `#[tauri::command]` handler SHALL be reachable
+The application migration set SHALL not install extensions. The PostgreSQL
+installation owner SHALL run `crates/lifeos-core/sql/bootstrap-postgres-ruvector.sql`
+with `lifeos_runtime_role`; it SHALL install `pgcrypto`, `btree_gin`, and
+`ruvector` in `extensions`, create the five empty `lifeos_*` schemas, and
+grant the runtime role only database connect, required extension
+type/function usage, and `USAGE`/`CREATE` in those application schemas.
+It SHALL pin the runtime role's database-local search path to
+`lifeos_runtime, extensions, pg_catalog` so SQLx migration bookkeeping does
+not require `CREATE` on `public`.
 
-### Requirement: Embedded migrations
+#### Scenario: Incorrect extension placement is rejected
 
-The system SHALL embed migration SQL files at compile time via `sqlx::migrate!("./migrations")` and SHALL run them idempotently on every startup.
+- **WHEN** `ruvector` is absent from `extensions`, including when it exists in
+  `public`
+- **THEN** runtime health verification SHALL fail closed
 
-#### Scenario: First run applies all migrations
+### Requirement: Embedded application migrations
 
-- **WHEN** the application launches against an empty database
-- **THEN** every `.sql` file under `crates/lifeos-core/migrations/` SHALL be applied
-- **AND** the `_sqlx_migrations` table SHALL contain one row per applied migration
+The system SHALL embed numbered SQL migrations with `sqlx::migrate!` and run
+them idempotently in PostgreSQL. The administrative bootstrap SHALL create the
+`lifeos_blob`, `lifeos_security`, `lifeos_runtime`, `lifeos_semantic`, and
+`lifeos_agentdb` schemas; migrations SHALL verify their presence and create
+only application relations within their scoped runtime grants.
 
-#### Scenario: Subsequent runs are no-ops
+#### Scenario: First run applies every migration
 
-- **WHEN** the application launches against a database whose `_sqlx_migrations` table is already up to date
-- **THEN** no schema changes SHALL occur
-- **AND** the row count in `_sqlx_migrations` SHALL remain unchanged
+- **WHEN** a bootstraped empty database is started
+- **THEN** every numbered migration SHALL be recorded in `_sqlx_migrations`
 
-#### Scenario: Concurrent app instances cannot corrupt migrations
+#### Scenario: Incomplete migrations fail health
 
-- **WHEN** two app instances race on first launch against the same DB file
-- **THEN** sqlx's built-in `_sqlx_migrations` advisory lock SHALL serialize them
-- **AND** the final schema SHALL be identical to a single-instance launch
+- **WHEN** fewer embedded migrations are recorded than shipped
+- **THEN** `Storage::health` SHALL return `StorageError::IncompleteMigrations`
 
-### Requirement: Connection pool with WAL and foreign keys
+### Requirement: Durable projection state
 
-The system SHALL maintain a `SqlitePool` with `max_connections=5` and `min_connections=1`. Every connection SHALL have `journal_mode=WAL`, `foreign_keys=ON`, and `busy_timeout=5000` applied via the pool's `after_connect` hook.
+`ui-state`, `lighting-state`, and `ai-provider` SHALL be JSONB projections in
+`lifeos_runtime.projection`; app-data JSON files SHALL be legacy import sources
+only. Each successful write SHALL atomically advance that projection's
+generation.
 
-#### Scenario: Pool serves concurrent reads
+#### Scenario: Projection writes validate JSON
 
-- **WHEN** five `SELECT` queries are dispatched on the pool simultaneously
-- **THEN** all five SHALL complete without serialization at the application layer
+- **WHEN** a projection write receives invalid JSON
+- **THEN** it SHALL return `StorageError::InvalidProjectionJson`
+- **AND** the prior canonical projection SHALL remain unchanged
 
-#### Scenario: Pool honors PRAGMAs per connection
+### Requirement: Compatibility and dependency isolation
 
-- **WHEN** a fresh connection is acquired from the pool
-- **THEN** `PRAGMA journal_mode` SHALL return `wal`
-- **AND** `PRAGMA foreign_keys` SHALL return `1`
-- **AND** `PRAGMA busy_timeout` SHALL return `5000`
-
-### Requirement: `db_health` Tauri command
-
-The system SHALL expose a `#[tauri::command] async fn db_health()` that returns a `DbHealth` struct describing pool health, applied migration count, and the schema version string. Status SHALL be `"ok"` when applied migrations equal the embedded count; otherwise `"degraded"`.
-
-#### Scenario: Healthy database returns ok status
-
-- **WHEN** the frontend invokes `db_health` on a database with all migrations applied
-- **THEN** the response SHALL have `status == "ok"`
-- **AND** `applied_migrations` SHALL equal the count of `.sql` files shipped
-- **AND** `schema_version` SHALL equal `"1"`
-
-#### Scenario: Behind-by-one returns degraded status
-
-- **WHEN** the frontend invokes `db_health` after a manual `db_migrate` failure left one migration unapplied
-- **THEN** the response SHALL have `status == "degraded"`
-
-### Requirement: `db_migrate` Tauri command
-
-The system SHALL expose a `#[tauri::command] async fn db_migrate()` that re-runs the embedded migration set and returns a `MigrateReport { applied: u32, total: u32 }`.
-
-#### Scenario: Manual re-run is idempotent
-
-- **WHEN** the frontend invokes `db_migrate` on an already-up-to-date database
-- **THEN** `applied` SHALL equal `total`
-- **AND** no new rows SHALL be added to `_sqlx_migrations`
-
-### Requirement: `storage` feature flag
-
-The `lifeos-core` crate SHALL declare a `storage` Cargo feature gating both `sqlx` and `tokio` as optional dependencies. The feature SHALL be included in the default feature set.
-
-#### Scenario: Default build includes storage
-
-- **WHEN** `cargo check -p lifeos-core` runs without any feature overrides
-- **THEN** the `lifeos_core::storage` module SHALL be present in the compiled artifact
-
-#### Scenario: `--no-default-features` excludes sqlx entirely
-
-- **WHEN** `cargo check -p lifeos-core --no-default-features` runs
-- **THEN** the build SHALL succeed
-- **AND** `cargo tree -p lifeos-core --no-default-features` SHALL NOT mention `sqlx` or `tokio`
-
-### Requirement: No `openssl-sys` in the dependency graph
-
-The system SHALL preserve the rustls-only posture of the existing `lifeos-core` and `src-tauri` crates. Enabling the `storage` feature SHALL NOT introduce `openssl-sys`.
-
-#### Scenario: Dependency tree is openssl-free
-
-- **WHEN** `cargo tree -p lifeos-core --features storage | grep openssl-sys` runs
-- **THEN** the output SHALL be empty
+The `storage` feature SHALL gate PostgreSQL/RuVector storage. The
+`legacy-sqlite-import` feature SHALL add read-only import support only; it
+SHALL not authorize new SQLite product writes. `cargo check -p lifeos-core
+--no-default-features` SHALL succeed, and enabling storage SHALL not introduce
+`openssl-sys`.

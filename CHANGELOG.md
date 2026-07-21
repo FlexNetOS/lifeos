@@ -2,6 +2,21 @@
 
 All notable changes to LifeOS (ubuntu-lifeos). Dates ISO. Each stage closed with green gates (tests + build + axe).
 
+## [Unreleased] · PostgreSQL/RuVector durable-storage cutover
+
+- Replaced the application’s SQLite durable-store path with mandatory
+  PostgreSQL/RuVector storage (`LIFEOS_DATABASE_URL`), including namespace
+  verification for `extensions.ruvector` and a credential-redacted health
+  receipt.
+- Moved account identity, AgentDB projections, semantic vectors/GNN cache, UI
+  persistence, lighting state, and AI-provider selection into PostgreSQL.
+- Added administrative extension bootstrap SQL and a host-scoped native SDK
+  bridge that resolves both build-time pkg-config metadata and transitive
+  GTK/WebKit runtime libraries under the Nix-owned toolchain.
+- Added fail-closed, read-only migration of legacy SQLite and JSON sources:
+  source bytes are captured with SHA-256 in PostgreSQL, conflicts preserve both
+  sources, and local files are retired only after commit.
+
 ## [0.1.7] — 2026-05-25 · design-md-format-adoption
 
 `/ccg:spec-impl` run implementing the `design-md-format-adoption` OPSX change. Adopts Google Labs' [`@google/design.md@0.1.1`](https://github.com/google-labs-code/design.md) (Apache-2.0) — a YAML+markdown format spec for describing design systems to AI agents — and locks the previously-manual 0-axe-violation baseline into automated `vitest-axe` specs.

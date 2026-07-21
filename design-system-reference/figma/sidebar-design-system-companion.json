@@ -1,0 +1,133 @@
+{
+  "schema_version": "lifeos.figma-sidebar-connection.v1",
+  "design_input": {
+    "url": "https://www.figma.com/design/z7aJ8uZrOsvfnWlsApN0Bu/Sidebar-Design-System-Companion?node-id=0-1&m=de",
+    "file_key": "z7aJ8uZrOsvfnWlsApN0Bu",
+    "node_id": "0:1",
+    "node_name": "00 — Overview + Tokens",
+    "inspected_at": "2026-07-20",
+    "authority": "Figma is a controlled design input. DESIGN.md, the LifeOS Design System, and checked-in implementation contracts remain implementation authority."
+  },
+  "connector_receipt": {
+    "access": "verified",
+    "hierarchy": [
+      {
+        "node_id": "0:1",
+        "name": "00 — Overview + Tokens",
+        "kind": "canvas"
+      },
+      {
+        "node_id": "5:27",
+        "name": "Overview + Tokens Canvas",
+        "kind": "frame",
+        "size": "2200x1450"
+      },
+      {
+        "node_id": "5:37",
+        "name": "File Map",
+        "kind": "frame"
+      },
+      {
+        "node_id": "5:46",
+        "name": "Mental Model",
+        "kind": "frame"
+      }
+    ],
+    "declared_pages": [
+      "00 — Overview + Tokens",
+      "01 — Components + Sidebar Spec",
+      "02 — Responsive + Handoff"
+    ],
+    "component_variants": {
+      "status": "not_exposed_by_current_connector_seat",
+      "reason": "Published component and variant inventory requires a Figma Dev or Full seat on an Organization or Enterprise plan.",
+      "receipt": "Figma Debug UUID d04513c2-1e38-4b56-a8ff-f346595c2e83"
+    },
+    "code_connect": {
+      "status": "seat_gated",
+      "repository_approved_equivalent": "This checked-in manifest, data-figma-component anchors, source mapping test, design-token verifier, and a11y/structural regression suites.",
+      "receipt": "Figma Debug UUID 6872f788-6fb9-47d8-895d-e8cb82c976e0",
+      "upgrade_condition": "When a qualified Figma seat is available, add official Code Connect mappings for the exact component nodes and retain this manifest as the repository-side receipt."
+    },
+    "variables": {
+      "status": "not_exposed_for_canvas_selection",
+      "receipt": "Figma Debug UUID f30ece5e-1534-45d6-97cd-82d730cd1357",
+      "disposition": "No Figma variable is copied into source or treated as runtime authority."
+    }
+  },
+  "observed_design_tokens": {
+    "typography": {
+      "figma": "Inter",
+      "lifeos": "Lexend for UI and Rigelstar only for designated display/wordmark roles",
+      "relationship": "intentional LifeOS Design System authority divergence"
+    },
+    "colors": [
+      { "figma_name": "App background", "figma_value": "#18181B", "lifeos_token": "--bg-2", "lifeos_value": "#1A1A1A", "relationship": "nearest dark card surface; not a value import" },
+      { "figma_name": "Icon rail", "figma_value": "#09090B", "lifeos_token": "--surface-sidebar", "lifeos_value": "var(--bg-0) / #0A0A0A", "relationship": "semantic rail equivalent" },
+      { "figma_name": "Detail panel", "figma_value": "#0C0C0F", "lifeos_token": "--surface-panel", "lifeos_value": "var(--bg-1) / #121212", "relationship": "semantic panel equivalent" },
+      { "figma_name": "Elevated surface", "figma_value": "#111116", "lifeos_token": "--bg-1", "lifeos_value": "#121212", "relationship": "nearest elevated surface" },
+      { "figma_name": "Active tint", "figma_value": "#0F1D31", "lifeos_token": "--tint-cyan-soft", "lifeos_value": "rgba(0,212,255,.10)", "relationship": "semantic active tint" },
+      { "figma_name": "Text primary", "figma_value": "#F4F4F5", "lifeos_token": "--fg-1", "lifeos_value": "#ECEDEE", "relationship": "semantic primary text" },
+      { "figma_name": "Text muted", "figma_value": "#71717A", "lifeos_token": "--fg-3", "lifeos_value": "#9BA1A6", "relationship": "LifeOS readability token takes precedence" },
+      { "figma_name": "Accent blue", "figma_value": "#60A5FA", "lifeos_token": "--lifeos-cyan", "lifeos_value": "#00D4FF", "relationship": "LifeOS brand-primary authority divergence" },
+      { "figma_name": "Success", "figma_value": "#22C55E", "lifeos_token": "--status-ok", "lifeos_value": "var(--lifeos-green) / #00E676", "relationship": "semantic success equivalent" },
+      { "figma_name": "Warning", "figma_value": "#F59E0B", "lifeos_token": "--status-warn", "lifeos_value": "#FFB020", "relationship": "semantic warning equivalent" },
+      { "figma_name": "Danger", "figma_value": "#EF4444", "lifeos_token": "--status-err", "lifeos_value": "#FF4D6A", "relationship": "semantic danger equivalent" }
+    ],
+    "spacing_and_shape": {
+      "figma_card_radius": "24px",
+      "figma_token_card_radius": "18px",
+      "lifeos_tokens": ["--radius-md", "--radius-lg", "--radius-xl", "--space-1", "--space-2", "--space-3", "--space-4"],
+      "relationship": "LifeOS compressed 4/6/8/12/16 scale remains authoritative; companion geometry is reviewed as input rather than copied."
+    },
+    "icon_system": {
+      "repository": "lucide-vue-next through Icon.vue",
+      "figma_disposition": "Semantic icon roles map to Lucide names; no copied icon raster is authority."
+    }
+  },
+  "component_mappings": [
+    {
+      "figma_concept": "Command spine / Icon rail",
+      "declared_page": "01 — Components + Sidebar Spec",
+      "source": "src/components/Sidebar.vue",
+      "component": "Sidebar",
+      "source_anchor": "Sidebar Companion/Icon rail",
+      "states": ["idle", "active", "focus-visible", "workspace-panel toggled", "network dialog open", "notification expanded"],
+      "accessibility": "tests/a11y/components.spec.ts",
+      "regression": "tests/figma-sidebar-companion.spec.ts"
+    },
+    {
+      "figma_concept": "Command spine / Detail panel",
+      "declared_page": "01 — Components + Sidebar Spec",
+      "source": "src/components/Workspace.vue",
+      "component": "Workspace",
+      "source_anchor": "Sidebar Companion/Detail panel",
+      "states": ["expanded", "collapsed", "section selector open", "drag reorder"],
+      "accessibility": "tests/a11y/components.spec.ts",
+      "regression": "tests/figma-sidebar-companion.spec.ts"
+    },
+    {
+      "figma_concept": "Reusable component / Menu row",
+      "declared_page": "01 — Components + Sidebar Spec",
+      "source": "src/components/MenuRow.vue",
+      "component": "MenuRow",
+      "source_anchor": "Sidebar Companion/Menu row",
+      "states": ["idle", "active", "collapsed", "keyboard focus"],
+      "accessibility": "tests/a11y/components.spec.ts",
+      "regression": "tests/figma-sidebar-companion.spec.ts"
+    }
+  ],
+  "upgrade_workflow": [
+    "Inspect the exact file key and node through the Figma connector before changing source.",
+    "Refresh the connector receipt, component hierarchy, and token observations in this manifest; do not store a Figma screenshot as authority.",
+    "Compare each observed token against DESIGN.md and colors_and_type.css. Record an explicit design-contract decision for every divergence.",
+    "Update only the mapped Vue components and their interactive/a11y tests.",
+    "Run bun run figma:sidebar:check, bun run test:a11y, bun run test, and the visual/structural regression test.",
+    "If a qualified Figma seat becomes available, create and verify official Code Connect mappings for exact component nodes, then update code_connect status and receipts."
+  ],
+  "authority_guards": {
+    "no_stale_screenshot_authority": true,
+    "prohibited_authority": ["downloaded Figma screenshots", "manually copied Figma CSS", "temporary connector assets", "Figma variables absent from the checked-in contract"],
+    "repository_source_of_truth": ["DESIGN.md", "design-system-reference/README.md", "colors_and_type.css", "mapped Vue components", "tests"]
+  }
+}

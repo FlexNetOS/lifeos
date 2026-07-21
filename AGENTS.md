@@ -179,7 +179,7 @@ Runtime contract:
 1. The editor renders the active SFC inside its canvas pane. The mock layer + AI chat strip live in the right rail of `OpenPencilEditor.vue`.
 2. AI chat messages tagged `source: "open-pencil"` get the special canned reply pattern ("I'll refactor and run `bun run check` before flagging the PR back."). See `stores/lifeos.ts → sendAiMessage`.
 3. **File navigation routes through `useNav().pickSub(...)`** with `view: "open-pencil"` on the item. That's what tells `App.vue` to mount `<OpenPencilEditor>` instead of `<SubsectionView>`.
-4. **Persistence boundary**: edits are buffered in-memory until the user clicks Apply (not yet wired). Real persistence will go via Tauri's `fs` plugin, scoped to `$APPDATA/lifeos/edits/*` (see `tauri.conf.json` plugins → `fs`).
+4. **Persistence boundary**: edits are buffered in-memory until the user clicks Apply (not yet wired). When Apply is wired, its durable source and audit record must go through PostgreSQL/RuVector (`lifeos_blob` plus a maintained projection), never a Tauri app-data file.
 5. The legacy `#__om-edit-overrides` inline style block (from the bundle's CDN preview `index.html`) is no longer present in the production entry — OpenPencil rewrites the SFC source instead of injecting `!important` overrides.
 
 If you change SFC mounting logic in `App.vue`, keep this gate intact: `v-else-if="lifeos.activeSub.item?.view === 'open-pencil'"`. Without it, OpenPencil-tagged subs fall through to `SubsectionView` and the editor never mounts.
@@ -196,10 +196,10 @@ The Rust side (`src-tauri/src/lib.rs`) exposes three commands:
 | Command | Purpose |
 |---|---|
 | `ai_complete(prompt, source) -> Result<String, String>` | Routes to the active provider; returns the reply or the calm error string. |
-| `ai_provider_get() -> String` | Reads `<app_data_dir>/ai.json`; defaults to `"claude"`. |
-| `ai_provider_set(provider) -> Result<(), String>` | Persists the choice to `<app_data_dir>/ai.json`. |
+| `ai_provider_get() -> Result<String, String>` | Reads the canonical PostgreSQL `ai-provider` projection; defaults to `"claude"` when absent. |
+| `ai_provider_set(provider) -> Result<(), String>` | Persists the validated choice to the canonical PostgreSQL `ai-provider` projection. |
 
-Provider selection lives at `<app_data_dir>/ai.json` as `{ "provider": "claude" | "openai" | "gemini" }`. The store mirrors that as `aiProvider` (state) + `availableAiProviders` (getter) + `setAiProvider(name)` (action) — sibling-identical between `lifeos.ts` and `lifeos.js`.
+Provider selection lives in `lifeos_runtime.projection` under key `ai-provider` as `{ "provider": "claude" | "openai" | "gemini" }`. A pre-cutover `<app_data_dir>/ai.json` is imported byte-for-byte into PostgreSQL before it is retired. The store mirrors that as `aiProvider` (state) + `availableAiProviders` (getter) + `setAiProvider(name)` (action) — sibling-identical between `lifeos.ts` and `lifeos.js`.
 
 API-key lookup per provider, in order: OS keyring (`service: "lifeos"`, account: `"anthropic" | "openai" | "gemini"`) via the `keyring` crate, then env var fallback (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY`). Either path is sufficient; both missing surfaces the calm error to the UI. HTTP uses `reqwest` with `rustls-tls` (no `openssl-sys` C build).
 
@@ -215,14 +215,14 @@ pinia.use(tauriPersistence({ storeId: "lifeos", keys: LIFEOS_PERSIST_KEYS }));
 app.use(pinia);
 ```
 
-The Rust side (`src-tauri/src/lib.rs`) exposes two commands plus a shared `state_file(name)` helper so future state slices reuse the same path:
+The Rust side (`src-tauri/src/lib.rs`) exposes two stable commands backed by the canonical PostgreSQL projection table:
 
 | Command | Purpose |
 |---|---|
-| `ui_state_read() -> Result<String, String>` | Reads `<app_data_dir>/ui-state.json`; returns `"{}"` when the file doesn't exist yet. |
-| `ui_state_write(state) -> Result<(), String>` | Overwrites `<app_data_dir>/ui-state.json` with the serialised slice. |
+| `ui_state_read() -> Result<String, String>` | Reads `lifeos_runtime.projection` key `ui-state`; returns `"{}"` when absent. |
+| `ui_state_write(state) -> Result<(), String>` | Validates and atomically writes the serialised slice to `lifeos_runtime.projection`. |
 
-`lights_state_read` / `lights_state_write` route through the same helper, now pointing at `lighting.json`.
+`lights_state_read` / `lights_state_write` use the same PostgreSQL projection boundary under key `lighting-state`. Legacy `ui-state.json`, `lighting.json`, and `ai.json` sources are captured as raw PostgreSQL blobs and retired only after their import transaction commits.
 
 Persisted keys (whitelist in `LIFEOS_PERSIST_KEYS`): `activeId`, `wsCollapsed`, `sectionByWs`, `aiAvatarHidden`, `aiChatOpen`, `avatarPos`, `aiProvider`, `teamOrder`, `sectionOrder`, `itemOrder`. Transient (`aiMessages`), URL-driven (`activeSub`, `pendingExpand`), and ephemeral UI (`cmdkOpen`, `cmdkSeed`, `extraItems`, `extraSections`) are intentionally excluded — `aiMessages` would replay stale chat, the URL surfaces re-derive `activeSub`/`pendingExpand` on every nav, and `cmdkOpen` is a transient overlay. Writes are debounced (default 300ms) so rapid mutations coalesce into a single disk hit.
 

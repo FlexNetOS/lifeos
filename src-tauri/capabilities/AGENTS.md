@@ -15,7 +15,7 @@ Tauri 2 capability definitions — the explicit allowlist of plugin permissions 
 
 ### Working In This Directory
 - Adding a new plugin (e.g. `tauri-plugin-clipboard`) means adding both its crate to `../Cargo.toml` AND its permissions to this file's `permissions` array. Without the permission, the IPC silently fails.
-- `fs:default` is intentionally broad; the *real* path restriction lives in `../src/lib.rs` — every file write builds its path off `app.path().app_data_dir()`. Do not loosen this with `fs:allow-read-text-file` or `fs:allow-write-text-file` without a documented reason.
+- `fs:default` is intentionally broad; durable product state belongs in PostgreSQL/RuVector. App-data paths in `../src/lib.rs` are read only for controlled legacy import, never a frontend-controlled or newly-created product-state write surface. Do not loosen this with `fs:allow-read-text-file` or `fs:allow-write-text-file` without a documented reason.
 - Schema validation against `../gen/schemas/desktop-schema.json` happens at build time. If you see a build error about an unknown permission, the schema may be stale — run `bun run tauri:build` (from the repo root) once to regenerate it.
 
 ### Verification

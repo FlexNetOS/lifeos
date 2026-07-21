@@ -4,10 +4,10 @@
 //! `AuthState` session container live in `lifeos_core::auth`. This file owns
 //! the five `#[tauri::command]` wrappers that the Vue layer invokes.
 //!
-//! Storage backend: `lifeos_core::storage::accounts` (SQLite via `Storage`
-//! managed in `lib.rs::run()`). The JSON-at-rest helpers (`account.json`) have
-//! been retired; one-time migration from any pre-existing `account.json` is
-//! handled automatically during startup by `Storage::setup` in `lib.rs`.
+//! Storage backend: `lifeos_core::storage::accounts` (canonical
+//! PostgreSQL/RuVector via `Storage` managed in `lib.rs::run()`). The legacy
+//! JSON-at-rest helper (`account.json`) is imported transactionally at startup
+//! and retired only after its exact source bytes are captured in PostgreSQL.
 //!
 //! Tauri command public surfaces (`auth_status` / `auth_signup` / `auth_signin`
 //! / `auth_signout` / `auth_reset_vault`) are unchanged from the frontend's

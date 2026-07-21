@@ -1,9 +1,9 @@
 // LifeOS — Pinia persistence plugin (JS sibling for browser preview).
 // Surface MUST match src/lib/persistence.ts — store-sync parity is enforced.
 //
-// Reads `<app_data_dir>/ui-state.json` on store activation and merges only the
-// whitelisted keys into `$patch`. Subscribes to `$state` changes and debounce-
-// writes the same whitelisted slice back via `ui_state_write`. Outside Tauri
+// Reads the canonical PostgreSQL `ui-state` projection on store activation and
+// merges only the whitelisted keys into `$patch`. Subscribes to `$state` changes
+// and debounce-writes the same whitelisted slice via `ui_state_write`. Outside Tauri
 // (plain Vite dev / Vitest, where `window.__TAURI__?.core?.invoke` is missing)
 // the plugin no-ops — no read, no subscribe, no console noise — so the existing
 // 93-test suite stays green.
@@ -39,7 +39,7 @@ export function tauriPersistence(opts) {
     let hydrating = true;
     let writeTimer = null;
 
-    // Hydrate first — merge whitelisted keys from disk into the live store.
+    // Hydrate first — merge whitelisted keys from PostgreSQL into the live store.
     invoke("ui_state_read")
       .then((raw) => {
         const text = typeof raw === "string" ? raw : "";

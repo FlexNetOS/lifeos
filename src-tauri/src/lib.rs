@@ -8,7 +8,7 @@ mod auth;
 // Portable types live in lifeos-core (Stage 1b). The Tauri shell re-uses them
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
-use lifeos_core::storage::{DbHealth, MigrateReport, Storage};
+use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
@@ -35,56 +35,45 @@ fn open_settings(window: tauri::Window) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 
-// ---------- State file persistence ----------
-// Generic helper for any named JSON blob under <app_data_dir>. The frontend owns
-// each slice's schema; this layer stays schema-agnostic so additive UI changes
-// don't require a Rust rebuild. Used by lights_state_* and ui_state_*.
+// ---------- Durable projection persistence ----------
+// The frontend owns each slice's schema, while PostgreSQL/RuVector remains the
+// one canonical durable product-data boundary. These command names intentionally
+// remain stable for the existing Vue persistence and lighting stores.
 
-fn state_file(app: &tauri::AppHandle, name: &str) -> Result<std::path::PathBuf, String> {
-    let dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("app_data_dir: {e}"))?;
-    std::fs::create_dir_all(&dir).map_err(|e| format!("create_dir_all: {e}"))?;
-    Ok(dir.join(name))
-}
-
-fn read_state_file(app: &tauri::AppHandle, name: &str) -> Result<String, String> {
-    let path = state_file(app, name)?;
-    match std::fs::read_to_string(&path) {
-        Ok(s) => Ok(s),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(String::from("{}")),
-        Err(e) => Err(format!("read {}: {e}", path.display())),
-    }
-}
-
-fn write_state_file(app: &tauri::AppHandle, name: &str, state: String) -> Result<(), String> {
-    let path = state_file(app, name)?;
-    std::fs::write(&path, state).map_err(|e| format!("write {}: {e}", path.display()))
+#[tauri::command]
+async fn lights_state_read(storage: tauri::State<'_, Storage>) -> Result<String, String> {
+    state::read(storage.pool(), "lighting-state")
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-fn lights_state_read(app: tauri::AppHandle) -> Result<String, String> {
-    read_state_file(&app, "lighting.json")
+async fn lights_state_write(
+    storage: tauri::State<'_, Storage>,
+    state: String,
+) -> Result<(), String> {
+    state::write(storage.pool(), "lighting-state", &state)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-fn lights_state_write(app: tauri::AppHandle, state: String) -> Result<(), String> {
-    write_state_file(&app, "lighting.json", state)
+async fn ui_state_read(storage: tauri::State<'_, Storage>) -> Result<String, String> {
+    state::read(storage.pool(), "ui-state")
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-fn ui_state_read(app: tauri::AppHandle) -> Result<String, String> {
-    read_state_file(&app, "ui-state.json")
-}
-
-#[tauri::command]
-fn ui_state_write(app: tauri::AppHandle, state: String) -> Result<(), String> {
-    write_state_file(&app, "ui-state.json", state)
+async fn ui_state_write(storage: tauri::State<'_, Storage>, state: String) -> Result<(), String> {
+    state::write(storage.pool(), "ui-state", &state)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 // ---------- AI provider routing ----------
-// Reads `<app_data_dir>/ai.json` for `{ "provider": "claude" | "openai" | "gemini" }`.
+// Reads the canonical `lifeos_runtime.projection` row `ai-provider` for
+// `{ "provider": "claude" | "openai" | "gemini" }`.
 // Each provider's API key is fetched from the OS keyring first (service: "lifeos",
 // account: "anthropic" | "openai" | "gemini"), with env-var fallback for headless or
 // keyring-less environments. The user-facing error message stays calm regardless of
@@ -92,32 +81,17 @@ fn ui_state_write(app: tauri::AppHandle, state: String) -> Result<(), String> {
 
 const AI_ERROR_MSG: &str = "LifeOS couldn't reach the AI provider right now — try again.";
 
-fn ai_file(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
-    let dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("app_data_dir: {e}"))?;
-    std::fs::create_dir_all(&dir).map_err(|e| format!("create_dir_all: {e}"))?;
-    Ok(dir.join("ai.json"))
-}
-
-fn read_provider(app: &tauri::AppHandle) -> AiProvider {
-    let path = match ai_file(app) {
-        Ok(p) => p,
-        Err(_) => return AiProvider::default_provider(),
-    };
-    let raw = match std::fs::read_to_string(&path) {
-        Ok(s) => s,
-        Err(_) => return AiProvider::default_provider(),
-    };
-    let val: serde_json::Value = match serde_json::from_str(&raw) {
-        Ok(v) => v,
-        Err(_) => return AiProvider::default_provider(),
-    };
-    val.get("provider")
+async fn read_provider(storage: &Storage) -> Result<AiProvider, String> {
+    let raw = state::read(storage.pool(), "ai-provider")
+        .await
+        .map_err(|e| e.to_string())?;
+    let val: serde_json::Value = serde_json::from_str(&raw)
+        .map_err(|e| format!("invalid persisted AI-provider projection: {e}"))?;
+    Ok(val
+        .get("provider")
         .and_then(|v| v.as_str())
         .and_then(AiProvider::from_str)
-        .unwrap_or_else(AiProvider::default_provider)
+        .unwrap_or_else(AiProvider::default_provider))
 }
 
 // Pull a secret from the OS keyring (service "lifeos") then fall back to an env var.
@@ -222,12 +196,14 @@ async fn call_gemini(prompt: &str) -> Result<String, String> {
 
 #[tauri::command]
 async fn ai_complete(
-    app: tauri::AppHandle,
+    storage: tauri::State<'_, Storage>,
     prompt: String,
     source: String,
 ) -> Result<String, String> {
     let _ = source; // reserved for future per-surface routing (chat / open-pencil / lights)
-    let provider = read_provider(&app);
+    let provider = read_provider(&storage)
+        .await
+        .map_err(|_| AI_ERROR_MSG.to_string())?;
     match provider {
         AiProvider::Openai => call_openai(&prompt).await,
         AiProvider::Gemini => call_gemini(&prompt).await,
@@ -237,17 +213,21 @@ async fn ai_complete(
 }
 
 #[tauri::command]
-fn ai_provider_get(app: tauri::AppHandle) -> String {
-    read_provider(&app).as_str().to_string()
+async fn ai_provider_get(storage: tauri::State<'_, Storage>) -> Result<String, String> {
+    Ok(read_provider(&storage).await?.as_str().to_string())
 }
 
 #[tauri::command]
-fn ai_provider_set(app: tauri::AppHandle, provider: String) -> Result<(), String> {
+async fn ai_provider_set(
+    storage: tauri::State<'_, Storage>,
+    provider: String,
+) -> Result<(), String> {
     let parsed = AiProvider::from_str(&provider)
         .ok_or_else(|| format!("unsupported provider: {provider}"))?;
-    let path = ai_file(&app)?;
     let payload = serde_json::json!({ "provider": parsed.as_str() }).to_string();
-    std::fs::write(&path, payload).map_err(|e| format!("write {}: {e}", path.display()))
+    state::write(storage.pool(), "ai-provider", &payload)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 // ---------- App version ----------
@@ -428,25 +408,41 @@ pub fn run() {
                     .path()
                     .app_data_dir()
                     .map_err(|e| format!("app_data_dir: {e}"))?;
-                std::fs::create_dir_all(&app_data_dir)
-                    .map_err(|e| format!("create_dir_all: {e}"))?;
-
-                let db_path = app_data_dir.join("lifeos.db");
-                let db_url = format!("sqlite:{}?mode=rwc", db_path.display());
-
                 let storage = tauri::async_runtime::block_on(async {
-                    let s = Storage::new(&db_url).await.map_err(|e| e.to_string())?;
+                    let s = Storage::from_runtime_env()
+                        .await
+                        .map_err(|e| e.to_string())?;
                     s.migrate().await.map_err(|e| e.to_string())?;
+                    s.verify_required_extensions()
+                        .await
+                        .map_err(|e| e.to_string())?;
+                    for (file_name, projection_key) in [
+                        ("ui-state.json", "ui-state"),
+                        ("lighting.json", "lighting-state"),
+                        ("ai.json", "ai-provider"),
+                    ] {
+                        state::migrate_from_json_file(
+                            s.pool(),
+                            &app_data_dir,
+                            file_name,
+                            projection_key,
+                        )
+                        .await
+                        .map_err(|e| e.to_string())?;
+                    }
                     lifeos_core::storage::accounts::migrate_from_json(s.pool(), &app_data_dir)
                         .await
                         .map_err(|e| e.to_string())?;
+                    lifeos_core::storage::legacy_sqlite::migrate_from_sqlite(
+                        s.pool(),
+                        &app_data_dir.join("lifeos.db"),
+                    )
+                    .await
+                    .map_err(|e| e.to_string())?;
                     Ok::<Storage, String>(s)
                 })
                 .map_err(|e| {
-                    format!(
-                        "LifeOS couldn't initialize storage at {} — see logs. ({e})",
-                        db_path.display()
-                    )
+                    format!("LifeOS couldn't initialize canonical PostgreSQL/RuVector storage — see logs. ({e})")
                 })?;
 
                 app.manage(storage);

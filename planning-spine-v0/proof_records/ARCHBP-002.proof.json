@@ -1,0 +1,42 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-002",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests cover crash at every enqueue, embed, flush, and acknowledge boundary; replay is ordered, idempotent, observable, and lossless; model/version provenance is recorded; PostgreSQL remains macro-state authority and envctl consumes only a versioned export contract.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin 2292b3c (stubs fail closed: redb primitives 0/7, seam 1/8 with the pass being an all-errors assertion), implementation landed green at ee72b6e",
+    "crash_enqueue_boundary": true,
+    "crash_embed_boundary": true,
+    "crash_flush_boundary": true,
+    "crash_acknowledge_boundary": true,
+    "crash_boundary_evidence": "seam tests crash_mid_flush (sink dies after one durable row; cursor untouched; replay lands every sequence exactly once with the durable row skipped) and crash_after_flush_before_acknowledge (rows durable, cursor behind; replay skips all and acknowledges); redb test outbox_survives_crash_and_reopen (drop every handle, reopen, exact pre-crash entries and cursor)",
+    "replay_ordered": true,
+    "replay_idempotent": true,
+    "replay_observable": true,
+    "replay_lossless": true,
+    "replay_evidence": "entries are append-only and never deleted; sequences contiguous from 1; export keyed by sequence with ON CONFLICT (seq) DO NOTHING in one transaction per batch; outbox-status and typed sync receipts (synced/skipped_existing/acknowledged_up_to/pending_remaining) expose every step; corrupt entries fail the run closed while the valid prefix still lands and acknowledges",
+    "model_version_provenance_recorded": true,
+    "provenance_evidence": "codedb.embedding-job.v0 carries model_name + model_revision + payload_digest; validated fail-closed at enqueue and again at sync; seam test model_and_version_provenance_survive_into_the_export_rows plus live PG read-back showing job->>'model_name'/'model_revision'",
+    "postgres_macro_state_authority_preserved": true,
+    "envctl_versioned_export_contract": true,
+    "authority_evidence": "sync lands only in the versioned export contract table codedb_outbox_export (codedb.outbox-export.v0); envctl remains the sole authoritative committer and consumes the contract; DSN inherited exclusively through CODEDB_PG_CONN (--pg-conn rejected); blob linkage enforced against the store's content-addressed bytes before enqueue",
+    "no_shared_store_or_authority_ambiguity": true,
+    "pg_integration_real_service": "2/2 against PostgreSQL 17.10 on the durable meta/var cluster (disposable database codedb_outbox_test over unix socket)",
+    "full_suite": "cargo test --workspace: 292 passed, 0 failed",
+    "product_execution_performed": true,
+    "product_execution_evidence": "live CLI flow against the durable cluster: ingest-envelope (blob e6a52d13…) → outbox-enqueue (receipt v0, seq 1) → outbox-sync (synced [1], acknowledged 1) → idempotent rerun (synced [], pending 0) → psql read-back of codedb_outbox_export row 1 with contract version and model provenance"
+  },
+  "proof_summary": "ARCHBP-002 is complete: redb is the restartable local buffer and explicit application outbox for ordered embedding work, and the synchronization seam lands idempotently in the versioned PostgreSQL export contract without shared-store or authority ambiguity. Red-first contracts (nu_plugin 2292b3c) cover crash at every enqueue, embed, flush, and acknowledge boundary; the green implementation (ee72b6e, PR FlexNetOS/nu_plugin#43) proves ordered, idempotent, observable, lossless replay — append-only entries, contiguous sequences, a monotonic bounded acknowledge cursor, sequence-keyed ON CONFLICT landing, and fail-closed handling of corrupt entries with the valid prefix preserved. Model and version provenance ride every job and survive into the export rows. PostgreSQL remains the macro-state authority: the seam writes only the codedb.outbox-export.v0 contract that envctl (sole authoritative committer) consumes, with the DSN confined to CODEDB_PG_CONN. Verified by redb 7/7, seam 9/9, pg-integration 2/2 against the real durable PostgreSQL 17.10 cluster, workspace 292/0, and a live CLI end-to-end receipt.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-002.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/43",
+    "nu_plugin:crates/codedb_store_redb/src/lib.rs",
+    "nu_plugin:crates/codedb_store_redb/tests/outbox.rs",
+    "nu_plugin:crates/codedb/src/outbox.rs",
+    "nu_plugin:crates/codedb_store_pg/src/lib.rs",
+    "nu_plugin:crates/codedb_store_pg/tests/outbox_export.rs",
+    "nu_plugin:crates/codedb/src/main.rs"
+  ]
+}

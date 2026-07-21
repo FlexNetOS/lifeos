@@ -226,6 +226,7 @@
     "DECIDE-005",
     "DECIDE-006",
     "ARCHBP-001",
+    "ARCHBP-002",
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
@@ -237,21 +238,20 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 296,
+  "ledger_entry_count": 297,
   "lifecycle_counts": {
     "blocked": 28,
-    "complete": 200,
+    "complete": 201,
     "draft": 0,
-    "ready": 16,
+    "ready": 15,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "b04e21d1d0ab25c27a9f7833c940bef1db466080cd290b1bb809a38a63d4fa57",
+  "proof_ledger_sha256": "ad3392f2f3cff352a76267d4698b369aa0f118f34638a642d33ad38bc8231e94",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
-    "ARCHBP-002",
     "ARCHBP-007",
     "ARCHBP-011",
     "ARCHBP-018",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "d688b03f8ff828340c19449a6d63d31e19a56ddd72b56144dad800929c956028",
+  "source_graph_sha256": "97ddb436b8a4464ec103a3aee4d0c868d25aa72a8a2cdadfbba516bc0c5f14b1",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -7908,11 +7908,11 @@
     },
     {
       "effective": {
-        "next_action": "Begin after ARCHBP-001 proves exact native ingestion.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-002.proof.json; next child task: ARCHBP-003.",
         "proof_uri": "proof_records/ARCHBP-002.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-001",
         "STORE-001"
@@ -7920,22 +7920,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 297,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "079eb82dc3e4a4e1057bb14434567e4a1c807923e025bb27ff70aa395103a395",
+        "status": "pass"
       },
       "source": {
         "next_action": "Begin after ARCHBP-001 proves exact native ingestion.",
         "proof_uri": "proof_records/ARCHBP-002.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 199,
       "task_id": "ARCHBP-002",
       "title": "Implement the redb outbox and PostgreSQL RuVector synchronization seam",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Begin after ARCHBP-001 proves exact native ingestion.",
+          "to": "Proof accepted from proof_records/ARCHBP-002.proof.json; next child task: ARCHBP-003."
+        }
+      }
     },
     {
       "effective": {
@@ -9624,6 +9631,7 @@
     "DECIDE-005",
     "DECIDE-006",
     "ARCHBP-001",
+    "ARCHBP-002",
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",

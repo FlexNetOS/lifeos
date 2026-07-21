@@ -84,6 +84,7 @@ onBeforeUnmount(() => {
     >
       <div
         class="notif-drawer"
+        data-figma-reference="5:49#temporary-panels"
         role="dialog"
         aria-modal="false"
         aria-labelledby="notif-title"

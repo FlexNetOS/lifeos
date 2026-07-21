@@ -10,11 +10,13 @@ import { createRouter, createMemoryHistory } from "vue-router";
 import { axe } from "vitest-axe";
 
 import Sidebar from "@/components/Sidebar.vue";
+import Workspace from "@/components/Workspace.vue";
 import AIAvatar from "@/components/AIAvatar.vue";
 import TelemetryWidget from "@/components/TelemetryWidget.vue";
 import Badge from "@/components/Badge.vue";
 import Icon from "@/components/Icon.vue";
 import MenuRow from "@/components/MenuRow.vue";
+import { useLifeos } from "@/stores/lifeos.js";
 
 // Real router via createMemoryHistory — components such as Sidebar use Vue
 // Router's Symbol injection, which stubs alone do not satisfy.
@@ -52,9 +54,35 @@ describe("Sidebar", () => {
   });
 
   it("has no a11y violations when collapsed", async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useLifeos().toggleWs();
     const w = mount(Sidebar, {
-      ...globalOpts(),
-      props: { data: window.LIFEOS_DATA ?? {}, collapsed: true },
+      global: {
+        plugins: [pinia, makeRouter()],
+        stubs: { RouterView: { template: '<div />' }, Teleport: true },
+      },
+    });
+    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+  });
+});
+
+// — Workspace ———————————————————————————————————————————————
+describe("Workspace", () => {
+  it("has no a11y violations when expanded", async () => {
+    const w = mount(Workspace, globalOpts());
+    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+  });
+
+  it("has no a11y violations when collapsed", async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useLifeos().toggleWs();
+    const w = mount(Workspace, {
+      global: {
+        plugins: [pinia, makeRouter()],
+        stubs: { RouterView: { template: '<div />' }, Teleport: true },
+      },
     });
     expect(await axe(w.element, axeOptions)).toHaveNoViolations();
   });

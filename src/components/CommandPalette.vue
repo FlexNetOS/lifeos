@@ -172,21 +172,24 @@ const onOverlayMousedown = (e) => {
          aria-modal="true"
          aria-label="Command palette"
          @mousedown="onOverlayMousedown">
-      <div class="cmdk-panel">
+      <div class="cmdk-panel" data-figma-reference="5:49#command-menu">
         <div class="cmdk-input-wrap">
           <Icon name="search" :size="16" />
           <input ref="inputRef"
                  v-model="q"
                  type="text"
                  placeholder="Jump to workspace · section · item · team…"
+                 role="combobox"
                  aria-label="Search LifeOS"
+                 aria-autocomplete="list"
+                 aria-expanded="true"
                  aria-controls="cmdk-results"
-                 :aria-activedescendant="`cmdk-row-${active}`"
+                 :aria-activedescendant="results.length ? `cmdk-row-${active}` : undefined"
                  @keydown="onKey" />
           <kbd class="kbd">ESC</kbd>
         </div>
-        <div ref="listRef" id="cmdk-results" class="cmdk-results" role="listbox">
-          <div v-if="results.length === 0" class="cmdk-empty">
+        <div ref="listRef" id="cmdk-results" class="cmdk-results" role="listbox" aria-label="Command results">
+          <div v-if="results.length === 0" class="cmdk-empty" role="option" aria-disabled="true">
             <Icon name="sparkles" :size="14" /> No matches. Try a workspace, section, or team name.
           </div>
           <button v-for="(r, i) in results"

@@ -12,28 +12,14 @@
     ]
   },
   "lifecycle_event": "planning-spine:verify",
-  "observed_at": "2026-07-20T16:10:21.304Z",
+  "observed_at": "2026-07-20T21:51:44.427Z",
   "performed_checks": [
     "required_docs_exist",
     "vision_artifact_catalog_matches_exact_bytes",
     "vision_navigation_links_resolve",
     "nu_plugin_task_table_handoff_is_complete_deterministic_and_review_only",
-    "agent_navigation_graph_is_current_connected_and_queryable",
-    "navigation_outputs_satisfy_declared_schemas",
-    "notebooklm_blueprint_is_hash_bound_and_cross_referenced",
-    "schemas_define_required_fields",
-    "task_schema_requires_execution_constraints",
-    "cell_schema_requires_pre_execution_snapshot",
-    "examples_satisfy_schemas",
-    "readme_preserves_scope_boundaries",
-    "task_example_preserves_proof_constraints",
-    "simulation_report_emits_constraint_updates",
-    "mvp_bundle_manifest_exists",
-    "mvp_bundle_preserves_scope_boundaries",
-    "mvp_bundle_resolves_canonical_examples",
-    "mvp_bundle_cross_object_integrity",
-    "mvp_bundle_verifier_authority_integrity"
+    "agent_navigation_graph_is_current_connected_and_queryable"
   ],
-  "result": "pass",
-  "message": "planning-spine-v0 verification passed"
+  "result": "fail",
+  "message": "planning-spine-v0 verification failed: Agent navigation graph drifted: navigation/generated/navigation_graph.json is stale; navigation/generated/navigation_index.json is stale; navigation/generated/navigation.validation_report.json is stale"
 }

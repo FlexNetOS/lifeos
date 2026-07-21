@@ -37,7 +37,14 @@ not the only copy of the architecture source.
 Machine receipts live in [receipts.json](./receipts.json). The
 [section inventory](./section_inventory.json) assigns every source line to one
 contiguous section with its own digest; it supplements rather than replaces the
-full-file digest.
+full-file digest. The
+[atomic requirement crosswalk](./anchor_atomic_requirement_crosswalk.json)
+partitions all 6,340 lines into 1,646 contiguous units and assigns 1,194 stable,
+exact-provenance requirement IDs, including all 548 component-integration rows.
+Its [CSV projection](./anchor_atomic_requirement_crosswalk.csv) carries the same
+requirement-to-implementation fields for tabular review. Optional and
+alternative language remains mandatory unless a later owner record explicitly
+approves a Tier-B session toggle.
 
 Original immutable inputs were read from:
 
@@ -72,10 +79,12 @@ inventory):
    conduct, framework choices, safety, and installed-runtime ownership.
 2. These exact-byte anchors govern the desired PostgreSQL/RuVector topology,
    ownership direction, operational round trips, and required build scope.
-3. Canonical Planning Spine task inputs, maintained authority contracts, and
-   accepted proof history govern execution state.
-4. Legacy `.handoff` content is migration evidence only.
-5. Generated navigation and status files are reproducible projections only.
+3. Owner-ratified decisions and maintained implementation contracts govern
+   reconciled implementation choices.
+4. Canonical task, claim, proof-ledger, and source records govern execution and
+   evidence state. Legacy `.handoff` content is migration evidence only.
+5. Generated indexes, graphs, reports, navigation, and status files are
+   reproducible projections only.
 
 Checked implementation and executable proof still determine whether an anchor
 requirement is implemented. A polished anchor statement cannot make an absent
@@ -103,6 +112,14 @@ runtime current; an implementation gap becomes a named task and release gate.
 - [Anchor claim/task crosswalk](./anchor_claim_task_crosswalk.csv) maps the
   complete section/diagram requirement groups to canonical task and proof
   state.
+- [Atomic requirement crosswalk](./anchor_atomic_requirement_crosswalk.json)
+  gives every substantive anchor block an exact source range, digest,
+  repository/component assignment, state, task, dependencies, contracts,
+  tests, proof artifacts, conflict handling, and evidence-backed status.
+- [Source contract receipts](./source_contract_receipts.json) inventory the
+  active first-party repositories, worktrees, and applicable operating,
+  architecture, build, security, testing, release, contribution, Planning
+  Spine, and proof-ledger documents with hashes and dispositions.
 - [Conflict ledger](./anchor_conflict_ledger.csv) records every discovered
   contract or current-state conflict and its controlling resolution.
 - [Blueprint compatibility](../ARCHITECTURE_BLUEPRINT_COMPATIBILITY.md) retains
@@ -116,6 +133,7 @@ runtime current; an implementation gap becomes a named task and release gate.
 
 ```bash
 bun run planning-spine:anchors:check
+bun run planning-spine:anchor-crosswalk:check
 bun run planning-spine:consolidation:check
 bun run planning-spine:navigation:check
 bun run planning-spine:verify

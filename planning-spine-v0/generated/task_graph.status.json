@@ -221,6 +221,7 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
+    "ARCHBP-037",
     "ARCHBP-038",
     "ARCHBP-039",
     "ARCHBP-040",
@@ -234,18 +235,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 302,
+  "ledger_entry_count": 303,
   "lifecycle_counts": {
     "blocked": 19,
-    "complete": 206,
+    "complete": 207,
     "draft": 0,
-    "ready": 19,
+    "ready": 18,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "4ae24b1d39f5c60b78f0acdd1671ad473c567640b4ebf94e7078840c470ccbe6",
+  "proof_ledger_sha256": "a66d6bb0796fa471f063782932db0b50380523480219053016f4e3e89939c330",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -264,7 +265,6 @@
     "ARCHBP-031",
     "ARCHBP-032",
     "ARCHBP-034",
-    "ARCHBP-037",
     "ARCHBP-044",
     "ARCHBP-046"
   ],
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "64153004f976141df247d72e7784c546a5068229f0683ba33a3c36cbc6c65eea",
+  "source_graph_sha256": "3a03f4e79d4d36a0c678fc895941fcf9190fbf588c2ad44bcfe0ef29c6f32ebb",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -9038,11 +9038,11 @@
     },
     {
       "effective": {
-        "next_action": "Write the failing CI/local parity, clock, timezone, path, repeated-run, and genuine-source-change tests before changing the generator.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-037.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-037.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-033",
         "ARCHBP-036"
@@ -9050,22 +9050,29 @@
       "phase": "13-foundation-gap-closure",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 303,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "c8cd19f9ffe846311afb2010192527c867d3dc25ab61b27b44d3bdca0c432890",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write the failing CI/local parity, clock, timezone, path, repeated-run, and genuine-source-change tests before changing the generator.",
         "proof_uri": "proof_records/ARCHBP-037.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 234,
       "task_id": "ARCHBP-037",
       "title": "Make navigation generation byte-deterministic across local and CI environments",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write the failing CI/local parity, clock, timezone, path, repeated-run, and genuine-source-change tests before changing the generator.",
+          "to": "Proof accepted from proof_records/ARCHBP-037.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -9670,6 +9677,7 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
+    "ARCHBP-037",
     "ARCHBP-038",
     "ARCHBP-039",
     "ARCHBP-040",

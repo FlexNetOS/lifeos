@@ -3,7 +3,6 @@
     "LPS-029",
     "ARCHBP-005",
     "ARCHBP-006",
-    "ARCHBP-017",
     "ARCHBP-025",
     "ARCHBP-043",
     "ARCHBP-047",
@@ -216,6 +215,7 @@
     "ARCHBP-013",
     "ARCHBP-014",
     "ARCHBP-015",
+    "ARCHBP-016",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",
@@ -242,10 +242,10 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 321,
+  "ledger_entry_count": 322,
   "lifecycle_counts": {
-    "blocked": 8,
-    "complete": 225,
+    "blocked": 7,
+    "complete": 226,
     "draft": 0,
     "ready": 11,
     "rolled-back": 0,
@@ -253,12 +253,12 @@
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "da2247522fbc14b78648197e7421c4c990e01c813aa38b19743643727d35ddbe",
+  "proof_ledger_sha256": "3f3e5529f97e06c1e0aab638d5f2b137b43161a84219db5f5affbdd172223c59",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-004",
     "ARCHBP-010",
-    "ARCHBP-016",
+    "ARCHBP-017",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "1a84663b03f68a71418941bfce0c4eb21c9b12241d444282152ac754a8430369",
+  "source_graph_sha256": "a58d028bddeb0e17135bae5aaaf52e3467d232003bd681b9bd37f79cab7e4d7c",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8409,41 +8409,48 @@
     },
     {
       "effective": {
-        "next_action": "Record the algorithm decision and write failing tamper, reorder, replay, and partial-write tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-016.proof.json; next child task: ARCHBP-017.",
         "proof_uri": "proof_records/ARCHBP-016.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-015"
       ],
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 322,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "84e1f09c6d9d4410ee7b158416ce3dcbe8acb94fee21aa83a66bf67313bc00a2",
+        "status": "pass"
       },
       "source": {
         "next_action": "Record the algorithm decision and write failing tamper, reorder, replay, and partial-write tests.",
         "proof_uri": "proof_records/ARCHBP-016.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 213,
       "task_id": "ARCHBP-016",
       "title": "Implement witness-chain anti-bluffing receipts",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Record the algorithm decision and write failing tamper, reorder, replay, and partial-write tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-016.proof.json; next child task: ARCHBP-017."
+        }
+      }
     },
     {
       "effective": {
         "next_action": "Define the evidence-bound causal schema and failing forgery, staleness, contradiction, and authorization tests.",
         "proof_uri": "proof_records/ARCHBP-017.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "ready",
       "parent_ids": [
         "ARCHBP-003",
         "ARCHBP-016"
@@ -8460,7 +8467,7 @@
       "source": {
         "next_action": "Define the evidence-bound causal schema and failing forgery, staleness, contradiction, and authorization tests.",
         "proof_uri": "proof_records/ARCHBP-017.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
       "source_row_number": 214,
       "task_id": "ARCHBP-017",
@@ -9809,6 +9816,7 @@
     "ARCHBP-013",
     "ARCHBP-014",
     "ARCHBP-015",
+    "ARCHBP-016",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",

@@ -40,6 +40,22 @@ for (const token of manifest.observed_design_tokens.colors) {
   requireValue(tokens.includes(token.lifeos_token), `LifeOS token is absent: ${token.lifeos_token}`);
 }
 
+requireValue(
+  manifest.observed_design_tokens.colors.length >= 13,
+  "observed color tokens must cover all thirteen page-00 swatches"
+);
+
+const documentPages = manifest.connector_receipt.document_pages;
+requireValue(Array.isArray(documentPages) && documentPages.length >= 7, "document_pages must enumerate the live seven-page inventory");
+if (Array.isArray(documentPages)) {
+  for (const page of documentPages) {
+    requireValue(
+      typeof page.node_id === "string" && /^\d+:\d+$/.test(page.node_id) && typeof page.name === "string" && page.name.length > 0,
+      `document_pages entry must carry a node id and name: ${JSON.stringify(page)}`
+    );
+  }
+}
+
 if (failures.length) {
   console.error("Figma Sidebar Companion contract failed:");
   for (const failure of failures) console.error(`- ${failure}`);
@@ -54,6 +70,7 @@ console.log(
       node_id: manifest.design_input.node_id,
       component_mappings: manifest.component_mappings.length,
       token_mappings: manifest.observed_design_tokens.colors.length,
+      document_pages: manifest.connector_receipt.document_pages.length,
       code_connect: manifest.connector_receipt.code_connect.status,
       screenshot_authority: "disabled"
     },

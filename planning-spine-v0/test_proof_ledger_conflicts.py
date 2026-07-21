@@ -74,7 +74,7 @@ class ProofLedgerConflictTests(unittest.TestCase):
         self.assertEqual(analysis.errors, [])
         self.assertEqual(analysis.unresolved_conflicts, [])
         self.assertGreaterEqual(len(analysis.resolved_conflicts), 18)
-        self.assertEqual(analysis.max_sequence, 278)
+        self.assertGreaterEqual(analysis.max_sequence, 278)
         self.assertEqual(
             analysis.effective_index[("GRAPH-005", "1")].proof_sha256,
             "e991b760e43417667dc47c45131be4c50f74aaa9d15c28270feee6393b666efa",

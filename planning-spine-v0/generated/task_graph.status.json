@@ -18,7 +18,6 @@
     "ARCHBP-025",
     "ARCHBP-034",
     "ARCHBP-037",
-    "ARCHBP-042",
     "ARCHBP-043",
     "ARCHBP-045",
     "ARCHBP-046",
@@ -226,6 +225,7 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
+    "ARCHBP-039",
     "ARCHBP-040",
     "ARCHBP-041"
   ],
@@ -235,10 +235,10 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 298,
+  "ledger_entry_count": 299,
   "lifecycle_counts": {
-    "blocked": 24,
-    "complete": 202,
+    "blocked": 23,
+    "complete": 203,
     "draft": 0,
     "ready": 18,
     "rolled-back": 0,
@@ -246,7 +246,7 @@
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "4053b846e5cb1aa42ea9586b2610b34177c37d04e64fd420f7c5903f39638f78",
+  "proof_ledger_sha256": "b5a5e56c3b3af2fa06305abb3e35c8732415877b88e59c2c75eec18a37e8935e",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -265,7 +265,7 @@
     "ARCHBP-031",
     "ARCHBP-032",
     "ARCHBP-038",
-    "ARCHBP-039",
+    "ARCHBP-042",
     "ARCHBP-044"
   ],
   "result": "pass",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "e3495cbabbdfd6d250b181842829e8f6e15f2129726018d345d22be21dd3ef88",
+  "source_graph_sha256": "b74de4d2050afbb4d370efd402c6b652142f60299950c151737e9dfa81966bd7",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -9100,33 +9100,40 @@
     },
     {
       "effective": {
-        "next_action": "After ARCHBP-002 defines the outbox seam, write failing single-opener, atomic-publication, replay, and stale-reader tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-039.proof.json; next child task: ARCHBP-042.",
         "proof_uri": "proof_records/ARCHBP-039.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-002"
       ],
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 299,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "fe2289d481ba94c3f83132482ec091659b999e762bd7105c4c16cac72b656fae",
+        "status": "pass"
       },
       "source": {
         "next_action": "After ARCHBP-002 defines the outbox seam, write failing single-opener, atomic-publication, replay, and stale-reader tests.",
         "proof_uri": "proof_records/ARCHBP-039.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 236,
       "task_id": "ARCHBP-039",
       "title": "Build the single-owner redb service and atomic mmap live projection",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After ARCHBP-002 defines the outbox seam, write failing single-opener, atomic-publication, replay, and stale-reader tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-039.proof.json; next child task: ARCHBP-042."
+        }
+      }
     },
     {
       "effective": {
@@ -9213,9 +9220,9 @@
       "effective": {
         "next_action": "After the owner and envelope seams pass, write failing privilege-bypass, crash-boundary, idempotency, acknowledgement-order, and return-projection tests.",
         "proof_uri": "proof_records/ARCHBP-042.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "ready",
       "parent_ids": [
         "ARCHBP-039",
         "ARCHBP-041"
@@ -9232,7 +9239,7 @@
       "source": {
         "next_action": "After the owner and envelope seams pass, write failing privilege-bypass, crash-boundary, idempotency, acknowledgement-order, and return-projection tests.",
         "proof_uri": "proof_records/ARCHBP-042.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
       "source_row_number": 239,
       "task_id": "ARCHBP-042",
@@ -9642,6 +9649,7 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
+    "ARCHBP-039",
     "ARCHBP-040",
     "ARCHBP-041"
   ]

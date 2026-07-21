@@ -1,0 +1,42 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-039",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove single-opener denial, authenticated/versioned UDS requests, monotonic local_seq, inactive-slot write/fsync/checksum/atomic flip, matching ordered events, reconnect gaps, crash replay, spool preservation, corruption fallback, and benchmarked commit-to-render latency without data loss.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin 648729d (stub service fails closed, 0/8), implementation green at b7440c1 (8/8)",
+    "single_opener_denial": true,
+    "single_opener_evidence": "in-process ownership registry plus redb's own handle arbitration deny a second OwnerService over the same root; clean shutdown releases ownership and the root reopens",
+    "authenticated_versioned_uds": true,
+    "uds_evidence": "flexnetos.redb-owner.v0 protocol over a Unix-domain socket; wrong token and wrong protocol version fail closed without consuming sequences; the token file is owner-only (0600)",
+    "monotonic_local_seq": true,
+    "atomic_projection_publication": true,
+    "projection_evidence": "per commit: inactive-slot write → fsync → atomic pointer rename flip; generations alternate slots a/b; the pointer witnesses the previous generation's slot/seq/checksum",
+    "ordered_events_matching_commits": true,
+    "reconnect_gap_detection": true,
+    "events_evidence": "append-only fsynced spool of {seq, slot, checksum}; read_events(after_seq) returns exactly the gap; sequences complete and ordered",
+    "crash_replay": true,
+    "crash_evidence": "injected publication crash after the redb commit leaves the pointer lagging; restart detects db_seq > pointer_seq and republishes before serving; the lost commit's event is appended on replay",
+    "spool_preservation": true,
+    "corruption_fallback": true,
+    "corruption_evidence": "flipping one byte in the active slot fails its witnessed checksum; the mmap reader falls back to the previous generation with degraded=true — visible, never silent",
+    "latency_benchmarked_without_assumed_claim": true,
+    "latency_evidence": "30 raw commit-to-read microsecond samples at logs/redb-owner-latency/samples.json; sanity-bounded only, no sub-millisecond claim assumed per the anchor's R-ledger",
+    "no_second_opener_no_http_no_pg_polling": true,
+    "deadlock_fix": "genuine defect found red-first: shutdown relied on a connect-to-unblock hack that deadlocked once the socket path was unlinked; the accept loop now polls nonblocking with a stop flag",
+    "full_suite": "cargo test --workspace: 284 passed, 0 failed (owner 8/8)",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the supervised flexnetos-redb-owner binary serves a real UDS with real redb persistence, real mmap reads, and real fsynced generations in every test; latency samples are measured against the running service"
+  },
+  "proof_summary": "ARCHBP-039 is complete: flexnetos-redb-owner gives one supervised service the only writable redb handle, versioned token-authenticated Unix-domain mutation/query commands, and atomically published checksummed read-only mmap projection generations with ordered commit notifications. Red-first contracts (nu_plugin 648729d) cover single-opener denial, auth/version rejection without sequence consumption, contiguous monotonic local_seq, inactive-slot write/fsync/atomic-flip publication, ordered gap-detectable events, crash replay via pointer-lag detection, spool preservation, previous-generation corruption fallback (visibly degraded), and raw commit-to-read latency samples with no assumed sub-millisecond claim. The green implementation (b7440c1, PR FlexNetOS/nu_plugin#45) also fixed a genuine shutdown deadlock surfaced by the tests. Workspace 284/0.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-039.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/45",
+    "nu_plugin:crates/flexnetos_redb_owner/src/lib.rs",
+    "nu_plugin:crates/flexnetos_redb_owner/src/main.rs",
+    "nu_plugin:crates/flexnetos_redb_owner/tests/owner.rs",
+    "nu_plugin:logs/redb-owner-latency/samples.json"
+  ]
+}

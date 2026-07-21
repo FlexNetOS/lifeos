@@ -196,7 +196,7 @@ const railEntry = computed(() => {
 </script>
 
 <template>
-  <section v-if="lifeos.wsCollapsed" class="workspace mini" :aria-label="`${ws?.title} quick access`">
+  <section v-if="lifeos.wsCollapsed" class="workspace mini" data-figma-reference="5:49#detail-panel" :aria-label="`${ws?.title} quick access`">
     <button class="mini-id" :title="`Open ${ws?.title}`" :aria-label="`Open ${ws?.title}`" @click="lifeos.toggleWs">
       <Icon :name="railEntry?.icon || 'layers'" :size="16" />
     </button>
@@ -232,7 +232,7 @@ const railEntry = computed(() => {
     </button>
   </section>
 
-  <section v-else class="workspace" :data-workspace="lifeos.activeId" :aria-label="`${ws?.title || 'Workspace'} panel`">
+  <section v-else class="workspace" data-figma-reference="5:49#detail-panel" :data-workspace="lifeos.activeId" :aria-label="`${ws?.title || 'Workspace'} panel`">
     <header class="ws-head">
       <div class="ws-selector" ref="selRef">
         <button :class="['ws-selector-trigger', { open }]"

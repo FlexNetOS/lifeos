@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <aside class="rail">
+  <aside class="rail" data-figma-reference="5:49#icon-rail">
     <button :class="['rail-brand', { collapsed: lifeos.wsCollapsed }]"
             :title="lifeos.wsCollapsed ? 'Open LifeOS workspace panel' : 'Close LifeOS workspace panel'"
             aria-label="Toggle LifeOS workspace panel"

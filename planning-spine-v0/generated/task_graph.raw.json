@@ -4554,7 +4554,7 @@
         "execution_cell": "swarm-scale-cell",
         "verification_gate": "The harness publishes raw samples and exact hardware/software identities; runs 1, 8, 16, 32, and at least 50 agents when capacity permits; exercises overload and recovery; reports confidence intervals and honest limits; no architecture claim exceeds measured evidence.",
         "rollback_plan": "Stop the load cell, remove task-created state, restore resource limits, and retain raw failure samples and capacity findings.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "proof_records/ARCHBP-010.proof.json",
         "next_action": "Define the workload, resource budgets, failure cases, and red acceptance thresholds."
       }
@@ -4642,7 +4642,7 @@
         "execution_cell": "ruflo-coordination-cell",
         "verification_gate": "Red tests prove authority-preserving dispatch, idempotent retry, cancellation, timeout, budget exhaustion, partial failure recovery, agent identity binding, and append-only proof emission; only the canonical task graph can authorize work.",
         "rollback_plan": "Stop dispatch, cancel task-scoped agents, restore the prior coordinator adapter, replay durable events to the last acknowledged point, and leave task status unpromoted.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-014.proof.json",
         "next_action": "Verify the Ruflo API and write failing authority, retry, cancellation, budget, and recovery tests."
       }
@@ -4664,7 +4664,7 @@
         "execution_cell": "mincut-defense-cell",
         "verification_gate": "Red tests cover compromised, noisy, partitioned, and healthy swarms; every cut has reproducible evidence and bounded blast radius; false positives and recovery are measured; complexity wording matches benchmark and primary implementation.",
         "rollback_plan": "Disable automatic isolation, restore the prior graph, reattach only receipt-identified healthy edges after review, and retain attack and false-positive evidence.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "proof_records/ARCHBP-015.proof.json",
         "next_action": "Build the attack corpus and write failing isolation, false-positive, recovery, and complexity tests."
       }

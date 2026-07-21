@@ -234,6 +234,48 @@ describe("planning-spine agent navigation", () => {
     expect(rows).toEqual([{ id: "A-1", title: "A, title", body: 'line 1\nline "2"' }]);
   });
 
+  it("keeps the verifier's runtime report byte-stable across invocation shapes, timezones, and repeats (ARCHBP-037)", () => {
+    // Reproduces the PR 61/62 local-pass / CI-stale cascade: the committed
+    // runtime report must encode ONE deterministic environment contract, so
+    // running the verifier via `bun run planning-spine:verify`, directly via
+    // `bun scripts/verify-planning-spine.mjs`, from another timezone, or
+    // twice in a row must not change a single committed byte — while a real
+    // source change must still produce detectable drift.
+    const { execFileSync } = require("node:child_process");
+    const reportPath = path.join(repoRoot, "planning-spine-v0/state/verification_runtime_report.json");
+    const runVerify = (envOverrides) => {
+      execFileSync(process.execPath, ["scripts/verify-planning-spine.mjs"], {
+        cwd: repoRoot,
+        env: {
+          ...process.env,
+          SOURCE_DATE_EPOCH: "1784592000",
+          ...envOverrides,
+        },
+        stdio: "pipe",
+      });
+      return fs.readFileSync(reportPath, "utf8");
+    };
+
+    const viaLifecycle = runVerify({ npm_lifecycle_event: "planning-spine:verify" });
+    const direct = runVerify({ npm_lifecycle_event: undefined });
+    expect(direct).toBe(viaLifecycle);
+
+    const otherTimezone = runVerify({ TZ: "Asia/Tokyo", npm_lifecycle_event: undefined });
+    expect(otherTimezone).toBe(viaLifecycle);
+
+    const repeat = runVerify({ npm_lifecycle_event: "planning-spine:verify" });
+    expect(repeat).toBe(viaLifecycle);
+
+    // The environment contract carries no machine-specific absolute paths:
+    // a nix store executable path in the report re-stales navigation on
+    // every other machine.
+    const report = JSON.parse(viaLifecycle);
+    expect(report.executable.includes("/nix/store/")).toBe(false);
+    for (const arg of report.runtime.argv) {
+      expect(path.isAbsolute(arg)).toBe(false);
+    }
+  }, 240000);
+
   it("distinguishes YAML frontmatter from imported Markdown separators", () => {
     expect(parseFrontmatter("---\nid: valid.frontmatter\ntags:\n  - navigation\n---\n# Title\n")).toEqual({
       id: "valid.frontmatter",

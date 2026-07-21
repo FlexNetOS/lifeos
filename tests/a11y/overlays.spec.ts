@@ -4,7 +4,7 @@
 // Run: bun run test:a11y
 
 import { describe, it, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { axe } from "vitest-axe";
@@ -13,6 +13,7 @@ import CommandPalette from "@/components/CommandPalette.vue";
 import KeyboardHelp from "@/components/KeyboardHelp.vue";
 import NotificationsDrawer from "@/components/NotificationsDrawer.vue";
 import ToastContainer from "@/components/ToastContainer.vue";
+import { useLifeos } from "@/stores/lifeos.js";
 
 // Real router via createMemoryHistory — overlays such as CommandPalette use
 // Vue Router's Symbol injection, which stubs alone do not satisfy.
@@ -49,10 +50,14 @@ describe("CommandPalette", () => {
   });
 
   it("has no a11y violations when open", async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useLifeos().openCmdk("");
     const w = mount(CommandPalette, {
-      ...globalOpts(),
-      props: { open: true },
+      global: { plugins: [pinia, makeRouter()], stubs: { Teleport: true } },
     });
+    await flushPromises();
+    expect(w.find("[data-figma-reference='5:49#command-menu']").exists()).toBe(true);
     expect(await axe(w.element, axeOptions)).toHaveNoViolations();
   });
 });
@@ -90,13 +95,14 @@ describe("NotificationsDrawer", () => {
   });
 
   it("has no a11y violations when open", async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useLifeos().openNotificationsDrawer();
     const w = mount(NotificationsDrawer, {
-      ...globalOpts(),
-      props: {
-        open: true,
-        notifications: window.LIFEOS_DATA?.notifications ?? [],
-      },
+      global: { plugins: [pinia, makeRouter()], stubs: { Teleport: true } },
     });
+    await flushPromises();
+    expect(w.find("[data-figma-reference='5:49#temporary-panels']").exists()).toBe(true);
     expect(await axe(w.element, axeOptions)).toHaveNoViolations();
   });
 });

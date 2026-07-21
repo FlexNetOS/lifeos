@@ -76,12 +76,29 @@ function sectionInventory(anchor, bytes) {
   const lines = text.split("\n");
   if (lines.at(-1) === "") lines.pop();
   const headings = [];
+  let fence = null;
   lines.forEach((line, index) => {
+    const fenceMatch = /^\s*(`{3,}|~{3,})/.exec(line);
+    if (fence) {
+      if (
+        fenceMatch &&
+        fenceMatch[1][0] === fence.character &&
+        fenceMatch[1].length >= fence.length
+      ) {
+        fence = null;
+      }
+      return;
+    }
+    if (fenceMatch) {
+      fence = { character: fenceMatch[1][0], length: fenceMatch[1].length };
+      return;
+    }
     const match = /^(#{1,6})\s+(.+)$/.exec(line);
     if (match) {
       headings.push({ level: match[1].length, title: match[2], start_line: index + 1 });
     }
   });
+  if (fence) throw new Error(`${anchor.id} has an unterminated Markdown code fence`);
 
   const starts = headings.map((heading) => heading.start_line);
   if (starts[0] !== 1) starts.unshift(1);

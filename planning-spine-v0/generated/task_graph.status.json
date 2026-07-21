@@ -226,6 +226,7 @@
     "DECIDE-004",
     "DECIDE-005",
     "DECIDE-006",
+    "ARCHBP-001",
     "ARCHBP-035"
   ],
   "draft_task_ids": [],
@@ -234,21 +235,20 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 292,
+  "ledger_entry_count": 293,
   "lifecycle_counts": {
     "blocked": 29,
-    "complete": 196,
+    "complete": 197,
     "draft": 0,
-    "ready": 19,
+    "ready": 18,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "f563fe49d0244c2413894b80189d8bdb6635df9c310e448c25f70faede5cc032",
+  "proof_ledger_sha256": "dec7fec53643b8f80a8cb80ee3730865dcdb9757b578466d157d73f7fa031405",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
-    "ARCHBP-001",
     "ARCHBP-007",
     "ARCHBP-011",
     "ARCHBP-018",
@@ -7865,11 +7865,11 @@
     },
     {
       "effective": {
-        "next_action": "Write the bounded ingestion fixtures and failing protocol, provenance, and deduplication tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-001.proof.json; next child task: ARCHBP-002.",
         "proof_uri": "proof_records/ARCHBP-001.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "NBVERIFY-003",
         "POSTGRES-004"
@@ -7877,11 +7877,11 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 293,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "781d7b66d0389178ca98d73eb44bf1d8cf78d49f748532f806d124eb85cb6bb6",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write the bounded ingestion fixtures and failing protocol, provenance, and deduplication tests.",
@@ -7891,8 +7891,20 @@
       "source_row_number": 198,
       "task_id": "ARCHBP-001",
       "title": "Build the native Nushell code-ingestion pipeline",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action",
+        "status"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write the bounded ingestion fixtures and failing protocol, provenance, and deduplication tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-001.proof.json; next child task: ARCHBP-002."
+        },
+        "status": {
+          "from": "ready",
+          "to": "complete"
+        }
+      }
     },
     {
       "effective": {
@@ -9575,6 +9587,7 @@
     "DECIDE-004",
     "DECIDE-005",
     "DECIDE-006",
+    "ARCHBP-001",
     "ARCHBP-035"
   ]
 }

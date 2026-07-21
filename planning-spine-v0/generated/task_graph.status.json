@@ -220,6 +220,7 @@
     "ARCHBP-002",
     "ARCHBP-019",
     "ARCHBP-027",
+    "ARCHBP-029",
     "ARCHBP-032",
     "ARCHBP-033",
     "ARCHBP-034",
@@ -239,18 +240,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 307,
+  "ledger_entry_count": 308,
   "lifecycle_counts": {
     "blocked": 19,
-    "complete": 211,
+    "complete": 212,
     "draft": 0,
-    "ready": 14,
+    "ready": 13,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "24a73be506e82bb335d83d2b7c78580102d1e7b09dd958722756601bf6c0b2d9",
+  "proof_ledger_sha256": "c3e761ccfea7292d6b42172fd5c457d3a010d797512f0846d35e83e39399480d",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -262,7 +263,6 @@
     "ARCHBP-024",
     "ARCHBP-026",
     "ARCHBP-028",
-    "ARCHBP-029",
     "ARCHBP-030",
     "ARCHBP-031",
     "ARCHBP-044",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "2384985d8c11a55b816082459146d58bdc0d6baa9aab4498d4e59e5fc3ae190b",
+  "source_graph_sha256": "77bf66df33295a7a4ea715b21a2c646f7a29bda218bc2e3f30afb32504c9b876",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8765,11 +8765,11 @@
     },
     {
       "effective": {
-        "next_action": "Prepare the option matrix and request the bounded owner decision.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-029.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-029.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "FOUNDATION-001",
         "RELEASE-002"
@@ -8777,22 +8777,29 @@
       "phase": "13-foundation-gap-closure",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 308,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "bdcea40ff334a3d4babf58f16224a755becb5cf167612feef3a5f668f85f0c0d",
+        "status": "pass"
       },
       "source": {
         "next_action": "Prepare the option matrix and request the bounded owner decision.",
         "proof_uri": "proof_records/ARCHBP-029.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 226,
       "task_id": "ARCHBP-029",
       "title": "Decide Rust toolchain bundling versus build-only provenance",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Prepare the option matrix and request the bounded owner decision.",
+          "to": "Proof accepted from proof_records/ARCHBP-029.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -9704,6 +9711,7 @@
     "ARCHBP-002",
     "ARCHBP-019",
     "ARCHBP-027",
+    "ARCHBP-029",
     "ARCHBP-032",
     "ARCHBP-033",
     "ARCHBP-034",

@@ -1,11 +1,12 @@
 {
   "schema_version": "lifeos.figma-sidebar-connection.v1",
   "design_input": {
-    "url": "https://www.figma.com/design/z7aJ8uZrOsvfnWlsApN0Bu/Sidebar-Design-System-Companion?node-id=0-1&m=de",
+    "url": "https://www.figma.com/design/z7aJ8uZrOsvfnWlsApN0Bu/Sidebar-Design-System-Companion?node-id=0-1&m=dev",
     "file_key": "z7aJ8uZrOsvfnWlsApN0Bu",
     "node_id": "0:1",
     "node_name": "00 — Overview + Tokens",
-    "inspected_at": "2026-07-20",
+    "inspected_at": "2026-07-21",
+    "inspection_note": "Inspected live through the Figma MCP connector as David Revenaugh (Pro tier). node_id 0:1 remains the canonical token entry page; the document now spans 7 pages (see connector_receipt.document_pages). The MCP top-level page listing enumerates only page 0:1, so the remaining pages were inspected via their node-specific URLs.",
     "authority": "Figma is a controlled design input. DESIGN.md, the LifeOS Design System, and checked-in implementation contracts remain implementation authority."
   },
   "connector_receipt": {
@@ -33,11 +34,16 @@
         "kind": "frame"
       }
     ],
-    "declared_pages": [
-      "00 — Overview + Tokens",
-      "01 — Components + Sidebar Spec",
-      "02 — Responsive + Handoff"
+    "document_pages": [
+      { "node_id": "0:1", "name": "00 — Overview + Tokens", "kind": "canvas", "role": "Design tokens, overview, file map, and the command-spine mental model." },
+      { "node_id": "5:25", "name": "01 — Components + Sidebar Spec", "kind": "canvas", "role": "Rail-button and detail-item component specs with states; 1440x900 expanded command-spine mockup; rail/active/command annotations." },
+      { "node_id": "166:2", "name": "01 — LifeOS Brand", "kind": "canvas", "role": "Canonical brand masters (lockups, wordmark, marks, triads), production usage, repository handoff mapping table, and purge notice." },
+      { "node_id": "181:2", "name": "02 — LifeOS Product Identity", "kind": "canvas", "role": "Brand architecture, product identity, ElementArk endorsement, navigation triad (work=cyan/personal=purple/home=green), usage documentation, repository export mapping, product-context proofs, and audit-evidence table." },
+      { "node_id": "5:26", "name": "LifeOS / Screens", "kind": "canvas", "role": "Full application screen matrix (very large working canvas)." },
+      { "node_id": "142:5950", "name": "LifeOS / Archive", "kind": "canvas", "role": "Archived LifeOS screens retained for history." },
+      { "node_id": "119:1925", "name": "Archive — Non-LifeOS Screens", "kind": "canvas", "role": "Archived non-LifeOS screens retained for history." }
     ],
+    "document_pages_note": "The Figma file's own 'File map' frame (node 5:37) still describes an aspirational three-page structure ('00 — Overview + Tokens', '01 — Components + Sidebar Spec', '02 — Responsive + Handoff'). The live document instead carries the seven pages above; '02 — Responsive + Handoff' was never built and '02 — LifeOS Product Identity' stands in its place. Recorded as an observation only; the Figma file is not edited from this repository.",
     "component_variants": {
       "status": "not_exposed_by_current_connector_seat",
       "reason": "Published component and variant inventory requires a Figma Dev or Full seat on an Organization or Enterprise plan.",
@@ -52,6 +58,7 @@
     "variables": {
       "status": "not_exposed_for_canvas_selection",
       "receipt": "Figma Debug UUID f30ece5e-1534-45d6-97cd-82d730cd1357",
+      "live_check_2026_07_21": "get_variable_defs on nodes 0:1 and 5:27 returned no bound variables. The companion documents tokens with local paint/text styles carrying a 'Sidebar Companion' prefix (see the 'Core tokens' caption), not bound Figma variables.",
       "disposition": "No Figma variable is copied into source or treated as runtime authority."
     }
   },
@@ -66,13 +73,15 @@
       { "figma_name": "Icon rail", "figma_value": "#09090B", "lifeos_token": "--surface-sidebar", "lifeos_value": "var(--bg-0) / #0A0A0A", "relationship": "semantic rail equivalent" },
       { "figma_name": "Detail panel", "figma_value": "#0C0C0F", "lifeos_token": "--surface-panel", "lifeos_value": "var(--bg-1) / #121212", "relationship": "semantic panel equivalent" },
       { "figma_name": "Elevated surface", "figma_value": "#111116", "lifeos_token": "--bg-1", "lifeos_value": "#121212", "relationship": "nearest elevated surface" },
+      { "figma_name": "Hover", "figma_value": "#18181B", "lifeos_token": "--bg-3", "lifeos_value": "#232323", "relationship": "semantic hover surface; LifeOS elevates to --bg-3 (--surface-card-hover) on hover while the companion darkens — LifeOS token authoritative" },
       { "figma_name": "Active tint", "figma_value": "#0F1D31", "lifeos_token": "--tint-cyan-soft", "lifeos_value": "rgba(0,212,255,.10)", "relationship": "semantic active tint" },
       { "figma_name": "Text primary", "figma_value": "#F4F4F5", "lifeos_token": "--fg-1", "lifeos_value": "#ECEDEE", "relationship": "semantic primary text" },
       { "figma_name": "Text muted", "figma_value": "#71717A", "lifeos_token": "--fg-3", "lifeos_value": "#9BA1A6", "relationship": "LifeOS readability token takes precedence" },
       { "figma_name": "Accent blue", "figma_value": "#60A5FA", "lifeos_token": "--lifeos-cyan", "lifeos_value": "#00D4FF", "relationship": "LifeOS brand-primary authority divergence" },
       { "figma_name": "Success", "figma_value": "#22C55E", "lifeos_token": "--status-ok", "lifeos_value": "var(--lifeos-green) / #00E676", "relationship": "semantic success equivalent" },
       { "figma_name": "Warning", "figma_value": "#F59E0B", "lifeos_token": "--status-warn", "lifeos_value": "#FFB020", "relationship": "semantic warning equivalent" },
-      { "figma_name": "Danger", "figma_value": "#EF4444", "lifeos_token": "--status-err", "lifeos_value": "#FF4D6A", "relationship": "semantic danger equivalent" }
+      { "figma_name": "Danger", "figma_value": "#EF4444", "lifeos_token": "--status-err", "lifeos_value": "#FF4D6A", "relationship": "semantic danger equivalent" },
+      { "figma_name": "Border", "figma_value": "#2A2A32", "lifeos_token": "--bg-4", "lifeos_value": "#2A2A2A", "relationship": "nearest border token (near-identical); LifeOS --bg-4 (--border-default) authoritative", "swatch_anomaly": "The Border swatch fill in the Figma file reads #69E438 (a green — a file-side glitch); the documented hex label #2A2A32 matches every card border and is the intended value recorded here." }
     ],
     "spacing_and_shape": {
       "figma_card_radius": "24px",
@@ -89,6 +98,7 @@
     {
       "figma_concept": "Command spine / Icon rail",
       "declared_page": "01 — Components + Sidebar Spec",
+      "figma_reference": { "page_node_id": "5:25", "node_id": "5:154", "node_name": "Icon Rail / persistent 64px", "spec_nodes": "Rail button component specs 5:108–5:128 (Default/Hover/Active/Disabled/Alert)" },
       "source": "src/components/Sidebar.vue",
       "component": "Sidebar",
       "source_anchor": "Sidebar Companion/Icon rail",
@@ -99,6 +109,7 @@
     {
       "figma_concept": "Command spine / Detail panel",
       "declared_page": "01 — Components + Sidebar Spec",
+      "figma_reference": { "page_node_id": "5:25", "node_id": "5:176", "node_name": "Detail Sidebar / expanded 320px" },
       "source": "src/components/Workspace.vue",
       "component": "Workspace",
       "source_anchor": "Sidebar Companion/Detail panel",
@@ -109,6 +120,7 @@
     {
       "figma_concept": "Reusable component / Menu row",
       "declared_page": "01 — Components + Sidebar Spec",
+      "figma_reference": { "page_node_id": "5:25", "node_id": "5:130", "node_name": "Component Spec / Sidebar Detail Item / Default", "spec_nodes": "Detail item states 5:130–5:147 (Default/Hover/Active/Disabled/With badge); live items 5:191–5:224" },
       "source": "src/components/MenuRow.vue",
       "component": "MenuRow",
       "source_anchor": "Sidebar Companion/Menu row",
@@ -124,6 +136,29 @@
     "Update only the mapped Vue components and their interactive/a11y tests.",
     "Run bun run figma:sidebar:check, bun run test:a11y, bun run test, and the visual/structural regression test.",
     "If a qualified Figma seat becomes available, create and verify official Code Connect mappings for exact component nodes, then update code_connect status and receipts."
+  ],
+  "refresh_log": [
+    {
+      "date": "2026-07-21",
+      "connector": "Figma MCP (remote), authenticated David Revenaugh, Pro tier",
+      "changes": [
+        "Corrected the truncated design_input.url mode flag (m=de -> m=dev).",
+        "Enumerated the live seven-page document inventory (connector_receipt.document_pages) via node-specific URLs, replacing the aspirational three-page declared_pages.",
+        "Reconciled observed colors to the full thirteen page-00 swatches, adding Hover (#18181B) and Border (#2A2A32) and recording the Border swatch-fill glitch.",
+        "Enriched the three command-spine component mappings with their page-01 (5:25) reference nodes.",
+        "Recorded the live get_variable_defs check (no bound Figma variables; local 'Sidebar Companion' paint/text styles instead).",
+        "Held Code Connect at seat_gated (Pro tier); no official Code Connect mapping is possible without an Org/Enterprise Dev seat."
+      ]
+    }
+  ],
+  "declared_pages": [
+    "00 — Overview + Tokens",
+    "01 — Components + Sidebar Spec",
+    "01 — LifeOS Brand",
+    "02 — LifeOS Product Identity",
+    "LifeOS / Screens",
+    "LifeOS / Archive",
+    "Archive — Non-LifeOS Screens"
   ],
   "authority_guards": {
     "no_stale_screenshot_authority": true,

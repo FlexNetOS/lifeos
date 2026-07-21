@@ -1,0 +1,32 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-019",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Every candidate is source-identity and digest bound; target ISA, host ABI, POSIX/filesystem/process support, hardware-switch status, release maturity, and portability relevance are evidenced; absence or mismatch is recorded honestly.",
+  "gate_result": {
+    "evidence_document": "planning-spine-v0/1.0_VISION/current_state/ARCHBP-019-ruvnet-vm-verification.md (merged to lifeos main at bc0c7d9, PR #78)",
+    "evidence_document_sha256": "3ca87bb9b2fb7763220c92c4fcc2b136aa224dc4b9c715501e34f3f63e20b3c8",
+    "source_identity_and_digest_bound": true,
+    "identity_evidence": "doc §3: ruvnet/rvm identity-bound at HEAD af97d18f29d5704f2fbbeecccce192d712bb9a80; ruvnet/RuVector at f3de1724 with crates/{ruvix,rvm} path commits; crates.io ruvix-*/rvf-runtime bound by sha256 digests; npm @metaharness/host-rvm bound by shasum",
+    "target_isa_evidenced": true,
+    "host_abi_evidenced": true,
+    "posix_fs_process_support_evidenced": true,
+    "hardware_switch_status_evidenced": true,
+    "release_maturity_evidenced": true,
+    "capability_evidence": "doc §5 re-checks all four FOUNDATION_ECOSYSTEM_MAP §5.3 grounds at both upstream HEADs: target remains aarch64-unknown-none, the 8/13-call WASM ABI carries no POSIX/filesystem/exec surface, the hardware switch remains stubbed/false, and zero binary release assets exist",
+    "portability_relevance_evidenced": true,
+    "absence_and_mismatch_recorded_honestly": true,
+    "honesty_evidence": "doc §7 records the negative evidence for ruvnet/optimizer (404) verbatim, flags inference explicitly in §8, and leaves the §5.3 architecture disposition standing with the integration plan unchanged",
+    "reproducible_probe_plan": "doc §2 records probes P1–P9 as a reproducible read-only method (GitHub REST, crates.io API, npm registry; nothing installed, built, or executed)",
+    "method_read_only": true,
+    "product_execution_performed": true,
+    "product_execution_evidence": "the research executed authenticated registry and repository queries against the live upstream sources and recorded raw receipts; this proof binds the merged document by its exact SHA-256"
+  },
+  "proof_summary": "ARCHBP-019 is complete: the newer upstream ruvnet VM reference is verified and identity-bound in the merged evidence document ARCHBP-019-ruvnet-vm-verification.md (sha256 3ca87bb9…, lifeos main bc0c7d9 / PR #78). Every candidate is source-identity and digest bound — ruvnet/rvm at af97d18f, ruvnet/RuVector at f3de1724, crates.io artifacts by sha256, npm by shasum — and the capability matrix re-evidences target ISA (aarch64-unknown-none), the 8/13-call WASM host ABI with no POSIX/filesystem/process surface, the stubbed hardware switch, and zero-release maturity at both upstream HEADs, leaving the FOUNDATION_ECOSYSTEM_MAP §5.3 disposition standing. Absences and mismatches (ruvnet/optimizer 404) are recorded honestly with inference flagged, and the read-only probe plan P1–P9 makes the verification reproducible. This proof binds the gate clauses to the document's sections and exact digest.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-019.proof.json",
+    "planning-spine-v0/1.0_VISION/current_state/ARCHBP-019-ruvnet-vm-verification.md"
+  ]
+}

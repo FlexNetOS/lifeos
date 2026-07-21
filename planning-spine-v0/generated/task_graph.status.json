@@ -219,6 +219,7 @@
     "ARCHBP-001",
     "ARCHBP-002",
     "ARCHBP-033",
+    "ARCHBP-034",
     "ARCHBP-035",
     "ARCHBP-036",
     "ARCHBP-037",
@@ -235,18 +236,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 303,
+  "ledger_entry_count": 304,
   "lifecycle_counts": {
     "blocked": 19,
-    "complete": 207,
+    "complete": 208,
     "draft": 0,
-    "ready": 18,
+    "ready": 17,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "a66d6bb0796fa471f063782932db0b50380523480219053016f4e3e89939c330",
+  "proof_ledger_sha256": "05fe5f2bdd95bfb5f908acb64b2642e5ba826654e633f1f2516d6fd23e24c292",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -264,7 +265,6 @@
     "ARCHBP-030",
     "ARCHBP-031",
     "ARCHBP-032",
-    "ARCHBP-034",
     "ARCHBP-044",
     "ARCHBP-046"
   ],
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "3a03f4e79d4d36a0c678fc895941fcf9190fbf588c2ad44bcfe0ef29c6f32ebb",
+  "source_graph_sha256": "fbd3d7e9deaec2770df155c8fb70a45931e383af907cfa321abfc6bbec638686",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8916,11 +8916,11 @@
     },
     {
       "effective": {
-        "next_action": "Write failing cascade, contradictory-summary, null-identity, ledger-invalidation, and recovery tests before changing projection code.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-034.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-034.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-033",
         "LPS-007",
@@ -8929,22 +8929,29 @@
       "phase": "13-foundation-gap-closure",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 304,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "be0e874dfd34e3e18af1423bcf192e7891a4fd631cb1cfdb65eea2a0ef624a22",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write failing cascade, contradictory-summary, null-identity, ledger-invalidation, and recovery tests before changing projection code.",
         "proof_uri": "proof_records/ARCHBP-034.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 231,
       "task_id": "ARCHBP-034",
       "title": "Reconcile verifier failure state with proof and task status projections",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write failing cascade, contradictory-summary, null-identity, ledger-invalidation, and recovery tests before changing projection code.",
+          "to": "Proof accepted from proof_records/ARCHBP-034.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -9675,6 +9682,7 @@
     "ARCHBP-001",
     "ARCHBP-002",
     "ARCHBP-033",
+    "ARCHBP-034",
     "ARCHBP-035",
     "ARCHBP-036",
     "ARCHBP-037",

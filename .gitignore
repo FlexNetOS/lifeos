@@ -23,8 +23,15 @@ firmware/esp32/target/
 .omc/logs/
 .omc/sessions/
 
-# Claude Code session worktrees — never track agent worktree scaffolding
+# .claude — commit shared agent config; ignore local/session/worktree state.
+# Canonical target: envctl generates .claude from PostgreSQL/RuVector per worktree
+# (blueprint hard rule 14 + §4.7); until then git carries the shared pieces.
+#   Committed (shared, every worktree needs it): settings.json, skills/, rules/, hooks/
+#   Ignored (local / session / machine-specific):
+.claude/settings.local.json
+.claude/projects/
 .claude/worktrees/
+.claude/**/*.local.json
 
 # Editor / OS
 .vscode/*

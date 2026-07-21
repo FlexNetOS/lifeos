@@ -1,0 +1,30 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-011",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests establish deterministic seeded runs, leakage-free datasets, naive baselines, reservoir/readout separation, ensemble outputs, calibrated uncertainty, and explicit non-authority labeling for every timeline.",
+  "gate_result": {
+    "harness_merged": "meta-ruvector main 27b74f4ee 'feat(atas): implement bounded ESN research harness (#117)' — standalone crate atas_harness (empty [workspace] opt-out, zero external dependencies by design: in-crate PRNG/linalg/JSON for hermetic determinism)",
+    "deterministic_seeded_runs": true,
+    "leakage_free_datasets": true,
+    "naive_baselines": true,
+    "reservoir_readout_separation": true,
+    "ensemble_outputs": true,
+    "calibrated_uncertainty": true,
+    "non_authority_labeling": true,
+    "module_evidence": "src/{esn,ensemble,baseline,dataset,schema,rng,linalg,json,atas}.rs: echo-state reservoir, ensembles, naive baselines, leakage-controlled DatasetContract + SeriesDataset, and the future-timeline report schema with ResearchLabel non-authority marking on every timeline; the crate description itself declares ARCHBP-011 and non-authoritative research-only status",
+    "suite_green_live": "cargo test: 14 passed, 0 failed — re-executed this session (2026-07-21) on the FlexNetOS host",
+    "red_first_honesty": "PR #117 was squash-merged as a single commit, so the red→green transition is not independently visible in git history; this proof records the gate through the 14 currently-green gate tests exercising every clause rather than claiming a reconstructed red transcript",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the full harness suite executed live this session with deterministic results"
+  },
+  "proof_summary": "ARCHBP-011 is complete: the ATAS ESN future-timeline research harness exists as the merged standalone atas_harness crate on meta-ruvector main (27b74f4ee, PR #117) and its 14 gate tests — covering deterministic seeded runs, leakage-free dataset contracts, naive baselines, reservoir/readout separation, ensemble outputs, calibrated uncertainty, and explicit non-authority ResearchLabel marking on every timeline — pass live on this host (14/14, re-run 2026-07-21). The crate is hermetically dependency-free by design and self-declares its non-authoritative research-only status. The squash-merge of PR #117 means the red-first transition is not separately visible in history; that is recorded honestly here, with the green gate suite as the standing evidence.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-011.proof.json",
+    "meta-ruvector:atas_harness/src/lib.rs",
+    "meta-ruvector:atas_harness/src/schema.rs",
+    "meta-ruvector:atas_harness/src/dataset.rs"
+  ]
+}

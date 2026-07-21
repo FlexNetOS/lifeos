@@ -218,6 +218,7 @@
     "DECIDE-006",
     "ARCHBP-001",
     "ARCHBP-002",
+    "ARCHBP-011",
     "ARCHBP-019",
     "ARCHBP-026",
     "ARCHBP-027",
@@ -241,23 +242,22 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 309,
+  "ledger_entry_count": 310,
   "lifecycle_counts": {
     "blocked": 19,
-    "complete": 213,
+    "complete": 214,
     "draft": 0,
-    "ready": 12,
+    "ready": 11,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "8db164c24ea4aac4b0bdfb237a759f3b8d43b807cc7673d17f1c8f33762cc24d",
+  "proof_ledger_sha256": "89d9f8d7ba5fc870a16db01822ac62389f1559630e0c2fba57f91cd189a22f91",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
     "ARCHBP-007",
-    "ARCHBP-011",
     "ARCHBP-018",
     "ARCHBP-021",
     "ARCHBP-022",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "608d7d76e09774410e4ba568ffaf18951cc044ca2501904ccc6ddf75e8cd2f7d",
+  "source_graph_sha256": "d78127d4030225b6dc0f54a2dea0e7762cee8e99af271b1dd56a9e775c0a8f1a",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8192,11 +8192,11 @@
     },
     {
       "effective": {
-        "next_action": "Verify primary algorithms and define the leakage-free dataset, naive baselines, and failing forecast tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-011.proof.json; next child task: ARCHBP-012.",
         "proof_uri": "proof_records/ARCHBP-011.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "POSTGRES-005",
         "NBSOURCE-006"
@@ -8204,22 +8204,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 310,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "4a6319a034c5a8c91104e3bbd8a1114900e14d56566d3f7a0eb6962679c5dd7f",
+        "status": "pass"
       },
       "source": {
         "next_action": "Verify primary algorithms and define the leakage-free dataset, naive baselines, and failing forecast tests.",
         "proof_uri": "proof_records/ARCHBP-011.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 208,
       "task_id": "ARCHBP-011",
       "title": "Build the ATAS ESN future-timeline research harness",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Verify primary algorithms and define the leakage-free dataset, naive baselines, and failing forecast tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-011.proof.json; next child task: ARCHBP-012."
+        }
+      }
     },
     {
       "effective": {
@@ -9716,6 +9723,7 @@
     "DECIDE-006",
     "ARCHBP-001",
     "ARCHBP-002",
+    "ARCHBP-011",
     "ARCHBP-019",
     "ARCHBP-026",
     "ARCHBP-027",

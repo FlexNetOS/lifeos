@@ -1,0 +1,39 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-038",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests cover zero-length, binary, invalid UTF-8, sparse, symlink, xattr, model, repository, log, cache, and protected-encrypted-secret fixtures; every original byte and transformation is queryable; export and reconstruction prove explicit byte, structure, metadata, semantic, and provenance equality with zero unclassified loss.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin be6fe14 (stubs fail closed, 0/3), implementation green at 3333763 (3/3)",
+    "gate_fixture_corpus_complete": true,
+    "fixture_evidence": "one corpus exercises all thirteen declared classes: directory, zero_length, text_utf8, binary (NUL bytes), invalid_utf8_text, sparse (real hole via set_len), symlink (including dangling), xattr_file (user.codedb_class), model_weight (.safetensors), repository_object (.git/objects), log, cache, protected_encrypted_secret (.age ciphertext)",
+    "every_byte_queryable": true,
+    "hash_substitution_impossible": true,
+    "byte_evidence": "host_byte_objects stores the real bytes; the suite recomputes sha256(bytes) INSIDE PostgreSQL and matches it against the declared content address, and octet_length(bytes) must equal the declared length — a hash-only substitute cannot satisfy either",
+    "transformations_queryable": true,
+    "metadata_queryable": true,
+    "queryability_evidence": "plain SQL retrieves symlink targets, xattr values (metadata->'xattrs'->>'user.codedb_class'), and sparse size/allocation; declared transformations live in host_import_transformations",
+    "byte_equality": true,
+    "structure_equality": true,
+    "metadata_equality": true,
+    "semantic_equality": true,
+    "provenance_equality": true,
+    "reconstruction_evidence": "reconstruction materializes the session into a fresh tree — sparse holes re-derive via last-nonzero + set_len, xattrs/modes/symlink targets restore exactly, encrypted secrets round-trip as ciphertext — and the receipt proves byte (both trees re-hashed against stored addresses), structure (path sets identical across original/recorded/reconstructed), metadata (classify() re-run on both trees), semantic (classes re-derive identically), and provenance (completed session + tool version + declared transformations) equality with explicit mismatch reporting",
+    "zero_unclassified_loss": true,
+    "fail_closed_evidence": "an unclassifiable object (fifo) aborts the import naming the object, and no completed session exists afterward — loss cannot be silent",
+    "disposable_before_production": "all proofs run against the disposable host_import_test database on the durable cluster; no production data imported",
+    "collation_independence": "entry ordering is byte-sorted in Rust so SQL text collation cannot affect structural comparisons",
+    "full_suite": "host_import 3/3 against real PostgreSQL 17.10; workspace 276 passed / 0 failed; clippy clean",
+    "product_execution_performed": true,
+    "product_execution_evidence": "all three tests run the real importer against the real durable PostgreSQL 17.10 cluster with a real filesystem corpus (real holes, real xattrs, real symlinks) and physically reconstruct and re-verify the tree"
+  },
+  "proof_summary": "ARCHBP-038 is complete: codedb-host-import (nu_plugin PR FlexNetOS/nu_plugin#46, red be6fe14 → green 3333763) imports every declared host data class as original bytes plus typed records into PostgreSQL under a thirteen-class fail-closed registry covering the entire verification-gate corpus. Byte objects are content-addressed real bytes — PostgreSQL itself recomputes the digest over the stored bytes, making hash-only substitution structurally impossible — with modes, symlink targets, xattr maps, and sparseness queryable in plain SQL and session provenance carrying declared transformations. Reconstruction materializes the session into a fresh tree and proves explicit byte, structure, metadata, semantic, and provenance equality with zero unclassified loss; unclassifiable objects abort the import with no completed session. Proven 3/3 against the real durable PostgreSQL 17.10 cluster, workspace 276/0.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-038.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/46",
+    "nu_plugin:crates/codedb_host_import/src/lib.rs",
+    "nu_plugin:crates/codedb_host_import/tests/host_import.rs"
+  ]
+}

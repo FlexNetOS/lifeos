@@ -223,6 +223,7 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
+    "ARCHBP-038",
     "ARCHBP-039",
     "ARCHBP-040",
     "ARCHBP-041",
@@ -234,18 +235,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 300,
+  "ledger_entry_count": 301,
   "lifecycle_counts": {
     "blocked": 21,
-    "complete": 204,
+    "complete": 205,
     "draft": 0,
-    "ready": 19,
+    "ready": 18,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "975e9c8205e0d799cb24008f80772724526fe0d78942eda4c294a051809e1100",
+  "proof_ledger_sha256": "d3c936636afdf6c4ff210b7cefe01571f62868810b5381bee45e0b5ebd1d7586",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -265,7 +266,6 @@
     "ARCHBP-032",
     "ARCHBP-034",
     "ARCHBP-037",
-    "ARCHBP-038",
     "ARCHBP-044"
   ],
   "result": "pass",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "e2dbd9fd240d57f237ece8d668e8d5c892676c4bff80b252e72085652d75f9e8",
+  "source_graph_sha256": "4aa2daac6db64d6e5556a050fe6a438bb133929a0ad4bb73e1b1fd1f8b8a5e4b",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -9069,11 +9069,11 @@
     },
     {
       "effective": {
-        "next_action": "Begin after ARCHBP-001 proves exact ingestion; enumerate the complete data-class corpus and write failing byte/metadata reconstruction tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-038.proof.json; next child task: ARCHBP-045.",
         "proof_uri": "proof_records/ARCHBP-038.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-001",
         "STORE-001"
@@ -9081,22 +9081,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 301,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "3167b0f97da6407bd190b95797bad515e5f97025968a4a26c64509ed8cdbe9d7",
+        "status": "pass"
       },
       "source": {
         "next_action": "Begin after ARCHBP-001 proves exact ingestion; enumerate the complete data-class corpus and write failing byte/metadata reconstruction tests.",
         "proof_uri": "proof_records/ARCHBP-038.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 235,
       "task_id": "ARCHBP-038",
       "title": "Implement byte-complete host ALL-data import and reconstruction",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Begin after ARCHBP-001 proves exact ingestion; enumerate the complete data-class corpus and write failing byte/metadata reconstruction tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-038.proof.json; next child task: ARCHBP-045."
+        }
+      }
     },
     {
       "effective": {
@@ -9656,6 +9663,7 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
+    "ARCHBP-038",
     "ARCHBP-039",
     "ARCHBP-040",
     "ARCHBP-041",

@@ -546,13 +546,21 @@ def gate_lps_006() -> tuple[str, dict, str, list[str], dict]:
         "cell.json": sha256_file("examples/cell.json"),
         "cell.schema.json": sha256_file("schemas/cell.schema.json"),
     }
-    summary = (
-        "Cell schema and example validate; mutation boundaries (allowed_paths/blocked_paths) and a "
-        "promotion gate (verification_gate 'proof gate must pass before success') are explicit. "
-        "However the LPS-006 gate also requires explicit network-denied-by-default, snapshot, and "
-        "rollback boundaries, and none of these are represented in the cell schema, the cell "
-        "example, or 05_HERMETIC_CELL_CONTRACT.md. Gate does not fully hold."
-    )
+    if status == "pass":
+        summary = (
+            "Cell schema and example validate; mutation boundaries (allowed_paths/blocked_paths), a "
+            "promotion gate (verification_gate 'proof gate must pass before success'), and the "
+            "enumerated network-denied-by-default, snapshot, and rollback boundaries are all "
+            "explicitly represented across the cell schema, the cell example, and "
+            "05_HERMETIC_CELL_CONTRACT.md."
+        )
+    else:
+        summary = (
+            "Cell schema and example validate; mutation boundaries (allowed_paths/blocked_paths) and a "
+            "promotion gate (verification_gate 'proof gate must pass before success') are explicit. "
+            "However the LPS-006 gate also requires explicit network-denied-by-default, snapshot, and "
+            f"rollback boundaries, and these are missing: {', '.join(missing)}. Gate does not fully hold."
+        )
     return status, checks, summary, [
         "planning-spine-v0/05_HERMETIC_CELL_CONTRACT.md",
         "planning-spine-v0/examples/cell.json",
@@ -578,7 +586,9 @@ def gate_lps_007() -> tuple[str, dict, str, list[str], dict]:
     checks = {
         "proof_record_schema_validates": _validates("schemas/proof-record.schema.json", "examples/proof-record.json"),
         "result_enum_supports_failed_checks": proof_schema["properties"]["result"]["enum"] == ["pass", "fail"],
-        "ledger_entry_count": len(entries),
+        # The live entry count lives in the status projection; embedding it
+        # here would invalidate this proof the moment the proof is appended.
+        "ledger_populated": bool(entries),
         "append_only_sequence_monotonic": monotonic,
         "every_entry_checksum_backed": all_hashed,
         "executor_verifier_distinct": bool(executor) and bool(verifier) and executor != verifier,
@@ -598,7 +608,7 @@ def gate_lps_007() -> tuple[str, dict, str, list[str], dict]:
     }
     summary = (
         f"Proof-record schema validates with result enum {{pass,fail}} preserving failed checks. The "
-        f"append-only ledger has {len(entries)} monotonically sequenced, SHA-256-backed entries, and "
+        f"append-only ledger's entries are monotonically sequenced and SHA-256-backed, and "
         f"the shipped authority integrity report (result=pass) proves the verifier agent "
         f"({verifier}) is distinct from the executor ({executor}) — proof, not assertion, is the sole "
         f"completion authority."
@@ -699,13 +709,19 @@ def gate_lps_009() -> tuple[str, dict, str, list[str], dict]:
     checks["missing_gate_requirements"] = missing
     status = "pass" if not missing else "blocked"
     checksums = {"08_EXECUTION_GATES.md": sha256_file("08_EXECUTION_GATES.md")}
-    summary = (
-        "08_EXECUTION_GATES.md documents a fail-closed authority/simulation/cell/proof/decision "
-        "transition matrix. But the LPS-009 gate additionally requires (a) the named machine-readable "
-        "schemas/gates.yaml artifact, which does not exist, and (b) an explicit human-approval gate "
-        "for spend, legal, credentials, production, physical action, and irreversible work, which the "
-        "doc does not define. Gate does not fully hold."
-    )
+    if status == "pass":
+        summary = (
+            "08_EXECUTION_GATES.md documents a fail-closed authority/simulation/cell/proof/decision "
+            "transition matrix, the named machine-readable schemas/gates.yaml artifact exists, and "
+            "the doc defines the default-deny human-approval gate for spend, legal, credentials, "
+            "production deployment, physical action, and irreversible work."
+        )
+    else:
+        summary = (
+            "08_EXECUTION_GATES.md documents a fail-closed authority/simulation/cell/proof/decision "
+            f"transition matrix. But the LPS-009 gate is not fully satisfied: {'; '.join(missing)}. "
+            "Gate does not fully hold."
+        )
     return status, checks, summary, [
         "planning-spine-v0/08_EXECUTION_GATES.md",
     ], checksums
@@ -758,15 +774,20 @@ def gate_lps_011(crosswalk: dict) -> tuple[str, dict, str, list[str], dict]:
     }
     status = "pass" if crosswalk["all_questions_have_decision_row"] else "blocked"
     checksums = {"09_OPEN_QUESTIONS.md": sha256_file("09_OPEN_QUESTIONS.md")}
-    summary = (
-        f"Crosswalked all {crosswalk['question_count']} open questions in 09_OPEN_QUESTIONS.md to the "
-        f"task graph. {crosswalk['owned_by_decision_row_count']} have a bounded owning DECISION row. "
-        f"The gate requires every open question to be converted into an owned, gated task-graph "
-        f"decision row; that conversion has not happened, so the gate does not hold. RFC-Q1/RFC-Q2 "
-        f"have related proof-boundary rows (LPS-005, LPS-010) that only preserve the current deferral, "
-        f"and RFC-Q3 (proof-URI addressing) has neither an owning decision row nor a documented "
-        f"deferral rule. Adding decision rows is outside this lane's file ownership."
-    )
+    if status == "pass":
+        summary = (
+            f"Crosswalked all {crosswalk['question_count']} open questions in 09_OPEN_QUESTIONS.md to "
+            f"the task graph; every one is owned by a bounded, gated DECISION row "
+            f"({crosswalk['owned_by_decision_row_count']} of {crosswalk['question_count']})."
+        )
+    else:
+        summary = (
+            f"Crosswalked all {crosswalk['question_count']} open questions in 09_OPEN_QUESTIONS.md to the "
+            f"task graph. {crosswalk['owned_by_decision_row_count']} have a bounded owning DECISION row. "
+            f"The gate requires every open question to be converted into an owned, gated task-graph "
+            f"decision row; that conversion has not happened for "
+            f"{', '.join(q['id'] for q in unowned)}, so the gate does not hold."
+        )
     return status, checks, summary, [
         "planning-spine-v0/09_OPEN_QUESTIONS.md",
         "planning-spine-v0/generated/lps_doc_open_questions_map.json",
@@ -808,6 +829,51 @@ def build_proof(task_id: str, gate_text: str, observed_at: str, status: str, gat
     }
 
 
+def ledger_max_revisions(ledger_path: Path) -> dict[str, int]:
+    """Highest revision the append-only ledger records for each task."""
+    revisions: dict[str, int] = {}
+    if not ledger_path.is_file():
+        return revisions
+    for line in ledger_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        entry = json.loads(line)
+        task_id = entry.get("task_id")
+        try:
+            revision = int(str(entry.get("revision")))
+        except (TypeError, ValueError):
+            continue
+        if isinstance(task_id, str) and task_id:
+            revisions[task_id] = max(revisions.get(task_id, 0), revision)
+    return revisions
+
+
+def write_monotonic_proof(path: Path, proof: dict, ledger_floor: int = 0) -> None:
+    """Write a proof record only when its content changed, bumping the revision.
+
+    Content comparison ignores ``observed_at`` and ``revision`` so re-runs are
+    byte-idempotent; a genuine change bumps monotonically past both the
+    existing file revision and ``ledger_floor`` (the highest revision the
+    append-only ledger already records for this task) so the merger accepts
+    the new record without a same-revision digest conflict.
+    """
+    if path.is_file():
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        volatile = {"observed_at", "revision"}
+        if {k: v for k, v in existing.items() if k not in volatile} == {
+            k: v for k, v in proof.items() if k not in volatile
+        }:
+            return
+        existing_revision = existing.get("revision")
+        floor = ledger_floor
+        if isinstance(existing_revision, int):
+            floor = max(floor, existing_revision)
+        if floor >= 1:
+            proof = {**proof, "revision": floor + 1}
+    write_json(path, proof)
+
+
 def main() -> int:
     observed_at = now_utc()
     rows = load_source_rows()
@@ -837,12 +903,18 @@ def main() -> int:
         "LPS-011": lambda: gate_lps_011(crosswalk),
     }
 
+    ledger_revisions = ledger_max_revisions(PROOF_RECORDS / "proof_ledger.jsonl")
+
     verdicts = {}
     for task_id, fn in evaluators.items():
         status, gate_result, summary, artifact_paths, checksums = fn()
         gate_text = gates.get(task_id, "")
         proof = build_proof(task_id, gate_text, observed_at, status, gate_result, summary, artifact_paths, checksums)
-        write_json(PROOF_RECORDS / f"{task_id}.proof.json", proof)
+        write_monotonic_proof(
+            PROOF_RECORDS / f"{task_id}.proof.json",
+            proof,
+            ledger_floor=ledger_revisions.get(task_id, 0),
+        )
         verdicts[task_id] = {"status": status, "verification_gate": gate_text, "gate_result": gate_result}
 
     write_json(GENERATED / "lps_doc_gate_verdicts.json", {"observed_at": observed_at, "verdicts": verdicts})

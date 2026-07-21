@@ -19,7 +19,7 @@ const temporaryDirectories = [];
 const SUPERSEDED_SHA = "1d06edc08b843edf17684b6ca2caf7ac5cd32c2615cee3da2ffed3f598ac4e3c";
 const ACCEPTED_SHA = "e991b760e43417667dc47c45131be4c50f74aaa9d15c28270feee6393b666efa";
 // Matches the committed generated_at of generated/task_graph.status.json.
-const STATUS_SOURCE_DATE_EPOCH = "1784505600";
+const STATUS_SOURCE_DATE_EPOCH = "1784592000";
 
 function fixture(name) {
   return path.join(fixtureDir, name);
@@ -291,6 +291,12 @@ describe("proof-ledger duplicate revision identities (ARCHBP-035)", () => {
 
       for (const conflict of report.resolved_conflicts) {
         const proofPath = path.join(pkgRoot, "proof_records", `${conflict.task_id}.proof.json`);
+        const proof = JSON.parse(fs.readFileSync(proofPath, "utf8"));
+        if (Number(proof.revision) > Number(conflict.revision)) {
+          // A later monotonic re-heal legitimately supersedes the resolved
+          // revision; the resolution stays bound to its historical artifact.
+          continue;
+        }
         const onDisk = crypto.createHash("sha256").update(fs.readFileSync(proofPath)).digest("hex");
         expect(conflict.accepted_proof_sha256, conflict.task_id).toBe(onDisk);
       }

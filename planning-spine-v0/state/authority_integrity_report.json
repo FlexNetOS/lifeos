@@ -1,9 +1,110 @@
 {
   "bundle_path": "planning-spine-v0/examples/mvp-bundle.json",
-  "observed_at": "2026-07-20T21:51:44.427Z",
-  "result": "fail",
-  "message": "planning-spine-v0 verifier authority integrity failed: Agent navigation graph drifted: navigation/generated/navigation_graph.json is stale; navigation/generated/navigation_index.json is stale; navigation/generated/navigation.validation_report.json is stale",
-  "verifier_authority": null,
-  "proof_record": null,
-  "integrity_checks": []
+  "observed_at": "2026-07-21T10:32:03.321Z",
+  "result": "pass",
+  "message": "planning-spine-v0 verifier authority integrity passed",
+  "verifier_authority": {
+    "authority_root": "noa",
+    "operational_delegate": "cecca",
+    "task_id": "task.execute.slice",
+    "executor_agent_id": "agent.executor",
+    "executor_role_id": "role.executor",
+    "verifier_agent_id": "agent.verifier",
+    "verifier_role_id": "role.verifier",
+    "verifier_capability_ids": [
+      "cap.verify.proof"
+    ]
+  },
+  "proof_record": {
+    "proof_id": "proof.task.execute.slice",
+    "subject_type": "task",
+    "subject_id": "task.execute.slice",
+    "verified_by": "agent.verifier",
+    "result": "pass"
+  },
+  "integrity_checks": [
+    {
+      "name": "verifier_agent_is_distinct_from_executor",
+      "detail": "Verifier agent must be distinct from the executing agent",
+      "result": "pass",
+      "context": {
+        "verifier_agent_id": "agent.verifier",
+        "executor_agent_id": "agent.executor"
+      }
+    },
+    {
+      "name": "verifier_role_is_carried_by_verifier_agent",
+      "detail": "Verifier agent must carry the declared verifier role",
+      "result": "pass",
+      "context": {
+        "verifier_agent_id": "agent.verifier",
+        "verifier_role_id": "role.verifier"
+      }
+    },
+    {
+      "name": "verifier_capabilities_are_required_by_verifier_role",
+      "detail": "Verifier role must require every declared verifier capability",
+      "result": "pass",
+      "context": {
+        "verifier_role_id": "role.verifier",
+        "verifier_capability_ids": [
+          "cap.verify.proof"
+        ]
+      }
+    },
+    {
+      "name": "verifier_capabilities_are_carried_by_verifier_agent",
+      "detail": "Verifier agent must carry every declared verifier capability",
+      "result": "pass",
+      "context": {
+        "verifier_agent_id": "agent.verifier",
+        "verifier_capability_ids": [
+          "cap.verify.proof"
+        ]
+      }
+    },
+    {
+      "name": "verifier_scope_matches_operational_delegate",
+      "detail": "Verifier authority scope must stay inside the declared operational delegation boundary",
+      "result": "pass",
+      "context": {
+        "verifier_agent_id": "agent.verifier",
+        "authority_scope": "cecca-delegated",
+        "operational_delegate": "cecca"
+      }
+    },
+    {
+      "name": "proof_record_verified_by_resolved_verifier_agent",
+      "detail": "ProofRecord.verified_by must resolve to the declared verifier agent object",
+      "result": "pass",
+      "context": {
+        "proof_id": "proof.task.execute.slice",
+        "verified_by": "agent.verifier",
+        "verifier_agent_id": "agent.verifier"
+      }
+    },
+    {
+      "name": "proof_record_subject_matches_bundle_task",
+      "detail": "ProofRecord subject must resolve to the bundle task",
+      "result": "pass",
+      "context": {
+        "proof_id": "proof.task.execute.slice",
+        "subject_type": "task",
+        "subject_id": "task.execute.slice",
+        "task_id": "task.execute.slice"
+      }
+    },
+    {
+      "name": "verifier_boundary_rules_forbid_execution",
+      "detail": "Verifier agent boundary rules must explicitly forbid task execution",
+      "result": "pass",
+      "context": {
+        "verifier_agent_id": "agent.verifier",
+        "boundary_rules": [
+          "Must validate proof against the declared task and artifact chain.",
+          "Cannot execute the task it verifies."
+        ]
+      }
+    }
+  ]
 }

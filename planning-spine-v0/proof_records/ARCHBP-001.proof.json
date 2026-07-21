@@ -1,0 +1,42 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-001",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests precede implementation; bounded .nu, .rs, and .toml fixtures round-trip exact bytes, paths, permissions, AST metadata, and hashes through the native MessagePack plugin; duplicate content is content-addressed once; raw benchmark samples qualify all performance wording.",
+  "gate_result": {
+    "red_tests_precede_implementation": true,
+    "red_commit": "8dfe9bd (nu_plugin archbp-001-ingest-envelope): e2e + 9 unit tests, 0 passed / 9 failed on stubs",
+    "green_commit": "d6a2a8c (nu_plugin archbp-001-ingest-envelope)",
+    "fixtures_round_trip_exact_bytes": true,
+    "fixtures_round_trip_relative_paths": true,
+    "fixtures_round_trip_unix_permissions": true,
+    "fixtures_round_trip_nushell_ast_metadata": true,
+    "fixtures_round_trip_sha256_and_blake3_hashes": true,
+    "native_messagepack_plugin_path_used": true,
+    "typed_pipeline_input_not_nothing": true,
+    "duplicate_content_content_addressed_once": true,
+    "dedup_evidence": "e2e dedup_hit_count=1 unique_blob_count=5 over 6 fixtures incl. byte-identical dup pair; unit idempotency re-ingest dedup_hit_count=3 unique_blob_count=0",
+    "blake3_dedup_index": "codedb-store-redb blake3_index table, lazily created, blake3->sha256",
+    "raw_benchmark_samples_recorded": true,
+    "benchmark_artifact": "nu_plugin logs/ingestion-benchmark/samples.json (30 raw wall-clock samples, median ~47ms full typed round trip including nu startup and plugin registration)",
+    "no_unmeasured_zero_copy_or_vectorization_claims": true,
+    "workspace_test_regressions": 0,
+    "workspace_tests": "cargo test --workspace: 276 passed, 0 failed; nushell syntax gate green; truth_surface --check-source 815 files ok",
+    "allowed_paths_honored": true,
+    "blocked_paths_honored": "no envctl ownership touched; no PostgreSQL mutation (redb-only lane; authoritative PG commits remain envctl-owned per R10); no generated Yazelix runtime edits; no secrets",
+    "product_execution_performed": true
+  },
+  "proof_summary": "ARCHBP-001 built the bounded native-Nushell ingestion pipeline red-first in the nu_plugin repository (branch archbp-001-ingest-envelope, PR FlexNetOS/nu_plugin#41). The typed `codedb ingest-envelope` plugin command takes a record pipeline input over the native MessagePack protocol, validates fail-closed (exact schema version, bounded counts and sizes, clean relative paths, sha256 and blake3 recomputed over decoded bytes), and persists through the redb store where identical bytes are content-addressed exactly once via a BLAKE3 index; `codedb ingest-report` and the existing materialization path round-trip exact bytes, relative paths, unix modes, module paths, hashes, and flattened Nushell AST rows for the committed .nu/.rs/.toml fixtures end-to-end. Thirty raw wall-clock samples qualify all performance wording; no zero-copy or vectorization claim is made.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-001.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/41",
+    "nu_plugin:tests/test_ingestion_round_trip.nu",
+    "nu_plugin:crates/codedb/src/ingest.rs",
+    "nu_plugin:crates/codedb_store_redb/src/lib.rs",
+    "nu_plugin:crates/nu_plugin_codedb/src/main.rs",
+    "nu_plugin:scripts/bench_ingestion_round_trip.nu",
+    "nu_plugin:logs/ingestion-benchmark/samples.json"
+  ]
+}

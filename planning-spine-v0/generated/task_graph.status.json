@@ -4,7 +4,6 @@
     "ARCHBP-005",
     "ARCHBP-006",
     "ARCHBP-010",
-    "ARCHBP-014",
     "ARCHBP-015",
     "ARCHBP-016",
     "ARCHBP-017",
@@ -217,6 +216,7 @@
     "ARCHBP-009",
     "ARCHBP-011",
     "ARCHBP-012",
+    "ARCHBP-013",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",
@@ -243,10 +243,10 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 318,
+  "ledger_entry_count": 319,
   "lifecycle_counts": {
-    "blocked": 12,
-    "complete": 222,
+    "blocked": 11,
+    "complete": 223,
     "draft": 0,
     "ready": 10,
     "rolled-back": 0,
@@ -254,11 +254,11 @@
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "5bd585a7e329707b32a5268045738fabee2fc01720cfe5af2e756a2e01e3fd70",
+  "proof_ledger_sha256": "d26fd5c6dfca1a23efb6f93384868facce76fd310596f29b5b52b593cab87e9f",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-004",
-    "ARCHBP-013",
+    "ARCHBP-014",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "6c564e31ae9e57b9d1cab5341029d48dba67d527524840c820795b33288056bb",
+  "source_graph_sha256": "ddb20ae9dde8805612b494e1a6b5f22312a2fd6cab791f2eeaa27f07aaa00c94",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8295,11 +8295,11 @@
     },
     {
       "effective": {
-        "next_action": "Write failing local-default, privacy, cost, uncertainty, and outage-routing tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-013.proof.json; next child task: ARCHBP-014.",
         "proof_uri": "proof_records/ARCHBP-013.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-011",
         "ARCHBP-012"
@@ -8307,30 +8307,37 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 319,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "c239da63bc2c284c973a245ae2e5aa530c2055a1792623b0f83f7ba28340cde8",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write failing local-default, privacy, cost, uncertainty, and outage-routing tests.",
         "proof_uri": "proof_records/ARCHBP-013.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 210,
       "task_id": "ARCHBP-013",
       "title": "Implement RuvLTRA proportional local-cloud routing",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write failing local-default, privacy, cost, uncertainty, and outage-routing tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-013.proof.json; next child task: ARCHBP-014."
+        }
+      }
     },
     {
       "effective": {
         "next_action": "Verify the Ruflo API and write failing authority, retry, cancellation, budget, and recovery tests.",
         "proof_uri": "proof_records/ARCHBP-014.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "ready",
       "parent_ids": [
         "ARCHBP-008",
         "ARCHBP-013"
@@ -8347,7 +8354,7 @@
       "source": {
         "next_action": "Verify the Ruflo API and write failing authority, retry, cancellation, budget, and recovery tests.",
         "proof_uri": "proof_records/ARCHBP-014.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
       "source_row_number": 211,
       "task_id": "ARCHBP-014",
@@ -9785,6 +9792,7 @@
     "ARCHBP-009",
     "ARCHBP-011",
     "ARCHBP-012",
+    "ARCHBP-013",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",

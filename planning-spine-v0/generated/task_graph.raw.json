@@ -1,9 +1,9 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-20T15:05:04Z",
+  "generated_at": "2026-07-21T00:00:00Z",
   "source": {
     "format": "csv",
-    "path": "planning-spine-v0/generated/task_graph.source.csv",
+    "path": "generated/task_graph.source.csv",
     "header": [
       "task_id",
       "parent_id",
@@ -4378,7 +4378,7 @@
         "execution_cell": "storage-sync-cell",
         "verification_gate": "Red tests cover crash at every enqueue, embed, flush, and acknowledge boundary; replay is ordered, idempotent, observable, and lossless; model/version provenance is recorded; PostgreSQL remains macro-state authority and envctl consumes only a versioned export contract.",
         "rollback_plan": "Disable the synchronizer, replay the append-only outbox from the last acknowledged cursor, remove only task-created test namespaces, and restore the prior adapter version.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "proof_records/ARCHBP-002.proof.json",
         "next_action": "Begin after ARCHBP-001 proves exact native ingestion."
       }

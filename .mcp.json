@@ -3,7 +3,7 @@
     "cognitum-seed": {
       "type": "http",
       "url": "${COGNITUM_SEED_MCP_URL:-http://169.254.42.1/mcp}",
-      "comment": "LOCAL Cognitum Seed hardware appliance = the code-intelligence root. 114 MCP tools / 21 groups / 3 scopes (minimal 18, default 24, full 114): identity, vector memory, cognitive witness chains, coherence, custody, optimize, cogs. USB endpoint http://169.254.42.1/mcp is implicitly trusted (ADR-057). For WiFi/LAN use https://169.254.42.1:8443/mcp with Authorization: Bearer ${COGNITUM_SEED_TOKEN} after installing the trust CA (drive: trust/install-trust.sh). Override host via COGNITUM_SEED_MCP_URL. Requires the seed plugged in + its USB-ethernet link up."
+      "comment": "LOCAL Cognitum Seed hardware appliance = the code-intelligence root. 114 MCP tools / 21 groups / 3 scopes (minimal 18, default 24, full 114): identity, vector memory, cognitive witness chains, coherence, custody, optimize, cogs. USB endpoint http://169.254.42.1/mcp is implicitly trusted (ADR-057). For WiFi/LAN use https://169.254.42.1:8443/mcp with Authorization: Bearer ${COGNITUM_SEED_TOKEN} after installing the trust CA (drive: trust/install-trust.sh). Override host via COGNITUM_SEED_MCP_URL. Requires the seed plugged in with its USB-ethernet (cdc_ncm) link up."
     },
     "cognitum": {
       "type": "sse",
@@ -11,14 +11,6 @@
       "comment": "Cognitum cloud control plane (catalog / CRM / fleet / docs, ~7 tools). Read tools are open; write ops need COGNITUM_API_KEY. Host-independent (cloud).",
       "env": {
         "COGNITUM_API_KEY": "${COGNITUM_API_KEY}"
-      }
-    },
-    "brain": {
-      "command": "/home/flexnetos/.nix-profile/bin/mcp-brain",
-      "comment": "RuVector Shared Brain (meta-ruvector crate 'mcp-brain', bin 'mcp-brain', stdio). Tools: brain_search/share/get/vote/transfer/drift/partition/list/sync + brain_page_*. LOCAL + seed-associated: point BRAIN_URL at the locally-hosted ruvbrain (default upstream is cloud). Build: `cargo build -p mcp-brain --release` in meta-ruvector, then nix-package the binary into /home/flexnetos/.nix-profile/bin/.",
-      "env": {
-        "BRAIN_URL": "${BRAIN_URL:-http://169.254.42.1}",
-        "BRAIN_API_KEY": "${BRAIN_API_KEY:-anonymous}"
       }
     }
   }

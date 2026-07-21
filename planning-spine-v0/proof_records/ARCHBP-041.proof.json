@@ -1,0 +1,42 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-041",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove JSONL, JSON, Nuon, native record/list/table, binary raw linkage, length/digest rejection, idempotent object assignment, MessagePack child ordering, typed receipts, and redb/PostgreSQL metadata parity.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin e3c933d (stubs fail closed: 7/10 red with the 3 passes being all-rejection assertions), implementation green at cd26f50",
+    "json_aggregate_validated": true,
+    "jsonl_event_stream_validated": true,
+    "json_event_array_validated": true,
+    "native_record_list_over_msgpack": true,
+    "nuon_coverage": "Nuon-origin data reaches the plugin as native Nu records/lists over the MessagePack protocol (open file.nuon | codedb ingest-envelope); the record and list paths are proven live e2e",
+    "binary_raw_linkage": true,
+    "length_digest_rejection": true,
+    "rejection_evidence": "per-frame sha256 recomputed against decoded base64 payloads; byte_length must equal decoded length; per-stream offsets contiguous from zero; sequences strictly monotonic; completion totals and frame_count must agree; truncated JSONL (no execution_complete) rejected; live e2e corrupts every frame digest and asserts nonzero exit",
+    "idempotent_object_assignment": true,
+    "idempotency_evidence": "canonical raw_object_id = sha256 of the exact reassembled stream bytes; re-ingest yields identical ids with dedup marked; pre-assigned canonical ids pass only when they match the recomputed address; identical bytes ingested as typed source blobs dedup against raw objects — one content-addressed identity space, no raw/typed split",
+    "messagepack_child_ordering": true,
+    "protocol_evidence": "live e2e drives the real nu_plugin_codedb child over MessagePack (--plugin-config/--plugins) for record, re-ingest, and list paths; canonical ids are byte-identical across JSON-file, JSONL-file, record-protocol, and list-protocol inputs from separate real rtk_nu executions; traces preserved at logs/raw-envelope-protocol/traces.json",
+    "typed_receipts": true,
+    "receipt_evidence": "codedb.raw-ingest-receipt.v0 carries idempotency_key, per-stream raw_object rows (id, byte_length, frame_count, deduplicated), and truthful exit metadata including signal death (code=null/signal preserved)",
+    "redb_postgresql_metadata_parity": true,
+    "parity_evidence": "codedb_raw_objects lands identical rows under identical canonical ids; pg-integration parity test compares parsed metadata values row-for-row against list_raw_objects on a real PostgreSQL 17.10 service (2x flush proves ON CONFLICT idempotency)",
+    "full_suite": "cargo test --workspace: 302 passed, 0 failed",
+    "product_execution_performed": true,
+    "product_execution_evidence": "live e2e executes the profile-pinned rtk_nu against a two-stream child (sh -c printf interleave), ingests the resulting envelopes through all four input paths, and proves stdout raw_object_id sha256:b94d27b9… (the canonical digest of 'hello world') identical everywhere"
+  },
+  "proof_summary": "ARCHBP-041 is complete: the typed codedb ingest-envelope command now accepts rtk_nu raw envelopes in every rendering — JSON aggregate, JSONL event stream, JSON event array, and native Nu record/list over the real MessagePack child-plugin protocol — validates them fail-closed (per-frame digest and length recomputation, contiguous offsets, strictly monotonic sequences, completion agreement, truncated-stream rejection), reassembles byte-exact streams, and assigns canonical content-addressed raw_object_id values idempotently in the same identity space as typed source bytes. Typed receipts echo idempotency keys and truthful exit metadata; raw-report reads back stream, frame, digest, and idempotency metadata; and redb/PostgreSQL metadata parity is proven row-for-row against a real PostgreSQL 17.10 service. Red-first at nu_plugin e3c933d, green at cd26f50 (PR FlexNetOS/nu_plugin#44, stacked on #43), workspace 302/0, live e2e traces preserved.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-041.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/44",
+    "nu_plugin:crates/codedb/src/raw_envelope.rs",
+    "nu_plugin:crates/codedb_store_redb/src/lib.rs",
+    "nu_plugin:crates/codedb_store_pg/src/lib.rs",
+    "nu_plugin:crates/codedb_store_pg/tests/raw_objects_parity.rs",
+    "nu_plugin:crates/nu_plugin_codedb/src/main.rs",
+    "nu_plugin:tests/test_raw_envelope_round_trip.nu",
+    "nu_plugin:logs/raw-envelope-protocol/traces.json"
+  ]
+}

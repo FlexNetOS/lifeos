@@ -226,7 +226,8 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
-    "ARCHBP-040"
+    "ARCHBP-040",
+    "ARCHBP-041"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
@@ -234,18 +235,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 297,
+  "ledger_entry_count": 298,
   "lifecycle_counts": {
     "blocked": 24,
-    "complete": 201,
+    "complete": 202,
     "draft": 0,
-    "ready": 19,
+    "ready": 18,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "ad3392f2f3cff352a76267d4698b369aa0f118f34638a642d33ad38bc8231e94",
+  "proof_ledger_sha256": "4053b846e5cb1aa42ea9586b2610b34177c37d04e64fd420f7c5903f39638f78",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -265,7 +266,6 @@
     "ARCHBP-032",
     "ARCHBP-038",
     "ARCHBP-039",
-    "ARCHBP-041",
     "ARCHBP-044"
   ],
   "result": "pass",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "914606a918d061ae03bb306ab330ab0eda1e4415dff19b245a4f50985a814745",
+  "source_graph_sha256": "e3495cbabbdfd6d250b181842829e8f6e15f2129726018d345d22be21dd3ef88",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -9173,11 +9173,11 @@
     },
     {
       "effective": {
-        "next_action": "Begin after ARCHBP-001 and ARCHBP-040; write failing typed-input, raw-linkage, digest, idempotency, and protocol-order tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-041.proof.json; next child task: ARCHBP-042.",
         "proof_uri": "proof_records/ARCHBP-041.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-001",
         "ARCHBP-040"
@@ -9185,22 +9185,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 298,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "9561fde6b52f613d49127689e2d5e0212295b82753e880eca4c35ad42f688ee5",
+        "status": "pass"
       },
       "source": {
         "next_action": "Begin after ARCHBP-001 and ARCHBP-040; write failing typed-input, raw-linkage, digest, idempotency, and protocol-order tests.",
         "proof_uri": "proof_records/ARCHBP-041.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 238,
       "task_id": "ARCHBP-041",
       "title": "Add typed codedb ingest-envelope with canonical raw-object linkage",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Begin after ARCHBP-001 and ARCHBP-040; write failing typed-input, raw-linkage, digest, idempotency, and protocol-order tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-041.proof.json; next child task: ARCHBP-042."
+        }
+      }
     },
     {
       "effective": {
@@ -9635,6 +9642,7 @@
     "ARCHBP-033",
     "ARCHBP-035",
     "ARCHBP-036",
-    "ARCHBP-040"
+    "ARCHBP-040",
+    "ARCHBP-041"
   ]
 }

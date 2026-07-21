@@ -101,13 +101,13 @@ Lose that condition and OpenPencil-tagged subs fall through to `<SubsectionView>
 
 Added in `database-storage-foundation`. Owned entirely by `lifeos-core` + the Tauri shell — the Vue layer never touches the DB directly.
 
-- **Feature flag**: `storage` in `crates/lifeos-core/Cargo.toml`. Default-on for desktop + daemon; ESP32/`no_std` consumers turn it off with `default-features = false`. Guard: `cargo check -p lifeos-core --no-default-features` must always pass.
-- **DB file**: `<app_data_dir>/lifeos.db` (`sqlite:…?mode=rwc`). Already covered by the existing `$APPDATA/lifeos/*` Tauri FS scope — no new capability grant.
-- **Init sequence**: inside `tauri::Builder::setup()` (before any IPC command fires): `Storage::new` → `storage.migrate()` → `accounts::migrate_from_json`. On any failure the app refuses to start with a calm error string: `"LifeOS couldn't initialize storage at <path> — see logs."`.
-- **`db_health` command**: returns `DbHealth { status, db_path, applied_migrations, last_migration_version, schema_version }`. `status == "degraded"` when `applied_migrations < embedded_migration_count` (call `db_migrate` to recover).
-- **`db_migrate` command**: re-runs `sqlx::migrate!` (idempotent).
-- **`account.json` migration**: one-time on first boot after upgrade. If `account.json` exists and the `accounts` table is empty, the JSON record is inserted then the file is renamed to `account.json.migrated-<RFC3339-UTC-hyphenated>` (never deleted). Corrupt JSON → app still starts, `accounts` table stays empty, file left in place.
-- **Module layout**: `crates/lifeos-core/src/storage/{mod, error, accounts, mempalace, ruvector}.rs`; migrations at `crates/lifeos-core/migrations/000N_*.sql`.
+- **Feature flags**: `storage` in `crates/lifeos-core/Cargo.toml` owns PostgreSQL/RuVector storage; `legacy-sqlite-import` is a one-way read-only importer enabled only by the desktop shell. ESP32/`no_std` consumers turn storage off with `default-features = false`. Guard: `cargo check -p lifeos-core --no-default-features` must always pass.
+- **Canonical store**: `LIFEOS_DATABASE_URL` must name PostgreSQL. The application rejects SQLite URLs and verifies that `ruvector` is installed in schema `extensions`. Administrative bootstrap lives at `crates/lifeos-core/sql/bootstrap-postgres-ruvector.sql`.
+- **Init sequence**: inside `tauri::Builder::setup()` (before any IPC command fires): `Storage::from_runtime_env` → `storage.migrate()` → extension verification → legacy JSON/SQLite imports. On any failure the app refuses to start with a calm initialization error.
+- **`db_health` command**: returns `DbHealth { status, database_id, applied_migrations, last_migration_version, ruvector_extension_version, schema_version }`; `database_id` never contains credentials.
+- **`db_migrate` command**: re-runs `sqlx::migrate!` (idempotent) in PostgreSQL.
+- **Legacy migration**: `account.json`, UI/provider JSON state, and the historical `lifeos.db` are opened/read only, copied with their source bytes into PostgreSQL in a transaction, and removed only after commit. A conflicting record fails closed and leaves the local source intact.
+- **Module layout**: `crates/lifeos-core/src/storage/{mod,error,accounts,legacy_sqlite,mempalace,ruvector,state}.rs`; numbered migrations at `crates/lifeos-core/migrations/000N_*.sql`.
 - **ESP32 isolation test**: `cargo tree -p lifeos-core --features storage | grep openssl-sys` must be empty.
 
 ### DESIGN.md is the agent-readable token source

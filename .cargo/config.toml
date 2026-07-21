@@ -1,0 +1,19 @@
+# The profile-owned Nix `pkg-config` wrapper intentionally searches only Nix
+# package metadata.  LifeOS's Linux Tauri SDK is installed by the platform
+# owner, so native build scripts need the platform resolver instead.  The
+# bridge keeps Rust/Bun/Cargo ownership on the active Nix profile and does not
+# override an explicitly supplied PKG_CONFIG value.
+[env]
+PKG_CONFIG = { value = "scripts/resolve-pkg-config.sh", relative = true }
+
+# Platform GTK/WebKit libraries have transitive dependencies which the Nix
+# dynamic loader cache cannot discover. Emit legacy DT_RPATH (rather than
+# DT_RUNPATH) so this checked-in bridge applies to those indirect dependencies
+# too. The target stanza is intentionally host-specific; cross targets retain
+# their owning toolchain/runtime contracts.
+[target.x86_64-unknown-linux-gnu]
+rustflags = [
+  "-C", "link-arg=-Wl,--disable-new-dtags",
+  "-C", "link-arg=-Wl,-rpath,/usr/lib/x86_64-linux-gnu",
+  "-C", "link-arg=-Wl,-rpath,/lib/x86_64-linux-gnu",
+]

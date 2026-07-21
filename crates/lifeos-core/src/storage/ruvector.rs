@@ -1,9 +1,11 @@
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::PgPool;
 
 use super::StorageError;
 
-/// A row from `ruvector_vectors`.
+/// A row from the canonical semantic embedding projection. `vector` retains
+/// exact source bytes; the database also holds a RuVector value for finite
+/// coordinates so semantic queries use the extension instead of a sidecar.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct VectorRow {
     pub id: String,
@@ -14,7 +16,8 @@ pub struct VectorRow {
     pub last_synced_at: i64,
 }
 
-/// A row from `ruvector_gnn_cache`.
+/// A durable cache receipt. The hot cache itself belongs to the redb owner;
+/// this table retains its reconstructable canonical counterpart.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct GnnCacheRow {
     pub cache_key: String,
@@ -28,20 +31,38 @@ pub fn encode_vector(v: &[f32]) -> Vec<u8> {
 }
 
 /// Decode a little-endian byte slice back into `Vec<f32>`.
-///
-/// Returns `StorageError::InvalidVectorBytes` when the slice length is not a
-/// multiple of 4.
 pub fn decode_vector(b: &[u8]) -> Result<Vec<f32>, StorageError> {
     if b.len() % 4 != 0 {
         return Err(StorageError::InvalidVectorBytes);
     }
     Ok(b.chunks_exact(4)
-        .map(|c| f32::from_le_bytes(c.try_into().unwrap()))
+        .map(|c| f32::from_le_bytes(c.try_into().expect("four-byte chunks")))
         .collect())
 }
 
+pub(crate) fn ruvector_literal(vector_bytes: &[u8]) -> Result<Option<String>, StorageError> {
+    let values = decode_vector(vector_bytes)?;
+    if values.iter().any(|value| !value.is_finite()) {
+        return Ok(None);
+    }
+    Ok(Some(format!(
+        "[{}]",
+        values
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(",")
+    )))
+}
+
+fn metadata(value: Option<&str>) -> Result<Option<serde_json::Value>, StorageError> {
+    value
+        .map(|raw| serde_json::from_str(raw).map_err(|_| StorageError::InvalidProjectionJson))
+        .transpose()
+}
+
 pub async fn upsert_vector(
-    pool: &SqlitePool,
+    pool: &PgPool,
     id: &str,
     collection: &str,
     dim: i64,
@@ -49,36 +70,40 @@ pub async fn upsert_vector(
     metadata_json: Option<&str>,
     last_synced_at: i64,
 ) -> Result<(), StorageError> {
-    // Belt-and-braces Rust-side guard before hitting the DB CHECK constraint.
     if vector_bytes.len() as i64 != dim * 4 {
         return Err(StorageError::VectorLengthMismatch);
     }
-
+    let embedding = ruvector_literal(vector_bytes)?;
     sqlx::query(
-        "INSERT INTO ruvector_vectors (id, collection, dim, vector, metadata_json, last_synced_at)
-         VALUES (?, ?, ?, ?, ?, ?)
-         ON CONFLICT(id) DO UPDATE SET
-           collection = excluded.collection,
-           dim = excluded.dim,
-           vector = excluded.vector,
-           metadata_json = excluded.metadata_json,
-           last_synced_at = excluded.last_synced_at",
+        "INSERT INTO lifeos_semantic.embedding
+           (id, collection, dim, raw_vector, embedding, metadata_json, last_synced_at)
+         VALUES ($1, $2, $3, $4, $5::extensions.ruvector, $6, to_timestamp($7))
+         ON CONFLICT (id) DO UPDATE SET
+           collection = EXCLUDED.collection,
+           dim = EXCLUDED.dim,
+           raw_vector = EXCLUDED.raw_vector,
+           embedding = EXCLUDED.embedding,
+           metadata_json = EXCLUDED.metadata_json,
+           last_synced_at = EXCLUDED.last_synced_at",
     )
     .bind(id)
     .bind(collection)
-    .bind(dim)
+    .bind(dim as i32)
     .bind(vector_bytes)
-    .bind(metadata_json)
-    .bind(last_synced_at)
+    .bind(embedding)
+    .bind(metadata(metadata_json)?)
+    .bind(last_synced_at as f64)
     .execute(pool)
     .await?;
     Ok(())
 }
 
-pub async fn get_vector(pool: &SqlitePool, id: &str) -> Result<Option<VectorRow>, StorageError> {
+pub async fn get_vector(pool: &PgPool, id: &str) -> Result<Option<VectorRow>, StorageError> {
     let row = sqlx::query_as::<_, VectorRow>(
-        "SELECT id, collection, dim, vector, metadata_json, last_synced_at
-         FROM ruvector_vectors WHERE id = ?",
+        "SELECT id, collection, dim::BIGINT AS dim, raw_vector AS vector,
+           metadata_json::text AS metadata_json,
+           EXTRACT(EPOCH FROM last_synced_at)::BIGINT AS last_synced_at
+         FROM lifeos_semantic.embedding WHERE id = $1",
     )
     .bind(id)
     .fetch_optional(pool)
@@ -87,12 +112,14 @@ pub async fn get_vector(pool: &SqlitePool, id: &str) -> Result<Option<VectorRow>
 }
 
 pub async fn list_by_collection(
-    pool: &SqlitePool,
+    pool: &PgPool,
     collection: &str,
 ) -> Result<Vec<VectorRow>, StorageError> {
     let rows = sqlx::query_as::<_, VectorRow>(
-        "SELECT id, collection, dim, vector, metadata_json, last_synced_at
-         FROM ruvector_vectors WHERE collection = ?",
+        "SELECT id, collection, dim::BIGINT AS dim, raw_vector AS vector,
+           metadata_json::text AS metadata_json,
+           EXTRACT(EPOCH FROM last_synced_at)::BIGINT AS last_synced_at
+         FROM lifeos_semantic.embedding WHERE collection = $1 ORDER BY id",
     )
     .bind(collection)
     .fetch_all(pool)
@@ -101,32 +128,31 @@ pub async fn list_by_collection(
 }
 
 pub async fn upsert_gnn(
-    pool: &SqlitePool,
+    pool: &PgPool,
     cache_key: &str,
     payload: &[u8],
     computed_at: i64,
 ) -> Result<(), StorageError> {
     sqlx::query(
-        "INSERT INTO ruvector_gnn_cache (cache_key, payload, computed_at)
-         VALUES (?, ?, ?)
-         ON CONFLICT(cache_key) DO UPDATE SET
-           payload = excluded.payload,
-           computed_at = excluded.computed_at",
+        "INSERT INTO lifeos_semantic.gnn_cache (cache_key, payload, computed_at)
+         VALUES ($1, $2, to_timestamp($3))
+         ON CONFLICT (cache_key) DO UPDATE SET
+           payload = EXCLUDED.payload,
+           computed_at = EXCLUDED.computed_at",
     )
     .bind(cache_key)
     .bind(payload)
-    .bind(computed_at)
+    .bind(computed_at as f64)
     .execute(pool)
     .await?;
     Ok(())
 }
 
-pub async fn get_gnn(
-    pool: &SqlitePool,
-    cache_key: &str,
-) -> Result<Option<GnnCacheRow>, StorageError> {
+pub async fn get_gnn(pool: &PgPool, cache_key: &str) -> Result<Option<GnnCacheRow>, StorageError> {
     let row = sqlx::query_as::<_, GnnCacheRow>(
-        "SELECT cache_key, payload, computed_at FROM ruvector_gnn_cache WHERE cache_key = ?",
+        "SELECT cache_key, payload,
+           EXTRACT(EPOCH FROM computed_at)::BIGINT AS computed_at
+         FROM lifeos_semantic.gnn_cache WHERE cache_key = $1",
     )
     .bind(cache_key)
     .fetch_optional(pool)
@@ -134,117 +160,114 @@ pub async fn get_gnn(
     Ok(row)
 }
 
-pub async fn clear_collection(pool: &SqlitePool, name: &str) -> Result<(), StorageError> {
-    sqlx::query("DELETE FROM ruvector_vectors WHERE collection = ?")
+pub async fn clear_collection(pool: &PgPool, name: &str) -> Result<(), StorageError> {
+    sqlx::query("DELETE FROM lifeos_semantic.embedding WHERE collection = $1")
         .bind(name)
         .execute(pool)
         .await?;
     Ok(())
 }
 
-pub async fn clear_gnn_cache(pool: &SqlitePool) -> Result<(), StorageError> {
-    sqlx::query("DELETE FROM ruvector_gnn_cache")
+pub async fn clear_gnn_cache(pool: &PgPool) -> Result<(), StorageError> {
+    sqlx::query("DELETE FROM lifeos_semantic.gnn_cache")
         .execute(pool)
         .await?;
     Ok(())
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::storage::Storage;
-
-    async fn setup() -> Storage {
-        let s = Storage::new_in_memory().await.unwrap();
-        s.migrate().await.unwrap();
-        s
-    }
+    use serial_test::serial;
 
     #[tokio::test]
-    async fn vector_roundtrip() {
-        let s = setup().await;
-        let pool = s.pool();
-
-        // Hand-rolled property loop covering special f32 values.
+    #[serial(lifeos_postgres)]
+    async fn vector_roundtrip_preserves_bytes_and_projects_finite_values() {
+        let storage = Storage::new_for_test().await.unwrap();
+        let pool = storage.pool();
         let cases: &[&[f32]] = &[
             &[1.0, 2.0, 3.0],
             &[f32::NAN, f32::INFINITY, f32::NEG_INFINITY],
             &[f32::MIN_POSITIVE, f32::MAX, -0.0_f32, 0.0_f32],
-            &[f32::from_bits(0x0000_0001)], // smallest positive subnormal
+            &[f32::from_bits(0x0000_0001)],
         ];
 
-        for (i, &floats) in cases.iter().enumerate() {
+        for (index, &floats) in cases.iter().enumerate() {
             let encoded = encode_vector(floats);
             let decoded = decode_vector(&encoded).unwrap();
             assert_eq!(floats.len(), decoded.len());
-            // Bit-for-bit equality (NaN-safe).
             for (a, b) in floats.iter().zip(&decoded) {
-                assert_eq!(a.to_bits(), b.to_bits(), "case {i}: bit mismatch");
+                assert_eq!(a.to_bits(), b.to_bits(), "case {index}: bit mismatch");
             }
-
-            // Round-trip through DB.
-            let id = format!("v{i}");
-            let dim = floats.len() as i64;
-            upsert_vector(pool, &id, "test", dim, &encoded, None, 0)
+            let id = format!("v{index}");
+            upsert_vector(pool, &id, "test", floats.len() as i64, &encoded, None, 0)
                 .await
                 .unwrap();
             let row = get_vector(pool, &id).await.unwrap().unwrap();
             let back = decode_vector(&row.vector).unwrap();
             for (a, b) in floats.iter().zip(&back) {
-                assert_eq!(a.to_bits(), b.to_bits(), "db round-trip case {i}");
+                assert_eq!(a.to_bits(), b.to_bits(), "db round-trip case {index}");
             }
         }
+
+        let projected: Option<String> = sqlx::query_scalar(
+            "SELECT embedding::text FROM lifeos_semantic.embedding WHERE id = $1",
+        )
+        .bind("v0")
+        .fetch_one(pool)
+        .await
+        .unwrap();
+        assert!(projected.is_some());
+        let non_finite: Option<String> = sqlx::query_scalar(
+            "SELECT embedding::text FROM lifeos_semantic.embedding WHERE id = $1",
+        )
+        .bind("v1")
+        .fetch_one(pool)
+        .await
+        .unwrap();
+        assert!(non_finite.is_none());
     }
 
     #[tokio::test]
-    async fn check_constraints() {
-        let s = setup().await;
-        let pool = s.pool();
-
-        // Rust-side guard: mismatch between declared dim and byte length.
+    #[serial(lifeos_postgres)]
+    async fn constraints_and_gnn_receipts() {
+        let storage = Storage::new_for_test().await.unwrap();
+        let pool = storage.pool();
         let three_floats = encode_vector(&[1.0, 2.0, 3.0]);
-        let err = upsert_vector(pool, "bad", "test", 4, &three_floats, None, 0)
-            .await
-            .unwrap_err();
-        assert!(matches!(err, StorageError::VectorLengthMismatch));
-
-        // Raw sqlx: dim = 0 rejected by CHECK constraint.
+        assert!(matches!(
+            upsert_vector(pool, "bad", "test", 4, &three_floats, None, 0).await,
+            Err(StorageError::VectorLengthMismatch)
+        ));
         let raw_err = sqlx::query(
-            "INSERT INTO ruvector_vectors (id, collection, dim, vector, last_synced_at)
-             VALUES ('x', 'c', 0, X'', 0)",
+            "INSERT INTO lifeos_semantic.embedding
+               (id, collection, dim, raw_vector, last_synced_at)
+             VALUES ($1, $2, 0, $3, to_timestamp(0))",
         )
+        .bind("x")
+        .bind("c")
+        .bind(Vec::<u8>::new())
         .execute(pool)
         .await;
         assert!(raw_err.is_err(), "dim=0 should violate CHECK constraint");
-
-        // decode_vector: odd byte length.
-        let err = decode_vector(&[0u8, 1u8, 2u8]).unwrap_err();
-        assert!(matches!(err, StorageError::InvalidVectorBytes));
-    }
-
-    #[tokio::test]
-    async fn gnn_cache_roundtrip() {
-        let s = setup().await;
-        let pool = s.pool();
+        assert!(matches!(
+            decode_vector(&[0u8, 1u8, 2u8]),
+            Err(StorageError::InvalidVectorBytes)
+        ));
 
         upsert_gnn(pool, "key1", b"payload", 1000).await.unwrap();
-        let row = get_gnn(pool, "key1").await.unwrap().unwrap();
-        assert_eq!(row.payload, b"payload");
-        assert_eq!(row.computed_at, 1000);
-
-        // Upsert overwrites.
+        assert_eq!(
+            get_gnn(pool, "key1").await.unwrap().unwrap().payload,
+            b"payload"
+        );
         upsert_gnn(pool, "key1", b"new_payload", 2000)
             .await
             .unwrap();
-        let row = get_gnn(pool, "key1").await.unwrap().unwrap();
-        assert_eq!(row.payload, b"new_payload");
-
+        assert_eq!(
+            get_gnn(pool, "key1").await.unwrap().unwrap().payload,
+            b"new_payload"
+        );
         clear_gnn_cache(pool).await.unwrap();
-        let row = get_gnn(pool, "key1").await.unwrap();
-        assert!(row.is_none());
+        assert!(get_gnn(pool, "key1").await.unwrap().is_none());
     }
 }

@@ -17,7 +17,7 @@ tauri-build = { version = "2", features = [] }
 # Portable LifeOS core — types, auth, MCP clients. Stage 1b moves the pure
 # structs (VaultEntry / AppVersion / TelemetrySnapshot / AiProvider) here so the
 # Tauri shell stops being the canonical home for cross-platform data shapes.
-lifeos-core = { path = "../crates/lifeos-core", features = ["plugin-host", "storage"] }
+lifeos-core = { path = "../crates/lifeos-core", features = ["plugin-host", "storage", "legacy-sqlite-import"] }
 tauri = { version = "2", features = [] }
 tauri-plugin-fs = "2"
 tauri-plugin-shell = "2"

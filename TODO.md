@@ -54,9 +54,13 @@ Discovered during `/ccg:spec-init`. Codex backend currently blocked, so CCG runs
 - [ ] **`git init` this repo** — `ubuntu-lifeos` is not a git repository, which blocks codex (`Not inside a trusted directory and --skip-git-repo-check was not specified`) and codeagent-wrapper's codex backend. Either run `git init` here, or pass `--skip-git-repo-check` per call. Repo currently has substantial history-worthy content (CLAUDE.md, AGENTS.md, README.md, plans, src/, src-tauri/) — initializing version control is overdue regardless of the codex issue.
 - [ ] **(Optional) Resolve rmcp `serde error` noise** — on every codex start, one of the configured MCP servers in `~/.codex/config.toml` (`gitnexus`, `ruvector`, `mempalace`, `understand-anything`, `open-pencil`, `fast-context`, `context7`) emits non-JSON on stdout, triggering `rmcp::transport::async_rw: Error reading from stream: serde error expected value at line 1 column 1`. Doesn't block, just pollutes logs. Bisect by commenting out servers one at a time.
 
-## database-storage-foundation OPSX change — closed 2026-05-25
+## database-storage-foundation OPSX change — historical, superseded by PostgreSQL/RuVector cutover
 
-`/ccg:spec-impl` completed. All tasks 1–8 green. See CHANGELOG 0.1.6 for the full record.
+`/ccg:spec-impl` completed the original SQLite foundation on 2026-05-25. It is
+not the current durable-storage authority: the owner-ratified PostgreSQL with
+RuVector cutover supersedes it. See the Unreleased changelog entry and
+`crates/lifeos-core/sql/bootstrap-postgres-ruvector.sql` for the active
+contract. The checklist remains below as an immutable historical receipt.
 
 - [x] Cargo workspace + feature flag setup (`storage` feature, default-on)
 - [x] Migration SQL files (`0001_accounts.sql`, `0002_mempalace.sql`, `0003_ruvector.sql`)
@@ -67,9 +71,11 @@ Discovered during `/ccg:spec-init`. Codex backend currently blocked, so CCG runs
 - [x] Tauri shell integration (`db_health`, `db_migrate` commands; Storage init in setup)
 - [x] Tests (round-trip, FK cascade, vector bit-exact, constraint violations, JSON migration idempotency)
 
-## Database driver alternatives — considered & deferred (2026-05-25)
+## Database driver alternatives — historical 2026-05-25 record
 
-Decision: `sqlx` (async, both drivers in one crate, rustls, embedded migrations) is the chosen integration layer for the `database-storage-foundation` OPSX change. The three alternatives below were deliberately rejected for the initial change; entries kept so the decision is auditable and we don't re-litigate without new information.
+Decision: `sqlx` remains the integration layer, now with PostgreSQL/RuVector as
+the canonical durable store. The SQLite alternative notes below are historical
+only; SQLite is permitted solely for the checked-in read-only legacy importer.
 
 - [ ] **`tauri-plugin-sql` — revisit only if the frontend ever needs direct DB access** — Tauri's official plugin (sqlite/mysql/pg, `@tauri-apps/plugin-sql` on the JS side, no `#[tauri::command]` wrappers needed). Rejected because it couples DB to Tauri, breaks the `lifeos-daemon` headless Pi target, and `lifeos-core` cannot consume it. Trigger to revisit: the Vue layer gains a legitimate need to bypass Rust for ad-hoc queries (none today).
 - [ ] **`sea-orm` — revisit only if hand-written sqlx becomes painful** — Active-record / entity layer over sqlx. Same drivers, same rustls posture, adds codegen + slower compile + extra learning surface. Trigger to revisit: the hand-written sqlx query layer exceeds ~25 entities OR `sqlx::migrate!` outgrows our migration story.

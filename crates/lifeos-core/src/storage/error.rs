@@ -13,6 +13,18 @@ pub enum StorageError {
     VectorLengthMismatch,
     /// Migration source JSON could not be parsed as a valid `AccountRecord`.
     CorruptJson,
+    /// A command attempted to open a non-PostgreSQL durable store.
+    UnsupportedDatabaseUrl,
+    /// The runtime database bridge did not supply `LIFEOS_DATABASE_URL`.
+    MissingDatabaseUrl,
+    /// Storage tests require an explicitly provisioned disposable PostgreSQL URL.
+    MissingTestDatabaseUrl,
+    /// RuVector must be installed in the dedicated `extensions` schema.
+    RequiredExtension,
+    /// The durable schema has fewer applied migrations than the embedded set.
+    IncompleteMigrations { applied: u32, expected: u32 },
+    /// A frontend projection write did not contain valid JSON.
+    InvalidProjectionJson,
     /// Underlying sqlx error.
     Sqlx(sqlx::Error),
     /// Filesystem I/O error (archive rename, etc.).
@@ -31,6 +43,23 @@ impl fmt::Display for StorageError {
                 write!(f, "vector bytes length does not match declared dim")
             }
             Self::CorruptJson => write!(f, "account.json is corrupt or has an unexpected shape"),
+            Self::UnsupportedDatabaseUrl => {
+                write!(f, "LifeOS durable storage requires a PostgreSQL URL")
+            }
+            Self::MissingDatabaseUrl => {
+                write!(f, "LIFEOS_DATABASE_URL is required for durable storage")
+            }
+            Self::MissingTestDatabaseUrl => {
+                write!(f, "LIFEOS_TEST_DATABASE_URL is required for storage tests")
+            }
+            Self::RequiredExtension => {
+                write!(f, "ruvector must be installed in the extensions schema")
+            }
+            Self::IncompleteMigrations { applied, expected } => write!(
+                f,
+                "database has {applied} applied migrations but {expected} are required"
+            ),
+            Self::InvalidProjectionJson => write!(f, "projection payload must be valid JSON"),
             Self::Sqlx(e) => write!(f, "database error: {e}"),
             Self::Io(e) => write!(f, "I/O error: {e}"),
         }
@@ -49,14 +78,17 @@ impl std::error::Error for StorageError {
 
 impl From<sqlx::Error> for StorageError {
     fn from(e: sqlx::Error) -> Self {
-        // Detect SQLite constraint violations and map to domain errors.
+        // PostgreSQL SQLSTATEs keep domain failures independent of locale and
+        // server wording.
         if let sqlx::Error::Database(ref db) = e {
-            let msg = db.message();
-            if msg.contains("UNIQUE") && msg.contains("accounts.email") {
-                return Self::DuplicateEmail;
-            }
-            if msg.contains("FOREIGN KEY") {
-                return Self::ForeignKeyViolation;
+            match db.code().as_deref() {
+                Some("23505") => {
+                    return Self::DuplicateEmail;
+                }
+                Some("23503") => {
+                    return Self::ForeignKeyViolation;
+                }
+                _ => {}
             }
         }
         Self::Sqlx(e)

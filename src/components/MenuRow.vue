@@ -15,6 +15,7 @@ defineEmits(["click"]);
 
 <template>
   <div :class="['menu-row', { active: item.active, collapsed }]"
+       data-figma-component="Sidebar Companion/Menu row"
        :title="collapsed ? item.label : undefined"
        role="button"
        tabindex="0"

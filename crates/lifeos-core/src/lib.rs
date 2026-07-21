@@ -11,8 +11,8 @@ pub mod types;
 #[cfg(feature = "plugin-host")]
 pub mod plugin;
 
-// Wave 4: SQLite-backed local storage layer. Off by default for no_std/ESP32
-// consumers; enabled for desktop + daemon via the `storage` feature.
+// Canonical PostgreSQL/RuVector storage. Off for no_std/ESP32 consumers; the
+// desktop shell opts in through the `storage` feature.
 #[cfg(feature = "storage")]
 pub mod storage;
 

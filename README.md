@@ -22,14 +22,13 @@ The ElementArk-led canonical lockups remain source assets for corporate and pare
 
 ## Quick start
 
-Toolchain (matches the host's `mise`-managed tree):
+Toolchain (the active Yazelix/Nix profile owns the executable front doors):
 
 | Tool | Version |
 |------|---------|
-| node | 24.15.0 |
-| bun | 1.3.13 |
-| rustc / cargo | 1.95.0 |
-| tauri-cli | 2.11.1 |
+| bun | 1.3.14 |
+| rustc / cargo | 1.98.0-nightly |
+| tauri-cli | 2.11.2 |
 
 ```bash
 # Install JS deps
@@ -50,7 +49,45 @@ bun run build               # Vite static bundle to dist/
 bun run tauri:build         # Native installers (.deb / .AppImage on Linux)
 ```
 
-Tauri Linux system deps already installed on this host (`webkit2gtk-4.1`, `libsoup-3.0`, `gtk-3`, `libxdo`, `ayatana-appindicator3`, `librsvg2`, `build-essential`).
+On Linux, Tauri uses the platform SDK (`webkit2gtk-4.1`, `libsoup-3.0`, `gtk-3`, `libxdo`, `ayatana-appindicator3`, `librsvg2`, `build-essential`). The active Nix `pkg-config` wrapper intentionally excludes platform metadata, so the checked-in [`.cargo/config.toml`](./.cargo/config.toml) routes Cargo build scripts through [`scripts/resolve-pkg-config.sh`](./scripts/resolve-pkg-config.sh). The same target-scoped bridge emits an RPATH for the platform library directories, so transitive GTK/WebKit libraries resolve at runtime under the Nix loader as well. This preserves the Nix-owned Cargo toolchain while letting Tauri resolve the already-installed platform SDK. A caller-provided `PKG_CONFIG` takes precedence.
+
+## Durable PostgreSQL/RuVector storage
+
+PostgreSQL with RuVector is the sole canonical durable product-data store. Set
+`LIFEOS_DATABASE_URL` before launching the Tauri shell; the application refuses
+to start without it or without `ruvector` installed in the dedicated
+`extensions` schema. The bootstrap must be run by the PostgreSQL installation
+owner, before the less-privileged LifeOS runtime role is used:
+
+```bash
+psql "$LIFEOS_ADMIN_DATABASE_URL" \
+  -v lifeos_runtime_role=lifeos_app \
+  --file crates/lifeos-core/sql/bootstrap-postgres-ruvector.sql
+
+LIFEOS_DATABASE_URL="postgresql://lifeos_app@database.example/lifeos" bun run tauri:dev
+```
+
+The bootstrap owns extensions and the empty application schemas because those
+are administrative boundaries; it grants the runtime role only `CONNECT`,
+`USAGE`/`CREATE` in the five `lifeos_*` schemas, and the required RuVector
+type/function access. It also pins that role's database-local `search_path` to
+`lifeos_runtime, extensions, pg_catalog`, so SQLx's unqualified migration
+ledger never needs `CREATE` on `public`. The numbered Rust migrations then own
+LifeOS tables.
+`ui-state`, lighting state, and AI-provider selection are PostgreSQL
+projections, not app-data JSON files. A one-way read-only importer safely moves
+pre-cutover `lifeos.db`, `account.json`, `ui-state.json`, `lighting.json`, and
+`ai.json` sources into PostgreSQL, archives their exact bytes there, and only
+then retires the local source. Conflicting local/canonical records stop startup
+without deleting either side.
+
+For storage integration tests, provision a disposable database with the same
+extension bootstrap and pass only its URL through `LIFEOS_TEST_DATABASE_URL`:
+
+```bash
+LIFEOS_TEST_DATABASE_URL="$LIFEOS_TEST_DATABASE_URL" \
+  cargo test -p lifeos-core --features "storage,legacy-sqlite-import" -- --test-threads=1
+```
 
 ---
 

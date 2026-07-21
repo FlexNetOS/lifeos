@@ -3,11 +3,9 @@
 //! Stage 1c of the TODO: lifted out of `src-tauri/src/auth.rs` so the headless
 //! daemon and any future shell can verify a stored account record without
 //! linking the Tauri runtime. Everything here is platform-agnostic — no
-//! `tauri::*` imports, no filesystem I/O. Storage (`<app_data_dir>/account.json`)
-//! stays in the shell because it depends on `tauri::AppHandle::path()`.
-//!
-//! The persisted shape (`AccountRecord` JSON) is unchanged from the pre-move
-//! Tauri shell, so existing on-disk records keep working.
+//! `tauri::*` imports, no filesystem I/O. PostgreSQL identity persistence stays
+//! in the shell/core storage boundary; `AccountRecord` is retained solely as
+//! the validated legacy-import wire shape.
 
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
@@ -25,9 +23,8 @@ pub const ERR_VALIDATION_NAME: &str = "Display name can't be empty.";
 pub const ERR_VALIDATION_PASSWORD: &str = "Password must be at least 8 characters.";
 pub const ERR_INTERNAL: &str = "LifeOS couldn't update the local credential store.";
 
-/// The on-disk record. Serializes to `<app_data_dir>/account.json` via the
-/// shell's storage helpers. Field names are part of the wire format — do not
-/// rename without a migration plan.
+/// The historical account-record wire shape. Field names are part of the
+/// legacy import format — do not rename without a migration plan.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AccountRecord {
     pub email: String,

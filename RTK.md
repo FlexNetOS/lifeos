@@ -2,9 +2,9 @@
 
 **Usage**: Token-optimized CLI proxy for shell commands.
 
-## Rule
+## Rule — mandatory
 
-Always prefix shell commands with `rtk`.
+RTK is the **mandatory must-use** command frontdoor. Every shell execution begins with the profile-owned `/home/flexnetos/.nix-profile/bin/rtk`; commands that need raw, unfiltered evidence use `rtk proxy <cmd>`. Adoption is verified from the session transcript, not from mere binary availability.
 
 Examples:
 

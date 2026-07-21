@@ -17,6 +17,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 How they interact: completeness without surgical discipline becomes sprawl; surgical discipline without completeness becomes the "table this for later" anti-pattern. Hit the *asked-for* scope completely, then stop — and do it with the four rules above. "Boil the ocean" is not license to expand scope; it's the obligation to finish the scope you took.
 
+## Architecture anchor — RuVector data-pipeline blueprint
+
+`Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md` (repo root) is the **normative architecture and data-pipeline authority** for this repository. Read it before substantive architecture, storage, ingress, or release work, and conform to its "HARD EXECUTION RULES — READ FIRST" (21 rules) and "Operational invariants and acceptance" (19 invariants). Its opening law: *"EVERYTHING means EVERYTHING. EVERY BYTE means EVERY BYTE."* The blueprint is itself anchored to `Architecture_Data_Pipeline_Graph_ANCHORED_VERIFIED(3).md` (SHA-256 `abd36f1c…`) as its normative topology authority.
+
+Anchor invariants that bind day-to-day work here:
+
+- **PostgreSQL 17.10 + RuVector is the canonical durable macro-state and the Swarm Primary Runtime** — it hosts host ALL data, and after cutover all work happens inside it. (The repo's Rust storage layer already treats PostgreSQL/RuVector as canonical and rejects SQLite URLs — see "Storage layer (Rust-side only)" below.)
+- **nu_plugin / CodeDB is the byte-complete ingress** into PostgreSQL/RuVector; hashes, manifests, and pointers supplement byte capture and never replace it.
+- **redb is the transient shared low-latency state plane** — a single-owner, file-backed ACID buffer/cache/geometry/WAL that atomically publishes a read-only mmap projection plus ordered wakeup events; it is never the primary runtime or a source of truth.
+- **envctl is the sole authoritative PostgreSQL/RuVector ingress committer** and the bidirectional bridge, materializer, projection manager, and security boundary.
+- **ruvnet/rUv, RuVector, AgentDB, RVF, ruvllm, SONA, MicroLoRA, FastGRNN, Ruflo, RuvLTRA, ATAS** are installed and used, not replaced.
+- The bidirectional LifeOS **Glass (Tauri/Svelte) ↔ Yazelix Engine Room (`yzx enter` / Zellij)** front door stays operational after database cutover.
+
+Blueprint content map (open the file for detail — do not re-derive):
+
+| Section | Contents |
+|---|---|
+| HARD EXECUTION RULES — READ FIRST | 21 non-negotiable rules; the broader interpretation governs every ambiguity; a conflicting edit is invalid |
+| §1 Two-phase architecture | 1.1 Bootstrap import · 1.2 Operational (all work inside PostgreSQL/RuVector) |
+| §2 Host ALL-data contract | every repo/byte/semantic/metadata/task/model/secret record; raw bytes kept beside derived representations |
+| §3 Bidirectional operational front door | 3.1 Glass/Engine ownership · 3.2 eight physical pipelines · 3.3 redb owner / mmap / crash / replay · 3.4 rtk / rtk_nu / Nu / plugin raw-byte contract · 3.5 D01–D24 Mermaid atlas |
+| §4 Component scopes | 4.1 PostgreSQL+RuVector … 4.5 nu_plugin/CodeDB … 4.6 redb … 4.7 envctl … 4.10 ruvllm/AgentDB/RVF/SONA/Ruflo/RuvLTRA/ATAS |
+| §5 envctl security architecture | six subsystems: Secret Engine · Broker · Mint · Seed Vault · Cognitum Seed · Secret Relay |
+| RUVECTOR/RUVNET full component architecture (§§1–20) | ecosystem map, crate/package/extension inventory, PostgreSQL extension & SQL surface, retrieval/indexing, graph/GNN/causal/MinCut, COW branching, AgentDB/RVF, ruvllm, SONA/RL, witness-chain, Ruflo/RuvLTRA/ATAS, redb geometry, envctl integration, CodeDB ingress, Nix/release, complete data schema (§16), install/activation order (§17), bidirectional graph (§18), byte-capture/reconciliation (§19), additional components (§20) |
+| Capability register · component integration table | supplied capabilities and per-component integration rows |
+| Import, transformation, export, and release contract | zero-undeclared-loss completion; database-gated, envctl-activated release |
+| Anchor conformance ledger (A01–A15) | crosswalk over 15 anchor sections, 14 diagrams, 10 invariants |
+| Review ledger (R01–R16) | 2026-07-19 repository-source reconciliation (e.g. Vue→Svelte migration required; `rtk_nu` and `codedb ingest-envelope` are unbuilt release blockers) |
+| FlexNetOS operating doctrine and release gate | permanent `files → Nushell tables → validated envctl tables → generated files` conversion |
+| Operational invariants and acceptance | 19 invariants; zero silent-downgrade language permitted at release |
+
+Agent execution in this repo conforms to the blueprint's hard execution rules; an edit that conflicts with them is invalid.
+
+## Mandatory agent tooling — RTK · ICM · GitKB · GitNexus
+
+These are **mandatory must-use**, not optional. In this environment "optional" reads as mandatory.
+
+- **RTK (Rust Token Killer) — mandatory command frontdoor.** Every shell execution begins with the profile-owned `/home/flexnetos/.nix-profile/bin/rtk`; commands that need raw, unfiltered evidence use `rtk proxy <cmd>`. Adoption is verified from the session transcript, not from mere binary availability. Command reference: `RTK.md`.
+- **ICM (Infinite Context Memory) — mandatory persistent memory.** Recall before starting work (`icm recall "<query>"`); store immediately — before responding, not after — on every trigger: error resolved (`-t errors-resolved`), architecture or design decision (`-t decisions-lifeos`), user preference (`-t preferences -i critical`), significant task completed (`-t context-lifeos`), or more than ~20 tool calls without a store. ICM is the system of record for cross-session memory.
+- **GitKB — mandatory knowledge and code-intelligence layer.** Use the `kb_*` MCP tools (and `git kb`) for callers / usages / definitions, impact and blast-radius, and knowledge documents — not raw grep for code symbols. Create the task or incident document before implementing; link commits to tasks.
+- **GitNexus — mandatory code-intelligence.** Run impact analysis before editing any symbol, and `detect_changes()` before committing, per the GitNexus block at the bottom of this file (Always Do / Never Do).
+
+**Transitional note — why all three of GitKB, ICM, and GitNexus are mandated (alongside RTK).** GitNexus is retained and mandated *as-is*; it is **not** demoted. Its mandated status is provisional: GitNexus is demoted only after the **GitKB + ICM** combination is *proven* to fill its gap. Until that proof exists, all three (GitKB, ICM, GitNexus) are mandated and used together, with RTK as the mandatory shell frontdoor.
+
+## Path law — single Nix profile
+
+`/home/flexnetos/.nix-profile` is the **sole active owner and frontdoor** for all agent and workspace binaries, runtime, and configs — required to achieve the blueprint build. Forbidden:
+
+- any `.local` ownership, runtime, or launcher path;
+- any home-root `~/.codex` or `~/.claude` ownership or compatibility path.
+
+Profile-managed volatile agent state targets `/run/user/1001/yazelix/profile-runtime`. This governs ownership and runtime paths; it does not touch the in-repo `CLAUDE.md` / `AGENTS.md` contracts.
+
 ## Read first
 
 This repo already has two long-form documents that are **authoritative** — read them before doing substantive work, and prefer them over re-deriving information:
@@ -161,6 +214,8 @@ From `design-system-reference/README.md` (summarized — read the source for nua
 - **Heal, do not harm** — surgical changes, verify before committing.
 - **Never commit without `bun test` passing and the dev server booting.**
 - All changes must remain compatible with the OpenPencil in-app editing flow.
+
+> **GitNexus status: mandatory (provisional).** Retained *as-is* and mandated alongside RTK, ICM, and GitKB (see "Mandatory agent tooling — RTK · ICM · GitKB · GitNexus" above). It is demoted only once the GitKB + ICM combination is *proven* to fill its gap.
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence

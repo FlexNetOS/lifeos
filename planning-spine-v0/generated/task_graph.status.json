@@ -220,6 +220,7 @@
     "ARCHBP-002",
     "ARCHBP-011",
     "ARCHBP-019",
+    "ARCHBP-024",
     "ARCHBP-026",
     "ARCHBP-027",
     "ARCHBP-029",
@@ -242,18 +243,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 310,
+  "ledger_entry_count": 311,
   "lifecycle_counts": {
     "blocked": 19,
-    "complete": 214,
+    "complete": 215,
     "draft": 0,
-    "ready": 11,
+    "ready": 10,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "89d9f8d7ba5fc870a16db01822ac62389f1559630e0c2fba57f91cd189a22f91",
+  "proof_ledger_sha256": "cd6d97141c1d77ab4869baa8125b4f586dc9c053eff84958f727348a07b99c57",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -261,7 +262,6 @@
     "ARCHBP-018",
     "ARCHBP-021",
     "ARCHBP-022",
-    "ARCHBP-024",
     "ARCHBP-028",
     "ARCHBP-030",
     "ARCHBP-031",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "d78127d4030225b6dc0f54a2dea0e7762cee8e99af271b1dd56a9e775c0a8f1a",
+  "source_graph_sha256": "7c15295168ee4755588d4d1698fddc09a55140c1765daf51baafa138ba146225",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8609,11 +8609,11 @@
     },
     {
       "effective": {
-        "next_action": "Write failing exporter integrity, determinism, license, materialization, and rollback tests before the all-peer rehearsal.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-024.proof.json; next child task: ARCHBP-025.",
         "proof_uri": "proof_records/ARCHBP-024.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "CONSOLIDATE-003",
         "POSTGRES-008"
@@ -8621,22 +8621,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 311,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "3741ade936fc32be1b103477f34dcfd04a35c1b07fe69e6be092298db3f8628f",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write failing exporter integrity, determinism, license, materialization, and rollback tests before the all-peer rehearsal.",
         "proof_uri": "proof_records/ARCHBP-024.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 221,
       "task_id": "ARCHBP-024",
       "title": "Build CodeDB single-binary export and run full peer consolidation",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write failing exporter integrity, determinism, license, materialization, and rollback tests before the all-peer rehearsal.",
+          "to": "Proof accepted from proof_records/ARCHBP-024.proof.json; next child task: ARCHBP-025."
+        }
+      }
     },
     {
       "effective": {
@@ -9725,6 +9732,7 @@
     "ARCHBP-002",
     "ARCHBP-011",
     "ARCHBP-019",
+    "ARCHBP-024",
     "ARCHBP-026",
     "ARCHBP-027",
     "ARCHBP-029",

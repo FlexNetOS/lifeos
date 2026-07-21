@@ -1,0 +1,39 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-027",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail when RULES.md is missing, duplicated, stale, or sourced from retired mirrors; preview is idempotent; installed checksum traces to one reviewed editable source through envctl and the profile without widening plugins or MCPs.",
+  "gate_result": {
+    "canonical_source_decision": "the single reviewed editable source is yazelix agent_configs/codex/RULES.md.src, projected repo → nix profile share → materialized profile-runtime CODEX_HOME RULES.md; the historical ~/.codex path is superseded by the path law and its mirrors (~/.codex, ~/lifeos/.codex, ~/FlexNetOS/.codex, envctl workspace .codex) are retired and must stay empty",
+    "missing_detected_red": true,
+    "missing_evidence": "existing provenance gate clauses fail on missing deployed/review sources and missing generated runtime; the new authority gate additionally fails retired-mirror-source when the generated runtime is absent",
+    "duplicated_detected_red": true,
+    "duplicate_evidence": "new clause duplicate-authority fails when RULES.md exists at any retired mirror; proven red via --fixture-root simulation (planted ~/.codex/RULES.md → exit 1) and enforced source-only by the codex_rules_authority flake check whose planted-duplicate fixture must fail",
+    "stale_detected_red": true,
+    "stale_evidence": "existing provenance clause deployed↔repo hash sync detects staleness; the new single-source clause fails unless repo source, deployed profile source, and the runtime's embedded source_sha256 are one identical hash (fixture with divergent hashes → red)",
+    "retired_mirror_source_detected_red": true,
+    "mirror_evidence": "new clause retired-mirror-source fails when the generated runtime's authorship-input comment names anything but the deployed profile source; fixture naming a lifeos mirror → red",
+    "preview_idempotent": true,
+    "idempotence_evidence": "existing materializer gate proves byte-identical double render and recover-only no-op (flake checks codex_config_materializer + foundation double-materialize)",
+    "checksum_traces_to_one_reviewed_source": true,
+    "chain_evidence": "clean host: repo RULES.md.src, profile share RULES.md.src, and the runtime's embedded source_sha256 all equal ebf611b228f3f3177ff9c477b55653b61ecc375e28a6724ce4f0a3f9afd34ecc; envctl lifecycle verify and agent-env.yaml navigation invariant route the same chain",
+    "no_plugin_or_mcp_widening": true,
+    "widening_evidence": "provenance clauses no-retired-or-inactive-config-paths and icm-profile-selector pass unchanged; the change adds a read-only gate and no plugin or MCP surface",
+    "ci_enforced_source_only": true,
+    "ci_evidence": "nix build .#checks.x86_64-linux.codex_rules_authority builds green: the self-consistent green fixture passes all clauses and the planted-duplicate red fixture must fail inside the sandbox — no live host state required",
+    "existing_gates_unchanged_green": "codex_config_materializer and codex_config_provenance both pass on the live host (provenance requires the profile PATH so `which codex` resolves to the profile binary)",
+    "product_execution_performed": true,
+    "product_execution_evidence": "all clauses executed against the live profile runtime, the installed nix profile share, and the reviewed repo source; fixture red runs executed with planted duplicates and mirror-sourced generated files"
+  },
+  "proof_summary": "ARCHBP-027 is complete: durable RULES.md authority is restored and enforced end to end. Recon showed the authority chain (yazelix RULES.md.src → nix profile share → materialized profile-runtime CODEX_HOME, with envctl lifecycle verification) already live; the residual gaps are now closed by tests/codex_rules_authority.nu (yazelix PR FlexNetOS/yazelix#102, b664397): duplicate-authority fails on any retired-mirror RULES.md, retired-mirror-source fails unless the generated runtime names the deployed profile source, and single-source fails unless the repo, deployed, and embedded hashes are one identical value — each red path proven via --fixture-root simulation without touching blocked live locations, and enforced source-only in CI by the codex_rules_authority flake check. The clean host passes every clause on the ebf611b2… chain, preview idempotence and no-MCP-widening hold via the unchanged materializer and provenance gates, and the canonical-source decision (profile-runtime CODEX_HOME supersedes the historical ~/.codex) is recorded here.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-027.proof.json",
+    "https://github.com/FlexNetOS/yazelix/pull/102",
+    "yazelix:tests/codex_rules_authority.nu",
+    "yazelix:flake.nix",
+    "yazelix:tests/codex_config_materializer.nu",
+    "yazelix:tests/codex_config_provenance.nu"
+  ]
+}

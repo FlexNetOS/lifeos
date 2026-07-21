@@ -354,10 +354,10 @@ class IntegratedCorrectionCorpusTests(unittest.TestCase):
             {
                 "draft": 0,
                 "blocked": 19,
-                "ready": 17,
+                "ready": 16,
                 "simulated": 0,
                 "running": 0,
-                "complete": 208,
+                "complete": 209,
                 "rolled-back": 0,
             },
         )

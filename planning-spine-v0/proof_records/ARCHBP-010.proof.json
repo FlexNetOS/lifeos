@@ -1,0 +1,37 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-010",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The harness publishes raw samples and exact hardware/software identities; runs 1, 8, 16, 32, and at least 50 agents when capacity permits; exercises overload and recovery; reports confidence intervals and honest limits; no architecture claim exceeds measured evidence.",
+  "gate_result": {
+    "red_first": "contracts committed red at lifeos ce96aed (4/4 failing: stub throws on the pure clauses and the scale proof emitter exits non-zero), implementation green at HEAD (4/4)",
+    "publishes_raw_samples": true,
+    "raw_samples_evidence": "runScale collects one RAW wall-clock latency sample per agent (worker spawn + bounded SHA-256 workload) and publishes the full samplesMs array; every reported scale has rawSampleCount === scale (1,8,16,32,50 samples respectively). No aggregate is published without its underlying raw samples.",
+    "exact_hardware_software_identity": true,
+    "identity_evidence": "hardwareIdentity publishes the exact host identity — arch x64, cpuModel 'AMD Ryzen Threadripper PRO 7965WX 24-Cores', logicalCpus 48, totalMemBytes, platform linux, and the runtime nodeVersion — so the measurement is attributable to a specific machine and runtime.",
+    "runs_required_scale_ladder": true,
+    "ladder_evidence": "the harness runs the 1/8/16/32 ladder always and the 50-agent step when capacity permits; scaleSchedule requires >=16 logical CPUs for the 50 step, and on this 48-CPU host the 50-agent step ran (fiftyAgentStepRun=true). A capacity-scarce host honestly skips the 50 step with a stated reason rather than fabricating it.",
+    "real_parallelism": true,
+    "parallelism_evidence": "agents run as real node worker_threads, not simulated — the sweep drives ~10s of user CPU across the 48 logical cores in ~1s wall, and per-agent mean latency rises with scale (approx 43ms at 1 agent to 77ms at 50) as genuine CPU contention appears.",
+    "overload_and_recovery": true,
+    "overload_evidence": "an overload run oversubscribes to ~2x the logical CPUs (96 agents); mean per-agent latency degrades sharply versus the 16-agent baseline (e.g. ~30ms baseline to ~155ms overload, degraded=true), and a subsequent baseline run recovers toward the baseline (recovered=true) — the harness measures degradation and recovery rather than asserting fixed latency.",
+    "confidence_intervals": true,
+    "ci_evidence": "confidenceInterval95 reports a 95% CI (normal approximation, mean +/- 1.96*std/sqrt(n)) for every scale, published alongside p50/p95 percentiles from the raw samples.",
+    "honest_limits_declared": true,
+    "limits_evidence": "declaredCells marks CPU and memory as measured and GPU, network, and storage as NOT measured; honestLimits states no fixed-latency or throughput claim is made beyond the measured samples. The blueprint's 50-plus-agent and fixed-latency assertions are replaced by these reproducible measurements.",
+    "no_claim_exceeds_measured_evidence": true,
+    "evidence_bound": "every published metric derives from a raw measured sample on this host; the proof makes no architecture-level throughput or latency claim, and GPU/network/storage cells are declared unmeasured rather than asserted.",
+    "full_suite": "ARCHBP-010 spec 4/4 with real worker_threads.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the proof spawns real worker_threads at 1/8/16/32/50 agents plus a 96-agent overload and a recovery run on this host, measuring real wall-clock latency, throughput, and peak RSS. The spec spawns the proof emitter via bun and asserts on its emitted JSON."
+  },
+  "proof_summary": "ARCHBP-010 is complete: the swarm scale and hardware acceptance harness (lifeos scripts/swarm-scale-harness.mjs + tests/archbp-010-swarm-scale-harness.spec.ts, red ce96aed -> green HEAD, 4/4) replaces the blueprint's 50-plus-agent and fixed-latency assertions with reproducible measurements. Real node worker_threads run a bounded CPU workload at 1, 8, 16, 32, and 50 agents (the 50 step gated on >=16 logical CPUs and run on this 48-CPU Threadripper host), publishing the full raw per-agent latency samples, 95% confidence intervals, p50/p95 percentiles, throughput, and peak memory alongside the exact hardware and runtime identity. An overload run at ~2x the logical CPUs shows clear latency degradation and a subsequent baseline run recovers, and only CPU and memory cells are measured — GPU, network, and storage are declared unmeasured. No architecture claim exceeds the measured evidence.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-010.proof.json",
+    "scripts/swarm-scale-harness.mjs",
+    "tests/archbp-010-swarm-scale-harness.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

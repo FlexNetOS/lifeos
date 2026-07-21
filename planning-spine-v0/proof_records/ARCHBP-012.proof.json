@@ -1,0 +1,35 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-012",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Pre-registered tests compare attractor metrics against shuffled and simple-model baselines across seeds; findings report negative as well as positive results; only reproducible out-of-sample gains permit downstream use.",
+  "gate_result": {
+    "red_first": "contracts committed red at meta-ruvector 4159e8478 (5/8 substantive tests failing: coverage, leakage contract, criteria evaluation, skill-over-naive, downstream-permission — stub returns an unproven optimistic verdict), implementation green at c2268d477 (8/8)",
+    "pre_registered_criteria": true,
+    "criteria_evidence": "StudyConfig::preregistered fixes the protocol before observing data: series_len 400, washout 40, 60/15/25 chronological split, 5 seeds, ESN reservoir 80 / spectral 0.9 / leak 0.3 / ridge 1e-4, and a minimum required out-of-sample relative gain of 5%. Three acceptance criteria are declared up front: A1 skill-over-naive, A2 attractor-specific, A3 temporal-dependent.",
+    "compared_against_shuffle_and_simple_baselines": true,
+    "baseline_evidence": "Every seed and series is scored against a persistence baseline, a mean baseline, and a seeded Fisher-Yates shuffle ablation, using the crate's nrmse metric on a leakage-free chronological DatasetContract (train_end <= calib_start <= test_start, validated).",
+    "across_seeds": true,
+    "seed_evidence": "The study runs all 5 seeds on both the attractor-bearing series (mackey-glass) and the stochastic control (ar1) — 10 series/seed results, all reported (no cherry-picking; every_series_and_seed_is_reported asserts results.len() == seeds*2).",
+    "reports_negative_and_positive": true,
+    "honest_reporting_evidence": "Positive: the ESN beats a constant-mean forecast on every series and seed (it learns real structure). Negative: on the attractor series the ESN does NOT beat naive persistence by the pre-registered margin (per-seed relative gains [-0.176, 0.010, 0.006, 0.008, 0.007], median 0.72% vs required 5%); its median gain is SMALLER on the attractor (0.72%) than on the stochastic control (8.92%, driven by linear AR structure); and the shuffle ablation INCREASES rather than removes the advantage (attractor median 0.72% vs shuffled 30.73%). All three criteria fail.",
+    "only_reproducible_gains_permit_downstream": true,
+    "downstream_gate_evidence": "permits_downstream = A1 && A2 && A3 = false. The verdict states: no reproducible attractor-specific out-of-sample gain over simple baselines; downstream use NOT permitted. This is the honest outcome and directly enforces the blueprint's prohibition on promoting metaphor to mechanism.",
+    "reproducible": true,
+    "reproducibility_evidence": "study_is_reproducible_bit_for_bit asserts two runs produce bit-identical nrmse (deterministic seeded RNG and ESN); a committed examples/attractor_report.rs regenerates the full report on demand.",
+    "no_leakage": "training/test leakage is excluded by the chronological DatasetContract, asserted directly in dataset_contract_is_leakage_free_and_chronological.",
+    "full_suite": "attractor_study_gate 8/8; full atas_harness crate suite 22/22 (existing 14 + new 8); new code clippy-clean.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The study runs real ESN reservoirs (real fit/predict), real persistence/mean baselines, and a real shuffle ablation over real mackey-glass and ar1 series on this host; the numbers in this proof are the actual measured out-of-sample nrmse values."
+  },
+  "proof_summary": "ARCHBP-012 is complete: a pre-registered empirical attractor study (meta-ruvector atas_harness::attractor_study + tests/attractor_study_gate.rs + examples/attractor_report.rs, PR FlexNetOS/meta-ruvector#129, red 4159e8478 -> green c2268d477, 8/8 gate, 22/22 crate suite, clippy-clean) empirically answers whether attractor-like structure yields reproducible out-of-sample forecast gains over simple baselines. With the acceptance criteria fixed in advance (5% minimum relative gain over persistence, attractor-specificity, temporal-dependence), the honest measured finding across 5 seeds is that the ESN beats a constant-mean forecast everywhere (it learns real structure) but does NOT beat naive persistence on the attractor series by the required margin (median gain 0.72%, negative on one seed), its gain is smaller on the attractor than on stochastic noise (0.72% vs 8.92%), and shuffling increases rather than removes the advantage. All three criteria fail, so permits_downstream=false and the study refuses to promote the attractor metaphor to mechanism. Negative results are reported alongside positive ones, every seed is shown, the dataset contract is leakage-free, and the run is bit-for-bit reproducible.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-012.proof.json",
+    "https://github.com/FlexNetOS/meta-ruvector/pull/129",
+    "meta-ruvector:atas_harness/src/attractor_study.rs",
+    "meta-ruvector:atas_harness/tests/attractor_study_gate.rs",
+    "meta-ruvector:atas_harness/examples/attractor_report.rs"
+  ]
+}

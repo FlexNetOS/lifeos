@@ -4,7 +4,6 @@
     "ARCHBP-005",
     "ARCHBP-006",
     "ARCHBP-010",
-    "ARCHBP-013",
     "ARCHBP-014",
     "ARCHBP-015",
     "ARCHBP-016",
@@ -217,6 +216,7 @@
     "ARCHBP-008",
     "ARCHBP-009",
     "ARCHBP-011",
+    "ARCHBP-012",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",
@@ -243,10 +243,10 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 317,
+  "ledger_entry_count": 318,
   "lifecycle_counts": {
-    "blocked": 13,
-    "complete": 221,
+    "blocked": 12,
+    "complete": 222,
     "draft": 0,
     "ready": 10,
     "rolled-back": 0,
@@ -254,11 +254,11 @@
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "14cbe41994064a36ecf5bf22fa765edf54a693835b3e1ecca731bb38ba6b24f5",
+  "proof_ledger_sha256": "5bd585a7e329707b32a5268045738fabee2fc01720cfe5af2e756a2e01e3fd70",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-004",
-    "ARCHBP-012",
+    "ARCHBP-013",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "cdb267d1c3307d17ebc0338a9d942a8a84c6b5c5cab86e27b297a037433e4d82",
+  "source_graph_sha256": "6c564e31ae9e57b9d1cab5341029d48dba67d527524840c820795b33288056bb",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8258,41 +8258,48 @@
     },
     {
       "effective": {
-        "next_action": "Pre-register the attractor, robustness, null-hypothesis, and out-of-sample tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-012.proof.json; next child task: ARCHBP-013.",
         "proof_uri": "proof_records/ARCHBP-012.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-011"
       ],
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 318,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "1ff7be34b75f0baeef0b7d1006b9f7c2ad39a1b3afcf56fa77d320d7b11dad51",
+        "status": "pass"
       },
       "source": {
         "next_action": "Pre-register the attractor, robustness, null-hypothesis, and out-of-sample tests.",
         "proof_uri": "proof_records/ARCHBP-012.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 209,
       "task_id": "ARCHBP-012",
       "title": "Validate temporal strange-attractor claims empirically",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Pre-register the attractor, robustness, null-hypothesis, and out-of-sample tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-012.proof.json; next child task: ARCHBP-013."
+        }
+      }
     },
     {
       "effective": {
         "next_action": "Write failing local-default, privacy, cost, uncertainty, and outage-routing tests.",
         "proof_uri": "proof_records/ARCHBP-013.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "ready",
       "parent_ids": [
         "ARCHBP-011",
         "ARCHBP-012"
@@ -8309,7 +8316,7 @@
       "source": {
         "next_action": "Write failing local-default, privacy, cost, uncertainty, and outage-routing tests.",
         "proof_uri": "proof_records/ARCHBP-013.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
       "source_row_number": 210,
       "task_id": "ARCHBP-013",
@@ -9777,6 +9784,7 @@
     "ARCHBP-008",
     "ARCHBP-009",
     "ARCHBP-011",
+    "ARCHBP-012",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",

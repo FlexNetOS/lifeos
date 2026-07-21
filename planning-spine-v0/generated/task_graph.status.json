@@ -216,6 +216,7 @@
     "ARCHBP-014",
     "ARCHBP-015",
     "ARCHBP-016",
+    "ARCHBP-017",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",
@@ -242,23 +243,22 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 322,
+  "ledger_entry_count": 323,
   "lifecycle_counts": {
     "blocked": 7,
-    "complete": 226,
+    "complete": 227,
     "draft": 0,
-    "ready": 11,
+    "ready": 10,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "3f3e5529f97e06c1e0aab638d5f2b137b43161a84219db5f5affbdd172223c59",
+  "proof_ledger_sha256": "12d9af61c91d5f24b71e822da3c19ae9fb94485df03aa7db4884f432c2b56789",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-004",
     "ARCHBP-010",
-    "ARCHBP-017",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "a58d028bddeb0e17135bae5aaaf52e3467d232003bd681b9bd37f79cab7e4d7c",
+  "source_graph_sha256": "a53b917f255a9347908bce89ad0a2c40d81e74971064410b56519c88b39e50e1",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8446,11 +8446,11 @@
     },
     {
       "effective": {
-        "next_action": "Define the evidence-bound causal schema and failing forgery, staleness, contradiction, and authorization tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-017.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-017.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-003",
         "ARCHBP-016"
@@ -8458,22 +8458,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 323,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "1717b30ae4085f7bd5334b8af8afba25932b84d1c502a702f5128c6894be4f3b",
+        "status": "pass"
       },
       "source": {
         "next_action": "Define the evidence-bound causal schema and failing forgery, staleness, contradiction, and authorization tests.",
         "proof_uri": "proof_records/ARCHBP-017.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 214,
       "task_id": "ARCHBP-017",
       "title": "Enforce causal graph GNN and Cypher authorization guardrails",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Define the evidence-bound causal schema and failing forgery, staleness, contradiction, and authorization tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-017.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -9817,6 +9824,7 @@
     "ARCHBP-014",
     "ARCHBP-015",
     "ARCHBP-016",
+    "ARCHBP-017",
     "ARCHBP-019",
     "ARCHBP-022",
     "ARCHBP-024",

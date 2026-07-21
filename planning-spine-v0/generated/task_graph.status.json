@@ -219,6 +219,7 @@
     "ARCHBP-001",
     "ARCHBP-002",
     "ARCHBP-019",
+    "ARCHBP-026",
     "ARCHBP-027",
     "ARCHBP-029",
     "ARCHBP-032",
@@ -240,18 +241,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 308,
+  "ledger_entry_count": 309,
   "lifecycle_counts": {
     "blocked": 19,
-    "complete": 212,
+    "complete": 213,
     "draft": 0,
-    "ready": 13,
+    "ready": 12,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "c3e761ccfea7292d6b42172fd5c457d3a010d797512f0846d35e83e39399480d",
+  "proof_ledger_sha256": "8db164c24ea4aac4b0bdfb237a759f3b8d43b807cc7673d17f1c8f33762cc24d",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-003",
@@ -261,7 +262,6 @@
     "ARCHBP-021",
     "ARCHBP-022",
     "ARCHBP-024",
-    "ARCHBP-026",
     "ARCHBP-028",
     "ARCHBP-030",
     "ARCHBP-031",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "77bf66df33295a7a4ea715b21a2c646f7a29bda218bc2e3f30afb32504c9b876",
+  "source_graph_sha256": "608d7d76e09774410e4ba568ffaf18951cc044ca2501904ccc6ddf75e8cd2f7d",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8665,11 +8665,11 @@
     },
     {
       "effective": {
-        "next_action": "Run YZXCONV-022 as the detailed owning task and link its proof into the root ledger.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-026.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-026.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "FOUNDATION-003",
         "EXPERIENCE-002"
@@ -8677,22 +8677,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 309,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "b67a7bec61253e2af0d9479002ca170cddd1d8dd595a7700aefde6d4c5b9e8b5",
+        "status": "pass"
       },
       "source": {
         "next_action": "Run YZXCONV-022 as the detailed owning task and link its proof into the root ledger.",
         "proof_uri": "proof_records/ARCHBP-026.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 223,
       "task_id": "ARCHBP-026",
       "title": "Prove Home Manager desktop and profile startup ownership",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Run YZXCONV-022 as the detailed owning task and link its proof into the root ledger.",
+          "to": "Proof accepted from proof_records/ARCHBP-026.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -9710,6 +9717,7 @@
     "ARCHBP-001",
     "ARCHBP-002",
     "ARCHBP-019",
+    "ARCHBP-026",
     "ARCHBP-027",
     "ARCHBP-029",
     "ARCHBP-032",

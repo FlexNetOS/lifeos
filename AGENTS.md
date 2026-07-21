@@ -44,7 +44,7 @@ These rules harmonize with the Fundamental rules above: no hallucination, no ove
 
 Anchor invariants that bind day-to-day work here:
 
-- **PostgreSQL 17.10 + RuVector is the canonical durable macro-state and the Swarm Primary Runtime** — it hosts host ALL data, and after cutover all work happens inside it. (The repo's Rust storage layer already treats PostgreSQL/RuVector as canonical and rejects SQLite URLs — see "Storage layer (Rust-side only)" below.)
+- **PostgreSQL 17.10 + RuVector is the canonical durable macro-state and the Swarm Primary Runtime** — it hosts host ALL data, and after cutover all work happens inside it. (The repo's Rust storage layer in `crates/lifeos-core` already treats PostgreSQL/RuVector as canonical and rejects SQLite URLs.)
 - **nu_plugin / CodeDB is the byte-complete ingress** into PostgreSQL/RuVector; hashes, manifests, and pointers supplement byte capture and never replace it.
 - **redb is the transient shared low-latency state plane** — a single-owner, file-backed ACID buffer/cache/geometry/WAL that atomically publishes a read-only mmap projection plus ordered wakeup events; it is never the primary runtime or a source of truth.
 - **envctl is the sole authoritative PostgreSQL/RuVector ingress committer** and the bidirectional bridge, materializer, projection manager, and security boundary.

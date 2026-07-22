@@ -12,7 +12,7 @@ describe("ARCHBP-102 controllable-resource registry", () => {
   test("the registry enumerates resources across the controllable classes", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp102-"));
     try {
-      const reg = defaultRegistry(dir);
+      const reg = defaultRegistry(dir, { port: 38482 });
       const classes = new Set(reg.resources.map((r: { class: string }) => r.class));
       // The in-session provable classes; desktop apps / network-controller /
       // update-policy adapters land with their host-gated lanes (Omada T6,
@@ -28,7 +28,7 @@ describe("ARCHBP-102 controllable-resource registry", () => {
   test("every resource has a per-resource acquire/release adapter with prior-state capture", async () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp102b-"));
     try {
-      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir) });
+      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir, { port: 38482 }) });
       for (const r of plane.registry.resources) {
         const { prior } = await plane.acquire(r.name, { ttlMs: 10000 });
         expect(prior, r.name).toBeDefined(); // prior state captured per resource

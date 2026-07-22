@@ -16,7 +16,7 @@ describe("ARCHBP-101 control-plane API", () => {
     try {
       const plane = new HostControlPlane({
         auditPath: join(dir, "audit.jsonl"),
-        registry: defaultRegistry(dir),
+        registry: defaultRegistry(dir, { port: 38481 }),
       });
       for (const method of ["acquire", "release", "sweep", "revertFromLog", "audit", "resource"]) {
         expect(typeof (plane as Record<string, unknown>)[method], method).toBe("function");
@@ -32,7 +32,7 @@ describe("ARCHBP-101 control-plane API", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp101b-"));
     try {
       const auditPath = join(dir, "audit.jsonl");
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir) });
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port: 38481 }) });
       await plane.acquire("workspace-lease");
       await plane.release("workspace-lease");
       const lines = readFileSync(auditPath, "utf8").trim().split("\n").map((l) => JSON.parse(l));
@@ -49,10 +49,10 @@ describe("ARCHBP-101 control-plane API", () => {
   test("reversibility is guaranteed: release verifies the host returned to prior state", async () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp101c-"));
     try {
-      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir) });
-      const { prior } = await plane.acquire("loopback-port-38471");
+      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir, { port: 38481 }) });
+      const { prior } = await plane.acquire("loopback-port-38481");
       expect(prior.free).toBe(true);
-      const { restored } = await plane.release("loopback-port-38471");
+      const { restored } = await plane.release("loopback-port-38481");
       expect(restored).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });

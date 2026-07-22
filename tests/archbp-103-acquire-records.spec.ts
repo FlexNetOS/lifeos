@@ -13,12 +13,12 @@ describe("ARCHBP-103 acquire records prior state", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp103-"));
     try {
       const auditPath = join(dir, "a.jsonl");
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir) });
-      const { prior } = await plane.acquire("loopback-port-38471");
-      expect(prior).toEqual({ port: 38471, free: true }); // real pre-state
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port: 38483 }) });
+      const { prior } = await plane.acquire("loopback-port-38483");
+      expect(prior).toEqual({ port: 38483, free: true }); // real pre-state
       const audit = JSON.parse(readFileSync(auditPath, "utf8").trim().split("\n")[0]);
       expect(audit.prior).toEqual(prior); // recorded in the durable log
-      await plane.release("loopback-port-38471");
+      await plane.release("loopback-port-38483");
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -28,7 +28,7 @@ describe("ARCHBP-103 acquire records prior state", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp103b-"));
     try {
       const auditPath = join(dir, "a.jsonl");
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir) });
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port: 38483 }) });
       await plane.acquire("workspace-lease");
       await expect(plane.acquire("workspace-lease")).rejects.toThrow(/conflict/);
       const lines = readFileSync(auditPath, "utf8").trim().split("\n").map((l) => JSON.parse(l));
@@ -43,7 +43,7 @@ describe("ARCHBP-103 acquire records prior state", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp103c-"));
     try {
       const auditPath = join(dir, "a.jsonl");
-      const registry = defaultRegistry(dir);
+      const registry = defaultRegistry(dir, { port: 38483 });
       registry.resources.push({ name: "missing-gpu", adapter: "gpu-advisory", params: { node: "/dev/nonexistent0" }, class: "gpu" });
       const plane = new HostControlPlane({ auditPath, registry });
       await expect(plane.acquire("missing-gpu")).rejects.toThrow(/missing/);

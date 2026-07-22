@@ -15,11 +15,11 @@ describe("ARCHBP-105 durable reversible audit log", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp105-"));
     try {
       const auditPath = join(dir, "a.jsonl");
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir) });
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port: 38485 }) });
       await plane.acquire("workspace-lease");
       await plane.release("workspace-lease");
-      await plane.acquire("loopback-port-38471");
-      await plane.release("loopback-port-38471");
+      await plane.acquire("loopback-port-38485");
+      await plane.release("loopback-port-38485");
       const actions = readFileSync(auditPath, "utf8").trim().split("\n").map((l) => JSON.parse(l).action);
       expect(actions).toEqual(["acquire", "release", "acquire", "release"]);
     } finally {
@@ -31,11 +31,11 @@ describe("ARCHBP-105 durable reversible audit log", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp105b-"));
     try {
       const auditPath = join(dir, "a.jsonl");
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir) });
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port: 38485 }) });
       await plane.acquire("workspace-lease");
-      await plane.acquire("loopback-port-38471");
+      await plane.acquire("loopback-port-38485");
       const released = await plane.revertFromLog();
-      expect(released.sort()).toEqual(["loopback-port-38471", "workspace-lease"]);
+      expect(released.sort()).toEqual(["loopback-port-38485", "workspace-lease"]);
       expect(plane.holds.size).toBe(0);
       expect(existsSync(join(dir, "lease"))).toBe(false);
     } finally {
@@ -49,7 +49,7 @@ describe("ARCHBP-105 durable reversible audit log", () => {
     const auditPath = join(DURABLE_ROOT, "audit.jsonl");
     const scratch = mkdtempSync(join(tmpdir(), "archbp105c-"));
     try {
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(scratch) });
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(scratch, { port: 38495 }) });
       await plane.acquire("workspace-lease");
       await plane.release("workspace-lease");
       expect(existsSync(auditPath)).toBe(true);

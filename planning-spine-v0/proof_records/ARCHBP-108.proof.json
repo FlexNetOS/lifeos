@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "task_id": "ARCHBP-108",
+  "verification_gate": "Red tests fail first for: Commandeer demonstrated; Clean release verified; OS normal throughout; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "commandeer_demonstrated": true,
+    "commandeer_evidence": "LifeOS takes real authoritative control: while the port is held the little brother genuinely cannot bind it (EADDRINUSE asserted) \u2014 control is real, not advisory.",
+    "clean_release_verified": true,
+    "release_evidence": "Release restores the prior state (restored:true) and the OS immediately re-binds the port itself.",
+    "os_normal_throughout": true,
+    "normal_evidence": "During the hold the host binds other ports and runs processes normally (I13); the full arc is audited acquire->release with restored:true.",
+    "full_suite": "ARCHBP-108 spec 1/1.",
+    "product_execution_evidence": "Real EADDRINUSE denial, real restore, real concurrent host operations.",
+    "red_first": "gates committed red with the control plane absent (8/8 files failing) at the lane red commit, green at HEAD",
+    "product_execution_performed": true
+  },
+  "proof_summary": "ARCHBP-108 is complete: the end-to-end commandeer-and-release proof holds \u2014 LifeOS takes real authoritative control (the host is genuinely denied the resource while held), releases cleanly with verified restoration, and the OS functions normally throughout, with the whole arc audited.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-108.proof.json",
+    "tests/archbp-108-commandeer-release-proof.spec.ts",
+    "scripts/host-control-plane.mjs",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

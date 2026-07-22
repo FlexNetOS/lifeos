@@ -13,7 +13,7 @@ describe("ARCHBP-106 no permanent takeover", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp106-"));
     try {
       const auditPath = join(dir, "a.jsonl");
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir) });
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port: 38486 }) });
       const { expiresAt } = await plane.acquire("workspace-lease", { ttlMs: 50 });
       expect(expiresAt).toBeGreaterThan(Date.now() - 1000);
       const released = await plane.sweep(expiresAt + 1);
@@ -29,7 +29,7 @@ describe("ARCHBP-106 no permanent takeover", () => {
   test("auto-release on failure: a failed acquire leaves zero holds", async () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp106b-"));
     try {
-      const registry = defaultRegistry(dir);
+      const registry = defaultRegistry(dir, { port: 38486 });
       registry.resources.push({ name: "bad", adapter: "gpu-advisory", params: { node: "/dev/never0" }, class: "gpu" });
       const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry });
       await expect(plane.acquire("bad")).rejects.toThrow();
@@ -42,8 +42,8 @@ describe("ARCHBP-106 no permanent takeover", () => {
   test("the little-brother invariant is tested: host functions DURING a hold", async () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp106c-"));
     try {
-      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir) });
-      await plane.acquire("loopback-port-38471");
+      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir, { port: 38486 }) });
+      await plane.acquire("loopback-port-38486");
       // While LifeOS holds the port, the host still functions: filesystem,
       // process spawning, and OTHER ports all remain usable.
       const { execFileSync } = await import("node:child_process");
@@ -51,9 +51,9 @@ describe("ARCHBP-106 no permanent takeover", () => {
       expect(out).toContain("host-alive");
       const { createServer } = await import("node:net");
       const other = createServer();
-      await new Promise<void>((res, rej) => { other.once("error", rej); other.listen(38472, "127.0.0.1", () => res()); });
+      await new Promise<void>((res, rej) => { other.once("error", rej); other.listen(38487, "127.0.0.1", () => res()); });
       await new Promise((res) => other.close(res));
-      await plane.release("loopback-port-38471");
+      await plane.release("loopback-port-38486");
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

@@ -1,0 +1,29 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-091",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Guard implemented; CI/boot check; Fails on violation; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates executed red with the guard absent (2/2 files failing), green at HEAD (3/3)",
+    "guard_implemented": true,
+    "guard_evidence": "scripts/check-metavar-not-in-containers.mjs enforces I15 over the host-visible container surface: overlay layer dirs (lower/upper/work) referencing meta/var, meta/var bound into /var/lib/docker|containerd, and the reverse bind — all detected from /proc/mounts unprivileged.",
+    "ci_boot_check": true,
+    "ci_evidence": "The guard executes inside the always-on vitest gate against the live host mount table; today it scans the real container surface (the Omada moby 98ade093 overlay is host-visible) and proves 0 violations.",
+    "fails_on_violation": true,
+    "violation_evidence": "A fixture mount table with meta/var/lib/postgresql in an overlay lowerdir AND meta/var bound into a docker volume root makes the guard exit 1 naming both violations.",
+    "honest_boundary": true,
+    "boundary_evidence": "The unprivileged verification boundary (per-container in-namespace bind tables need root) is printed by the guard itself and closed permanently by the T6 docker/KVM cutover (ARCHBP-089..092), which retires the container runtime.",
+    "full_suite": "ARCHBP-091 spec 3/3.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "Live scan of the real host mount table including the existing container overlay, plus a real rejected violation fixture."
+  },
+  "proof_summary": "ARCHBP-091 is complete: the I15 assertion runs in CI against the live host mount surface — meta/var is proven absent from every host-visible container overlay layer and bind (including the existing Omada moby container), violations are rejected with exit 1 (fixture-proven), and the unprivileged verification boundary is stated honestly with its closure assigned to the T6 cutover.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-091.proof.json",
+    "scripts/check-metavar-not-in-containers.mjs",
+    "tests/archbp-091-metavar-container-guard.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

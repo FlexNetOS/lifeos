@@ -264,6 +264,8 @@
     "ARCHBP-072",
     "ARCHBP-073",
     "ARCHBP-075",
+    "ARCHBP-082",
+    "ARCHBP-091",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-129",
@@ -275,18 +277,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 351,
+  "ledger_entry_count": 353,
   "lifecycle_counts": {
     "blocked": 12,
-    "complete": 254,
+    "complete": 256,
     "draft": 0,
-    "ready": 57,
+    "ready": 55,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "72a9e74f78674cea9119d64cfb8a9a7c56ef69d1f0a16cdcdd1299e176c2ea06",
+  "proof_ledger_sha256": "9ff5dea5ab6dc3641b154b14fece035168ebe99fd42c01e41362c961d0cc0084",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -302,7 +304,6 @@
     "ARCHBP-079",
     "ARCHBP-080",
     "ARCHBP-081",
-    "ARCHBP-082",
     "ARCHBP-083",
     "ARCHBP-084",
     "ARCHBP-085",
@@ -311,7 +312,6 @@
     "ARCHBP-088",
     "ARCHBP-089",
     "ARCHBP-090",
-    "ARCHBP-091",
     "ARCHBP-092",
     "ARCHBP-093",
     "ARCHBP-094",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "61eaf0aecd49faae864acc308b28dc3fc840ab0c7aa9a913b6338ef5351ca339",
+  "source_graph_sha256": "a747236ef84f80e75195128db6620e3fb8e33b0987cbf438c70ba0add5359b73",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -10544,33 +10544,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-082.proof.json; next child task: ARCHBP-052.",
         "proof_uri": "proof_records/ARCHBP-082.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 352,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "d8107c54c66d281d4daabdfe171bafbd6877cf0777f8c583654e129e0918e47a",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-082.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 270,
       "task_id": "ARCHBP-082",
       "title": "CI guard that fails on any home-owned active owner.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-082.proof.json; next child task: ARCHBP-052."
+        }
+      }
     },
     {
       "effective": {
@@ -10814,33 +10821,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-091.proof.json; next child task: ARCHBP-053.",
         "proof_uri": "proof_records/ARCHBP-091.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 353,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "0f4297fd6a44855fae3ca4d53260530d9b270dd96ce6deb3fc063657ec468688",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-091.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 279,
       "task_id": "ARCHBP-091",
       "title": "Assertion/test preventing meta/var from being mounted into docker/containerd.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-091.proof.json; next child task: ARCHBP-053."
+        }
+      }
     },
     {
       "effective": {
@@ -12534,6 +12548,8 @@
     "ARCHBP-072",
     "ARCHBP-073",
     "ARCHBP-075",
+    "ARCHBP-082",
+    "ARCHBP-091",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-129",

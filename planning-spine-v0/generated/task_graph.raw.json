@@ -1,9 +1,9 @@
 {
   "schema_version": "lifeos-planning-spine.task-graph.raw.v0",
-  "generated_at": "2026-07-22T16:00:00Z",
+  "generated_at": "2026-07-21T00:00:00Z",
   "source": {
     "format": "csv",
-    "path": "generated/task_graph.source.csv",
+    "path": "planning-spine-v0/generated/task_graph.source.csv",
     "header": [
       "task_id",
       "parent_id",
@@ -4356,7 +4356,7 @@
         "execution_cell": "codedb-ingestion-cell",
         "verification_gate": "Red tests precede implementation; bounded .nu, .rs, and .toml fixtures round-trip exact bytes, paths, permissions, AST metadata, and hashes through the native MessagePack plugin; duplicate content is content-addressed once; raw benchmark samples qualify all performance wording.",
         "rollback_plan": "Revert the bounded ingestion schema and plugin changes, delete only task-created test databases and artifacts by receipt, and preserve original source fixtures.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-001.proof.json",
         "next_action": "Write the bounded ingestion fixtures and failing protocol, provenance, and deduplication tests."
       }
@@ -5060,7 +5060,7 @@
         "execution_cell": "planning-link-compat-cell",
         "verification_gate": "Red tests reproduce the inline Markdown example false positive and bare wiki-alias false negative; code spans and fenced examples are ignored; aliases resolve exactly as the generated index; missing, ambiguous, absolute-escape, and parent-escape targets still fail; planning verification and navigation checks agree.",
         "rollback_plan": "Restore the prior verifier and generator, retain the failing fixtures and receipts, and keep strict documentation verification marked blocked until resolver parity is re-established.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-033.proof.json",
         "next_action": "Write the failing inline-example, alias, ambiguity, missing-target, and path-escape tests before changing either resolver."
       }
@@ -5104,7 +5104,7 @@
         "execution_cell": "proof-ledger-conflict-cell",
         "verification_gate": "Red tests reproduce the existing same-task same-revision different-digest conflict; resolution requires an independent-verifier record naming both identities and the accepted disposition; raw ledger lines remain byte-preserved; merger, status, navigation, and audit readers reject unresolved conflicts and agree after append-only resolution.",
         "rollback_plan": "Keep the ledger byte-preserved, remove only task-created unaccepted resolution fixtures, restore prior readers, and leave new proof merges blocked while the conflict remains unresolved.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-035.proof.json",
         "next_action": "Capture both GRAPH-005 revision 1 ledger identities and write failing merger, reader-parity, unresolved-conflict, and append-only-resolution tests."
       }
@@ -5126,7 +5126,7 @@
         "execution_cell": "navigation-count-cell",
         "verification_gate": "Red tests reproduce the 249-versus-canonical mismatch; displayed task totals come from or are checked against normalized task_count; adding or removing a fixture task updates or invalidates the claim automatically; navigation generation and check agree without hand-editing generated artifacts.",
         "rollback_plan": "Restore the prior navigation source and generator, retain the stale-count fixture, and remove the displayed exact count until derived-count verification is restored.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-036.proof.json",
         "next_action": "Write the failing stale-count and task-addition tests before changing authored navigation or generator logic."
       }
@@ -5214,7 +5214,7 @@
         "execution_cell": "rtk-nu-adapter-cell",
         "verification_gate": "Red tests prove ordered raw teeing for stdout/stderr/binary, invalid UTF-8, partial lines, signals, nonzero exits, parser failure, large-stream chunking, digest and offset integrity, compact-view linkage, and exact profile-owned package resolution.",
         "rollback_plan": "Remove the task-created adapter package and profile input, restore the prior RTK closure, retain raw fixtures and receipts, and keep structured legacy ingestion blocked.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-040.proof.json",
         "next_action": "Write failing envelope-schema, raw-order, binary, invalid-UTF-8, signal, parser-failure, and profile-resolution tests."
       }

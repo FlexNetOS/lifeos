@@ -287,6 +287,7 @@
     "ARCHBP-055",
     "ARCHBP-129",
     "ARCHBP-130",
+    "ARCHBP-133",
     "ARCHBP-134"
   ],
   "draft_task_ids": [],
@@ -295,18 +296,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 372,
+  "ledger_entry_count": 373,
   "lifecycle_counts": {
     "blocked": 11,
-    "complete": 275,
+    "complete": 276,
     "draft": 0,
-    "ready": 37,
+    "ready": 36,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "b81ce9db053ee639a36b9488e9aac3a16b01918c0f1393f2e24633adf2b6675b",
+  "proof_ledger_sha256": "cebaa1c0eefd1e17abd7bcb37c4b8140474169d5b63841b109541a4b6f0ad88d",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -344,7 +345,6 @@
     "ARCHBP-120",
     "ARCHBP-131",
     "ARCHBP-132",
-    "ARCHBP-133",
     "ARCHBP-135"
   ],
   "result": "pass",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "0308b35f3729d2e192665cc7c580dcd84cdf5390142020f1c06ec47801d94137",
+  "source_graph_sha256": "af8be8d6e9ff26dc39154453a8853a8768d28dac4138a482fc51b10100ebee80",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -12326,33 +12326,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-133.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-133.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-039"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 373,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "1e7be33b52182c751b746147db443500d535dabced74020c352ff94a4208908f",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
         "proof_uri": "proof_records/ARCHBP-133.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 322,
       "task_id": "ARCHBP-133",
       "title": "GAP t7-7-failure-handling: Recover cleanly from crash/dirty shutdown (WAL replay, redb crash path).",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-133.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -12705,6 +12712,7 @@
     "ARCHBP-055",
     "ARCHBP-129",
     "ARCHBP-130",
+    "ARCHBP-133",
     "ARCHBP-134"
   ]
 }

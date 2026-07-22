@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { closeSync, existsSync, openSync, readFileSync, readSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
@@ -48,8 +48,14 @@ describe("ARCHBP-133 envelope-level dirty-shutdown recovery", () => {
     expect(r.wal_replay.validated).toBe(true);
     expect(joined).toContain("database system was not properly shut down");
     expect(joined).toMatch(/redo starts at|redo done at/);
-    // The same recovery lines are in the real logfile right now.
-    const live = readFileSync(PG_LOG, "utf8");
+    // The same recovery lines are in the real logfile right now. The cluster
+    // log is append-only and huge — tail-read the last 4MB, never the whole.
+    const size = statSync(PG_LOG).size;
+    const offset = Math.max(0, size - 4 * 1024 * 1024);
+    const buf = Buffer.alloc(size - offset);
+    const fd = openSync(PG_LOG, "r");
+    try { readSync(fd, buf, 0, buf.length, offset); } finally { closeSync(fd); }
+    const live = buf.toString("utf8");
     expect(live).toContain("database system was not properly shut down; automatic recovery in progress");
     expect(live).toMatch(/redo done at/);
   });

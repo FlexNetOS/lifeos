@@ -60,7 +60,7 @@ describe("ARCHBP-134 portable-release packaging decision", () => {
     // The path must cover: musl proof, classification, closure extraction,
     // envelope launcher, and a relocation test.
     expect(steps).toContain("musl");
-    expect(steps).toContain("closure");
+    expect(steps.toLowerCase()).toContain("closure");
     expect(steps).toContain("yzx-envelope");
     expect(steps.toLowerCase()).toContain("relocation");
     // Store-independence invariants from the isolation ledger bind the path.

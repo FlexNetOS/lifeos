@@ -353,11 +353,11 @@ class IntegratedCorrectionCorpusTests(unittest.TestCase):
             projection["lifecycle_counts"],
             {
                 "draft": 0,
-                "blocked": 14,
-                "ready": 76,
+                "blocked": 13,
+                "ready": 69,
                 "simulated": 0,
                 "running": 0,
-                "complete": 233,
+                "complete": 241,
                 "rolled-back": 0,
             },
         )

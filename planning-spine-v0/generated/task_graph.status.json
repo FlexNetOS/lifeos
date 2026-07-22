@@ -5,7 +5,6 @@
     "ARCHBP-043",
     "ARCHBP-047",
     "ARCHBP-048",
-    "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-051",
     "ARCHBP-052",
@@ -248,7 +247,15 @@
     "ARCHBP-041",
     "ARCHBP-042",
     "ARCHBP-045",
-    "ARCHBP-046"
+    "ARCHBP-046",
+    "ARCHBP-058",
+    "ARCHBP-059",
+    "ARCHBP-060",
+    "ARCHBP-061",
+    "ARCHBP-062",
+    "ARCHBP-063",
+    "ARCHBP-064",
+    "ARCHBP-049"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
@@ -256,18 +263,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 330,
+  "ledger_entry_count": 338,
   "lifecycle_counts": {
-    "blocked": 14,
-    "complete": 233,
+    "blocked": 13,
+    "complete": 241,
     "draft": 0,
-    "ready": 76,
+    "ready": 69,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "56ee7431c83689ea59381519c7c58a3c2b50a8d4df33d221ff2f717d954506f6",
+  "proof_ledger_sha256": "60d83ee6d143e6c5c6bace357f7e649567595eb2575922d4ca0c872c4ec2fd30",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -276,13 +283,6 @@
     "ARCHBP-030",
     "ARCHBP-031",
     "ARCHBP-044",
-    "ARCHBP-058",
-    "ARCHBP-059",
-    "ARCHBP-060",
-    "ARCHBP-061",
-    "ARCHBP-062",
-    "ARCHBP-063",
-    "ARCHBP-064",
     "ARCHBP-065",
     "ARCHBP-066",
     "ARCHBP-067",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "8f86f0d662bd0cbfb2dfc367b32acdc65fc5123e05c9658f7d1d83aed15f59a5",
+  "source_graph_sha256": "d5deb0ba9e3e03331b0eb3cf6c5fa57423a75c2752ef79ccb2dc4fbe78f427d4",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -9705,213 +9705,262 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-058.proof.json; next child task: ARCHBP-049.",
         "proof_uri": "proof_records/ARCHBP-058.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 332,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "28a62ab9b3686da6a740cae04f793465590f3177a04b8e6234641f5044fd90f6",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-058.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 246,
       "task_id": "ARCHBP-058",
       "title": "Document big-brother/little-brother semantics: LifeOS acquires and releases host resources on demand; Ubuntu a",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-058.proof.json; next child task: ARCHBP-049."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-059.proof.json; next child task: ARCHBP-049.",
         "proof_uri": "proof_records/ARCHBP-059.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 333,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "05e3ebd69172de129a2c7b2d837c6f94dd09e729ec5046775d9f4bb1fee8007e",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-059.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 247,
       "task_id": "ARCHBP-059",
       "title": "Exhaustively classify every runtime path into volatile (tmpfs), durable (persistent), or portable (release) ti",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-059.proof.json; next child task: ARCHBP-049."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-060.proof.json; next child task: ARCHBP-049.",
         "proof_uri": "proof_records/ARCHBP-060.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 334,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "cd93b924812f8339d55f9c921545d3733fbcf9a5306c64cbdd161cd770aaa0ce",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-060.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 248,
       "task_id": "ARCHBP-060",
       "title": "Record the one honest limit: namespaces share the host kernel (source of zero latency); reboot ends processes",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-060.proof.json; next child task: ARCHBP-049."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-061.proof.json; next child task: ARCHBP-049.",
         "proof_uri": "proof_records/ARCHBP-061.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 335,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "d01e1bd0edf9ef1cffddf0ae1e0b59665b4cc6db04d6daf716c1eefe0b9b9473",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-061.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 249,
       "task_id": "ARCHBP-061",
       "title": "Enumerate I01..In invariants, each with an acceptance predicate, covering isolation, persistence, ownership, p",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-061.proof.json; next child task: ARCHBP-049."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-062.proof.json; next child task: ARCHBP-049.",
         "proof_uri": "proof_records/ARCHBP-062.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 336,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "416aa819a92f62014ca4869338f27232f3201e892320749d825081ac0a6ed757",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-062.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 250,
       "task_id": "ARCHBP-062",
       "title": "For each goal G1-G10 define the concrete runnable test that proves it (e.g. host full-upgrade+reboot leaves Li",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-062.proof.json; next child task: ARCHBP-049."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-063.proof.json; next child task: ARCHBP-049.",
         "proof_uri": "proof_records/ARCHBP-063.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 337,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "cb5bbcca70e97f0aa161fe3cc6a126ccef5879146ae5c1bfeaa0df34b5819092",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-063.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 251,
       "task_id": "ARCHBP-063",
       "title": "Enumerate what breaks isolation today: unattended-upgrades kernel swap, tmpfs profile-runtime, home residuals,",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-063.proof.json; next child task: ARCHBP-049."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-064.proof.json; next child task: ARCHBP-049.",
         "proof_uri": "proof_records/ARCHBP-064.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 338,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "44e5c40bfdae332cbb72062e33a2e087e65cdf9a35c66fa44e29efdee0d23b41",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-064.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 252,
       "task_id": "ARCHBP-064",
       "title": "Finalize and publish the isolation spec so T2-T10 reference a stable authority.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-064.proof.json; next child task: ARCHBP-049."
+        }
+      }
     },
     {
       "effective": {
@@ -11595,11 +11644,11 @@
     },
     {
       "effective": {
-        "next_action": "Drive the child tasks to green, then record the lane rollup proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-049.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-049.proof.json",
-        "status": "blocked"
+        "status": "complete"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-058",
         "ARCHBP-059",
@@ -11612,22 +11661,29 @@
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 331,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "a7fd46cb0b5a8fb7f7119f203dd80ef6e0b1899f3b51233be57e4c55c6c3b060",
+        "status": "pass"
       },
       "source": {
         "next_action": "Drive the child tasks to green, then record the lane rollup proof.",
         "proof_uri": "proof_records/ARCHBP-049.proof.json",
-        "status": "blocked"
+        "status": "complete"
       },
       "source_row_number": 309,
       "task_id": "ARCHBP-049",
       "title": "Isolation architecture spec and invariant ledger (two-brother model)",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Drive the child tasks to green, then record the lane rollup proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-049.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -12369,6 +12425,14 @@
     "ARCHBP-041",
     "ARCHBP-042",
     "ARCHBP-045",
-    "ARCHBP-046"
+    "ARCHBP-046",
+    "ARCHBP-058",
+    "ARCHBP-059",
+    "ARCHBP-060",
+    "ARCHBP-061",
+    "ARCHBP-062",
+    "ARCHBP-063",
+    "ARCHBP-064",
+    "ARCHBP-049"
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-059",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Every env var and state path classified; Rule: nothing durable on host /run; Feeds [[tasks/yzx-iso/t3-0-lane-index]]; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates committed red at lifeos a82c166 (6/6 failing: tier map absent), green at HEAD (6/6)",
+    "every_path_classified": true,
+    "classification_evidence": "isolation_tier_map.json classifies 18 entries — the six agent env vars (CLAUDE_CONFIG_DIR, CODEX_HOME, YAZELIX_STATE_DIR, XDG_DATA_HOME, XDG_STATE_HOME, ICM_DB) and the state/cache/release paths (postgres datadir, redb plane, transcripts, profile-runtime, cargo-target, rustup, build tmp, runner _work root, nix-profile frontdoor, release closure, gitkb db, envctl tables) — each into exactly one of volatile/durable/portable.",
+    "nothing_durable_on_run_rule": true,
+    "rule_evidence": "The map's rule is nothing-durable-on-host-run; zero durable entries target /run, and entries whose CURRENT location still violates the rule (tmpfs profile-runtime, CLAUDE_CONFIG_DIR, CODEX_HOME, YAZELIX_STATE_DIR) are honestly flagged misplaced:true with durable target paths off /run — the 2026-07-21 loss surface is recorded, not hidden.",
+    "feeds_declared": true,
+    "feeds_evidence": "The map feeds tasks/yzx-iso/t3-0-lane-index (runtime relocation, ARCHBP-072..077/131).",
+    "full_suite": "ARCHBP-059 spec 6/6.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "tests/archbp-059-tier-map.spec.ts executes against the published planning-spine-v0/docs/isolation_tier_map.json, enforcing tier validity, required-surface coverage, the /run rule, and honest misplaced flags."
+  },
+  "proof_summary": "ARCHBP-059 is complete: every known runtime env var and state path is classified into volatile/durable/portable in the versioned isolation_tier_map.json under the normative nothing-durable-on-host-run rule; current violations (the tmpfs profile-runtime tree that caused the 2026-07-21 session loss, plus home residuals) are flagged misplaced with durable targets rather than hidden, so classification cannot drift silently. The map feeds the t3 runtime-relocation lane.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-059.proof.json",
+    "planning-spine-v0/docs/isolation_tier_map.json",
+    "tests/archbp-059-tier-map.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

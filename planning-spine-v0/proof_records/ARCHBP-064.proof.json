@@ -1,0 +1,30 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-064",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Spec reviewed and ratified; Referenced by all lane indexes; Versioned in repo; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates committed red at lifeos a82c166 (4/4 failing: spec absent), green at HEAD (4/4)",
+    "reviewed_and_ratified": true,
+    "ratification_evidence": "The spec carries version 1.0.0 and status ratified with an explicit review basis: the 2026-07-22 yzx-iso vs planning-spine reconciliation (tasks/yzx-iso/reconciliation-index — per-leaf verdicts on the strict proof-record basis), applied to the spine at 1af25ec; silent edits to a ratified version are declared invalid.",
+    "referenced_by_all_lane_indexes": true,
+    "reference_evidence": "The spec header lists all ten yzx-iso lane indexes (t1-0..t10-0), and each lane index document in GitKB was updated with a backlink to the ratified spec (git kb commit on 2026-07-22).",
+    "versioned_in_repo": true,
+    "versioning_evidence": "The normative spec and its three machine-readable companions are committed under planning-spine-v0/docs/ in the lifeos repository — no untracked home-directory draft is the authority; the owner brief yazilix-nix-isolated-persistant.md is cited as the source vision.",
+    "full_suite": "ARCHBP-064 spec 4/4.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "tests/archbp-064-ratify-spec.spec.ts validates the version/ratification block, the reconciliation review record, all ten lane references, the blueprint and owner-brief anchors, and the in-repo publication of the spec."
+  },
+  "proof_summary": "ARCHBP-064 is complete: the isolation architecture spec is finalized and published at planning-spine-v0/docs/isolation-architecture-spec.md as version 1.0.0, status ratified, with the 2026-07-22 reconciliation as its recorded review basis; it anchors to the RuVector blueprint and the owner-stated brief, is referenced by all ten yzx-iso lane indexes (backlinks committed in GitKB), and is versioned in the repository together with the invariant ledger, tier map, and failure-mode catalog — a stable authority for T2-T10.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-064.proof.json",
+    "planning-spine-v0/docs/isolation-architecture-spec.md",
+    "planning-spine-v0/docs/isolation_invariant_ledger.json",
+    "planning-spine-v0/docs/isolation_tier_map.json",
+    "planning-spine-v0/docs/isolation_failure_modes.json",
+    "tests/archbp-064-ratify-spec.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-060",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Boundary and rationale documented; Isolation vs survival separated as orthogonal; Referenced by [[tasks/yzx-iso/t7-0-lane-index]]; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates committed red at lifeos a82c166 (3/3 failing: spec absent), green at HEAD (3/3)",
+    "boundary_documented": true,
+    "boundary_evidence": "Spec section 3 records the one honest limit without euphemism: the kernel is shared (the source of zero hypervisor latency, I03/I04), so a host kernel upgrade plus reboot ends LifeOS processes but never touches LifeOS state (I01/I05).",
+    "orthogonality_separated": true,
+    "orthogonality_evidence": "Isolation (namespaces/envelope/control plane, protecting the siblings while both run) and survival (durable tier + re-attach across inevitable reboots) are stated as orthogonal concerns, with Survival = durable tier + re-attach as the normative formula (I10).",
+    "referenced_by_declared": true,
+    "reference_evidence": "Section 3 is referenced by tasks/yzx-iso/t7-0-lane-index (boot re-attach, ARCHBP-093..100), and the lane index carries the spec backlink in GitKB.",
+    "full_suite": "ARCHBP-060 spec 3/3.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "tests/archbp-060-kernel-boundary.spec.ts validates the published spec's boundary statements, the orthogonality separation, and the survival formula."
+  },
+  "proof_summary": "ARCHBP-060 is complete: the shared-kernel boundary is documented as spec section 3 — namespaces share the host kernel (the source of zero latency), a reboot ends LifeOS processes but never LifeOS state, and isolation vs survival are separated as orthogonal concerns with Survival = durable tier + re-attach. The section is the t7 boot re-attach lane's stated authority.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-060.proof.json",
+    "planning-spine-v0/docs/isolation-architecture-spec.md",
+    "tests/archbp-060-kernel-boundary.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

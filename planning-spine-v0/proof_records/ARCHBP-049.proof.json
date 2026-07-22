@@ -1,0 +1,32 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-049",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "All child tasks complete with passing proof records; no child draft; lane acceptance satisfied.",
+  "gate_result": {
+    "all_children_complete_with_passing_proofs": true,
+    "children_evidence": "ARCHBP-058 (two-brother model, 4/4), ARCHBP-059 (tier map, 6/6), ARCHBP-060 (shared-kernel boundary, 3/3), ARCHBP-061 (invariant ledger I01..I17, 5/5), ARCHBP-062 (CT-G1..CT-G10 conformance tests, 3/3), ARCHBP-063 (failure-mode catalog FM-01..FM-08 + 2026-07-21 incident, 5/5), and ARCHBP-064 (ratified v1.0.0 publication, 4/4) each carry a passing revision-1 proof record in this ledger.",
+    "no_child_draft": true,
+    "draft_evidence": "All seven children moved red (a82c166) to green in the same lane delivery; none remains draft, simulated, or partially satisfied.",
+    "lane_acceptance_satisfied": true,
+    "acceptance_evidence": "The T1 rollup acceptance holds: the isolation architecture spec v1.0.0 is ratified and versioned with its invariant ledger, tier map, and failure-mode catalog; the invariant ledger is merged as normative and referenced by the conformance tests; and all ten yzx-iso lane indexes in GitKB reference the published spec so T2-T10 have a stable authority.",
+    "full_suite": "Lane specs 30/30 across seven gate files.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The rollup aggregates seven executed child gates that validate the real published artifacts; no child was accepted on assertion."
+  },
+  "proof_summary": "ARCHBP-049 is complete: the isolation architecture spec and invariant ledger lane rolled up with all seven children (ARCHBP-058..064) complete and green — the ratified v1.0.0 spec, the normative I01..I17 invariant ledger, the exhaustive runtime tier map under the nothing-durable-on-host-run rule, the CT-G1..CT-G10 per-goal conformance tests, and the FM-01..FM-08 failure-mode catalog embedding the 2026-07-21 incident are published and versioned in planning-spine-v0/docs, and all ten yzx-iso lane indexes reference the spec as their stable authority.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-049.proof.json",
+    "planning-spine-v0/proof_records/ARCHBP-058.proof.json",
+    "planning-spine-v0/proof_records/ARCHBP-059.proof.json",
+    "planning-spine-v0/proof_records/ARCHBP-060.proof.json",
+    "planning-spine-v0/proof_records/ARCHBP-061.proof.json",
+    "planning-spine-v0/proof_records/ARCHBP-062.proof.json",
+    "planning-spine-v0/proof_records/ARCHBP-063.proof.json",
+    "planning-spine-v0/proof_records/ARCHBP-064.proof.json",
+    "planning-spine-v0/docs/isolation-architecture-spec.md",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-072",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Complete var list captured; Durable vs volatile tagged; Cross-checked vs T1.2 tier map; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates executed red with the implementation absent (3/3 files failing), green at HEAD (3/3)",
+    "complete_var_list_captured": true,
+    "capture_evidence": "scripts/enumerate-runtime-env.mjs live-captures the ten-var agent surface (CLAUDE_CONFIG_DIR, CODEX_HOME, YAZELIX_STATE_DIR, XDG_DATA_HOME, XDG_STATE_HOME, XDG_RUNTIME_DIR, ICM_DB, CARGO_TARGET_DIR, RUSTUP_HOME, TMPDIR) into planning-spine-v0/docs/runtime_env_enumeration.json: 10 vars, 6 on /run tmpfs, 2 durable-on-run.",
+    "durable_volatile_tagged": true,
+    "tagging_evidence": "Every entry carries its tier (durable/volatile/portable/unset) and misplaced flag; the pre-migration truth is recorded honestly: CLAUDE_CONFIG_DIR (and CODEX_HOME) are durable-class state living on /run tmpfs — the exact 2026-07-21 loss surface.",
+    "cross_checked_vs_tier_map": true,
+    "crosscheck_evidence": "Tier and misplaced values are sourced from and asserted equal to the T1.2 tier map (isolation_tier_map.json) for every mapped var; the generator regenerates live to a temp path in CI without touching the committed artifact.",
+    "full_suite": "ARCHBP-072 spec 3/3.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The enumeration runs against the real session environment; the spec re-executes it live under vitest."
+  },
+  "proof_summary": "ARCHBP-072 is complete: the agent runtime env-var surface is enumerated live — ten vars captured with durable/volatile tags cross-checked against the T1.2 tier map, honestly recording the two durable-class residents still on /run tmpfs (CLAUDE_CONFIG_DIR, CODEX_HOME) as the restart-gated migration surface.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-072.proof.json",
+    "planning-spine-v0/docs/runtime_env_enumeration.json",
+    "scripts/enumerate-runtime-env.mjs",
+    "tests/archbp-072-env-enumeration.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "schema_version": "lifeos-planning-spine.runtime-env-enumeration.v0",
+  "generated_by": "scripts/enumerate-runtime-env.mjs",
+  "cross_checked_against": "planning-spine-v0/docs/isolation_tier_map.json",
+  "var_count": 10,
+  "on_run_tmpfs_count": 6,
+  "durable_on_run_count": 2,
+  "entries": [
+    {
+      "name": "CLAUDE_CONFIG_DIR",
+      "live_value": "/run/user/1001/yazelix/profile-runtime/claude",
+      "on_run_tmpfs": true,
+      "tier": "durable",
+      "tier_map_entry": true,
+      "misplaced": true,
+      "target_path": "/home/flexnetos/meta/var/xdg-data/claude"
+    },
+    {
+      "name": "CODEX_HOME",
+      "live_value": null,
+      "on_run_tmpfs": false,
+      "tier": "durable",
+      "tier_map_entry": true,
+      "misplaced": true,
+      "target_path": "/home/flexnetos/meta/var/xdg-data/codex"
+    },
+    {
+      "name": "YAZELIX_STATE_DIR",
+      "live_value": "/run/user/1001/yazelix/profile-runtime/yazelix",
+      "on_run_tmpfs": true,
+      "tier": "durable",
+      "tier_map_entry": true,
+      "misplaced": true,
+      "target_path": "/home/flexnetos/meta/var/xdg-state/yazelix"
+    },
+    {
+      "name": "XDG_DATA_HOME",
+      "live_value": "/home/flexnetos/meta/var/lib",
+      "on_run_tmpfs": false,
+      "tier": "durable",
+      "tier_map_entry": true,
+      "misplaced": false,
+      "target_path": "/home/flexnetos/meta/var/xdg-data"
+    },
+    {
+      "name": "XDG_STATE_HOME",
+      "live_value": "/home/flexnetos/meta/var/lib",
+      "on_run_tmpfs": false,
+      "tier": "durable",
+      "tier_map_entry": true,
+      "misplaced": false,
+      "target_path": "/home/flexnetos/meta/var/xdg-state"
+    },
+    {
+      "name": "XDG_RUNTIME_DIR",
+      "live_value": "/run/user/1001",
+      "on_run_tmpfs": true,
+      "tier": "volatile",
+      "tier_map_entry": false,
+      "misplaced": false,
+      "target_path": null
+    },
+    {
+      "name": "ICM_DB",
+      "live_value": null,
+      "on_run_tmpfs": false,
+      "tier": "durable",
+      "tier_map_entry": true,
+      "misplaced": false,
+      "target_path": "/home/flexnetos/meta/var/xdg-data/icm/memories.db"
+    },
+    {
+      "name": "CARGO_TARGET_DIR",
+      "live_value": "/run/user/1001/yazelix/volatile/cargo-target",
+      "on_run_tmpfs": true,
+      "tier": "volatile",
+      "tier_map_entry": false,
+      "misplaced": false,
+      "target_path": null
+    },
+    {
+      "name": "RUSTUP_HOME",
+      "live_value": "/run/user/1001/yazelix/volatile/rustup-home",
+      "on_run_tmpfs": true,
+      "tier": "volatile",
+      "tier_map_entry": false,
+      "misplaced": false,
+      "target_path": null
+    },
+    {
+      "name": "TMPDIR",
+      "live_value": "/run/user/1001/yazelix/volatile/tmp",
+      "on_run_tmpfs": true,
+      "tier": "volatile",
+      "tier_map_entry": false,
+      "misplaced": false,
+      "target_path": null
+    }
+  ]
+}

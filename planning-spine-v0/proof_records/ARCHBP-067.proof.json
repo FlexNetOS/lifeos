@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-067",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: All mounts unwound on exit; No dangling namespaces; Host state restored; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates executed red against the pre-delivery surface (engine absent), green at HEAD (3/3)",
+    "mounts_unwound_on_exit": true,
+    "mount_evidence": "An envelope with GPU passthrough and its own >10-entry mount table exits; the host /proc/mounts is byte-identical before and after — mounts are namespace-scoped and unwind with the namespace.",
+    "no_dangling_namespaces": true,
+    "namespace_evidence": "leakcheck scans every /proc/*/environ for the envelope id and the host mount table for residue: leaked_processes=0, host_mount_residue=0, clean=true after exit (also enforced with --die-with-parent).",
+    "host_state_restored": true,
+    "restore_evidence": "An --isolate-net envelope run leaves the host interface table (/proc/net/dev) unchanged — acquired resources release with the namespace and the host returns to its prior state.",
+    "full_suite": "ARCHBP-067 spec 3/3.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "Host mount-table and interface-table invariance measured around real envelope runs; leakcheck executed live."
+  },
+  "proof_summary": "ARCHBP-067 is complete: envelope teardown is zero-leak — all envelope mounts unwind with the namespace on exit (host mount table byte-identical), no dangling namespaces or processes survive (leakcheck clean per envelope id), and acquired resources release so host state is restored.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-067.proof.json",
+    "tests/archbp-067-envelope-teardown.spec.ts",
+    "https://github.com/FlexNetOS/yazelix/pull/103",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

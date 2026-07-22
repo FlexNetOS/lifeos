@@ -5,7 +5,6 @@
     "ARCHBP-043",
     "ARCHBP-047",
     "ARCHBP-048",
-    "ARCHBP-050",
     "ARCHBP-051",
     "ARCHBP-052",
     "ARCHBP-053",
@@ -255,7 +254,15 @@
     "ARCHBP-062",
     "ARCHBP-063",
     "ARCHBP-064",
-    "ARCHBP-049"
+    "ARCHBP-065",
+    "ARCHBP-066",
+    "ARCHBP-067",
+    "ARCHBP-068",
+    "ARCHBP-069",
+    "ARCHBP-070",
+    "ARCHBP-071",
+    "ARCHBP-049",
+    "ARCHBP-050"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
@@ -263,18 +270,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 338,
+  "ledger_entry_count": 346,
   "lifecycle_counts": {
-    "blocked": 13,
-    "complete": 241,
+    "blocked": 12,
+    "complete": 249,
     "draft": 0,
-    "ready": 69,
+    "ready": 62,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "60d83ee6d143e6c5c6bace357f7e649567595eb2575922d4ca0c872c4ec2fd30",
+  "proof_ledger_sha256": "46e02369370ed6a8ff55ebab34b9b5e33a403b96e9bf7dd30c6afbb4e79ad8e4",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -283,13 +290,6 @@
     "ARCHBP-030",
     "ARCHBP-031",
     "ARCHBP-044",
-    "ARCHBP-065",
-    "ARCHBP-066",
-    "ARCHBP-067",
-    "ARCHBP-068",
-    "ARCHBP-069",
-    "ARCHBP-070",
-    "ARCHBP-071",
     "ARCHBP-072",
     "ARCHBP-073",
     "ARCHBP-074",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "d5deb0ba9e3e03331b0eb3cf6c5fa57423a75c2752ef79ccb2dc4fbe78f427d4",
+  "source_graph_sha256": "a044fa5ae0d6222b7ff65b49d71c75521cdba716fa378f7052b53ea24a1c34fa",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -9964,213 +9964,262 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-065.proof.json; next child task: ARCHBP-050.",
         "proof_uri": "proof_records/ARCHBP-065.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 340,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "db6ee047b571567c21291d64693b27ac21e4352ebeb8d736a80c952ba2f1daab",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-065.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 253,
       "task_id": "ARCHBP-065",
       "title": "Package the envelope as a flake app/package so it is nix-declared, not ad-hoc.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-065.proof.json; next child task: ARCHBP-050."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-066.proof.json; next child task: ARCHBP-050.",
         "proof_uri": "proof_records/ARCHBP-066.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 341,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "658a8aebad59fb7b3ad418e9629deaf9b36faa3696b3fdfb812b67866f27cb9b",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-066.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 254,
       "task_id": "ARCHBP-066",
       "title": "Namespace setup, env injection, cwd, shell (nu inside only).",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-066.proof.json; next child task: ARCHBP-050."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-067.proof.json; next child task: ARCHBP-050.",
         "proof_uri": "proof_records/ARCHBP-067.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 342,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "5a77db88bc8952ea016c5ae211e384aa21ac46b1e4cd6bddf4947c9f2ef448a6",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-067.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 255,
       "task_id": "ARCHBP-067",
       "title": "Teardown mounts + acquired resources with zero leaks on exit.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-067.proof.json; next child task: ARCHBP-050."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-068.proof.json; next child task: ARCHBP-050.",
         "proof_uri": "proof_records/ARCHBP-068.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 343,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "a5d44e95155a61096cb64a8fe974643022d402d51b79c49342c67e6a3163be98",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-068.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 256,
       "task_id": "ARCHBP-068",
       "title": "Bind meta/var, postgres datadir, and the relocated runtime path into the sandbox.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-068.proof.json; next child task: ARCHBP-050."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-069.proof.json; next child task: ARCHBP-050.",
         "proof_uri": "proof_records/ARCHBP-069.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 344,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "fd9df2e7d8163055b35715059f60b2984f2fe777ef40dfc1420ee066d8c0f8e7",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-069.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 257,
       "task_id": "ARCHBP-069",
       "title": "On-demand passthrough of GPU, ports, and devices into the envelope for big-brother control.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-069.proof.json; next child task: ARCHBP-050."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-070.proof.json; next child task: ARCHBP-050.",
         "proof_uri": "proof_records/ARCHBP-070.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 345,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "44ff6ddd1a897c0e11e3892c12234642d4e6edf4ecd23ec0b2a82340de7a84a2",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-070.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 258,
       "task_id": "ARCHBP-070",
       "title": "Multiple envelopes on one shared kernel without state collision.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-070.proof.json; next child task: ARCHBP-050."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-071.proof.json; next child task: ARCHBP-050.",
         "proof_uri": "proof_records/ARCHBP-071.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 346,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "58d1c8c3fac7a783d24fcbc4274bf90cae90bffd9c3b45d46944b6e1e808a0e2",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-071.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 259,
       "task_id": "ARCHBP-071",
       "title": "Test suite + docs; prove against T1 invariants.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-071.proof.json; next child task: ARCHBP-050."
+        }
+      }
     },
     {
       "effective": {
@@ -11687,11 +11736,11 @@
     },
     {
       "effective": {
-        "next_action": "Drive the child tasks to green, then record the lane rollup proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-050.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-050.proof.json",
-        "status": "blocked"
+        "status": "complete"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-065",
         "ARCHBP-066",
@@ -11704,22 +11753,29 @@
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 339,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "8ad9a7b117a3f204660e8806cf2ec8cfc02fdbd9e33f99e505a3dee257c64630",
+        "status": "pass"
       },
       "source": {
         "next_action": "Drive the child tasks to green, then record the lane rollup proof.",
         "proof_uri": "proof_records/ARCHBP-050.proof.json",
-        "status": "blocked"
+        "status": "complete"
       },
       "source_row_number": 310,
       "task_id": "ARCHBP-050",
       "title": "Bubblewrap user-namespace hermetic envelope implementation",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Drive the child tasks to green, then record the lane rollup proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-050.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -12433,6 +12489,14 @@
     "ARCHBP-062",
     "ARCHBP-063",
     "ARCHBP-064",
-    "ARCHBP-049"
+    "ARCHBP-065",
+    "ARCHBP-066",
+    "ARCHBP-067",
+    "ARCHBP-068",
+    "ARCHBP-069",
+    "ARCHBP-070",
+    "ARCHBP-071",
+    "ARCHBP-049",
+    "ARCHBP-050"
   ]
 }

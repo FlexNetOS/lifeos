@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-071",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Tests green; Docs published; Invariant conformance recorded; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates executed red against the pre-delivery surface (engine absent), green at HEAD (4/4)",
+    "tests_green": true,
+    "tests_evidence": "The full T2 gate set is green: 20/20 tests across seven spec files (archbp-065..071) — flake build, enter lifecycle, teardown, durable binds, resource hooks, multi-envelope, acceptance.",
+    "docs_published": true,
+    "docs_evidence": "envelope/README.md is published beside the engine in the yazelix repo (PR #103): subcommands, options, the honest-executor contract, and the invariant conformance table.",
+    "invariant_conformance_recorded": true,
+    "conformance_evidence": "Conformance against the T1 ledger is recorded and re-proven live: I03 (private user/pid namespaces, bwrap userspace executor, no hypervisor), I05/I06 (durable state only via explicit binds to durable-tier paths, nothing durable on host /run — the engine contains no /run bind), I11/I12 (on-demand acquire, clean release), I13 (host never modified). The acceptance seal re-runs enter -> observe -> exit -> leakcheck clean.",
+    "full_suite": "ARCHBP-071 spec 4/4; lane 20/20.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The acceptance spec executes live envelopes and validates the published documentation artifact."
+  },
+  "proof_summary": "ARCHBP-071 is complete: the T2 envelope acceptance holds — the lane's test suite is green (20/20 across seven gates), the engine documentation is published in the yazelix repo, and conformance against the T1 invariant ledger (I03/I05/I06/I11/I12/I13) is recorded and re-proven by live envelope execution with a clean leakcheck seal.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-071.proof.json",
+    "tests/archbp-071-envelope-acceptance.spec.ts",
+    "https://github.com/FlexNetOS/yazelix/pull/103",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

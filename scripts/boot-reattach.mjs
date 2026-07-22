@@ -28,10 +28,23 @@ const DURABLE_ROOTS = [
 // user-owned socket dir — the canonical macro-state comes back up at
 // re-attach, exactly what the 2026-07-21 incident lacked.
 function pgBin() {
-  try {
-    const hit = execFileSync("bash", ["-c", "ls -d /nix/store/*-postgresql-17.10/bin/pg_ctl 2>/dev/null | head -1"], { encoding: "utf8" }).trim();
-    return hit || null;
-  } catch { return null; }
+  // Path law: the profile frontdoor is the sole sanctioned launcher — it wraps
+  // the postgresql-and-plugins build whose share dir carries ruvector. A bare
+  // postgresql-17.10 store path starts a server that cannot load the canonical
+  // extension ($libdir/ruvector missing) while TCP health still passes — the
+  // defect that ran the cluster extension-less after the 2026-07-21 incident.
+  const candidates = [
+    "test -x /home/flexnetos/.nix-profile/bin/pg_ctl && echo /home/flexnetos/.nix-profile/bin/pg_ctl",
+    "ls -d /nix/store/*-flexnetos-foundation-postgresql-frontdoors-*-ruvector-*/bin/pg_ctl 2>/dev/null | head -1",
+    "ls -d /nix/store/*-postgresql-and-plugins-17.10/bin/pg_ctl 2>/dev/null | head -1",
+  ];
+  for (const probe of candidates) {
+    try {
+      const hit = execFileSync("bash", ["-c", probe], { encoding: "utf8" }).trim();
+      if (hit) return hit;
+    } catch { /* next candidate */ }
+  }
+  return null;
 }
 
 const PG_DATA = "/home/flexnetos/meta/var/lib/postgresql/17";

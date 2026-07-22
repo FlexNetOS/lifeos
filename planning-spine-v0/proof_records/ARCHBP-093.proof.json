@@ -1,0 +1,28 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "task_id": "ARCHBP-093",
+  "verification_gate": "Red tests fail first for: Trigger + idempotency defined; Ordering vs host boot set; No host-service coupling; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "trigger_idempotency_defined": true,
+    "trigger_evidence": "planning-spine-v0/docs/lifeos-reattach.service is a declarative systemd USER unit: WantedBy=default.target (fires at user login/boot session start), Type=oneshot invoking the idempotent reattach command; the engine emits the identical unit deterministically.",
+    "ordering_vs_host_boot": true,
+    "ordering_evidence": "The unit orders only within the user session \u2014 no After= on any host service/target.",
+    "no_host_service_coupling": true,
+    "coupling_evidence": "No Requires=/BindsTo= on any host system unit (asserted line-by-line): the host boots and updates freely (G1) while the unit re-attaches LifeOS.",
+    "full_suite": "ARCHBP-093 spec 3/3.",
+    "product_execution_evidence": "The unit the engine emits is byte-compared to the published artifact.",
+    "red_first": "gates committed red with the re-attach engine and unit absent (4/4 files failing), green at HEAD (lane 12/12)",
+    "product_execution_performed": true
+  },
+  "proof_summary": "ARCHBP-093 is complete: a login/boot-triggered, idempotent systemd USER unit re-materializes the envelope and re-attaches state, ordered only within the user session and coupled to no host system service \u2014 the host lifecycle stays free.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-093.proof.json",
+    "planning-spine-v0/docs/lifeos-reattach.service",
+    "tests/archbp-093-reattach-unit.spec.ts",
+    "scripts/boot-reattach.mjs",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

@@ -1,0 +1,17 @@
+# lifeos-reattach.service — systemd USER unit (login-triggered, idempotent).
+# Installs under ~/.config/systemd/user/ (or the profile-owned equivalent):
+#   systemctl --user enable lifeos-reattach.service
+# It couples to NO host system service: WantedBy=default.target fires at user
+# login/boot session start, After= orders only against the user session bus.
+[Unit]
+Description=LifeOS envelope + durable-state re-attach (yzx-iso T7)
+# No Requires=/BindsTo= on any host system unit: the host boots freely (G1).
+
+[Service]
+Type=oneshot
+# The single deliberate command (ARCHBP-098); safe to re-run any time.
+ExecStart=/home/flexnetos/.nix-profile/toolbin/bun /home/flexnetos/meta/src/lifeos/.claude/worktrees/archbp-frontier/scripts/boot-reattach.mjs reattach --json
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target

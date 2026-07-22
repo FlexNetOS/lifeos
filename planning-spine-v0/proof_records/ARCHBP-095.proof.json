@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "task_id": "ARCHBP-095",
+  "verification_gate": "Red tests fail first for: Durable mounts re-attached; Paths match T3/T4; Ownership correct; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "durable_mounts_reattached": true,
+    "reattach_evidence": "reattachDurablePlane() verifies each durable root live: meta/var/lib present, the PostgreSQL/RuVector datadir present, xdg-data present and writable (probe write executed and removed).",
+    "paths_match_t3_t4": true,
+    "path_evidence": "The rebound roots are exactly the tier map's durable targets (meta/var/lib/postgresql prefix asserted against isolation_tier_map.json).",
+    "ownership_correct": true,
+    "ownership_evidence": "Every durable root is owned by the LifeOS user (uid match asserted).",
+    "full_suite": "ARCHBP-095 spec 1/1.",
+    "product_execution_evidence": "Real filesystem verification including a live write probe on the durable plane.",
+    "red_first": "gates committed red with the re-attach engine and unit absent (4/4 files failing), green at HEAD (lane 12/12)",
+    "product_execution_performed": true
+  },
+  "proof_summary": "ARCHBP-095 is complete: the durable plane rebinds so services find their data \u2014 the meta/var lib tier, the PostgreSQL/RuVector datadir, and the writable xdg-data root all re-attach with correct ownership at exactly the T3/T4 tier-map paths.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-095.proof.json",
+    "tests/archbp-094-095-envelope-durable-rebind.spec.ts",
+    "scripts/boot-reattach.mjs",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

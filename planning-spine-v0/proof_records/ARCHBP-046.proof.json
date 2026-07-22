@@ -1,0 +1,33 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-046",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove database-issued identity/task/branch/lease/policy, bounded physical Git/editor/runner execution, exact inputs/intermediates/outputs/conflicts/errors, approval and merge governance without monorepo fusion, and PostgreSQL/RuVector as the durable authority and complete record.",
+  "gate_result": {
+    "red_first": "contracts committed red at lifeos d2db812 (5/5 failing: stub coordinator throws), implementation green at HEAD (5/5)",
+    "database_is_durable_authority": true,
+    "authority_evidence": "DURABLE_AUTHORITY is 'postgresql+ruvector' and every JobSpec and receipt is stamped with it — PostgreSQL/RuVector is the operational coordinator and complete record; the external Git surface is an input, never promoted to durable authority.",
+    "database_coordinates_not_replaces_git": true,
+    "boundary_evidence": "hasDbGitExecution() is always false — the database issues JobSpecs and leases and holds the complete record, but physical Git/editor/runner execution is performed outside it and merely coordinated. The database never replaces physical Git execution.",
+    "database_issued_jobspec": true,
+    "jobspec_evidence": "issueJobSpec produces a JobSpec carrying a database-issued identity (jobId derived from task+repo+branch), the task id, the branch, an exclusive lease, and the policy — identity, task, branch, lease, and policy are all database-issued.",
+    "bounded_exclusive_lease": true,
+    "lease_evidence": "acquireLease grants the lease to one holder and denies any other holder while that lease is live (reason 'lease-held-by-other') — physical execution is bounded to a single lease holder at a time.",
+    "governed_multi_merge_no_fusion": true,
+    "merge_evidence": "governMerge denies a cross-repository merge as monorepo fusion (reason 'monorepo-fusion-forbidden'), denies an unapproved merge (reason 'unapproved-merge'), and denies a merge beyond the policy budget (reason 'merge-budget-exhausted'); only an approved, same-repository, within-budget merge is allowed. The meta-repo's independent repositories are never fused.",
+    "exact_receipts_require_raw_logs": true,
+    "receipt_evidence": "buildReceipt captures the exact inputs, intermediates, outputs, conflicts, and errors of a job and fails closed when raw logs are missing (throws 'missing-raw-logs') — the complete record requires exact raw evidence, and a receipt is frozen once built.",
+    "full_suite": "ARCHBP-046 spec 5/5.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the proof runs the real coordinator: it issues a JobSpec, exercises the exclusive lease (grant then deny), runs the governed-merge policy across fusion/unapproved/approved/over-budget cases, and builds a receipt (and a fail-closed missing-logs case). The spec spawns the proof emitter via bun and asserts on its emitted JSON."
+  },
+  "proof_summary": "ARCHBP-046 is complete: the PostgreSQL/RuVector operational coordinator (lifeos scripts/db-coordinator-lifecycle.mjs + tests/archbp-046-db-coordinator-lifecycle.spec.ts, red d2db812 -> green HEAD, 5/5) makes the database the durable authority and complete record while coordinating — never replacing — physical Git/editor/runner execution (hasDbGitExecution()=false). It issues database-authoritative JobSpecs carrying identity, task, branch, an exclusive lease, and policy; the lease is bounded to one holder at a time (a second holder is denied while a lease is live); multi-merge is governed so cross-repository merges (monorepo fusion), unapproved merges, and over-budget merges are all denied and only an approved same-repo within-budget merge is allowed; and every job's receipt captures the exact inputs, intermediates, outputs, conflicts, and errors and fails closed when raw logs are missing. The external Git surface is an input, never promoted to durable authority, and the meta-repo's independent repositories are never fused.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-046.proof.json",
+    "scripts/db-coordinator-lifecycle.mjs",
+    "tests/archbp-046-db-coordinator-lifecycle.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

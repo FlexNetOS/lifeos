@@ -238,7 +238,8 @@
     "ARCHBP-040",
     "ARCHBP-041",
     "ARCHBP-042",
-    "ARCHBP-045"
+    "ARCHBP-045",
+    "ARCHBP-046"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
@@ -246,18 +247,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 328,
+  "ledger_entry_count": 329,
   "lifecycle_counts": {
     "blocked": 5,
-    "complete": 232,
+    "complete": 233,
     "draft": 0,
-    "ready": 7,
+    "ready": 6,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "73dceb47fd258830072c41979a480f9e0974c215c30d7e75e4976c451e75a1dc",
+  "proof_ledger_sha256": "1a9d0feea3efeb40692d167ecb7d8cd26488cb880b96f9cc3ba0d85f8ab376ae",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -265,15 +266,14 @@
     "ARCHBP-021",
     "ARCHBP-030",
     "ARCHBP-031",
-    "ARCHBP-044",
-    "ARCHBP-046"
+    "ARCHBP-044"
   ],
   "result": "pass",
   "rolled_back_task_ids": [],
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "96820d49b9e5d9f10f50ab2b3247f72e1564e51c1aa119e8645138660b2ca85c",
+  "source_graph_sha256": "424b4ec9d7e1fb4132b1130d07750119970342d98db32fe1bae4c43befe874a3",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -9546,11 +9546,11 @@
     },
     {
       "effective": {
-        "next_action": "After host import and durable reconciliation, write failing unauthorized-dispatch, missing-capture, unapproved-merge, split-authority, rollback, and result-return tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-046.proof.json; next child task: ARCHBP-047.",
         "proof_uri": "proof_records/ARCHBP-046.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-038",
         "ARCHBP-042"
@@ -9558,22 +9558,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 329,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "9b1c1590692ca6797c59b5b305193260693d23278f30b041f05af40aa340e22e",
+        "status": "pass"
       },
       "source": {
         "next_action": "After host import and durable reconciliation, write failing unauthorized-dispatch, missing-capture, unapproved-merge, split-authority, rollback, and result-return tests.",
         "proof_uri": "proof_records/ARCHBP-046.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 243,
       "task_id": "ARCHBP-046",
       "title": "Move repository task context refactor and multi-merge operations under database control",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "After host import and durable reconciliation, write failing unauthorized-dispatch, missing-capture, unapproved-merge, split-authority, rollback, and result-return tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-046.proof.json; next child task: ARCHBP-047."
+        }
+      }
     },
     {
       "effective": {
@@ -9883,6 +9890,7 @@
     "ARCHBP-040",
     "ARCHBP-041",
     "ARCHBP-042",
-    "ARCHBP-045"
+    "ARCHBP-045",
+    "ARCHBP-046"
   ]
 }

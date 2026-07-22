@@ -271,6 +271,7 @@
     "ARCHBP-096",
     "ARCHBP-097",
     "ARCHBP-098",
+    "ARCHBP-099",
     "ARCHBP-101",
     "ARCHBP-102",
     "ARCHBP-103",
@@ -293,18 +294,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 370,
+  "ledger_entry_count": 371,
   "lifecycle_counts": {
     "blocked": 11,
-    "complete": 273,
+    "complete": 274,
     "draft": 0,
-    "ready": 39,
+    "ready": 38,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "3296b6d8e8107c3957109c98dc39bd564f8fa80cf4adedde12b5f9cf90c8b82d",
+  "proof_ledger_sha256": "2dcbe63db81876a40a56aacb0ab3c3ab680ef20fd7265616610948ff2cb07e0d",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -329,7 +330,6 @@
     "ARCHBP-089",
     "ARCHBP-090",
     "ARCHBP-092",
-    "ARCHBP-099",
     "ARCHBP-100",
     "ARCHBP-110",
     "ARCHBP-111",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "5231900a8a09e385231ef50f488f59fe02d35de58a6b7732dcf8705b34e277e2",
+  "source_graph_sha256": "f261073b47517b54747256197856c52b4eaccb386bda7e9d226a14fd6fbd6368",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -11110,33 +11110,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-099.proof.json; next child task: ARCHBP-054.",
         "proof_uri": "proof_records/ARCHBP-099.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 371,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "6236c8e0a48158a6d8d6f41fb21305106f04473f0a11d50dafed8fb38aa3189f",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-099.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 287,
       "task_id": "ARCHBP-099",
       "title": "Automated harness that cold-reboots and asserts full re-attach.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-099.proof.json; next child task: ARCHBP-054."
+        }
+      }
     },
     {
       "effective": {
@@ -12675,6 +12682,7 @@
     "ARCHBP-096",
     "ARCHBP-097",
     "ARCHBP-098",
+    "ARCHBP-099",
     "ARCHBP-101",
     "ARCHBP-102",
     "ARCHBP-103",

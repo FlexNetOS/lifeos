@@ -1,8 +1,8 @@
 import { execFile, execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { promisify } from "node:util";
-import { describe, expect, test } from "vitest";
+import { afterAll, describe, expect, test } from "vitest";
 
 // ARCHBP-099 — Automated harness that cold-reboots and asserts full re-attach.
 // Gate: Harness built; Runs unattended; Asserts service + session restore.
@@ -12,10 +12,10 @@ import { describe, expect, test } from "vitest";
 const execFileAsync = promisify(execFile);
 const repoRoot = resolve(import.meta.dirname, "..");
 const harness = resolve(repoRoot, "scripts/cold-reboot-harness.mjs");
-const scratch = resolve(
-  process.env.XDG_RUNTIME_DIR ?? "/tmp",
-  `archbp-099-${process.pid}`,
-);
+// Fixtures live on the DURABLE tier: the harness (correctly) refuses /run
+// tmpfs roots for both its state and the session store.
+const scratch = `/home/flexnetos/meta/var/tmp/archbp-099-${process.pid}`;
+afterAll(() => rmSync(scratch, { recursive: true, force: true }));
 
 const bootId = () =>
   readFileSync("/proc/sys/kernel/random/boot_id", "utf8").trim();

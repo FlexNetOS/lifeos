@@ -281,6 +281,7 @@
     "ARCHBP-107",
     "ARCHBP-108",
     "ARCHBP-109",
+    "ARCHBP-110",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-055",
@@ -294,18 +295,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 371,
+  "ledger_entry_count": 372,
   "lifecycle_counts": {
     "blocked": 11,
-    "complete": 274,
+    "complete": 275,
     "draft": 0,
-    "ready": 38,
+    "ready": 37,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "2dcbe63db81876a40a56aacb0ab3c3ab680ef20fd7265616610948ff2cb07e0d",
+  "proof_ledger_sha256": "b81ce9db053ee639a36b9488e9aac3a16b01918c0f1393f2e24633adf2b6675b",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -331,7 +332,6 @@
     "ARCHBP-090",
     "ARCHBP-092",
     "ARCHBP-100",
-    "ARCHBP-110",
     "ARCHBP-111",
     "ARCHBP-112",
     "ARCHBP-113",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "f261073b47517b54747256197856c52b4eaccb386bda7e9d226a14fd6fbd6368",
+  "source_graph_sha256": "0308b35f3729d2e192665cc7c580dcd84cdf5390142020f1c06ec47801d94137",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -11510,33 +11510,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-110.proof.json; next child task: ARCHBP-056.",
         "proof_uri": "proof_records/ARCHBP-110.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 372,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "ede9fde4de1047ff35ec43fb6be53c3877df0735ee353ed037a46365150d6d16",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-110.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 298,
       "task_id": "ARCHBP-110",
       "title": "Hook host update events so LifeOS can observe or gate them during active work.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-110.proof.json; next child task: ARCHBP-056."
+        }
+      }
     },
     {
       "effective": {
@@ -12692,6 +12699,7 @@
     "ARCHBP-107",
     "ARCHBP-108",
     "ARCHBP-109",
+    "ARCHBP-110",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-055",

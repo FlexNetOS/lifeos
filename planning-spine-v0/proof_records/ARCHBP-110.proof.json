@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-110",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Update events observable; Gating during active sessions; Uses T8 control plane; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gate executed red with the observer absent (5/5 failing), green at HEAD (5/5)",
+    "events_observable": true,
+    "events_evidence": "scripts/os-update-observer.mjs parses the live /var/log/apt/history.log into normalized events (start/end/commandline/actions/packages) risk-classified against the ARCHBP-109 lifecycle map's desktop-breaking patterns, and reads the apt-daily timer surface via systemctl show. Live observation at delivery: 19 events, 5 desktop-breaking, 2 kernel events — the 2026-07-21 06:31:48 kernel swap attributed directly to /usr/bin/unattended-upgrade, closing the causal chain the 109 map asserted from the 06:29:49 timer run; apt-daily-upgrade fired again 2026-07-22 06:58:46 with next-elapse 2026-07-23 06:00:32.",
+    "gating_active_sessions": true,
+    "gating_evidence": "The os-update-hold lease is the unprivileged gating lever: gate-check answers allow (exit 0) with no hold, block (exit 1) while the hold is live, with a machine-readable verdict carrying the live active-session count from the durable session store. hold/release proven across processes: the durable lease dir persists after the holding process exits and release restore-verifies. The generated DPkg::Pre-Invoke snippet makes every apt/dpkg run (including unattended-upgrades) fail closed while the hold is live; installing it under /etc/apt/apt.conf.d is root and stays with ARCHBP-111 — /etc mutation is a blocked path for this task and was not touched.",
+    "uses_t8_plane": true,
+    "t8_evidence": "hold/release go through HostControlPlane (imported from scripts/host-control-plane.mjs, no parallel plane): the lease is a registered lease-dir resource, acquisition carries owner + TTL, and the durable audit.jsonl records acquire (adapter lease-dir, owner) and release (restored: true) — asserted from the actual audit lines in the gate.",
+    "full_suite": "ARCHBP-110 spec 5/5.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The gate live-reads the real host apt history and systemd timer surface, and the delivery run observed the real 2026-07-21 kernel-swap event and today's live timer state; the hold/release/gate-check cycle executed against a real durable lease with a real audit trail."
+  },
+  "proof_summary": "ARCHBP-110 is complete: host update events are observable live (parsed, risk-classified, timer surface included, kernel-swap causality confirmed from the log itself), and LifeOS can gate updates during active work through an os-update-hold lease in the T8 control plane with a durable audit — with the apt Pre-Invoke hook generated for ARCHBP-111's root installation.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-110.proof.json",
+    "scripts/os-update-observer.mjs",
+    "tests/archbp-110-os-update-observer.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

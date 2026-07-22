@@ -57,7 +57,10 @@ describe("ARCHBP-129 envelope mount design", () => {
     expect(engine).toBeTruthy();
     const src = readFileSync(engine as string, "utf8");
     expect(src).toContain("--tmpfs /");
-    expect(src).toContain("--ro-bind /nix /nix");
+    // Since ARCHBP-021 the store bind is parameterized (--store mode binds an
+    // extracted release closure at /nix); the default remains the host store.
+    expect(src).toContain('--ro-bind "$STORE_SRC" /nix');
+    expect(src).toContain('STORE_SRC="/nix"');
     expect(src).toContain('--tmpfs "$HOME"');
   });
 });

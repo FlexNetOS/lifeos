@@ -29,7 +29,7 @@ function makeSessionRoot(dir: string) {
 
 // Fixture services in the boot-reattach schema, TCP-health-gated on ports
 // unique to this run (pid-derived, same discipline as the 096 spec).
-const p1 = 38700 + (process.pid % 97);
+const p1 = 23700 + (process.pid % 97);
 function fixtureServices(port: number) {
   return [
     {
@@ -85,7 +85,7 @@ describe("ARCHBP-099 cold-reboot re-attach harness", () => {
   }, 120000);
 
   test("verify fails loudly when a service did not come back", async () => {
-    const dead = [{ name: "gone-db", order: 1, healthTcp: 38699, timeoutMs: 500 }];
+    const dead = [{ name: "gone-db", order: 1, healthTcp: 23699, timeoutMs: 500 }];
     const { statePath, dir } = armed("dead", dead);
     const receiptPath = `${dir}/verdict.json`;
     await expect(

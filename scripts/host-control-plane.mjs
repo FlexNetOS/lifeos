@@ -185,7 +185,7 @@ export class HostControlPlane {
   }
 }
 
-export function defaultRegistry(scratchDir, { port = 38471 } = {}) {
+export function defaultRegistry(scratchDir, { port = 23471 } = {}) {
   return {
     schema_version: "lifeos-planning-spine.host-control-registry.v0",
     resources: [

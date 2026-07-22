@@ -226,6 +226,7 @@
     "ARCHBP-016",
     "ARCHBP-017",
     "ARCHBP-019",
+    "ARCHBP-021",
     "ARCHBP-022",
     "ARCHBP-023",
     "ARCHBP-024",
@@ -282,6 +283,7 @@
     "ARCHBP-108",
     "ARCHBP-109",
     "ARCHBP-110",
+    "ARCHBP-120",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-055",
@@ -296,23 +298,22 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 373,
+  "ledger_entry_count": 375,
   "lifecycle_counts": {
     "blocked": 11,
-    "complete": 276,
+    "complete": 278,
     "draft": 0,
-    "ready": 36,
+    "ready": 34,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "cebaa1c0eefd1e17abd7bcb37c4b8140474169d5b63841b109541a4b6f0ad88d",
+  "proof_ledger_sha256": "5c67a4ac584a519c643019b43f17e33e2d52a8aa117435a33558279afd47e4b8",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
     "ARCHBP-020",
-    "ARCHBP-021",
     "ARCHBP-030",
     "ARCHBP-031",
     "ARCHBP-044",
@@ -342,7 +343,6 @@
     "ARCHBP-117",
     "ARCHBP-118",
     "ARCHBP-119",
-    "ARCHBP-120",
     "ARCHBP-131",
     "ARCHBP-132",
     "ARCHBP-135"
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "af8be8d6e9ff26dc39154453a8853a8768d28dac4138a482fc51b10100ebee80",
+  "source_graph_sha256": "1864205aa97360ed9e0a4fbbeb287e21f3c08d12a7f2e55898cace4420af151d",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -8687,11 +8687,11 @@
     },
     {
       "effective": {
-        "next_action": "Run the YZXCONV-021 red-test design and portability matrix as the detailed owning task. | yzx-iso GAP (t10-2,t10-3,t10-4): apply remaining-scope from these designed-not-built tasks; goals not narrowed; see GitKB tasks/yzx-iso.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-021.proof.json; next child task: ARCHBP-025.",
         "proof_uri": "proof_records/ARCHBP-021.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "FOUNDATION-003",
         "RELEASE-002",
@@ -8700,22 +8700,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 374,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "444c853ae468e1ccbcf2d2459a108a8f45d058d2752425fce2328b48b98b20bf",
+        "status": "pass"
       },
       "source": {
         "next_action": "Run the YZXCONV-021 red-test design and portability matrix as the detailed owning task. | yzx-iso GAP (t10-2,t10-3,t10-4): apply remaining-scope from these designed-not-built tasks; goals not narrowed; see GitKB tasks/yzx-iso.",
         "proof_uri": "proof_records/ARCHBP-021.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 218,
       "task_id": "ARCHBP-021",
       "title": "Prove full-stack Yazelix musl and portable-closure release",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Run the YZXCONV-021 red-test design and portability matrix as the detailed owning task. | yzx-iso GAP (t10-2,t10-3,t10-4): apply remaining-scope from these designed-not-built tasks; goals not narrowed; see GitKB tasks/yzx-iso.",
+          "to": "Proof accepted from proof_records/ARCHBP-021.proof.json; next child task: ARCHBP-025."
+        }
+      }
     },
     {
       "effective": {
@@ -11817,33 +11824,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-120.proof.json; next child task: ARCHBP-057.",
         "proof_uri": "proof_records/ARCHBP-120.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 375,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "b6d690d9c77c616e69768dfd6b9d479c97e72cba8f4aa92dbe7a130c51fa6e98",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-120.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 308,
       "task_id": "ARCHBP-120",
       "title": "Benchmark the released envelope vs bare native; confirm no hypervisor tax.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-120.proof.json; next child task: ARCHBP-057."
+        }
+      }
     },
     {
       "effective": {
@@ -12651,6 +12665,7 @@
     "ARCHBP-016",
     "ARCHBP-017",
     "ARCHBP-019",
+    "ARCHBP-021",
     "ARCHBP-022",
     "ARCHBP-023",
     "ARCHBP-024",
@@ -12707,6 +12722,7 @@
     "ARCHBP-108",
     "ARCHBP-109",
     "ARCHBP-110",
+    "ARCHBP-120",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-055",

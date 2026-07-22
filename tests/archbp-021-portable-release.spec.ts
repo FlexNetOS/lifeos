@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -34,8 +34,11 @@ describe("ARCHBP-021 portable release (musl + relocatable closure)", () => {
       expect(a.file_type, a.name).toContain("static-pie");
       const onDisk = `${BUNDLE}/bin/${a.name}`;
       expect(sha256(onDisk), a.name).toBe(a.sha256); // the shipped byte is the proven byte
-      // Executes store-free on this host right now.
-      execFileSync(onDisk, ["--help"], { timeout: 10000 });
+      // Executes store-free on this host right now (a usage complaint still
+      // proves the static binary loaded and ran — only exec failure is red).
+      const run = spawnSync(onDisk, ["--help"], { encoding: "utf8", timeout: 10000 });
+      expect(run.error, a.name).toBeUndefined(); // exec failure would set this
+      expect(typeof run.status, a.name).toBe("number"); // the process ran to an exit
     }
   });
 

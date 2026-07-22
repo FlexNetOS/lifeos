@@ -11,7 +11,7 @@ describe("ARCHBP-096 ordered health-gated startup", () => {
     // Real fixture: two TCP services started by the engine itself, ordered.
     // Ports are unique per run (pid-derived) and the fixtures live only a few
     // seconds, so back-to-back runs never find a leaked listener already up.
-    const p1 = 38600 + (process.pid % 97);
+    const p1 = 23600 + (process.pid % 97);
     const p2 = p1 + 100;
     const fixture = (port: number) =>
       ["bun", "-e", `Bun.listen({hostname:'127.0.0.1',port:${port},socket:{data(){}}}); setTimeout(()=>{}, 5000)`];
@@ -27,7 +27,7 @@ describe("ARCHBP-096 ordered health-gated startup", () => {
 
   test("a failed dependency stops the chain and the failure is surfaced", async () => {
     const services = [
-      { name: "broken-dep", order: 1, healthTcp: 38563, timeoutMs: 500 }, // nothing listens, no start
+      { name: "broken-dep", order: 1, healthTcp: 23563, timeoutMs: 500 }, // nothing listens, no start
       { name: "never-reached", order: 2, health: ["true"] },
     ];
     const r = await startServicesOrdered(services);
@@ -38,10 +38,10 @@ describe("ARCHBP-096 ordered health-gated startup", () => {
 
   test("idempotency: an already-healthy service is not restarted", async () => {
     const server = createServer();
-    await new Promise<void>((res, rej) => { server.once("error", rej); server.listen(38564, "127.0.0.1", () => res()); });
+    await new Promise<void>((res, rej) => { server.once("error", rej); server.listen(23564, "127.0.0.1", () => res()); });
     try {
       const r = await startServicesOrdered([
-        { name: "already-up", order: 1, healthTcp: 38564, start: ["false"] }, // start would fail if invoked
+        { name: "already-up", order: 1, healthTcp: 23564, start: ["false"] }, // start would fail if invoked
       ]);
       expect(r.ok).toBe(true);
       expect(r.report[0].started).toBe(false); // health passed first — no restart

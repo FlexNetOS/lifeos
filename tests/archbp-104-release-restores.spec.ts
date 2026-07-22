@@ -13,16 +13,16 @@ describe("ARCHBP-104 release restores prior host state", () => {
   test("release restores and independently verifies OS normalcy (port usable again)", async () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp104-"));
     try {
-      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir, { port: 38484 }) });
-      await plane.acquire("loopback-port-38484");
-      const { restored } = await plane.release("loopback-port-38484");
+      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir, { port: 23484 }) });
+      await plane.acquire("loopback-port-23484");
+      const { restored } = await plane.release("loopback-port-23484");
       expect(restored).toBe(true);
       // Independent OS-normalcy proof: the little brother can bind the port
       // again immediately after release.
       const server = createServer();
       await new Promise<void>((res, rej) => {
         server.once("error", rej);
-        server.listen(38484, "127.0.0.1", () => res());
+        server.listen(23484, "127.0.0.1", () => res());
       });
       await new Promise((res) => server.close(res));
     } finally {
@@ -33,7 +33,7 @@ describe("ARCHBP-104 release restores prior host state", () => {
   test("no residue: worker processes and lease dirs are gone after release", async () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp104b-"));
     try {
-      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir, { port: 38484 }) });
+      const plane = new HostControlPlane({ auditPath: join(dir, "a.jsonl"), registry: defaultRegistry(dir, { port: 23484 }) });
       await plane.acquire("background-worker");
       expect(existsSync(join(dir, "worker.pid"))).toBe(true);
       await plane.acquire("workspace-lease");

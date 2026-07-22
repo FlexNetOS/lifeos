@@ -207,6 +207,7 @@
     "ARCHBP-003",
     "ARCHBP-004",
     "ARCHBP-005",
+    "ARCHBP-006",
     "ARCHBP-007",
     "ARCHBP-008",
     "ARCHBP-009",
@@ -245,21 +246,20 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 327,
+  "ledger_entry_count": 328,
   "lifecycle_counts": {
     "blocked": 5,
-    "complete": 231,
+    "complete": 232,
     "draft": 0,
-    "ready": 8,
+    "ready": 7,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "b39dae58656656aaa3be4d23b0d5e7429f75e5d545183015835909a2c6559d7d",
+  "proof_ledger_sha256": "73dceb47fd258830072c41979a480f9e0974c215c30d7e75e4976c451e75a1dc",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
-    "ARCHBP-006",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "628f4240a517a1f6d9b97765957b5b560e5ef4fb6d32315a817dc726597b3d38",
+  "source_graph_sha256": "96820d49b9e5d9f10f50ab2b3247f72e1564e51c1aa119e8645138660b2ca85c",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8060,11 +8060,11 @@
     },
     {
       "effective": {
-        "next_action": "Define the versioned export contract and failing exact-projection fixtures.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-006.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-006.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-005",
         "POSTGRES-008"
@@ -8072,22 +8072,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 328,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "45cbe725745661612a15a5871253b52196c378d8e9d548c745a2aadae3c9f85b",
+        "status": "pass"
       },
       "source": {
         "next_action": "Define the versioned export contract and failing exact-projection fixtures.",
         "proof_uri": "proof_records/ARCHBP-006.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 203,
       "task_id": "ARCHBP-006",
       "title": "Build the envctl production projection engine",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Define the versioned export contract and failing exact-projection fixtures.",
+          "to": "Proof accepted from proof_records/ARCHBP-006.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -9845,6 +9852,7 @@
     "ARCHBP-003",
     "ARCHBP-004",
     "ARCHBP-005",
+    "ARCHBP-006",
     "ARCHBP-007",
     "ARCHBP-008",
     "ARCHBP-009",

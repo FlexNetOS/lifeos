@@ -1,0 +1,83 @@
+{
+  "schema_version": "lifeos-planning-spine.envelope-mount-design.v0",
+  "spec_version": "1.0.0",
+  "implements": "yzx-iso t2-1-envelope-design (spine ARCHBP-129)",
+  "engine": "yazelix envelope/yzx-envelope.sh (flake app yzx-envelope, PR FlexNetOS/yazelix#103)",
+  "tier_map": "planning-spine-v0/docs/isolation_tier_map.json",
+  "mount_table": [
+    {
+      "path": "/",
+      "mechanism": "tmpfs",
+      "writable": true,
+      "decision": "tmpfs-not-overlay",
+      "rationale": "The private root is an empty tmpfs, not an overlayfs of the host root: the envelope presents ONLY what is declared, so host state can never leak in by omission and nothing the envelope writes can shadow-modify host paths. Unprivileged overlayfs is also blocked by the same host AppArmor userns policy the executor already navigates — tmpfs is both stricter and portable.",
+      "tier": "volatile"
+    },
+    {
+      "path": "/nix",
+      "mechanism": "ro-bind",
+      "writable": false,
+      "decision": "bind-not-copy",
+      "rationale": "The store is the single immutable binary provider (path law); a read-only bind gives zero-copy access with no write channel. At release time the portable closure replaces this bind (I09/I17).",
+      "tier": "portable"
+    },
+    {
+      "path": "/etc/resolv.conf + /etc/passwd + /etc/group",
+      "mechanism": "ro-bind",
+      "writable": false,
+      "decision": "minimal-etc-not-full-etc",
+      "rationale": "Only name resolution and user identity are bound, individually and read-only. The full host /etc (machine identity, systemd config, apt state) stays invisible — a full /etc bind would re-couple the envelope to the host lifecycle.",
+      "tier": "volatile"
+    },
+    {
+      "path": "/proc",
+      "mechanism": "proc",
+      "writable": true,
+      "decision": "fresh-procfs",
+      "rationale": "A fresh procfs scoped to the private PID namespace: the envelope sees only its own processes (probe pid=2).",
+      "tier": "volatile"
+    },
+    {
+      "path": "/dev",
+      "mechanism": "dev",
+      "writable": true,
+      "decision": "minimal-devtmpfs",
+      "rationale": "A minimal /dev (null, zero, urandom, tty…). Real device nodes (GPU, others) enter only via explicit on-demand dev-binds (I11).",
+      "tier": "volatile"
+    },
+    {
+      "path": "/tmp",
+      "mechanism": "tmpfs",
+      "writable": true,
+      "decision": "per-envelope-tmpfs",
+      "rationale": "Private scratch per envelope — the multi-session collision boundary proven by ARCHBP-070 (three concurrent envelopes, zero cross-visibility).",
+      "tier": "volatile"
+    },
+    {
+      "path": "$HOME",
+      "mechanism": "tmpfs",
+      "writable": true,
+      "decision": "overlay-as-tmpfs-not-overlayfs",
+      "rationale": "The home overlay is an empty tmpfs over $HOME, not an overlayfs: home residuals (~/.claude and peers, the G5 retirement surface) are invisible inside, and nothing written inside can land in the host home. Durable agent state re-enters only through declared durable binds once the T3 migration relocates it.",
+      "tier": "volatile"
+    },
+    {
+      "path": "/durable/** (caller-declared, e.g. meta/var, postgres datadir, relocated runtime)",
+      "mechanism": "bind",
+      "writable": true,
+      "decision": "explicit-rw-bind-per-durable-root",
+      "rationale": "Durable state crosses the boundary only by explicit declaration (--durable SRC:DST), sourced from the tier map's durable targets: meta/var/lib/postgresql (canonical PostgreSQL/RuVector macro-state), meta/var/lib/redb, meta/var/xdg-data. Writes persist across envelope exit (ARCHBP-068) — the durable plane, not the envelope, is the persistence boundary (I05/I06).",
+      "tier": "durable"
+    },
+    {
+      "path": "/dev/dri, /dev/nvidia* (on demand)",
+      "mechanism": "dev-bind",
+      "writable": true,
+      "decision": "on-demand-acquire-release",
+      "rationale": "GPU and device nodes appear only when acquired (--gpu / --device) and vanish with the namespace on exit — the envelope-side hook of the t8 control plane (I11/I12), proven by ARCHBP-069.",
+      "tier": "volatile"
+    }
+  ],
+  "namespaces": ["user", "pid", "ipc", "uts", "mount", "net (on --isolate-net)"],
+  "invariants": ["I03", "I05", "I06", "I11", "I12"]
+}

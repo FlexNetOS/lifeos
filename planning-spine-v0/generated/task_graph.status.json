@@ -265,7 +265,9 @@
     "ARCHBP-073",
     "ARCHBP-075",
     "ARCHBP-049",
-    "ARCHBP-050"
+    "ARCHBP-050",
+    "ARCHBP-129",
+    "ARCHBP-130"
   ],
   "draft_task_ids": [],
   "forbidden_update_count": 0,
@@ -273,18 +275,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 349,
+  "ledger_entry_count": 351,
   "lifecycle_counts": {
     "blocked": 12,
-    "complete": 252,
+    "complete": 254,
     "draft": 0,
-    "ready": 59,
+    "ready": 57,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "5e04e73f82688f42c77625a83bc38f7bdb51c7aa90a80629a505f913a2d86eb5",
+  "proof_ledger_sha256": "72a9e74f78674cea9119d64cfb8a9a7c56ef69d1f0a16cdcdd1299e176c2ea06",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -339,8 +341,6 @@
     "ARCHBP-118",
     "ARCHBP-119",
     "ARCHBP-120",
-    "ARCHBP-129",
-    "ARCHBP-130",
     "ARCHBP-131",
     "ARCHBP-132",
     "ARCHBP-133",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "3eb786bd45a67319d784e0ea1fb51eaddd8db7c92c85421adbc67159c4f87f7c",
+  "source_graph_sha256": "61eaf0aecd49faae864acc308b28dc3fc840ab0c7aa9a913b6338ef5351ca339",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -12052,63 +12052,77 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-129.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-129.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 350,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "b1daee25bfb33e38e644b773911fb228d6a94f47c9893b3a4e40efcd411b5a19",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
         "proof_uri": "proof_records/ARCHBP-129.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 318,
       "task_id": "ARCHBP-129",
       "title": "GAP t2-1-envelope-design: Define private /, /nix, home overlay, and durable-state mounts the sandbox presents.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-129.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-130.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-130.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-039"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 351,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "7cbe3d0c8628156d1a2de743ade404cdbd2a6f0561d59dd9926faa4bd7ce1af2",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
         "proof_uri": "proof_records/ARCHBP-130.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 319,
       "task_id": "ARCHBP-130",
       "title": "GAP t2-7-latency-validation: Benchmark in-envelope vs bare-native; assert near-zero overhead (no hypervisor tax).",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the remaining-scope gap, implement to green, record proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-130.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -12521,6 +12535,8 @@
     "ARCHBP-073",
     "ARCHBP-075",
     "ARCHBP-049",
-    "ARCHBP-050"
+    "ARCHBP-050",
+    "ARCHBP-129",
+    "ARCHBP-130"
   ]
 }

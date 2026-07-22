@@ -1,0 +1,33 @@
+{
+  "schema_version": "lifeos-planning-spine.envelope-latency-bench.v0",
+  "recorded_for": "yzx-iso t10-7-latency-benchmark (T10.7 release gauntlet)",
+  "workload": "python3 sum(i*i for i in range(20_000_000)) self-timed via perf_counter",
+  "runs_per_arm": 9,
+  "bare_median_s": 1.0088800260018616,
+  "envelope_median_s": 1.0085128260034253,
+  "runtime_overhead_pct": -0.036396795354493944,
+  "envelope_setup_median_ms": 27.78028199704113,
+  "setup_cost_note": "one-time per-envelope bwrap construction cost, excluded from the runtime-latency claim (I04) and reported honestly here",
+  "bare_samples_s": [
+    1.0071424999987357,
+    1.0491696919998503,
+    1.0088800260018616,
+    1.049064441001974,
+    1.0063230310006475,
+    0.9964935710013378,
+    1.01600538799903,
+    1.0110427599975083,
+    1.0084059340006206
+  ],
+  "envelope_samples_s": [
+    1.022112560000096,
+    1.0085128260034253,
+    1.008504184002959,
+    0.993849793998379,
+    1.0081301440004609,
+    1.0059153300026082,
+    1.0246298739984923,
+    1.0202309349988354,
+    1.0157406859980256
+  ]
+}

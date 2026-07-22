@@ -1,0 +1,32 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-029",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "The owner records one option or an explicitly bounded hybrid, exact unblock conditions, provenance and update ownership, offline and relocation expectations, rollback, and effects on musl and closure tasks; no release task assumes an undecided model.",
+  "gate_result": {
+    "decision_record": "planning-spine-v0/1.0_VISION/current_state/ARCHBP-029-toolchain-decision.md (merged to lifeos main at 9f1f1c4, PR #76; DECIDE-007)",
+    "decision_record_sha256": "86b3325c6cc64f10f3d943e88b980fbe40e9b3b2a9f2424e0a5e1dc0510cf3ec",
+    "one_option_recorded": true,
+    "option": "build-only provenance (Option B), recorded 2026-07-15 under the owner's 2026-07-14 delegated bounded mission authority",
+    "measured_evidence": "rust-nightly closure 772.8 MiB across 11 store paths (nix path-info quoted), stable comparison 758.0 MiB, 12 license texts enumerated, 7-consequence decision matrix",
+    "exact_unblock_conditions": true,
+    "unblock_evidence": "four exact unblock conditions toward Option A (toolchain bundling) recorded in the decision record",
+    "provenance_and_update_ownership": true,
+    "ownership_evidence": "Nix owns the build plane; peers own pins per FOUNDATION_META_PORTABILITY_MODEL.md §6; the Release Agent records pins into manifests",
+    "offline_relocation_rollback_recorded": true,
+    "effects_on_musl_and_closure_tasks": true,
+    "no_release_task_assumes_undecided_model": true,
+    "machine_gate_green": "planning-spine-v0/scripts/check-archbp-029-decision.mjs → 'ARCHBP-029 gate: all clauses satisfied' (re-run this session, 2026-07-21)",
+    "release_contract_annotation": "the historical QUESTION row in meta/docs/lifeos-toolchain-and-dependency-bundle.md line 19 is explicitly superseded by the decision record's Effects section (planning-spine decision authority outranks raw contract prose); the in-place annotation lives outside this task's lifeos allowed paths and is deferred to the meta-repo docs owner",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the machine-checkable decision gate script executed green against the merged record this session"
+  },
+  "proof_summary": "ARCHBP-029 is complete: the Rust toolchain bundling question is decided and machine-verified. The merged decision record (sha256 86b3325c…, lifeos main 9f1f1c4 / PR #76, DECIDE-007) selects build-only provenance under owner-delegated bounded authority with measured closure evidence (772.8 MiB nightly / 758.0 MiB stable, 12 licenses), a seven-consequence matrix, four exact unblock conditions toward bundling, explicit provenance/update ownership, offline/relocation/rollback expectations, and effects on the musl and closure tasks — and the dedicated gate script check-archbp-029-decision.mjs re-verified every clause green this session, so no release task can assume an undecided model. The stale QUESTION row in the meta-repo release contract is superseded by this decision's authority and its in-place annotation deferred to the meta-repo docs owner (outside this task's allowed paths).",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-029.proof.json",
+    "planning-spine-v0/1.0_VISION/current_state/ARCHBP-029-toolchain-decision.md",
+    "planning-spine-v0/scripts/check-archbp-029-decision.mjs"
+  ]
+}

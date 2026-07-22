@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-129",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Mount table specified; Overlay vs bind decisions recorded; Matches tier map T1.2; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates executed red with the design artifact absent (2/2 files failing), green at HEAD (3/3)",
+    "mount_table_specified": true,
+    "table_evidence": "planning-spine-v0/docs/envelope_mount_design.json specifies the complete nine-row mount table: private tmpfs /, ro-bind /nix, minimal ro /etc (resolv.conf/passwd/group only), fresh procfs, minimal devtmpfs, per-envelope tmpfs /tmp, tmpfs home overlay, explicit rw durable binds, and on-demand GPU/device dev-binds — each with mechanism, writability, tier, and a substantive rationale.",
+    "overlay_vs_bind_decisions_recorded": true,
+    "decision_evidence": "Four named decisions with rationale: tmpfs-not-overlay for the private root (declared-only presentation; unprivileged overlayfs blocked by the same AppArmor policy), overlay-as-tmpfs-not-overlayfs for home (residuals invisible, no write-back channel), bind-not-copy for the store, and explicit-rw-bind-per-durable-root for durable state.",
+    "matches_tier_map": true,
+    "tier_map_evidence": "Every mount row's tier is a T1.2 tier-map tier; the durable row names the map's durable roots (meta/var/lib/postgresql); the spec also proves the design is IMPLEMENTED — the shipped engine constructs exactly these primitives (--tmpfs /, --ro-bind /nix, --tmpfs $HOME).",
+    "full_suite": "ARCHBP-129 spec 3/3.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The design is validated against the live engine source that ARCHBP-065..071 proved by execution."
+  },
+  "proof_summary": "ARCHBP-129 is complete: the envelope mount design is fully specified — private tmpfs root, read-only /nix, tmpfs home overlay, minimal /etc, and explicit durable-state binds — with every overlay-vs-bind decision recorded and justified, matched to the T1.2 tier map, and proven implemented by the shipped yzx-envelope engine.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-129.proof.json",
+    "planning-spine-v0/docs/envelope_mount_design.json",
+    "tests/archbp-129-envelope-design.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

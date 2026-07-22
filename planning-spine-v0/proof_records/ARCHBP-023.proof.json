@@ -1,0 +1,31 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-023",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests cover creation, assignment, running, blocked, complete, proof invalidation, retry, conflict, and restart; one authority is explicit; GitKB views and TEAS agree after replay; contradictions fail closed and remain visible.",
+  "gate_result": {
+    "red_first": "contracts committed red at meta-ruvector 09f341982 (7/8 failing: stub projection returns empty views), implementation green at d8724c485 (8/8)",
+    "one_explicit_authority_no_writeback": true,
+    "authority_evidence": "TEAS is the single, explicit task authority (AUTHORITY='TEAS'); the bridge is one-directional and exposes no GitKB->TEAS write-back (has_writeback()=false). The GitKB board/graph/ready/assign/context/incident views are pure projections of the TEAS event log, so the write-back seam and dual authority are eliminated.",
+    "covers_full_lifecycle": true,
+    "lifecycle_evidence": "the projection folds the TEAS event log through the full lifecycle: Create (board 'created', context body, dependency graph edges), Assign (assign view + board 'assigned' + ready), Run ('running'), Block ('blocked'), Complete-with-proof ('complete'), ProofInvalidate (reverts from complete to 'proof-invalidated' with an incident), Retry (blocked/invalidated/restarted -> 'running'), Conflict (incident, status unchanged), and Restart ('restarted').",
+    "views_agree_after_replay": true,
+    "replay_evidence": "project(events) is deterministic (events sorted by seq, BTreeMap-ordered views); replaying the same events yields byte-identical GitKbViews (asserted structurally with derived PartialEq) — GitKB agrees with TEAS after replay.",
+    "contradictions_fail_closed_and_visible": true,
+    "fail_closed_evidence": "completing without a proof reference is rejected: the task is NOT marked complete and an incident 'complete without proof reference — failed closed' is recorded; an invalidated proof revokes completion with a visible incident; an explicit conflict records an incident and leaves the status unchanged. In every contradiction path the task is never silently marked complete and the contradiction remains visible in the incident view.",
+    "versioned_adapter": true,
+    "versioning_evidence": "the adapter carries SCHEMA_VERSION 'teas-gitkb-bridge.v0'; it is a standalone hermetic crate (teas_gitkb_bridge) that opts out of the meta-ruvector root workspace with zero external dependencies, so the production build/clippy surface is untouched.",
+    "full_suite": "bridge_gate 8/8; clippy-clean.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the gate exercises the real projection over real TEAS event sequences for every lifecycle transition and every contradiction path, asserting the resulting GitKB views and incidents. Tests run live on this host (8/8)."
+  },
+  "proof_summary": "ARCHBP-023 is complete: the TEAS->GitKB single-authority projection bridge (meta-ruvector teas_gitkb_bridge crate + tests/bridge_gate.rs, PR FlexNetOS/meta-ruvector#130, red 09f341982 -> green d8724c485, 8/8, clippy-clean) eliminates the TEAS-to-GitKB write-back seam. TEAS is the sole explicit authority (AUTHORITY=TEAS, has_writeback()=false) and the GitKB board/graph/ready/assign/context/incident views are a deterministic one-directional projection of the TEAS event log, so there is no dual authority. The projection covers the full lifecycle — creation, assignment, running, blocked, complete, proof invalidation, retry, conflict, and restart — and replaying the same events yields byte-identical views (GitKB agrees with TEAS after replay). Contradictions fail closed and remain visible: completing without a proof reference, invalidated proofs, and explicit conflicts never silently mark a task complete and each surfaces in the incident view. The adapter is a versioned, standalone, hermetic crate that leaves the production build surface untouched.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-023.proof.json",
+    "https://github.com/FlexNetOS/meta-ruvector/pull/130",
+    "meta-ruvector:teas_gitkb_bridge/src/lib.rs",
+    "meta-ruvector:teas_gitkb_bridge/tests/bridge_gate.rs"
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "schema_version": "lifeos-planning-spine.isolation-invariant-ledger.v0",
+  "spec_version": "1.0.0",
+  "normative": true,
+  "source_spec": "planning-spine-v0/docs/isolation-architecture-spec.md",
+  "invariants": [
+    {
+      "id": "I01",
+      "statement": "A host OS update (kernel, apt, unattended-upgrades, snap, desktop) never alters, corrupts, or interrupts LifeOS durable state.",
+      "predicate": "The LifeOS durable tier is byte-identical before and after a host apt full-upgrade plus reboot.",
+      "goals": ["G1"],
+      "covers": ["isolation", "persistence"]
+    },
+    {
+      "id": "I02",
+      "statement": "A LifeOS update never modifies the host kernel, host packages, /etc, or the host user environment.",
+      "predicate": "The host manifest (dpkg selections, /etc content hash, kernel version, login shell) is identical before and after a LifeOS update.",
+      "goals": ["G1"],
+      "covers": ["isolation"]
+    },
+    {
+      "id": "I03",
+      "statement": "LifeOS runs as native host processes inside a Nix-declared user-namespace envelope; no hypervisor and no container daemon sits in the hot path.",
+      "predicate": "The envelope process tree contains no qemu, kvm, dockerd, or containerd ancestor; the envelope is entered via bwrap as a direct child of the session supervisor.",
+      "goals": ["G2"],
+      "covers": ["isolation"]
+    },
+    {
+      "id": "I04",
+      "statement": "In-envelope runtime latency equals bare-native latency; there is no hypervisor tax.",
+      "predicate": "The in-envelope benchmark suite completes within 2 percent of the bare-native baseline on the same host.",
+      "goals": ["G2"],
+      "covers": ["isolation"]
+    },
+    {
+      "id": "I05",
+      "statement": "Every byte of LifeOS state — PostgreSQL/RuVector macro-state, redb transient projections, agent/session/tool state, secrets, raw ingested bytes — lives on LifeOS-owned durable storage.",
+      "predicate": "Every enumerated state root in the tier map resolves to a durable-tier path, and a kill-plus-reboot cycle reproduces the durable tier byte-identically.",
+      "goals": ["G3"],
+      "covers": ["persistence"]
+    },
+    {
+      "id": "I06",
+      "statement": "Nothing durable lives on the host /run tmpfs.",
+      "predicate": "The tier map contains zero durable entries whose target path starts with /run/, and the CI guard fails when any durable env var points at /run.",
+      "goals": ["G4"],
+      "covers": ["persistence", "ownership"]
+    },
+    {
+      "id": "I07",
+      "statement": "The volatile tier (caches, cargo-target, build tmp, rustup toolchains) stays ephemeral on tmpfs and is never promoted to durable storage.",
+      "predicate": "Every cache-class entry in the tier map is classified volatile with a tmpfs current path, and no durable-tier mount hosts cache-class data.",
+      "goals": ["G4"],
+      "covers": ["ownership"]
+    },
+    {
+      "id": "I08",
+      "statement": "No home-owned residual acts as an active owner; every LifeOS binary, runtime path, and active config resolves solely through the single Nix profile frontdoor.",
+      "predicate": "A full sweep finds zero active owners under ~/.claude, ~/.local/share/<tool>, or ~/FlexNetOS, and the CI guard fails on any home-owned active owner.",
+      "goals": ["G5"],
+      "covers": ["ownership"]
+    },
+    {
+      "id": "I09",
+      "statement": "The shipped LifeOS release is fully self-contained: it runs on a clean host with no Nix daemon and no shared /nix/store.",
+      "predicate": "The clean-host boot test passes, and the RPATH/ldd audit of the released closure shows no unresolved /nix/store references outside the shipped bundle.",
+      "goals": ["G6"],
+      "covers": ["portability"]
+    },
+    {
+      "id": "I10",
+      "statement": "After any host reboot the LifeOS envelope re-materializes and re-attaches to its durable state automatically or via a single deliberate command.",
+      "predicate": "The cold-reboot harness restores PostgreSQL/RuVector, redb, the Glass/Engine front door, and resumable session context without manual repair.",
+      "goals": ["G7"],
+      "covers": ["persistence"]
+    },
+    {
+      "id": "I11",
+      "statement": "Host resources are acquired only through the declared control plane, and every acquisition records the prior host state for restore.",
+      "predicate": "Every acquire action has a matching audit record containing a restore snapshot taken before control was taken.",
+      "goals": ["G8"],
+      "covers": ["isolation"]
+    },
+    {
+      "id": "I12",
+      "statement": "Every acquisition has a clean release that restores the recorded prior host state; controls are reversible and time-bounded, never a permanent takeover.",
+      "predicate": "An acquire/release cycle across every registered resource leaves the observable host state equal to its pre-acquire snapshot.",
+      "goals": ["G8"],
+      "covers": ["isolation"]
+    },
+    {
+      "id": "I13",
+      "statement": "The little brother always functions: during and after any LifeOS control action the host OS can update, reboot, and run its own daemons normally.",
+      "predicate": "Host update and reboot performed while LifeOS holds and then releases resources complete normally with no host-side degradation.",
+      "goals": ["G8", "G1"],
+      "covers": ["isolation"]
+    },
+    {
+      "id": "I14",
+      "statement": "Retained services (Omada controller and peers) run Nix-supervised inside the envelope, not under ad-hoc host docker or KVM.",
+      "predicate": "Omada serves under Nix supervision while docker.service, containerd.service, libvirtd, and qemu-kvm boot units are disabled, and the host still functions normally.",
+      "goals": ["G9"],
+      "covers": ["ownership"]
+    },
+    {
+      "id": "I15",
+      "statement": "meta/var is never bind-mounted into any container runtime.",
+      "predicate": "The container-mount assertion scan finds zero meta/var paths in any docker/containerd mount table.",
+      "goals": ["G9"],
+      "covers": ["ownership", "persistence"]
+    },
+    {
+      "id": "I16",
+      "statement": "Host update mechanisms (unattended-upgrades, kernel installs, snap refreshes) are gated or observed by the LifeOS control plane during active work, and reboots are deliberate; the host stays free to update normally otherwise.",
+      "predicate": "With a live session, kernel/snapd/accountsservice upgrades are held and auto-reboot is disabled; with no session, the host updates and reboots unassisted (the drdave path).",
+      "goals": ["G10"],
+      "covers": ["isolation"]
+    },
+    {
+      "id": "I17",
+      "statement": "The portable release carries its own store closure; /nix/store is a development-time dependency only.",
+      "predicate": "The release artifact bundles or relocates its complete closure, and deleting the host /nix/store does not affect the running release.",
+      "goals": ["G6"],
+      "covers": ["portability"]
+    }
+  ]
+}

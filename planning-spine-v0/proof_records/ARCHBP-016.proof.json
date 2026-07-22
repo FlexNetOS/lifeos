@@ -1,0 +1,38 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-016",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests detect event removal, reorder, substitution, replay, algorithm confusion, and partial writes; the chosen primitive and domain separation are documented; verification is independent; claims are limited to tamper evidence and fail-closed policy.",
+  "gate_result": {
+    "red_first": "contracts committed red at lifeos 129c4a9 (10/10 failing: stub throws on every clause), implementation green at HEAD (10/10)",
+    "documented_primitive_and_explicit_decision": true,
+    "decision_evidence": "ALGORITHM_DECISION documents the explicit choice of SHA-256 (FIPS 180-4) over the blueprint's SHAKE-256 by reasoning, not by assertion: SHA-256 is the reviewed digest already used by the planning-spine proof ledger, so witness chains stay independently verifiable with the same proven primitive; SHAKE-256 was considered and recorded as considered. customCryptography=false — only a standard reviewed primitive from node:crypto is used.",
+    "domain_separation": true,
+    "domain_evidence": "each of the five event kinds (source, vector, decision, execution, proof) carries a distinct domain tag (wc:v1:<kind>) bound into both the data digest and the entry hash, so an event of one kind can never verify as another kind; the schema version is bound too.",
+    "detects_event_removal": true,
+    "detects_reorder": true,
+    "detects_substitution": true,
+    "detects_replay": true,
+    "detects_algorithm_confusion": true,
+    "detects_partial_write": true,
+    "tamper_evidence": "verifyChain independently recomputes the whole chain and fails closed: removal/reorder/replay break the sequential seq and prev-hash linkage (removal-reorder-or-replay, broken-link); substitution changes the recomputed data digest (data-substitution); algorithm confusion is rejected both by the reviewed-algorithm whitelist and by the recomputed entry hash (algorithm-confusion); a partial write with a missing entryHash fails closed (partial-write). The live proof records all six detections true, wellFormedValid true.",
+    "independent_verification": true,
+    "independent_evidence": "verifyChain reconstructs every hash from the entries alone with no shared state from the builder (independentVerification=true) — verification does not trust the producer.",
+    "append_only_history": true,
+    "append_only_evidence": "WitnessChain.record only appends; entries carry monotonically increasing seq and each entry's prevHash pins the prior entry's hash — history is immutable and any mutation is detected on verification.",
+    "honest_claims_only": true,
+    "claims_evidence": "the claim is limited to 'tamper-evident and fail-closed' detection; it explicitly states no mathematical-impossibility or unforgeability-proof claim is made (claim matches /tamper-evident/ and never /impossible/). No secret values are embedded and no production key is mutated.",
+    "full_suite": "ARCHBP-016 spec 10/10.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the proof builds a real five-event witness chain with node:crypto SHA-256, verifies it, then applies six real tampering transforms (removal, reorder, substitution, replay, algorithm confusion, partial write) and confirms each is detected. The spec spawns the proof emitter via bun and asserts on its emitted JSON."
+  },
+  "proof_summary": "ARCHBP-016 is complete: the witness-chain anti-bluffing receipts adapter (lifeos scripts/witness-chain-lifecycle.mjs + tests/archbp-016-witness-chain-lifecycle.spec.ts, red 129c4a9 -> green HEAD, 10/10) binds source, vector, decision, execution, and proof events into a tamper-evident SHA-256 hash chain using only a reviewed standard primitive (node:crypto, no custom cryptography). The algorithm choice is explicit and documented — SHA-256 over the blueprint's SHAKE-256, with the algorithm id bound into every entry so an algorithm-confusion swap is detected — and each event kind carries a distinct domain tag bound into the hash. Independent recomputation detects event removal, reorder, substitution, replay, algorithm confusion, and partial writes, and fails closed on the first inconsistency. History is append-only with monotonic sequence and prev-hash linkage. Claims are limited to tamper evidence and fail-closed policy; no mathematical-impossibility claim is made, no secret values are embedded, and no production key is mutated.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-016.proof.json",
+    "scripts/witness-chain-lifecycle.mjs",
+    "tests/archbp-016-witness-chain-lifecycle.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

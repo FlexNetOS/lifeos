@@ -223,23 +223,30 @@ function writeStableReport(reportPath, report) {
 function portableArg(arg) {
   if (!path.isAbsolute(arg)) return arg;
   const relative = path.relative(repoRoot, arg);
-  return relative && !relative.startsWith("..") && !path.isAbsolute(relative) ? relative : arg;
+  if (relative && !relative.startsWith("..") && !path.isAbsolute(relative)) return relative;
+  // Out-of-repo absolutes (the runtime binary, store paths) reduce to their
+  // basename: the committed report is an environment contract, and machine-
+  // specific paths would re-stale navigation on every other machine.
+  return path.basename(arg);
 }
 
 function writeRuntimeReport(result, message) {
+  // One deterministic environment contract (ARCHBP-037): the committed
+  // report never varies with the invocation shape, machine paths, timezone,
+  // or clock — only with the verifier's actual inputs and results. The
+  // canonical entrypoint is recorded regardless of how the process was
+  // launched; the executable reduces to its basename.
   const report = {
-    command: process.env.npm_lifecycle_event === "planning-spine:verify"
-      ? "bun run planning-spine:verify"
-      : `bun ${path.relative(repoRoot, process.argv[1] ?? "scripts/verify-planning-spine.mjs")}`,
+    command: "bun run planning-spine:verify",
     cwd: ".",
     pkg_root: path.relative(repoRoot, pkgRoot),
-    executable: process.execPath,
+    executable: path.basename(process.execPath),
     runtime: {
       name: typeof Bun !== "undefined" ? "bun" : "node",
       version: typeof Bun !== "undefined" ? Bun.version : process.version,
       argv: process.argv.map(portableArg)
     },
-    lifecycle_event: process.env.npm_lifecycle_event ?? null,
+    lifecycle_event: "planning-spine:verify",
     observed_at: null,
     performed_checks: performedChecks,
     result,

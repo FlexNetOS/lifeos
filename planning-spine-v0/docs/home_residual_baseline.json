@@ -1,0 +1,15 @@
+{
+  "schema_version": "lifeos-planning-spine.home-residual-baseline.v0",
+  "captured": "2026-07-22 (live scan, archbp-frontier session)",
+  "retirement_authority": "yzx-iso T5 (spine ARCHBP-078..083) + the restart-gated migration runbook meta/var/ops/README-migrate-tool-state.md",
+  "note": "The known set below is the honest pre-T5 state. The guard fails on any residual NOT in this list (a regression); --strict fails on all of them (the post-T5 mode). Shrink this list as T5 retires each residual — never grow it.",
+  "known_residuals": [
+    { "path": "/home/flexnetos/.claude", "why": "durable session transcripts + legacy config; relocation restart-gated (ARCHBP-078/131)" },
+    { "path": "/home/flexnetos/.codex", "why": "codex home residual; same relocation lane" },
+    { "path": "/home/flexnetos/.local/share/icm", "why": "ICM db default location until ICM_DB env adopted at session restart" },
+    { "path": "/home/flexnetos/.local/share/rtk", "why": "rtk has no data-dir config; follows XDG at restart" },
+    { "path": "/home/flexnetos/.local/share/yazelix", "why": "written continuously by the RUNNING zellij; un-movable mid-session" },
+    { "path": "/home/flexnetos/.local/share/weave", "why": "weave state; follows XDG at restart" },
+    { "path": "/home/flexnetos/FlexNetOS", "why": "self-hosted runner _work root re-materialized by flexnetos_runner@.service; re-pointed by ARCHBP-079, deleted by ARCHBP-080" }
+  ]
+}

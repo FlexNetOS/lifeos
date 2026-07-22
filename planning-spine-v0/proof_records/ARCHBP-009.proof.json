@@ -1,0 +1,36 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-009",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests reject unproven components and unbound state; supported components record exact source/model identity, isolate per-agent updates, respect resource budgets, roll back deterministically, and require witness-backed promotion before execution use.",
+  "gate_result": {
+    "red_first": "contracts committed red at lifeos cd0c857 (substantive clauses failing: stub adapter throws on the whitelist, provenance, promotion, resource, isolation, and FastGRNN clauses), implementation green at HEAD (6/6)",
+    "rejects_unproven_components": true,
+    "whitelist_evidence": "SUPPORTED_LEARNING_COMPONENTS is exactly [microlora, sona, fastgrnn]; assertSupportedComponent rejects any other name (e.g. 'invented-optimizer', 'gpt-online') and the proof records componentGuard.rejectedUnsupported=true — no invented algorithm or API is admitted.",
+    "exact_source_model_identity": true,
+    "provenance_evidence": "buildProvenance binds learning state to an exact identity and freezes the record, failing closed on any missing field. Live provenance: SONA component packageVersion 0.1.7, model 'sona-h8-mlr2', agentId, config digest; FastGRNN packageVersion 0.1.22, nativeVersion 2.2.3 (the tiny-dancer native library version, distinct from the npm package version), model 'fastgrnn-router'.",
+    "isolate_per_agent_updates": true,
+    "isolation_evidence": "Each agent gets its own SonaEngine sandbox. After agent-a records a trajectory and learns, agent-a's sandbox holds 1 pattern while agent-b's sandbox holds 0 (isolation.isolated=true) — one agent's learning never leaks into another's.",
+    "respect_resource_budgets": true,
+    "resource_evidence": "assertResourceBudget confirms the sandbox stats stay within budget with zero dropped trajectories (withinBudget=true, dropped=0) and all counters finite; the SONA config caps trajectoryCapacity, microLoraRank, baseLoraRank, and patternClusters.",
+    "roll_back_deterministically": true,
+    "rollback_evidence": "Learning accumulates in the sandbox; rollback() discards promotion so execution reverts to the baseline engine that never learned. After rollback the execution pattern count equals the baseline count and isPromoted=false (rollback.deterministic=true) — a deterministic revert, not a best-effort undo.",
+    "witness_backed_promotion_before_execution": true,
+    "promotion_evidence": "Before promotion, execution reads the baseline engine (executionBeforePromotionUsesBaseline=true): learned sandbox patterns do NOT affect execution. Promotion runs the witness-backed gate evaluatePromotion (complete provenance + quality >= qualityThreshold + a witness digest of {agentId,input,quality}); only then does execution read the sandbox (executionAfterPromotionUsesSandbox=true, patterns > baseline). Un-witnessed, low-quality, or incomplete-provenance promotions fail closed.",
+    "fastgrnn_integrated": true,
+    "fastgrnn_evidence": "FastGRNN (tiny-dancer) is trained on a small bounded workload (12 rows, 5 epochs) and scores a real embedding (score 0.556, a finite number), with its own provenance record — the component is genuinely integrated, not stubbed.",
+    "no_absolute_stability_claim": "stabilityClaim='measured-workload-only; no absolute-stability claim'; no model is replaced and no online learning affects execution without the promotion gate.",
+    "full_suite": "ARCHBP-009 spec 6/6 against the real @ruvector/sona@0.1.7 + @ruvector/tiny-dancer@0.1.22 native surface.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The proof runs real SonaEngine instances (real trajectory recording, real forceLearn producing real patterns, real per-engine isolation) and a real FastGRNN trainRouter + score on this host. The spec spawns the proof emitter via bun and asserts on its emitted JSON."
+  },
+  "proof_summary": "ARCHBP-009 is complete: the MicroLoRA/SONA/FastGRNN learning-boundary adapter (lifeos scripts/learning-boundary-lifecycle.mjs + tests/archbp-009-learning-boundary-lifecycle.spec.ts, red cd0c857 -> green HEAD, 6/6) integrates only the primary-source-supported components (whitelist microlora/sona/fastgrnn; unsupported names rejected) over the real @ruvector/sona@0.1.7 and @ruvector/tiny-dancer@0.1.22 native surface. Learning state is bound to an exact, frozen provenance identity (package + native versions, model, agent id, config digest) that fails closed on any missing field. Per-agent updates are isolated (agent-a learns 1 pattern, agent-b stays at 0), resource budgets are respected (zero dropped trajectories), and learning is confined to a per-agent sandbox that does not affect execution until a witness-backed promotion gate passes (complete provenance + quality >= threshold + witness). Rollback is deterministic — execution reverts to the baseline engine that never learned. FastGRNN is genuinely integrated (real train + score 0.556). No component is invented, no model is replaced, and no absolute-stability claim is made.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-009.proof.json",
+    "scripts/learning-boundary-lifecycle.mjs",
+    "tests/archbp-009-learning-boundary-lifecycle.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

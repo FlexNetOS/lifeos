@@ -1,0 +1,38 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-024",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove snapshot verify, list, materialize, license, corruption rejection, deterministic build, and rollback; the rehearsal accounts for every peer capability and preserves each independent repository and lockfile; no release claim exceeds the bounded artifact.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin 39fefee (stub library fails closed across all suites), implementation green at 50e1c84",
+    "snapshot_verify": true,
+    "list": true,
+    "materialize": true,
+    "license": true,
+    "corruption_rejection": true,
+    "deterministic_build": true,
+    "rollback": true,
+    "family_evidence": "verify suite 7/7 (embedded verification, deterministic-ordered list, schema/summary bounds, license report covering every embedded component, flipped-byte and lying-manifest rejection, byte-identical double regeneration against committed assets, no secret-shaped embedding) and materialize suite 3/3 (byte-exact tree with modes, unsafe-overwrite refusal preserving existing content, corrupted-pack failure leaving no target — staging plus atomic rename)",
+    "design_conformance": "implements the CDB100 design doc layout and command contract exactly: verify/list/schema/summary/export/materialize/license-report over assets/{codedb-pack.zst,manifest.json,checksums.sha256,license-manifest.json}",
+    "rehearsal_accounts_every_capability": true,
+    "rehearsal_preserves_every_repo_and_lockfile": true,
+    "rehearsal_evidence": "read-only walk of the CONSOLIDATE-003 contract: 3 retirement units with independent .git, reachable pinned heads (d7cc4d8/d47ca72/b2e0678), and preserved lockfiles; 19 adopted capabilities each mapped to a unit repo; 42 provenance peers accounted with the inventory's own worktree-transient classification honored (a gone transient worktree is preserved iff its parent clone survives — all seven such cases resolve to surviving parents); receipt committed at nu_plugin logs/consolidation-rehearsal/receipt.json with all_preserved=true",
+    "no_release_claim_exceeds_bounded_artifact": true,
+    "bounded_evidence": "the crate description, the receipt's bounded_claim field, and this proof all state the artifact is bounded; nothing was retired, merged, or cut over (the contract's own units are NOT-RETIRABLE/operator-frozen and remain untouched)",
+    "full_suite": "crate 11/11, workspace 287 passed / 0 failed, clippy clean",
+    "product_execution_performed": true,
+    "product_execution_evidence": "asset generation, verification, materialization, and the rehearsal all executed live; the rehearsal read the real spine contract files and probed the real peer repositories with git"
+  },
+  "proof_summary": "ARCHBP-024 is complete: codedb-single-binary-export (nu_plugin PR FlexNetOS/nu_plugin#47, red 39fefee → green 50e1c84) delivers the CDB100-designed single-binary snapshot artifact — a deterministically generated embedded pack with manifest, per-file checksums, and license manifest, whose seven gate families all pass red-first: verify, list, materialize (staging + atomic rename rollback, unsafe-overwrite refusal, exact modes), license coverage, corruption rejection, byte-identical deterministic regeneration, and secret-shape exclusion. The read-only all-peer consolidation rehearsal accounts for all 3 retirement units, 19 adopted capabilities, and 42 provenance peers with independent repositories, lockfiles, and pinned heads preserved (transient-worktree entries resolving to surviving parent clones per the inventory's own classification), and its committed receipt carries an explicit bounded claim — no release claim exceeds the bounded artifact.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-024.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/47",
+    "nu_plugin:crates/codedb_single_binary_export/src/lib.rs",
+    "nu_plugin:crates/codedb_single_binary_export/tests/verify.rs",
+    "nu_plugin:crates/codedb_single_binary_export/tests/materialize.rs",
+    "nu_plugin:crates/codedb_single_binary_export/tests/rehearsal.rs",
+    "nu_plugin:logs/consolidation-rehearsal/receipt.json"
+  ]
+}

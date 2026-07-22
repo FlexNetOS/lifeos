@@ -1,0 +1,29 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-065",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: bwrap wrapper builds via flake; No host installs required; Pinned inputs; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates executed red against the pre-delivery surface (engine absent: 7/7 files failing) at lifeos red commit, green at HEAD (2/2)",
+    "builds_via_flake": true,
+    "build_evidence": "nix build .#yzx-envelope on the yazelix flake (branch archbp-065-071-isolation-envelope, PR FlexNetOS/yazelix#103) produces /nix/store/dwvgys4ykl1sap674fpnjs5zkspq206g-yzx-envelope; the built binary runs and emits its executor JSON.",
+    "no_host_installs": true,
+    "hermetic_evidence": "writeShellApplication with runtimeInputs = [bubblewrap coreutils gnugrep] — the build needs nothing from the host; shellcheck passes at build time.",
+    "pinned_inputs": true,
+    "pinning_evidence": "bubblewrap comes from the flake's pinned nixpkgs input (pkgs.bubblewrap), never from the host; the flake app apps.<system>.yzx-envelope exposes the engine.",
+    "honest_executor": true,
+    "executor_evidence": "On this host the store bwrap is denied userns by kernel.apparmor_restrict_unprivileged_userns=1; the engine records the downgrade to the AppArmor-profiled /usr/bin/bwrap with root cause and the owner-gated permanent fix (an AppArmor profile for the store bwrap) — never silent.",
+    "full_suite": "ARCHBP-065 spec 2/2.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The spec performs the real nix build and executes the built store binary."
+  },
+  "proof_summary": "ARCHBP-065 is complete: the envelope is nix-declared — flake package + app yzx-envelope (writeShellApplication, pinned bubblewrap input) builds hermetically with no host installs and the built store binary runs; executor selection honestly records the AppArmor-profiled host-bwrap fallback on restricted hosts instead of silently downgrading.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-065.proof.json",
+    "tests/archbp-065-envelope-flake.spec.ts",
+    "https://github.com/FlexNetOS/yazelix/pull/103",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-070",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: N envelopes coexist; No cross-session leakage; Shared durable plane safe; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates executed red against the pre-delivery surface (engine absent), green at HEAD (1/1)",
+    "n_envelopes_coexist": true,
+    "coexist_evidence": "Three envelopes (alpha/beta/gamma) run concurrently on the shared kernel, overlapping in time (each sleeps mid-run), all exiting 0.",
+    "no_cross_session_leakage": true,
+    "leakage_evidence": "While all three ran, each envelope's /tmp listing contained ONLY its own private file — none of the other envelopes' state was visible in any session (private mount namespaces per envelope).",
+    "shared_durable_plane_safe": true,
+    "durable_evidence": "All three appended to the same durable bind concurrently; the shared log contains exactly one line from each (atomic O_APPEND single-line writes), and every envelope tore down leakcheck-clean.",
+    "full_suite": "ARCHBP-070 spec 1/1.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "Three real concurrent bwrap envelopes with overlapping lifetimes on this host."
+  },
+  "proof_summary": "ARCHBP-070 is complete: multiple envelopes coexist on one shared kernel without state collision — three concurrent envelopes each saw only their own private /tmp, the shared durable plane received exactly one record from each without loss or interleaving corruption, and all tore down with zero leaks.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-070.proof.json",
+    "tests/archbp-070-envelope-multi.spec.ts",
+    "https://github.com/FlexNetOS/yazelix/pull/103",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

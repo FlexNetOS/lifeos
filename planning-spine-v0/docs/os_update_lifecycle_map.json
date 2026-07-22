@@ -1,0 +1,60 @@
+{
+  "schema_version": "lifeos-planning-spine.os-update-lifecycle-map.v0",
+  "spec_version": "1.0.0",
+  "implements": "yzx-iso t9 mapping (spine ARCHBP-109)",
+  "captured": "2026-07-22 live host observation (drdave-TRX50-AI-TOP)",
+  "mechanisms": [
+    {
+      "name": "unattended-upgrades",
+      "trigger": "systemd apt-daily-upgrade.timer",
+      "schedule": "daily ~06:58 CDT (observed next-fire; RandomizedDelay applies)",
+      "config": "/etc/apt/apt.conf.d/20auto-upgrades: APT::Periodic::Update-Package-Lists=1, APT::Periodic::Unattended-Upgrade=1 — BOTH ENABLED",
+      "scope": "Allowed-Origins: distro release, -security, ESMApps/ESM security, -updates",
+      "risk": "installs kernel images and REMOVES the running kernel unattended; the 2026-07-21 06:31 kernel swap (installed 7.0.0-28, removed running -22) fired from this mechanism ~2 minutes after the 06:29:49 timer run",
+      "observed_evidence": "systemctl list-timers: apt-daily-upgrade.timer LAST 2026-07-21 06:29:49 — matching the incident timeline to the minute"
+    },
+    {
+      "name": "apt-daily package-list refresh",
+      "trigger": "systemd apt-daily.timer",
+      "schedule": "daily ~17:36 CDT (observed)",
+      "config": "APT::Periodic::Update-Package-Lists=1",
+      "risk": "feeds the upgrade candidate set; harmless alone but arms the next unattended run"
+    },
+    {
+      "name": "aptdaemon / update-manager interactive path",
+      "trigger": "user-driven or desktop-prompted (GUI)",
+      "schedule": "on demand",
+      "risk": "applies desktop-breaking packages under a LIVE GNOME session; on 2026-07-21 at 19:44 it upgraded snapd 2.75->2.76, accountsservice, google-chrome, and vscode, destabilizing the running desktop (chrome crash 19:55, update-manager crash 20:02)"
+    },
+    {
+      "name": "snap refresh",
+      "trigger": "snapd internal timer (snapd.refresh not exposed as a systemd timer on this host)",
+      "schedule": "snapd default 4x/day window; not readable unprivileged on this host (snap CLI absent from the agent PATH) — recorded as an observation boundary for the T9 observer",
+      "risk": "snapd self-refresh restarts snap services mid-session (the 19:44 snapd upgrade rode the apt path, but snap self-refresh is an independent channel)"
+    },
+    {
+      "name": "kernel install + reboot requirement",
+      "trigger": "any of the above installing linux-image-*",
+      "schedule": "follows the mechanism that carries it",
+      "risk": "a kernel swap makes the eventual reboot mandatory and ends every live LifeOS process (shared-kernel boundary, spec section 3); survival depends entirely on the durable tier + re-attach (T7, now delivered)"
+    }
+  ],
+  "desktop_breaking_packages": [
+    { "pattern": "linux-image-*, linux-headers-*, linux-modules-*", "why": "kernel swap; removes the running kernel and forces a reboot window" },
+    { "pattern": "snapd", "why": "restarts snap infrastructure under live sessions (2026-07-21 19:44)" },
+    { "pattern": "accountsservice", "why": "restarts the login/user service the desktop session depends on (2026-07-21 19:44)" },
+    { "pattern": "google-chrome-stable, code", "why": "in-place binary replacement crashes running instances (2026-07-21 19:55 chrome crash dump)" },
+    { "pattern": "gnome-shell, gdm3, mutter, xorg/wayland stack", "why": "session-critical desktop components; upgrade mid-session risks the whole GNOME session" }
+  ],
+  "incident_reference": {
+    "id": "2026-07-21 reboot incident",
+    "catalog": "planning-spine-v0/docs/isolation_failure_modes.json (incident_2026_07_21, FM-01/FM-02)",
+    "tie": "the observed apt-daily-upgrade.timer LAST run (06:29:49) is the trigger of the 06:31 kernel swap; the 19:44 aptdaemon batch is the desktop destabilizer; both mechanisms above"
+  },
+  "governance_targets": {
+    "observe": "ARCHBP-110 — event observer over apt/dpkg logs and the timer surface (97 apt history entries readable unprivileged today)",
+    "hold_during_sessions": "ARCHBP-111 — apt-mark hold / unattended-upgrades blacklist for kernel/snapd/accountsservice while a session is live (root, owner-gated)",
+    "deliberate_reboots": "ARCHBP-112 — disable auto-reboot, require intent (root, owner-gated)",
+    "prove": "ARCHBP-113/114/117 — host upgrade + drdave path with LifeOS unaffected"
+  }
+}

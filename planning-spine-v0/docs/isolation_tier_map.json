@@ -1,0 +1,193 @@
+{
+  "schema_version": "lifeos-planning-spine.isolation-tier-map.v0",
+  "spec_version": "1.0.0",
+  "rule": "nothing-durable-on-host-run",
+  "feeds": ["tasks/yzx-iso/t3-0-lane-index"],
+  "tiers": {
+    "volatile": "Ephemeral by design; lives on tmpfs; loss on reboot is correct behavior.",
+    "durable": "Persistent LifeOS-owned state; must survive any reboot, kernel swap, or desktop crash byte-identically.",
+    "portable": "Travels with the released closure; store-independent at release time."
+  },
+  "entries": [
+    {
+      "name": "CLAUDE_CONFIG_DIR",
+      "kind": "env-var",
+      "path": "$CLAUDE_CONFIG_DIR",
+      "current_path": "/run/user/1001/yazelix/profile-runtime/claude",
+      "target_path": "/home/flexnetos/meta/var/xdg-data/claude",
+      "tier": "durable",
+      "misplaced": true,
+      "note": "Agent config/session runtime; wiped by the 2026-07-21 reboot because it sits on host tmpfs. Owned by ARCHBP-072/ARCHBP-131."
+    },
+    {
+      "name": "CODEX_HOME",
+      "kind": "env-var",
+      "path": "$CODEX_HOME",
+      "current_path": "/run/user/1001/yazelix/profile-runtime/codex",
+      "target_path": "/home/flexnetos/meta/var/xdg-data/codex",
+      "tier": "durable",
+      "misplaced": true,
+      "note": "Codex agent state on host tmpfs today; same relocation lane as CLAUDE_CONFIG_DIR."
+    },
+    {
+      "name": "YAZELIX_STATE_DIR",
+      "kind": "env-var",
+      "path": "$YAZELIX_STATE_DIR",
+      "current_path": "/run/user/1001/yazelix/profile-runtime/yazelix",
+      "target_path": "/home/flexnetos/meta/var/xdg-state/yazelix",
+      "tier": "durable",
+      "misplaced": true,
+      "note": "Session/zellij state; the live session binds it, so relocation is restart-gated (ARCHBP-076)."
+    },
+    {
+      "name": "XDG_DATA_HOME",
+      "kind": "env-var",
+      "path": "$XDG_DATA_HOME",
+      "current_path": "/home/flexnetos/meta/var/xdg-data",
+      "target_path": "/home/flexnetos/meta/var/xdg-data",
+      "tier": "durable",
+      "misplaced": false,
+      "note": "Already redirected to the meta durable tier by the envctl bootstrap rows."
+    },
+    {
+      "name": "XDG_STATE_HOME",
+      "kind": "env-var",
+      "path": "$XDG_STATE_HOME",
+      "current_path": "/home/flexnetos/meta/var/xdg-state",
+      "target_path": "/home/flexnetos/meta/var/xdg-state",
+      "tier": "durable",
+      "misplaced": false,
+      "note": "Already redirected to the meta durable tier by the envctl bootstrap rows."
+    },
+    {
+      "name": "ICM_DB",
+      "kind": "env-var",
+      "path": "$ICM_DB",
+      "current_path": "/home/flexnetos/meta/var/xdg-data/icm/memories.db",
+      "target_path": "/home/flexnetos/meta/var/xdg-data/icm/memories.db",
+      "tier": "durable",
+      "misplaced": false,
+      "note": "Persistent memory database; the only supported override for the ICM store location."
+    },
+    {
+      "name": "postgres-datadir",
+      "kind": "state-path",
+      "path": "/home/flexnetos/meta/var/lib/postgresql",
+      "current_path": "/home/flexnetos/meta/var/lib/postgresql",
+      "target_path": "/home/flexnetos/meta/var/lib/postgresql",
+      "tier": "durable",
+      "misplaced": false,
+      "note": "PostgreSQL 17.10 + RuVector canonical macro-state — the Swarm Primary Runtime datadir."
+    },
+    {
+      "name": "redb-plane",
+      "kind": "state-path",
+      "path": "/home/flexnetos/meta/var/lib/redb",
+      "current_path": "/home/flexnetos/meta/var/lib/redb",
+      "target_path": "/home/flexnetos/meta/var/lib/redb",
+      "tier": "durable",
+      "misplaced": false,
+      "note": "Transient shared low-latency plane; file-backed ACID buffer whose durability requirement is crash-replay, not canonical truth."
+    },
+    {
+      "name": "claude-session-transcripts",
+      "kind": "state-path",
+      "path": "~/.claude/projects",
+      "current_path": "/home/flexnetos/.claude/projects",
+      "target_path": "/home/flexnetos/meta/var/xdg-data/claude/projects",
+      "tier": "durable",
+      "misplaced": true,
+      "note": "409 jsonl transcripts survived the 2026-07-21 reboot precisely because they were NOT on tmpfs — but they live in a home residual that path-law retires (ARCHBP-078/ARCHBP-131)."
+    },
+    {
+      "name": "profile-runtime",
+      "kind": "state-path",
+      "path": "/run/user/1001/yazelix/profile-runtime",
+      "current_path": "/run/user/1001/yazelix/profile-runtime",
+      "target_path": "/home/flexnetos/meta/var/xdg-data",
+      "tier": "durable",
+      "misplaced": true,
+      "note": "Generated agent runtime tree currently parasitized onto host systemd tmpfs; the root cause of the 2026-07-21 session loss."
+    },
+    {
+      "name": "cargo-target",
+      "kind": "cache-path",
+      "path": "/home/flexnetos/meta/var/cargo-target",
+      "current_path": "/home/flexnetos/meta/var/cargo-target",
+      "target_path": "/home/flexnetos/meta/var/cargo-target",
+      "tier": "volatile",
+      "misplaced": false,
+      "note": "Build product cache; disk-backed by policy (never tmpfs for large builds) but reproducible — correctly ephemeral in contract even when disk-backed."
+    },
+    {
+      "name": "rustup-toolchains",
+      "kind": "cache-path",
+      "path": "/run/user/1001/yazelix/volatile/rustup",
+      "current_path": "/run/user/1001/yazelix/volatile/rustup",
+      "target_path": "/run/user/1001/yazelix/volatile/rustup",
+      "tier": "volatile",
+      "misplaced": false,
+      "note": "Re-downloadable toolchains; correctly volatile on tmpfs."
+    },
+    {
+      "name": "build-tmp",
+      "kind": "cache-path",
+      "path": "/run/user/1001/yazelix/volatile/tmp",
+      "current_path": "/run/user/1001/yazelix/volatile/tmp",
+      "target_path": "/run/user/1001/yazelix/volatile/tmp",
+      "tier": "volatile",
+      "misplaced": false,
+      "note": "Scratch space including agent scratchpads; correctly volatile."
+    },
+    {
+      "name": "runner-work-root",
+      "kind": "state-path",
+      "path": "~/FlexNetOS/src/flexnetos_runner/_work",
+      "current_path": "/home/flexnetos/FlexNetOS/src/flexnetos_runner/_work",
+      "target_path": "/home/flexnetos/meta/var/runner/_work",
+      "tier": "durable",
+      "misplaced": true,
+      "note": "Self-hosted runner work root re-materializes a home residual; re-pointed by ARCHBP-079, residual deleted by ARCHBP-080."
+    },
+    {
+      "name": "nix-profile-frontdoor",
+      "kind": "state-path",
+      "path": "/home/flexnetos/.nix-profile",
+      "current_path": "/home/flexnetos/.nix-profile",
+      "target_path": "/home/flexnetos/.nix-profile",
+      "tier": "portable",
+      "misplaced": false,
+      "note": "Development-time store-backed frontdoor; at release time its closure ships inside the portable bundle (I09/I17)."
+    },
+    {
+      "name": "release-closure",
+      "kind": "release-path",
+      "path": "<release-bundle>/store",
+      "current_path": "/nix/store",
+      "target_path": "<release-bundle>/store",
+      "tier": "portable",
+      "misplaced": false,
+      "note": "The released closure travels with the app (relocatable/embedded store or static-musl); decided by ARCHBP-134."
+    },
+    {
+      "name": "gitkb-database",
+      "kind": "state-path",
+      "path": "/home/flexnetos/meta/var/lib/gitkb",
+      "current_path": "/home/flexnetos/meta/var/lib/gitkb",
+      "target_path": "/home/flexnetos/meta/var/lib/gitkb",
+      "tier": "durable",
+      "misplaced": false,
+      "note": "Knowledge-base database on the durable tier."
+    },
+    {
+      "name": "envctl-tables",
+      "kind": "state-path",
+      "path": "/home/flexnetos/meta/var/lib/envctl",
+      "current_path": "/home/flexnetos/meta/var/lib/envctl",
+      "target_path": "/home/flexnetos/meta/var/lib/envctl",
+      "tier": "durable",
+      "misplaced": false,
+      "note": "envctl bootstrap/committer tables — the sole authoritative env committer's own state."
+    }
+  ]
+}

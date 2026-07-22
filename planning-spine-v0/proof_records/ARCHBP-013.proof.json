@@ -1,0 +1,38 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-013",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests cover local-only default, cost ceiling, privacy denial, resource exhaustion, classifier uncertainty, outage fallback, and auditability; offline replay beats declared baselines before any live route is enabled.",
+  "gate_result": {
+    "red_first": "contracts committed red at lifeos d0f8988 (10/10 failing: stub policy engine throws on every clause), implementation green at HEAD (10/10)",
+    "local_only_default": true,
+    "default_evidence": "DEFAULT_ROUTE is 'local' and defaultPolicy().liveRoutingEnabled is false. Even a fully cloud-eligible workload routes local while live routing is disabled (reason 'cloud-eligible-live-routing-disabled'); low-complexity work stays local. The proof records defaultRoute='local', liveRoutingEnabled=false.",
+    "cost_ceiling": true,
+    "cost_evidence": "estimatedCost above the policy ceiling forces local with reason 'cost-ceiling' — no hidden spend; cloud is never taken over budget (gate privacyDenial/costCeiling both true in the proof).",
+    "privacy_denial": true,
+    "privacy_evidence": "a privacy-flagged workload is denied cloud (reason 'privacy-denial', route local) — no secret exposure; the private path never reaches an external route.",
+    "resource_exhaustion_fails_closed": true,
+    "resource_evidence": "resource exhaustion with no eligible cloud path returns 'reject' rather than silently overrunning local capacity or forcing an unapproved cloud call (resourceExhaustionFailsClosed=true).",
+    "classifier_uncertainty": true,
+    "uncertainty_evidence": "confidence below the policy minimum forces local (reason 'classifier-uncertainty') — no route is taken on an uncertain classification, and never on forecast prose alone.",
+    "outage_fallback": true,
+    "outage_evidence": "a cloud outage flag forces local (reason 'outage-fallback').",
+    "auditability": true,
+    "audit_evidence": "every decision carries a full audit record: all input signals, the policy thresholds (costCeiling, minConfidence, complexityThreshold, liveRoutingEnabled), and a sha256 signal digest (auditable=true, 64-hex digest) — no hidden routing.",
+    "offline_replay_beats_baseline_before_live": true,
+    "replay_evidence": "offline replay over recorded scenarios yields policy accuracy 1.0 versus an always-cloud baseline accuracy of 0.0 (beatsBaseline=true), and takes zero live routes (liveRoutesTaken=0) — the policy is validated by replay before any live route is enabled.",
+    "proportionality_signal_is_measured_not_invented": "the complexity/cost signal is the real ruvnet FastGRNN cost router (@ruvector/tiny-dancer), trained and scored live (sampleComplexity 0.53) — no invented proportionality claim; @ruvector/router is a vector DB, not a cost router, and the third-party 'ruvltra-mcp-server' (published by coco4_at_jp, not ruvnet) is deliberately not used.",
+    "full_suite": "ARCHBP-013 spec 10/10 against the real @ruvector/tiny-dancer FastGRNN native surface.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the proof trains a real FastGRNN router and scores a real embedding to drive the policy, then runs the real policy engine across every gate and an offline replay. The spec spawns the proof emitter via bun and asserts on its emitted JSON."
+  },
+  "proof_summary": "ARCHBP-013 is complete: the RuvLTRA proportional local-cloud routing adapter (lifeos scripts/ruvltra-routing-lifecycle.mjs + tests/archbp-013-ruvltra-routing-lifecycle.spec.ts, red d0f8988 -> green HEAD, 10/10) routes workloads from measured signals with an explicit local-only default and live cloud routing gated OFF. The policy is fail-closed on every clause: privacy denial, cost ceiling, classifier uncertainty, and cloud outage each force local, and resource exhaustion with no eligible cloud path rejects rather than overrunning local capacity or making an unapproved cloud call. Every decision is fully auditable (all signals + thresholds + a sha256 digest). The complexity signal is the real ruvnet FastGRNN cost router (@ruvector/tiny-dancer, sampleComplexity 0.53), not invented and not forecast prose. Offline replay validates the policy (accuracy 1.0 vs an always-cloud baseline 0.0, beatsBaseline=true) while taking zero live routes — proving behavior before any live route is enabled. No hidden spend, no secret exposure, no unapproved cloud call.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-013.proof.json",
+    "scripts/ruvltra-routing-lifecycle.mjs",
+    "tests/archbp-013-ruvltra-routing-lifecycle.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

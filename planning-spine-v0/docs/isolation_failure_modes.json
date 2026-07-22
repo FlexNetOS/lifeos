@@ -1,0 +1,81 @@
+{
+  "schema_version": "lifeos-planning-spine.isolation-failure-modes.v0",
+  "spec_version": "1.0.0",
+  "incident_2026_07_21": {
+    "host": "drdave-TRX50-AI-TOP",
+    "summary": "Perceived total data loss was actually a 21:28 host reboot caused by cascading Ubuntu upgrades applied while a GNOME session and live agent sessions were running. The filesystem was 100% intact; only live processes and tmpfs state were lost.",
+    "timeline": [
+      "06:31 unattended-upgrade installed linux-image-7.0.0-28 and REMOVED the running 7.0.0-22 kernel (kernel swap under a live session)",
+      "19:44 aptdaemon upgraded snapd 2.75->2.76, accountsservice, google-chrome, and vscode, destabilizing the live desktop",
+      "19:55 chrome crash dump recorded",
+      "20:00 drdave ran apt full-upgrade",
+      "20:02 update-manager crash dump recorded",
+      "21:28 reboot into 7.0.0-28; all live processes ended"
+    ],
+    "facts": [
+      "Filesystem 100% intact (/dev/nvme1n1p2, 3.6T, 26% used); 498G RAM with zero OOM; no NVIDIA Xid — not a hardware crash",
+      "journald is volatile (no /var/log/journal), so prior-boot logs were unrecoverable",
+      "/run/user/1001/yazelix/profile-runtime (CLAUDE_CONFIG_DIR, codex) is tmpfs and was wiped",
+      "Durable transcripts at ~/.claude/projects (409 jsonl) survived with pre-reboot mtimes",
+      "The host itself was healthy: drdave updated and rebooted with no issues afterward — the defect was LifeOS being coupled to the host session lifecycle"
+    ]
+  },
+  "failure_modes": [
+    {
+      "id": "FM-01",
+      "summary": "unattended-upgrades kernel swap under a live session (installed 7.0.0-28, removed the running 7.0.0-22)",
+      "root_cause": "Host update policy is ungoverned: kernel replacement proceeds with no awareness of active LifeOS work, making an eventual reboot mandatory mid-session.",
+      "owning_task": "ARCHBP-109",
+      "feeds": ["T9"]
+    },
+    {
+      "id": "FM-02",
+      "summary": "In-session snapd/accountsservice/desktop-package upgrades destabilize the live desktop",
+      "root_cause": "aptdaemon and snap refresh apply desktop-breaking packages during active work; there is no hold window tied to session liveness.",
+      "owning_task": "ARCHBP-111",
+      "feeds": ["T9"]
+    },
+    {
+      "id": "FM-03",
+      "summary": "Durable agent runtime parasitized on tmpfs profile-runtime (/run/user/1001/yazelix/profile-runtime)",
+      "root_cause": "The generated profile runtime tree (CLAUDE_CONFIG_DIR, CODEX_HOME, yazelix state) lives on the host systemd /run tmpfs, so every reboot wipes durable-class agent state — the direct cause of the 2026-07-21 session loss.",
+      "owning_task": "ARCHBP-072",
+      "feeds": ["T5"]
+    },
+    {
+      "id": "FM-04",
+      "summary": "Home residuals as active owners (~/.claude transcripts, ~/.local/share tools, ~/FlexNetOS runner _work)",
+      "root_cause": "XDG defaults and the runner service point durable tool state at home-owned paths outside the single Nix-profile frontdoor, violating path-law and scattering state across owners.",
+      "owning_task": "ARCHBP-078",
+      "feeds": ["T5"]
+    },
+    {
+      "id": "FM-05",
+      "summary": "Host docker/kvm stacks outside Nix (Omada moby container 98ade093; libvirtd/qemu-kvm boot units enabled)",
+      "root_cause": "The Omada network controller runs as an APT-installed dockerd container with an overlay-backed Mongo datadir, and unused libvirt/qemu units start at boot — services and state outside declared Nix supervision.",
+      "owning_task": "ARCHBP-084",
+      "feeds": ["T6"]
+    },
+    {
+      "id": "FM-06",
+      "summary": "Volatile journald leaves no prior-boot forensics",
+      "root_cause": "No persistent /var/log/journal exists, so update-event and crash forensics vanish at reboot, blinding incident analysis and update governance.",
+      "owning_task": "ARCHBP-110",
+      "feeds": ["T9"]
+    },
+    {
+      "id": "FM-07",
+      "summary": "Interactive agent shell runs unsandboxed directly on the host",
+      "root_cause": "The session shares the host mount/pid namespaces (no envelope), so Nix provides hermetic binaries but no runtime isolation; commands mutate the host directly.",
+      "owning_task": "ARCHBP-066",
+      "feeds": ["T5", "T6"]
+    },
+    {
+      "id": "FM-08",
+      "summary": "Reboot ends live processes with no automatic re-attach",
+      "root_cause": "The shared kernel honestly ends processes at reboot, and no boot-triggered unit re-materializes the envelope and re-attaches durable state, so recovery is manual.",
+      "owning_task": "ARCHBP-093",
+      "feeds": ["T9"]
+    }
+  ]
+}

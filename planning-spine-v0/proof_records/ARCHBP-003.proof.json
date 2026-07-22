@@ -1,0 +1,34 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-003",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove deterministic model/version identity, repeatable embeddings within the declared tolerance, hybrid retrieval quality, dependency and causal edge integrity, PostgreSQL transactionality, and no competing vector-store authority.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin ac2f464 (5/6 failing: embedder zeroed and persist stubbed), implementation green at HEAD (6/6)",
+    "deterministic_model_version_identity": true,
+    "identity_evidence": "EmbeddingModel carries model_id 'codedb-featurehash' and model_version 'v0-fnv1a-8d'; a document's embedding is fully determined by the model identity plus the input sha256 — no model is downloaded (path law: no model outside the one profile)",
+    "repeatable_within_tolerance": true,
+    "repeatability_evidence": "identical text embeds bit-identically; near-identical inputs stay above the declared cosine repeatability tolerance while distinct inputs are separated below 0.99",
+    "hybrid_retrieval_quality": true,
+    "hybrid_evidence": "one database-local plan fuses ts_rank lexical with the ruvector <=> cosine operator; for the query 'configuration file parsing' the config document ranks first ahead of networking, database, and unrelated docs",
+    "dependency_and_causal_edge_integrity": true,
+    "edge_evidence": "directional dependency and causal edges persist as graph rows; app→config dependency and config→failure causal edges resolve, and the reverse dependency does not — edges are directional",
+    "postgresql_transactionality": true,
+    "transactionality_evidence": "persistence runs in one transaction; oversized content fails closed on the declared bound with the document count unchanged — no partial row or orphaned vector",
+    "no_competing_vector_authority": true,
+    "authority_evidence": "every vector lives in an extensions.ruvector(N) column, verified by querying pg_type — the embedding column's type is (extensions, ruvector); redb is never a geometry engine and the adapter exposes no second store or sidecar",
+    "genuine_defect_fixed": "bring-up surfaced a Rust string backslash-continuation that glued 'AS vector' to 'FROM' in the hybrid CTE (same class as the ARCHBP-042 finding); fixed with explicit spacing",
+    "full_suite": "adapter 6/6 against the live RuVector-enabled PostgreSQL 17.10 cluster; workspace 276 passed / 0 failed; clippy clean",
+    "product_execution_performed": true,
+    "product_execution_evidence": "all six tests run the real adapter against the real durable PostgreSQL 17.10 cluster with the real ruvector extension: real embeddings persisted into real ruvector columns, real hybrid ranking, real graph edges"
+  },
+  "proof_summary": "ARCHBP-003 is complete: codedb-ruvector-adapter (nu_plugin PR FlexNetOS/nu_plugin#48, red ac2f464 → green HEAD) is the live RuVector semantic and hybrid SQL adapter. It generates deterministic, provenance-bound embeddings through a feature-hash embedder that downloads no model (path-law compliant) and whose model identity plus input digest fully determine every vector, then persists content, tsvector, an extensions.ruvector(N) column, and provenance in one transaction. Retrieval is one database-local plan fusing lexical ts_rank with the ruvector cosine operator (the config document ranks first for a config query), directional dependency and causal edges persist and resolve as graph rows, persistence fails closed on its content bound with no partial row, and the embedding column's type is verified extensions.ruvector so redb is never a geometry engine and there is no vector sidecar or competing authority. Proven 6/6 against the real durable RuVector-enabled PostgreSQL 17.10 cluster, workspace 276/0.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-003.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/48",
+    "nu_plugin:crates/codedb_ruvector_adapter/src/lib.rs",
+    "nu_plugin:crates/codedb_ruvector_adapter/tests/adapter.rs"
+  ]
+}

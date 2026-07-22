@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-058",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Acquire + clean-release semantics written; Little-brother-always-functions invariant stated; Consumed by [[tasks/yzx-iso/t8-0-lane-index]]; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gates committed red at lifeos a82c166 (4/4 failing: spec absent), green at HEAD (4/4)",
+    "acquire_clean_release_written": true,
+    "acquire_evidence": "Spec section 1 defines on-demand acquisition through the declared control plane with the prior host state recorded before control is taken (I11), and clean-release that restores the prior host state exactly as recorded, reversible and time-bounded (I12).",
+    "little_brother_invariant_stated": true,
+    "invariant_evidence": "The little-brother-always-functions invariant is stated as normative I13: the host OS always functions normally — it updates, reboots, and runs its own daemons without LifeOS interference — with the 2026-07-21 drdave path as empirical proof.",
+    "consumer_declared": true,
+    "consumer_evidence": "Section 1 is declared consumed by tasks/yzx-iso/t8-0-lane-index, and all ten yzx-iso lane indexes were updated in GitKB to reference the ratified spec.",
+    "full_suite": "ARCHBP-058 spec 4/4.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "tests/archbp-058-two-brother-model.spec.ts executes structural validation against the published planning-spine-v0/docs/isolation-architecture-spec.md — the real, versioned artifact, not a fixture."
+  },
+  "proof_summary": "ARCHBP-058 is complete: the two-brother control model is documented as the normative section 1 of the ratified isolation architecture spec v1.0.0 — LifeOS (big brother) acquires host resources on demand through a declared, audited control plane with prior-state recording, and every acquire has a clean, reversible release that restores the recorded prior host state; the little-brother-always-functions invariant (I13) is stated normatively with the 2026-07-21 empirical basis. The section is consumed by the t8 host-control lane and the spec is referenced by all ten yzx-iso lane indexes.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-058.proof.json",
+    "planning-spine-v0/docs/isolation-architecture-spec.md",
+    "tests/archbp-058-two-brother-model.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

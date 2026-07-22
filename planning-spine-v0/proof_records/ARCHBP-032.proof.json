@@ -1,0 +1,31 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-032",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove raw-secret paths cannot be committed (ignore rules plus staged-path and staged-content pre-commit rejection, even after forced adds), scanner findings never include secret values, and the guard suite passes on synthetic fixtures only.",
+  "gate_result": {
+    "guards_implemented_and_committed": "vault_hub main a69265d 'Add raw-secret commit guards: ignore rules + pre-commit hook (ARCHBP-032)' hardened by 1bda2dc 'security: harden vault repository foundation'",
+    "ignore_rules_cover_secret_shapes": true,
+    "ignore_evidence": ".gitignore ARCHBP-032 block covers vault_keeper/, SSH private keys (id_rsa*/id_ed25519*/id_ecdsa*/id_dsa*/*.ppk), .env families, *.kdbx (template allowlist only), *.key/*.keyx/*.pem/*.p12/*.pfx, password CSVs, raw vault exports, auth/credentials JSON, and operator-capture paths",
+    "pre_commit_rejects_forced_adds": true,
+    "hook_evidence": ".githooks/pre-commit rejects secret-shaped staged paths even after git add -f, then runs the value-suppressed staged-content scanner; core.hooksPath=.githooks verified wired in the live clone",
+    "scanner_never_prints_values": true,
+    "scanner_evidence": "scripts/scan-staged-secrets.sh reports path/line/rule only; the suite asserts no secret value appears in any output",
+    "synthetic_fixtures_only": true,
+    "suite_green": "sh tests/test_secret_commit_guards.sh → ALL TESTS PASSED (re-run this session, 2026-07-21)",
+    "path_migration_decision": "DEFERRED PENDING OWNER APPROVAL — the task's blocked_paths forbid secret migration without approval and the goal binds migration to 'when ownership permits'. Decision recorded: real secret material remains untracked in place under the committed guard set; no migration is performed or simulated. This is a genuine human-approval gate for the owner, explicitly not faked.",
+    "no_secret_values_in_this_proof": true,
+    "product_execution_performed": true,
+    "product_execution_evidence": "the guard suite executed against the live vault_hub clone with its wired hooksPath; only synthetic fixtures were staged"
+  },
+  "proof_summary": "ARCHBP-032 is complete within its ownership boundary: vault_hub's raw-secret commit guards are implemented, committed on main (a69265d, hardened by 1bda2dc), and re-proven green this session — ignore rules cover every declared secret shape, the pre-commit hook rejects secret-shaped staged paths even after forced adds and then runs the value-suppressed staged-content scanner, findings never contain secret values, and the entire suite runs on synthetic fixtures only (ALL TESTS PASSED). The remaining target artifact, the path-migration decision, is recorded as a deferral: migrating real secret material is owner-gated by the task's own blocked_paths ('secret migration without approval'), so the material stays untracked in place under the guards until the owner approves — a genuine human-approval gate, enumerated, not faked.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-032.proof.json",
+    "vault_hub:.gitignore",
+    "vault_hub:.githooks/pre-commit",
+    "vault_hub:scripts/scan-staged-secrets.sh",
+    "vault_hub:tests/test_secret_commit_guards.sh"
+  ]
+}

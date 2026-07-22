@@ -1,0 +1,28 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-133",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Dirty-shutdown recovery works; WAL/replay validated; No corruption; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gate executed red with the engine and receipt absent (5/5 failing), green at HEAD (5/5)",
+    "dirty_shutdown_recovery": true,
+    "recovery_evidence": "scripts/dirty-shutdown-recovery.mjs executed the real drill against the live canonical cluster: 500 committed sentinel rows written to a dedicated drill database, kill -9 on the live postmaster (true crash — no shutdown checkpoint), port 5432 confirmed refusing, stale postmaster.pid observed as the dirty marker, then recovery through the sanctioned reattach path (startServicesOrdered(productionServices)) with health-gated return to accepting connections.",
+    "wal_replay_validated": true,
+    "replay_evidence": "Validated from the cluster's own log at the recorded pre-crash offset: 'database system was interrupted; last known up at 2026-07-22 09:33:08', 'database system was not properly shut down; automatic recovery in progress', 'redo starts at 0/119DC7E0', 'redo done at 0/11E20EF8', 'database system is ready to accept connections'. The always-on spec re-verifies these lines live from the real logfile (tail-read) on every suite run.",
+    "no_corruption": true,
+    "corruption_evidence": "Sentinel md5 checksum identical across the crash (cbeb4add42a023bb63560e3cbd78dcc5 before and after), 500/500 rows read back, redb-plane probe file byte-identical, durable plane checks passing. Rollback honored: the drill database was dropped and the redb probe removed; the durable receipt at meta/var/xdg-data/lifeos/crash-drill/receipt.json is the retained evidence.",
+    "honest_notes": "The drill executed twice: the first invocation completed its crash cycle but its receipt pipeline broke in shell plumbing before writing; the second run performed a full clean cycle and wrote the receipt. Both crash cycles recovered cleanly (two 'not properly shut down' recovery blocks in the log) — corroborating rather than weakening the result. Separately, the drill surfaced that the cluster logfile is 1.79 GB and unrotated — recorded as GitKB incidents/postgres-logfile-unrotated with a config fix path; engine and spec tail-read by offset, never wholesale.",
+    "full_suite": "ARCHBP-133 spec 5/5.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The kill -9, WAL replay, and integrity verification all ran against the real PostgreSQL 17.10 + RuVector canonical cluster on its real durable datadir — not a fixture; the recovery lines quoted are the production cluster's own."
+  },
+  "proof_summary": "ARCHBP-133 is complete: envelope-level dirty-shutdown recovery is proven on the real canonical cluster — a true kill -9 crash with confirmed downtime and dirty marker, recovery through the sanctioned reattach path, WAL replay validated from the cluster's own redo lines, and byte-identical sentinel data across the crash with the redb plane intact and rollback honored.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-133.proof.json",
+    "scripts/dirty-shutdown-recovery.mjs",
+    "tests/archbp-133-dirty-shutdown-recovery.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

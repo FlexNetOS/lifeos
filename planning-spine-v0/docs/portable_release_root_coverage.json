@@ -1,0 +1,92 @@
+{
+  "schema_version": "lifeos-planning-spine.portable-release-root-coverage.v0",
+  "spec_version": "1.0.0",
+  "implements": "YZXCONV-021 root coverage (spine ARCHBP-021), executing the ARCHBP-134 hybrid strategy",
+  "executed": "2026-07-22",
+  "toolchain": {
+    "rustc": "1.98.0-nightly (f8a08b688 2026-05-30) with x86_64-unknown-linux-musl rust-std",
+    "cc": "flexnetosMuslToolchain (pkgsCross.musl64 stdenv.cc via the yazelix flake, profile-exposed as x86_64-linux-musl-gcc)",
+    "build_discipline": "cargo build --release --locked, two fully independent CARGO_TARGET_DIR trees under /home/flexnetos/meta/var/cache/cargo-target (disk-backed, never tmpfs), byte-hash compared"
+  },
+  "musl_artifacts": [
+    {
+      "name": "yzx-open",
+      "sha256": "f670a111f767539ba391aa33e1ec44bacfb60e709e1192947e32d97dac7526c0",
+      "reproducible": true,
+      "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked",
+      "source": "yazelix crates/yzx-open (worktree archbp-065-071-isolation-envelope)"
+    },
+    {
+      "name": "yzx-tutor",
+      "sha256": "07e046f56c573d116906bae84389bfdc0741fc4dc17c3c26f9d2a49e2e32a8d3",
+      "reproducible": true,
+      "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked",
+      "source": "yazelix crates/yzx-tutor"
+    },
+    {
+      "name": "yzx-yazi-config",
+      "sha256": "c445a884b27c41c888f05b83ded6204a33090641d45473b7aa82b6498d48df28",
+      "reproducible": true,
+      "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked",
+      "source": "yazelix crates/yzx-yazi-config"
+    }
+  ],
+  "non_musl_classification": [
+    {
+      "dependency": "WebKitGTK / Tauri Glass GUI stack",
+      "owner": "lifeos desktop shell (src-tauri)",
+      "fallback": "relocatable extracted closure inside the envelope; musl-static WebKitGTK is not practical and forcing it would drop the Glass front door — a forbidden downgrade"
+    },
+    {
+      "dependency": "PostgreSQL 17.10 + RuVector canonical cluster",
+      "owner": "durable macro-state plane (meta/var/lib/postgresql)",
+      "fallback": "closure-shipped server binaries with the durable datadir bound via --durable; the datadir itself never ships inside a bundle"
+    },
+    {
+      "dependency": "zellij / nushell / helix / yazi TUI stack",
+      "owner": "yazelix flake package set",
+      "fallback": "relocatable extracted closure; upstream musl builds exist but rebuilding third-party binaries breaks the proven-source supply-chain rule, so the closure carries the exact tested store paths"
+    },
+    {
+      "dependency": "bun 1.3.14 (vendored glibc binary)",
+      "owner": "flexnetos foundation tools",
+      "fallback": "relocatable extracted closure; upstream ships glibc builds only, closure travel keeps the tested byte"
+    },
+    {
+      "dependency": "yzx-config (path-deps ratconfig, yazelix-cursors)",
+      "owner": "yazelix crates",
+      "fallback": "musl-eligible once its peer path-deps are vendored or built from the main checkout where ../../../ratconfig resolves; excluded from this artifact set rather than force-built from the isolated worktree"
+    },
+    {
+      "dependency": "bwrap envelope executor",
+      "owner": "yzx-envelope engine (executor selection)",
+      "fallback": "recorded chain bwrap(nix-store) -> bwrap(AppArmor-profiled host /usr/bin/bwrap) -> proot; on this host class the store bwrap is denied by kernel.apparmor_restrict_unprivileged_userns=1 and the profiled host bwrap carries the launch (honest downgrade, ARCHBP-065)"
+    }
+  ],
+  "closure": {
+    "roots": [
+      "/nix/store/mx7cqa2fli3r2921fl11bfyr1kvscqzq-yzx-envelope",
+      "/nix/store/cgjr3kj3hs7ngznyws5qfg16c8scpys0-bash-interactive-5.3p9"
+    ],
+    "paths": 20,
+    "size_mb": 74,
+    "extraction": "nix-store -qR over the release roots, copied byte-preserving into <bundle>/nixroot/store"
+  },
+  "relocation": {
+    "moved_prefix": "/home/flexnetos/meta/var/cache/archbp021/bundle-moved",
+    "launcher": "bundle-root copy of yzx-envelope.sh with the new --store option: binds <bundle>/nixroot at /nix, hiding the host store entirely",
+    "store_workload": "/nix/store/cgjr3kj3hs7ngznyws5qfg16c8scpys0-bash-interactive-5.3p9/bin/bash",
+    "test_a_store_bound": "bundle bash executed from the moved prefix with the host store hidden: printed relocation-ok and ls /nix/store showed exactly 20 paths (the bundle closure; the host store holds thousands) — glibc interpreter and libraries resolved from the bundle alone",
+    "empty_store_root": "/home/flexnetos/meta/var/cache/archbp021/empty-nixroot",
+    "test_b_store_free": "musl yzx-tutor executed with a completely EMPTY /nix (exit 0) — the static-pie artifact needs no store at all"
+  },
+  "host_nix_dependence": {
+    "remaining": [
+      "launcher bootstrap: the envelope script itself runs under a host bash and a host (or profiled) bwrap on AppArmor-restricted hosts — the bundle does not yet self-bootstrap from a bare kernel",
+      "development continues against the shared host /nix/store (tier map: nix-profile-frontdoor is portable-tier only at release)",
+      "the full-stack release roots (zellij/nushell/GUI/PostgreSQL) are not yet closure-extracted — this receipt proves the mechanism on the envelope+bash root set; T10 gauntlets (yzx-iso t10-3/t10-4) extend it to the full stack"
+    ],
+    "blocks_stronger_claims": true,
+    "claim_boundary": "No universal no-/nix/store claim is made: only the three musl artifacts are store-free; everything else travels as a closure that the envelope re-binds at a private /nix."
+  }
+}

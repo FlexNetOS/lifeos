@@ -1,0 +1,41 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-014",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove authority-preserving dispatch, idempotent retry, cancellation, timeout, budget exhaustion, partial failure recovery, agent identity binding, and append-only proof emission; only the canonical task graph can authorize work.",
+  "gate_result": {
+    "red_first": "contracts committed red at lifeos a3c0fa4 (10/10 failing: stub coordinator throws on every clause), implementation green at HEAD (10/10)",
+    "ruflo_primary_source_installed": true,
+    "primary_source_evidence": "ruflo@3.32.9 is installed from npm ~ruvnet (published by ruvnet <ruv@ruv.net>) and verified at proof time (rufloInstalled=true, version 3.32.9). The full Ruflo swarm platform (CLI/MCP/docker/@claude-flow) is deliberately NOT spun up — that would be a heavy live route the gate forbids; the authority contract is proven offline. The third-party 'ruvltra-mcp-server' family is not used.",
+    "authority_preserving_dispatch": true,
+    "authority_evidence": "authorizeDispatch admits only a task that exists in the canonical task graph AND is Ready. A Ready task authorizes (readyAuthorized=true); an invented task not in the graph is rejected with reason 'not-in-canonical-graph' (inventedRejected=true); Blocked and Complete tasks are rejected (nonReadyRejected=true). dispatch() throws on an invented task — the coordinator cannot invent work; only the canonical task graph authorizes.",
+    "agent_identity_binding": true,
+    "binding_evidence": "each dispatch is bound to a REAL AgentDB identity (ARCHBP-007 AgentRvfMemory fileId, e.g. fbdc6794...), a ruvllm cartridge id (ARCHBP-008), and a RuvLTRA route (ARCHBP-013 decideRoute) that defaults local (routeIsLocalDefault=true) — the coordinator integrates the real supplied components, not stubs.",
+    "idempotent_retry": true,
+    "idempotency_evidence": "re-dispatching the same task at the same attempt returns the identical dispatch id (agentIdentityBound asserts d.id === dIdem.id) and does not double-charge budget — dispatch is idempotent per (task, attempt).",
+    "bounded_retry": true,
+    "retry_evidence": "retry() is bounded by maxRetries: with maxRetries=2, two retries succeed and the third returns null (retryBounded=true) — no unbounded retry.",
+    "cancellation": true,
+    "cancellation_evidence": "cancel() moves a dispatch to 'cancelled' and any subsequent markSucceeded throws (cancelStopped=true) — cancellation stops further progress.",
+    "timeout": true,
+    "timeout_evidence": "checkTimeout past the deadline moves a non-terminal dispatch to 'timed-out' (timedOut=true).",
+    "budget_exhaustion_fails_closed": true,
+    "budget_evidence": "budgetCheck fails closed when a dispatch would exceed the remaining budget; a second dispatch over a budget of 1 throws (budgetFailsClosed=true) — no hidden spend.",
+    "partial_failure_recovery_without_completion": true,
+    "recovery_evidence": "a failed dispatch is recorded as 'failed' and recovered by bounded retry, but the coordinator NEVER marks a task complete — there is no completeTask method (coordinatorCannotComplete=true). Completion is the Planning Spine's authority via an accepted proof record.",
+    "append_only_proof_emission": true,
+    "proof_evidence": "emitProofCandidate appends a monotonically-sequenced candidate (seq 1, 2, ...) to an append-only proof log; candidates carry accepted=false and status='candidate' (appendOnly=true, candidatesNotAccepted=true) — the coordinator emits candidates the spine must accept, and cannot fabricate an accepted completion.",
+    "full_suite": "ARCHBP-014 spec 10/10; node-authority spec remains 7/7 after the ruflo devDependency install (trustedDependencies unchanged).",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the proof verifies the real installed ruflo package, opens a real AgentDB .rvf to bind a real agent identity, routes through the real RuvLTRA policy, and exercises the full coordinator state machine across every gate clause. The spec spawns the proof emitter via bun and asserts on its emitted JSON."
+  },
+  "proof_summary": "ARCHBP-014 is complete: the Ruflo swarm coordinator adapter (lifeos scripts/ruflo-coordinator-lifecycle.mjs + tests/archbp-014-ruflo-coordinator-lifecycle.spec.ts, red a3c0fa4 -> green HEAD, 10/10) binds Ruflo coordination — installed primary source ruflo@3.32.9 from npm ~ruvnet — to the canonical task-graph authority and the real AgentDB identity (ARCHBP-007), ruvllm cartridge (ARCHBP-008), and RuvLTRA routing (ARCHBP-013) adapters. The coordinator can only dispatch tasks the canonical graph marks Ready (invented and non-ready tasks are rejected), dispatch is idempotent per attempt and budget-charged once, retries are bounded by maxRetries, cancellation and timeout stop progress, budget exhaustion fails closed, and partial failures recover by bounded retry without ever completing a task — there is no completeTask method, so completion stays the Planning Spine's authority. Proof emission is append-only candidate emission (accepted=false) that only the spine can accept. The heavy Ruflo swarm platform is not spun up (no hidden cloud route); the authority contract is proven offline against real bindings.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-014.proof.json",
+    "scripts/ruflo-coordinator-lifecycle.mjs",
+    "tests/archbp-014-ruflo-coordinator-lifecycle.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

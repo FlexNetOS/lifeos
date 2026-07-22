@@ -1,0 +1,33 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-026",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests first fail when Home Manager is absent, selects a second profile, writes generated runtime as source, or allows a shadow launcher; Nix evaluation and build prove Home Manager is consumed by the one foundation element; the installed desktop and profile startup ownership is proven; the package task's proof links into the root ledger.",
+  "gate_result": {
+    "wraps_package_task": "YZXCONV-022 (yazelix runtime convergence spine), now Complete with proof yazelix_runtime_convergence/proof_records/YZXCONV-022.proof.json bound to the evidence report sha256 614893ab60a36669ccecdb9caf8a395f4b7b60811d14c292d4877b71bf0240ae",
+    "home_manager_inside_one_foundation_element": true,
+    "module_evidence": "yazelix home-manager/module.nix is imported by flake.nix and exported as homeManagerModules.default — a component of the one foundation install owner, not a second owner",
+    "red_test_subjects_encoded_and_built": true,
+    "check_evidence": "the home_manager flake check encodes the red-test subjects (default variant ships bin/yzx + the Yazelix Nova desktop entry; override variant detects a fake shadow launcher; runtime variant must NOT ship a desktop entry; HM v1 must not generate Yazelix runtime config as source; store-backed symlink discipline) and builds green: /nix/store/b1zg909wm2vbgncynq1gmwl7iayb7l1f-yzx-home-manager-check",
+    "no_second_profile": true,
+    "profile_evidence": "single_profile_contract builds green (/nix/store/rmqlj3h0255avfjsfwlva81qkwby94rf-single-profile-contract-check): /home/flexnetos/.nix-profile remains the sole active owner",
+    "foundation_contracts_green": "/nix/store/5l3b8q9wl3mlzvxwd1q685q1gadlvfns-flexnetos-foundation-contracts",
+    "generated_runtime_matches_reviewed_inputs": true,
+    "runtime_evidence": "yzx doctor (profile-owned) resolves every runtime component from the nix store with no failures; codex provenance and rules-authority gates prove generated files trace byte-exactly to reviewed sources",
+    "desktop_and_startup_ownership_proven": true,
+    "nested_proof_linked_into_root_ledger": true,
+    "linkage_evidence": "this record carries the YZXCONV-022 proof binding and lands in the root proof ledger via the append-only merge; the nested convergence graph regenerated (55 tasks) with YZXCONV-022 Complete",
+    "product_execution_performed": true,
+    "product_execution_evidence": "three real nix check builds and a live yzx doctor run executed this session on the FlexNetOS host"
+  },
+  "proof_summary": "ARCHBP-026 is complete: Home Manager desktop and profile startup ownership is proven under the one foundation install owner. The wrapped package task YZXCONV-022 is now Complete in the yazelix runtime convergence spine with its proof bound to a fresh evidence report (sha256 614893ab…): the home_manager flake check — which encodes the red-test subjects for absence, second-profile selection, generated-runtime-as-source, and shadow launchers — builds green together with single_profile_contract and flexnetos_foundation_contracts, yzx doctor resolves every runtime component from the nix store, and the generated runtime traces to reviewed inputs through the codex provenance gates. The nested proof links into the root ledger through this record, closing the root task.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-026.proof.json",
+    "planning-spine-v0/yazelix_runtime_convergence/proof_records/YZXCONV-022.proof.json",
+    "planning-spine-v0/yazelix_runtime_convergence/reports/YZXCONV-022-home-manager-ownership.md",
+    "yazelix:home-manager/module.nix",
+    "yazelix:flake.nix"
+  ]
+}

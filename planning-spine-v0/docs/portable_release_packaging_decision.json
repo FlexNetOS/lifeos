@@ -1,0 +1,47 @@
+{
+  "schema_version": "lifeos-planning-spine.portable-release-packaging-decision.v0",
+  "spec_version": "1.0.0",
+  "implements": "yzx-iso t10-1-packaging-decision (spine ARCHBP-134)",
+  "decided": "2026-07-22",
+  "strategy": "hybrid: static-musl for eligible binaries + relocatable extracted closure for the full stack",
+  "justification": "No single mechanism covers the full-stack release honestly. Static musl (the flake's flexnetosMuslToolchain: pkgsCross.musl64 cc + x86_64-unknown-linux-musl rust-std) yields truly store-free single binaries for the eligible CLI/runtime surface (rtk, nu plugins, envctl-class Rust tools), eliminating hardcoded /nix/store dynamic-library paths outright. The GUI stack (Tauri/WebKitGTK, zellij front door) and the PostgreSQL/RuVector runtime cannot be practically musl-linked; they ship as a relocatable extracted closure — the runtime closure copied out of /nix/store into the release bundle with a launcher that binds it at a private /nix inside the yzx-envelope (the shipped bwrap engine), reusing the proven executor-selection chain.",
+  "options_considered": [
+    {
+      "option": "nix bundle (self-extracting archive)",
+      "verdict": "rejected as primary",
+      "trade_offs": "Pro: one-command production from the existing flake. Con: multi-GB self-extracting artifacts with slow cold starts; still materializes a store at runtime; poor incremental updates; opaque to the byte-capture contract."
+    },
+    {
+      "option": "static-musl everything",
+      "verdict": "adopted for eligible binaries only",
+      "trade_offs": "Pro: zero store dependence, single-file artifacts, no relocation machinery. Con: the WebKitGTK/Tauri GUI stack, fontconfig/GL userland, and PostgreSQL extension ecosystem are not practically musl-static; forcing it would silently drop the Glass front door — a forbidden downgrade."
+    },
+    {
+      "option": "relocatable/embedded extracted closure",
+      "verdict": "adopted for the full stack",
+      "trade_offs": "Pro: the exact tested store paths travel with the app; the envelope presents them at /nix inside the sandbox, so binaries run unpatched; incremental and byte-auditable. Con: needs a launcher with user namespaces — on hosts with kernel.apparmor_restrict_unprivileged_userns=1 the launcher reuses the proven executor fallback chain (profiled host bwrap today, shipped AppArmor profile as the owner-gated fix; proot as the last-resort documented fallback with its syscall-translation tax recorded)."
+    },
+    {
+      "option": "nix-user-chroot",
+      "verdict": "rejected",
+      "trade_offs": "Blocked by the same unprivileged-userns AppArmor restriction proven live during ARCHBP-065 (unconfined binaries are denied uid-map setup on this host class), with no profiled fallback of its own — strictly dominated by the envelope launcher."
+    },
+    {
+      "option": "documented host-Nix fallback",
+      "verdict": "retained as dev-time only",
+      "trade_offs": "Development continues against the shared /nix/store (tier map: nix-profile-frontdoor is portable-tier at release); the release itself must never require a host Nix daemon (I09/I17)."
+    }
+  ],
+  "prototype_path": {
+    "task": "ARCHBP-021 (YZXCONV-021)",
+    "steps": [
+      "1. Prove x86_64-unknown-linux-musl builds for the eligible binary set with the flake's flexnetosMuslToolchain (reproducible artifacts, ldd-clean).",
+      "2. Classify the non-musl remainder (GUI stack, PostgreSQL/RuVector, dynamic userland) with an explicit owner and fallback per dependency.",
+      "3. Closure-extract the classified runtime set (nix path-info -r over the release roots) into <bundle>/store.",
+      "4. Launcher: yzx-envelope with --ro-bind <bundle>/store /nix — executor chain bwrap(store) -> bwrap(profiled host) -> proot, selection recorded per the honest-downgrade contract.",
+      "5. Relocation test: launch from a moved clean prefix (CT-G6 clean-host-boot; RPATH/ldd audit shows no references escaping the bundle)."
+    ],
+    "invariants": ["I09", "I17"],
+    "gauntlet": "yzx-iso t10-3/t10-4 (clean-host boot, store independence) under ARCHBP-021 and the T10 release lane"
+  }
+}

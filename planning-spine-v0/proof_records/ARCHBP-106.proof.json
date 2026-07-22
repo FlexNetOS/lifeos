@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "task_id": "ARCHBP-106",
+  "verification_gate": "Red tests fail first for: No permanent takeover possible; Auto-release on failure; Invariant tested; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "no_permanent_takeover": true,
+    "ttl_evidence": "Every lease is time-bounded: an expired lease auto-releases on sweep with a ttl-expire audit entry, leaving zero holds \u2014 nothing can be held forever.",
+    "auto_release_on_failure": true,
+    "failure_evidence": "A failing acquire (missing GPU node) leaves zero holds after the auto-release path.",
+    "invariant_tested": true,
+    "invariant_evidence": "The little-brother-always-functions invariant (I13) is tested live: DURING a LifeOS hold the host still spawns processes, reads the filesystem, and binds other ports normally.",
+    "full_suite": "ARCHBP-106 spec 3/3.",
+    "product_execution_evidence": "Real TTL expiry sweep, real failure path, real host operations during a live hold.",
+    "red_first": "gates committed red with the control plane absent (8/8 files failing) at the lane red commit, green at HEAD",
+    "product_execution_performed": true
+  },
+  "proof_summary": "ARCHBP-106 is complete: no permanent takeover is possible \u2014 controls are TTL-bounded with audited auto-release on expiry and on failure, and the little-brother-always-functions invariant is tested live with the host fully functional during a LifeOS hold.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-106.proof.json",
+    "tests/archbp-106-no-permanent-takeover.spec.ts",
+    "scripts/host-control-plane.mjs",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

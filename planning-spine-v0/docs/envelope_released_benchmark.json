@@ -1,0 +1,36 @@
+{
+  "schema_version": "lifeos-planning-spine.envelope-latency-bench.v0",
+  "recorded_for": "yzx-iso t10-7-latency-benchmark \u2014 RELEASED bundle instantiation (spine ARCHBP-120)",
+  "workload": "python3 sum(i*i for i in range(20_000_000)) self-timed via perf_counter",
+  "runs_per_arm": 9,
+  "bare_median_s": 1.0292707249973319,
+  "envelope_median_s": 1.0363582799982396,
+  "runtime_overhead_pct": 0.6885996879903598,
+  "envelope_setup_median_ms": 33.34630799827187,
+  "setup_cost_note": "one-time per-envelope bwrap construction cost, excluded from the runtime-latency claim (I04) and reported honestly here",
+  "bare_samples_s": [
+    1.0388493840000592,
+    1.0152641419990687,
+    1.0619688759979908,
+    1.01643645799777,
+    1.0460654339985922,
+    1.0275626029979321,
+    1.0165038800041657,
+    1.092357018002076,
+    1.0292707249973319
+  ],
+  "envelope_samples_s": [
+    1.0310820039958344,
+    1.0722720979974838,
+    1.0936983220017282,
+    1.0628735339996638,
+    1.0443994369998109,
+    1.0294402029976482,
+    1.0363582799982396,
+    1.0301453479987686,
+    1.026666189005482
+  ],
+  "consumes": "scripts/envelope-latency-bench.mjs (the T2.7/ARCHBP-130 harness, unchanged, via YZX_ENVELOPE_BIN)",
+  "released_engine": "/home/flexnetos/meta/var/cache/archbp021/bench-bundle/released-engine-shim.sh \u2014 bundle launcher in --store mode, host store hidden (36-path/234MB closure incl. python3)",
+  "comparison_note": "ARCHBP-130 measured the dev-host envelope at -0.04%; this run measures the RELEASED bundle envelope at the recorded overhead \u2014 both within measurement noise, confirming the native-process (non-hypervisor) claim I04 for the release vehicle."
+}

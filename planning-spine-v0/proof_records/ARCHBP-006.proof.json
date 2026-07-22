@@ -1,0 +1,33 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-006",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests prove byte-identical repeated projection of .rs, .toml, and .nu fixtures, correct module paths and permissions, safe relative links, source-version traceability, no canonical overwrite, and complete receipt-driven cleanup.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin 2f20286 (7/7 failing: stub project() errs), implementation green at 1b1b742 (7/7)",
+    "byte_identical_repeated_projection": true,
+    "byte_evidence": "projecting the same branch of .rs, .toml, and .nu fixtures into two independent output directories yields byte-identical files, and every projected file equals its source bytes exactly — projection is deterministic and byte-exact.",
+    "correct_module_paths_and_permissions": true,
+    "metadata_evidence": "the receipt preserves each file's module_path (e.g. src/lib.rs -> 'crate'), and the requested permissions are applied on disk (scripts/run.nu is 0o755, src/lib.rs is 0o644, verified via filesystem metadata).",
+    "safe_relative_links_only": true,
+    "safe_link_evidence": "is_safe_link admits only relative, non-escaping paths ('./mod.rs', 'sub/child.rs') and rejects absolute ('/etc/passwd') and parent-escaping ('../escape') targets — no unsafe symlink or path is published.",
+    "source_version_traceability": true,
+    "traceability_evidence": "the receipt records the branch id and version and stamps every projected entry with its source_version, and receipt entries are in deterministic sorted order — every projected byte traces back to its exact source branch version.",
+    "no_canonical_overwrite": true,
+    "no_overwrite_evidence": "overwrites_canonical() is always false and the engine writes only under the provided disposable output directory; any file whose relative path is absolute or escapes with '..' is rejected before a single byte is written (fail closed, reason 'path-escape:<path>') — canonical source is never overwritten, no direct store-internal read or generated-runtime hand edit occurs.",
+    "receipt_driven_cleanup_complete": true,
+    "cleanup_evidence": "cleanup(receipt, output_dir) removes exactly the projected files and returns the count removed; after cleanup none of the projected files remain — the disposable output is fully reclaimed from the receipt.",
+    "full_suite": "production_projection gate 7/7; clippy-clean.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the gate performs real file I/O: it projects real .rs/.toml/.nu bytes into disposable temp directories, reads them back to verify byte-identity and permissions, rejects a real path-escape, and runs a real receipt-driven cleanup that removes every projected file. Tests run live on this host (7/7)."
+  },
+  "proof_summary": "ARCHBP-006 is complete: the envctl production projection engine (nu_plugin production_projection crate + tests/projection.rs, PR FlexNetOS/nu_plugin#51, red 2f20286 -> green 1b1b742, 7/7, clippy-clean) deterministically projects a selected approved branch to disposable .rs/.toml/.nu files with exact bytes, module_path metadata, permissions, deterministic ordering (sorted by relative path), and source-version traceability. Repeated projection is byte-identical and every projected file equals its source bytes; permissions are applied on disk; only safe relative links are published (absolute and parent-escaping paths are rejected before any write); the engine writes only under the disposable output directory and never overwrites canonical source (overwrites_canonical()=false), with no direct store-internal reads or generated-runtime hand edits; and a receipt drives complete cleanup that removes exactly the projected files.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-006.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/51",
+    "nu_plugin:production_projection/src/lib.rs",
+    "nu_plugin:production_projection/tests/projection.rs"
+  ]
+}

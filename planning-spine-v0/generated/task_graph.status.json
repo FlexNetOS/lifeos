@@ -283,6 +283,7 @@
     "ARCHBP-108",
     "ARCHBP-109",
     "ARCHBP-110",
+    "ARCHBP-116",
     "ARCHBP-120",
     "ARCHBP-049",
     "ARCHBP-050",
@@ -298,18 +299,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 377,
+  "ledger_entry_count": 378,
   "lifecycle_counts": {
     "blocked": 11,
-    "complete": 278,
+    "complete": 279,
     "draft": 0,
-    "ready": 34,
+    "ready": 33,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "021a82afd629a6782b8d430ccbb4eff7958089f04a9ed4457080191ddc829d86",
+  "proof_ledger_sha256": "b723ccd96ce78a650a4d7505a138a8d087fa80597199e56155034a076d1983d2",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -339,7 +340,6 @@
     "ARCHBP-113",
     "ARCHBP-114",
     "ARCHBP-115",
-    "ARCHBP-116",
     "ARCHBP-117",
     "ARCHBP-118",
     "ARCHBP-119",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "1864205aa97360ed9e0a4fbbeb287e21f3c08d12a7f2e55898cace4420af151d",
+  "source_graph_sha256": "7354d51eabbe87f0c3a2cda845be03072da7bb4a2bb3c359bea7c7f2134457b6",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -11704,33 +11704,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-116.proof.json; next child task: ARCHBP-056.",
         "proof_uri": "proof_records/ARCHBP-116.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 378,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "455a2647e287ac354338d14ecb20714365e0e9f56902da8106a99d3c91508287",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-116.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 304,
       "task_id": "ARCHBP-116",
       "title": "Encode update governance as declarative config, not manual steps.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-116.proof.json; next child task: ARCHBP-056."
+        }
+      }
     },
     {
       "effective": {
@@ -12722,6 +12729,7 @@
     "ARCHBP-108",
     "ARCHBP-109",
     "ARCHBP-110",
+    "ARCHBP-116",
     "ARCHBP-120",
     "ARCHBP-049",
     "ARCHBP-050",

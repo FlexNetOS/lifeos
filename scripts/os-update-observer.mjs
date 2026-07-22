@@ -21,6 +21,9 @@ import { listSessions } from "./boot-reattach.mjs";
 
 const repoRoot = resolve(new URL(".", import.meta.url).pathname, "..");
 const MAP_PATH = resolve(repoRoot, "planning-spine-v0/docs/os_update_lifecycle_map.json");
+// ARCHBP-116: governance is DECLARED, not hardcoded — the guard consumes the
+// committed policy; changing governance means changing that reviewable file.
+const POLICY_DEFAULT = resolve(repoRoot, "planning-spine-v0/docs/update_governance_policy.json");
 const SCRATCH_DEFAULT = "/home/flexnetos/meta/var/xdg-data/lifeos/os-update-gate";
 const HOLD_RESOURCE = "os-update-hold";
 
@@ -113,14 +116,20 @@ export async function release({ scratch = SCRATCH_DEFAULT, owner = "lifeos" } = 
   return p.release(HOLD_RESOURCE);
 }
 
-export function gateCheck({ scratch = SCRATCH_DEFAULT } = {}) {
+export function gateCheck({ scratch = SCRATCH_DEFAULT, policyPath = POLICY_DEFAULT } = {}) {
+  const policy = JSON.parse(readFileSync(policyPath, "utf8"));
   const lease = `${scratch}/${HOLD_RESOURCE}.lease`;
   const heldNow = existsSync(lease);
   const sessions = listSessions();
+  // The declared policy governs: a live hold blocks only while the config
+  // says the gate is enabled — behavior flips by config, never by code edit.
+  const block = heldNow && policy.gate.enabled === true;
   return {
     schema_version: "lifeos-planning-spine.os-update-gate-verdict.v0",
-    decision: heldNow ? "block" : "allow",
+    decision: block ? "block" : "allow",
     hold: heldNow,
+    policy_source: policyPath,
+    policy_gate_enabled: policy.gate.enabled === true,
     owner: heldNow ? readFileSync(`${lease}/owner`, "utf8").trim() : null,
     active_sessions: sessions.sessions.length,
     lease,
@@ -151,7 +160,7 @@ async function main() {
   } else if (cmd === "release") {
     process.stdout.write(`${JSON.stringify(await release({ scratch, owner: opt("owner", "lifeos") }))}\n`);
   } else if (cmd === "gate-check") {
-    const verdict = gateCheck({ scratch });
+    const verdict = gateCheck({ scratch, policyPath: opt("policy", POLICY_DEFAULT) });
     process.stdout.write(`${JSON.stringify(verdict)}\n`);
     process.exit(verdict.decision === "block" ? 1 : 0);
   } else if (cmd === "snippet") {

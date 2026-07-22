@@ -1,0 +1,59 @@
+{
+  "schema_version": "lifeos-planning-spine.update-governance-policy.v0",
+  "spec_version": "1.0.0",
+  "implements": "yzx-iso t9 governance-as-config (spine ARCHBP-116)",
+  "declared": "2026-07-22",
+  "principle": "Update governance is this declared config, not manual steps: the ARCHBP-110 guard consumes it, root appliers (ARCHBP-111/112) materialize it, and changing governance means changing this reviewable file.",
+  "holds": [
+    {
+      "pattern": "linux-image-*",
+      "during": "active-session",
+      "why": "kernel swap removes the running kernel and forces a reboot window",
+      "evidence": "os_update_lifecycle_map.json desktop_breaking_packages (2026-07-21 06:31 incident, timer-attributed)",
+      "apply_mechanism": "apt-mark hold via the ARCHBP-111 root applier; released when no session holds os-update-hold"
+    },
+    {
+      "pattern": "linux-headers-*",
+      "during": "active-session",
+      "why": "kernel companion packages ride the same swap",
+      "evidence": "os_update_lifecycle_map.json desktop_breaking_packages",
+      "apply_mechanism": "apt-mark hold via the ARCHBP-111 root applier"
+    },
+    {
+      "pattern": "linux-modules-*",
+      "during": "active-session",
+      "why": "kernel companion packages ride the same swap",
+      "evidence": "os_update_lifecycle_map.json desktop_breaking_packages",
+      "apply_mechanism": "apt-mark hold via the ARCHBP-111 root applier"
+    },
+    {
+      "pattern": "snapd",
+      "during": "active-session",
+      "why": "restarts snap infrastructure under live sessions (2026-07-21 19:44)",
+      "evidence": "os_update_lifecycle_map.json desktop_breaking_packages",
+      "apply_mechanism": "apt-mark hold via the ARCHBP-111 root applier"
+    },
+    {
+      "pattern": "accountsservice",
+      "during": "active-session",
+      "why": "restarts the login/user service the desktop session depends on (2026-07-21 19:44)",
+      "evidence": "os_update_lifecycle_map.json desktop_breaking_packages",
+      "apply_mechanism": "apt-mark hold via the ARCHBP-111 root applier"
+    }
+  ],
+  "gate": {
+    "enabled": true,
+    "mechanism": "os-update-hold lease in the T8 host control plane (scripts/os-update-observer.mjs hold/release/gate-check)",
+    "pre_invoke_hook": "generated DPkg::Pre-Invoke snippet (scripts/os-update-observer.mjs snippet) — installed under /etc/apt/apt.conf.d by ARCHBP-111 (root)",
+    "decision": "while the hold lease is live AND this gate is enabled, every apt/dpkg run fails closed before touching packages; with the gate disabled here, the same hold is advisory only"
+  },
+  "reboot": {
+    "auto_reboot": "forbidden",
+    "requires": "explicit operator intent via the ARCHBP-112 root applier (Unattended-Upgrade::Automatic-Reboot=false + notify-and-confirm path)",
+    "post_reboot": "lifeos-reattach.service + lifeos-cold-reboot-verify.service assert full re-attach (ARCHBP-093..099)"
+  },
+  "observability": {
+    "events": "scripts/os-update-observer.mjs events — live apt history, risk-classified against os_update_lifecycle_map.json",
+    "timers": "scripts/os-update-observer.mjs timers — apt-daily / apt-daily-upgrade last+next fire"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-116",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests fail first for: Policy declared in config; Guard enforces it; Reviewable in repo; green only when all pass with a recorded proof record.",
+  "gate_result": {
+    "red_first": "gate executed red with the policy artifact and consumption absent (3/3 failing), green at HEAD (3/3)",
+    "policy_declared": true,
+    "policy_evidence": "planning-spine-v0/docs/update_governance_policy.json declares the full governance surface: five hold classes (linux-image/headers/modules, snapd, accountsservice) each bound to active-session scope with the ARCHBP-111 root apply mechanism named and its 109-map incident evidence cited; the gate mechanism (os-update-hold lease via the T8 plane + the generated Pre-Invoke hook); and the reboot-intent policy (auto_reboot forbidden, ARCHBP-112 explicit-intent applier, post-reboot re-attach units).",
+    "guard_enforces": true,
+    "enforcement_evidence": "scripts/os-update-observer.mjs gate-check now CONSUMES the declared policy (default: the committed file; --policy= for review): proven live with the SAME os-update-hold lease held, a policy with gate.enabled=true blocks (exit 1) and a policy with gate.enabled=false allows (exit 0) — behavior flips purely by config, no code edit, and the verdict cites policy_source and policy_gate_enabled.",
+    "reviewable_in_repo": true,
+    "review_evidence": "The policy is a committed, schema-versioned artifact; the gate cross-checks that every held class traces to a desktop-breaking pattern in the 109 lifecycle map (evidence-cited, not invented) and that the guard's default policy source is the committed file itself.",
+    "honest_boundary": "Root materialization of the declared holds (apt-mark) and reboot policy (Unattended-Upgrade::Automatic-Reboot) remains ARCHBP-111/112 — the declaration and its unprivileged enforcement point are complete; the root appliers consume the same file.",
+    "full_suite": "ARCHBP-116 spec 3/3; ARCHBP-110 regression 5/5.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "The enforcement proof executed against the real T8 lease machinery with real hold/release cycles and the real committed policy file."
+  },
+  "proof_summary": "ARCHBP-116 is complete: update governance is encoded as a declared, reviewable, schema-versioned config that the ARCHBP-110 guard consumes — the same live hold blocks or passes purely by the declared policy, every held class cites its incident evidence, and the root appliers (ARCHBP-111/112) materialize the same file rather than manual steps.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-116.proof.json",
+    "planning-spine-v0/docs/update_governance_policy.json",
+    "scripts/os-update-observer.mjs",
+    "tests/archbp-116-declarative-governance.spec.ts",
+    "https://github.com/FlexNetOS/lifeos/pull/98"
+  ]
+}

@@ -220,6 +220,7 @@
     "ARCHBP-017",
     "ARCHBP-019",
     "ARCHBP-022",
+    "ARCHBP-023",
     "ARCHBP-024",
     "ARCHBP-026",
     "ARCHBP-027",
@@ -244,25 +245,24 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 324,
+  "ledger_entry_count": 325,
   "lifecycle_counts": {
     "blocked": 7,
-    "complete": 228,
+    "complete": 229,
     "draft": 0,
-    "ready": 9,
+    "ready": 8,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "5a3e47e6f4e522ee5ea9feff06c840d81381b5a155af63bd84cb9f84c8e995f0",
+  "proof_ledger_sha256": "039503b19cb2e625ecda2b762e580f29f3007786628c3c38c248be288107a831",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-004",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
-    "ARCHBP-023",
     "ARCHBP-030",
     "ARCHBP-031",
     "ARCHBP-044",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "88280cea3caf76349a0727d5218f76ed5e081c34de143e58c56181be9d570cb5",
+  "source_graph_sha256": "756b3c4b404d3079d15f44b55d210ab36100ccf3d83c13eb0b8fd9a535105699",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8662,11 +8662,11 @@
     },
     {
       "effective": {
-        "next_action": "Choose the authoritative direction and write failing lifecycle, replay, conflict, and invalidation round-trip tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-023.proof.json; no child task is declared in this graph.",
         "proof_uri": "proof_records/ARCHBP-023.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-022",
         "LPS-024"
@@ -8674,22 +8674,29 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 325,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "1b966ced456e987d6128ea66802e190fcf2b47002b850b95cece942c11f105dc",
+        "status": "pass"
       },
       "source": {
         "next_action": "Choose the authoritative direction and write failing lifecycle, replay, conflict, and invalidation round-trip tests.",
         "proof_uri": "proof_records/ARCHBP-023.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 220,
       "task_id": "ARCHBP-023",
       "title": "Round-trip TEAS work orders status and proof through GitKB",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Choose the authoritative direction and write failing lifecycle, replay, conflict, and invalidation round-trip tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-023.proof.json; no child task is declared in this graph."
+        }
+      }
     },
     {
       "effective": {
@@ -9835,6 +9842,7 @@
     "ARCHBP-017",
     "ARCHBP-019",
     "ARCHBP-022",
+    "ARCHBP-023",
     "ARCHBP-024",
     "ARCHBP-026",
     "ARCHBP-027",

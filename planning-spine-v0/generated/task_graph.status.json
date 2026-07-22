@@ -1,7 +1,6 @@
 {
   "blocked_task_ids": [
     "LPS-029",
-    "ARCHBP-005",
     "ARCHBP-006",
     "ARCHBP-025",
     "ARCHBP-043",
@@ -207,6 +206,7 @@
     "ARCHBP-001",
     "ARCHBP-002",
     "ARCHBP-003",
+    "ARCHBP-004",
     "ARCHBP-007",
     "ARCHBP-008",
     "ARCHBP-009",
@@ -245,10 +245,10 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 325,
+  "ledger_entry_count": 326,
   "lifecycle_counts": {
-    "blocked": 7,
-    "complete": 229,
+    "blocked": 6,
+    "complete": 230,
     "draft": 0,
     "ready": 8,
     "rolled-back": 0,
@@ -256,10 +256,10 @@
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "039503b19cb2e625ecda2b762e580f29f3007786628c3c38c248be288107a831",
+  "proof_ledger_sha256": "c00b430cc3f37fb957041a9371e4e6eab22b6470bfcd996028c7162df8aba34a",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
-    "ARCHBP-004",
+    "ARCHBP-005",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "756b3c4b404d3079d15f44b55d210ab36100ccf3d83c13eb0b8fd9a535105699",
+  "source_graph_sha256": "96ce7c78ed8b712e096c7584d0a08d4e1ae5a13e29262df85a042f6232fbed26",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -7984,11 +7984,11 @@
     },
     {
       "effective": {
-        "next_action": "Write the negative direct-mutation, drift, approval, and path-isolation tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-004.proof.json; next child task: ARCHBP-005.",
         "proof_uri": "proof_records/ARCHBP-004.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-003",
         "POSTGRES-007"
@@ -7996,30 +7996,37 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 326,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "7cb2196dba9cff1ac4b2bb47c1eb18f4b2f4332e4d132d27c0ed75a3697983a6",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write the negative direct-mutation, drift, approval, and path-isolation tests.",
         "proof_uri": "proof_records/ARCHBP-004.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 201,
       "task_id": "ARCHBP-004",
       "title": "Enforce approval-gated semantic code edit plans",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write the negative direct-mutation, drift, approval, and path-isolation tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-004.proof.json; next child task: ARCHBP-005."
+        }
+      }
     },
     {
       "effective": {
         "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests.",
         "proof_uri": "proof_records/ARCHBP-005.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "ready",
       "parent_ids": [
         "ARCHBP-004",
         "POSTGRES-005"
@@ -8036,7 +8043,7 @@
       "source": {
         "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests.",
         "proof_uri": "proof_records/ARCHBP-005.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
       "source_row_number": 202,
       "task_id": "ARCHBP-005",
@@ -9829,6 +9836,7 @@
     "ARCHBP-001",
     "ARCHBP-002",
     "ARCHBP-003",
+    "ARCHBP-004",
     "ARCHBP-007",
     "ARCHBP-008",
     "ARCHBP-009",

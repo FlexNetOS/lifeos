@@ -1,0 +1,37 @@
+{
+  "schema_version": "lifeos-planning-spine.proof-record.v0",
+  "task_id": "ARCHBP-004",
+  "observed_at": "2026-07-21T00:00:00Z",
+  "revision": 1,
+  "status": "pass",
+  "verification_gate": "Red tests reject direct database mutation, stale source snapshots, missing approval, path escape, and unproved apply; an approved bounded plan materializes an isolated patch, runs repository gates, records proof, and leaves canonical source unchanged until normal Git review.",
+  "gate_result": {
+    "red_first": "contracts committed red at nu_plugin 61f5c23 (8/8 failing: stub gate returns optimistic allow with no isolated patch), implementation green at 300fa3d (8/8)",
+    "rejects_direct_sql_mutation": true,
+    "direct_sql_evidence": "any plan containing a DirectSqlMutation action is rejected with reason 'direct-sql-mutation-forbidden' — direct SQL UPDATE of canonical source is never authorized.",
+    "rejects_stale_source_snapshot": true,
+    "drift_evidence": "a plan bound to a source snapshot digest that does not match the current source digest is rejected with reason 'stale-source-snapshot-drift' — edits are refused when the source has drifted from the snapshot the plan was built against.",
+    "rejects_missing_approval": true,
+    "approval_evidence": "a plan without an owner approval (approved_by = None) is rejected with reason 'missing-owner-approval' — no apply proceeds without explicit owner approval.",
+    "rejects_path_escape": true,
+    "path_escape_evidence": "an edit whose path contains '..' or falls outside the plan's allowed paths is rejected with reason 'path-escape:<path>' — edits are confined to the declared allowed paths.",
+    "rejects_unproved_apply": true,
+    "unproved_evidence": "when the repository gate has not passed, apply is rejected with reason 'unproved-apply-repository-gate-failed' — no unproven change is materialized.",
+    "approved_bounded_plan_materializes_isolated_patch": true,
+    "materialize_evidence": "an approved, drift-free, path-confined plan that passes the repository gate is allowed and materializes an ISOLATED patch (the edited file/content pairs) — a proposed change set, not a live mutation.",
+    "canonical_source_unchanged": true,
+    "canonical_evidence": "the gate never writes canonical source: can_apply_to_canonical() is always false; only an isolated patch is produced, which awaits normal Git review. There is no live-branch-overwrite or autonomous-merge path.",
+    "immutable_decision_receipt": true,
+    "receipt_evidence": "every evaluation records an append-only Decision receipt with a monotonically increasing receipt_seq (1, 2, ...) capturing the plan id, outcome, and reason — the decision history is immutable and auditable.",
+    "full_suite": "semantic_edit_gate gate 8/8; clippy-clean.",
+    "product_execution_performed": true,
+    "product_execution_evidence": "the gate is exercised over real edit plans for every rejection path (direct SQL, drift, missing approval, path escape, unproved apply) and the approved-plan materialization path, asserting the outcome, reason, isolated patch, and append-only receipts. Tests run live on this host (8/8)."
+  },
+  "proof_summary": "ARCHBP-004 is complete: the approval-gated semantic edit authority (nu_plugin semantic_edit_gate crate + tests/gate.rs, PR FlexNetOS/nu_plugin#49, red 61f5c23 -> green 300fa3d, 8/8, clippy-clean) enforces source-snapshot-bound edit plans. Before an isolated patch is materialized a plan must contain no direct SQL mutation of canonical source, match the current source (no drift), carry owner approval, confine every edit to the allowed paths (no path escape), and pass the repository gates. Only then is an isolated patch materialized — the gate never writes canonical source (can_apply_to_canonical()=false), so there is no direct SQL UPDATE, live-branch overwrite, or autonomous merge, and the patch awaits normal Git review. Every decision records an immutable, append-only receipt. All five rejection paths and the approved-materialization path pass 8/8.",
+  "artifact_paths": [
+    "planning-spine-v0/proof_records/ARCHBP-004.proof.json",
+    "https://github.com/FlexNetOS/nu_plugin/pull/49",
+    "nu_plugin:semantic_edit_gate/src/lib.rs",
+    "nu_plugin:semantic_edit_gate/tests/gate.rs"
+  ]
+}

@@ -4422,7 +4422,7 @@
         "execution_cell": "semantic-edit-cell",
         "verification_gate": "Red tests reject direct database mutation, stale source snapshots, missing approval, path escape, and unproved apply; an approved bounded plan materializes an isolated patch, runs repository gates, records proof, and leaves canonical source unchanged until normal Git review.",
         "rollback_plan": "Discard the isolated patch and task-created plan rows, retain rejection evidence, and restore the prior planner schema; canonical source and Git history remain unchanged.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-004.proof.json",
         "next_action": "Write the negative direct-mutation, drift, approval, and path-isolation tests."
       }
@@ -4444,7 +4444,7 @@
         "execution_cell": "database-cow-cell",
         "verification_gate": "Red tests cover fork, concurrent replacement, ABA identity, merge conflict, branch deletion, and restart; selected branches reconstruct exact source and metadata; rollback removes only identity-matched task artifacts and cannot delete a concurrent replacement.",
         "rollback_plan": "Retain the immutable branch ledger, mark the failed branch rejected, remove only identity-matched derived rows and projections, and restore the prior branch-schema migration.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "proof_records/ARCHBP-005.proof.json",
         "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests."
       }

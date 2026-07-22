@@ -108,3 +108,20 @@ Until this executes, `STRUCTURE-001`/`STRUCTURE-006` are in **regression** on th
 - But the exhaustive "every future move" guarantee is **contingent on RECOVERY-004** surfacing any additional stray state. Until RECOVERY-004 closes, this reconciliation is **PARTIAL by design**, not by omission.
 
 **Recommended closure order:** RECOVERY-001..004 → execute §3 envctl stray-state archive + harness repoint under owner gate → execute §4 worktree reconciliation → re-run `STRUCTURE-001` absence check → flip `PRESERVE-003` to pass.
+
+## Peer-set re-baseline (2026-07-22, incidents/preserve-provenance-drift-inert-gate)
+
+Seven transient worktree/fix peers were cleaned up after their PRs landed;
+their final recorded provenance is preserved here and their rows removed:
+
+- `flexnetos_runner-kache-shim-wt` — last recorded HEAD `a3c796fd6934d0cb619a3e0be2ebe32553940ac0` (branch kache-shim-stable-path, clean); branch history lives in its parent repo.
+- `flexnetos_runner-meta-prefix-wt` — last recorded HEAD `a843cd3469a6826ce86b7cca1ef038f2b757aa98` (branch fix/runner-meta-prefix, clean); branch history lives in its parent repo.
+- `meta-ruvector-qat-wt` — last recorded HEAD `b12d0b33a46f8c0fa67b71e572dd4a8999aaccea` (branch codex-ruvllm-qat-graft, clean); branch history lives in its parent repo.
+- `meta-ruvector-router-wt` — last recorded HEAD `c2cfe161d54481f8d7e9b8f0e934ae042bdaa60c` (branch codex-ruvltra-router, clean); branch history lives in its parent repo.
+- `mrv-95-sync` — last recorded HEAD `aa78e16742c333717ef72f30a65eec2c4befa744` (branch sync/upstream-ruvnet-main, clean); branch history lives in its parent repo.
+- `mrv-ci-fix` — last recorded HEAD `5e087ae86446015256b6399a35824a4fcad5d247` (branch ci/fix-workspace-checks, clean); branch history lives in its parent repo.
+- `mrv-reconcile-wt` — last recorded HEAD `78ca3d6301526465a6ba5f97418311ceb3fcb84c` (branch chore/reconcile-session-work, clean); branch history lives in its parent repo.
+
+Two live peers were added: `atc` (agent dispatch/registry, clone) and
+`envctl-wt-archbp042` (envctl committer worktree). All surviving rows'
+head_commit/branch/worktree_state fields were refreshed from disk.

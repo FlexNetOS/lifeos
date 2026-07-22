@@ -279,6 +279,7 @@
     "ARCHBP-106",
     "ARCHBP-107",
     "ARCHBP-108",
+    "ARCHBP-109",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-055",
@@ -291,18 +292,18 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 368,
+  "ledger_entry_count": 369,
   "lifecycle_counts": {
     "blocked": 11,
-    "complete": 271,
+    "complete": 272,
     "draft": 0,
-    "ready": 41,
+    "ready": 40,
     "rolled-back": 0,
     "running": 0,
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "1181924471367ab4a889d2ee0cdcd15e74936c5246058a77f5a8739858c916f0",
+  "proof_ledger_sha256": "7e423bf536616c81323711a37e32a8e1bbe387af098e081c2105c5ab4123435e",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
     "ARCHBP-018",
@@ -329,7 +330,6 @@
     "ARCHBP-092",
     "ARCHBP-099",
     "ARCHBP-100",
-    "ARCHBP-109",
     "ARCHBP-110",
     "ARCHBP-111",
     "ARCHBP-112",
@@ -352,7 +352,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "807a9b63cc7fdd9d443e18b474229af40427b0657e7b38849a5b32acb23c1119",
+  "source_graph_sha256": "533016d1280c419b762b9ee61b7b7b3f7a1c8dc8c4049c4b35ffdc53448f7cfc",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 323,
   "tasks": [
@@ -11466,33 +11466,40 @@
     },
     {
       "effective": {
-        "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-109.proof.json; next child task: ARCHBP-056.",
         "proof_uri": "proof_records/ARCHBP-109.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "STORE-001"
       ],
       "phase": "14-yazelix-isolation-persistence",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 369,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "3674ac7fa5b6611c13942b37f33318b542a8860ca69f0c6dd5e8978f870ff630",
+        "status": "pass"
       },
       "source": {
         "next_action": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
         "proof_uri": "proof_records/ARCHBP-109.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 297,
       "task_id": "ARCHBP-109",
       "title": "Map unattended-upgrades, apt, snap refresh, kernel installs and their triggers/timing.",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Author failing tests for the acceptance criteria, then implement to green and record the proof.",
+          "to": "Proof accepted from proof_records/ARCHBP-109.proof.json; next child task: ARCHBP-056."
+        }
+      }
     },
     {
       "effective": {
@@ -12669,6 +12676,7 @@
     "ARCHBP-106",
     "ARCHBP-107",
     "ARCHBP-108",
+    "ARCHBP-109",
     "ARCHBP-049",
     "ARCHBP-050",
     "ARCHBP-055",

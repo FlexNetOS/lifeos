@@ -1,7 +1,6 @@
 {
   "blocked_task_ids": [
     "LPS-029",
-    "ARCHBP-006",
     "ARCHBP-025",
     "ARCHBP-043",
     "ARCHBP-047",
@@ -207,6 +206,7 @@
     "ARCHBP-002",
     "ARCHBP-003",
     "ARCHBP-004",
+    "ARCHBP-005",
     "ARCHBP-007",
     "ARCHBP-008",
     "ARCHBP-009",
@@ -245,10 +245,10 @@
   "generated_at": "2026-07-21T00:00:00Z",
   "global_coverage_gate": "closed",
   "invalidated_task_ids": [],
-  "ledger_entry_count": 326,
+  "ledger_entry_count": 327,
   "lifecycle_counts": {
-    "blocked": 6,
-    "complete": 230,
+    "blocked": 5,
+    "complete": 231,
     "draft": 0,
     "ready": 8,
     "rolled-back": 0,
@@ -256,10 +256,10 @@
     "simulated": 0
   },
   "next_ready_task_id": null,
-  "proof_ledger_sha256": "c00b430cc3f37fb957041a9371e4e6eab22b6470bfcd996028c7162df8aba34a",
+  "proof_ledger_sha256": "b39dae58656656aaa3be4d23b0d5e7429f75e5d545183015835909a2c6559d7d",
   "proof_ledger_uri": "proof_records/proof_ledger.jsonl",
   "ready_task_ids": [
-    "ARCHBP-005",
+    "ARCHBP-006",
     "ARCHBP-018",
     "ARCHBP-020",
     "ARCHBP-021",
@@ -273,7 +273,7 @@
   "running_task_ids": [],
   "schema_version": "lifeos-planning-spine.task-graph.status.v0",
   "simulated_task_ids": [],
-  "source_graph_sha256": "96ce7c78ed8b712e096c7584d0a08d4e1ae5a13e29262df85a042f6232fbed26",
+  "source_graph_sha256": "628f4240a517a1f6d9b97765957b5b560e5ef4fb6d32315a817dc726597b3d38",
   "source_graph_uri": "generated/task_graph.normalized.json",
   "task_count": 244,
   "tasks": [
@@ -8022,11 +8022,11 @@
     },
     {
       "effective": {
-        "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests.",
+        "next_action": "Proof accepted from proof_records/ARCHBP-005.proof.json; next child task: ARCHBP-006.",
         "proof_uri": "proof_records/ARCHBP-005.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
-      "lifecycle_state": "ready",
+      "lifecycle_state": "complete",
       "parent_ids": [
         "ARCHBP-004",
         "POSTGRES-005"
@@ -8034,30 +8034,37 @@
       "phase": "13-architecture-blueprint-execution",
       "proof": {
         "invalidates": null,
-        "ledger_line_number": null,
-        "observed_at": null,
-        "revision": null,
-        "sha256": null,
-        "status": null
+        "ledger_line_number": 327,
+        "observed_at": "2026-07-21T00:00:00Z",
+        "revision": "1",
+        "sha256": "fe75615bb209e03c7f0fc6ab159c59f7913ce239c7b59094277899b6e18e5d55",
+        "status": "pass"
       },
       "source": {
         "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests.",
         "proof_uri": "proof_records/ARCHBP-005.proof.json",
-        "status": "ready"
+        "status": "complete"
       },
       "source_row_number": 202,
       "task_id": "ARCHBP-005",
       "title": "Implement database-native copy-on-write code branches and rollback",
-      "updated_fields": [],
-      "updates": {}
+      "updated_fields": [
+        "next_action"
+      ],
+      "updates": {
+        "next_action": {
+          "from": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests.",
+          "to": "Proof accepted from proof_records/ARCHBP-005.proof.json; next child task: ARCHBP-006."
+        }
+      }
     },
     {
       "effective": {
         "next_action": "Define the versioned export contract and failing exact-projection fixtures.",
         "proof_uri": "proof_records/ARCHBP-006.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
-      "lifecycle_state": "blocked",
+      "lifecycle_state": "ready",
       "parent_ids": [
         "ARCHBP-005",
         "POSTGRES-008"
@@ -8074,7 +8081,7 @@
       "source": {
         "next_action": "Define the versioned export contract and failing exact-projection fixtures.",
         "proof_uri": "proof_records/ARCHBP-006.proof.json",
-        "status": "blocked"
+        "status": "ready"
       },
       "source_row_number": 203,
       "task_id": "ARCHBP-006",
@@ -9837,6 +9844,7 @@
     "ARCHBP-002",
     "ARCHBP-003",
     "ARCHBP-004",
+    "ARCHBP-005",
     "ARCHBP-007",
     "ARCHBP-008",
     "ARCHBP-009",

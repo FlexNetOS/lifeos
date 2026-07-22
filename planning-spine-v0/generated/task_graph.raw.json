@@ -4444,7 +4444,7 @@
         "execution_cell": "database-cow-cell",
         "verification_gate": "Red tests cover fork, concurrent replacement, ABA identity, merge conflict, branch deletion, and restart; selected branches reconstruct exact source and metadata; rollback removes only identity-matched task artifacts and cannot delete a concurrent replacement.",
         "rollback_plan": "Retain the immutable branch ledger, mark the failed branch rejected, remove only identity-matched derived rows and projections, and restore the prior branch-schema migration.",
-        "status": "Ready",
+        "status": "Complete",
         "proof_uri": "proof_records/ARCHBP-005.proof.json",
         "next_action": "Write failing fork, concurrency, deterministic-selection, and identity-bound rollback tests."
       }
@@ -4466,7 +4466,7 @@
         "execution_cell": "envctl-projection-cell",
         "verification_gate": "Red tests prove byte-identical repeated projection of .rs, .toml, and .nu fixtures, correct module paths and permissions, safe relative links, source-version traceability, no canonical overwrite, and complete receipt-driven cleanup.",
         "rollback_plan": "Delete the derived projection by its receipt, restore the prior projection adapter, and leave source rows, canonical source, and installed runtime unchanged.",
-        "status": "Blocked",
+        "status": "Ready",
         "proof_uri": "proof_records/ARCHBP-006.proof.json",
         "next_action": "Define the versioned export contract and failing exact-projection fixtures."
       }

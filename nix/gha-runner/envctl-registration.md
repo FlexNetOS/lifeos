@@ -5,26 +5,42 @@
 > through envctl's committer — it does not mutate any table itself.
 
 The hermetic runner needs a GitHub **runner-registration token** (short-lived, ~1h) to
-join the FlexNetOS org. That token, and the agent provider keys, are minted by envctl.
+join the org. envctl does not mint that token type directly — it mints a GitHub App
+**installation access token** (`envctl secret mint-github`), which is then exchanged for a
+runner-registration token via GitHub's REST API. Both verbs below are verified against
+`envctl secret --help` (source: `meta/src/envctl/crates/cli`).
+
+> Preconditions: the secretd **vault must be unlocked** (`envctl secret unlock`) and you
+> must know the GitHub App **installation id**. Confirm the mint JSON shape once with
+> `envctl secret mint-github --installation-id <ID> --output json --ttl-secs 3600 | from json`
+> — `register.nu` reads the `.token` field.
 
 ## What the owner runs (one session, on the profile-owned host)
 
+These are **Nushell** commands (the profile shell is `…/toolbin/nu`). Note nu uses
+`(cmd …)` for command substitution — not bash `$(…)`.
+
 ```nu
-# 1. Mint a runner-registration token for the org and register the runner.
-#    register.nu calls `envctl mint gha-runner-registration --org FlexNetOS` internally;
-#    run it where envctl is on PATH (an in-session agent shell is NOT such a place):
+# 0. Unlock the vault (USB-first; passphrase fallback).
+envctl secret unlock
+
+# 1. Register the runner. register.nu mints the App installation token via
+#    `envctl secret mint-github`, exchanges it for a runner-registration token, then runs
+#    config.sh with the 3 labels. Run where envctl + gh are on PATH (NOT an in-session shell):
 cd /home/flexnetos/meta/src/lifeos/nix/gha-runner
-nix run .#register            # mints via envctl, then config.sh with the 3 labels
+nix run .#register -- --installation-id <INSTALLATION_ID>
+#   …or supply a runner-registration token you obtained yourself:
+# nix run .#register -- --token <RUNNER_REGISTRATION_TOKEN>
 
 # 2. Launch the runner (user-level; NEVER a system systemd unit):
 nix run .#runner              # foreground; keep in a yzx/Zellij pane
 
-# 3. Provider secrets for the agent step — commit through envctl's committer, NOT by hand.
-#    These map to the workflow's `env:` secrets (ANTHROPIC_API_KEY, etc.). Add them as
-#    GitHub Actions secrets on FlexNetOS/lifeos so the composite action can read them:
-gh secret set ANTHROPIC_API_KEY  --repo FlexNetOS/lifeos --body "$(envctl get anthropic-api-key)"
-gh secret set OPENROUTER_API_KEY --repo FlexNetOS/lifeos --body "$(envctl get openrouter-api-key)"
-gh secret set OPENAI_API_KEY     --repo FlexNetOS/lifeos --body "$(envctl get openai-api-key)"
+# 3. Provider secrets for the agent step. Read each from the vault with
+#    `envctl secret secret get <NAME> --reveal` and set it as a GitHub Actions secret so
+#    the composite action's `env:` can read it (names must match the vault secret names):
+gh secret set ANTHROPIC_API_KEY  --repo FlexNetOS/lifeos --body (envctl secret secret get anthropic-api-key --reveal | str trim)
+gh secret set OPENROUTER_API_KEY --repo FlexNetOS/lifeos --body (envctl secret secret get openrouter-api-key --reveal | str trim)
+gh secret set OPENAI_API_KEY     --repo FlexNetOS/lifeos --body (envctl secret secret get openai-api-key --reveal | str trim)
 ```
 
 ## Proposed envctl row (for the committer — informational)

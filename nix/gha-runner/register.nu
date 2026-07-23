@@ -8,26 +8,39 @@
 # --token). Volatile runner state lives under profile-runtime; nothing touches the OS.
 #
 # Usage:
-#   nix run .#register                      # mints the token via envctl (B1)
-#   nix run .#register -- --token <TOKEN>   # owner supplies a token directly
+#   nix run .#register -- --installation-id <ID>   # mint via envctl GitHub App (B1)
+#   nix run .#register -- --token <TOKEN>          # owner supplies a runner-registration token directly
 
 def main [
   --org: string = "FlexNetOS"
   --repo: string = "lifeos"
   --name: string = "flexnetos-nix-01"
   --labels: string = "self-hosted,flexnetos,nix"
+  --installation-id: string = ""                                   # GitHub App installation id for `envctl secret mint-github`
   --token: string = ""                                             # empty => mint via envctl (B1)
   --runtime: string = "/run/user/1001/yazelix/profile-runtime/gha-runner"
 ] {
   let url = $"https://github.com/($org)/($repo)"
 
   # 1. Registration token — B1 fence.
+  #    Verified against `envctl secret --help` (source: meta/src/envctl/crates/cli):
+  #    envctl does NOT mint runner-registration tokens directly. It mints a GitHub App
+  #    *installation* access token (`secret mint-github`); that token is then exchanged
+  #    for a runner-registration token via GitHub's REST API. Two real steps.
   let tok = if ($token | is-empty) {
-    print "Minting registration token via envctl (B1 owner-fence)…"
-    (^envctl mint gha-runner-registration --org $org | str trim)
+    if ($installation_id | is-empty) {
+      error make { msg: "Pass --installation-id (for `envctl secret mint-github`) or --token directly (B1)." }
+    }
+    print "Minting GitHub App installation token via envctl, then exchanging for a runner token (B1)…"
+    # NOTE: `.token` is the assumed field on the mint-github JSON contract — confirm once
+    #       against a live `envctl secret mint-github ... | from json` (vault must be unlocked).
+    let app_tok = (^envctl secret mint-github --installation-id $installation_id --output json --ttl-secs 3600 | from json | get token)
+    with-env { GH_TOKEN: $app_tok } {
+      (^gh api --method POST $"/repos/($org)/($repo)/actions/runners/registration-token" --jq ".token" | str trim)
+    }
   } else { $token }
   if ($tok | is-empty) {
-    error make { msg: "No registration token. Pass --token, or run where envctl is reachable (B1)." }
+    error make { msg: "No registration token. Pass --token, or run where envctl + gh are reachable (B1)." }
   }
 
   # 2. Materialize a writable runner dir under profile-runtime (volatile state, SPEC §2).

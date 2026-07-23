@@ -1,0 +1,30 @@
+{
+  "phase": "C",
+  "iteration": 1,
+  "doneCriteria": "node nix/gha-runner/wait-run-green.mjs archbp-env-test.yml --ready",
+  "next": "OWNER (B1): nix run .#register && nix run .#runner && git push && gh workflow run archbp-env-test.yml && node nix/gha-runner/wait-run-green.mjs archbp-env-test.yml --runner self-hosted",
+  "blockers": "B1: envctl unreachable in-session — live runner registration + push + dispatch are owner actions",
+  "noProgress": false,
+  "history": [
+    {
+      "phase": "P",
+      "iteration": 1,
+      "next": "Phase A: author flake.nix + agent-layer manifest + composite action + workflow + actionlint config; run nix flake check"
+    },
+    {
+      "phase": "A",
+      "iteration": 3,
+      "next": "Phase R: capture real npmDepsHash (npm now in closure), realize agent-layer, verify hermetic closure"
+    },
+    {
+      "phase": "R",
+      "iteration": 5,
+      "next": "Phase C: wait-run-green.mjs + README runbook + envctl bootstrap row; stop at B1 live-run fence"
+    },
+    {
+      "phase": "C",
+      "iteration": 1,
+      "next": "OWNER (B1): nix run .#register && nix run .#runner && git push && gh workflow run archbp-env-test.yml && node nix/gha-runner/wait-run-green.mjs archbp-env-test.yml --runner self-hosted"
+    }
+  ]
+}

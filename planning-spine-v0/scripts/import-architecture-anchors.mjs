@@ -18,10 +18,10 @@ const anchors = [
     kind: "expanded-execution-blueprint",
     option: "blueprint",
     target: "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
-    sourcePath: "/home/flexnetos/Downloads/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED (1).md",
-    sha256: "c54063110be8bebb07469cbc0f76fecab142cd636e98950a36a3ee02b766a62c",
-    bytes: 974321,
-    lines: 6340
+    sourcePath: "/home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    sha256: "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    bytes: 977386,
+    lines: 6347
   },
   {
     id: "ARCHANCHOR-002",

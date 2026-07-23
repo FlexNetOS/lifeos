@@ -46,8 +46,16 @@
           pname = "lifeos-gha-agent-layer";
           version = "0.1.0";
           src = ./agent-layer;
-          npmDepsHash = lib.fakeHash;   # capture: `nix build .#agent-layer` prints the real hash
+          npmDepsHash = "sha256-dhre1ifoeXL3z5D95YZlRIl5/sTh5N9U/AOjRc8gPV4=";  # captured post lockfile phantom-optional-dep patch
           dontNpmBuild = true;          # these are prebuilt CLIs; no build step
+          makeCacheWritable = true;     # agentic-flow's tree needs a writable npm cache
+          # agentic-flow ships native postinstall (node-gyp) scripts that cannot run in
+          # the pure sandbox; the JS CLIs resolve without them (ADR-033 runtime is JS).
+          # --omit=optional: @metaharness/kernel ships per-platform napi natives as
+          # optionalDependencies with no installable lock entries; a linux runner needs
+          # none of them (agentic-flow PRIMER documents JS fallbacks). This also clears
+          # npm ci's optional-dep lock-sync check.
+          npmFlags = [ "--legacy-peer-deps" "--ignore-scripts" "--omit=optional" ];
           # Provide the CLIs on PATH: node_modules/.bin -> $out/bin
           postInstall = ''
             mkdir -p $out/bin

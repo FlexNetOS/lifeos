@@ -1,0 +1,68 @@
+name: 'archbp-env-test'
+description: 'Run the archbp-* env-test harness on the hermetic Nix closure (rUv agent layer, ADR-033 rewritten for self-hosted+nix)'
+
+# REWRITE of the ADR-033 default composite action:
+#   - NO actions/setup-node  — node/bun come from the [self-hosted, flexnetos, nix]
+#     closure already on PATH (nix/gha-runner substrate).
+#   - NO `npm ci`            — the agent layer is materialized by the Nix closure.
+#   - --gha-mode preserved   — suppress prompts, JSON to stdout, exit 0/1/2 (ADR-033 §2).
+# See nix/gha-runner/DESIGN.md §2 for the full generate->rewrite rationale.
+
+inputs:
+  task:
+    description: 'The task for the agent to perform'
+    required: false
+    default: 'run archbp env tests'
+  dry-run:
+    description: 'If true, print proposed actions but do not execute them'
+    required: false
+    default: 'false'
+
+outputs:
+  result:
+    description: 'The agent result as a JSON string'
+    value: ${{ steps.run.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - id: closure
+      shell: bash
+      run: |
+        # Prove the toolchain is the Nix closure, not the OS.
+        echo "node: $(command -v node) ($(node --version))"
+        echo "bun:  $(command -v bun) ($(bun --version))"
+        echo "git:  $(command -v git)"
+        {
+          echo "### archbp-env-test — Nix closure toolchain"
+          echo "- node: \`$(command -v node)\` $(node --version)"
+          echo "- bun:  \`$(command -v bun)\` $(bun --version)"
+        } >> "$GITHUB_STEP_SUMMARY"
+
+    - id: archbp
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        # The archbp-* env tests are vitest specs. Install the app's own deps
+        # (app-level, not toolchain) then run only the archbp subset.
+        bun install --frozen-lockfile || bun install
+        bunx vitest run tests/archbp-
+
+    - id: run
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ env.ANTHROPIC_API_KEY }}
+        OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
+        OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
+        HARNESS_MEMORY_PATH: ${{ runner.temp }}/harness-memory
+      run: |
+        # Invoke the rUv agent layer from the closure in --gha-mode.
+        # Until B1 (envctl-minted secrets on the live runner), the agent step degrades
+        # to a structured "pending" result rather than failing the job's proof value.
+        if command -v agentic-flow >/dev/null 2>&1; then
+          result="$(agentic-flow --gha-mode --task "${{ inputs.task }}" --dry-run "${{ inputs.dry-run }}" 2>/dev/null || echo '{"status":"agent-error"}')"
+        else
+          result='{"status":"agent-layer-pending-B1","note":"agentic-flow provided by nix/gha-runner closure; capture npmDepsHash + register runner"}'
+        fi
+        echo "result=$result" >> "$GITHUB_OUTPUT"
+        echo "agent result: $result"

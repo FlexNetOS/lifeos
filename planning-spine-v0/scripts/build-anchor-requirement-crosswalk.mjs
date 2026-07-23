@@ -14,7 +14,7 @@ const anchorPath = path.join(
   "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 );
 const immutableSourcePath =
-  "/home/flexnetos/Downloads/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED (1).md";
+  "/home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md";
 const sectionInventoryPath = path.join(anchorDirectory, "section_inventory.json");
 const parentCrosswalkPath = path.join(anchorDirectory, "anchor_claim_task_crosswalk.csv");
 const jsonOutputPath = path.join(anchorDirectory, "anchor_atomic_requirement_crosswalk.json");
@@ -22,9 +22,9 @@ const csvOutputPath = path.join(anchorDirectory, "anchor_atomic_requirement_cros
 
 const expectedAnchor = {
   id: "ARCHANCHOR-001",
-  sha256: "c54063110be8bebb07469cbc0f76fecab142cd636e98950a36a3ee02b766a62c",
-  bytes: 974321,
-  lines: 6340
+  sha256: "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  bytes: 977386,
+  lines: 6347
 };
 
 const parentVerification = {

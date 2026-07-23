@@ -5,7 +5,7 @@ description: Manage GitKB knowledge base for project documentation, tasks, and c
 
 # GitKB Knowledge Base Skill
 
-GitKB is a distributed knowledge base with a git-like CLI. Documents are stored in a local database and materialized to `.kb/workspace/` for editing.
+GitKB is a distributed knowledge base with a git-like CLI. Documents are stored in a local database and materialized to `.kb/workspaces/<identity>/` for editing.
 
 ## Common Gotchas
 
@@ -29,14 +29,14 @@ git-kb search "<keywords>" --all-terms --json # Require every term
 
 # Create and modify
 git-kb create --type task --slug tasks/my-task --title "My Task" --json
-git-kb set <slug> --status active            # Quick metadata update (auto-commits)
+git-kb set <slug> status=active               # Workspace-first metadata update; commit separately
 ```
 
 ### Workspace Operations
 
 ```bash
 git-kb checkout <slug>                       # Materialize for editing
-git-kb checkout --path context/              # Checkout by path prefix
+git-kb checkout context/                     # Checkout by positional path prefix
 git-kb status --json                         # Show pending changes
 git-kb diff                                  # Show line-level diffs
 git-kb commit -m "msg" <pathspecs...>        # Save changes to database
@@ -64,7 +64,7 @@ git-kb context --compact --code-refs         # Task-aware context bundle
 ```bash
 git-kb graph <slug> --json                   # Show document relationships
 git-kb log <slug>                            # Commit history
-git-kb link --child <child> --container <parent>  # Link documents
+git-kb link <child> --to <parent>             # Link documents
 ```
 
 ### Code Intelligence
@@ -143,7 +143,10 @@ When MCP tools are available, prefer them for structured JSON output and paralle
    git-kb checkout tasks/my-task
    ```
 
-3. Edit the file at `.kb/workspace/tasks/my-task.md`
+3. Resolve and edit the materialized file under `.kb/workspaces/<identity>/`:
+   ```bash
+   find .kb/workspaces -path '*/tasks/my-task.md' -print
+   ```
 
 4. Commit changes (always scope to your documents):
    ```bash
@@ -161,7 +164,8 @@ Before changing status to `completed`:
 
 2. Then update the status:
    ```bash
-   git-kb set tasks/my-task --status completed
+git-kb set tasks/my-task status=completed
+git-kb commit -m "Complete my-task" tasks/my-task
    ```
 
 ### Creating a New Task
@@ -169,7 +173,7 @@ Before changing status to `completed`:
 ```bash
 git-kb create --type task --slug tasks/my-task --title "Implement feature X" --json
 git-kb checkout tasks/my-task
-# Edit .kb/workspace/tasks/my-task.md
+# Resolve the materialized file with: find .kb/workspaces -path '*/tasks/my-task.md' -print
 git-kb commit -m "Add my-task" tasks/my-task
 ```
 
@@ -186,7 +190,7 @@ Implements [[tasks/my-task]]
 
 | Term | Definition |
 |------|------------|
-| **Workspace** | `.kb/workspace/` — Files materialized for editing |
+| **Workspace** | `.kb/workspaces/<identity>/` — Files materialized for editing |
 | **Checkout** | Materialize document from DB to workspace |
 | **Commit** | Sync workspace changes back to database |
 | **Slug** | Human-readable document ID (e.g., `tasks/my-task`) |

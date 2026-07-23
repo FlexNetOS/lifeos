@@ -1,29 +1,4 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "git-kb daemon status --quiet >/dev/null 2>&1 || git-kb daemon start --background >/dev/null 2>&1",
-            "timeout": 10,
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "command": "vox -l fr \"Terminé.\"",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ]
-  },
-  "outputStyle": "Proactive",
   "permissions": {
     "allow": [
       "Bash(rtk *)",
@@ -59,5 +34,34 @@
       "mcp__icm",
       "mcp__icm__*"
     ]
-  }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git-kb daemon status --quiet >/dev/null 2>&1 || git-kb daemon start --background >/dev/null 2>&1",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "vox -l fr \"Terminé.\""
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "ruvnet-brain@gitkb": true,
+    "gitkb@gitkb": true
+  },
+  "outputStyle": "Proactive"
 }

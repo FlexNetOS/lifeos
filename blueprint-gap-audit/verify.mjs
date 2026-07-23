@@ -11,7 +11,7 @@ const INVENTORY = join(HERE, 'inventory.md');
 const CLOSURE = join(HERE, 'closure.md');
 
 // Structural baseline established in Phase S (regression guard).
-const BASELINE_BYTES = 970000; // blueprint was 974321 B pre-edit; edits are additive, so >= this.
+const BASELINE_BYTES = 974321; // Pre-edit blueprint was 974321 B; additive changes may not delete source bytes.
 const FINDING_IDS = ['RECON-01', 'RECON-02', 'RECON-03', 'CONSIST-01'];
 
 const phase = process.argv[2] || 'all';

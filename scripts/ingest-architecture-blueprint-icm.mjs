@@ -54,7 +54,6 @@ function resolveProfilePsql() {
   );
 }
 
-const PSQL_BIN = resolveProfilePsql();
 const ICM_CONFIG_PATH = "/home/flexnetos/.config/icm/config.toml";
 const PG_SOCKET = "/home/flexnetos/meta/var/run/postgresql";
 const PG_DATABASE = "icm";
@@ -139,30 +138,36 @@ const HIGH_TITLE_PATTERNS = [
 const RECALL_PROBES = [
   {
     id: "hard-rules",
+    evidence: ["HARD EXECUTION RULES", "EVERYTHING means EVERYTHING", "every byte"],
     query: "HARD EXECUTION RULES EVERYTHING means EVERYTHING every byte"
   },
   {
     id: "postgresql-ruvector",
+    evidence: ["PostgreSQL", "RuVector", "canonical durable macro-state"],
     query:
       "PostgreSQL RuVector canonical durable macro-state Swarm Primary Runtime"
   },
   {
     id: "redb",
+    evidence: ["redb", "mmap projection", "ordered wakeup"],
     query:
       "redb transient shared low-latency state plane mmap projection ordered wakeup"
   },
   {
     id: "envctl",
+    evidence: ["envctl", "authoritative", "ingress committer"],
     query:
       "envctl sole authoritative PostgreSQL RuVector ingress committer security boundary"
   },
   {
     id: "codedb",
+    evidence: ["CodeDB", "byte-complete ingress", "raw bytes"],
     query:
       "nu_plugin CodeDB byte-complete ingress raw bytes hashes manifests pointers"
   },
   {
     id: "release-gate",
+    evidence: ["database-gated", "envctl-activated", "zero undeclared loss"],
     query:
       "database-gated envctl-activated release zero undeclared loss release gate"
   }
@@ -845,7 +850,7 @@ function runIcm(args, options = {}) {
 }
 
 function runPsql(sql) {
-  return runRtk(PSQL_BIN, [
+  return runRtk(resolveProfilePsql(), [
     "-X",
     "--no-psqlrc",
     "-v",
@@ -916,6 +921,17 @@ function parseEmbeddingConfig() {
 }
 
 function preflightDatabase() {
+  const extensions = runPsqlJson(`
+    SELECT json_build_object(
+      'vector', EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector'),
+      'ruvector', EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'ruvector')
+    )`);
+  if (!extensions.vector && !extensions.ruvector) {
+    fail(
+      "canonical PostgreSQL vector support is absent; envctl must provision the " +
+        "approved vector/RuVector extension before this importer can run"
+    );
+  }
   const receipt = runPsqlJson(`
     SELECT json_build_object(
       'embedding_type', (
@@ -1088,6 +1104,28 @@ function readFingerprintMetadata() {
     )
     FROM icm_metadata
     WHERE key LIKE ${sqlLiteral(`${MEMOIR_NAME}.%`)}`);
+}
+
+function expectedFingerprintMetadata(fingerprint) {
+  return {
+    [`${MEMOIR_NAME}.embedding_dimension`]: String(EXPECTED_EMBEDDING_DIMENSION),
+    [`${MEMOIR_NAME}.embedding_fast_model`]: FAST_EMBEDDING_MODEL,
+    [`${MEMOIR_NAME}.embedding_fingerprint`]: fingerprint.sha256,
+    [`${MEMOIR_NAME}.embedding_pipeline`]:
+      "fast_model-l2 + primary_model-l2 -> concatenated",
+    [`${MEMOIR_NAME}.embedding_primary_model`]: PRIMARY_EMBEDDING_MODEL,
+    [`${MEMOIR_NAME}.source_sha256`]: SOURCE_SHA256
+  };
+}
+
+function assertFingerprintMetadata(fingerprint) {
+  const actual = readFingerprintMetadata();
+  for (const [key, value] of Object.entries(expectedFingerprintMetadata(fingerprint))) {
+    if (actual[key] !== value) {
+      fail(`envctl ingress provenance mismatch for ${key}`);
+    }
+  }
+  return actual;
 }
 
 function blueprintTopics(plan) {
@@ -1323,14 +1361,18 @@ function semanticRecall({ readOnly = false } = {}) {
       { readOnly }
     ).stdout;
     const results = JSON.parse(output);
-    const match = results.find((result) =>
-      result.topic?.startsWith(`${TOPIC_PREFIX}:`)
-    );
+    const match = results.find((result) => {
+      const evidence = `${result.summary ?? ""}\n${result.raw_excerpt ?? ""}`.toLowerCase();
+      return result.topic?.startsWith(`${TOPIC_PREFIX}:`) &&
+        Number.isFinite(result.score) && result.score > 0 &&
+        probe.evidence.every((term) => evidence.includes(term.toLowerCase()));
+    });
     if (!match) {
-      fail(`semantic recall probe did not retrieve the blueprint: ${probe.id}`);
+      fail(`semantic recall probe did not retrieve its required evidence: ${probe.id}`);
     }
     receipts.push({
       id: probe.id,
+      evidence: probe.evidence,
       matched_memory_id: logicalIdFromSummary(match.summary),
       score: match.score,
       topic: match.topic
@@ -1539,6 +1581,7 @@ function execute(options) {
     graph = readGraph();
   }
 
+  const provenance = assertFingerprintMetadata(fingerprint);
   const exact = verifyExactState(plan, memories, graph);
 
   const recall = options.skipRecall
@@ -1552,7 +1595,7 @@ function execute(options) {
     ["stats", "--no-embeddings"],
     { readOnly: options.verifyOnly }
   ).stdout.trim();
-  const metadata = readFingerprintMetadata();
+  const metadata = provenance;
 
   return {
     mode: options.verifyOnly ? "verify-only" : "ingest",

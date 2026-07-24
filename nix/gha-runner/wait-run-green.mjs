@@ -9,7 +9,7 @@
 //   exit 0 = success (green on the required runner, or --ready checks pass)
 //   exit 1 = failed / timed out / no self-hosted runner
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const wf = process.argv[2];
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d; };
@@ -26,7 +26,7 @@ function gh(args) { return execFileSync("gh", args, { encoding: "utf8", maxBuffe
 
 if (readyOnly) {
   // Pre-B1 readiness: file present + declares workflow_dispatch + self-hosted runs-on.
-  const body = execFileSync("cat", [path], { encoding: "utf8" });
+  const body = readFileSync(path, { encoding: "utf8" });
   const hasDispatch = /workflow_dispatch/.test(body);
   const hasSelfHosted = /runs-on:\s*\[.*self-hosted/.test(body);
   console.log(`ready-check: dispatch=${hasDispatch} self-hosted=${hasSelfHosted}`);

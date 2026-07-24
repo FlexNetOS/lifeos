@@ -55,12 +55,16 @@ runs:
         OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
         OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
         HARNESS_MEMORY_PATH: ${{ runner.temp }}/harness-memory
+        ARCHBP_TASK: ${{ inputs.task }}
+        ARCHBP_DRY_RUN: ${{ inputs.dry-run }}
       run: |
         # Invoke the rUv agent layer from the closure in --gha-mode.
         # Until B1 (envctl-minted secrets on the live runner), the agent step degrades
         # to a structured "pending" result rather than failing the job's proof value.
+        # inputs.task / inputs.dry-run reach the shell only via env vars, never by
+        # template interpolation (actions/code-injection).
         if command -v agentic-flow >/dev/null 2>&1; then
-          result="$(agentic-flow --gha-mode --task "${{ inputs.task }}" --dry-run "${{ inputs.dry-run }}" 2>/dev/null || echo '{"status":"agent-error"}')"
+          result="$(agentic-flow --gha-mode --task "$ARCHBP_TASK" --dry-run "$ARCHBP_DRY_RUN" 2>/dev/null || echo '{"status":"agent-error"}')"
         else
           result='{"status":"agent-layer-pending-B1","note":"agentic-flow provided by nix/gha-runner closure; capture npmDepsHash + register runner"}'
         fi

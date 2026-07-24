@@ -1,11 +1,11 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "task_id": "ART-116_INFRA_TOPOLOGY",
-  "generated_at": "2026-07-04T23:20:52+00:00",
+  "generated_at": "2026-07-24T10:29:52+00:00",
   "status": "complete",
   "scope": {
-    "source": "target descriptor, repo scan, envctl database reports, safe filename scan",
-    "runtime_live_state_confirmed": false,
+    "source": "direct read-only probing of the live host in this session: /proc, /sys, and system binaries (ip, ss, lsblk, df, du, openssl) invoked by absolute path where the interactive PATH (nix-profile only) did not expose them",
+    "runtime_live_state_confirmed": true,
     "secret_material_read": false,
     "blocked_patterns": [
       "**/.env",
@@ -13,550 +13,2074 @@
       "**/private_keys/**",
       "**/*.pem",
       "**/*.key"
-    ]
-  },
-  "target_context": {
-    "target_registry_status": "passed",
-    "target": {
-      "id": "target-flexnetos-vs-lifeos",
-      "target_id": "flexnetos-vs-lifeos",
-      "target_type": "mixed",
-      "primary_root": "/home/flexnetos/FlexNetOS",
-      "compare_root": "/home/flexnetos/lifeos",
-      "descriptor_hash": "sha256:b3f653f9e9cda7991821687f041cb540ce3e4342bde03ef333aa0e72a6b42384",
-      "safety_mode": "approval-gated",
-      "max_auto_risk": "R2"
-    },
-    "primary_root": "/home/flexnetos/FlexNetOS",
-    "compare_root": "/home/flexnetos/lifeos",
-    "descriptor_inputs": [
-      {
-        "source": "examples/target-descriptors/flexnetos-vs-lifeos.yaml",
-        "target_id": "flexnetos-vs-lifeos",
-        "target_type": "mixed",
-        "descriptor_hash": "sha256:b3f653f9e9cda7991821687f041cb540ce3e4342bde03ef333aa0e72a6b42384"
-      },
-      {
-        "source": "examples/target-descriptors/generic-codebase.yaml",
-        "target_id": "replace-with-target-id",
-        "target_type": "codebase",
-        "descriptor_hash": "sha256:e79f5c931d50fb8193c678d61ddecc1405c8030ab9528946fcb65a7bde06bff9"
-      },
-      {
-        "source": "generated:synthetic-data-target",
-        "target_id": "synthetic-data-target",
-        "target_type": "data",
-        "descriptor_hash": "sha256:b60cc1a1afc87e27ced7bcd8cd986a858d8bc85fa7509692133faf682e1d6c7d"
-      },
-      {
-        "source": "generated:synthetic-infrastructure-target",
-        "target_id": "synthetic-infrastructure-target",
-        "target_type": "infrastructure",
-        "descriptor_hash": "sha256:0527a67aad464952377710ed804063fb78f929cfb6db7580a33911ca34884f79"
-      },
-      {
-        "source": "generated:synthetic-integration-target",
-        "target_id": "synthetic-integration-target",
-        "target_type": "integration",
-        "descriptor_hash": "sha256:2c0b9fff80948d3964bfb88006d579c33ee3cb26c9dea98478e9085c9ffcb6e6"
-      }
-    ]
-  },
-  "package_context": {
-    "package_scan_generated_at": "2026-07-04T00:00:00-05:00",
-    "top_level_entries": [
-      {
-        "name": "INSTALL_IN_REPOS.sh",
-        "type": "file"
-      },
-      {
-        "name": "PACKAGE_MANIFEST.json",
-        "type": "file"
-      },
-      {
-        "name": "PROMPT_PACKAGE_COMBINED.md",
-        "type": "file"
-      },
-      {
-        "name": "README.md",
-        "type": "file"
-      },
-      {
-        "name": "RUN_WITH_CODEX_ENVCTL.sh",
-        "type": "file"
-      },
-      {
-        "name": "codex",
-        "type": "directory"
-      },
-      {
-        "name": "examples",
-        "type": "directory"
-      },
-      {
-        "name": "expected-output",
-        "type": "directory"
-      },
-      {
-        "name": "helpers",
-        "type": "directory"
-      },
-      {
-        "name": "history",
-        "type": "directory"
-      },
-      {
-        "name": "prompts",
-        "type": "directory"
-      },
-      {
-        "name": "schemas",
-        "type": "directory"
-      },
-      {
-        "name": "source",
-        "type": "directory"
-      },
-      {
-        "name": "specs",
-        "type": "directory"
-      },
-      {
-        "name": "sql",
-        "type": "directory"
-      }
     ],
-    "scanned_folders": {
-      "specs": {
-        "exists": true,
-        "file_count": 6
-      },
-      "prompts": {
-        "exists": true,
-        "file_count": 23
-      },
-      "codex": {
-        "exists": true,
-        "file_count": 11
-      },
-      "schemas": {
-        "exists": true,
-        "file_count": 9
-      },
-      "examples": {
-        "exists": true,
-        "file_count": 6
-      },
-      "helpers": {
-        "exists": true,
-        "file_count": 5
-      },
-      "sql": {
-        "exists": true,
-        "file_count": 4
-      },
-      "source": {
-        "exists": true,
-        "file_count": 41
-      },
-      "expected-output": {
-        "exists": true,
-        "file_count": 4
-      },
-      "history": {
-        "exists": true,
-        "file_count": 2
-      }
+    "superseded_generator_note": "The prior version of this generator performed a repo-filename evidence scan against a target descriptor (/home/flexnetos/FlexNetOS) and never probed real host infrastructure. This version replaces that scan with genuine host probing per the ART-116 packet contract."
+  },
+  "host_identity": {
+    "hostname": "drdave-TRX50-AI-TOP",
+    "kernel": {
+      "sysname": "Linux",
+      "release": "7.0.0-28-generic",
+      "version": "#28-Ubuntu SMP PREEMPT_DYNAMIC Sun Jun 21 01:01:36 UTC 2026",
+      "machine": "x86_64"
     }
   },
-  "envctl_database_context": {
-    "db_status": "passed",
-    "db_backend": "sqlite",
-    "runtime": "python sqlite3 in-memory",
-    "required_tables": [
-      "envctl_migration_agent_sessions",
-      "envctl_migration_approvals",
-      "envctl_migration_artifact_contracts",
-      "envctl_migration_artifacts",
-      "envctl_migration_checkpoints",
-      "envctl_migration_evidence",
-      "envctl_migration_graph_edges",
-      "envctl_migration_operations",
-      "envctl_migration_packages",
-      "envctl_migration_plugin_sessions",
-      "envctl_migration_recipes",
-      "envctl_migration_rollbacks",
-      "envctl_migration_run_events",
-      "envctl_migration_runs",
-      "envctl_migration_targets",
-      "envctl_migration_validations"
+  "compute": {
+    "probe_method": "os.cpu_count()/os.sched_getaffinity() + direct reads of /proc/cpuinfo, /proc/meminfo, /proc/loadavg (no subprocess)",
+    "hostname": "drdave-TRX50-AI-TOP",
+    "kernel": {
+      "sysname": "Linux",
+      "release": "7.0.0-28-generic",
+      "version": "#28-Ubuntu SMP PREEMPT_DYNAMIC Sun Jun 21 01:01:36 UTC 2026",
+      "machine": "x86_64"
+    },
+    "logical_cpu_count_os_cpu_count": 48,
+    "logical_cpu_count_affinity": 48,
+    "logical_cpu_count_cpuinfo": 48,
+    "cpu_model_name": "AMD Ryzen Threadripper PRO 7965WX 24-Cores",
+    "physical_package_count": 1,
+    "cores_per_package": [
+      "24"
     ],
-    "required_views": [
-      "envctl_migration_artifact_index",
-      "envctl_migration_live_timeline",
-      "envctl_migration_open_approvals",
-      "envctl_migration_replay_readiness",
-      "envctl_migration_run_latest_status",
-      "envctl_migration_validation_scorecard"
+    "siblings_per_package": [
+      "48"
     ],
-    "artifact_registry_smoke_status": "passed",
-    "artifact_registry_sample_hash": "sha256:d83a779c4f5ba4274c455c016193ad62f58d974033e53f9b11a78369cb94cded",
-    "protocol_records": [
-      "TargetDescriptor",
-      "MigrationRecipe",
-      "MigrationRun",
-      "RunEvent",
-      "Operation",
-      "ApprovalRequest",
-      "ApprovalDecision",
-      "ArtifactRecord",
-      "EvidenceRecord",
-      "GraphEdge",
-      "ValidationResult",
-      "ReplayRequest",
-      "ReplayResult",
-      "ProofRecord"
-    ]
+    "memory_kb": {
+      "mem_total": "523156536",
+      "mem_free": "199394248",
+      "mem_available": "475197400",
+      "swap_total": "8388604",
+      "swap_free": "8388604"
+    },
+    "load_average": {
+      "1min": "3.81",
+      "5min": "7.12",
+      "15min": "7.00",
+      "runnable_over_total_processes": "3/4651",
+      "last_pid": "3352097"
+    },
+    "status": "probed"
   },
-  "safe_scan": {
-    "target_root": "/home/flexnetos/FlexNetOS",
-    "exists": true,
-    "visited_file_count": 469467
+  "networking": {
+    "probe_method": {
+      "addresses": "/usr/sbin/ip -j addr",
+      "routes": "/usr/sbin/ip route",
+      "listeners": "/bin/ss -tlnp"
+    },
+    "interfaces": [
+      {
+        "name": "lo",
+        "mac": "00:00:00:00:00:00",
+        "state": "UNKNOWN",
+        "mtu": 65536,
+        "flags": [
+          "LOOPBACK",
+          "UP",
+          "LOWER_UP"
+        ],
+        "ipv4": [
+          "127.0.0.1/8"
+        ],
+        "ipv6": [
+          "::1/128"
+        ]
+      },
+      {
+        "name": "eno1",
+        "mac": "10:ff:e0:b3:9e:55",
+        "state": "UP",
+        "mtu": 1500,
+        "flags": [
+          "BROADCAST",
+          "MULTICAST",
+          "UP",
+          "LOWER_UP"
+        ],
+        "ipv4": [
+          "10.0.1.172/24"
+        ],
+        "ipv6": [
+          "fe80::12ff:e0ff:feb3:9e55/64"
+        ]
+      },
+      {
+        "name": "enp73s0",
+        "mac": "10:ff:e0:b3:9e:56",
+        "state": "DOWN",
+        "mtu": 1500,
+        "flags": [
+          "NO-CARRIER",
+          "BROADCAST",
+          "MULTICAST",
+          "UP"
+        ],
+        "ipv4": [],
+        "ipv6": []
+      },
+      {
+        "name": "wlp71s0",
+        "mac": "04:68:74:aa:a0:65",
+        "state": "UP",
+        "mtu": 1500,
+        "flags": [
+          "BROADCAST",
+          "MULTICAST",
+          "UP",
+          "LOWER_UP"
+        ],
+        "ipv4": [
+          "10.0.1.161/24"
+        ],
+        "ipv6": [
+          "fe80::45ad:5107:3e96:1f46/64"
+        ]
+      },
+      {
+        "name": "virbr0",
+        "mac": "52:54:00:a2:9b:31",
+        "state": "DOWN",
+        "mtu": 1500,
+        "flags": [
+          "NO-CARRIER",
+          "BROADCAST",
+          "MULTICAST",
+          "UP"
+        ],
+        "ipv4": [
+          "192.168.122.1/24"
+        ],
+        "ipv6": []
+      },
+      {
+        "name": "docker0",
+        "mac": "12:21:ba:7e:a7:04",
+        "state": "DOWN",
+        "mtu": 1500,
+        "flags": [
+          "NO-CARRIER",
+          "BROADCAST",
+          "MULTICAST",
+          "UP"
+        ],
+        "ipv4": [
+          "172.17.0.1/16"
+        ],
+        "ipv6": []
+      },
+      {
+        "name": "br-6fff958fc08d",
+        "mac": "f2:76:d1:42:b6:e1",
+        "state": "DOWN",
+        "mtu": 1500,
+        "flags": [
+          "NO-CARRIER",
+          "BROADCAST",
+          "MULTICAST",
+          "UP"
+        ],
+        "ipv4": [
+          "172.18.0.1/16"
+        ],
+        "ipv6": []
+      },
+      {
+        "name": "enxb6c23dc46927",
+        "mac": "b6:c2:3d:c4:69:27",
+        "state": "UP",
+        "mtu": 1500,
+        "flags": [
+          "BROADCAST",
+          "MULTICAST",
+          "UP",
+          "LOWER_UP"
+        ],
+        "ipv4": [],
+        "ipv6": []
+      },
+      {
+        "name": "enxde98079bf2db",
+        "mac": "de:98:07:9b:f2:db",
+        "state": "UNKNOWN",
+        "mtu": 1500,
+        "flags": [
+          "BROADCAST",
+          "MULTICAST",
+          "UP",
+          "LOWER_UP"
+        ],
+        "ipv4": [],
+        "ipv6": []
+      }
+    ],
+    "routes_raw": [
+      "default via 10.0.1.1 dev eno1 proto dhcp src 10.0.1.172 metric 104 ",
+      "default via 10.0.1.1 dev wlp71s0 proto dhcp src 10.0.1.161 metric 600 ",
+      "10.0.1.0/24 dev eno1 proto kernel scope link src 10.0.1.172 metric 104 ",
+      "10.0.1.0/24 dev wlp71s0 proto kernel scope link src 10.0.1.161 metric 600 ",
+      "172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown ",
+      "172.18.0.0/16 dev br-6fff958fc08d proto kernel scope link src 172.18.0.1 linkdown ",
+      "192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1 linkdown "
+    ],
+    "default_routes": [
+      "default via 10.0.1.1 dev eno1 proto dhcp src 10.0.1.172 metric 104 ",
+      "default via 10.0.1.1 dev wlp71s0 proto dhcp src 10.0.1.161 metric 600 "
+    ],
+    "listening_sockets": [
+      {
+        "local_address": "192.168.122.1:53",
+        "process": null
+      },
+      {
+        "local_address": "127.0.0.1:38719",
+        "process": "users:((\"bun\",pid=418049,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38716",
+        "process": "users:((\"bun\",pid=739787,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38715",
+        "process": "users:((\"bun\",pid=688800,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38712",
+        "process": "users:((\"bun\",pid=709439,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38707",
+        "process": "users:((\"bun\",pid=712964,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38664",
+        "process": "users:((\"bun\",pid=802699,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38665",
+        "process": "users:((\"bun\",pid=448362,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38657",
+        "process": "users:((\"bun\",pid=424262,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38681",
+        "process": "users:((\"bun\",pid=417874,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38764",
+        "process": "users:((\"bun\",pid=803408,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38765",
+        "process": "users:((\"bun\",pid=449147,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38757",
+        "process": "users:((\"bun\",pid=425671,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38755",
+        "process": "users:((\"bun\",pid=828137,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38781",
+        "process": "users:((\"bun\",pid=417884,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38779",
+        "process": "users:((\"bun\",pid=765187,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38773",
+        "process": "users:((\"bun\",pid=738329,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38768",
+        "process": "users:((\"bun\",pid=712652,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38730",
+        "process": "users:((\"bun\",pid=766560,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38750",
+        "process": "users:((\"bun\",pid=471135,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38566",
+        "process": "users:((\"bun\",pid=384648,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38565",
+        "process": "users:((\"bun\",pid=384557,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38562",
+        "process": "users:((\"bun\",pid=362754,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38561",
+        "process": "users:((\"bun\",pid=362682,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38630",
+        "process": "users:((\"bun\",pid=765319,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38650",
+        "process": "users:((\"bun\",pid=470310,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38607",
+        "process": "users:((\"bun\",pid=712119,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38619",
+        "process": "users:((\"bun\",pid=418007,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38616",
+        "process": "users:((\"bun\",pid=738384,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38615",
+        "process": "users:((\"bun\",pid=688121,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:38612",
+        "process": "users:((\"bun\",pid=828684,fd=11))"
+      },
+      {
+        "local_address": "172.18.0.1:45101",
+        "process": "users:((\"rygel\",pid=3265940,fd=35))"
+      },
+      {
+        "local_address": "127.0.0.1:41892",
+        "process": "users:((\"rygel\",pid=3265940,fd=15))"
+      },
+      {
+        "local_address": "172.17.0.1:48683",
+        "process": "users:((\"rygel\",pid=3265940,fd=31))"
+      },
+      {
+        "local_address": "127.0.0.1:45351",
+        "process": null
+      },
+      {
+        "local_address": "192.168.122.1:38369",
+        "process": "users:((\"rygel\",pid=3265940,fd=27))"
+      },
+      {
+        "local_address": "127.0.0.1:23726",
+        "process": "users:((\"bun\",pid=910067,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23724",
+        "process": "users:((\"bun\",pid=1777504,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23722",
+        "process": "users:((\"bun\",pid=2637513,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23723",
+        "process": "users:((\"bun\",pid=2286096,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23721",
+        "process": "users:((\"bun\",pid=3150124,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23716",
+        "process": "users:((\"bun\",pid=2880767,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23717",
+        "process": "users:((\"bun\",pid=3283736,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23714",
+        "process": "users:((\"bun\",pid=2155127,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23712",
+        "process": "users:((\"bun\",pid=885803,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23742",
+        "process": "users:((\"bun\",pid=1544026,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23736",
+        "process": "users:((\"bun\",pid=3192644,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23737",
+        "process": "users:((\"bun\",pid=2677438,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23733",
+        "process": "users:((\"bun\",pid=2514007,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23731",
+        "process": "users:((\"bun\",pid=2285394,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23692",
+        "process": "users:((\"bun\",pid=2756463,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23689",
+        "process": "users:((\"bun\",pid=3604857,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23681",
+        "process": "users:((\"bun\",pid=2951231,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23710",
+        "process": "users:((\"bun\",pid=1545868,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23708",
+        "process": "users:((\"bun\",pid=2636241,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23709",
+        "process": "users:((\"bun\",pid=2910045,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23706",
+        "process": "users:((\"bun\",pid=851915,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23705",
+        "process": "users:((\"bun\",pid=3322746,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23702",
+        "process": "users:((\"bun\",pid=2850036,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23700",
+        "process": "users:((\"bun\",pid=2078332,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23791",
+        "process": "users:((\"bun\",pid=2219757,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23789",
+        "process": "users:((\"bun\",pid=3605706,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23787",
+        "process": "users:((\"bun\",pid=3191471,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23781",
+        "process": "users:((\"bun\",pid=2951241,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23778",
+        "process": "users:((\"bun\",pid=2332683,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23777",
+        "process": "users:((\"bun\",pid=2250485,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23797",
+        "process": "users:((\"bun\",pid=2614530,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23792",
+        "process": "users:((\"bun\",pid=2756474,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23756",
+        "process": "users:((\"bun\",pid=3604470,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23757",
+        "process": "users:((\"bun\",pid=3143110,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23754",
+        "process": "users:((\"bun\",pid=909050,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23755",
+        "process": "users:((\"bun\",pid=853116,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23751",
+        "process": "users:((\"bun\",pid=2221524,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23749",
+        "process": "users:((\"bun\",pid=2154096,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23744",
+        "process": "users:((\"bun\",pid=3283522,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23745",
+        "process": "users:((\"bun\",pid=2952556,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23775",
+        "process": "users:((\"bun\",pid=3321357,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23773",
+        "process": "users:((\"bun\",pid=885081,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23770",
+        "process": "users:((\"bun\",pid=2719467,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23766",
+        "process": "users:((\"bun\",pid=850762,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23764",
+        "process": "users:((\"bun\",pid=2320954,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23763",
+        "process": "users:((\"bun\",pid=850771,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23760",
+        "process": "users:((\"bun\",pid=1779066,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23614",
+        "process": "users:((\"bun\",pid=2153846,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23612",
+        "process": "users:((\"bun\",pid=885380,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23610",
+        "process": "users:((\"bun\",pid=1545774,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23605",
+        "process": "users:((\"bun\",pid=3321697,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23600",
+        "process": "users:((\"bun\",pid=2077767,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23663",
+        "process": "users:((\"bun\",pid=850703,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23660",
+        "process": "users:((\"bun\",pid=1778395,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23657",
+        "process": "users:((\"bun\",pid=3142874,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23655",
+        "process": "users:((\"bun\",pid=852617,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23651",
+        "process": "users:((\"bun\",pid=2220703,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23678",
+        "process": "users:((\"bun\",pid=2332270,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23664",
+        "process": "users:((\"bun\",pid=2319683,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23631",
+        "process": "users:((\"bun\",pid=2614083,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23626",
+        "process": "users:((\"bun\",pid=909371,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23624",
+        "process": "users:((\"bun\",pid=2850131,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23622",
+        "process": "users:((\"bun\",pid=2636972,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23623",
+        "process": "users:((\"bun\",pid=2285088,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23621",
+        "process": "users:((\"bun\",pid=3149099,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23616",
+        "process": "users:((\"bun\",pid=2880086,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23617",
+        "process": "users:((\"bun\",pid=2720069,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23644",
+        "process": "users:((\"bun\",pid=3282991,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23645",
+        "process": "users:((\"bun\",pid=2952538,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23642",
+        "process": "users:((\"bun\",pid=2677389,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:23636",
+        "process": "users:((\"bun\",pid=3191570,fd=11))"
+      },
+      {
+        "local_address": "127.0.0.1:27217",
+        "process": null
+      },
+      {
+        "local_address": "127.0.0.53%lo:53",
+        "process": null
+      },
+      {
+        "local_address": "127.0.0.54:53",
+        "process": null
+      },
+      {
+        "local_address": "127.0.0.1:1420",
+        "process": "users:((\"MainThread\",pid=971327,fd=20))"
+      },
+      {
+        "local_address": "10.0.1.161:42369",
+        "process": "users:((\"rygel\",pid=3265940,fd=23))"
+      },
+      {
+        "local_address": "127.0.0.1:631",
+        "process": null
+      },
+      {
+        "local_address": "127.0.0.1:5432",
+        "process": "users:((\".postgres-wrapp\",pid=2891097,fd=6))"
+      },
+      {
+        "local_address": "127.0.0.1:11434",
+        "process": null
+      },
+      {
+        "local_address": "10.0.1.172:59078",
+        "process": "users:((\"rygel\",pid=3265940,fd=19))"
+      },
+      {
+        "local_address": "127.0.0.1:8420",
+        "process": "users:((\"icm\",pid=1192878,fd=9))"
+      },
+      {
+        "local_address": "[fe80::45ad:5107:3e96:1f46]%wlp71s0:35390",
+        "process": "users:((\"rygel\",pid=3265940,fd=47))"
+      },
+      {
+        "local_address": "[::1]:55414",
+        "process": "users:((\"rygel\",pid=3265940,fd=39))"
+      },
+      {
+        "local_address": "[fe80::12ff:e0ff:feb3:9e55]%eno1:50296",
+        "process": "users:((\"rygel\",pid=3265940,fd=43))"
+      },
+      {
+        "local_address": "*:9098",
+        "process": null
+      },
+      {
+        "local_address": "*:8843",
+        "process": null
+      },
+      {
+        "local_address": "*:8088",
+        "process": null
+      },
+      {
+        "local_address": "*:8043",
+        "process": null
+      },
+      {
+        "local_address": "*:3389",
+        "process": null
+      },
+      {
+        "local_address": "*:3390",
+        "process": "users:((\"gnome-remote-de\",pid=21787,fd=84))"
+      },
+      {
+        "local_address": "[::1]:631",
+        "process": null
+      },
+      {
+        "local_address": "*:29816",
+        "process": null
+      },
+      {
+        "local_address": "*:29817",
+        "process": null
+      },
+      {
+        "local_address": "*:29812",
+        "process": null
+      },
+      {
+        "local_address": "*:29813",
+        "process": null
+      },
+      {
+        "local_address": "*:29814",
+        "process": null
+      },
+      {
+        "local_address": "*:29815",
+        "process": null
+      },
+      {
+        "local_address": "*:29811",
+        "process": null
+      }
+    ],
+    "listening_socket_count": 134,
+    "commands": [
+      {
+        "purpose": "interface_addresses",
+        "cmd": "/usr/sbin/ip -j addr",
+        "returncode": 0,
+        "stdout": "[{\"ifindex\":1,\"ifname\":\"lo\",\"flags\":[\"LOOPBACK\",\"UP\",\"LOWER_UP\"],\"mtu\":65536,\"qdisc\":\"noqueue\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"loopback\",\"address\":\"00:00:00:00:00:00\",\"broadcast\":\"00:00:00:00:00:00\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"127.0.0.1\",\"prefixlen\":8,\"scope\":\"host\",\"label\":\"lo\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295},{\"family\":\"inet6\",\"local\":\"::1\",\"prefixlen\":128,\"scope\":\"host\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":2,\"ifname\":\"eno1\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"10:ff:e0:b3:9e:55\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"altnames\":[\"enp70s0\",\"enx10ffe0b39e55\"],\"addr_info\":[{\"family\":\"inet\",\"local\":\"10.0.1.172\",\"prefixlen\":24,\"broadcast\":\"10.0.1.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"eno1\",\"valid_life_time\":4397,\"preferred_life_time\":4397},{\"family\":\"inet6\",\"local\":\"fe80::12ff:e0ff:feb3:9e55\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":3,\"ifname\":\"enp73s0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"10:ff:e0:b3:9e:56\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"altnames\":[\"enx10ffe0b39e56\"],\"addr_info\":[]},{\"ifindex\":6,\"ifname\":\"wlp71s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"04:68:74:aa:a0:65\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"altnames\":[\"wlx046874aaa065\"],\"addr_info\":[{\"family\":\"inet\",\"local\":\"10.0.1.161\",\"prefixlen\":24,\"broadcast\":\"10.0.1.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"wlp71s0\",\"valid_life_time\":5317,\"preferred_life_time\":5317},{\"family\":\"inet6\",\"local\":\"fe80::45ad:5107:3e96:1f46\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":7,\"ifname\":\"virbr0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"52:54:00:a2:9b:31\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"192.168.122.1\",\"prefixlen\":24,\"broadcast\":\"192.168.122.255\",\"scope\":\"global\",\"label\":\"virbr0\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":8,\"ifname\":\"docker0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"DOWN\",\"group\":\"default\",\"link_type\":\"ether\",\"address\":\"12:21:ba:7e:a7:04\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"172.17.0.1\",\"prefixlen\":16,\"broadcast\":\"172.17.255.255\",\"scope\":\"global\",\"label\":\"docker0\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":9,\"ifname\":\"br-6fff958fc08d\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"DOWN\",\"group\":\"default\",\"link_type\":\"ether\",\"address\":\"f2:76:d1:42:b6:e1\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"172.18.0.1\",\"prefixlen\":16,\"broadcast\":\"172.18.255.255\",\"scope\":\"global\",\"label\":\"br-6fff958fc08d\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":18,\"ifname\":\"enxb6c23dc46927\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"fq_codel\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"b6:c2:3d:c4:69:27\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":19,\"ifname\":\"enxde98079bf2db\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"fq_codel\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"de:98:07:9b:f2:db\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]}]\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "ipv4_routes",
+        "cmd": "/usr/sbin/ip route",
+        "returncode": 0,
+        "stdout": "default via 10.0.1.1 dev eno1 proto dhcp src 10.0.1.172 metric 104 \ndefault via 10.0.1.1 dev wlp71s0 proto dhcp src 10.0.1.161 metric 600 \n10.0.1.0/24 dev eno1 proto kernel scope link src 10.0.1.172 metric 104 \n10.0.1.0/24 dev wlp71s0 proto kernel scope link src 10.0.1.161 metric 600 \n172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown \n172.18.0.0/16 dev br-6fff958fc08d proto kernel scope link src 172.18.0.1 linkdown \n192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1 linkdown \n",
+        "stderr": ""
+      },
+      {
+        "purpose": "listening_sockets",
+        "cmd": "/bin/ss -tlnp",
+        "returncode": 0,
+        "stdout": "State  Recv-Q Send-Q                       Local Address:Port  Peer Address:PortProcess                                      \nLISTEN 0      32                           192.168.122.1:53         0.0.0.0:*                                                \nLISTEN 0      512                              127.0.0.1:38719      0.0.0.0:*    users:((\"bun\",pid=418049,fd=11))            \nLISTEN 0      512                              127.0.0.1:38716      0.0.0.0:*    users:((\"bun\",pid=739787,fd=11))            \nLISTEN 0      512                              127.0.0.1:38715      0.0.0.0:*    users:((\"bun\",pid=688800,fd=11))            \nLISTEN 0      512                              127.0.0.1:38712      0.0.0.0:*    users:((\"bun\",pid=709439,fd=11))            \nLISTEN 0      512                              127.0.0.1:38707      0.0.0.0:*    users:((\"bun\",pid=712964,fd=11))            \nLISTEN 0      512                              127.0.0.1:38664      0.0.0.0:*    users:((\"bun\",pid=802699,fd=11))            \nLISTEN 0      512                              127.0.0.1:38665      0.0.0.0:*    users:((\"bun\",pid=448362,fd=11))            \nLISTEN 0      512                              127.0.0.1:38657      0.0.0.0:*    users:((\"bun\",pid=424262,fd=11))            \nLISTEN 0      512                              127.0.0.1:38681      0.0.0.0:*    users:((\"bun\",pid=417874,fd=11))            \nLISTEN 0      512                              127.0.0.1:38764      0.0.0.0:*    users:((\"bun\",pid=803408,fd=11))            \nLISTEN 0      512                              127.0.0.1:38765      0.0.0.0:*    users:((\"bun\",pid=449147,fd=11))            \nLISTEN 0      512                              127.0.0.1:38757      0.0.0.0:*    users:((\"bun\",pid=425671,fd=11))            \nLISTEN 0      512                              127.0.0.1:38755      0.0.0.0:*    users:((\"bun\",pid=828137,fd=11))            \nLISTEN 0      512                              127.0.0.1:38781      0.0.0.0:*    users:((\"bun\",pid=417884,fd=11))            \nLISTEN 0      512                              127.0.0.1:38779      0.0.0.0:*    users:((\"bun\",pid=765187,fd=11))            \nLISTEN 0      512                              127.0.0.1:38773      0.0.0.0:*    users:((\"bun\",pid=738329,fd=11))            \nLISTEN 0      512                              127.0.0.1:38768      0.0.0.0:*    users:((\"bun\",pid=712652,fd=11))            \nLISTEN 0      512                              127.0.0.1:38730      0.0.0.0:*    users:((\"bun\",pid=766560,fd=11))            \nLISTEN 0      512                              127.0.0.1:38750      0.0.0.0:*    users:((\"bun\",pid=471135,fd=11))            \nLISTEN 0      512                              127.0.0.1:38566      0.0.0.0:*    users:((\"bun\",pid=384648,fd=11))            \nLISTEN 0      512                              127.0.0.1:38565      0.0.0.0:*    users:((\"bun\",pid=384557,fd=11))            \nLISTEN 0      512                              127.0.0.1:38562      0.0.0.0:*    users:((\"bun\",pid=362754,fd=11))            \nLISTEN 0      512                              127.0.0.1:38561      0.0.0.0:*    users:((\"bun\",pid=362682,fd=11))            \nLISTEN 0      512                              127.0.0.1:38630      0.0.0.0:*    users:((\"bun\",pid=765319,fd=11))            \nLISTEN 0      512                              127.0.0.1:38650      0.0.0.0:*    users:((\"bun\",pid=470310,fd=11))            \nLISTEN 0      512                              127.0.0.1:38607      0.0.0.0:*    users:((\"bun\",pid=712119,fd=11))            \nLISTEN 0      512                              127.0.0.1:38619      0.0.0.0:*    users:((\"bun\",pid=418007,fd=11))            \nLISTEN 0      512                              127.0.0.1:38616      0.0.0.0:*    users:((\"bun\",pid=738384,fd=11))            \nLISTEN 0      512                              127.0.0.1:38615      0.0.0.0:*    users:((\"bun\",pid=688121,fd=11))            \nLISTEN 0      512                              127.0.0.1:38612      0.0.0.0:*    users:((\"bun\",pid=828684,fd=11))            \nLISTEN 0      10                              172.18.0.1:45101      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=35))         \nLISTEN 0      10                               127.0.0.1:41892      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=15))         \nLISTEN 0      10                              172.17.0.1:48683      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=31))         \nLISTEN 0      4096                             127.0.0.1:45351      0.0.0.0:*                                                \nLISTEN 0      10                           192.168.122.1:38369      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=27))         \nLISTEN 0      512                              127.0.0.1:23726      0.0.0.0:*    users:((\"bun\",pid=910067,fd=11))            \nLISTEN 0      512                              127.0.0.1:23724      0.0.0.0:*    users:((\"bun\",pid=1777504,fd=11))           \nLISTEN 0      512                              127.0.0.1:23722      0.0.0.0:*    users:((\"bun\",pid=2637513,fd=11))           \nLISTEN 0      512                              127.0.0.1:23723      0.0.0.0:*    users:((\"bun\",pid=2286096,fd=11))           \nLISTEN 0      512                              127.0.0.1:23721      0.0.0.0:*    users:((\"bun\",pid=3150124,fd=11))           \nLISTEN 0      512                              127.0.0.1:23716      0.0.0.0:*    users:((\"bun\",pid=2880767,fd=11))           \nLISTEN 0      512                              127.0.0.1:23717      0.0.0.0:*    users:((\"bun\",pid=3283736,fd=11))           \nLISTEN 0      512                              127.0.0.1:23714      0.0.0.0:*    users:((\"bun\",pid=2155127,fd=11))           \nLISTEN 0      512                              127.0.0.1:23712      0.0.0.0:*    users:((\"bun\",pid=885803,fd=11))            \nLISTEN 0      512                              127.0.0.1:23742      0.0.0.0:*    users:((\"bun\",pid=1544026,fd=11))           \nLISTEN 0      512                              127.0.0.1:23736      0.0.0.0:*    users:((\"bun\",pid=3192644,fd=11))           \nLISTEN 0      512                              127.0.0.1:23737      0.0.0.0:*    users:((\"bun\",pid=2677438,fd=11))           \nLISTEN 0      512                              127.0.0.1:23733      0.0.0.0:*    users:((\"bun\",pid=2514007,fd=11))           \nLISTEN 0      512                              127.0.0.1:23731      0.0.0.0:*    users:((\"bun\",pid=2285394,fd=11))           \nLISTEN 0      512                              127.0.0.1:23692      0.0.0.0:*    users:((\"bun\",pid=2756463,fd=11))           \nLISTEN 0      512                              127.0.0.1:23689      0.0.0.0:*    users:((\"bun\",pid=3604857,fd=11))           \nLISTEN 0      512                              127.0.0.1:23681      0.0.0.0:*    users:((\"bun\",pid=2951231,fd=11))           \nLISTEN 0      512                              127.0.0.1:23710      0.0.0.0:*    users:((\"bun\",pid=1545868,fd=11))           \nLISTEN 0      512                              127.0.0.1:23708      0.0.0.0:*    users:((\"bun\",pid=2636241,fd=11))           \nLISTEN 0      512                              127.0.0.1:23709      0.0.0.0:*    users:((\"bun\",pid=2910045,fd=11))           \nLISTEN 0      512                              127.0.0.1:23706      0.0.0.0:*    users:((\"bun\",pid=851915,fd=11))            \nLISTEN 0      512                              127.0.0.1:23705      0.0.0.0:*    users:((\"bun\",pid=3322746,fd=11))           \nLISTEN 0      512                              127.0.0.1:23702      0.0.0.0:*    users:((\"bun\",pid=2850036,fd=11))           \nLISTEN 0      512                              127.0.0.1:23700      0.0.0.0:*    users:((\"bun\",pid=2078332,fd=11))           \nLISTEN 0      512                              127.0.0.1:23791      0.0.0.0:*    users:((\"bun\",pid=2219757,fd=11))           \nLISTEN 0      512                              127.0.0.1:23789      0.0.0.0:*    users:((\"bun\",pid=3605706,fd=11))           \nLISTEN 0      512                              127.0.0.1:23787      0.0.0.0:*    users:((\"bun\",pid=3191471,fd=11))           \nLISTEN 0      512                              127.0.0.1:23781      0.0.0.0:*    users:((\"bun\",pid=2951241,fd=11))           \nLISTEN 0      512                              127.0.0.1:23778      0.0.0.0:*    users:((\"bun\",pid=2332683,fd=11))           \nLISTEN 0      512                              127.0.0.1:23777      0.0.0.0:*    users:((\"bun\",pid=2250485,fd=11))           \nLISTEN 0      512                              127.0.0.1:23797      0.0.0.0:*    users:((\"bun\",pid=2614530,fd=11))           \nLISTEN 0      512                              127.0.0.1:23792      0.0.0.0:*    users:((\"bun\",pid=2756474,fd=11))           \nLISTEN 0      512                              127.0.0.1:23756      0.0.0.0:*    users:((\"bun\",pid=3604470,fd=11))           \nLISTEN 0      512                              127.0.0.1:23757      0.0.0.0:*    users:((\"bun\",pid=3143110,fd=11))           \nLISTEN 0      512                              127.0.0.1:23754      0.0.0.0:*    users:((\"bun\",pid=909050,fd=11))            \nLISTEN 0      512                              127.0.0.1:23755      0.0.0.0:*    users:((\"bun\",pid=853116,fd=11))            \nLISTEN 0      512                              127.0.0.1:23751      0.0.0.0:*    users:((\"bun\",pid=2221524,fd=11))           \nLISTEN 0      512                              127.0.0.1:23749      0.0.0.0:*    users:((\"bun\",pid=2154096,fd=11))           \nLISTEN 0      512                              127.0.0.1:23744      0.0.0.0:*    users:((\"bun\",pid=3283522,fd=11))           \nLISTEN 0      512                              127.0.0.1:23745      0.0.0.0:*    users:((\"bun\",pid=2952556,fd=11))           \nLISTEN 0      512                              127.0.0.1:23775      0.0.0.0:*    users:((\"bun\",pid=3321357,fd=11))           \nLISTEN 0      512                              127.0.0.1:23773      0.0.0.0:*    users:((\"bun\",pid=885081,fd=11))            \nLISTEN 0      512                              127.0.0.1:23770      0.0.0.0:*    users:((\"bun\",pid=2719467,fd=11))           \nLISTEN 0      512                              127.0.0.1:23766      0.0.0.0:*    users:((\"bun\",pid=850762,fd=11))            \nLISTEN 0      512                              127.0.0.1:23764      0.0.0.0:*    users:((\"bun\",pid=2320954,fd=11))           \nLISTEN 0      512                              127.0.0.1:23763      0.0.0.0:*    users:((\"bun\",pid=850771,fd=11))            \nLISTEN 0      512                              127.0.0.1:23760      0.0.0.0:*    users:((\"bun\",pid=1779066,fd=11))           \nLISTEN 0      512                              127.0.0.1:23614      0.0.0.0:*    users:((\"bun\",pid=2153846,fd=11))           \nLISTEN 0      512                              127.0.0.1:23612      0.0.0.0:*    users:((\"bun\",pid=885380,fd=11))            \nLISTEN 0      512                              127.0.0.1:23610      0.0.0.0:*    users:((\"bun\",pid=1545774,fd=11))           \nLISTEN 0      512                              127.0.0.1:23605      0.0.0.0:*    users:((\"bun\",pid=3321697,fd=11))           \nLISTEN 0      512                              127.0.0.1:23600      0.0.0.0:*    users:((\"bun\",pid=2077767,fd=11))           \nLISTEN 0      512                              127.0.0.1:23663      0.0.0.0:*    users:((\"bun\",pid=850703,fd=11))            \nLISTEN 0      512                              127.0.0.1:23660      0.0.0.0:*    users:((\"bun\",pid=1778395,fd=11))           \nLISTEN 0      512                              127.0.0.1:23657      0.0.0.0:*    users:((\"bun\",pid=3142874,fd=11))           \nLISTEN 0      512                              127.0.0.1:23655      0.0.0.0:*    users:((\"bun\",pid=852617,fd=11))            \nLISTEN 0      512                              127.0.0.1:23651      0.0.0.0:*    users:((\"bun\",pid=2220703,fd=11))           \nLISTEN 0      512                              127.0.0.1:23678      0.0.0.0:*    users:((\"bun\",pid=2332270,fd=11))           \nLISTEN 0      512                              127.0.0.1:23664      0.0.0.0:*    users:((\"bun\",pid=2319683,fd=11))           \nLISTEN 0      512                              127.0.0.1:23631      0.0.0.0:*    users:((\"bun\",pid=2614083,fd=11))           \nLISTEN 0      512                              127.0.0.1:23626      0.0.0.0:*    users:((\"bun\",pid=909371,fd=11))            \nLISTEN 0      512                              127.0.0.1:23624      0.0.0.0:*    users:((\"bun\",pid=2850131,fd=11))           \nLISTEN 0      512                              127.0.0.1:23622      0.0.0.0:*    users:((\"bun\",pid=2636972,fd=11))           \nLISTEN 0      512                              127.0.0.1:23623      0.0.0.0:*    users:((\"bun\",pid=2285088,fd=11))           \nLISTEN 0      512                              127.0.0.1:23621      0.0.0.0:*    users:((\"bun\",pid=3149099,fd=11))           \nLISTEN 0      512                              127.0.0.1:23616      0.0.0.0:*    users:((\"bun\",pid=2880086,fd=11))           \nLISTEN 0      512                              127.0.0.1:23617      0.0.0.0:*    users:((\"bun\",pid=2720069,fd=11))           \nLISTEN 0      512                              127.0.0.1:23644      0.0.0.0:*    users:((\"bun\",pid=3282991,fd=11))           \nLISTEN 0      512                              127.0.0.1:23645      0.0.0.0:*    users:((\"bun\",pid=2952538,fd=11))           \nLISTEN 0      512                              127.0.0.1:23642      0.0.0.0:*    users:((\"bun\",pid=2677389,fd=11))           \nLISTEN 0      512                              127.0.0.1:23636      0.0.0.0:*    users:((\"bun\",pid=3191570,fd=11))           \nLISTEN 0      4096                             127.0.0.1:27217      0.0.0.0:*                                                \nLISTEN 0      4096                         127.0.0.53%lo:53         0.0.0.0:*                                                \nLISTEN 0      4096                            127.0.0.54:53         0.0.0.0:*                                                \nLISTEN 0      511                              127.0.0.1:1420       0.0.0.0:*    users:((\"MainThread\",pid=971327,fd=20))     \nLISTEN 0      10                              10.0.1.161:42369      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=23))         \nLISTEN 0      4096                             127.0.0.1:631        0.0.0.0:*                                                \nLISTEN 0      200                              127.0.0.1:5432       0.0.0.0:*    users:((\".postgres-wrapp\",pid=2891097,fd=6))\nLISTEN 0      4096                             127.0.0.1:11434      0.0.0.0:*                                                \nLISTEN 0      10                              10.0.1.172:59078      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=19))         \nLISTEN 0      4096                             127.0.0.1:8420       0.0.0.0:*    users:((\"icm\",pid=1192878,fd=9))            \nLISTEN 0      10     [fe80::45ad:5107:3e96:1f46]%wlp71s0:35390         [::]:*    users:((\"rygel\",pid=3265940,fd=47))         \nLISTEN 0      10                                   [::1]:55414         [::]:*    users:((\"rygel\",pid=3265940,fd=39))         \nLISTEN 0      10        [fe80::12ff:e0ff:feb3:9e55]%eno1:50296         [::]:*    users:((\"rygel\",pid=3265940,fd=43))         \nLISTEN 0      4096                                     *:9098             *:*                                                \nLISTEN 0      100                                      *:8843             *:*                                                \nLISTEN 0      100                                      *:8088             *:*                                                \nLISTEN 0      100                                      *:8043             *:*                                                \nLISTEN 0      5                                        *:3389             *:*                                                \nLISTEN 0      5                                        *:3390             *:*    users:((\"gnome-remote-de\",pid=21787,fd=84)) \nLISTEN 0      4096                                 [::1]:631           [::]:*                                                \nLISTEN 0      1024                                     *:29816            *:*                                                \nLISTEN 0      1024                                     *:29817            *:*                                                \nLISTEN 0      1024                                     *:29812            *:*                                                \nLISTEN 0      1024                                     *:29813            *:*                                                \nLISTEN 0      1024                                     *:29814            *:*                                                \nLISTEN 0      1024                                     *:29815            *:*                                                \nLISTEN 0      1024                                     *:29811            *:*                                                \n",
+        "stderr": ""
+      }
+    ],
+    "status": "probed"
+  },
+  "storage": {
+    "probe_method": "df -B1 -P; lsblk -J (real disks/partitions only); /proc/[pid]/cmdline scan for `postgres -D <datadir>`; du -sh on the datadir",
+    "filesystems": [
+      {
+        "filesystem": "tmpfs",
+        "size_bytes": 107142459392,
+        "used_bytes": 13803520,
+        "available_bytes": 107128655872,
+        "capacity": "1%",
+        "mounted_on": "/run"
+      },
+      {
+        "filesystem": "/dev/nvme1n1p2",
+        "size_bytes": 3935720988672,
+        "used_bytes": 1026554228736,
+        "available_bytes": 2719181324288,
+        "capacity": "28%",
+        "mounted_on": "/"
+      },
+      {
+        "filesystem": "tmpfs",
+        "size_bytes": 267856146432,
+        "used_bytes": 260800512,
+        "available_bytes": 267595345920,
+        "capacity": "1%",
+        "mounted_on": "/dev/shm"
+      },
+      {
+        "filesystem": "efivarfs",
+        "size_bytes": 131072,
+        "used_bytes": 64695,
+        "available_bytes": 61257,
+        "capacity": "52%",
+        "mounted_on": "/sys/firmware/efi/efivars"
+      },
+      {
+        "filesystem": "none",
+        "size_bytes": 1048576,
+        "used_bytes": 0,
+        "available_bytes": 1048576,
+        "capacity": "0%",
+        "mounted_on": "/run/credentials/systemd-journald.service"
+      },
+      {
+        "filesystem": "none",
+        "size_bytes": 1048576,
+        "used_bytes": 0,
+        "available_bytes": 1048576,
+        "capacity": "0%",
+        "mounted_on": "/run/credentials/systemd-resolved.service"
+      },
+      {
+        "filesystem": "/dev/nvme1n1p1",
+        "size_bytes": 1124999168,
+        "used_bytes": 6606848,
+        "available_bytes": 1118392320,
+        "capacity": "1%",
+        "mounted_on": "/boot/efi"
+      },
+      {
+        "filesystem": "tmpfs",
+        "size_bytes": 267856146432,
+        "used_bytes": 59232256,
+        "available_bytes": 267796914176,
+        "capacity": "1%",
+        "mounted_on": "/tmp"
+      },
+      {
+        "filesystem": "tmpfs",
+        "size_bytes": 53571227648,
+        "used_bytes": 20016680960,
+        "available_bytes": 33554546688,
+        "capacity": "38%",
+        "mounted_on": "/run/user/1001"
+      },
+      {
+        "filesystem": "tmpfs",
+        "size_bytes": 53571227648,
+        "used_bytes": 106496,
+        "available_bytes": 53571121152,
+        "capacity": "1%",
+        "mounted_on": "/run/user/1000"
+      },
+      {
+        "filesystem": "/dev/sdc1",
+        "size_bytes": 24000275144704,
+        "used_bytes": 1871603507200,
+        "available_bytes": 22128671637504,
+        "capacity": "8%",
+        "mounted_on": "/run/media/flexnetos/BackupHDD"
+      },
+      {
+        "filesystem": "/dev/sdd",
+        "size_bytes": 33501184,
+        "used_bytes": 241664,
+        "available_bytes": 33259520,
+        "capacity": "1%",
+        "mounted_on": "/run/media/flexnetos/COGNITUM"
+      }
+    ],
+    "block_devices": [
+      {
+        "name": "sda",
+        "size": "18.2T",
+        "type": "disk",
+        "fstype": null,
+        "mountpoints": [],
+        "model": "ST20000NT001-3MB101",
+        "serial": "ZYD2RJEG",
+        "parent": null
+      },
+      {
+        "name": "sda1",
+        "size": "18.2T",
+        "type": "part",
+        "fstype": "ntfs",
+        "mountpoints": [],
+        "model": null,
+        "serial": null,
+        "parent": "sda"
+      },
+      {
+        "name": "sdb",
+        "size": "238.5G",
+        "type": "disk",
+        "fstype": null,
+        "mountpoints": [],
+        "model": "SSK Portable SSD 256GB",
+        "serial": "SSKPSSD0000000002268",
+        "parent": null
+      },
+      {
+        "name": "sdb1",
+        "size": "238.5G",
+        "type": "part",
+        "fstype": "vfat",
+        "mountpoints": [
+          "/run/media/drdave/UBUNTU 26_0"
+        ],
+        "model": null,
+        "serial": null,
+        "parent": "sdb"
+      },
+      {
+        "name": "sdc",
+        "size": "21.8T",
+        "type": "disk",
+        "fstype": null,
+        "mountpoints": [],
+        "model": "ST24000NT002-3N1101",
+        "serial": "ZYD4DN2H",
+        "parent": null
+      },
+      {
+        "name": "sdc1",
+        "size": "21.8T",
+        "type": "part",
+        "fstype": "ntfs",
+        "mountpoints": [
+          "/run/media/flexnetos/BackupHDD"
+        ],
+        "model": null,
+        "serial": null,
+        "parent": "sdc"
+      },
+      {
+        "name": "sdd",
+        "size": "32M",
+        "type": "disk",
+        "fstype": "vfat",
+        "mountpoints": [
+          "/run/media/flexnetos/COGNITUM"
+        ],
+        "model": "File-Stor Gadget",
+        "serial": "0e34a5e5-a7b6-4c68-ad04-e437e22f326a",
+        "parent": null
+      },
+      {
+        "name": "sde",
+        "size": "18.2T",
+        "type": "disk",
+        "fstype": null,
+        "mountpoints": [],
+        "model": "ST20000NT001-3MB101",
+        "serial": "ZYD2L293",
+        "parent": null
+      },
+      {
+        "name": "sde1",
+        "size": "4.5T",
+        "type": "part",
+        "fstype": null,
+        "mountpoints": [],
+        "model": null,
+        "serial": null,
+        "parent": "sde"
+      },
+      {
+        "name": "sde2",
+        "size": "1G",
+        "type": "part",
+        "fstype": "vfat",
+        "mountpoints": [],
+        "model": null,
+        "serial": null,
+        "parent": "sde"
+      },
+      {
+        "name": "sde3",
+        "size": "13.6T",
+        "type": "part",
+        "fstype": "ext4",
+        "mountpoints": [],
+        "model": null,
+        "serial": null,
+        "parent": "sde"
+      },
+      {
+        "name": "nvme1n1",
+        "size": "3.6T",
+        "type": "disk",
+        "fstype": null,
+        "mountpoints": [],
+        "model": "Samsung SSD 9100 PRO 4TB",
+        "serial": "S7YANJ0Y315416B",
+        "parent": null
+      },
+      {
+        "name": "nvme1n1p1",
+        "size": "1G",
+        "type": "part",
+        "fstype": "vfat",
+        "mountpoints": [
+          "/boot/efi"
+        ],
+        "model": null,
+        "serial": null,
+        "parent": "nvme1n1"
+      },
+      {
+        "name": "nvme1n1p2",
+        "size": "3.6T",
+        "type": "part",
+        "fstype": "ext4",
+        "mountpoints": [
+          "/"
+        ],
+        "model": null,
+        "serial": null,
+        "parent": "nvme1n1"
+      },
+      {
+        "name": "nvme0n1",
+        "size": "3.6T",
+        "type": "disk",
+        "fstype": null,
+        "mountpoints": [],
+        "model": "Samsung SSD 9100 PRO 4TB",
+        "serial": "S7YANJ0Y403683Y",
+        "parent": null
+      },
+      {
+        "name": "nvme0n1p1",
+        "size": "1G",
+        "type": "part",
+        "fstype": "vfat",
+        "mountpoints": [],
+        "model": null,
+        "serial": null,
+        "parent": "nvme0n1"
+      },
+      {
+        "name": "nvme0n1p2",
+        "size": "500G",
+        "type": "part",
+        "fstype": "ext4",
+        "mountpoints": [],
+        "model": null,
+        "serial": null,
+        "parent": "nvme0n1"
+      },
+      {
+        "name": "nvme0n1p3",
+        "size": "1.9T",
+        "type": "part",
+        "fstype": "ext4",
+        "mountpoints": [],
+        "model": null,
+        "serial": null,
+        "parent": "nvme0n1"
+      }
+    ],
+    "postgresql_datadir": {
+      "process_found": true,
+      "datadir": "/home/flexnetos/meta/var/lib/postgresql/17",
+      "datadir_exists": true,
+      "datadir_size_human": "25G",
+      "hosted_on_filesystem": "/"
+    },
+    "commands": [
+      {
+        "purpose": "filesystem_usage",
+        "cmd": "/bin/df -B1 -P",
+        "returncode": 0,
+        "stdout": "Filesystem           1-blocks          Used      Available Capacity Mounted on\ntmpfs            107142459392      13803520   107128655872       1% /run\n/dev/nvme1n1p2  3935720988672 1026554228736  2719181324288      28% /\ntmpfs            267856146432     260800512   267595345920       1% /dev/shm\nefivarfs               131072         64695          61257      52% /sys/firmware/efi/efivars\nnone                  1048576             0        1048576       0% /run/credentials/systemd-journald.service\nnone                  1048576             0        1048576       0% /run/credentials/systemd-resolved.service\n/dev/nvme1n1p1     1124999168       6606848     1118392320       1% /boot/efi\ntmpfs            267856146432      59232256   267796914176       1% /tmp\ntmpfs             53571227648   20016680960    33554546688      38% /run/user/1001\ntmpfs             53571227648        106496    53571121152       1% /run/user/1000\n/dev/sdc1      24000275144704 1871603507200 22128671637504       8% /run/media/flexnetos/BackupHDD\n/dev/sdd             33501184        241664       33259520       1% /run/media/flexnetos/COGNITUM\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "block_devices",
+        "cmd": "/usr/bin/lsblk -J -e7 -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS,MODEL,SERIAL",
+        "returncode": 0,
+        "stdout": "{\n   \"blockdevices\": [\n      {\n         \"name\": \"sda\",\n         \"size\": \"18.2T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"ST20000NT001-3MB101\",\n         \"serial\": \"ZYD2RJEG\",\n         \"children\": [\n            {\n               \"name\": \"sda1\",\n               \"size\": \"18.2T\",\n               \"type\": \"part\",\n               \"fstype\": \"ntfs\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"sdb\",\n         \"size\": \"238.5G\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"SSK Portable SSD 256GB\",\n         \"serial\": \"SSKPSSD0000000002268\",\n         \"children\": [\n            {\n               \"name\": \"sdb1\",\n               \"size\": \"238.5G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [\n                   \"/run/media/drdave/UBUNTU 26_0\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"sdc\",\n         \"size\": \"21.8T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"ST24000NT002-3N1101\",\n         \"serial\": \"ZYD4DN2H\",\n         \"children\": [\n            {\n               \"name\": \"sdc1\",\n               \"size\": \"21.8T\",\n               \"type\": \"part\",\n               \"fstype\": \"ntfs\",\n               \"mountpoints\": [\n                   \"/run/media/flexnetos/BackupHDD\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"sdd\",\n         \"size\": \"32M\",\n         \"type\": \"disk\",\n         \"fstype\": \"vfat\",\n         \"mountpoints\": [\n             \"/run/media/flexnetos/COGNITUM\"\n         ],\n         \"model\": \"File-Stor Gadget\",\n         \"serial\": \"0e34a5e5-a7b6-4c68-ad04-e437e22f326a\"\n      },{\n         \"name\": \"sde\",\n         \"size\": \"18.2T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"ST20000NT001-3MB101\",\n         \"serial\": \"ZYD2L293\",\n         \"children\": [\n            {\n               \"name\": \"sde1\",\n               \"size\": \"4.5T\",\n               \"type\": \"part\",\n               \"fstype\": null,\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"sde2\",\n               \"size\": \"1G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"sde3\",\n               \"size\": \"13.6T\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"nvme1n1\",\n         \"size\": \"3.6T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"Samsung SSD 9100 PRO 4TB\",\n         \"serial\": \"S7YANJ0Y315416B\",\n         \"children\": [\n            {\n               \"name\": \"nvme1n1p1\",\n               \"size\": \"1G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [\n                   \"/boot/efi\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"nvme1n1p2\",\n               \"size\": \"3.6T\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [\n                   \"/\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"nvme0n1\",\n         \"size\": \"3.6T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"Samsung SSD 9100 PRO 4TB\",\n         \"serial\": \"S7YANJ0Y403683Y\",\n         \"children\": [\n            {\n               \"name\": \"nvme0n1p1\",\n               \"size\": \"1G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"nvme0n1p2\",\n               \"size\": \"500G\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"nvme0n1p3\",\n               \"size\": \"1.9T\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      }\n   ]\n}\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "postgresql_datadir_size",
+        "cmd": "/usr/bin/du -sh /home/flexnetos/meta/var/lib/postgresql/17",
+        "returncode": 0,
+        "stdout": "25G\t/home/flexnetos/meta/var/lib/postgresql/17\n",
+        "stderr": ""
+      }
+    ],
+    "status": "probed"
+  },
+  "dns": {
+    "probe_method": "direct reads of /etc/resolv.conf and /etc/hosts (no subprocess)",
+    "nameservers": [
+      "127.0.0.53"
+    ],
+    "search_domains": [
+      "lan"
+    ],
+    "hosts_file_entries": [
+      {
+        "ip": "127.0.0.1",
+        "names": [
+          "localhost"
+        ]
+      },
+      {
+        "ip": "127.0.1.1",
+        "names": [
+          "drdave-TRX50-AI-TOP"
+        ]
+      },
+      {
+        "ip": "::1",
+        "names": [
+          "ip6-localhost",
+          "ip6-loopback"
+        ]
+      },
+      {
+        "ip": "fe00::0",
+        "names": [
+          "ip6-localnet"
+        ]
+      },
+      {
+        "ip": "ff00::0",
+        "names": [
+          "ip6-mcastprefix"
+        ]
+      },
+      {
+        "ip": "ff02::1",
+        "names": [
+          "ip6-allnodes"
+        ]
+      },
+      {
+        "ip": "ff02::2",
+        "names": [
+          "ip6-allrouters"
+        ]
+      },
+      {
+        "ip": "127.0.0.1",
+        "names": [
+          "n8n.test",
+          "#",
+          "lane"
+        ]
+      },
+      {
+        "ip": "127.0.0.1",
+        "names": [
+          "myapp.test",
+          "#",
+          "lane"
+        ]
+      },
+      {
+        "ip": "127.0.0.1",
+        "names": [
+          "app.test",
+          "#",
+          "lane"
+        ]
+      },
+      {
+        "ip": "127.0.0.1",
+        "names": [
+          "app.example.com",
+          "#",
+          "lane"
+        ]
+      }
+    ],
+    "status": "probed"
+  },
+  "load_balancers": {
+    "probe_method": "/proc/[pid]/comm + cmdline scan for nginx/haproxy/caddy/traefik/envoy/kong process names; existence check of common config directories",
+    "matched_processes": [],
+    "config_dirs_checked": [
+      "/etc/nginx",
+      "/etc/haproxy",
+      "/etc/caddy",
+      "/etc/traefik"
+    ],
+    "config_dirs_present": [],
+    "status": "none_detected",
+    "note": "No reverse-proxy or load-balancer process, nor a known config directory, was found on this host."
+  },
+  "firewalls": {
+    "probe_method": "/proc/modules for loaded netfilter modules (no privilege required); nft/iptables/ufw ruleset listing attempted read-only via absolute binary paths",
+    "kernel_netfilter_modules_loaded": [
+      "nft_compat",
+      "x_tables",
+      "nf_tables"
+    ],
+    "tooling": {
+      "nft": {
+        "binary": "/usr/sbin/nft",
+        "permitted": false,
+        "message": "Operation not permitted (you must be root)\nnetlink: Error: cache initialization failed: Operation not permitted"
+      },
+      "iptables": {
+        "binary": "/sbin/iptables",
+        "permitted": false,
+        "message": "iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Permission denied (you must be root)"
+      },
+      "ufw": {
+        "binary": "/usr/sbin/ufw",
+        "permitted": false,
+        "message": "ERROR: You need to be root to run this script"
+      }
+    },
+    "commands": [
+      {
+        "purpose": "firewall_ruleset:nft",
+        "cmd": "/usr/sbin/nft list ruleset",
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Operation not permitted (you must be root)\nnetlink: Error: cache initialization failed: Operation not permitted\n"
+      },
+      {
+        "purpose": "firewall_ruleset:iptables",
+        "cmd": "/sbin/iptables -L -n",
+        "returncode": 4,
+        "stdout": "",
+        "stderr": "iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Permission denied (you must be root)\n"
+      },
+      {
+        "purpose": "firewall_ruleset:ufw",
+        "cmd": "/usr/sbin/ufw status",
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "ERROR: You need to be root to run this script\n"
+      }
+    ],
+    "status": "ruleset_read_permission_denied",
+    "note": "Kernel netfilter subsystem is active (modules loaded: nft_compat, x_tables, nf_tables) but this session lacks the root privilege required to enumerate nft/iptables/ufw rules. Ruleset contents are not available and are not fabricated."
+  },
+  "certificates": {
+    "probe_method": "directory enumeration by path only for known PUBLIC trust-store directories (secrets/private_keys/*.key always skipped, defensively re-checked per file); openssl x509 -noout metadata extraction (subject/issuer/notAfter only, never raw content) on a bounded sample",
+    "openssl_binary": "/usr/bin/openssl",
+    "trust_store_dirs_checked": [
+      {
+        "path": "/etc/ssl/certs",
+        "exists": true
+      },
+      {
+        "path": "/usr/lib/ssl/certs",
+        "exists": true
+      },
+      {
+        "path": "/etc/pki/tls/certs",
+        "exists": false
+      },
+      {
+        "path": "/usr/local/share/ca-certificates",
+        "exists": true
+      },
+      {
+        "path": "/usr/share/ca-certificates",
+        "exists": true
+      }
+    ],
+    "total_cert_like_files_found": 252,
+    "sampled_count": 20,
+    "sampled_certificates": [
+      {
+        "path": "/etc/ssl/certs/ca-certificates.crt",
+        "kind": "file",
+        "symlink_target": null,
+        "subject": "CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES",
+        "issuer": "CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES",
+        "not_after": "Dec 31 09:37:37 2030 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/usr/lib/ssl/certs/ca-certificates.crt",
+        "kind": "file",
+        "symlink_target": null,
+        "subject": "CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES",
+        "issuer": "CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES",
+        "not_after": "Dec 31 09:37:37 2030 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/usr/local/share/ca-certificates/cognitum-ca.crt",
+        "kind": "file",
+        "symlink_target": null,
+        "subject": "CN=Cognitum Device CA, O=Cognitum One, OU=Device Security",
+        "issuer": "CN=Cognitum Device CA, O=Cognitum One, OU=Device Security",
+        "not_after": "Jun 13 11:17:14 2046 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/usr/local/share/ca-certificates/lane.crt",
+        "kind": "file",
+        "symlink_target": null,
+        "subject": "CN=lane Root CA, O=lane",
+        "issuer": "CN=lane Root CA, O=lane",
+        "not_after": "Jun 10 22:30:20 2036 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/002c0b4f.0",
+        "kind": "symlink",
+        "symlink_target": "GlobalSign_Root_R46.pem",
+        "subject": "C=BE, O=GlobalSign nv-sa, CN=GlobalSign Root R46",
+        "issuer": "C=BE, O=GlobalSign nv-sa, CN=GlobalSign Root R46",
+        "not_after": "Mar 20 00:00:00 2046 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/0179095f.0",
+        "kind": "symlink",
+        "symlink_target": "BJCA_Global_Root_CA1.pem",
+        "subject": "C=CN, O=BEIJING CERTIFICATE AUTHORITY, CN=BJCA Global Root CA1",
+        "issuer": "C=CN, O=BEIJING CERTIFICATE AUTHORITY, CN=BJCA Global Root CA1",
+        "not_after": "Dec 12 03:16:17 2044 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/062cdee6.0",
+        "kind": "symlink",
+        "symlink_target": "GlobalSign_Root_CA_-_R3.pem",
+        "subject": "OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign",
+        "issuer": "OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign",
+        "not_after": "Mar 18 10:00:00 2029 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/064e0aa9.0",
+        "kind": "symlink",
+        "symlink_target": "QuoVadis_Root_CA_2_G3.pem",
+        "subject": "C=BM, O=QuoVadis Limited, CN=QuoVadis Root CA 2 G3",
+        "issuer": "C=BM, O=QuoVadis Limited, CN=QuoVadis Root CA 2 G3",
+        "not_after": "Jan 12 18:59:32 2042 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/06dc52d5.0",
+        "kind": "symlink",
+        "symlink_target": "SSL.com_EV_Root_Certification_Authority_RSA_R2.pem",
+        "subject": "C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com EV Root Certification Authority RSA R2",
+        "issuer": "C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com EV Root Certification Authority RSA R2",
+        "not_after": "May 30 18:14:37 2042 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/09789157.0",
+        "kind": "symlink",
+        "symlink_target": "Starfield_Services_Root_Certificate_Authority_-_G2.pem",
+        "subject": "C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2",
+        "issuer": "C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2",
+        "not_after": "Dec 31 23:59:59 2037 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/0a775a30.0",
+        "kind": "symlink",
+        "symlink_target": "GTS_Root_R3.pem",
+        "subject": "C=US, O=Google Trust Services LLC, CN=GTS Root R3",
+        "issuer": "C=US, O=Google Trust Services LLC, CN=GTS Root R3",
+        "not_after": "Jun 22 00:00:00 2036 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/0b1b94ef.0",
+        "kind": "symlink",
+        "symlink_target": "CFCA_EV_ROOT.pem",
+        "subject": "C=CN, O=China Financial Certification Authority, CN=CFCA EV ROOT",
+        "issuer": "C=CN, O=China Financial Certification Authority, CN=CFCA EV ROOT",
+        "not_after": "Dec 31 03:07:01 2029 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/0b9bc432.0",
+        "kind": "symlink",
+        "symlink_target": "ISRG_Root_X2.pem",
+        "subject": "C=US, O=Internet Security Research Group, CN=ISRG Root X2",
+        "issuer": "C=US, O=Internet Security Research Group, CN=ISRG Root X2",
+        "not_after": "Sep 17 16:00:00 2040 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/0bf05006.0",
+        "kind": "symlink",
+        "symlink_target": "SSL.com_Root_Certification_Authority_ECC.pem",
+        "subject": "C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com Root Certification Authority ECC",
+        "issuer": "C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com Root Certification Authority ECC",
+        "not_after": "Feb 12 18:14:03 2041 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/0f5dc4f3.0",
+        "kind": "symlink",
+        "symlink_target": "UCA_Extended_Validation_Root.pem",
+        "subject": "C=CN, O=UniTrust, CN=UCA Extended Validation Root",
+        "issuer": "C=CN, O=UniTrust, CN=UCA Extended Validation Root",
+        "not_after": "Dec 31 00:00:00 2038 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/0f6fa695.0",
+        "kind": "symlink",
+        "symlink_target": "GDCA_TrustAUTH_R5_ROOT.pem",
+        "subject": "C=CN, O=GUANG DONG CERTIFICATE AUTHORITY CO.,LTD., CN=GDCA TrustAUTH R5 ROOT",
+        "issuer": "C=CN, O=GUANG DONG CERTIFICATE AUTHORITY CO.,LTD., CN=GDCA TrustAUTH R5 ROOT",
+        "not_after": "Dec 31 15:59:59 2040 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/1001acf7.0",
+        "kind": "symlink",
+        "symlink_target": "GTS_Root_R1.pem",
+        "subject": "C=US, O=Google Trust Services LLC, CN=GTS Root R1",
+        "issuer": "C=US, O=Google Trust Services LLC, CN=GTS Root R1",
+        "not_after": "Jun 22 00:00:00 2036 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/1359544c.0",
+        "kind": "symlink",
+        "symlink_target": "cognitum-ca.pem",
+        "subject": "CN=Cognitum Device CA, O=Cognitum One, OU=Device Security",
+        "issuer": "CN=Cognitum Device CA, O=Cognitum One, OU=Device Security",
+        "not_after": "Jun 13 11:17:14 2046 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/14bc7599.0",
+        "kind": "symlink",
+        "symlink_target": "emSign_ECC_Root_CA_-_G3.pem",
+        "subject": "C=IN, OU=emSign PKI, O=eMudhra Technologies Limited, CN=emSign ECC Root CA - G3",
+        "issuer": "C=IN, OU=emSign PKI, O=eMudhra Technologies Limited, CN=emSign ECC Root CA - G3",
+        "not_after": "Feb 18 18:30:00 2043 GMT",
+        "parsed": true
+      },
+      {
+        "path": "/etc/ssl/certs/1cef98f5.0",
+        "kind": "symlink",
+        "symlink_target": "TrustAsia_Global_Root_CA_G4.pem",
+        "subject": "C=CN, O=TrustAsia Technologies, Inc., CN=TrustAsia Global Root CA G4",
+        "issuer": "C=CN, O=TrustAsia Technologies, Inc., CN=TrustAsia Global Root CA G4",
+        "not_after": "May 19 02:10:22 2046 GMT",
+        "parsed": true
+      }
+    ],
+    "commands": [
+      {
+        "purpose": "cert_metadata:ca-certificates.crt",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/ca-certificates.crt",
+        "returncode": 0,
+        "stdout": "subject=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nissuer=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nnotAfter=Dec 31 09:37:37 2030 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:ca-certificates.crt",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /usr/lib/ssl/certs/ca-certificates.crt",
+        "returncode": 0,
+        "stdout": "subject=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nissuer=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nnotAfter=Dec 31 09:37:37 2030 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:cognitum-ca.crt",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /usr/local/share/ca-certificates/cognitum-ca.crt",
+        "returncode": 0,
+        "stdout": "subject=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nissuer=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nnotAfter=Jun 13 11:17:14 2046 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:lane.crt",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /usr/local/share/ca-certificates/lane.crt",
+        "returncode": 0,
+        "stdout": "subject=CN=lane Root CA, O=lane\nissuer=CN=lane Root CA, O=lane\nnotAfter=Jun 10 22:30:20 2036 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:002c0b4f.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/002c0b4f.0",
+        "returncode": 0,
+        "stdout": "subject=C=BE, O=GlobalSign nv-sa, CN=GlobalSign Root R46\nissuer=C=BE, O=GlobalSign nv-sa, CN=GlobalSign Root R46\nnotAfter=Mar 20 00:00:00 2046 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:0179095f.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0179095f.0",
+        "returncode": 0,
+        "stdout": "subject=C=CN, O=BEIJING CERTIFICATE AUTHORITY, CN=BJCA Global Root CA1\nissuer=C=CN, O=BEIJING CERTIFICATE AUTHORITY, CN=BJCA Global Root CA1\nnotAfter=Dec 12 03:16:17 2044 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:062cdee6.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/062cdee6.0",
+        "returncode": 0,
+        "stdout": "subject=OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign\nissuer=OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign\nnotAfter=Mar 18 10:00:00 2029 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:064e0aa9.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/064e0aa9.0",
+        "returncode": 0,
+        "stdout": "subject=C=BM, O=QuoVadis Limited, CN=QuoVadis Root CA 2 G3\nissuer=C=BM, O=QuoVadis Limited, CN=QuoVadis Root CA 2 G3\nnotAfter=Jan 12 18:59:32 2042 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:06dc52d5.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/06dc52d5.0",
+        "returncode": 0,
+        "stdout": "subject=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com EV Root Certification Authority RSA R2\nissuer=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com EV Root Certification Authority RSA R2\nnotAfter=May 30 18:14:37 2042 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:09789157.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/09789157.0",
+        "returncode": 0,
+        "stdout": "subject=C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2\nissuer=C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2\nnotAfter=Dec 31 23:59:59 2037 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:0a775a30.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0a775a30.0",
+        "returncode": 0,
+        "stdout": "subject=C=US, O=Google Trust Services LLC, CN=GTS Root R3\nissuer=C=US, O=Google Trust Services LLC, CN=GTS Root R3\nnotAfter=Jun 22 00:00:00 2036 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:0b1b94ef.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0b1b94ef.0",
+        "returncode": 0,
+        "stdout": "subject=C=CN, O=China Financial Certification Authority, CN=CFCA EV ROOT\nissuer=C=CN, O=China Financial Certification Authority, CN=CFCA EV ROOT\nnotAfter=Dec 31 03:07:01 2029 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:0b9bc432.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0b9bc432.0",
+        "returncode": 0,
+        "stdout": "subject=C=US, O=Internet Security Research Group, CN=ISRG Root X2\nissuer=C=US, O=Internet Security Research Group, CN=ISRG Root X2\nnotAfter=Sep 17 16:00:00 2040 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:0bf05006.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0bf05006.0",
+        "returncode": 0,
+        "stdout": "subject=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com Root Certification Authority ECC\nissuer=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com Root Certification Authority ECC\nnotAfter=Feb 12 18:14:03 2041 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:0f5dc4f3.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0f5dc4f3.0",
+        "returncode": 0,
+        "stdout": "subject=C=CN, O=UniTrust, CN=UCA Extended Validation Root\nissuer=C=CN, O=UniTrust, CN=UCA Extended Validation Root\nnotAfter=Dec 31 00:00:00 2038 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:0f6fa695.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0f6fa695.0",
+        "returncode": 0,
+        "stdout": "subject=C=CN, O=GUANG DONG CERTIFICATE AUTHORITY CO.,LTD., CN=GDCA TrustAUTH R5 ROOT\nissuer=C=CN, O=GUANG DONG CERTIFICATE AUTHORITY CO.,LTD., CN=GDCA TrustAUTH R5 ROOT\nnotAfter=Dec 31 15:59:59 2040 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:1001acf7.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/1001acf7.0",
+        "returncode": 0,
+        "stdout": "subject=C=US, O=Google Trust Services LLC, CN=GTS Root R1\nissuer=C=US, O=Google Trust Services LLC, CN=GTS Root R1\nnotAfter=Jun 22 00:00:00 2036 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:1359544c.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/1359544c.0",
+        "returncode": 0,
+        "stdout": "subject=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nissuer=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nnotAfter=Jun 13 11:17:14 2046 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:14bc7599.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/14bc7599.0",
+        "returncode": 0,
+        "stdout": "subject=C=IN, OU=emSign PKI, O=eMudhra Technologies Limited, CN=emSign ECC Root CA - G3\nissuer=C=IN, OU=emSign PKI, O=eMudhra Technologies Limited, CN=emSign ECC Root CA - G3\nnotAfter=Feb 18 18:30:00 2043 GMT\n",
+        "stderr": ""
+      },
+      {
+        "purpose": "cert_metadata:1cef98f5.0",
+        "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/1cef98f5.0",
+        "returncode": 0,
+        "stdout": "subject=C=CN, O=TrustAsia Technologies, Inc., CN=TrustAsia Global Root CA G4\nissuer=C=CN, O=TrustAsia Technologies, Inc., CN=TrustAsia Global Root CA G4\nnotAfter=May 19 02:10:22 2046 GMT\n",
+        "stderr": ""
+      }
+    ],
+    "status": "probed",
+    "blocked_patterns_honored": [
+      "**/.env",
+      "**/secrets/**",
+      "**/private_keys/**",
+      "**/*.pem",
+      "**/*.key"
+    ]
   },
   "coverage": {
     "compute": {
-      "evidence_count": 40,
-      "status": "repo_evidence_found",
-      "sample_paths": [
-        "src/Cargo.toml",
-        "src/teri/Cargo.toml",
-        "src/teri/src/services/zep_tools.rs",
-        "src/teri/src/services/graph_backend.rs",
-        "src/teri/src/services/graph_memory.rs",
-        "src/teri/src/services/simulation_manager.rs",
-        "src/teri/src/services/mod.rs",
-        "src/teri/src/services/entity_reader.rs",
-        "src/teri/src/services/simulation_runner.rs",
-        "src/teri/src/services/simulation_config.rs",
-        "src/teri/src/services/ontology.rs",
-        "src/teri/src/services/agent_memory.rs"
-      ]
+      "status": "probed"
     },
     "networking": {
-      "evidence_count": 40,
-      "status": "repo_evidence_found",
-      "sample_paths": [
-        "src/teri/src/report/mod.rs",
-        "src/teri/src/report/sink.rs",
-        "src/teri/src/report/manager.rs",
-        "src/teri/src/report/console_logger.rs",
-        "src/teri/src/report/logger.rs",
-        "src/teri/src/api/report.rs",
-        "src/teri/src/services/oasis_profile_export.rs",
-        "src/teri/templates/report_gen.jinja",
-        "src/teri/frontend/src/components/Step4Report.vue",
-        "src/teri/frontend/src/api/report.js",
-        "src/teri/frontend/src/views/ReportView.vue",
-        "src/teri/.worktrees/issue-86-source-wires/src/report/mod.rs"
-      ]
+      "status": "probed",
+      "interface_count": 9,
+      "listening_socket_count": 134
     },
     "storage": {
-      "evidence_count": 40,
-      "status": "repo_evidence_found",
-      "sample_paths": [
-        "COMMAND_LEDGER.csv",
-        "src/teri/code-research/references/research-ledger.md",
-        "src/teri/uploads/simulations/sim_2d08edb915b4/state.json",
-        "src/teri/uploads/simulations/sim_e01869db64aa/state.json",
-        "src/teri/frontend/src/components/HistoryDatabase.vue",
-        "src/teri/.sqlx/query-ae4b5479dae11bb7cd954d25a4bff2f415180056d7bac6db2b3a5cc982668fa8.json",
-        "src/teri/.sqlx/query-55d963cbcf18ec8e63e62ce9c1b4a00c58342561643d3465cddba460d73cb62a.json",
-        "src/teri/.sqlx/query-140f9202393c5ebfdd4b248bdc619acf4ce063f22b82d0d8ac2d2da93db2e601.json",
-        "src/teri/.sqlx/query-e0266364eb6571e3e56884dd40016382451c4be1ccf8db6d0482af64be78c93e.json",
-        "src/teri/.sqlx/query-e31f14d818b47b8ecc7789bbcfb526597238e092326db5562724ea139678ce10.json",
-        "src/teri/.sqlx/query-9265b9756a5016a30c537d7affd287b58c385e60dbe2f94e94e94d277d6bea6b.json",
-        "src/teri/.sqlx/query-5c1213186659cb129a1b56ad5a0a24f699ec338cc178e6ae9c858d38ddbce719.json"
-      ]
+      "status": "probed",
+      "filesystem_count": 12,
+      "block_device_count": 18
     },
     "dns": {
-      "evidence_count": 40,
-      "status": "repo_evidence_found",
-      "sample_paths": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/data/cross-domain-clinical.json",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/data/cross-domain-policy.json",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/data/cross-domain-tender.json",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/sldbench/configs/domain_mixture_scaling_law.yaml",
-        "src/meta-ruvector/examples/data/discoveries/cross_domain_correlations.json",
-        "src/meta-ruvector/examples/data/framework/examples/multi_domain_discovery.rs",
-        "src/meta-ruvector/examples/data/framework/examples/cross_domain_discovery.rs",
-        "src/meta-ruvector/examples/prime-radiant/docs/ddd/domain-model.md",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/error.rs",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/mod.rs",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/repository.rs",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/entities.rs"
-      ]
+      "status": "probed",
+      "nameserver_count": 1
     },
     "load_balancers": {
-      "evidence_count": 40,
-      "status": "repo_evidence_found",
-      "sample_paths": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/Inference-engine/engines/src/neural_foundry/runtime/mcp_gateway.rs",
-        "src/meta-ruvector/examples/vwm-viewer/nginx.conf",
-        "src/meta-ruvector/examples/edge-net/dashboard/nginx.conf",
-        "src/meta-ruvector/.codex/mirror/.claude/agents/optimization/load-balancer.md",
-        "src/meta-ruvector/.codex/agents/claude/claude-optimization-load-balancer.toml",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.js.map",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.d.ts",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.js",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.ts",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.d.ts.map",
-        "src/meta-ruvector/docs/research/claude-code-rvsource/versions/v2.1.x/tree/react_memo_cache_sentinel/react_memo_cache_sentinel/registerLoadBalancerType.js",
-        "src/meta-ruvector/.claude/agents/optimization/load-balancer.md"
-      ]
+      "status": "none_detected"
     },
     "firewalls": {
-      "evidence_count": 40,
-      "status": "repo_evidence_found",
-      "sample_paths": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/case-studies/02-prompt-firewall.md",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/crates/core/src/firewall.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/Inference-engine/engines/src/runtime/execution/sandbox.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/Inference-engine/engines/src/neural_foundry/executor/sandbox.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/inference-cel/src/execution/wasm_sandbox.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/inference-cel/src/execution/native_sandbox.rs",
-        "src/envctl/.codex/tmp/arg0/codex-arg0kYEWiv/codex-linux-sandbox",
-        "src/meta-ruvector/tests/sandbox_security_tests.rs",
-        "src/meta-ruvector/crates/rvAgent/rvagent-backends/src/sandbox.rs",
-        "src/meta-ruvector/.codex/mirror/.claude/agents/flow-nexus/sandbox.md",
-        "src/meta-ruvector/.codex/agents/claude/claude-flow-nexus-sandbox.toml",
-        "src/meta-ruvector/docs/research/claude-code-rvsource/versions/v2.1.x/tree/react_memo_cache_sentinel/react_memo_cache_sentinel/wrapWithSandbox.js"
-      ]
+      "status": "ruleset_read_permission_denied"
     },
     "certificates": {
-      "evidence_count": 40,
-      "status": "repo_evidence_found",
-      "sample_paths": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/config.yaml",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/initial_program.py",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/requirements.txt",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/evaluator.py",
-        "src/envctl/crates/secretd/src/edge/tls.rs",
-        "src/meta-ruvector/examples/rvf/dashboard/src/components/WitnessLog.ts",
-        "src/meta-ruvector/vendor/cognitum-one/src/seed/tls_pin.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/tests/mmwave_bridge_tls.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/tests/mtls_roundtrip.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/tests/tls_roundtrip.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/src/tls.rs",
-        "src/meta-ruvector/crates/ruvector-tiny-dancer-core/src/uncertainty.rs"
-      ]
+      "status": "probed",
+      "total_found": 252
     }
   },
+  "gaps": [
+    {
+      "category": "firewalls",
+      "gap": "Ruleset enumeration (nft/iptables/ufw) requires root privilege, not available in this session.",
+      "next_evidence_needed": "Re-run the firewall probe as root or with CAP_NET_ADMIN to capture actual rule contents."
+    },
+    {
+      "category": "load_balancers",
+      "gap": "No reverse-proxy/load-balancer process or config directory detected on this host.",
+      "next_evidence_needed": "If a load balancer is expected for this workload, confirm it runs on a different host/container outside this process namespace."
+    }
+  ],
   "nodes": [
     {
-      "id": "target:flexnetos-vs-lifeos",
-      "kind": "migration_target",
-      "label": "FlexNetOS versus lifeos target",
-      "evidence": [
-        "generated/envctl_target_registry.json",
-        "../examples/target-descriptors/flexnetos-vs-lifeos.yaml"
-      ]
-    },
-    {
-      "id": "compute:workspace-repos",
+      "id": "host:drdave-TRX50-AI-TOP",
       "kind": "compute",
-      "label": "Workspace source repositories and local build/runtime surfaces",
+      "label": "Local host (drdave-TRX50-AI-TOP)",
       "evidence": [
-        "src/Cargo.toml",
-        "src/teri/Cargo.toml",
-        "src/teri/src/services/zep_tools.rs",
-        "src/teri/src/services/graph_backend.rs",
-        "src/teri/src/services/graph_memory.rs",
-        "src/teri/src/services/simulation_manager.rs",
-        "src/teri/src/services/mod.rs",
-        "src/teri/src/services/entity_reader.rs",
-        "src/teri/src/services/simulation_runner.rs",
-        "src/teri/src/services/simulation_config.rs",
-        "src/teri/src/services/ontology.rs",
-        "src/teri/src/services/agent_memory.rs"
+        "/proc/cpuinfo",
+        "/proc/meminfo",
+        "/proc/loadavg"
       ]
     },
     {
-      "id": "network:local-services",
+      "id": "network:lo",
       "kind": "networking",
-      "label": "Local service, socket, relay, and container networking evidence",
+      "label": "Interface lo (UNKNOWN) 127.0.0.1/8",
       "evidence": [
-        "src/teri/src/report/mod.rs",
-        "src/teri/src/report/sink.rs",
-        "src/teri/src/report/manager.rs",
-        "src/teri/src/report/console_logger.rs",
-        "src/teri/src/report/logger.rs",
-        "src/teri/src/api/report.rs",
-        "src/teri/src/services/oasis_profile_export.rs",
-        "src/teri/templates/report_gen.jinja",
-        "src/teri/frontend/src/components/Step4Report.vue",
-        "src/teri/frontend/src/api/report.js",
-        "src/teri/frontend/src/views/ReportView.vue",
-        "src/teri/.worktrees/issue-86-source-wires/src/report/mod.rs"
+        "/usr/sbin/ip -j addr"
       ]
     },
     {
-      "id": "storage:migration-db",
+      "id": "network:eno1",
+      "kind": "networking",
+      "label": "Interface eno1 (UP) 10.0.1.172/24",
+      "evidence": [
+        "/usr/sbin/ip -j addr"
+      ]
+    },
+    {
+      "id": "network:wlp71s0",
+      "kind": "networking",
+      "label": "Interface wlp71s0 (UP) 10.0.1.161/24",
+      "evidence": [
+        "/usr/sbin/ip -j addr"
+      ]
+    },
+    {
+      "id": "network:virbr0",
+      "kind": "networking",
+      "label": "Interface virbr0 (DOWN) 192.168.122.1/24",
+      "evidence": [
+        "/usr/sbin/ip -j addr"
+      ]
+    },
+    {
+      "id": "network:docker0",
+      "kind": "networking",
+      "label": "Interface docker0 (DOWN) 172.17.0.1/16",
+      "evidence": [
+        "/usr/sbin/ip -j addr"
+      ]
+    },
+    {
+      "id": "network:br-6fff958fc08d",
+      "kind": "networking",
+      "label": "Interface br-6fff958fc08d (DOWN) 172.18.0.1/16",
+      "evidence": [
+        "/usr/sbin/ip -j addr"
+      ]
+    },
+    {
+      "id": "network:enxb6c23dc46927",
+      "kind": "networking",
+      "label": "Interface enxb6c23dc46927 (UP)",
+      "evidence": [
+        "/usr/sbin/ip -j addr"
+      ]
+    },
+    {
+      "id": "storage:postgresql-datadir",
       "kind": "storage",
-      "label": "envctl migration database and repository storage surfaces",
+      "label": "PostgreSQL 17 datadir (/home/flexnetos/meta/var/lib/postgresql/17, 25G)",
       "evidence": [
-        "generated/envctl_migration_db_model.json",
-        "COMMAND_LEDGER.csv",
-        "src/teri/code-research/references/research-ledger.md",
-        "src/teri/uploads/simulations/sim_2d08edb915b4/state.json",
-        "src/teri/uploads/simulations/sim_e01869db64aa/state.json",
-        "src/teri/frontend/src/components/HistoryDatabase.vue",
-        "src/teri/.sqlx/query-ae4b5479dae11bb7cd954d25a4bff2f415180056d7bac6db2b3a5cc982668fa8.json",
-        "src/teri/.sqlx/query-55d963cbcf18ec8e63e62ce9c1b4a00c58342561643d3465cddba460d73cb62a.json",
-        "src/teri/.sqlx/query-140f9202393c5ebfdd4b248bdc619acf4ce063f22b82d0d8ac2d2da93db2e601.json",
-        "src/teri/.sqlx/query-e0266364eb6571e3e56884dd40016382451c4be1ccf8db6d0482af64be78c93e.json",
-        "src/teri/.sqlx/query-e31f14d818b47b8ecc7789bbcfb526597238e092326db5562724ea139678ce10.json"
+        "/proc/[pid]/cmdline (postgres -D)",
+        "du -sh"
       ]
     },
     {
-      "id": "dns:repo-config",
+      "id": "disk:sda",
+      "kind": "storage",
+      "label": "sda 18.2T ST20000NT001-3MB101",
+      "evidence": [
+        "lsblk -J"
+      ]
+    },
+    {
+      "id": "disk:sdb",
+      "kind": "storage",
+      "label": "sdb 238.5G SSK Portable SSD 256GB",
+      "evidence": [
+        "lsblk -J"
+      ]
+    },
+    {
+      "id": "disk:sdc",
+      "kind": "storage",
+      "label": "sdc 21.8T ST24000NT002-3N1101",
+      "evidence": [
+        "lsblk -J"
+      ]
+    },
+    {
+      "id": "disk:sdd",
+      "kind": "storage",
+      "label": "sdd 32M File-Stor Gadget",
+      "evidence": [
+        "lsblk -J"
+      ]
+    },
+    {
+      "id": "disk:sde",
+      "kind": "storage",
+      "label": "sde 18.2T ST20000NT001-3MB101",
+      "evidence": [
+        "lsblk -J"
+      ]
+    },
+    {
+      "id": "disk:nvme1n1",
+      "kind": "storage",
+      "label": "nvme1n1 3.6T Samsung SSD 9100 PRO 4TB",
+      "evidence": [
+        "lsblk -J"
+      ]
+    },
+    {
+      "id": "disk:nvme0n1",
+      "kind": "storage",
+      "label": "nvme0n1 3.6T Samsung SSD 9100 PRO 4TB",
+      "evidence": [
+        "lsblk -J"
+      ]
+    },
+    {
+      "id": "dns:resolver",
       "kind": "dns",
-      "label": "DNS/domain configuration evidence in target filesystem",
+      "label": "DNS resolver(s): 127.0.0.53",
       "evidence": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/data/cross-domain-clinical.json",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/data/cross-domain-policy.json",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/data/cross-domain-tender.json",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/sldbench/configs/domain_mixture_scaling_law.yaml",
-        "src/meta-ruvector/examples/data/discoveries/cross_domain_correlations.json",
-        "src/meta-ruvector/examples/data/framework/examples/multi_domain_discovery.rs",
-        "src/meta-ruvector/examples/data/framework/examples/cross_domain_discovery.rs",
-        "src/meta-ruvector/examples/prime-radiant/docs/ddd/domain-model.md",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/error.rs",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/mod.rs",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/repository.rs",
-        "src/meta-ruvector/examples/vibecast-7sense/crates/sevensense-vector/src/domain/entities.rs"
+        "/etc/resolv.conf"
       ]
     },
     {
-      "id": "load_balancer:repo-config",
-      "kind": "load_balancer",
-      "label": "Reverse proxy/load-balancer evidence in target filesystem",
-      "evidence": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/Inference-engine/engines/src/neural_foundry/runtime/mcp_gateway.rs",
-        "src/meta-ruvector/examples/vwm-viewer/nginx.conf",
-        "src/meta-ruvector/examples/edge-net/dashboard/nginx.conf",
-        "src/meta-ruvector/.codex/mirror/.claude/agents/optimization/load-balancer.md",
-        "src/meta-ruvector/.codex/agents/claude/claude-optimization-load-balancer.toml",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.js.map",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.d.ts",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.js",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.ts",
-        "src/meta-ruvector/npm/packages/cloud-run/load-balancer.d.ts.map",
-        "src/meta-ruvector/docs/research/claude-code-rvsource/versions/v2.1.x/tree/react_memo_cache_sentinel/react_memo_cache_sentinel/registerLoadBalancerType.js",
-        "src/meta-ruvector/.claude/agents/optimization/load-balancer.md"
-      ]
-    },
-    {
-      "id": "firewall:policy",
+      "id": "firewall:netfilter",
       "kind": "firewall",
-      "label": "Network policy, sandbox, and firewall-adjacent controls",
+      "label": "Kernel netfilter (nft_compat, x_tables, nf_tables)",
       "evidence": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/case-studies/02-prompt-firewall.md",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/brain-in-the-fish/crates/core/src/firewall.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/Inference-engine/engines/src/runtime/execution/sandbox.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/Inference-engine/engines/src/neural_foundry/executor/sandbox.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/inference-cel/src/execution/wasm_sandbox.rs",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/cluaiz/inference-cel/src/execution/native_sandbox.rs",
-        "src/envctl/.codex/tmp/arg0/codex-arg0kYEWiv/codex-linux-sandbox",
-        "src/meta-ruvector/tests/sandbox_security_tests.rs",
-        "src/meta-ruvector/crates/rvAgent/rvagent-backends/src/sandbox.rs",
-        "src/meta-ruvector/.codex/mirror/.claude/agents/flow-nexus/sandbox.md",
-        "src/meta-ruvector/.codex/agents/claude/claude-flow-nexus-sandbox.toml",
-        "src/meta-ruvector/docs/research/claude-code-rvsource/versions/v2.1.x/tree/react_memo_cache_sentinel/react_memo_cache_sentinel/wrapWithSandbox.js"
+        "/proc/modules"
       ]
     },
     {
-      "id": "certificates:tls",
+      "id": "certificates:system-trust-store",
       "kind": "certificates",
-      "label": "TLS/certificate dependency and configuration evidence",
+      "label": "System trust store (252 cert files under /etc/ssl/certs)",
       "evidence": [
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/config.yaml",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/initial_program.py",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/requirements.txt",
-        "src/teri/.worktrees/issue-86-source-wires/.worktrees/external-sources/openevolve/examples/alphaevolve_math_problems/uncertainty_ineq/evaluator.py",
-        "src/envctl/crates/secretd/src/edge/tls.rs",
-        "src/meta-ruvector/examples/rvf/dashboard/src/components/WitnessLog.ts",
-        "src/meta-ruvector/vendor/cognitum-one/src/seed/tls_pin.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/tests/mmwave_bridge_tls.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/tests/mtls_roundtrip.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/tests/tls_roundtrip.rs",
-        "src/meta-ruvector/crates/ruvector-hailo-cluster/src/tls.rs",
-        "src/meta-ruvector/crates/ruvector-tiny-dancer-core/src/uncertainty.rs"
-      ]
-    },
-    {
-      "id": "registry:artifact-registry",
-      "kind": "control_plane",
-      "label": "envctl artifact registry",
-      "evidence": [
-        "generated/envctl_artifact_registry_report.json",
-        "scripts/artifact_registry.py"
+        "/etc/ssl/certs"
       ]
     }
   ],
   "edges": [
     {
-      "from": "target:flexnetos-vs-lifeos",
-      "to": "compute:workspace-repos",
-      "type": "contains"
+      "from": "host:drdave-TRX50-AI-TOP",
+      "to": "network:lo",
+      "type": "has_interface"
     },
     {
-      "from": "target:flexnetos-vs-lifeos",
-      "to": "network:local-services",
-      "type": "contains"
+      "from": "host:drdave-TRX50-AI-TOP",
+      "to": "network:eno1",
+      "type": "has_interface"
     },
     {
-      "from": "target:flexnetos-vs-lifeos",
-      "to": "storage:migration-db",
-      "type": "contains"
+      "from": "host:drdave-TRX50-AI-TOP",
+      "to": "network:wlp71s0",
+      "type": "has_interface"
     },
     {
-      "from": "compute:workspace-repos",
-      "to": "network:local-services",
-      "type": "exposes_or_runs"
+      "from": "host:drdave-TRX50-AI-TOP",
+      "to": "network:virbr0",
+      "type": "has_interface"
     },
     {
-      "from": "network:local-services",
-      "to": "dns:repo-config",
-      "type": "may_resolve_through"
+      "from": "host:drdave-TRX50-AI-TOP",
+      "to": "network:docker0",
+      "type": "has_interface"
     },
     {
-      "from": "network:local-services",
-      "to": "load_balancer:repo-config",
-      "type": "may_front"
+      "from": "host:drdave-TRX50-AI-TOP",
+      "to": "network:br-6fff958fc08d",
+      "type": "has_interface"
     },
     {
-      "from": "firewall:policy",
-      "to": "network:local-services",
+      "from": "network:eno1",
+      "to": "network:default-gateway",
+      "type": "default_route"
+    },
+    {
+      "from": "network:wlp71s0",
+      "to": "network:default-gateway",
+      "type": "default_route"
+    },
+    {
+      "from": "storage:postgresql-datadir",
+      "to": "disk:nvme1n1",
+      "type": "resides_on"
+    },
+    {
+      "from": "firewall:netfilter",
+      "to": "host:drdave-TRX50-AI-TOP",
       "type": "constrains"
     },
     {
-      "from": "certificates:tls",
-      "to": "network:local-services",
+      "from": "certificates:system-trust-store",
+      "to": "host:drdave-TRX50-AI-TOP",
       "type": "secures"
-    },
-    {
-      "from": "registry:artifact-registry",
-      "to": "storage:migration-db",
-      "type": "persists_to"
     }
   ],
-  "gaps": [],
-  "source_artifacts": [
-    "generated/envctl_target_registry.json",
-    "generated/package_scan.json",
-    "generated/envctl_migration_db_model.json",
-    "generated/envctl_artifact_registry_report.json",
-    "generated/shared_protocol_manifest.json",
-    "../examples/target-descriptors/flexnetos-vs-lifeos.yaml"
+  "commands_executed": [
+    {
+      "purpose": "interface_addresses",
+      "cmd": "/usr/sbin/ip -j addr",
+      "returncode": 0,
+      "stdout": "[{\"ifindex\":1,\"ifname\":\"lo\",\"flags\":[\"LOOPBACK\",\"UP\",\"LOWER_UP\"],\"mtu\":65536,\"qdisc\":\"noqueue\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"loopback\",\"address\":\"00:00:00:00:00:00\",\"broadcast\":\"00:00:00:00:00:00\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"127.0.0.1\",\"prefixlen\":8,\"scope\":\"host\",\"label\":\"lo\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295},{\"family\":\"inet6\",\"local\":\"::1\",\"prefixlen\":128,\"scope\":\"host\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":2,\"ifname\":\"eno1\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"10:ff:e0:b3:9e:55\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"altnames\":[\"enp70s0\",\"enx10ffe0b39e55\"],\"addr_info\":[{\"family\":\"inet\",\"local\":\"10.0.1.172\",\"prefixlen\":24,\"broadcast\":\"10.0.1.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"eno1\",\"valid_life_time\":4397,\"preferred_life_time\":4397},{\"family\":\"inet6\",\"local\":\"fe80::12ff:e0ff:feb3:9e55\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":3,\"ifname\":\"enp73s0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"10:ff:e0:b3:9e:56\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"altnames\":[\"enx10ffe0b39e56\"],\"addr_info\":[]},{\"ifindex\":6,\"ifname\":\"wlp71s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"04:68:74:aa:a0:65\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"altnames\":[\"wlx046874aaa065\"],\"addr_info\":[{\"family\":\"inet\",\"local\":\"10.0.1.161\",\"prefixlen\":24,\"broadcast\":\"10.0.1.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"wlp71s0\",\"valid_life_time\":5317,\"preferred_life_time\":5317},{\"family\":\"inet6\",\"local\":\"fe80::45ad:5107:3e96:1f46\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":7,\"ifname\":\"virbr0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"52:54:00:a2:9b:31\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"192.168.122.1\",\"prefixlen\":24,\"broadcast\":\"192.168.122.255\",\"scope\":\"global\",\"label\":\"virbr0\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":8,\"ifname\":\"docker0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"DOWN\",\"group\":\"default\",\"link_type\":\"ether\",\"address\":\"12:21:ba:7e:a7:04\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"172.17.0.1\",\"prefixlen\":16,\"broadcast\":\"172.17.255.255\",\"scope\":\"global\",\"label\":\"docker0\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":9,\"ifname\":\"br-6fff958fc08d\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"DOWN\",\"group\":\"default\",\"link_type\":\"ether\",\"address\":\"f2:76:d1:42:b6:e1\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"172.18.0.1\",\"prefixlen\":16,\"broadcast\":\"172.18.255.255\",\"scope\":\"global\",\"label\":\"br-6fff958fc08d\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":18,\"ifname\":\"enxb6c23dc46927\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"fq_codel\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"b6:c2:3d:c4:69:27\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":19,\"ifname\":\"enxde98079bf2db\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"fq_codel\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"de:98:07:9b:f2:db\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]}]\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "ipv4_routes",
+      "cmd": "/usr/sbin/ip route",
+      "returncode": 0,
+      "stdout": "default via 10.0.1.1 dev eno1 proto dhcp src 10.0.1.172 metric 104 \ndefault via 10.0.1.1 dev wlp71s0 proto dhcp src 10.0.1.161 metric 600 \n10.0.1.0/24 dev eno1 proto kernel scope link src 10.0.1.172 metric 104 \n10.0.1.0/24 dev wlp71s0 proto kernel scope link src 10.0.1.161 metric 600 \n172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown \n172.18.0.0/16 dev br-6fff958fc08d proto kernel scope link src 172.18.0.1 linkdown \n192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1 linkdown \n",
+      "stderr": ""
+    },
+    {
+      "purpose": "listening_sockets",
+      "cmd": "/bin/ss -tlnp",
+      "returncode": 0,
+      "stdout": "State  Recv-Q Send-Q                       Local Address:Port  Peer Address:PortProcess                                      \nLISTEN 0      32                           192.168.122.1:53         0.0.0.0:*                                                \nLISTEN 0      512                              127.0.0.1:38719      0.0.0.0:*    users:((\"bun\",pid=418049,fd=11))            \nLISTEN 0      512                              127.0.0.1:38716      0.0.0.0:*    users:((\"bun\",pid=739787,fd=11))            \nLISTEN 0      512                              127.0.0.1:38715      0.0.0.0:*    users:((\"bun\",pid=688800,fd=11))            \nLISTEN 0      512                              127.0.0.1:38712      0.0.0.0:*    users:((\"bun\",pid=709439,fd=11))            \nLISTEN 0      512                              127.0.0.1:38707      0.0.0.0:*    users:((\"bun\",pid=712964,fd=11))            \nLISTEN 0      512                              127.0.0.1:38664      0.0.0.0:*    users:((\"bun\",pid=802699,fd=11))            \nLISTEN 0      512                              127.0.0.1:38665      0.0.0.0:*    users:((\"bun\",pid=448362,fd=11))            \nLISTEN 0      512                              127.0.0.1:38657      0.0.0.0:*    users:((\"bun\",pid=424262,fd=11))            \nLISTEN 0      512                              127.0.0.1:38681      0.0.0.0:*    users:((\"bun\",pid=417874,fd=11))            \nLISTEN 0      512                              127.0.0.1:38764      0.0.0.0:*    users:((\"bun\",pid=803408,fd=11))            \nLISTEN 0      512                              127.0.0.1:38765      0.0.0.0:*    users:((\"bun\",pid=449147,fd=11))            \nLISTEN 0      512                              127.0.0.1:38757      0.0.0.0:*    users:((\"bun\",pid=425671,fd=11))            \nLISTEN 0      512                              127.0.0.1:38755      0.0.0.0:*    users:((\"bun\",pid=828137,fd=11))            \nLISTEN 0      512                              127.0.0.1:38781      0.0.0.0:*    users:((\"bun\",pid=417884,fd=11))            \nLISTEN 0      512                              127.0.0.1:38779      0.0.0.0:*    users:((\"bun\",pid=765187,fd=11))            \nLISTEN 0      512                              127.0.0.1:38773      0.0.0.0:*    users:((\"bun\",pid=738329,fd=11))            \nLISTEN 0      512                              127.0.0.1:38768      0.0.0.0:*    users:((\"bun\",pid=712652,fd=11))            \nLISTEN 0      512                              127.0.0.1:38730      0.0.0.0:*    users:((\"bun\",pid=766560,fd=11))            \nLISTEN 0      512                              127.0.0.1:38750      0.0.0.0:*    users:((\"bun\",pid=471135,fd=11))            \nLISTEN 0      512                              127.0.0.1:38566      0.0.0.0:*    users:((\"bun\",pid=384648,fd=11))            \nLISTEN 0      512                              127.0.0.1:38565      0.0.0.0:*    users:((\"bun\",pid=384557,fd=11))            \nLISTEN 0      512                              127.0.0.1:38562      0.0.0.0:*    users:((\"bun\",pid=362754,fd=11))            \nLISTEN 0      512                              127.0.0.1:38561      0.0.0.0:*    users:((\"bun\",pid=362682,fd=11))            \nLISTEN 0      512                              127.0.0.1:38630      0.0.0.0:*    users:((\"bun\",pid=765319,fd=11))            \nLISTEN 0      512                              127.0.0.1:38650      0.0.0.0:*    users:((\"bun\",pid=470310,fd=11))            \nLISTEN 0      512                              127.0.0.1:38607      0.0.0.0:*    users:((\"bun\",pid=712119,fd=11))            \nLISTEN 0      512                              127.0.0.1:38619      0.0.0.0:*    users:((\"bun\",pid=418007,fd=11))            \nLISTEN 0      512                              127.0.0.1:38616      0.0.0.0:*    users:((\"bun\",pid=738384,fd=11))            \nLISTEN 0      512                              127.0.0.1:38615      0.0.0.0:*    users:((\"bun\",pid=688121,fd=11))            \nLISTEN 0      512                              127.0.0.1:38612      0.0.0.0:*    users:((\"bun\",pid=828684,fd=11))            \nLISTEN 0      10                              172.18.0.1:45101      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=35))         \nLISTEN 0      10                               127.0.0.1:41892      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=15))         \nLISTEN 0      10                              172.17.0.1:48683      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=31))         \nLISTEN 0      4096                             127.0.0.1:45351      0.0.0.0:*                                                \nLISTEN 0      10                           192.168.122.1:38369      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=27))         \nLISTEN 0      512                              127.0.0.1:23726      0.0.0.0:*    users:((\"bun\",pid=910067,fd=11))            \nLISTEN 0      512                              127.0.0.1:23724      0.0.0.0:*    users:((\"bun\",pid=1777504,fd=11))           \nLISTEN 0      512                              127.0.0.1:23722      0.0.0.0:*    users:((\"bun\",pid=2637513,fd=11))           \nLISTEN 0      512                              127.0.0.1:23723      0.0.0.0:*    users:((\"bun\",pid=2286096,fd=11))           \nLISTEN 0      512                              127.0.0.1:23721      0.0.0.0:*    users:((\"bun\",pid=3150124,fd=11))           \nLISTEN 0      512                              127.0.0.1:23716      0.0.0.0:*    users:((\"bun\",pid=2880767,fd=11))           \nLISTEN 0      512                              127.0.0.1:23717      0.0.0.0:*    users:((\"bun\",pid=3283736,fd=11))           \nLISTEN 0      512                              127.0.0.1:23714      0.0.0.0:*    users:((\"bun\",pid=2155127,fd=11))           \nLISTEN 0      512                              127.0.0.1:23712      0.0.0.0:*    users:((\"bun\",pid=885803,fd=11))            \nLISTEN 0      512                              127.0.0.1:23742      0.0.0.0:*    users:((\"bun\",pid=1544026,fd=11))           \nLISTEN 0      512                              127.0.0.1:23736      0.0.0.0:*    users:((\"bun\",pid=3192644,fd=11))           \nLISTEN 0      512                              127.0.0.1:23737      0.0.0.0:*    users:((\"bun\",pid=2677438,fd=11))           \nLISTEN 0      512                              127.0.0.1:23733      0.0.0.0:*    users:((\"bun\",pid=2514007,fd=11))           \nLISTEN 0      512                              127.0.0.1:23731      0.0.0.0:*    users:((\"bun\",pid=2285394,fd=11))           \nLISTEN 0      512                              127.0.0.1:23692      0.0.0.0:*    users:((\"bun\",pid=2756463,fd=11))           \nLISTEN 0      512                              127.0.0.1:23689      0.0.0.0:*    users:((\"bun\",pid=3604857,fd=11))           \nLISTEN 0      512                              127.0.0.1:23681      0.0.0.0:*    users:((\"bun\",pid=2951231,fd=11))           \nLISTEN 0      512                              127.0.0.1:23710      0.0.0.0:*    users:((\"bun\",pid=1545868,fd=11))           \nLISTEN 0      512                              127.0.0.1:23708      0.0.0.0:*    users:((\"bun\",pid=2636241,fd=11))           \nLISTEN 0      512                              127.0.0.1:23709      0.0.0.0:*    users:((\"bun\",pid=2910045,fd=11))           \nLISTEN 0      512                              127.0.0.1:23706      0.0.0.0:*    users:((\"bun\",pid=851915,fd=11))            \nLISTEN 0      512                              127.0.0.1:23705      0.0.0.0:*    users:((\"bun\",pid=3322746,fd=11))           \nLISTEN 0      512                              127.0.0.1:23702      0.0.0.0:*    users:((\"bun\",pid=2850036,fd=11))           \nLISTEN 0      512                              127.0.0.1:23700      0.0.0.0:*    users:((\"bun\",pid=2078332,fd=11))           \nLISTEN 0      512                              127.0.0.1:23791      0.0.0.0:*    users:((\"bun\",pid=2219757,fd=11))           \nLISTEN 0      512                              127.0.0.1:23789      0.0.0.0:*    users:((\"bun\",pid=3605706,fd=11))           \nLISTEN 0      512                              127.0.0.1:23787      0.0.0.0:*    users:((\"bun\",pid=3191471,fd=11))           \nLISTEN 0      512                              127.0.0.1:23781      0.0.0.0:*    users:((\"bun\",pid=2951241,fd=11))           \nLISTEN 0      512                              127.0.0.1:23778      0.0.0.0:*    users:((\"bun\",pid=2332683,fd=11))           \nLISTEN 0      512                              127.0.0.1:23777      0.0.0.0:*    users:((\"bun\",pid=2250485,fd=11))           \nLISTEN 0      512                              127.0.0.1:23797      0.0.0.0:*    users:((\"bun\",pid=2614530,fd=11))           \nLISTEN 0      512                              127.0.0.1:23792      0.0.0.0:*    users:((\"bun\",pid=2756474,fd=11))           \nLISTEN 0      512                              127.0.0.1:23756      0.0.0.0:*    users:((\"bun\",pid=3604470,fd=11))           \nLISTEN 0      512                              127.0.0.1:23757      0.0.0.0:*    users:((\"bun\",pid=3143110,fd=11))           \nLISTEN 0      512                              127.0.0.1:23754      0.0.0.0:*    users:((\"bun\",pid=909050,fd=11))            \nLISTEN 0      512                              127.0.0.1:23755      0.0.0.0:*    users:((\"bun\",pid=853116,fd=11))            \nLISTEN 0      512                              127.0.0.1:23751      0.0.0.0:*    users:((\"bun\",pid=2221524,fd=11))           \nLISTEN 0      512                              127.0.0.1:23749      0.0.0.0:*    users:((\"bun\",pid=2154096,fd=11))           \nLISTEN 0      512                              127.0.0.1:23744      0.0.0.0:*    users:((\"bun\",pid=3283522,fd=11))           \nLISTEN 0      512                              127.0.0.1:23745      0.0.0.0:*    users:((\"bun\",pid=2952556,fd=11))           \nLISTEN 0      512                              127.0.0.1:23775      0.0.0.0:*    users:((\"bun\",pid=3321357,fd=11))           \nLISTEN 0      512                              127.0.0.1:23773      0.0.0.0:*    users:((\"bun\",pid=885081,fd=11))            \nLISTEN 0      512                              127.0.0.1:23770      0.0.0.0:*    users:((\"bun\",pid=2719467,fd=11))           \nLISTEN 0      512                              127.0.0.1:23766      0.0.0.0:*    users:((\"bun\",pid=850762,fd=11))            \nLISTEN 0      512                              127.0.0.1:23764      0.0.0.0:*    users:((\"bun\",pid=2320954,fd=11))           \nLISTEN 0      512                              127.0.0.1:23763      0.0.0.0:*    users:((\"bun\",pid=850771,fd=11))            \nLISTEN 0      512                              127.0.0.1:23760      0.0.0.0:*    users:((\"bun\",pid=1779066,fd=11))           \nLISTEN 0      512                              127.0.0.1:23614      0.0.0.0:*    users:((\"bun\",pid=2153846,fd=11))           \nLISTEN 0      512                              127.0.0.1:23612      0.0.0.0:*    users:((\"bun\",pid=885380,fd=11))            \nLISTEN 0      512                              127.0.0.1:23610      0.0.0.0:*    users:((\"bun\",pid=1545774,fd=11))           \nLISTEN 0      512                              127.0.0.1:23605      0.0.0.0:*    users:((\"bun\",pid=3321697,fd=11))           \nLISTEN 0      512                              127.0.0.1:23600      0.0.0.0:*    users:((\"bun\",pid=2077767,fd=11))           \nLISTEN 0      512                              127.0.0.1:23663      0.0.0.0:*    users:((\"bun\",pid=850703,fd=11))            \nLISTEN 0      512                              127.0.0.1:23660      0.0.0.0:*    users:((\"bun\",pid=1778395,fd=11))           \nLISTEN 0      512                              127.0.0.1:23657      0.0.0.0:*    users:((\"bun\",pid=3142874,fd=11))           \nLISTEN 0      512                              127.0.0.1:23655      0.0.0.0:*    users:((\"bun\",pid=852617,fd=11))            \nLISTEN 0      512                              127.0.0.1:23651      0.0.0.0:*    users:((\"bun\",pid=2220703,fd=11))           \nLISTEN 0      512                              127.0.0.1:23678      0.0.0.0:*    users:((\"bun\",pid=2332270,fd=11))           \nLISTEN 0      512                              127.0.0.1:23664      0.0.0.0:*    users:((\"bun\",pid=2319683,fd=11))           \nLISTEN 0      512                              127.0.0.1:23631      0.0.0.0:*    users:((\"bun\",pid=2614083,fd=11))           \nLISTEN 0      512                              127.0.0.1:23626      0.0.0.0:*    users:((\"bun\",pid=909371,fd=11))            \nLISTEN 0      512                              127.0.0.1:23624      0.0.0.0:*    users:((\"bun\",pid=2850131,fd=11))           \nLISTEN 0      512                              127.0.0.1:23622      0.0.0.0:*    users:((\"bun\",pid=2636972,fd=11))           \nLISTEN 0      512                              127.0.0.1:23623      0.0.0.0:*    users:((\"bun\",pid=2285088,fd=11))           \nLISTEN 0      512                              127.0.0.1:23621      0.0.0.0:*    users:((\"bun\",pid=3149099,fd=11))           \nLISTEN 0      512                              127.0.0.1:23616      0.0.0.0:*    users:((\"bun\",pid=2880086,fd=11))           \nLISTEN 0      512                              127.0.0.1:23617      0.0.0.0:*    users:((\"bun\",pid=2720069,fd=11))           \nLISTEN 0      512                              127.0.0.1:23644      0.0.0.0:*    users:((\"bun\",pid=3282991,fd=11))           \nLISTEN 0      512                              127.0.0.1:23645      0.0.0.0:*    users:((\"bun\",pid=2952538,fd=11))           \nLISTEN 0      512                              127.0.0.1:23642      0.0.0.0:*    users:((\"bun\",pid=2677389,fd=11))           \nLISTEN 0      512                              127.0.0.1:23636      0.0.0.0:*    users:((\"bun\",pid=3191570,fd=11))           \nLISTEN 0      4096                             127.0.0.1:27217      0.0.0.0:*                                                \nLISTEN 0      4096                         127.0.0.53%lo:53         0.0.0.0:*                                                \nLISTEN 0      4096                            127.0.0.54:53         0.0.0.0:*                                                \nLISTEN 0      511                              127.0.0.1:1420       0.0.0.0:*    users:((\"MainThread\",pid=971327,fd=20))     \nLISTEN 0      10                              10.0.1.161:42369      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=23))         \nLISTEN 0      4096                             127.0.0.1:631        0.0.0.0:*                                                \nLISTEN 0      200                              127.0.0.1:5432       0.0.0.0:*    users:((\".postgres-wrapp\",pid=2891097,fd=6))\nLISTEN 0      4096                             127.0.0.1:11434      0.0.0.0:*                                                \nLISTEN 0      10                              10.0.1.172:59078      0.0.0.0:*    users:((\"rygel\",pid=3265940,fd=19))         \nLISTEN 0      4096                             127.0.0.1:8420       0.0.0.0:*    users:((\"icm\",pid=1192878,fd=9))            \nLISTEN 0      10     [fe80::45ad:5107:3e96:1f46]%wlp71s0:35390         [::]:*    users:((\"rygel\",pid=3265940,fd=47))         \nLISTEN 0      10                                   [::1]:55414         [::]:*    users:((\"rygel\",pid=3265940,fd=39))         \nLISTEN 0      10        [fe80::12ff:e0ff:feb3:9e55]%eno1:50296         [::]:*    users:((\"rygel\",pid=3265940,fd=43))         \nLISTEN 0      4096                                     *:9098             *:*                                                \nLISTEN 0      100                                      *:8843             *:*                                                \nLISTEN 0      100                                      *:8088             *:*                                                \nLISTEN 0      100                                      *:8043             *:*                                                \nLISTEN 0      5                                        *:3389             *:*                                                \nLISTEN 0      5                                        *:3390             *:*    users:((\"gnome-remote-de\",pid=21787,fd=84)) \nLISTEN 0      4096                                 [::1]:631           [::]:*                                                \nLISTEN 0      1024                                     *:29816            *:*                                                \nLISTEN 0      1024                                     *:29817            *:*                                                \nLISTEN 0      1024                                     *:29812            *:*                                                \nLISTEN 0      1024                                     *:29813            *:*                                                \nLISTEN 0      1024                                     *:29814            *:*                                                \nLISTEN 0      1024                                     *:29815            *:*                                                \nLISTEN 0      1024                                     *:29811            *:*                                                \n",
+      "stderr": ""
+    },
+    {
+      "purpose": "filesystem_usage",
+      "cmd": "/bin/df -B1 -P",
+      "returncode": 0,
+      "stdout": "Filesystem           1-blocks          Used      Available Capacity Mounted on\ntmpfs            107142459392      13803520   107128655872       1% /run\n/dev/nvme1n1p2  3935720988672 1026554228736  2719181324288      28% /\ntmpfs            267856146432     260800512   267595345920       1% /dev/shm\nefivarfs               131072         64695          61257      52% /sys/firmware/efi/efivars\nnone                  1048576             0        1048576       0% /run/credentials/systemd-journald.service\nnone                  1048576             0        1048576       0% /run/credentials/systemd-resolved.service\n/dev/nvme1n1p1     1124999168       6606848     1118392320       1% /boot/efi\ntmpfs            267856146432      59232256   267796914176       1% /tmp\ntmpfs             53571227648   20016680960    33554546688      38% /run/user/1001\ntmpfs             53571227648        106496    53571121152       1% /run/user/1000\n/dev/sdc1      24000275144704 1871603507200 22128671637504       8% /run/media/flexnetos/BackupHDD\n/dev/sdd             33501184        241664       33259520       1% /run/media/flexnetos/COGNITUM\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "block_devices",
+      "cmd": "/usr/bin/lsblk -J -e7 -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS,MODEL,SERIAL",
+      "returncode": 0,
+      "stdout": "{\n   \"blockdevices\": [\n      {\n         \"name\": \"sda\",\n         \"size\": \"18.2T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"ST20000NT001-3MB101\",\n         \"serial\": \"ZYD2RJEG\",\n         \"children\": [\n            {\n               \"name\": \"sda1\",\n               \"size\": \"18.2T\",\n               \"type\": \"part\",\n               \"fstype\": \"ntfs\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"sdb\",\n         \"size\": \"238.5G\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"SSK Portable SSD 256GB\",\n         \"serial\": \"SSKPSSD0000000002268\",\n         \"children\": [\n            {\n               \"name\": \"sdb1\",\n               \"size\": \"238.5G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [\n                   \"/run/media/drdave/UBUNTU 26_0\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"sdc\",\n         \"size\": \"21.8T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"ST24000NT002-3N1101\",\n         \"serial\": \"ZYD4DN2H\",\n         \"children\": [\n            {\n               \"name\": \"sdc1\",\n               \"size\": \"21.8T\",\n               \"type\": \"part\",\n               \"fstype\": \"ntfs\",\n               \"mountpoints\": [\n                   \"/run/media/flexnetos/BackupHDD\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"sdd\",\n         \"size\": \"32M\",\n         \"type\": \"disk\",\n         \"fstype\": \"vfat\",\n         \"mountpoints\": [\n             \"/run/media/flexnetos/COGNITUM\"\n         ],\n         \"model\": \"File-Stor Gadget\",\n         \"serial\": \"0e34a5e5-a7b6-4c68-ad04-e437e22f326a\"\n      },{\n         \"name\": \"sde\",\n         \"size\": \"18.2T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"ST20000NT001-3MB101\",\n         \"serial\": \"ZYD2L293\",\n         \"children\": [\n            {\n               \"name\": \"sde1\",\n               \"size\": \"4.5T\",\n               \"type\": \"part\",\n               \"fstype\": null,\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"sde2\",\n               \"size\": \"1G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"sde3\",\n               \"size\": \"13.6T\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"nvme1n1\",\n         \"size\": \"3.6T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"Samsung SSD 9100 PRO 4TB\",\n         \"serial\": \"S7YANJ0Y315416B\",\n         \"children\": [\n            {\n               \"name\": \"nvme1n1p1\",\n               \"size\": \"1G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [\n                   \"/boot/efi\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"nvme1n1p2\",\n               \"size\": \"3.6T\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [\n                   \"/\"\n               ],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      },{\n         \"name\": \"nvme0n1\",\n         \"size\": \"3.6T\",\n         \"type\": \"disk\",\n         \"fstype\": null,\n         \"mountpoints\": [],\n         \"model\": \"Samsung SSD 9100 PRO 4TB\",\n         \"serial\": \"S7YANJ0Y403683Y\",\n         \"children\": [\n            {\n               \"name\": \"nvme0n1p1\",\n               \"size\": \"1G\",\n               \"type\": \"part\",\n               \"fstype\": \"vfat\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"nvme0n1p2\",\n               \"size\": \"500G\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            },{\n               \"name\": \"nvme0n1p3\",\n               \"size\": \"1.9T\",\n               \"type\": \"part\",\n               \"fstype\": \"ext4\",\n               \"mountpoints\": [],\n               \"model\": null,\n               \"serial\": null\n            }\n         ]\n      }\n   ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "postgresql_datadir_size",
+      "cmd": "/usr/bin/du -sh /home/flexnetos/meta/var/lib/postgresql/17",
+      "returncode": 0,
+      "stdout": "25G\t/home/flexnetos/meta/var/lib/postgresql/17\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "firewall_ruleset:nft",
+      "cmd": "/usr/sbin/nft list ruleset",
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Operation not permitted (you must be root)\nnetlink: Error: cache initialization failed: Operation not permitted\n"
+    },
+    {
+      "purpose": "firewall_ruleset:iptables",
+      "cmd": "/sbin/iptables -L -n",
+      "returncode": 4,
+      "stdout": "",
+      "stderr": "iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Permission denied (you must be root)\n"
+    },
+    {
+      "purpose": "firewall_ruleset:ufw",
+      "cmd": "/usr/sbin/ufw status",
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "ERROR: You need to be root to run this script\n"
+    },
+    {
+      "purpose": "cert_metadata:ca-certificates.crt",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/ca-certificates.crt",
+      "returncode": 0,
+      "stdout": "subject=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nissuer=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nnotAfter=Dec 31 09:37:37 2030 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:ca-certificates.crt",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /usr/lib/ssl/certs/ca-certificates.crt",
+      "returncode": 0,
+      "stdout": "subject=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nissuer=CN=ACCVRAIZ1, OU=PKIACCV, O=ACCV, C=ES\nnotAfter=Dec 31 09:37:37 2030 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:cognitum-ca.crt",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /usr/local/share/ca-certificates/cognitum-ca.crt",
+      "returncode": 0,
+      "stdout": "subject=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nissuer=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nnotAfter=Jun 13 11:17:14 2046 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:lane.crt",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /usr/local/share/ca-certificates/lane.crt",
+      "returncode": 0,
+      "stdout": "subject=CN=lane Root CA, O=lane\nissuer=CN=lane Root CA, O=lane\nnotAfter=Jun 10 22:30:20 2036 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:002c0b4f.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/002c0b4f.0",
+      "returncode": 0,
+      "stdout": "subject=C=BE, O=GlobalSign nv-sa, CN=GlobalSign Root R46\nissuer=C=BE, O=GlobalSign nv-sa, CN=GlobalSign Root R46\nnotAfter=Mar 20 00:00:00 2046 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:0179095f.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0179095f.0",
+      "returncode": 0,
+      "stdout": "subject=C=CN, O=BEIJING CERTIFICATE AUTHORITY, CN=BJCA Global Root CA1\nissuer=C=CN, O=BEIJING CERTIFICATE AUTHORITY, CN=BJCA Global Root CA1\nnotAfter=Dec 12 03:16:17 2044 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:062cdee6.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/062cdee6.0",
+      "returncode": 0,
+      "stdout": "subject=OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign\nissuer=OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign\nnotAfter=Mar 18 10:00:00 2029 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:064e0aa9.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/064e0aa9.0",
+      "returncode": 0,
+      "stdout": "subject=C=BM, O=QuoVadis Limited, CN=QuoVadis Root CA 2 G3\nissuer=C=BM, O=QuoVadis Limited, CN=QuoVadis Root CA 2 G3\nnotAfter=Jan 12 18:59:32 2042 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:06dc52d5.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/06dc52d5.0",
+      "returncode": 0,
+      "stdout": "subject=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com EV Root Certification Authority RSA R2\nissuer=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com EV Root Certification Authority RSA R2\nnotAfter=May 30 18:14:37 2042 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:09789157.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/09789157.0",
+      "returncode": 0,
+      "stdout": "subject=C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2\nissuer=C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2\nnotAfter=Dec 31 23:59:59 2037 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:0a775a30.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0a775a30.0",
+      "returncode": 0,
+      "stdout": "subject=C=US, O=Google Trust Services LLC, CN=GTS Root R3\nissuer=C=US, O=Google Trust Services LLC, CN=GTS Root R3\nnotAfter=Jun 22 00:00:00 2036 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:0b1b94ef.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0b1b94ef.0",
+      "returncode": 0,
+      "stdout": "subject=C=CN, O=China Financial Certification Authority, CN=CFCA EV ROOT\nissuer=C=CN, O=China Financial Certification Authority, CN=CFCA EV ROOT\nnotAfter=Dec 31 03:07:01 2029 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:0b9bc432.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0b9bc432.0",
+      "returncode": 0,
+      "stdout": "subject=C=US, O=Internet Security Research Group, CN=ISRG Root X2\nissuer=C=US, O=Internet Security Research Group, CN=ISRG Root X2\nnotAfter=Sep 17 16:00:00 2040 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:0bf05006.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0bf05006.0",
+      "returncode": 0,
+      "stdout": "subject=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com Root Certification Authority ECC\nissuer=C=US, ST=Texas, L=Houston, O=SSL Corporation, CN=SSL.com Root Certification Authority ECC\nnotAfter=Feb 12 18:14:03 2041 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:0f5dc4f3.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0f5dc4f3.0",
+      "returncode": 0,
+      "stdout": "subject=C=CN, O=UniTrust, CN=UCA Extended Validation Root\nissuer=C=CN, O=UniTrust, CN=UCA Extended Validation Root\nnotAfter=Dec 31 00:00:00 2038 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:0f6fa695.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/0f6fa695.0",
+      "returncode": 0,
+      "stdout": "subject=C=CN, O=GUANG DONG CERTIFICATE AUTHORITY CO.,LTD., CN=GDCA TrustAUTH R5 ROOT\nissuer=C=CN, O=GUANG DONG CERTIFICATE AUTHORITY CO.,LTD., CN=GDCA TrustAUTH R5 ROOT\nnotAfter=Dec 31 15:59:59 2040 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:1001acf7.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/1001acf7.0",
+      "returncode": 0,
+      "stdout": "subject=C=US, O=Google Trust Services LLC, CN=GTS Root R1\nissuer=C=US, O=Google Trust Services LLC, CN=GTS Root R1\nnotAfter=Jun 22 00:00:00 2036 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:1359544c.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/1359544c.0",
+      "returncode": 0,
+      "stdout": "subject=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nissuer=CN=Cognitum Device CA, O=Cognitum One, OU=Device Security\nnotAfter=Jun 13 11:17:14 2046 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:14bc7599.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/14bc7599.0",
+      "returncode": 0,
+      "stdout": "subject=C=IN, OU=emSign PKI, O=eMudhra Technologies Limited, CN=emSign ECC Root CA - G3\nissuer=C=IN, OU=emSign PKI, O=eMudhra Technologies Limited, CN=emSign ECC Root CA - G3\nnotAfter=Feb 18 18:30:00 2043 GMT\n",
+      "stderr": ""
+    },
+    {
+      "purpose": "cert_metadata:1cef98f5.0",
+      "cmd": "/usr/bin/openssl x509 -noout -subject -issuer -enddate -in /etc/ssl/certs/1cef98f5.0",
+      "returncode": 0,
+      "stdout": "subject=C=CN, O=TrustAsia Technologies, Inc., CN=TrustAsia Global Root CA G4\nissuer=C=CN, O=TrustAsia Technologies, Inc., CN=TrustAsia Global Root CA G4\nnotAfter=May 19 02:10:22 2046 GMT\n",
+      "stderr": ""
+    }
   ]
 }

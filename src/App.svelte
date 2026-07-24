@@ -1,24 +1,22 @@
 <script>
-  // LifeOS — App SFC (root shell), Svelte port of App.vue — Phase 1 of the
+  // LifeOS — App SFC (root shell), Svelte port of App.vue — phases 1+2 of the
   // blueprint-mandated Vue→Svelte migration (blueprint invariant 4: Tauri/Svelte
   // Glass). See [[tasks/blueprint-glass-svelte-migration]].
   //
-  // Scope discipline: this phase ports the SHELL ONLY (App/Sidebar/Workspace) —
-  // not the workspace view panes it mounts in <main> (Dashboard, SubsectionView,
-  // N8nFlowView, OpenPencilEditor, LightsView, CalendarView, FilesView, HealthView,
-  // IoTView, ContactsView, SettingsView) or the overlay layer (AIAvatar/AIChat,
-  // CommandPalette, KeyboardHelp, NotificationsDrawer, ToastContainer) — those are
-  // phase 2. The <main> v-else-if chain below is preserved EXACTLY (same branch
-  // order, same discriminators, including the OpenPencil gate
-  // `activeSub.item?.view === 'open-pencil'`) so the gate logic itself is
-  // provably identical to App.vue's; each not-yet-ported branch renders a
-  // `data-view-pane`-tagged placeholder instead of the real view component.
-  // The AI avatar slot is similarly a placeholder — see phase2_backlog.
+  // Phase 2 replaced the phase-1 `data-view-pane` placeholders with the real
+  // ported view panes and overlays — the <main> branch chain below now mirrors
+  // App.vue 1:1 (same branch order, same discriminators, including the
+  // OpenPencil mounting gate `activeSub.item?.view === 'open-pencil'`).
   //
   // This component is NOT wired into src/main.ts or src/router/index.ts yet:
-  // the Vue App stays the sole mounted app until its Svelte replacement is
-  // proven by tests and explicitly cut over (never remove Vue functionality
-  // before its Svelte replacement is proven — see CLAUDE.md).
+  // the Vue App stays the sole mounted app until the Svelte tree passes parity
+  // review and is explicitly cut over in phase 3 (never remove Vue
+  // functionality before its Svelte replacement is proven — see CLAUDE.md).
+  //
+  // The auth gate is the only top-level branch: Login covers the viewport until
+  // the auth store reports `signed_in`. loadStatus() runs once on mount so the
+  // gate reflects the backend (no account → signup; account but no session →
+  // welcome-back signin).
   import { onMount } from "svelte";
   import { useLifeos } from "@/stores/lifeos.js";
   import { useAuth } from "@/stores/auth";
@@ -26,6 +24,22 @@
   import { router as appRouter } from "@/router";
   import Sidebar from "./components/Sidebar.svelte";
   import Workspace from "./components/Workspace.svelte";
+  import Dashboard from "./components/Dashboard.svelte";
+  import SubsectionView from "./components/SubsectionView.svelte";
+  import N8nFlowView from "./components/N8nFlowView.svelte";
+  import OpenPencilEditor from "./components/OpenPencilEditor.svelte";
+  import LightsView from "./components/LightsView.svelte";
+  import CalendarView from "./components/CalendarView.svelte";
+  import FilesView from "./components/FilesView.svelte";
+  import HealthView from "./components/HealthView.svelte";
+  import IoTView from "./components/IoTView.svelte";
+  import ContactsView from "./components/ContactsView.svelte";
+  import SettingsView from "./components/SettingsView.svelte";
+  import AIAvatar from "./components/AIAvatar.svelte";
+  import CommandPalette from "./components/CommandPalette.svelte";
+  import KeyboardHelp from "./components/KeyboardHelp.svelte";
+  import ToastContainer from "./components/ToastContainer.svelte";
+  import NotificationsDrawer from "./components/NotificationsDrawer.svelte";
   import Login from "./views/Login.svelte";
 
   let { router = appRouter } = $props();
@@ -48,31 +62,35 @@
     <Workspace {router} />
     <main class="main" id="main" tabindex="-1">
       {#if lifeosState.activeId === "settings" && !lifeosState.activeSub}
-        <div class="view-pane-placeholder" data-view-pane="settings"></div>
+        <SettingsView />
       {:else if lifeosState.activeId === "contacts" && !lifeosState.activeSub}
-        <div class="view-pane-placeholder" data-view-pane="contacts"></div>
+        <ContactsView {router} />
       {:else if !lifeosState.activeSub}
-        <div class="view-pane-placeholder" data-view-pane="dashboard"></div>
+        <Dashboard {router} />
       {:else if lifeosState.activeSub.item?.view === "open-pencil"}
-        <div class="view-pane-placeholder" data-view-pane="open-pencil"></div>
+        <OpenPencilEditor sub={lifeosState.activeSub} {router} />
       {:else if lifeosState.activeSub.item?.view === "n8n-flow"}
-        <div class="view-pane-placeholder" data-view-pane="n8n-flow"></div>
+        <N8nFlowView />
       {:else if lifeosState.activeSub.item?.view === "lights"}
-        <div class="view-pane-placeholder" data-view-pane="lights"></div>
+        <LightsView {router} />
       {:else if lifeosState.activeSub.item?.view === "calendar"}
-        <div class="view-pane-placeholder" data-view-pane="calendar"></div>
+        <CalendarView {router} />
       {:else if lifeosState.activeSub.item?.view === "files"}
-        <div class="view-pane-placeholder" data-view-pane="files"></div>
+        <FilesView {router} />
       {:else if lifeosState.activeSub.item?.view === "health"}
-        <div class="view-pane-placeholder" data-view-pane="health"></div>
+        <HealthView {router} />
       {:else if lifeosState.activeSub.item?.view === "iot"}
-        <div class="view-pane-placeholder" data-view-pane="iot"></div>
+        <IoTView {router} />
       {:else if lifeosState.activeSub.item?.view === "contacts"}
-        <div class="view-pane-placeholder" data-view-pane="contacts-sub"></div>
+        <ContactsView {router} />
       {:else}
-        <div class="view-pane-placeholder" data-view-pane="subsection"></div>
+        <SubsectionView />
       {/if}
     </main>
-    <div class="ai-avatar-placeholder" data-region="ai-avatar" aria-hidden="true"></div>
+    <AIAvatar />
+    <CommandPalette {router} />
+    <KeyboardHelp />
+    <NotificationsDrawer />
+    <ToastContainer />
   </div>
 {/if}

@@ -3,10 +3,10 @@
 //
 // Also covers what App-auth-gate.spec.js doesn't: the <main> view-pane gate
 // (including the OpenPencil mounting gate) that CLAUDE.md/AGENTS.md require
-// App.svelte to preserve exactly — see App.svelte's header comment for the
-// phase-1 placeholder strategy (Dashboard/SubsectionView/etc. aren't ported
-// until phase 2, so each branch renders a `data-view-pane`-tagged placeholder
-// instead of the real component; the gate CONDITIONS are what's under test).
+// App.svelte to preserve exactly. Phase 2 replaced the phase-1 placeholders
+// with the real ported components, so the gate tests now assert the actual
+// view roots (.canvas-greeting for Dashboard, .op-canvas for the editor,
+// .sub-canvas for SubsectionView, .ai-avatar for the overlay).
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, cleanup } from "@testing-library/svelte";
 import { tick } from "svelte";
@@ -100,29 +100,45 @@ describe("App.svelte shell layout + main-pane gate", () => {
     expect(container.querySelector(".shell .rail")).not.toBeNull();
     expect(container.querySelector(".shell .workspace")).not.toBeNull();
     expect(container.querySelector(".shell #main.main")).not.toBeNull();
-    expect(container.querySelector('.shell [data-region="ai-avatar"]')).not.toBeNull();
+    expect(container.querySelector(".shell .ai-avatar")).not.toBeNull();
   });
 
-  it("mounts the dashboard placeholder when no activeSub is set", async () => {
+  it("mounts the Dashboard when no activeSub is set", async () => {
     lifeos.activeSub = null;
     const { container } = render(App, { props: { router } });
     await tick();
-    expect(container.querySelector('[data-view-pane="dashboard"]')).not.toBeNull();
+    expect(container.querySelector("#main .canvas-greeting")).not.toBeNull();
   });
 
   it("preserves the OpenPencil mounting gate: activeSub.item?.view === 'open-pencil'", async () => {
     lifeos.activeSub = { workspaceId: "ai", sectionTitle: "Files", item: { label: "App.vue", view: "open-pencil" } };
     const { container } = render(App, { props: { router } });
     await tick();
-    expect(container.querySelector('[data-view-pane="open-pencil"]')).not.toBeNull();
-    expect(container.querySelector('[data-view-pane="subsection"]')).toBeNull();
+    expect(container.querySelector("#main .op-canvas")).not.toBeNull();
+    expect(container.querySelector("#main .sub-canvas")).toBeNull();
   });
 
-  it("falls through to the SubsectionView placeholder for an unrecognized/absent view discriminator", async () => {
+  it("falls through to SubsectionView for an unrecognized/absent view discriminator", async () => {
     lifeos.activeSub = { workspaceId: "ai", sectionTitle: "Rules", item: { label: "Quiet hours" } };
     const { container } = render(App, { props: { router } });
     await tick();
-    expect(container.querySelector('[data-view-pane="subsection"]')).not.toBeNull();
-    expect(container.querySelector('[data-view-pane="open-pencil"]')).toBeNull();
+    expect(container.querySelector("#main .sub-canvas")).not.toBeNull();
+    expect(container.querySelector("#main .op-canvas")).toBeNull();
+  });
+
+  it("mounts the N8nFlowView for view === 'n8n-flow'", async () => {
+    lifeos.activeSub = { workspaceId: "ai", sectionTitle: "Agent Teams", item: { label: "Day Captain", flowId: "day", view: "n8n-flow" } };
+    const { container } = render(App, { props: { router } });
+    await tick();
+    expect(container.querySelector("#main .flow-canvas")).not.toBeNull();
+  });
+
+  it("mounts SettingsView when activeId is settings with no activeSub", async () => {
+    lifeos.activeId = "settings";
+    lifeos.activeSub = null;
+    const { container } = render(App, { props: { router } });
+    await tick();
+    expect(container.querySelector("#main .settings-canvas")).not.toBeNull();
+    expect(container.querySelector("#main .canvas-greeting")).toBeNull();
   });
 });

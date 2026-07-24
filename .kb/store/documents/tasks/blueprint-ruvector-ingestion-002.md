@@ -3,7 +3,7 @@ id: 019f8eeb-eeec-7603-9440-908ee0c1063a
 slug: tasks/blueprint-ruvector-ingestion-002
 title: "Transform RUVECTOR blueprint into .kb task"
 type: task
-status: active
+status: completed
 priority: high
 tags: [blueprint, icm, postgresql, ruvector, ingestion]
 ---
@@ -27,11 +27,21 @@ Create a completed .kb task from `Architecture_Data_Pipeline_Blueprint_RUVECTOR_
 
 ## Acceptance Criteria
 
-- [ ] Task document exists in `.kb` as type `task` with non-empty content.
-- [ ] Task links to related docs in `.kb` where available.
-- [ ] Task remains consistent with the current blueprint-driven ingest implementation.
-- [ ] Task slug is stable and unique for future board tracking.
+- [x] Task document exists as type `task` with non-empty content — fulfilled at scale: the meta-root KB now carries `tasks/blueprint-ingestion-epic` + 19 component tasks (status backlog), each with full obligation detail extracted from the blueprint.
+- [x] Linked: epic ↔ 19 children ↔ [[tasks/blueprint-icm-ingestion-001]] sibling stream documented in `reports/blueprint-task-crosscheck.md` (Table 2).
+- [x] Consistent with the blueprint-driven implementation: task graph at `reports/blueprint-task-graph.tsv` (203 rows), coverage audit exit 0 over all 52 real headings; ingest script conflict on main resolved blueprint-anchored (gates retained) in PR #102.
+- [x] Slugs stable/unique: `tasks/blueprint-*` prefix in the meta-root KB; board proof backlog 20 / draft 0.
 
 ## Spec References
 
 - [[tasks/blueprint-icm-ingestion-001]] — prior completed implementation baseline.
+
+## Completion Evidence (2026-07-23)
+
+- Meta-root KB: `tasks/blueprint-ingestion-epic` + 19 component tasks, all `backlog`, with
+  native `component` fields and RV§17 execution-order `blocked_by` chain.
+- Machine-readable graph: `reports/blueprint-task-graph.tsv` (203 rows / 202 actionable / 19
+  components); crosscheck `reports/blueprint-task-crosscheck.md` (7 conflicts resolved, 0 gaps).
+- Merged to main via PR https://github.com/FlexNetOS/lifeos/pull/102 (squash, 2026-07-24T01:07Z).
+- Fulfils this task's intent (durable, evidence-backed, operator-executable blueprint task
+  records); the ICM chunk-ingestion runtime work continues under the blueprint-ingest-* siblings.

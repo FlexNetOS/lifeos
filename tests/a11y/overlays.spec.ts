@@ -1,134 +1,115 @@
-// LifeOS — a11y regression suite: interactive overlays (open + closed states)
+// LifeOS — a11y regression suite: interactive overlays (open + closed states) — Svelte
+// Ported 1:1 from the Vue suite at the phase-3 cutover. Open/closed is store-
+// driven exactly as in the app (the Vue suite's open/notifications props were
+// undeclared fallthroughs). Where Vue stubbed <Teleport>, the Svelte ports
+// really teleport to document.body via the portal action, so open-state
+// assertions and axe scans target the teleported panel there.
 //
 // Requires: bun add -D 'vitest-axe@0.1.0' 'axe-core'
 // Run: bun run test:a11y
 
-import { describe, it, beforeEach } from "vitest";
-import { flushPromises, mount } from "@vue/test-utils";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { render, cleanup } from "@testing-library/svelte";
+import { tick } from "svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { axe } from "vitest-axe";
 
-import CommandPalette from "@/components/CommandPalette.vue";
-import KeyboardHelp from "@/components/KeyboardHelp.vue";
-import NotificationsDrawer from "@/components/NotificationsDrawer.vue";
-import ToastContainer from "@/components/ToastContainer.vue";
+import CommandPalette from "@/components/CommandPalette.svelte";
+import KeyboardHelp from "@/components/KeyboardHelp.svelte";
+import NotificationsDrawer from "@/components/NotificationsDrawer.svelte";
+import ToastContainer from "@/components/ToastContainer.svelte";
 import { useLifeos } from "@/stores/lifeos.js";
 
-// Real router via createMemoryHistory — overlays such as CommandPalette use
-// Vue Router's Symbol injection, which stubs alone do not satisfy.
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
-  routes: [{ path: "/", component: { template: "<div />" } }],
-});
-
-const globalOpts = () => ({
-  global: {
-    plugins: [createPinia(), makeRouter()],
-    stubs: {
-      Teleport: true,
-    },
-  },
+  routes: [{ path: "/", component: {} }],
 });
 
 beforeEach(() => {
   setActivePinia(createPinia());
 });
 
+afterEach(() => cleanup());
+
 const axeOptions = {
   runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] },
 };
 
+const axeTarget = (container: HTMLElement): Element | string =>
+  container.firstElementChild ?? (container.innerHTML || "<div />");
+
 // — CommandPalette ————————————————————————————————————————————
 describe("CommandPalette", () => {
   it("has no a11y violations when closed", async () => {
-    const w = mount(CommandPalette, {
-      ...globalOpts(),
-      props: { open: false },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(CommandPalette, { props: { router: makeRouter() } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations when open", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
     useLifeos().openCmdk("");
-    const w = mount(CommandPalette, {
-      global: { plugins: [pinia, makeRouter()], stubs: { Teleport: true } },
-    });
-    await flushPromises();
-    expect(w.find("[data-figma-reference='5:49#command-menu']").exists()).toBe(true);
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    render(CommandPalette, { props: { router: makeRouter() } });
+    await tick();
+    const panel = document.body.querySelector("[data-figma-reference='5:49#command-menu']");
+    expect(panel).not.toBeNull();
+    expect(await axe(panel as Element, axeOptions)).toHaveNoViolations();
   });
 });
 
 // — KeyboardHelp ————————————————————————————————————————————
 describe("KeyboardHelp", () => {
   it("has no a11y violations when closed", async () => {
-    const w = mount(KeyboardHelp, {
-      ...globalOpts(),
-      props: { open: false },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(KeyboardHelp);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations when open", async () => {
-    const w = mount(KeyboardHelp, {
-      ...globalOpts(),
-      props: { open: true },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(KeyboardHelp);
+    // "?" opens the overlay — same trigger the app uses.
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
+    await tick();
+    const overlay =
+      container.firstElementChild ??
+      document.body.querySelector(".keyboard-help, [role='dialog']");
+    expect(overlay).not.toBeNull();
+    expect(await axe(overlay as Element, axeOptions)).toHaveNoViolations();
   });
 });
 
 // — NotificationsDrawer ————————————————————————————————————————
 describe("NotificationsDrawer", () => {
   it("has no a11y violations when closed", async () => {
-    const w = mount(NotificationsDrawer, {
-      ...globalOpts(),
-      props: {
-        open: false,
-        notifications: window.LIFEOS_DATA?.notifications ?? [],
-      },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(NotificationsDrawer);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations when open", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
     useLifeos().openNotificationsDrawer();
-    const w = mount(NotificationsDrawer, {
-      global: { plugins: [pinia, makeRouter()], stubs: { Teleport: true } },
-    });
-    await flushPromises();
-    expect(w.find("[data-figma-reference='5:49#temporary-panels']").exists()).toBe(true);
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    render(NotificationsDrawer);
+    await tick();
+    const panel = document.body.querySelector("[data-figma-reference='5:49#temporary-panels']");
+    expect(panel).not.toBeNull();
+    expect(await axe(panel as Element, axeOptions)).toHaveNoViolations();
   });
 });
 
 // — ToastContainer ————————————————————————————————————————————
 describe("ToastContainer", () => {
   it("has no a11y violations with no toasts", async () => {
-    const w = mount(ToastContainer, globalOpts());
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(ToastContainer);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations with all toast variants visible", async () => {
-    const w = mount(ToastContainer, {
-      ...globalOpts(),
-      // ToastContainer reads from the useToasts store; seed it via the pinia store directly.
-      // The store exposes addToast — call it after mount via the component's exposed interface
-      // or by triggering an action in the mounted store.
-    });
-    // Access the Pinia toasts store and add one of each variant.
-    const { useToasts } = await import("@/stores/toasts");
+    const { container } = render(ToastContainer);
+    // ToastContainer reads from the useToasts store; seed one of each variant.
+    const { useToasts } = await import("@/stores/toasts.js");
     const toasts = useToasts();
     toasts.push({ message: "Info toast", variant: "info" });
     toasts.push({ message: "Success toast", variant: "success" });
     toasts.push({ message: "Warning toast", variant: "warn" });
     toasts.push({ message: "Error toast", variant: "error" });
-    await w.vm.$nextTick();
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    await tick();
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });

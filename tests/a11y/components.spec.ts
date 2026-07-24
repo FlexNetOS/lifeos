@@ -1,210 +1,151 @@
-// LifeOS — a11y regression suite: stateful component variants
+// LifeOS — a11y regression suite: stateful component variants — Svelte
+// Ported 1:1 from the Vue suite at the phase-3 cutover. Variant states are
+// store-driven exactly as in the app (the Vue suite's hidden/chatOpen/loading/
+// telemetry props were undeclared fallthroughs; TelemetryWidget renders its
+// desktop-app placeholder in all three variants outside a Tauri host, in both
+// framework versions).
 //
 // Requires: bun add -D 'vitest-axe@0.1.0' 'axe-core'
 // Run: bun run test:a11y
 
-import { describe, it, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { render, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { axe } from "vitest-axe";
 
-import Sidebar from "@/components/Sidebar.vue";
-import Workspace from "@/components/Workspace.vue";
-import AIAvatar from "@/components/AIAvatar.vue";
-import TelemetryWidget from "@/components/TelemetryWidget.vue";
-import Badge from "@/components/Badge.vue";
-import Icon from "@/components/Icon.vue";
-import MenuRow from "@/components/MenuRow.vue";
+import Sidebar from "@/components/Sidebar.svelte";
+import Workspace from "@/components/Workspace.svelte";
+import AIAvatar from "@/components/AIAvatar.svelte";
+import TelemetryWidget from "@/components/TelemetryWidget.svelte";
+import Badge from "@/components/Badge.svelte";
+import Icon from "@/components/Icon.svelte";
+import MenuRow from "@/components/MenuRow.svelte";
 import { useLifeos } from "@/stores/lifeos.js";
 
-// Real router via createMemoryHistory — components such as Sidebar use Vue
-// Router's Symbol injection, which stubs alone do not satisfy.
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
-  routes: [{ path: "/", component: { template: "<div />" } }],
-});
-
-const globalOpts = () => ({
-  global: {
-    plugins: [createPinia(), makeRouter()],
-    stubs: {
-      RouterView: { template: '<div />' },
-      Teleport: true,
-    },
-  },
+  routes: [{ path: "/", component: {} }],
 });
 
 beforeEach(() => {
   setActivePinia(createPinia());
 });
 
+afterEach(() => cleanup());
+
 const axeOptions = {
   runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] },
 };
 
+const axeTarget = (container: HTMLElement): Element | string =>
+  container.firstElementChild ?? (container.innerHTML || "<div />");
+
 // — Sidebar ————————————————————————————————————————————————
 describe("Sidebar", () => {
   it("has no a11y violations when expanded", async () => {
-    const w = mount(Sidebar, {
-      ...globalOpts(),
-      props: { data: window.LIFEOS_DATA ?? {} },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Sidebar, { props: { router: makeRouter() } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations when collapsed", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
     useLifeos().toggleWs();
-    const w = mount(Sidebar, {
-      global: {
-        plugins: [pinia, makeRouter()],
-        stubs: { RouterView: { template: '<div />' }, Teleport: true },
-      },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Sidebar, { props: { router: makeRouter() } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });
 
 // — Workspace ———————————————————————————————————————————————
 describe("Workspace", () => {
   it("has no a11y violations when expanded", async () => {
-    const w = mount(Workspace, globalOpts());
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Workspace, { props: { router: makeRouter() } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations when collapsed", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
     useLifeos().toggleWs();
-    const w = mount(Workspace, {
-      global: {
-        plugins: [pinia, makeRouter()],
-        stubs: { RouterView: { template: '<div />' }, Teleport: true },
-      },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Workspace, { props: { router: makeRouter() } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });
 
 // — AIAvatar ————————————————————————————————————————————————
 describe("AIAvatar", () => {
   it("has no a11y violations when hidden", async () => {
-    const w = mount(AIAvatar, {
-      ...globalOpts(),
-      props: { hidden: true },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    useLifeos().toggleAiAvatarHidden();
+    const { container } = render(AIAvatar);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations when visible (chat closed)", async () => {
-    const w = mount(AIAvatar, {
-      ...globalOpts(),
-      props: { hidden: false },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(AIAvatar);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations with chat open", async () => {
-    const w = mount(AIAvatar, {
-      ...globalOpts(),
-      props: { hidden: false, chatOpen: true },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    useLifeos().toggleAiChat();
+    const { container } = render(AIAvatar);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });
 
 // — TelemetryWidget ————————————————————————————————————————
 describe("TelemetryWidget", () => {
   it("has no a11y violations in loading state", async () => {
-    const w = mount(TelemetryWidget, {
-      ...globalOpts(),
-      props: { loading: true },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(TelemetryWidget);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations in loaded state", async () => {
-    const w = mount(TelemetryWidget, {
-      ...globalOpts(),
-      props: {
-        loading: false,
-        telemetry: {
-          cpuPercent: 42,
-          memUsedGb: 8.2,
-          memTotalGb: 16,
-          netRxKbps: 1240,
-          netTxKbps: 380,
-          uptimeSecs: 86400,
-        },
-      },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(TelemetryWidget);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations in error state", async () => {
-    const w = mount(TelemetryWidget, {
-      ...globalOpts(),
-      props: { loading: false, error: "Could not read telemetry" },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(TelemetryWidget);
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });
 
 // — Badge ————————————————————————————————————————————————
 describe("Badge", () => {
   it("has no a11y violations (count, info tone)", async () => {
-    const w = mount(Badge, {
-      ...globalOpts(),
-      props: { count: 7, tone: "info" },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Badge, { props: { count: 7, tone: "info" } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations (count, err tone)", async () => {
-    const w = mount(Badge, {
-      ...globalOpts(),
-      props: { count: 3, tone: "err" },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Badge, { props: { count: 3, tone: "err" } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });
 
 // — Icon ————————————————————————————————————————————————
 describe("Icon", () => {
   it("has no a11y violations (known icon)", async () => {
-    const w = mount(Icon, {
-      ...globalOpts(),
-      props: { name: "bell", size: 20 },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Icon, { props: { name: "bell", size: 20 } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations (unknown icon — fallback span)", async () => {
-    const w = mount(Icon, {
-      ...globalOpts(),
-      props: { name: "does-not-exist", size: 16 },
-    });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    const { container } = render(Icon, { props: { name: "does-not-exist", size: 16 } });
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });
 
 // — MenuRow ————————————————————————————————————————————————
 describe("MenuRow", () => {
   it("has no a11y violations (idle)", async () => {
-    const w = mount(MenuRow, {
-      ...globalOpts(),
+    const { container } = render(MenuRow, {
       props: { item: { icon: "file", label: "Document", meta: "3 files" } },
     });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 
   it("has no a11y violations (active state)", async () => {
-    const w = mount(MenuRow, {
-      ...globalOpts(),
+    const { container } = render(MenuRow, {
       props: { item: { icon: "file", label: "Document", meta: "3 files", active: true } },
     });
-    expect(await axe(w.element, axeOptions)).toHaveNoViolations();
+    expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();
   });
 });

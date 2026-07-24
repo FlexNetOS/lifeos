@@ -1,14 +1,17 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { fileURLToPath, URL } from "node:url";
 
-// LifeOS Vue + Tauri kit
+// LifeOS Svelte + Tauri kit (Glass shell)
 // Tauri uses fixed dev port; HMR is wired via Tauri Vite plugin in production.
+// The Vue SFC toolchain retired at the phase-3 cutover; the `vue` package
+// itself remains a runtime dependency (Pinia's reactivity engine, vue-router,
+// and the pinia-bridge's standalone watch()).
 
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig(async () => ({
-  plugins: [vue()],
+  plugins: [svelte()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -41,10 +44,10 @@ export default defineConfig(async () => ({
         // preserving Vite 8's current output contract.
         codeSplitting: {
           groups: [
-            { name: "lucide", test: /[\\/]node_modules[\\/]@lucide[\\/]vue[\\/]/, priority: 40 },
+            { name: "lucide", test: /[\\/]node_modules[\\/]lucide-svelte[\\/]/, priority: 40 },
             { name: "vue-router", test: /[\\/]node_modules[\\/]vue-router[\\/]/, priority: 30 },
-            { name: "pinia", test: /[\\/]node_modules[\\/]pinia[\\/]/, priority: 20 },
-            { name: "vue", test: /[\\/]node_modules[\\/](?:@vue[\\/]|vue[\\/])/, priority: 10 },
+            { name: "pinia", test: /[\\/]node_modules[\\/](?:pinia|@vue[\\/]|vue[\\/])/, priority: 20 },
+            { name: "svelte", test: /[\\/]node_modules[\\/]svelte[\\/]/, priority: 10 },
           ],
         },
       },

@@ -326,6 +326,8 @@
              class:is-drop-target={drag.overSection === section.title && drag.kind === "section"}
              class:is-collapsed={isCollapsed(section.title)}
              data-section-anchor={section.title}
+             role="group"
+             aria-label="{section.title} section"
              draggable="true"
              ondragstart={(e) => startSectionDrag(e, section.title)}
              ondragover={onDragOver}
@@ -349,6 +351,7 @@
               <div data-expand-key="{section.title}-{i}"
                    class="draggable-item"
                    class:is-drop-target={drag.kind === "item" && drag.overItem?.sectionTitle === section.title && drag.overItem?.label === item.label}
+                   role="group"
                    draggable="true"
                    ondragstart={(e) => startItemDrag(e, section.title, item)}
                    ondragover={(e) => { e.stopPropagation(); onDragOver(e); }}

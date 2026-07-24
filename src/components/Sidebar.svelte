@@ -266,13 +266,13 @@
             <span class="net-row-k"><Icon name="shield-check" size={11} /> Firewall</span>
             <span class="net-row-v">Inbound blocked · 47 rules</span>
             <button class="net-sw" class:on={security.firewall} onclick={() => security.firewall = !security.firewall}
-                    aria-pressed={security.firewall}><span></span></button>
+                    aria-pressed={security.firewall} aria-label="Toggle firewall"><span></span></button>
           </div>
           <div class="net-toggle">
             <span class="net-row-k"><Icon name="zap-off" size={11} /> Kill switch</span>
             <span class="net-row-v">Block traffic if VPN drops</span>
             <button class="net-sw" class:on={security.killSwitch} onclick={() => security.killSwitch = !security.killSwitch}
-                    aria-pressed={security.killSwitch}><span></span></button>
+                    aria-pressed={security.killSwitch} aria-label="Toggle kill switch"><span></span></button>
           </div>
           <div class="net-leak-grid">
             <div class="net-leak" class:warn={security.ipv6Leak}>

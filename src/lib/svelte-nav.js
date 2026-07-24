@@ -1,5 +1,5 @@
 // LifeOS — navigation bridge for the Svelte shell port (Svelte counterpart of
-// src/lib/nav.js's useNav(), scoped to what Sidebar.svelte/Workspace.svelte call).
+// src/lib/nav.js's useNav(); full five-method surface, mirrored 1:1).
 //
 // Why not reuse useNav() directly: it calls vue-router's useRouter(), which reads
 // the router off Vue's component-injection context (inject(routerKey)). Outside a
@@ -34,6 +34,15 @@ export function createNav(router) {
     pickSub(item, sectionTitle) {
       lifeos.pickSub(item, sectionTitle);
       pushIfChanged(router, buildPath(lifeos.activeId, sectionTitle, item?.label));
+    },
+    clearSub() {
+      const sec = lifeos.sectionByWs[lifeos.activeId];
+      lifeos.clearSub();
+      pushIfChanged(router, buildPath(lifeos.activeId, sec));
+    },
+    jumpToTeam(item, teamIndex) {
+      lifeos.jumpToTeam(item, teamIndex);
+      pushIfChanged(router, buildPath("ai", "Agent Teams", item?.label));
     },
   };
 }

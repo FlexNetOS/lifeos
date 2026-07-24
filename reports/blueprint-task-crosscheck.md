@@ -60,3 +60,27 @@ The component dependency graph is intentionally cyclic (redb↔envctl, schema↔
 the blueprint's architecture is bidirectionally coupled. Execution order for Codex comes
 from the blueprint's own RV§17 sequential authority gates, encoded as `execution order N`
 in every task's Context. Order within the same number may run concurrently.
+
+## Verify-pass addendum (2026-07-23)
+
+Surface driven: git-kb board/show/graph/search as a cold-start consumer, plus probes
+(bad slug → clean error; tag filter; search ranking). Upgrades applied and committed
+(KB commit "Verify-pass upgrades: …"):
+
+1. **Intra-stream duplicate found and fixed**: T005 (§3.1) and T056 (RV§2) restated the
+   Vue→Svelte migration owned by T165 (R01). Consolidated into
+   `tasks/blueprint-glass-svelte-migration`; front-door task keeps T152 (step-13 integration)
+   with an explicit scope-split note. TSV component column re-synced; coverage audit re-run green.
+2. **Pin-currency audit** (observed on this host, appended to 7 tasks):
+   rtk 0.43.0 ✓; Nushell 0.113.1 ✓; nu_plugin HEAD = 931d48f ✓ (matches R17 pin — R19 checkout
+   staleness resolved); rtk_nu_main.rs exists (R18 verified) BUT rtk-tokenkill sits on
+   `feat/rtk-full-feature-config` @ 43b93ab, not pinned develop 44cf84e7; envctl live checkout is
+   `codex/profile-xdg-owner-20260721` @ 38f8aba (not R11's 48368a97); `/srv/flexnetos/sources/
+   RuVector/6a6c39e6*` absent (RV§15 precondition unmet); pg tools absent from ambient PATH
+   (verify inside Nix closure); @ruvector/rvf live registry 0.3.0 vs installed 0.2.3 vs ADR-era 0.1.x.
+3. **Native metadata added**: `component` set on all 20 docs; execution-order encoded as a
+   `blocked_by` DAG following the RV§17 authority-gate groups (order 1→2→3→5→6→7→8→9→13,
+   plus glass-engine-frontdoor ← glass-svelte-migration).
+4. **Tag collision noted**: pre-existing completed task `tasks/rtk-codex-hooks-server-dashboard-icm`
+   also carries tag `codex`; stream queries should filter by tag AND status, or slug prefix.
+5. Epic acceptance criteria checked off with evidence; progress log added.

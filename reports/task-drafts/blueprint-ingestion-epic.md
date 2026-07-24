@@ -50,6 +50,12 @@ against the pre-existing 207 meta-root KB tasks lives at
   assumption of done.
 - Status flow for children: `draft` → `backlog` only. Codex claims tasks by moving them to
   `active`; nothing here is pre-claimed.
+- Sibling stream: the lifeos-local KB carries an earlier, different-axis decomposition
+  (`tasks/blueprint-ingest-*` 009–014, blueprint-content-ingestion pipeline) that remains
+  active in that KB; see Table 2 of the crosscheck report. `tasks/blueprint-ruvector-ingestion-002`
+  there is fulfilled by this stream and is recommended for closure with evidence.
+- Provenance: the blueprint document itself was delivered by completed meta-root task
+  `tasks/architecture-data-pipeline-blueprint`; this epic implements it.
 
 ## Children
 

@@ -299,14 +299,6 @@
     export: "Export",
     files: activePath || "Files",
   }[pane] || "Canvas");
-
-  const onTabCloseKeydown = (e, path) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      e.stopPropagation();
-      closeTab(path);
-    }
-  };
 </script>
 
 <div class="canvas op-canvas">
@@ -567,9 +559,14 @@ claude mcp add --scope user open-pencil -- openpencil-mcp
                           title={t.path}>
                     <Icon name={t.icon} size={11} />
                     <span class="op-files-tab-name">{t.path.split("/").pop()}</span>
-                    <span class="op-files-tab-x" role="button" tabindex="-1"
+                    <!-- Deliberately a plain (non-focusable) span, exactly like the
+                         Vue original: role="button"/tabindex here would nest a
+                         focusable control inside the tab <button> and trip axe's
+                         nested-interactive rule (wcag2a), which gates test:a11y. -->
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <span class="op-files-tab-x"
                           onclick={(e) => { e.stopPropagation(); closeTab(t.path); }}
-                          onkeydown={(e) => onTabCloseKeydown(e, t.path)}
                           aria-label="Close tab">
                       <Icon name="x" size={9} />
                     </span>

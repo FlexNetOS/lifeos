@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import vue from "@vitejs/plugin-vue";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { fileURLToPath, URL } from "node:url";
 
 // Separate Vitest config for the a11y regression suite.
@@ -10,12 +10,16 @@ import { fileURLToPath, URL } from "node:url";
 // does not drown the unit-test signal during normal development.
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [svelte()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@lucide/vue": fileURLToPath(new URL("./tests/__mocks__/lucide-vue.js", import.meta.url)),
+      "lucide-svelte": fileURLToPath(new URL("./tests/__mocks__/lucide-svelte.js", import.meta.url)),
     },
+    // Same rationale as vitest.config.ts: Vitest loads specs through Vite's
+    // SSR module loader, so Svelte's compiled output needs the browser
+    // condition to mount into happy-dom correctly.
+    conditions: ["browser"],
   },
   test: {
     environment: "happy-dom",

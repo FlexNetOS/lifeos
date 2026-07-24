@@ -112,7 +112,7 @@
       <button type="button" class="ai-chat-tool" onclick={pickFile} title="Upload file or folder" aria-label="Upload">
         <Icon name="folder-up" size={14} />
       </button>
-      <input type="file" multiple bind:this={fileInput} hidden onchange={onFiles} />
+      <input type="file" multiple bind:this={fileInput} hidden onchange={onFiles} aria-label="Upload files" />
       <div class="ai-chat-tool-more" bind:this={moreEl}>
         <button type="button" class="ai-chat-tool" class:active={moreOpen} aria-expanded={moreOpen}
                 onclick={() => moreOpen = !moreOpen} title="More inputs" aria-label="More inputs">

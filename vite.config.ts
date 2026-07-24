@@ -1,14 +1,21 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { fileURLToPath, URL } from "node:url";
 
 // LifeOS Vue + Tauri kit
 // Tauri uses fixed dev port; HMR is wired via Tauri Vite plugin in production.
+//
+// Dual-plugin: Vue stays the mounted production app throughout the Svelte
+// migration (see App.svelte's header comment); the Svelte plugin here just
+// lets .svelte files build/HMR side by side with .vue while the port is
+// proven out component by component. Each plugin only claims its own file
+// extension, so they don't conflict.
 
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig(async () => ({
-  plugins: [vue()],
+  plugins: [vue(), svelte()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -41,10 +48,11 @@ export default defineConfig(async () => ({
         // preserving Vite 8's current output contract.
         codeSplitting: {
           groups: [
-            { name: "lucide", test: /[\\/]node_modules[\\/]@lucide[\\/]vue[\\/]/, priority: 40 },
+            { name: "lucide", test: /[\\/]node_modules[\\/](?:@lucide[\\/]vue|lucide-svelte)[\\/]/, priority: 40 },
             { name: "vue-router", test: /[\\/]node_modules[\\/]vue-router[\\/]/, priority: 30 },
             { name: "pinia", test: /[\\/]node_modules[\\/]pinia[\\/]/, priority: 20 },
             { name: "vue", test: /[\\/]node_modules[\\/](?:@vue[\\/]|vue[\\/])/, priority: 10 },
+            { name: "svelte", test: /[\\/]node_modules[\\/]svelte[\\/]/, priority: 10 },
           ],
         },
       },

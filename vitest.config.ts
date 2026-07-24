@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import vue from "@vitejs/plugin-vue";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { existsSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 
@@ -18,12 +19,20 @@ if (!onFlexnetosHost) {
 }
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), svelte()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
       "@lucide/vue": fileURLToPath(new URL("./tests/__mocks__/lucide-vue.js", import.meta.url)),
+      "lucide-svelte": fileURLToPath(new URL("./tests/__mocks__/lucide-svelte.js", import.meta.url)),
     },
+    // Vitest runs test files through Vite's SSR module loader even though the
+    // simulated DOM is happy-dom, so package.json "exports" resolution defaults
+    // to non-browser conditions. Svelte's compiled output needs the browser/DOM
+    // runtime (svelte/internal/client) to mount into happy-dom correctly — this
+    // is the standard, documented Svelte+Vitest fix. Vue/Pinia/vue-router also
+    // resolve fine under "browser" (verified by the full suite staying green).
+    conditions: ["browser"],
   },
   test: {
     environment: "happy-dom",

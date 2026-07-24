@@ -1,5 +1,4 @@
 import { defineConfig } from "vitest/config";
-import vue from "@vitejs/plugin-vue";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { existsSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
@@ -19,11 +18,10 @@ if (!onFlexnetosHost) {
 }
 
 export default defineConfig({
-  plugins: [vue(), svelte()],
+  plugins: [svelte()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@lucide/vue": fileURLToPath(new URL("./tests/__mocks__/lucide-vue.js", import.meta.url)),
       "lucide-svelte": fileURLToPath(new URL("./tests/__mocks__/lucide-svelte.js", import.meta.url)),
     },
     // Vitest runs test files through Vite's SSR module loader even though the
@@ -44,7 +42,7 @@ export default defineConfig({
       : ["**/node_modules/**", "tests/archbp-*.spec.{js,ts}"],
     coverage: {
       reporter: ["text", "html"],
-      include: ["src/**/*.{vue,js,ts}"],
+      include: ["src/**/*.{svelte,js,ts}"],
       exclude: ["src/main.ts"],
     },
   },

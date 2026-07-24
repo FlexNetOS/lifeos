@@ -1,7 +1,7 @@
-import { createApp } from "vue";
-import { createPinia } from "pinia";
+import { mount } from "svelte";
+import { createPinia, setActivePinia } from "pinia";
 import { router } from "@/router";
-import App from "@/App.vue";
+import App from "@/App.svelte";
 import { tauriPersistence, LIFEOS_PERSIST_KEYS } from "@/lib/persistence";
 
 // Load data.js (sets window.LIFEOS_DATA / AGGREGATORS / FLOWS).
@@ -14,14 +14,23 @@ import "../lifeos_app.css";
 import "../styles.css";
 
 const pinia = createPinia();
-// Register persistence BEFORE app.use(pinia) so the plugin attaches before any
-// store is activated. No-op in plain browser / Vitest where Tauri invoke is absent.
+// Register persistence BEFORE activating the pinia so the plugin attaches
+// before any store is created. No-op in plain browser / Vitest where Tauri
+// invoke is absent.
 pinia.use(tauriPersistence({ storeId: "lifeos", keys: LIFEOS_PERSIST_KEYS }));
+// No Vue app.use(pinia) anymore — the globally active pinia is how useLifeos()
+// et al. resolve from the Svelte tree (and from the router guard).
+setActivePinia(pinia);
 
-const app = createApp(App);
-app.use(pinia);
-app.use(router);
-app.mount("#app");
+// Headless router boot: with no Vue app to install into, perform the initial
+// navigation ourselves (what install() used to trigger) — this runs the
+// URL → store guard for the launch URL, marks the router ready, and attaches
+// the popstate listeners for back/forward.
+router.push(router.options.history.location).catch(() => {
+  /* initial redirect / duplicate navigation — safe to ignore */
+});
+
+mount(App, { target: document.getElementById("app")! });
 
 // Bridge to Tauri navigation events (Settings menu → /settings)
 declare global { interface Window { __TAURI__?: any; } }

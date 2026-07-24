@@ -7,7 +7,7 @@
   "description": "LifeOS — Vue 3 + Tauri UI kit (Path B). Sibling of ui_kits/lifeos_app/ React canon.",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "svelte-check && vite build",
     "preview": "vite preview",
     "planning-spine:navigation:generate": "bun planning-spine-v0/scripts/build-navigation-index.mjs --write",
     "planning-spine:navigation:check": "bun planning-spine-v0/scripts/build-navigation-index.mjs --check",
@@ -57,7 +57,7 @@
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md > design-system-reference/exports/tailwind.theme.json",
     "design:export": "bun run design:export:dtcg && bun run design:export:tailwind",
     "test:a11y": "vitest run --config vitest.a11y.config.ts",
-    "check": "vue-tsc --noEmit && bun run test && bun run test:a11y && bun run design:lint && bun run tauri:icons:check"
+    "check": "svelte-check && bun run test && bun run test:a11y && bun run design:lint && bun run tauri:icons:check"
   },
   "dependencies": {
     "@lucide/vue": "^1.16.0",
@@ -76,7 +76,6 @@
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@tauri-apps/cli": "^2.11.2",
     "@testing-library/svelte": "^5.4.2",
-    "@vitejs/plugin-vue": "^6.0.7",
     "@vitest/coverage-v8": "^4.1.7",
     "@vue/test-utils": "^2.4.10",
     "agentdb": "3.0.0-alpha.17",
@@ -87,11 +86,11 @@
     "ruflo": "3.32.9",
     "ruvector": "0.2.34",
     "svelte": "^5.56.7",
+    "svelte-check": "^4.7.3",
     "typescript": "^6.0.3",
     "vite": "^8.0.14",
     "vitest": "^4.1.7",
     "vitest-axe": "^0.1.0",
-    "vue-tsc": "^3.3.1",
     "yaml": "^2.8.1"
   },
   "trustedDependencies": [

@@ -1,12 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
-import { mount } from "@vue/test-utils";
+import { describe, expect, it, afterEach } from "vitest";
+import { render, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
-import Sidebar from "@/components/Sidebar.vue";
-import Workspace from "@/components/Workspace.vue";
-import MenuRow from "@/components/MenuRow.vue";
+import Sidebar from "@/components/Sidebar.svelte";
+import Workspace from "@/components/Workspace.svelte";
+import MenuRow from "@/components/MenuRow.svelte";
 
 const root = process.cwd();
 const manifest = JSON.parse(
@@ -16,8 +16,10 @@ const manifest = JSON.parse(
 const router = () =>
   createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: "/", component: { template: "<div />" } }]
+    routes: [{ path: "/", component: {} }]
   });
+
+afterEach(() => cleanup());
 
 describe("Figma Sidebar Design System Companion connection", () => {
   it("pins the exact authorized design input and rejects screenshot authority", () => {
@@ -27,7 +29,7 @@ describe("Figma Sidebar Design System Companion connection", () => {
     expect(manifest.connector_receipt.code_connect.status).toBe("seat_gated");
   });
 
-  it("keeps every source mapping anchored in checked-in Vue source", () => {
+  it("keeps every source mapping anchored in checked-in Svelte source", () => {
     for (const mapping of manifest.component_mappings) {
       const source = resolve(root, mapping.source);
       expect(existsSync(source), mapping.source).toBe(true);
@@ -38,17 +40,16 @@ describe("Figma Sidebar Design System Companion connection", () => {
   it("renders the mapped command-spine components with durable mapping anchors", () => {
     setActivePinia(createPinia());
     const componentRouter = router();
-    const global = { plugins: [createPinia(), componentRouter] };
-    const sidebar = mount(Sidebar, { global });
-    const workspace = mount(Workspace, { global });
-    const menuRow = mount(MenuRow, {
-      global,
+    const sidebar = render(Sidebar, { props: { router: componentRouter } });
+    const workspace = render(Workspace, { props: { router: componentRouter } });
+    const menuRow = render(MenuRow, {
       props: { item: { icon: "file", label: "Design contract", active: true } }
     });
 
-    expect(sidebar.get("[data-figma-component='Sidebar Companion/Icon rail']").exists()).toBe(true);
-    expect(workspace.find("[data-figma-component='Sidebar Companion/Detail panel']").exists()).toBe(true);
-    expect(menuRow.get("[data-figma-component='Sidebar Companion/Menu row']").exists()).toBe(true);
-    expect(menuRow.classes()).toContain("active");
+    expect(sidebar.container.querySelector("[data-figma-component='Sidebar Companion/Icon rail']")).not.toBeNull();
+    expect(workspace.container.querySelector("[data-figma-component='Sidebar Companion/Detail panel']")).not.toBeNull();
+    const row = menuRow.container.querySelector("[data-figma-component='Sidebar Companion/Menu row']");
+    expect(row).not.toBeNull();
+    expect(row!.classList.contains("active")).toBe(true);
   });
 });

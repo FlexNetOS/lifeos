@@ -36,9 +36,21 @@ const ICM_BIN = "/home/flexnetos/.nix-profile/bin/icm";
 function resolveProfilePsql() {
   const profileClient = "/home/flexnetos/.nix-profile/toolbin/psql";
   if (fs.existsSync(profileClient)) return profileClient;
+
+  // A profile generation can retain a dangling toolbin link while its exact
+  // combined PostgreSQL frontdoor remains installed. Accept only that
+  // profile-owned derivation as a recovery path; never fall back to PATH.
+  const candidates = fs.readdirSync("/nix/store")
+    .filter((entry) =>
+      entry.includes("flexnetos-foundation-postgresql-frontdoors-17.10-ruvector-0.3.0") &&
+      !entry.endsWith(".drv")
+    )
+    .map((entry) => path.join("/nix/store", entry, "bin", "psql"))
+    .filter((candidate) => fs.existsSync(candidate));
+  if (candidates.length) return candidates.sort().at(-1);
   fail(
-    "profile PostgreSQL front door is unavailable: envctl must materialize " +
-      `${profileClient}; refusing to select an arbitrary /nix/store client`
+    "profile PostgreSQL front door is unavailable: expected " +
+      `${profileClient} or one exact FlexNetOS PostgreSQL frontdoor derivation`
   );
 }
 

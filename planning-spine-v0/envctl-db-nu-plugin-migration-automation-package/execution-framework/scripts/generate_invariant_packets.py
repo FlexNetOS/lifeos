@@ -36,6 +36,19 @@ from pathlib import Path
 ANCHOR = "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 INVARIANT_HEADING = "## Operational invariants and acceptance"
 PG = "postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql"
+PGDATA = "/home/flexnetos/meta/var/lib/postgresql/17"
+
+# psql and pg_ctl are NOT on the profile PATH on this host, so a probe that simply
+# says `psql ...` fails with "command not found" and looks exactly like a real
+# invariant violation. Resolve psql from the RUNNING postmaster instead: that is
+# always the client matching the live server, and it never hardcodes a /nix/store
+# path that garbage collection could remove. If the server is down the resolution
+# fails and the probe fails -- which is the correct verdict, not a false negative.
+PSQL = (
+    'PSQL="$(command -v psql || '
+    f'echo "$(dirname "$(readlink -f /proc/$(head -1 {PGDATA}/postmaster.pid '
+    '2>/dev/null)/exe 2>/dev/null)")/psql")"; test -x "$PSQL" && '
+)
 
 # Probe table. One row per invariant number.
 #   probe    : command_template   -- exits 0 iff the invariant holds RIGHT NOW
@@ -51,15 +64,15 @@ PROBES: dict[int, dict[str, object]] = {
         # Catalog registration is NOT proof. The 2026-07-27 outage had ruvector 0.3.0
         # registered in pg_extension while every function failed on a missing $libdir.
         # This probe therefore EXECUTES a function instead of reading the catalog.
-        "probe": f"psql '{PG}' -tAc 'select extensions.ruvector_version()'",
-        "verify": f"psql '{PG}' -tAc 'select 1 from pg_extension where extname=$$ruvector$$' | grep -q 1",
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_version()'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select 1 from pg_extension where extname=$$ruvector$$' | grep -q 1",
     },
     2: {
         "cell": "database-primary-runtime",
         "risk": "high",
         "tools": ["psql"],
-        "probe": f"test \"$(psql '{PG}' -tAc \"select count(*) from information_schema.tables where table_schema not in ('pg_catalog','information_schema')\")\" -gt 0",
-        "verify": f"psql '{PG}' -tAc 'select pg_database_size(current_database())' | grep -qE '^[0-9]+$'",
+        "probe": f"{PSQL}test \"$(\"$PSQL\" '{PG}' -tAc \"select count(*) from information_schema.tables where table_schema not in ('pg_catalog','information_schema')\")\" -gt 0",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select pg_database_size(current_database())' | grep -qE '^[0-9]+$'",
     },
     3: {
         "cell": "execution-surfaces",
@@ -114,7 +127,7 @@ PROBES: dict[int, dict[str, object]] = {
         "tools": ["psql", "shell"],
         # "installed and used, not replaced" -- assert the extension answers, which is
         # the only shipped, executable evidence of the RuVector half of the ecosystem.
-        "probe": f"psql '{PG}' -tAc 'select extensions.ruvector_simd_info()'",
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_simd_info()'",
         "verify": "test -d /home/flexnetos/meta/var/lib/agentdb || test -d /home/flexnetos/meta/var/lib/ruvector",
     },
     10: {
@@ -128,8 +141,8 @@ PROBES: dict[int, dict[str, object]] = {
         "cell": "cow-branching",
         "risk": "high",
         "tools": ["psql"],
-        "probe": f"psql '{PG}' -tAc \"select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='extensions' and p.proname ~ 'branch|cow'\" | awk '{{exit ($1>0)?0:1}}'",
-        "verify": f"psql '{PG}' -tAc 'select extensions.ruvector_version()'",
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc \"select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='extensions' and p.proname ~ 'branch|cow'\" | awk '{{exit ($1>0)?0:1}}'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_version()'",
     },
     12: {
         "cell": "witness-chain",
@@ -142,8 +155,8 @@ PROBES: dict[int, dict[str, object]] = {
         "cell": "database-durability",
         "risk": "critical",
         "tools": ["psql"],
-        "probe": f"psql '{PG}' -tAc 'show wal_level' | grep -qE 'replica|logical'",
-        "verify": f"psql '{PG}' -tAc 'select pg_is_in_recovery()' | grep -qE 'f|t'",
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'show wal_level' | grep -qE 'replica|logical'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select pg_is_in_recovery()' | grep -qE 'f|t'",
     },
     14: {
         "cell": "return-loop",
@@ -157,8 +170,8 @@ PROBES: dict[int, dict[str, object]] = {
         "risk": "critical",
         "tools": ["psql"],
         # EVERY BYTE means the raw-object path must be queryable, not merely present.
-        "probe": f"psql '{PG}' -tAc \"select count(*) from information_schema.tables where table_name ~ 'raw|object|blob|ingest'\" | awk '{{exit ($1>0)?0:1}}'",
-        "verify": f"psql '{PG}' -tAc 'select current_database()' | grep -q lifeos",
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc \"select count(*) from information_schema.tables where table_name ~ 'raw|object|blob|ingest'\" | awk '{{exit ($1>0)?0:1}}'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select current_database()' | grep -q lifeos",
     },
     16: {
         "cell": "rtk-adapter",

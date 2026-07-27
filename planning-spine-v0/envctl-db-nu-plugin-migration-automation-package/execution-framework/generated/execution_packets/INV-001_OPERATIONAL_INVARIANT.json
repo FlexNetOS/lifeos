@@ -19,7 +19,7 @@
   ],
   "blocks": [],
   "can_run_parallel": true,
-  "command_template": "psql 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select extensions.ruvector_version()'",
+  "command_template": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select extensions.ruvector_version()'",
   "completion_gate": "probe exits 0 against the live system; a non-zero exit is a real invariant violation and must not be recorded as pending or proposed",
   "depends_on": [],
   "execution_cell": "database-primary-runtime",
@@ -61,5 +61,5 @@
   "target_files": [],
   "task_id": "INV-001_OPERATIONAL_INVARIANT",
   "title": "Invariant 1: PostgreSQL/RuVector contains host ALL data and remains the Swarm Primary Runtime.",
-  "verification_command": "psql 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select 1 from pg_extension where extname=$$ruvector$$' | grep -q 1"
+  "verification_command": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select 1 from pg_extension where extname=$$ruvector$$' | grep -q 1"
 }

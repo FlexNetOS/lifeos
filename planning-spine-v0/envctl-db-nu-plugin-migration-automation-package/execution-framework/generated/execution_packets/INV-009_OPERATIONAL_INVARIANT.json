@@ -19,7 +19,7 @@
   ],
   "blocks": [],
   "can_run_parallel": true,
-  "command_template": "psql 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select extensions.ruvector_simd_info()'",
+  "command_template": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select extensions.ruvector_simd_info()'",
   "completion_gate": "probe exits 0 against the live system; a non-zero exit is a real invariant violation and must not be recorded as pending or proposed",
   "depends_on": [],
   "execution_cell": "ruvnet-ecosystem",

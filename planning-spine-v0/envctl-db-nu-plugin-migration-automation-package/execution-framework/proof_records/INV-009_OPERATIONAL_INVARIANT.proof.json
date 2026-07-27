@@ -1,0 +1,29 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "INV-009_OPERATIONAL_INVARIANT",
+  "status": "passed",
+  "proof_type": "live_system_query",
+  "completed_at": "2026-07-27T21:24:36Z",
+  "actor": "codex-cli-background-shell",
+  "helper_id": "helper-invariant-09",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "/run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/INV-009_OPERATIONAL_INVARIANT/20260727T212404553545Z-b6c0d206055d",
+  "verification_command": "test -d /home/flexnetos/meta/var/lib/agentdb || test -d /home/flexnetos/meta/var/lib/ruvector",
+  "command": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select extensions.ruvector_simd_info()'",
+  "evidence": {
+    "agentdb_exists": true,
+    "ruvector_dir_exists": false,
+    "ruvector_simd_info": {
+      "architecture": "x86_64",
+      "active": "avx512",
+      "features": [
+        "avx512f",
+        "avx512vl",
+        "avx2",
+        "fma",
+        "sse4.2"
+      ],
+      "floats_per_op": 16
+    }
+  }
+}

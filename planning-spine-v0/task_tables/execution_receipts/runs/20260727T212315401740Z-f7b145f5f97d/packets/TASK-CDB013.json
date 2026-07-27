@@ -1,0 +1,96 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/Cargo.toml",
+    "src/nu_plugin/crates/codedb/Cargo.toml",
+    "src/nu_plugin/crates/codedb_build_capture/Cargo.toml",
+    "src/nu_plugin/crates/codedb_cargo/Cargo.toml",
+    "src/nu_plugin/crates/codedb_context/Cargo.toml",
+    "src/nu_plugin/crates/codedb_core/Cargo.toml",
+    "src/nu_plugin/crates/codedb_fixtures/Cargo.toml",
+    "src/nu_plugin/crates/codedb_mcp/Cargo.toml",
+    "src/nu_plugin/crates/codedb_rust_static/Cargo.toml",
+    "src/nu_plugin/crates/codedb_store_pg/Cargo.toml",
+    "src/nu_plugin/crates/codedb_store_redb/Cargo.toml",
+    "src/nu_plugin/crates/nu_plugin_codedb/Cargo.toml",
+    "src/nu_plugin/tests/test_workspace_manifest.py",
+    "src/nu_plugin/logs/CDB013-workspace.log"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB013",
+    "decision": null,
+    "intent_lock_digest": "blake3:6a0ea14b70d4a1b2f1fb40b25d378c312246189c056ecac6a7f6e42a128ddb26",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB014",
+    "TASK-CDB041"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB013",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB013",
+  "depends_on": [
+    "TASK-CDB006",
+    "TASK-CDB068"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "workspace ready",
+    "deterministic": true,
+    "verification_command": "cargo metadata succeeds"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:6a0ea14b70d4a1b2f1fb40b25d378c312246189c056ecac6a7f6e42a128ddb26"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:a99ea8de3656b91c071cf7667a8a7b7d07c86122494a0f7e2a19924fcf131f49",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB013",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB013"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB013 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/Cargo.toml"
+  ],
+  "task_id": "TASK-CDB013",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB013"
+}

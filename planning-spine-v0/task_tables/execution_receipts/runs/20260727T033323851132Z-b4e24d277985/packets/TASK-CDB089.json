@@ -1,0 +1,72 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/CHANGE_PLAN_SCHEMA.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB089",
+    "decision": null,
+    "intent_lock_digest": "blake3:53a6f650650141cd67c1b6213cc0ede7560dbd76ca889dd557b1061062d9bd4c",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB089",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB089",
+  "depends_on": [
+    "TASK-CDB075"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "apply gate decision provenance tests",
+    "deterministic": true,
+    "verification_command": "apply gate decision provenance tests"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:53a6f650650141cd67c1b6213cc0ede7560dbd76ca889dd557b1061062d9bd4c"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:08599d30fe5e05ed958fb3ab0b1f7cb973a32c62074ba52296b5eea01060791c",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB089",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB089"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB089 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/CHANGE_PLAN_SCHEMA.md"
+  ],
+  "task_id": "TASK-CDB089",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB089"
+}

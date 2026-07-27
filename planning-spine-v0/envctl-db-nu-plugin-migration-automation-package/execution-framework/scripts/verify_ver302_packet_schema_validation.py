@@ -53,8 +53,10 @@ ARRAY_FIELDS = {
     "blocks",
     "required_tools",
 }
-BOOL_FIELDS = {"can_run_parallel", "proof_required", "human_approval_required"}
+BOOL_FIELDS = {"can_run_parallel", "proof_required", "human_approval_required", "needs_capability_probe"}
 INT_FIELDS = {"max_parallel", "priority"}
+JSON_FIELDS = {"anchor_binding"}
+OPTIONAL_PACKET_FIELDS = {"anchor_binding", "needs_capability_probe", "probe_class", "source_graph_uri"}
 
 SECRET_PATTERNS = [
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
@@ -90,17 +92,21 @@ def secret_findings(relpaths: list[str]) -> list[str]:
 def convert_row_to_packet(row: dict[str, str], generated_at: str) -> dict[str, Any]:
     packet: dict[str, Any] = {"packet_schema_version": "1.0"}
     for key, value in row.items():
+        if key in OPTIONAL_PACKET_FIELDS and not str(value or "").strip():
+            continue
         if key in ARRAY_FIELDS:
             packet[key] = split_list(value)
         elif key in BOOL_FIELDS:
             packet[key] = str(value).lower() == "true"
         elif key in INT_FIELDS:
             packet[key] = int(value)
+        elif key in JSON_FIELDS:
+            packet[key] = json.loads(value)
         elif key == "status":
             continue
         else:
             packet[key] = value
-    packet["source_graph_uri"] = "generated/task_graph.csv"
+    packet.setdefault("source_graph_uri", "generated/task_graph.csv")
     packet["generated_at"] = generated_at
     return packet
 

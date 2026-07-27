@@ -1,6 +1,6 @@
 # envctl migration automation database schema
 
-Generated at: `2026-07-27T15:24:59+00:00`
+Generated at: `2026-07-27T22:20:30+00:00`
 Status: `passed`
 
 ## Applied migrations

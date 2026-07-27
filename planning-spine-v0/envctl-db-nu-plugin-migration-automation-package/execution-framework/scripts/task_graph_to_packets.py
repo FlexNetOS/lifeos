@@ -5,13 +5,17 @@ from pathlib import Path
 from _common import read_task_graph, split_list, write_json, root, make_proof, append_proof, now
 
 ARRAY_FIELDS = {'input_files','target_files','target_artifacts','allowed_paths','blocked_paths','depends_on','blocks','required_tools'}
-BOOL_FIELDS = {'can_run_parallel','proof_required','human_approval_required'}
+BOOL_FIELDS = {'can_run_parallel','proof_required','human_approval_required','needs_capability_probe'}
 INT_FIELDS = {'max_parallel','priority'}
+JSON_FIELDS = {'anchor_binding'}
+OPTIONAL_PACKET_FIELDS = {'anchor_binding','needs_capability_probe','probe_class','source_graph_uri'}
 
 
 def convert(row):
     packet = {'packet_schema_version':'1.0'}
     for k,v in row.items():
+        if k in OPTIONAL_PACKET_FIELDS and not str(v or '').strip():
+            continue
         if k in ARRAY_FIELDS:
             packet[k] = split_list(v)
         elif k in BOOL_FIELDS:
@@ -19,11 +23,13 @@ def convert(row):
         elif k in INT_FIELDS:
             try: packet[k] = int(v)
             except Exception: packet[k] = 0
+        elif k in JSON_FIELDS:
+            packet[k] = json.loads(v)
         elif k == 'status':
             continue
         else:
             packet[k] = v
-    packet['source_graph_uri'] = 'generated/task_graph.csv'
+    packet.setdefault('source_graph_uri', 'generated/task_graph.csv')
     packet['generated_at'] = now()
     return packet
 

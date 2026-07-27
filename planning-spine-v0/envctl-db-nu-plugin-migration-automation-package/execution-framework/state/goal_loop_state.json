@@ -1,32 +1,39 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-27T21:23:17+00:00",
+  "generated_at": "2026-07-27T22:23:48+00:00",
   "task_count": 80,
-  "complete_count": 78,
+  "complete_count": 77,
   "failed_count": 0,
-  "pending_count": 2,
+  "pending_count": 3,
   "runnable_count": 1,
   "dispatch_count": 1,
   "approval_blocker_count": 0,
-  "blocked_count": 1,
+  "blocked_count": 2,
   "runnable_tasks": [
     {
-      "task_id": "REL-400_PACKAGE_ARCHIVE",
-      "parallel_group": "release",
+      "task_id": "VER-304_FINAL_COMPLETENESS",
+      "parallel_group": "verification",
       "max_parallel": 1,
-      "packet_uri": "generated/execution_packets/REL-400_PACKAGE_ARCHIVE.json"
+      "packet_uri": "generated/execution_packets/VER-304_FINAL_COMPLETENESS.json"
     }
   ],
   "dispatch_packets": [
     {
-      "task_id": "REL-400_PACKAGE_ARCHIVE",
-      "parallel_group": "release",
+      "task_id": "VER-304_FINAL_COMPLETENESS",
+      "parallel_group": "verification",
       "max_parallel": 1,
-      "packet_uri": "generated/execution_packets/REL-400_PACKAGE_ARCHIVE.json"
+      "packet_uri": "generated/execution_packets/VER-304_FINAL_COMPLETENESS.json"
     }
   ],
   "approval_blockers": [],
   "blocked_tasks": [
+    {
+      "task_id": "REL-400_PACKAGE_ARCHIVE",
+      "reason": "unmet dependencies",
+      "dependencies": [
+        "VER-304_FINAL_COMPLETENESS"
+      ]
+    },
     {
       "task_id": "REL-401_HANDOFF",
       "reason": "unmet dependencies",
@@ -109,7 +116,7 @@
     "VER-301_SQL_SCHEMA_TEST": "complete",
     "VER-302_PACKET_SCHEMA_VALIDATION": "complete",
     "VER-303_GOAL_LOOP_COMPUTE": "complete",
-    "VER-304_FINAL_COMPLETENESS": "complete",
+    "VER-304_FINAL_COMPLETENESS": "pending",
     "REL-400_PACKAGE_ARCHIVE": "pending",
     "REL-401_HANDOFF": "pending",
     "MAINT-500_README_NAV_BACKTRACE": "complete",

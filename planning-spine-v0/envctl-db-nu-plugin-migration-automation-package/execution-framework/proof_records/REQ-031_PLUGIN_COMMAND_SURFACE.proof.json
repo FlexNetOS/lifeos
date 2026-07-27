@@ -1,61 +1,76 @@
 {
-  "actor": "json-task-runner",
-  "checksums": {
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-031_PLUGIN_COMMAND_SURFACE/161c4017bfde6f7a52e20a33074568bda40a31efc70124cafe633a413a90d843/20260727T212655427371Z-36120fbd01ec.json": "98d7ac96c2c35008e1374f19055547349b55375ba3ffede3d95a3616b162766f"
-  },
-  "commands_run": [
-    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/REQ-031_PLUGIN_COMMAND_SURFACE/20260727T212655427371Z-36120fbd01ec -"
+  "proof_schema_version": "1.0",
+  "task_id": "REQ-031_PLUGIN_COMMAND_SURFACE",
+  "status": "completed",
+  "started_at": "2026-07-04T23:06:55+00:00",
+  "completed_at": "2026-07-04T23:08:41+00:00",
+  "actor": "codex-cli-local",
+  "helper_id": "helper-nu-command-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "/home/flexnetos/FlexNetOS/src/envctl/envctl-db-nu-plugin-migration-automation-package",
+  "files_changed": [
+    "execution-framework/generated/nu_plugin_command_manifest.json",
+    "execution-framework/examples/nu/operator-session-template.nu",
+    "execution-framework/scripts/verify_plugin_command_surface.py",
+    "execution-framework/state/REQ-031_PLUGIN_COMMAND_SURFACE.heartbeat.json",
+    "execution-framework/logs/REQ-031_PLUGIN_COMMAND_SURFACE.log",
+    "execution-framework/proof_records/REQ-031_PLUGIN_COMMAND_SURFACE.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl"
   ],
-  "completed_at": "2026-07-27T21:27:52.308648Z",
+  "commands_run": [
+    "read ../specs/command-surface.md",
+    "read ../examples/nu/operator-session-template.nu",
+    "read ../prompts/NU_PLUGIN_CONTRACT.md",
+    "read ../schemas/nu_plugin_command_manifest.schema.json",
+    "read generated/nu_plugin_command_manifest.json",
+    "inspect /home/flexnetos/FlexNetOS/src/nu_plugin command conventions read-only",
+    "python3 scripts/verify_plugin_command_surface.py",
+    "python3 -m json.tool generated/nu_plugin_command_manifest.json",
+    "python3 -m json.tool generated/execution_packets/REQ-031_PLUGIN_COMMAND_SURFACE.json",
+    "sha256sum generated/nu_plugin_command_manifest.json examples/nu/operator-session-template.nu scripts/verify_plugin_command_surface.py state/REQ-031_PLUGIN_COMMAND_SURFACE.heartbeat.json logs/REQ-031_PLUGIN_COMMAND_SURFACE.log"
+  ],
+  "verification_output": {
+    "status": "passed",
+    "manifest": "generated/nu_plugin_command_manifest.json",
+    "operator_template": "examples/nu/operator-session-template.nu",
+    "required_command_count": 9,
+    "mutating_command_count": 4,
+    "read_command_count": 5,
+    "required_commands": [
+      "envctl migration approve",
+      "envctl migration pause",
+      "envctl migration proof",
+      "envctl migration replay",
+      "envctl migration resume",
+      "envctl migration run plan",
+      "envctl migration run start",
+      "envctl migration status",
+      "envctl migration target list"
+    ],
+    "json_validation": "generated/nu_plugin_command_manifest.json and generated/execution_packets/REQ-031_PLUGIN_COMMAND_SURFACE.json parse as JSON",
+    "notes": [
+      "Exact REQ-031 operator commands are present in the command manifest.",
+      "Mutating operator commands are marked mode=mutate and route through envctl endpoints with --emit-event.",
+      "Read commands expose Nushell-native record/table output metadata.",
+      "The package-local operator session template exercises the exact operator command names."
+    ],
+    "sandbox_note": "NU_PLUGIN_REPO was readable at /home/flexnetos/FlexNetOS/src/nu_plugin, but this execution cell only permits writes inside execution-framework."
+  },
+  "checksums": {
+    "execution-framework/generated/nu_plugin_command_manifest.json": "52e307270b2dab6901e4231187e9b7ae09c6eb015e7eef040f8b2f5b1f323c06",
+    "execution-framework/examples/nu/operator-session-template.nu": "99ace8eac895308df88bcc83e343cc14d1b7bce66d1b60eb8f117c0f26a70c2b",
+    "execution-framework/scripts/verify_plugin_command_surface.py": "f786cbe12029190c86af775574e1f621ebd3d39d34e355100f1b18d10e6d7f5a",
+    "execution-framework/state/REQ-031_PLUGIN_COMMAND_SURFACE.heartbeat.json": "005235caa8b45c078a9f8190d7f574bcf542427aafff27b16526c18ed6e2fdb5",
+    "execution-framework/logs/REQ-031_PLUGIN_COMMAND_SURFACE.log": "d80e24408dadec9d13052bcd90461dd2e56abbb8aee053d15b6acf0794687a6e"
+  },
+  "logs_uri": "logs/REQ-031_PLUGIN_COMMAND_SURFACE.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
   "evidence": [
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-031_PLUGIN_COMMAND_SURFACE/161c4017bfde6f7a52e20a33074568bda40a31efc70124cafe633a413a90d843/20260727T212655427371Z-36120fbd01ec.json",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-031_PLUGIN_COMMAND_SURFACE/6bca87f66d953762a8d375b3997b6e5a75302525ee4cf0e634058053be7b53d4.proof.json"
+    "generated/nu_plugin_command_manifest.json",
+    "examples/nu/operator-session-template.nu",
+    "scripts/verify_plugin_command_surface.py",
+    "logs/REQ-031_PLUGIN_COMMAND_SURFACE.log"
   ],
   "failure_reason": "",
-  "files_changed": [],
-  "helper_id": "helper-nu-command-01",
-  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-031_PLUGIN_COMMAND_SURFACE/161c4017bfde6f7a52e20a33074568bda40a31efc70124cafe633a413a90d843/logs/20260727T212655427371Z-36120fbd01ec",
-  "model_tag": "gpt-5.3-spark",
-  "next_action": "add or run an executable verification before claiming independent verification",
-  "proof_schema_version": "1.0",
-  "repo_path": "${NU_PLUGIN_REPO}",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
-  "started_at": "2026-07-27T21:26:55.477093Z",
-  "status": "completed",
-  "task_id": "REQ-031_PLUGIN_COMMAND_SURFACE",
-  "verification_output": {
-    "artifact_declarations": [
-      {
-        "declaration": "operator command surface",
-        "kind": "descriptive",
-        "status": "descriptive_not_materialized"
-      }
-    ],
-    "command_exit_code": 0,
-    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
-    "implementation_scope": "runner_command_completed",
-    "materialization_schema": "lifeos.runner-proof-materialization.v1",
-    "needs_capability_probe": false,
-    "orchestration": {
-      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
-      "run_id": "20260727T225340189121Z-479767e62e9e"
-    },
-    "origin_receipt": {
-      "attempt_id": "20260727T212655427371Z-36120fbd01ec",
-      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
-      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-031_PLUGIN_COMMAND_SURFACE/161c4017bfde6f7a52e20a33074568bda40a31efc70124cafe633a413a90d843/20260727T212655427371Z-36120fbd01ec.json",
-      "run_id": "20260727T212315401740Z-f7b145f5f97d",
-      "sha256": "98d7ac96c2c35008e1374f19055547349b55375ba3ffede3d95a3616b162766f"
-    },
-    "packet_execution_proven": true,
-    "packet_sha256": "161c4017bfde6f7a52e20a33074568bda40a31efc70124cafe633a413a90d843",
-    "preserved_task_proof": {
-      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-031_PLUGIN_COMMAND_SURFACE/6bca87f66d953762a8d375b3997b6e5a75302525ee4cf0e634058053be7b53d4.proof.json",
-      "sha256": "6bca87f66d953762a8d375b3997b6e5a75302525ee4cf0e634058053be7b53d4"
-    },
-    "probe_class": null,
-    "task_completion_proven": true,
-    "verification_executed": false,
-    "verification_exit_code": null
-  }
+  "next_action": "run REQ-032_PLUGIN_LIVE_VISUALS, REQ-034_PLUGIN_STATUS_STREAMS, and REQ-041_TWO_REPO_INTEGRATION after shared protocol schemas are ready"
 }

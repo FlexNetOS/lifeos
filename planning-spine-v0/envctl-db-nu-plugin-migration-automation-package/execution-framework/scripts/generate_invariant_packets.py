@@ -31,16 +31,9 @@ import argparse
 import hashlib
 import json
 import re
-import shlex
 from pathlib import Path
 
 ANCHOR = "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
-
-# json_task_runner.py runs packets beneath execution-framework FROM that directory
-# (command_root() returns it), not from the repo root where the anchor lives. Emitting
-# the bare filename is what made 635 of 881 tasks fail the 2026-07-27 run against a file
-# that was present the whole time. Metadata keeps the plain name; commands hop back up.
-ANCHOR_FROM_EXECUTION_FRAMEWORK = f"../../../{ANCHOR}"
 INVARIANT_HEADING = "## Operational invariants and acceptance"
 PG = "postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql"
 PGDATA = "/home/flexnetos/meta/var/lib/postgresql/17"
@@ -57,11 +50,6 @@ PSQL = (
     '2>/dev/null)/exe 2>/dev/null)")/psql")"; test -x "$PSQL" && '
 )
 
-
-def shell(command: str) -> str:
-    return f"bash -lc {shlex.quote(command)}"
-
-
 # Probe table. One row per invariant number.
 #   probe    : command_template   -- exits 0 iff the invariant holds RIGHT NOW
 #   verify   : verification_command -- independent re-assertion, also executable
@@ -76,15 +64,15 @@ PROBES: dict[int, dict[str, object]] = {
         # Catalog registration is NOT proof. The 2026-07-27 outage had ruvector 0.3.0
         # registered in pg_extension while every function failed on a missing $libdir.
         # This probe therefore EXECUTES a function instead of reading the catalog.
-        "probe": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_version()'"),
-        "verify": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select 1 from pg_extension where extname=$$ruvector$$' | grep -q 1"),
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_version()'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select 1 from pg_extension where extname=$$ruvector$$' | grep -q 1",
     },
     2: {
         "cell": "database-primary-runtime",
         "risk": "high",
         "tools": ["psql"],
-        "probe": shell(f"{PSQL}test \"$(\"$PSQL\" '{PG}' -tAc \"select count(*) from information_schema.tables where table_schema not in ('pg_catalog','information_schema')\")\" -gt 0"),
-        "verify": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select pg_database_size(current_database())' | grep -qE '^[0-9]+$'"),
+        "probe": f"{PSQL}test \"$(\"$PSQL\" '{PG}' -tAc \"select count(*) from information_schema.tables where table_schema not in ('pg_catalog','information_schema')\")\" -gt 0",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select pg_database_size(current_database())' | grep -qE '^[0-9]+$'",
     },
     3: {
         "cell": "execution-surfaces",
@@ -139,7 +127,7 @@ PROBES: dict[int, dict[str, object]] = {
         "tools": ["psql", "shell"],
         # "installed and used, not replaced" -- assert the extension answers, which is
         # the only shipped, executable evidence of the RuVector half of the ecosystem.
-        "probe": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_simd_info()'"),
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_simd_info()'",
         "verify": "test -d /home/flexnetos/meta/var/lib/agentdb || test -d /home/flexnetos/meta/var/lib/ruvector",
     },
     10: {
@@ -153,8 +141,8 @@ PROBES: dict[int, dict[str, object]] = {
         "cell": "cow-branching",
         "risk": "high",
         "tools": ["psql"],
-        "probe": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc \"select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='extensions' and p.proname ~ 'branch|cow'\" | awk '{{exit ($1>0)?0:1}}'"),
-        "verify": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_version()'"),
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc \"select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='extensions' and p.proname ~ 'branch|cow'\" | awk '{{exit ($1>0)?0:1}}'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select extensions.ruvector_version()'",
     },
     12: {
         "cell": "witness-chain",
@@ -167,8 +155,8 @@ PROBES: dict[int, dict[str, object]] = {
         "cell": "database-durability",
         "risk": "critical",
         "tools": ["psql"],
-        "probe": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'show wal_level' | grep -qE 'replica|logical'"),
-        "verify": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select pg_is_in_recovery()' | grep -qE 'f|t'"),
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'show wal_level' | grep -qE 'replica|logical'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select pg_is_in_recovery()' | grep -qE 'f|t'",
     },
     14: {
         "cell": "return-loop",
@@ -182,8 +170,8 @@ PROBES: dict[int, dict[str, object]] = {
         "risk": "critical",
         "tools": ["psql"],
         # EVERY BYTE means the raw-object path must be queryable, not merely present.
-        "probe": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc \"select count(*) from information_schema.tables where table_name ~ 'raw|object|blob|ingest'\" | awk '{{exit ($1>0)?0:1}}'"),
-        "verify": shell(f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select current_database()' | grep -q lifeos"),
+        "probe": f"{PSQL}\"$PSQL\" '{PG}' -tAc \"select count(*) from information_schema.tables where table_name ~ 'raw|object|blob|ingest'\" | awk '{{exit ($1>0)?0:1}}'",
+        "verify": f"{PSQL}\"$PSQL\" '{PG}' -tAc 'select current_database()' | grep -q lifeos",
     },
     16: {
         "cell": "rtk-adapter",
@@ -213,8 +201,8 @@ PROBES: dict[int, dict[str, object]] = {
         "tools": ["python3"],
         # The anchor must still contain its own conformance structures: 15 A-rows and
         # the D01-D24 atlas. This is the drift canary on the anchor itself.
-        "probe": f"python3 -c \"import re;t=open('{ANCHOR_FROM_EXECUTION_FRAMEWORK}',encoding='utf-8').read();a=len(re.findall(r'^\\\\| A\\\\d{{2}} \\\\|',t,re.M));d=len(re.findall(r'^#### D\\\\d{{2}}',t,re.M));raise SystemExit(0 if (a==15 and d==24) else 1)\"",
-        "verify": f"test -f {ANCHOR_FROM_EXECUTION_FRAMEWORK}",
+        "probe": f"python3 -c \"import re;t=open('{ANCHOR}',encoding='utf-8').read();a=len(re.findall(r'^\\\\| A\\\\d{{2}} \\\\|',t,re.M));d=len(re.findall(r'^#### D\\\\d{{2}}',t,re.M));raise SystemExit(0 if (a==15 and d==24) else 1)\"",
+        "verify": f"test -f {ANCHOR}",
     },
 }
 

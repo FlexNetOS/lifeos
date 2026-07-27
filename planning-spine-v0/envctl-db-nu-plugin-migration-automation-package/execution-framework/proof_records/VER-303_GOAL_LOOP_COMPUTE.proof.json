@@ -1,61 +1,178 @@
 {
-  "actor": "json-task-runner",
-  "checksums": {
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/VER-303_GOAL_LOOP_COMPUTE/ad8b9d814c8c8424f1562d7bbbcfaa239d05dc6057fc1d0b9f3288bf08e4a5db/20260727T222222011426Z-48e8165631b7.json": "70391262e0b6ac7a8161b0aa82edf2901a93ebd26d6d2c0b5c4329111b70ea14"
-  },
-  "commands_run": [
-    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/VER-303_GOAL_LOOP_COMPUTE/20260727T222222011426Z-48e8165631b7 -"
+  "proof_schema_version": "1.0",
+  "task_id": "VER-303_GOAL_LOOP_COMPUTE",
+  "status": "completed",
+  "started_at": "2026-07-27T22:23:48+00:00",
+  "completed_at": "2026-07-27T22:23:48+00:00",
+  "actor": "goal-validation-agent",
+  "helper_id": "helper-goal-validate-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "..",
+  "files_changed": [
+    "execution-framework/scripts/verify_ver303_goal_loop_compute.py",
+    "execution-framework/generated/ver303_goal_loop_compute_report.json",
+    "execution-framework/state/VER-303_GOAL_LOOP_COMPUTE.heartbeat.json",
+    "execution-framework/logs/VER-303_GOAL_LOOP_COMPUTE.log",
+    "execution-framework/proof_records/VER-303_GOAL_LOOP_COMPUTE.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl",
+    "execution-framework/state/goal_loop_state.json",
+    "execution-framework/generated/status_report.json",
+    "execution-framework/generated/status_from_proofs.json",
+    "history/verification_retry/2026-07-27T222348_0000.json"
   ],
-  "completed_at": "2026-07-27T22:23:59.499732Z",
+  "commands_run": [
+    "python3 scripts/verify_ver303_goal_loop_compute.py",
+    "python3 -m py_compile scripts/verify_ver303_goal_loop_compute.py"
+  ],
+  "verification_output": {
+    "schema_version": "1.0",
+    "task_id": "VER-303_GOAL_LOOP_COMPUTE",
+    "status": "pass",
+    "generated_at": "2026-07-27T22:23:48+00:00",
+    "packet_summary": {
+      "goal": "Ensure the /goal loop can compute a complete run path or stop at explicit approval blockers",
+      "repo_target": "filesystem",
+      "repo_path": "..",
+      "filesystem_scope": "package-root",
+      "verification_command": "python3 scripts/verify_ver303_goal_loop_compute.py"
+    },
+    "dependency_proofs": {
+      "VER-302_PACKET_SCHEMA_VALIDATION": {
+        "proof_path": "proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json",
+        "status": "completed",
+        "ok": true
+      },
+      "REQ-045_RUN_REPLAY": {
+        "proof_path": "proof_records/REQ-045_RUN_REPLAY.proof.json",
+        "status": "completed",
+        "ok": true
+      }
+    },
+    "retry_context": {
+      "active": true,
+      "reset_tasks": [
+        "VER-303_GOAL_LOOP_COMPUTE"
+      ]
+    },
+    "current_state": {
+      "generated_at": "2026-07-27T22:23:48+00:00",
+      "dispatch_packets": [
+        {
+          "task_id": "VER-303_GOAL_LOOP_COMPUTE",
+          "parallel_group": "verification",
+          "max_parallel": 1,
+          "packet_uri": "generated/execution_packets/VER-303_GOAL_LOOP_COMPUTE.json"
+        }
+      ],
+      "runnable_tasks": [
+        {
+          "task_id": "VER-303_GOAL_LOOP_COMPUTE",
+          "parallel_group": "verification",
+          "max_parallel": 1,
+          "packet_uri": "generated/execution_packets/VER-303_GOAL_LOOP_COMPUTE.json"
+        }
+      ],
+      "approval_blockers": [],
+      "blocked_tasks": [
+        {
+          "task_id": "VER-304_FINAL_COMPLETENESS",
+          "reason": "unmet dependencies",
+          "dependencies": [
+            "VER-303_GOAL_LOOP_COMPUTE"
+          ]
+        },
+        {
+          "task_id": "REL-400_PACKAGE_ARCHIVE",
+          "reason": "unmet dependencies",
+          "dependencies": [
+            "VER-304_FINAL_COMPLETENESS"
+          ]
+        },
+        {
+          "task_id": "REL-401_HANDOFF",
+          "reason": "unmet dependencies",
+          "dependencies": [
+            "REL-400_PACKAGE_ARCHIVE"
+          ]
+        }
+      ],
+      "status_ver303": "pending",
+      "status_ver304": "pending"
+    },
+    "projected_run_path": [
+      "VER-303_GOAL_LOOP_COMPUTE",
+      "VER-304_FINAL_COMPLETENESS",
+      "REL-400_PACKAGE_ARCHIVE",
+      "REL-401_HANDOFF"
+    ],
+    "projected_stop_reason": "complete",
+    "projected_terminal_state": {
+      "complete_count": 80,
+      "failed_count": 0,
+      "pending_count": 0,
+      "approval_blocker_count": 0,
+      "blocked_count": 0,
+      "dispatch_count": 0
+    },
+    "checks": {
+      "dependencies_completed": true,
+      "current_dispatch_targets_ver303": true,
+      "current_runnable_contains_only_ver303": true,
+      "current_has_no_approval_blockers": true,
+      "current_status_marks_ver303_pending": true,
+      "current_status_surface_matches_compute": true,
+      "projected_path_begins_with_ver303": true,
+      "projected_advances_to_ver304": true,
+      "projected_reaches_release_tasks": true,
+      "projected_stops_as_complete": true,
+      "projected_has_no_approval_blockers": true,
+      "projected_has_no_failed_tasks": true,
+      "projected_finishes_all_tasks": true,
+      "ver304_is_currently_blocked_only_by_ver303": true,
+      "packet_proof_required": true,
+      "packet_single_threaded": true
+    },
+    "warnings": [],
+    "errors": [],
+    "sha256": {
+      "generated/execution_packets/VER-303_GOAL_LOOP_COMPUTE.json": "sha256:81eca5c3f65bfdbdd86d2a2d3669c04648b80586a22e7592e68193ac2fd310cd",
+      "generated/status_report.json": "sha256:98c02be667898b4b6715a9db966e7e04494a6bf9436667aa449c968f8a124782",
+      "proof_records/proof_ledger.jsonl": "sha256:a00ca7187eb3e87079646f01392fd2eb7e96c580772d2f7c3e4d324adaa5f6e7",
+      "proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json": "sha256:ec484134005a580d6d81761f7a567021385585b612100cfddb36bc2c8bfce8a4",
+      "proof_records/REQ-045_RUN_REPLAY.proof.json": "sha256:de018dae64d7165bb3e65af3916c105ea045a2041b1fc94e30e46cee19e58fa0"
+    },
+    "secret_scan": {
+      "paths": [
+        "generated/ver303_goal_loop_compute_report.json",
+        "logs/VER-303_GOAL_LOOP_COMPUTE.log",
+        "scripts/verify_ver303_goal_loop_compute.py"
+      ],
+      "findings": []
+    }
+  },
+  "checksums": {
+    "execution-framework/scripts/verify_ver303_goal_loop_compute.py": "0b6c61b4dee2bd221e0936f922a1c6f18f710c75dbe5e927613b340fe79603fe",
+    "execution-framework/generated/ver303_goal_loop_compute_report.json": "3b7362253a6dc5c6779ed01d5952a5db45afb1d97a9274782218dbcdf0de8982",
+    "execution-framework/state/VER-303_GOAL_LOOP_COMPUTE.heartbeat.json": "f513a6c47a560b93dba3e2a51f685b76f1d47100421b3306f324705cb690d9c0",
+    "execution-framework/logs/VER-303_GOAL_LOOP_COMPUTE.log": "3b7362253a6dc5c6779ed01d5952a5db45afb1d97a9274782218dbcdf0de8982",
+    "execution-framework/proof_records/VER-303_GOAL_LOOP_COMPUTE.proof.json": "024bf828b0bc695176fc734121aa72224cb390e51bbf731396cc3fb95650b7be",
+    "execution-framework/proof_records/proof_ledger.jsonl": "4c740e379114517de918c9392f52e26626891d86844f3607d792ea404cf05087",
+    "execution-framework/state/goal_loop_state.json": "98c02be667898b4b6715a9db966e7e04494a6bf9436667aa449c968f8a124782",
+    "execution-framework/generated/status_report.json": "98c02be667898b4b6715a9db966e7e04494a6bf9436667aa449c968f8a124782",
+    "execution-framework/generated/status_from_proofs.json": "65418eb2a788806cbfd7f72081f7e3ab1933b2985b7b3d2a897a264dc9a38c42",
+    "history/verification_retry/2026-07-27T222348_0000.json": "c9a55e7d1fc7ab70b36ce36749a1646fa2be612ce746ef420287895f4fbbcf60"
+  },
+  "logs_uri": "logs/VER-303_GOAL_LOOP_COMPUTE.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
   "evidence": [
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/VER-303_GOAL_LOOP_COMPUTE/ad8b9d814c8c8424f1562d7bbbcfaa239d05dc6057fc1d0b9f3288bf08e4a5db/20260727T222222011426Z-48e8165631b7.json",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/VER-303_GOAL_LOOP_COMPUTE/5c7455beeaa7b51968b1b8d8ea2419704a5ed53087d71d9b8108187b4d028f20.proof.json"
+    "generated/execution_packets/VER-303_GOAL_LOOP_COMPUTE.json",
+    "generated/status_report.json",
+    "proof_records/proof_ledger.jsonl",
+    "generated/ver303_goal_loop_compute_report.json",
+    "proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json",
+    "proof_records/REQ-045_RUN_REPLAY.proof.json",
+    "../history/verification_retry/2026-07-27T222348_0000.json"
   ],
   "failure_reason": "",
-  "files_changed": [],
-  "helper_id": "helper-goal-validate-01",
-  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/VER-303_GOAL_LOOP_COMPUTE/ad8b9d814c8c8424f1562d7bbbcfaa239d05dc6057fc1d0b9f3288bf08e4a5db/logs/20260727T222222011426Z-48e8165631b7",
-  "model_tag": "gpt-5.3-spark",
-  "next_action": "add or run an executable verification before claiming independent verification",
-  "proof_schema_version": "1.0",
-  "repo_path": "..",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
-  "started_at": "2026-07-27T22:22:22.014308Z",
-  "status": "completed",
-  "task_id": "VER-303_GOAL_LOOP_COMPUTE",
-  "verification_output": {
-    "artifact_declarations": [
-      {
-        "declaration": "goal loop status",
-        "kind": "descriptive",
-        "status": "descriptive_not_materialized"
-      }
-    ],
-    "command_exit_code": 0,
-    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
-    "implementation_scope": "runner_command_completed",
-    "materialization_schema": "lifeos.runner-proof-materialization.v1",
-    "needs_capability_probe": false,
-    "orchestration": {
-      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
-      "run_id": "20260727T225340189121Z-479767e62e9e"
-    },
-    "origin_receipt": {
-      "attempt_id": "20260727T222222011426Z-48e8165631b7",
-      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
-      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/VER-303_GOAL_LOOP_COMPUTE/ad8b9d814c8c8424f1562d7bbbcfaa239d05dc6057fc1d0b9f3288bf08e4a5db/20260727T222222011426Z-48e8165631b7.json",
-      "run_id": "20260727T212315401740Z-f7b145f5f97d",
-      "sha256": "70391262e0b6ac7a8161b0aa82edf2901a93ebd26d6d2c0b5c4329111b70ea14"
-    },
-    "packet_execution_proven": true,
-    "packet_sha256": "ad8b9d814c8c8424f1562d7bbbcfaa239d05dc6057fc1d0b9f3288bf08e4a5db",
-    "preserved_task_proof": {
-      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/VER-303_GOAL_LOOP_COMPUTE/5c7455beeaa7b51968b1b8d8ea2419704a5ed53087d71d9b8108187b4d028f20.proof.json",
-      "sha256": "5c7455beeaa7b51968b1b8d8ea2419704a5ed53087d71d9b8108187b4d028f20"
-    },
-    "probe_class": null,
-    "task_completion_proven": true,
-    "verification_executed": false,
-    "verification_exit_code": null
-  }
+  "next_action": "run VER-304_FINAL_COMPLETENESS"
 }

@@ -40,15 +40,6 @@ from pathlib import Path
 
 ANCHOR = "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 
-# The anchor lives at the repo root, but json_task_runner.py does NOT run these
-# packets from there: command_root() walks the packet path upward and returns the
-# `execution-framework` directory for anything beneath it, so that is the cwd every
-# generated command sees. Emitting the bare filename made 635 of 881 tasks fail the
-# 2026-07-27 run with "No such file or directory" against a file that was present the
-# whole time. Metadata fields keep the plain repo-root-relative name; only the executed
-# command needs the hop back up.
-ANCHOR_FROM_EXECUTION_FRAMEWORK = f"../../../{ANCHOR}"
-
 
 def sha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -61,7 +52,7 @@ def shq(value: str) -> str:
 
 def grep_probe(needle: str) -> str:
     """Drift canary: the anchor must still contain this exact unit."""
-    return f"grep -Fq {shq(needle[:120])} {ANCHOR_FROM_EXECUTION_FRAMEWORK}"
+    return f"grep -Fq {shq(needle[:120])} {ANCHOR}"
 
 
 class Emitter:

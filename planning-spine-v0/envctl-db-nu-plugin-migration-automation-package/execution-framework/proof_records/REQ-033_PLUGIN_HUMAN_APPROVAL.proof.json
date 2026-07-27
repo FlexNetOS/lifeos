@@ -1,61 +1,77 @@
 {
-  "actor": "json-task-runner",
+  "actor": "codex-cli-local",
+  "artifacts": [
+    "/home/flexnetos/Downloads/nu_plugin/crates/nu_plugin_codedb/src/main.rs",
+    "generated/patches/REQ-033_PLUGIN_HUMAN_APPROVAL.nu_plugin.patch",
+    "generated/REQ-033_PLUGIN_HUMAN_APPROVAL.contract.json",
+    "state/REQ-033_PLUGIN_HUMAN_APPROVAL.heartbeat.json",
+    "logs/REQ-033_PLUGIN_HUMAN_APPROVAL.log"
+  ],
   "checksums": {
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-033_PLUGIN_HUMAN_APPROVAL/a1669996cbd3288bafe56893b68b356c4748435144cc83c14a648230122454fa/20260727T212655431875Z-8bc811d850dd.json": "69d0fd9aabcbc56e70c0f73f8ac541b93a41f7a49f829d1d4de5bd53ffe8432b"
+    "contract_sha256": "4b25c9e9dc5a98da42955ef3a83a41d67b017b9b1602428dacce30df8989d564",
+    "heartbeat_sha256": "8dc223e64c64c66f40896d0b90a10c869452f6a2e53bd7008205c89e3fdc2f36",
+    "log_sha256": "37b134145f7ca33a03f9f700b76134934a1df75a6c01cfc17fefef579042d9ea",
+    "patch_sha256": "abb68ac1c9c8986d6eab23005b2840fcb7b5736627604b8def4ee46f902026d3",
+    "target_source_sha256": "7c54c92517d64b5f54bc7deacfcd76c389de5b9f163c3292ab5d4005c9ece46e"
   },
-  "commands_run": [
-    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/REQ-033_PLUGIN_HUMAN_APPROVAL/20260727T212655431875Z-8bc811d850dd -"
-  ],
-  "completed_at": "2026-07-27T21:32:01.895619Z",
-  "evidence": [
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-033_PLUGIN_HUMAN_APPROVAL/a1669996cbd3288bafe56893b68b356c4748435144cc83c14a648230122454fa/20260727T212655431875Z-8bc811d850dd.json",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-033_PLUGIN_HUMAN_APPROVAL/bf916854b2d8b90137ca624a188557c17c5e444e7d494fb72dd3d0c6626b5f76.proof.json"
-  ],
+  "completed_at": "2026-07-27T04:39:10+00:00",
   "failure_reason": "",
-  "files_changed": [],
   "helper_id": "helper-nu-approval-01",
-  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-033_PLUGIN_HUMAN_APPROVAL/a1669996cbd3288bafe56893b68b356c4748435144cc83c14a648230122454fa/logs/20260727T212655431875Z-8bc811d850dd",
-  "model_tag": "gpt-5.3-spark",
-  "next_action": "add or run an executable verification before claiming independent verification",
-  "proof_schema_version": "1.0",
-  "repo_path": "${NU_PLUGIN_REPO}",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
-  "started_at": "2026-07-27T21:26:55.477748Z",
-  "status": "completed",
-  "task_id": "REQ-033_PLUGIN_HUMAN_APPROVAL",
-  "verification_output": {
-    "artifact_declarations": [
-      {
-        "declaration": "human approval surface",
-        "kind": "descriptive",
-        "status": "descriptive_not_materialized"
-      }
+  "implementation": {
+    "command_name": "codedb envctl human approvals",
+    "input_formats": [
+      "approval_request_json_array",
+      "approval_request_json_object",
+      "approval_request_jsonl",
+      "operation_queue_json_array",
+      "operation_queue_json_object",
+      "operation_queue_jsonl"
     ],
-    "command_exit_code": 0,
-    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
-    "implementation_scope": "runner_command_completed",
-    "materialization_schema": "lifeos.runner-proof-materialization.v1",
-    "needs_capability_probe": false,
-    "orchestration": {
-      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
-      "run_id": "20260727T225340189121Z-479767e62e9e"
-    },
-    "origin_receipt": {
-      "attempt_id": "20260727T212655431875Z-8bc811d850dd",
-      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
-      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-033_PLUGIN_HUMAN_APPROVAL/a1669996cbd3288bafe56893b68b356c4748435144cc83c14a648230122454fa/20260727T212655431875Z-8bc811d850dd.json",
-      "run_id": "20260727T212315401740Z-f7b145f5f97d",
-      "sha256": "69d0fd9aabcbc56e70c0f73f8ac541b93a41f7a49f829d1d4de5bd53ffe8432b"
-    },
-    "packet_execution_proven": true,
-    "packet_sha256": "a1669996cbd3288bafe56893b68b356c4748435144cc83c14a648230122454fa",
-    "preserved_task_proof": {
-      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-033_PLUGIN_HUMAN_APPROVAL/bf916854b2d8b90137ca624a188557c17c5e444e7d494fb72dd3d0c6626b5f76.proof.json",
-      "sha256": "bf916854b2d8b90137ca624a188557c17c5e444e7d494fb72dd3d0c6626b5f76"
-    },
-    "probe_class": null,
-    "task_completion_proven": true,
-    "verification_executed": false,
-    "verification_exit_code": null
+    "human_modes": [
+      "observer",
+      "approval-gated",
+      "operator",
+      "agent-only"
+    ],
+    "mutation_policy": "read_only_human_approval_projection",
+    "output_table": "envctl_human_approval_surface",
+    "target_file": "crates/nu_plugin_codedb/src/main.rs",
+    "unit_tests_added": [
+      "envctl_human_approval_rows_project_mode_and_actions",
+      "envctl_human_approval_rows_reject_bad_jsonl_and_invalid_mode"
+    ],
+    "views": [
+      "mode",
+      "approval",
+      "operation"
+    ]
+  },
+  "next_action": "REQ-041_TWO_REPO_INTEGRATION can consume the verified human approval surface.",
+  "owner_agent": "nu-plugin-agent",
+  "owner_lane": "lane_c_repo_b",
+  "parent_id": "REQ-010_CONTRACT_LOCK",
+  "phase": "03-nu-plugin",
+  "proof_schema_version": "1.0",
+  "repo_path": "/home/flexnetos/Downloads/nu_plugin",
+  "repo_target": "repo_b",
+  "rollback_plan": "Remove generated/patches/REQ-033_PLUGIN_HUMAN_APPROVAL.nu_plugin.patch, generated/REQ-033_PLUGIN_HUMAN_APPROVAL.contract.json, state/REQ-033_PLUGIN_HUMAN_APPROVAL.heartbeat.json, and this proof file. If the patch has been applied to repo_b, reverse only the hunks in the patch.",
+  "sandbox_note": "The recorded /home/flexnetos/FlexNetOS/src/nu_plugin path was absent; implementation was applied to the available /home/flexnetos/Downloads/nu_plugin source snapshot.",
+  "source_commit": "37e6d2a22994308f440da1ff3cb3fda9901c9e40",
+  "started_at": "2026-07-05T04:53:39+00:00",
+  "status": "completed",
+  "summary": "Implemented and verified the read-only Nushell human approval surface in the available Nu plugin source. The command projects approval requests and optional operation queue rows into a single envctl_human_approval_surface table with mode, approval, and operation views plus allowed actions for opt-in, approve, deny, pause, and delegate flows.",
+  "task_id": "REQ-033_PLUGIN_HUMAN_APPROVAL",
+  "title": "Implement human approval commands",
+  "verification": {
+    "log_uri": "logs/REQ-033_PLUGIN_HUMAN_APPROVAL.log",
+    "patch_apply_check": "passed",
+    "patch_whitespace_check": "passed",
+    "patched_source_structural_gate": "passed",
+    "targeted_cargo_test": "passed: 7 tests",
+    "workspace_cargo_test": "passed: 35 tests across 16 suites",
+    "cargo_fmt_check": "passed",
+    "temp_copy_git_apply": "passed",
+    "temp_tree_changed_file_check": "passed",
+    "toolchain_note": "Rust toolchain was available; targeted and full workspace tests passed."
   }
 }

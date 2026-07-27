@@ -1,9 +1,0 @@
-{
-  "task_id": "INV-002_OPERATIONAL_INVARIANT",
-  "status": "passed",
-  "checked_at": "2026-07-27T21:24:33Z",
-  "verification_command": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select pg_database_size(current_database())' | grep -qE '\''^[0-9]+$'\''",
-  "observation": {
-    "database_size_bytes": 23278515891
-  }
-}

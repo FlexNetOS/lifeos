@@ -1,87 +1,342 @@
 {
-  "actor": "json-task-runner",
-  "checksums": {
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-133_DEPRECATION_MAP/8536856b3a591e3d1dc96ca1233dcc5dfe7349dfcfa2df2c01b1785e2fdee31a/20260727T214313152164Z-c8ffcfeeac8f.json": "e1760f1fa05bfcd3b22b983df02a5c2f07d836d9f63b30395e83db4c05700a5d",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.json": "ceb2551eae5510a0a3199ef126f4b460c6ca056f9e4388ea3beb13ba3f5113ef",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.md": "f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537"
-  },
-  "commands_run": [
-    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/ART-133_DEPRECATION_MAP/20260727T214313152164Z-c8ffcfeeac8f -"
-  ],
-  "completed_at": "2026-07-27T21:43:42.557522Z",
-  "evidence": [
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.md",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.json",
-    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-133_DEPRECATION_MAP/8536856b3a591e3d1dc96ca1233dcc5dfe7349dfcfa2df2c01b1785e2fdee31a/20260727T214313152164Z-c8ffcfeeac8f.json",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/ART-133_DEPRECATION_MAP/469a9e076ba78e0df19bcb7094887fab9d3a85af807286c33debfd5073a8d9a3.proof.json"
-  ],
-  "failure_reason": "",
-  "files_changed": [
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.md",
-    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.json"
-  ],
-  "helper_id": "helper-artifact-34",
-  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-133_DEPRECATION_MAP/8536856b3a591e3d1dc96ca1233dcc5dfe7349dfcfa2df2c01b1785e2fdee31a/logs/20260727T214313152164Z-c8ffcfeeac8f",
-  "model_tag": "gpt-5.3-spark",
-  "next_action": "add or run an executable verification before claiming independent verification",
   "proof_schema_version": "1.0",
-  "repo_path": "${MIGRATION_TARGET_ROOT}",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
-  "started_at": "2026-07-27T21:43:13.182013Z",
-  "status": "completed",
   "task_id": "ART-133_DEPRECATION_MAP",
+  "status": "completed",
+  "started_at": "2026-07-27T05:08:06+00:00",
+  "completed_at": "2026-07-27T05:08:06+00:00",
+  "actor": "artifact-agent",
+  "helper_id": "helper-artifact-34",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
+  "files_changed": [
+    "execution-framework/scripts/generate_art133_deprecation_map.py",
+    "execution-framework/migration-artifacts/02-target-state/deprecation-map.md",
+    "execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+    "execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.json",
+    "execution-framework/generated/art133_deprecation_map_report.json",
+    "execution-framework/generated/status_from_proofs.json",
+    "execution-framework/state/ART-133_DEPRECATION_MAP.heartbeat.json",
+    "execution-framework/logs/ART-133_DEPRECATION_MAP.log",
+    "execution-framework/proof_records/ART-133_DEPRECATION_MAP.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl"
+  ],
+  "commands_run": [
+    "python3 scripts/generate_art133_deprecation_map.py",
+    "python3 scripts/status_from_proofs.py",
+    "python3 -m py_compile scripts/generate_art133_deprecation_map.py"
+  ],
   "verification_output": {
-    "artifact_declarations": [
+    "schema_version": "1.0",
+    "task_id": "ART-133_DEPRECATION_MAP",
+    "status": "passed",
+    "generated_at": "2026-07-27T05:08:06+00:00",
+    "summary": {
+      "retired": 1,
+      "replaced": 2,
+      "wrapped": 2,
+      "preserved": 3
+    },
+    "component_count": 8,
+    "artifact_paths": [
+      "migration-artifacts/02-target-state/deprecation-map.md",
+      "migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+      "migration-artifacts/art-133_deprecation_map/deprecation-map.json"
+    ],
+    "registry_results": [
       {
-        "declaration": "migration-artifacts/art-133_deprecation_map/*.md",
-        "kind": "glob",
-        "matches": [
-          {
-            "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.md",
-            "sha256": "f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537"
-          }
+        "artifact_row_id": "artifact-eb0182f087f9e501fe7e61f1",
+        "artifact_id": "02-target-state-deprecation-map-md",
+        "run_id": "run-art-133-deprecation-map",
+        "path": "migration-artifacts/02-target-state/deprecation-map.md",
+        "content_hash": "sha256:f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+        "producer_operation_id": "produce-02-target-state-deprecation-map-md",
+        "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+        "evidence_ids": [
+          "evidence-ebfa4e186521cf14df8eee8d",
+          "evidence-e9aa40ac18cb967e9fbe09be",
+          "evidence-f7276341a58595f7d04c879d",
+          "evidence-fd7641ffeb2a1746982b18a9",
+          "evidence-b3ba80ed591cb44b181ca74c",
+          "evidence-9a545fbbe00b3429d41345e7",
+          "evidence-3472ab11b16ed31f44108ac0"
         ],
-        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/*.md",
-        "status": "existing_glob"
+        "graph_edge_ids": [
+          "edge-a3dde2b49eef55fcf2de6c9c",
+          "edge-afe409f6a84a5ec8df22c40c",
+          "edge-7c1a9d2bfc2fbb77f726e16b",
+          "edge-93dbe349d0f28c3c4d3db11a",
+          "edge-92bb034b445745832f4c53cf",
+          "edge-133453bbf5863ea1ee5f80c4"
+        ],
+        "validation_ids": [
+          "validation-2eaef8943c2f2ae959edf657",
+          "validation-3eab379315f04a9f3a851760",
+          "validation-dfed1b7fda6519e50d7a7cbe"
+        ]
       },
       {
-        "declaration": "migration-artifacts/art-133_deprecation_map/*.json",
-        "kind": "glob",
-        "matches": [
-          {
-            "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.json",
-            "sha256": "ceb2551eae5510a0a3199ef126f4b460c6ca056f9e4388ea3beb13ba3f5113ef"
-          }
+        "artifact_row_id": "artifact-52c2f750bf1adcb3ee59c259",
+        "artifact_id": "art-133-deprecation-map-md",
+        "run_id": "run-art-133-deprecation-map",
+        "path": "migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+        "content_hash": "sha256:f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+        "producer_operation_id": "produce-02-target-state-deprecation-map-md",
+        "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+        "evidence_ids": [
+          "evidence-4dbcca00851a6e9aec10eb8f",
+          "evidence-e9169a479d61c0bf231bd776",
+          "evidence-762501cb44000415322d1e19"
         ],
-        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-133_deprecation_map/*.json",
-        "status": "existing_glob"
+        "graph_edge_ids": [
+          "edge-7279f641af9257850d8473af",
+          "edge-a4a9872a405034ab072eb530"
+        ],
+        "validation_ids": [
+          "validation-31733a6d5243bcd25ead837a"
+        ]
+      },
+      {
+        "artifact_row_id": "artifact-a1e1c787d74eb85edb8587b9",
+        "artifact_id": "art-133-deprecation-map-json",
+        "run_id": "run-art-133-deprecation-map",
+        "path": "migration-artifacts/art-133_deprecation_map/deprecation-map.json",
+        "content_hash": "sha256:ceb2551eae5510a0a3199ef126f4b460c6ca056f9e4388ea3beb13ba3f5113ef",
+        "producer_operation_id": "produce-02-target-state-deprecation-map-md",
+        "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+        "evidence_ids": [
+          "evidence-bbed7685afca24c672257b8e",
+          "evidence-89462478ec746e8959f7c41e"
+        ],
+        "graph_edge_ids": [
+          "edge-cbfd9a9717ef159018029378",
+          "edge-f826c4cfbaf687c150b8c3b2"
+        ],
+        "validation_ids": [
+          "validation-0f021f7241d95f33f66de5c9"
+        ]
       }
     ],
-    "command_exit_code": 0,
-    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
-    "implementation_scope": "runner_command_completed",
-    "materialization_schema": "lifeos.runner-proof-materialization.v1",
-    "needs_capability_probe": false,
-    "orchestration": {
-      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
-      "run_id": "20260727T225340189121Z-479767e62e9e"
+    "artifact_rows": [
+      {
+        "id": "artifact-eb0182f087f9e501fe7e61f1",
+        "run_id": "run-art-133-deprecation-map",
+        "artifact_id": "02-target-state-deprecation-map-md",
+        "title": "Deprecation Map",
+        "artifact_type": "migration_artifact",
+        "status": "complete",
+        "path": "migration-artifacts/02-target-state/deprecation-map.md",
+        "content_hash": "sha256:f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+        "generated_by_operation_id": "produce-02-target-state-deprecation-map-md",
+        "evidence": {
+          "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+          "evidence_ids": [
+            "evidence-ebfa4e186521cf14df8eee8d",
+            "evidence-e9aa40ac18cb967e9fbe09be",
+            "evidence-f7276341a58595f7d04c879d",
+            "evidence-fd7641ffeb2a1746982b18a9",
+            "evidence-b3ba80ed591cb44b181ca74c",
+            "evidence-9a545fbbe00b3429d41345e7",
+            "evidence-3472ab11b16ed31f44108ac0"
+          ],
+          "evidence_refs": [
+            "migration-artifacts/02-target-state/deprecation-map.md",
+            "migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+            "migration-artifacts/art-133_deprecation_map/deprecation-map.json",
+            "generated/contract_manifest.json",
+            "generated/envctl_artifact_registry_report.json",
+            "generated/shared_protocol_validation_report.json",
+            "migration-artifacts/art-105_package_lib_graph/package_lib_graph.json"
+          ],
+          "producer_operation_id": "produce-02-target-state-deprecation-map-md",
+          "provenance": {
+            "contract_row_id": "artifact:02-target-state-deprecation-map-md",
+            "helper_id": "helper-artifact-34",
+            "owner_agent": "artifact-agent",
+            "summary": {
+              "preserved": 3,
+              "replaced": 2,
+              "retired": 1,
+              "wrapped": 2
+            },
+            "task_id": "ART-133_DEPRECATION_MAP"
+          },
+          "validation_ids": [
+            "validation-2eaef8943c2f2ae959edf657",
+            "validation-3eab379315f04a9f3a851760",
+            "validation-dfed1b7fda6519e50d7a7cbe"
+          ]
+        },
+        "links": {
+          "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+          "graph_edge_ids": [
+            "edge-a3dde2b49eef55fcf2de6c9c",
+            "edge-afe409f6a84a5ec8df22c40c",
+            "edge-7c1a9d2bfc2fbb77f726e16b",
+            "edge-93dbe349d0f28c3c4d3db11a",
+            "edge-92bb034b445745832f4c53cf",
+            "edge-133453bbf5863ea1ee5f80c4"
+          ],
+          "links": [
+            {
+              "to": "task:REQ-024_ENVCTL_ARTIFACT_REGISTRY",
+              "type": "depends_on"
+            },
+            {
+              "to": "task:REQ-040_SHARED_PROTOCOL_SCHEMAS",
+              "type": "depends_on"
+            },
+            {
+              "to": "task:VER-300_UNIT_VALIDATION",
+              "type": "blocks"
+            },
+            {
+              "to": "artifact:03-code-analysis-package-library-dependency-graph-md",
+              "type": "uses_deprecation_signal"
+            },
+            {
+              "to": "artifact:09-governance-risk-register-md",
+              "type": "informs"
+            }
+          ]
+        }
+      },
+      {
+        "id": "artifact-52c2f750bf1adcb3ee59c259",
+        "run_id": "run-art-133-deprecation-map",
+        "artifact_id": "art-133-deprecation-map-md",
+        "title": "ART-133 Deprecation Map Markdown",
+        "artifact_type": "task_local_markdown_artifact",
+        "status": "complete",
+        "path": "migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+        "content_hash": "sha256:f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+        "generated_by_operation_id": "produce-02-target-state-deprecation-map-md",
+        "evidence": {
+          "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+          "evidence_ids": [
+            "evidence-4dbcca00851a6e9aec10eb8f",
+            "evidence-e9169a479d61c0bf231bd776",
+            "evidence-762501cb44000415322d1e19"
+          ],
+          "evidence_refs": [
+            "migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+            "migration-artifacts/02-target-state/deprecation-map.md",
+            "migration-artifacts/art-133_deprecation_map/deprecation-map.json"
+          ],
+          "producer_operation_id": "produce-02-target-state-deprecation-map-md",
+          "provenance": {
+            "owner_agent": "artifact-agent",
+            "source_artifact_id": "02-target-state-deprecation-map-md",
+            "task_id": "ART-133_DEPRECATION_MAP"
+          },
+          "validation_ids": [
+            "validation-31733a6d5243bcd25ead837a"
+          ]
+        },
+        "links": {
+          "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+          "graph_edge_ids": [
+            "edge-7279f641af9257850d8473af",
+            "edge-a4a9872a405034ab072eb530"
+          ],
+          "links": [
+            {
+              "to": "artifact:02-target-state-deprecation-map-md",
+              "type": "mirrors"
+            }
+          ]
+        }
+      },
+      {
+        "id": "artifact-a1e1c787d74eb85edb8587b9",
+        "run_id": "run-art-133-deprecation-map",
+        "artifact_id": "art-133-deprecation-map-json",
+        "title": "ART-133 Deprecation Map JSON",
+        "artifact_type": "machine_readable_record",
+        "status": "complete",
+        "path": "migration-artifacts/art-133_deprecation_map/deprecation-map.json",
+        "content_hash": "sha256:ceb2551eae5510a0a3199ef126f4b460c6ca056f9e4388ea3beb13ba3f5113ef",
+        "generated_by_operation_id": "produce-02-target-state-deprecation-map-md",
+        "evidence": {
+          "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+          "evidence_ids": [
+            "evidence-bbed7685afca24c672257b8e",
+            "evidence-89462478ec746e8959f7c41e"
+          ],
+          "evidence_refs": [
+            "migration-artifacts/art-133_deprecation_map/deprecation-map.json",
+            "migration-artifacts/02-target-state/deprecation-map.md"
+          ],
+          "producer_operation_id": "produce-02-target-state-deprecation-map-md",
+          "provenance": {
+            "owner_agent": "artifact-agent",
+            "source_artifact_id": "02-target-state-deprecation-map-md",
+            "task_id": "ART-133_DEPRECATION_MAP"
+          },
+          "validation_ids": [
+            "validation-0f021f7241d95f33f66de5c9"
+          ]
+        },
+        "links": {
+          "contract_id": "contract-full-migration-artifact-contract-1.0.0",
+          "graph_edge_ids": [
+            "edge-cbfd9a9717ef159018029378",
+            "edge-f826c4cfbaf687c150b8c3b2"
+          ],
+          "links": [
+            {
+              "to": "artifact:02-target-state-deprecation-map-md",
+              "type": "describes"
+            }
+          ]
+        }
+      }
+    ],
+    "checksums": {
+      "migration-artifacts/02-target-state/deprecation-map.md": "f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+      "migration-artifacts/art-133_deprecation_map/deprecation-map.md": "f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+      "migration-artifacts/art-133_deprecation_map/deprecation-map.json": "ceb2551eae5510a0a3199ef126f4b460c6ca056f9e4388ea3beb13ba3f5113ef"
     },
-    "origin_receipt": {
-      "attempt_id": "20260727T214313152164Z-c8ffcfeeac8f",
-      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
-      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-133_DEPRECATION_MAP/8536856b3a591e3d1dc96ca1233dcc5dfe7349dfcfa2df2c01b1785e2fdee31a/20260727T214313152164Z-c8ffcfeeac8f.json",
-      "run_id": "20260727T212315401740Z-f7b145f5f97d",
-      "sha256": "e1760f1fa05bfcd3b22b983df02a5c2f07d836d9f63b30395e83db4c05700a5d"
+    "validation": {
+      "artifact_file_exists": true,
+      "registry_contains_hash": true,
+      "validation_evidence_linked": true,
+      "all_required_classes_present": true
     },
-    "packet_execution_proven": true,
-    "packet_sha256": "8536856b3a591e3d1dc96ca1233dcc5dfe7349dfcfa2df2c01b1785e2fdee31a",
-    "preserved_task_proof": {
-      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/ART-133_DEPRECATION_MAP/469a9e076ba78e0df19bcb7094887fab9d3a85af807286c33debfd5073a8d9a3.proof.json",
-      "sha256": "469a9e076ba78e0df19bcb7094887fab9d3a85af807286c33debfd5073a8d9a3"
-    },
-    "probe_class": null,
-    "task_completion_proven": true,
-    "verification_executed": false,
-    "verification_exit_code": null
-  }
+    "evidence": [
+      "migration-artifacts/02-target-state/deprecation-map.md",
+      "migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+      "migration-artifacts/art-133_deprecation_map/deprecation-map.json",
+      "generated/contract_manifest.json",
+      "generated/execution_packets/ART-133_DEPRECATION_MAP.json",
+      "generated/envctl_artifact_registry_report.json",
+      "generated/shared_protocol_validation_report.json",
+      "migration-artifacts/art-105_package_lib_graph/package_lib_graph.json"
+    ]
+  },
+  "checksums": {
+    "execution-framework/scripts/generate_art133_deprecation_map.py": "b531217dd756b4a8b40bdb3c5bba52270fac4b4fbd174014a1e72403150b39a4",
+    "execution-framework/migration-artifacts/02-target-state/deprecation-map.md": "f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+    "execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.md": "f30becebc12231e576f7ae81534cb46b64e219bf6929681671c89a366665c537",
+    "execution-framework/migration-artifacts/art-133_deprecation_map/deprecation-map.json": "ceb2551eae5510a0a3199ef126f4b460c6ca056f9e4388ea3beb13ba3f5113ef",
+    "execution-framework/generated/art133_deprecation_map_report.json": "455e0c3c36360fda4635d32872c264fceba2dda966bb4ec071c08b520335a670",
+    "execution-framework/generated/status_from_proofs.json": "7e04336c2608c09c582de41db814601ad0d9330279c6d9a35f93a9b6249913c5",
+    "execution-framework/state/ART-133_DEPRECATION_MAP.heartbeat.json": "44b2a35927000fb7b4513dc65a51d86ef17d207249c4494d1aba0e233c32200a",
+    "execution-framework/logs/ART-133_DEPRECATION_MAP.log": "455e0c3c36360fda4635d32872c264fceba2dda966bb4ec071c08b520335a670",
+    "execution-framework/proof_records/ART-133_DEPRECATION_MAP.proof.json": "a5a58fb180fa1fc1e15acfae77c01e953aa26c0431fd3d4853bfb7d27c075203",
+    "execution-framework/proof_records/proof_ledger.jsonl": "04d28c4c6a7d1e7e759d746d9e05d3079a1be456460e16ce62e468509e5db077"
+  },
+  "logs_uri": "logs/ART-133_DEPRECATION_MAP.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "migration-artifacts/02-target-state/deprecation-map.md",
+    "migration-artifacts/art-133_deprecation_map/deprecation-map.md",
+    "migration-artifacts/art-133_deprecation_map/deprecation-map.json",
+    "generated/contract_manifest.json",
+    "generated/execution_packets/ART-133_DEPRECATION_MAP.json",
+    "generated/envctl_artifact_registry_report.json",
+    "generated/shared_protocol_validation_report.json",
+    "migration-artifacts/art-105_package_lib_graph/package_lib_graph.json"
+  ],
+  "failure_reason": "",
+  "next_action": ""
 }

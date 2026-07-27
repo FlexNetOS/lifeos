@@ -11,22 +11,24 @@ cd ~/envctl-db-nu-plugin-migration-automation-package
 Mission:
 Build the final product by executing the package's database-backed migration automation design against the real local repos. This is real execution only. No simulation. No demo. No fabricated repo structure. No destructive migration without explicit approval.
 
-Critical navigation order:
+Critical navigation and execution order:
 1. Read `README.md` first, especially `Agent navigation + backtrace metadata`.
 2. Confirm `history/v0` through `history/v5` exist and preserve upgrade-only/no-downgrade lineage.
 3. Use `execution-framework/generated/task_graph.csv` as the source of task truth.
-4. Use `execution-framework/generated/execution_manifest.json` to find the JSON executable packets.
-5. Execute bounded JSON packets from `execution-framework/generated/execution_packets/`.
-6. Start at runnable task `REQ-010_CONTRACT_LOCK` unless a newer `status_report.json` says otherwise.
-7. Write proof records to `execution-framework/proof_records/` and merge into `proof_ledger.jsonl` after every completed task.
-8. Recompute status with the framework scripts before reporting completion.
+4. Validate `execution-framework/generated/execution_manifest.json` against the graph, then use it to resolve JSON packets under `execution-framework/generated/execution_packets/`.
+5. Treat each JSON packet as the complete task instruction. Do not replace packet execution with a hand-authored task plan or prompt.
+6. Recompute current state from `execution-framework/proof_records/proof_ledger.jsonl`; never assume a hard-coded starting task.
+7. Dispatch only tasks whose declared dependencies are complete. Respect each packet's `can_run_parallel`, `parallel_group`, `max_parallel`, `start_after`, approval, and single-thread constraints.
+8. For a failed task, inspect its latest proof and log, fix the evidenced failure within that packet's allowed paths, and rerun that packet before unblocking dependents.
+9. After every attempt, write the task proof and update the append-only proof ledger. Regenerate merged proof/status views before selecting more work.
+10. Continue automatically until all tasks are complete or a genuine external/approval blocker prevents progress. Do not ask for a manual prompt between packets.
 
-Known no-gap state:
+Package baseline (verify it; current proof/status files supersede this snapshot):
 - Live Drive bookkeeping gaps from `DEEP_VERSION_GAP_ANALYSIS_2026-07-04_envctl_package` are closed.
 - Maintenance packets/proofs exist for README backtrace navigation, proof template restore, live manifest/verification sync, and final Codex handoff.
 - `execution-framework/proof_templates/PROOF_RECORD_TEMPLATE.json` is present.
 - `final_verification_report.json` status is `pass_no_gaps_drive_live_synchronized`.
-- envctl/nu_plugin implementation tasks are still pending by design; that is your work.
+- Implementation and verification state may have advanced since packaging. Trust the latest valid proof per task, not this prose.
 
 Required local repos:
 - envctl repo path: inspect the user's local target, do not invent it.
@@ -34,7 +36,7 @@ Required local repos:
 
 If repo paths are not provided by command-line args or environment variables, stop with `HARD STOP — REPO_PATHS_NOT_PROVIDED` and list the exact missing values. Do not create fake repos.
 
-Execution commands to run from package root before implementation:
+Bootstrap commands to run from package root before dispatch:
 
 ```bash
 cd execution-framework
@@ -44,7 +46,9 @@ python3 scripts/goal_loop.py generated/task_graph.csv
 python3 scripts/verify_history_and_completeness.py
 ```
 
-If paths differ after extraction, adapt only the path prefix; do not change task IDs or contract semantics.
+Then read `generated/status_report.json` and `state/goal_loop_state.json`, execute the listed dispatch packets, and repeat the goal loop after each completed bounded batch. If no packets are dispatchable while tasks are incomplete, report the exact failed dependency, approval gate, or external blocker from proof evidence.
+
+If the package was extracted somewhere other than `~/envctl-db-nu-plugin-migration-automation-package`, use the actual extracted package root. Adapt only the path prefix; do not change task IDs or contract semantics.
 
 Implementation objective:
 Make envctl database features perform the migration process as built-in, agent-controllable CLI/database tooling, with nu_plugin as the live human/agent control and visualization surface.

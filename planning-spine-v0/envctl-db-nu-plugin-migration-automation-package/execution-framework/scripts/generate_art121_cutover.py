@@ -104,6 +104,19 @@ def build_checklist(payload_context: dict[str, Any]) -> list[dict[str, Any]]:
     rollback_report = payload_context["rollback_report"]
     readiness = payload_context["readiness"]
     statuses = payload_context["statuses"]
+    validation_prerequisites = [
+        "REQ-041_TWO_REPO_INTEGRATION",
+        "REQ-045_RUN_REPLAY",
+        "VER-300_UNIT_VALIDATION",
+    ]
+    incomplete_validation_prerequisites = [
+        task_id
+        for task_id in validation_prerequisites
+        if statuses.get(task_id, "pending") not in {"completed", "passed"}
+    ]
+    incomplete_gate_tasks = payload_context["blocked_gates"]
+    validation_status = "blocked" if incomplete_validation_prerequisites else "ready"
+    execution_status = "blocked" if incomplete_gate_tasks else "ready"
     return [
         {
             "step_id": "CUT-001",
@@ -127,10 +140,10 @@ def build_checklist(payload_context: dict[str, Any]) -> list[dict[str, Any]]:
             "step_id": "CUT-002",
             "phase": "pre_cutover",
             "title": "Hold execution until validation and replay prerequisites clear",
-            "intent": "Make the current package state explicit: cutover planning exists, but live execution is still gated by unfinished validation and replay work.",
+            "intent": "Make prerequisite state explicit and prevent live execution whenever validation or replay evidence is incomplete.",
             "owner": "validation-agent",
-            "status": "blocked",
-            "blocking": True,
+            "status": validation_status,
+            "blocking": bool(incomplete_validation_prerequisites),
             "evidence_refs": [
                 "generated/status_from_proofs.json",
                 "migration-artifacts/art-128_readiness_scorecard/readiness-scorecard.md",
@@ -142,7 +155,12 @@ def build_checklist(payload_context: dict[str, Any]) -> list[dict[str, Any]]:
             ],
             "notes": [
                 f"Current statuses: REQ-041={statuses.get('REQ-041_TWO_REPO_INTEGRATION', 'pending')}, REQ-045={statuses.get('REQ-045_RUN_REPLAY', 'pending')}, VER-300={statuses.get('VER-300_UNIT_VALIDATION', 'pending')}.",
-                f"Readiness band remains {readiness.get('readiness_band', 'conditional')}.",
+                (
+                    "Validation and replay prerequisites are complete."
+                    if not incomplete_validation_prerequisites
+                    else "Incomplete prerequisites: " + ", ".join(incomplete_validation_prerequisites) + "."
+                ),
+                f"Readiness scorecard band: {readiness.get('readiness_band', 'conditional')}.",
             ],
         },
         {
@@ -211,8 +229,8 @@ def build_checklist(payload_context: dict[str, Any]) -> list[dict[str, Any]]:
             "title": "Run the validated migration sequence only after gate clearance",
             "intent": "Execute the move order from W6 after validation says the package is actually releasable.",
             "owner": "release-operator",
-            "status": "blocked",
-            "blocking": True,
+            "status": execution_status,
+            "blocking": bool(incomplete_gate_tasks),
             "evidence_refs": [
                 "migration-artifacts/art-120_wave_plan/wave-plan.md",
                 "generated/status_from_proofs.json",
@@ -223,7 +241,11 @@ def build_checklist(payload_context: dict[str, Any]) -> list[dict[str, Any]]:
                 "No new unreviewed exceptions were added after sign-off.",
             ],
             "notes": [
-                "This step is intentionally blocked in the current package snapshot because validation and replay tasks are still pending.",
+                (
+                    "All checklist gate tasks are complete; execution remains subject to the operator controls and abort criteria below."
+                    if not incomplete_gate_tasks
+                    else "Execution is blocked by: " + ", ".join(incomplete_gate_tasks) + "."
+                ),
             ],
         },
         {
@@ -284,6 +306,7 @@ def build_payload() -> dict[str, Any]:
             "rollback_report": rollback_report,
             "readiness": readiness,
             "statuses": statuses,
+            "blocked_gates": blocked_gates,
         }
     )
 

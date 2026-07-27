@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "task_id": "ART-133_DEPRECATION_MAP",
   "title": "Deprecation Map",
-  "generated_at": "2026-07-04T23:28:24+00:00",
+  "generated_at": "2026-07-27T05:08:06+00:00",
   "status": "complete",
   "contract_row": {
     "contract_row_id": "artifact:02-target-state-deprecation-map-md",
@@ -31,64 +31,113 @@
   ],
   "source_signals": {
     "package_graph_summary": {
-      "node_count": 8,
-      "edge_count": 6,
-      "python_file_count": 49,
-      "third_party_python_import_count": 2,
-      "shell_script_count": 6,
-      "issue_count": 4,
+      "node_count": 347,
+      "edge_count": 767,
+      "project_count": 69,
+      "library_count": 278,
+      "manifest_count": 156,
+      "lockfile_count": 54,
+      "issue_count": 5,
       "vulnerability_count": 1,
       "deprecation_count": 1,
-      "incompatibility_count": 2
+      "incompatibility_count": 3
     },
     "package_graph_issues": [
       {
         "id": "ART105-VULN-001",
         "category": "vulnerability",
         "severity": "unknown",
-        "component": "all",
-        "status": "no_external_lockfile_detected",
-        "finding": "The package contains no third-party package lockfile or version-pinned library manifest for CVE correlation; observed external Python imports are recorded without versions, so CVE status is unknown rather than clean.",
+        "component": "all lockfiles",
+        "status": "not_assessed_offline",
+        "finding": "Lockfiles were inventoried, but the target descriptor forbids network access and no authoritative offline advisory database was supplied. Vulnerability status is unknown, not clean; run ecosystem audits against an approved advisory snapshot before migration.",
         "evidence": [
-          "PACKAGE_MANIFEST.json",
-          "execution-framework/generated/package_scan.json"
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/_actions/actions/checkout/v6/package-lock.json",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/home/agent-env/codex-harness/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/epaint-0.33.3/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-0.18.2/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-0.19.0/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c32-0.18.2/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c32-0.19.0/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c64-0.18.2/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c64-0.19.0/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-common-0.18.2/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-common-0.19.0/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-f16-0.18.2/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-f16-0.19.0/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-f32-0.18.2/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-f32-0.19.0/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-f64-0.18.2/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-f64-0.19.0/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/pulp-0.22.3/Cargo.lock",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/ruvector-core-2.3.0/Cargo.lock"
         ]
       },
       {
         "id": "ART105-DEP-001",
         "category": "deprecation",
-        "severity": "medium",
-        "component": "source/codex-flexnetos-migration-prompt-package/helpers/__pycache__",
-        "status": "present_in_source_manifest",
-        "finding": "The source package manifest includes CPython 3.13 bytecode cache files; treat them as generated compatibility artifacts, not authoritative migration source.",
+        "severity": "unknown",
+        "component": "package metadata",
+        "status": "not_declared_in_manifests",
+        "finding": "The scanned manifest formats do not provide authoritative deprecation notices. Registry/advisory metadata must be refreshed in an approved connected environment; absence here is not evidence that dependencies are supported.",
         "evidence": [
-          "source/codex-flexnetos-migration-prompt-package/PACKAGE_MANIFEST.json"
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/_actions/actions/checkout/v6/package.json",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/agent-env/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/cli/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/engine/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/gui/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/secretctl/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/secretd/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/secrets-engine/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/secrets-proto/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/crates/secrets-store-libsql/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/home/agent-env/codex-harness/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/epaint-0.33.3/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-0.18.2/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-0.19.0/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c32-0.18.2/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c32-0.19.0/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c64-0.18.2/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-01-work/envctl/envctl/third_party/gemm-c64-0.19.0/Cargo.toml"
         ]
       },
       {
         "id": "ART105-INCOMPAT-001",
         "category": "incompatibility",
         "severity": "medium",
-        "component": "sqlite schema",
-        "status": "requires_sqlite_features",
-        "finding": "Artifact registry verification depends on SQLite foreign keys, views, unique constraints, and upsert semantics; alternate DB backends need compatible migrations before replay.",
+        "component": "JavaScript UI/build graph",
+        "status": "mixed_framework_toolchain",
+        "finding": "The LifeOS root manifest combines Vue, Svelte, Vite, Tauri, and their test plugins. Migration must preserve framework-specific compiler/plugin compatibility and cannot treat the JavaScript graph as a single-framework application.",
         "evidence": [
-          "sql/001_migration_automation_schema.sql",
-          "sql/002_views_and_indexes.sql",
-          "sql/003_seed_artifact_contract.sql",
-          "execution-framework/generated/contract_manifest.seed.sql"
+          "comparison:package.json",
+          "comparison:bun.lock"
         ]
       },
       {
         "id": "ART105-INCOMPAT-002",
         "category": "incompatibility",
         "severity": "medium",
-        "component": "codex execution runtime",
-        "status": "tool_required",
-        "finding": "Execution packets require codex, python3, and shell tools. The package does not vendor these tools, so target hosts must provide them through the envctl runtime.",
+        "component": "Rust target graph",
+        "status": "separate_target_resolvers",
+        "finding": "LifeOS desktop/core/daemon crates share the root Cargo workspace, while firmware/esp32 is explicitly excluded and uses a separate target/toolchain. A unified dependency upgrade can therefore resolve differently across host and firmware targets.",
         "evidence": [
-          "generated/execution_packets/ART-105_PACKAGE_LIB_GRAPH.json",
-          "RUN_WITH_CODEX_ENVCTL.sh"
+          "comparison:Cargo.toml",
+          "comparison:firmware/esp32/Cargo.toml"
+        ]
+      },
+      {
+        "id": "ART105-INCOMPAT-003",
+        "category": "incompatibility",
+        "severity": "medium",
+        "component": "cargo:ort, cargo:pkcs1",
+        "status": "prerelease_dependency",
+        "finding": "Direct dependency requirements include prerelease channels, which may introduce API or lockfile churn across migration environments.",
+        "evidence": [
+          "primary:src/flexnetos_runner/_work/actions-runner-02-work/envctl/envctl/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-02-work/envctl/envctl/crates/secrets-engine/Cargo.toml",
+          "primary:src/flexnetos_runner/_work/actions-runner-02-work/envctl/envctl/third_party/ruvector-core-2.3.0/Cargo.toml"
         ]
       }
     ],
@@ -112,7 +161,7 @@
       "component": "source/codex-flexnetos-migration-prompt-package/helpers/__pycache__",
       "classification": "retired",
       "disposition": "Exclude from authoritative migration source and regenerated package outputs.",
-      "rationale": "The source package manifest includes CPython 3.13 bytecode cache files; treat them as generated compatibility artifacts, not authoritative migration source.",
+      "rationale": "The scanned manifest formats do not provide authoritative deprecation notices. Registry/advisory metadata must be refreshed in an approved connected environment; absence here is not evidence that dependencies are supported.",
       "replacement": "Source helper scripts and package manifest entries without CPython cache files.",
       "owner": "artifact-agent",
       "risk": "medium",
@@ -172,7 +221,7 @@
       "component": "codex CLI background shell execution",
       "classification": "wrapped",
       "disposition": "Run through execution packets and envctl operation metadata instead of treating raw stdout as the state boundary.",
-      "rationale": "Execution packets require codex, python3, and shell tools. The package does not vendor these tools, so target hosts must provide them through the envctl runtime.",
+      "rationale": "LifeOS desktop/core/daemon crates share the root Cargo workspace, while firmware/esp32 is explicitly excluded and uses a separate target/toolchain. A unified dependency upgrade can therefore resolve differently across host and firmware targets.",
       "replacement": "envctl run ledger, operation records, event/evidence hashes, and proof records.",
       "owner": "envctl-runner-agent",
       "risk": "medium",
@@ -203,7 +252,7 @@
       "component": "SQLite migration automation schema and in-memory proof fixture",
       "classification": "preserved",
       "disposition": "Preserve for package-local validation while keeping backend portability risk visible.",
-      "rationale": "Artifact registry verification depends on SQLite foreign keys, views, unique constraints, and upsert semantics; alternate DB backends need compatible migrations before replay.",
+      "rationale": "The LifeOS root manifest combines Vue, Svelte, Vite, Tauri, and their test plugins. Migration must preserve framework-specific compiler/plugin compatibility and cannot treat the JavaScript graph as a single-framework application.",
       "replacement": "Compatible envctl migrations for any future durable backend.",
       "owner": "envctl-db-agent",
       "risk": "medium",

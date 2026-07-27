@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "task_id": "VER-300_UNIT_VALIDATION",
+  "status": "pass",
+  "summary": {
+    "passed_suites": 8,
+    "failed_suites": 0,
+    "blocked_tests": 0
+  },
+  "suites": [
+    {
+      "name": "envctl migration DB unit tests",
+      "command": "cargo test -p envctl-engine migration_db::tests -- --nocapture",
+      "status": "pass",
+      "tests_passed": 9,
+      "tests_filtered_out": 238
+    },
+    {
+      "name": "nu_plugin envctl boundary tests",
+      "command": "cargo test -p nu_plugin_codedb envctl_ -- --nocapture",
+      "status": "pass",
+      "tests_passed": 21,
+      "tests_filtered_out": 8
+    },
+    {
+      "name": "two-repo runtime integration",
+      "command": "ENVCTL_REPO=/home/flexnetos/meta/src/envctl NU_PLUGIN_REPO=/home/flexnetos/meta/src/nu_plugin python3 scripts/verify_two_repo_runtime.py",
+      "status": "pass",
+      "routes_verified": 10
+    },
+    {
+      "name": "envctl DB structural validation",
+      "command": "python3 scripts/verify_envctl_db_schema.py",
+      "status": "pass",
+      "tables": 16,
+      "views": 6,
+      "indexes": 31,
+      "foreign_keys": 24
+    },
+    {
+      "name": "shared protocol schemas",
+      "command": "/usr/bin/python3 scripts/verify_shared_protocol_schemas.py",
+      "status": "pass",
+      "sample_records": 14
+    },
+    {
+      "name": "artifact registry",
+      "command": "python3 scripts/verify_artifact_registry.py",
+      "status": "pass",
+      "evidence": 3,
+      "edges": 4,
+      "validations": 2
+    },
+    {
+      "name": "validation evidence",
+      "command": "python3 scripts/verify_validation_evidence.py",
+      "status": "pass",
+      "validations": 3,
+      "evidence": 4,
+      "hashed": 4
+    },
+    {
+      "name": "FlexNetOS adapter recipe",
+      "command": "python3 scripts/verify_flexnetos_adapter_recipe.py",
+      "status": "pass",
+      "phases": 4,
+      "operations": 8
+    }
+  ],
+  "secret_exposure": {
+    "status": "pass",
+    "blocked_paths_read": false,
+    "secret_findings": []
+  }
+}

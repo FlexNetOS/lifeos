@@ -1,36 +1,25 @@
 REQ-033_PLUGIN_HUMAN_APPROVAL verification log
-timestamp_utc=2026-07-05T04:57:38Z
-cwd=/home/flexnetos/FlexNetOS/src/envctl/envctl-db-nu-plugin-migration-automation-package/execution-framework
-NU_PLUGIN_REPO=/home/flexnetos/FlexNetOS/src/nu_plugin
+timestamp_utc=2026-07-27T04:39:10Z
+NU_PLUGIN_REPO=/home/flexnetos/Downloads/nu_plugin
 
-[patch apply check]
-patch_apply_check_exit=0
+[approval gate]
+python3 scripts/validate_agent_approval_gate.py
+result=passed
 
-[patch whitespace check]
-patch_whitespace_check_exit=0
+[implementation]
+command=codedb envctl human approvals
+target=crates/nu_plugin_codedb/src/main.rs
+views=mode,approval,operation
+actions=opt_in,approve,deny,pause,delegate
+mutation_policy=read_only_human_approval_projection
+input_formats=json_array,json_object,jsonl
 
-[temp copy apply]
-git_apply_temp_exit=0
-patched_file_differs_from_original_exit=1
-
-[toolchain availability]
-cargo not found
-rustc not found
-
-[patched-source structural gate]
-command_registered=True
-command_name=True
-required_approvals_path=True
-optional_ops_flag=True
-mode_flag=True
-mode_view_rows=True
-approval_view_rows=True
-operation_view_rows=True
-allowed_actions_column=True
-delegate_target_column=True
-projection_test=True
-bad_jsonl_test=True
-structural_gate_exit=0
-
-[temp tree changed files]
-crates/nu_plugin_codedb/src/main.rs
+[verification]
+cargo test -p nu_plugin_codedb
+result=7 passed
+cargo test --workspace
+result=35 passed across 16 suites
+cargo fmt --all -- --check
+result=passed
+mode_validation=passed
+malformed_jsonl_validation=passed

@@ -1,0 +1,12 @@
+[package]
+name = "codedb-fixture-feature-cfg"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+default = []
+extra = []
+
+[target.'cfg(unix)'.dependencies]
+codedb-fixture-unix-helper = { path = "deps/unix_helper" }

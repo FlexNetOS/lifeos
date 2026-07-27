@@ -1,7 +1,7 @@
 # API Contract Catalog
 
 Task: `ART-110_API_CATALOG`
-Generated at: `2026-07-04T23:31:52+00:00`
+Generated at: `2026-07-27T18:17:37+00:00`
 Target: `flexnetos-vs-lifeos`
 Target root: `/home/flexnetos/FlexNetOS`
 
@@ -40,5 +40,7 @@ Target root: `/home/flexnetos/FlexNetOS`
 | Version | Surface Count |
 |---|---:|
 | `1.0.0` | 15 |
-| `unversioned` | 238 |
-| `v1` | 81 |
+| `unversioned` | 69 |
+| `v1` | 23 |
+| `v2` | 1 |
+| `v6` | 1 |

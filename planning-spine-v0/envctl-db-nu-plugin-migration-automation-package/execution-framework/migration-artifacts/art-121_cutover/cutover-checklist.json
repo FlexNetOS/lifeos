@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "task_id": "ART-121_CUTOVER",
   "title": "Cutover Checklist",
-  "generated_at": "2026-07-05T05:02:33+00:00",
+  "generated_at": "2026-07-27T05:01:36+00:00",
   "target": {
     "target_id": "flexnetos-vs-lifeos",
     "primary_root": "/home/flexnetos/FlexNetOS",
@@ -65,13 +65,13 @@
     {
       "task_id": "REQ-041_TWO_REPO_INTEGRATION",
       "title": "Implement two-repo integration",
-      "status": "pending",
+      "status": "completed",
       "proof_uri": "proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json"
     },
     {
       "task_id": "REQ-045_RUN_REPLAY",
       "title": "Implement run/replay templates",
-      "status": "pending",
+      "status": "completed",
       "proof_uri": "proof_records/REQ-045_RUN_REPLAY.proof.json"
     },
     {
@@ -83,7 +83,7 @@
     {
       "task_id": "ART-122_ROLLBACK",
       "title": "Build Rollback plan",
-      "status": "pending",
+      "status": "completed",
       "proof_uri": "proof_records/ART-122_ROLLBACK.proof.json"
     },
     {
@@ -101,16 +101,11 @@
     {
       "task_id": "VER-300_UNIT_VALIDATION",
       "title": "Run unit/integration validation",
-      "status": "pending",
+      "status": "completed",
       "proof_uri": "proof_records/VER-300_UNIT_VALIDATION.proof.json"
     }
   ],
-  "blocked_gate_tasks": [
-    "REQ-041_TWO_REPO_INTEGRATION",
-    "REQ-045_RUN_REPLAY",
-    "ART-122_ROLLBACK",
-    "VER-300_UNIT_VALIDATION"
-  ],
+  "blocked_gate_tasks": [],
   "readiness_band": "conditional",
   "overall_readiness_score": 75.3,
   "wave_reference": {
@@ -262,10 +257,10 @@
       "step_id": "CUT-002",
       "phase": "pre_cutover",
       "title": "Hold execution until validation and replay prerequisites clear",
-      "intent": "Make the current package state explicit: cutover planning exists, but live execution is still gated by unfinished validation and replay work.",
+      "intent": "Make prerequisite state explicit and prevent live execution whenever validation or replay evidence is incomplete.",
       "owner": "validation-agent",
-      "status": "blocked",
-      "blocking": true,
+      "status": "ready",
+      "blocking": false,
       "evidence_refs": [
         "generated/status_from_proofs.json",
         "migration-artifacts/art-128_readiness_scorecard/readiness-scorecard.md"
@@ -276,8 +271,9 @@
         "VER-300_UNIT_VALIDATION is completed."
       ],
       "notes": [
-        "Current statuses: REQ-041=pending, REQ-045=pending, VER-300=pending.",
-        "Readiness band remains conditional."
+        "Current statuses: REQ-041=completed, REQ-045=completed, VER-300=completed.",
+        "Validation and replay prerequisites are complete.",
+        "Readiness scorecard band: conditional."
       ]
     },
     {
@@ -346,8 +342,8 @@
       "title": "Run the validated migration sequence only after gate clearance",
       "intent": "Execute the move order from W6 after validation says the package is actually releasable.",
       "owner": "release-operator",
-      "status": "blocked",
-      "blocking": true,
+      "status": "ready",
+      "blocking": false,
       "evidence_refs": [
         "migration-artifacts/art-120_wave_plan/wave-plan.md",
         "generated/status_from_proofs.json"
@@ -358,7 +354,7 @@
         "No new unreviewed exceptions were added after sign-off."
       ],
       "notes": [
-        "This step is intentionally blocked in the current package snapshot because validation and replay tasks are still pending."
+        "All checklist gate tasks are complete; execution remains subject to the operator controls and abort criteria below."
       ]
     },
     {
@@ -407,6 +403,6 @@
     "blocks": [
       "VER-300_UNIT_VALIDATION"
     ],
-    "execution_ready_now": false
+    "execution_ready_now": true
   }
 }

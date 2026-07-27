@@ -20,6 +20,18 @@ python3 scripts/verify_history_and_completeness.py
 
 These commands validate the task graph, generate bounded task packets, compute runnable work, merge proof state, and prove package completeness.
 
+## README Navigation / Backtrace
+
+- v0-v5 history: `history/pre_execution_framework_manifest.json`, `history/README.md`
+- Task graph: `generated/task_graph.csv`
+- Execution manifest: `generated/execution_manifest.json`
+- Packets: `generated/execution_packets/*.json`
+- Goal state: `generated/status_report.json`, `state/goal_loop_state.json`
+- Proof ledger: `proof_records/proof_ledger.jsonl`
+- this maintenance proof: `proof_records/MAINT-500_README_NAV_BACKTRACE.proof.json`
+- this maintenance packet: `generated/execution_packets/MAINT-500_README_NAV_BACKTRACE.json`
+- Codex entry points: `docs/INSTALL_BOOTSTRAP.md`, `docs/RUN_REPLAY.md`, `docs/GOAL_LOOP_PROTOCOL.md`
+
 ## Install And Bootstrap
 
 The repo install and Codex/background helper command templates are generated and verified by:

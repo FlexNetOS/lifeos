@@ -2,8 +2,8 @@
   "proof_schema_version": "1.0",
   "task_id": "EF-008_VERIFY_HISTORY_COMPLETENESS",
   "status": "completed",
-  "started_at": "2026-07-05T06:18:54+00:00",
-  "completed_at": "2026-07-05T06:18:54+00:00",
+  "started_at": "2026-07-27T19:29:36+00:00",
+  "completed_at": "2026-07-27T19:29:36+00:00",
   "actor": "local-execution-framework",
   "helper_id": "helper-final-01",
   "model_tag": "gpt-5.3-spark",
@@ -17,12 +17,12 @@
   ],
   "verification_output": {
     "schema_version": "1.0",
-    "generated_at": "2026-07-05T06:18:54+00:00",
+    "generated_at": "2026-07-27T19:29:36+00:00",
     "status": "pass_with_external_blocker",
     "local_package_complete": true,
     "task_count": 80,
-    "packet_count": 80,
-    "proof_count": 88,
+    "packet_count": 763,
+    "proof_count": 86,
     "missing_outputs": [],
     "tasks_without_packets": [],
     "packet_missing_fields": [],
@@ -115,19 +115,48 @@
     "unresolved_gaps": [],
     "goal_loop_summary": {
       "schema_version": "1.0",
-      "generated_at": "2026-07-05T06:18:54+00:00",
+      "generated_at": "2026-07-27T15:28:06+00:00",
       "task_count": 80,
-      "complete_count": 80,
+      "complete_count": 77,
       "failed_count": 0,
-      "pending_count": 0,
-      "runnable_count": 0,
-      "dispatch_count": 0,
+      "pending_count": 3,
+      "runnable_count": 1,
+      "dispatch_count": 1,
       "approval_blocker_count": 0,
-      "blocked_count": 0,
-      "runnable_tasks": [],
-      "dispatch_packets": [],
+      "blocked_count": 2,
+      "runnable_tasks": [
+        {
+          "task_id": "VER-304_FINAL_COMPLETENESS",
+          "parallel_group": "verification",
+          "max_parallel": 1,
+          "packet_uri": "generated/execution_packets/VER-304_FINAL_COMPLETENESS.json"
+        }
+      ],
+      "dispatch_packets": [
+        {
+          "task_id": "VER-304_FINAL_COMPLETENESS",
+          "parallel_group": "verification",
+          "max_parallel": 1,
+          "packet_uri": "generated/execution_packets/VER-304_FINAL_COMPLETENESS.json"
+        }
+      ],
       "approval_blockers": [],
-      "blocked_tasks": [],
+      "blocked_tasks": [
+        {
+          "task_id": "REL-400_PACKAGE_ARCHIVE",
+          "reason": "unmet dependencies",
+          "dependencies": [
+            "VER-304_FINAL_COMPLETENESS"
+          ]
+        },
+        {
+          "task_id": "REL-401_HANDOFF",
+          "reason": "unmet dependencies",
+          "dependencies": [
+            "REL-400_PACKAGE_ARCHIVE"
+          ]
+        }
+      ],
       "statuses": {
         "EF-001_SCAN_PACKAGE": "complete",
         "EF-002_GAP_REPORT": "complete",
@@ -202,9 +231,9 @@
         "VER-301_SQL_SCHEMA_TEST": "complete",
         "VER-302_PACKET_SCHEMA_VALIDATION": "complete",
         "VER-303_GOAL_LOOP_COMPUTE": "complete",
-        "VER-304_FINAL_COMPLETENESS": "complete",
-        "REL-400_PACKAGE_ARCHIVE": "complete",
-        "REL-401_HANDOFF": "complete",
+        "VER-304_FINAL_COMPLETENESS": "pending",
+        "REL-400_PACKAGE_ARCHIVE": "pending",
+        "REL-401_HANDOFF": "pending",
         "MAINT-500_README_NAV_BACKTRACE": "complete",
         "MAINT-501_RESTORE_PROOF_TEMPLATE": "complete",
         "MAINT-502_LIVE_MANIFEST_VERIFICATION_SYNC": "complete",
@@ -220,8 +249,8 @@
     ]
   },
   "checksums": {
-    "execution-framework/generated/final_verification_report.json": "3c2e52dfb9c5490243dbf23838a31df9862ea8f0d67fc1720bf60c81bb20c5e2",
-    "execution-framework/docs/FINAL_VERIFICATION.md": "4349775c03376d11933cc09cbf821b3eba47a69eb80b381da7cbe052d778ad5b"
+    "execution-framework/generated/final_verification_report.json": "314ac0048c3427d402deff3fef071775e05357c252476f9545e2132585e9d17f",
+    "execution-framework/docs/FINAL_VERIFICATION.md": "d9f6a03c9d260d140aa57a5c68ff93ac4daedc21c19122576722822fb124676c"
   },
   "logs_uri": "logs/EF-008_VERIFY_HISTORY_COMPLETENESS.log",
   "rollback_point": "history/pre_execution_framework_manifest.json",

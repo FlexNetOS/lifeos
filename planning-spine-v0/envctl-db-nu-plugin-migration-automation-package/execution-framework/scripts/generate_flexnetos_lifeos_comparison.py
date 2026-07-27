@@ -31,10 +31,14 @@ REQ_200_PROOF = ROOT / "proof_records" / "REQ-200_FLEXNETOS_TARGET_DESCRIPTOR.pr
 ARTIFACT_JSON = OUT_DIR / "flexnetos-lifeos-comparison.json"
 ARTIFACT_MD = OUT_DIR / "flexnetos-lifeos-comparison.md"
 PROOF_LEDGER = ROOT / "proof_records" / "proof_ledger.jsonl"
+SCRIPT_PATH = ROOT / "scripts" / "generate_flexnetos_lifeos_comparison.py"
 
 PRIMARY_ROOT = Path("/home/flexnetos/FlexNetOS")
-MISSING_COMPARE_ROOT = Path("/home/flexnetos/lifeos")
-LIFEOS_PEER_ROOT = PRIMARY_ROOT / "src" / "lifeos"
+COMPARE_ROOT = Path("/home/flexnetos/lifeos")
+RUNNER_CHECKOUT = (
+    PRIMARY_ROOT
+    / "src/flexnetos_runner/_work/actions-runner-01-work/flexnetos_runner/flexnetos_runner"
+)
 
 BLOCKED_PARTS = {".git", ".env", "secrets", "private_keys", ".venv", "__pycache__", "node_modules", "target"}
 BLOCKED_SUFFIXES = {".pem", ".key"}
@@ -229,9 +233,12 @@ def collect() -> dict[str, Any]:
 
     repositories = repo_map.get("repositories", [])
     lifeos_repo = find_repository(repositories, "src/lifeos")
-    catalog_path = PRIMARY_ROOT / "src" / "flexnetos_runner" / "release" / "catalog.tsv"
-    catalog = release_catalog_rows(catalog_path)
-    lifeos_catalog_rows = [row for row in catalog if row.get("component") == "lifeos"]
+    runner_repo = find_repository(
+        repositories,
+        "actions-runner-01-work/flexnetos_runner/flexnetos_runner",
+    )
+    runner_readme = RUNNER_CHECKOUT / "README.md"
+    release_script = RUNNER_CHECKOUT / "scripts/build-local-ubuntu-release.sh"
 
     service_edges = service_graph.get("edges", [])
     important_edges = [
@@ -250,48 +257,38 @@ def collect() -> dict[str, Any]:
         debug_hotspots = list(debug_hotspots.values())
 
     safe_evidence_files = {
-        "flexnetos_agents": PRIMARY_ROOT / "AGENTS.md",
-        "flexnetos_layout": PRIMARY_ROOT / "WORKSPACE_LAYOUT.md",
-        "release_catalog": catalog_path,
-        "lifeos_readme": LIFEOS_PEER_ROOT / "README.md",
-        "lifeos_package": LIFEOS_PEER_ROOT / "package.json",
-        "lifeos_cargo": LIFEOS_PEER_ROOT / "Cargo.toml",
+        "runner_readme": runner_readme,
+        "release_script": release_script,
+        "lifeos_last_route": COMPARE_ROOT / "src/envctl/home/agent-env/codex-harness/state/model-router/last-route.json",
     }
 
     line_evidence = {
-        "flexnetos_agents": extract_lines(
-            safe_evidence_files["flexnetos_agents"],
-            ["hollow", "real implementation", "canonical repos", "meta", "envctl", "flexnetos_runner", "yazelix"],
+        "runner_readme": extract_lines(
+            safe_evidence_files["runner_readme"],
+            ["execution plane", "self-hosted", "canonical operation", "release lane"],
             context=1,
         ),
-        "flexnetos_layout": extract_lines(
-            safe_evidence_files["flexnetos_layout"],
-            ["hollow", "canonical roots", "state/", "cache/", "logs/", "release/", "peer"],
+        "release_script": extract_lines(
+            safe_evidence_files["release_script"],
+            ["historical", "copy_lifeos_bundle_assets", "lifeos-bundle", "bun not found"],
             context=1,
         ),
-        "release_catalog_lifeos": extract_lines(safe_evidence_files["release_catalog"], ["lifeos"], context=0, limit=4),
-        "lifeos_readme": extract_lines(
-            safe_evidence_files["lifeos_readme"],
-            ["lifeos", "vue", "tauri", "desktop", "web", "design system", "fs scope"],
-            context=1,
-        ),
-        "lifeos_package": extract_lines(
-            safe_evidence_files["lifeos_package"],
-            ["lifeos-vue", "tauri", "vite", "vue", "pinia", "planning-spine"],
-            context=1,
-        ),
-        "lifeos_cargo": extract_lines(
-            safe_evidence_files["lifeos_cargo"],
-            ["lifeos", "workspace", "lifeos-core", "lifeos-daemon", "tauri"],
+        "lifeos_last_route": extract_lines(
+            safe_evidence_files["lifeos_last_route"],
+            ["requires_runner", "profile", "provider", "model"],
             context=1,
         ),
     }
 
-    lifeos_tree = summarize_lifeos_tree(LIFEOS_PEER_ROOT)
+    lifeos_tree = summarize_lifeos_tree(COMPARE_ROOT)
     git_state = {
-        "lifeos_branch": run_git(LIFEOS_PEER_ROOT, ["branch", "--show-current"]) if LIFEOS_PEER_ROOT.exists() else "missing",
-        "lifeos_head": run_git(LIFEOS_PEER_ROOT, ["rev-parse", "--short=12", "HEAD"]) if LIFEOS_PEER_ROOT.exists() else "missing",
-        "lifeos_status_short": run_git(LIFEOS_PEER_ROOT, ["status", "--short", "--branch"]) if LIFEOS_PEER_ROOT.exists() else "missing",
+        "lifeos_git_repository": (COMPARE_ROOT / ".git").exists(),
+        "runner_branch": run_git(RUNNER_CHECKOUT, ["branch", "--show-current"]),
+        "runner_head": run_git(RUNNER_CHECKOUT, ["rev-parse", "--short=12", "HEAD"]),
+        "runner_latest_commit": run_git(
+            RUNNER_CHECKOUT,
+            ["log", "-1", "--date=short", "--pretty=format:%h %ad %s"],
+        ),
     }
 
     comparison = {
@@ -307,42 +304,43 @@ def collect() -> dict[str, Any]:
         "root_state": {
             "descriptor": descriptor,
             "primary_root_exists": PRIMARY_ROOT.exists(),
-            "declared_compare_root": str(MISSING_COMPARE_ROOT),
-            "declared_compare_root_exists": MISSING_COMPARE_ROOT.exists(),
-            "lifeos_peer_root": str(LIFEOS_PEER_ROOT),
-            "lifeos_peer_root_exists": LIFEOS_PEER_ROOT.exists(),
+            "declared_compare_root": str(COMPARE_ROOT),
+            "declared_compare_root_exists": COMPARE_ROOT.exists(),
+            "lifeos_peer_root": str(PRIMARY_ROOT / "src/lifeos"),
+            "lifeos_peer_root_exists": (PRIMARY_ROOT / "src/lifeos").exists(),
             "req_200_compare_root_exists": req_200.get("verification_output", {}).get("root_checks", {}).get("compare_root_exists"),
             "req_200_warnings": req_200.get("verification_output", {}).get("warnings", []),
         },
         "conclusion": {
             "summary": (
-                "FlexNetOS was used as the active hollow workspace, control plane, environment authority, "
-                "runtime/release lane, and migration artifact sink. lifeos was present as a peer Vue/Tauri "
-                "product app under src/lifeos and as a release catalog bundle, not as the active filesystem root "
-                "or control-plane service."
+                "In the captured filesystem, FlexNetOS is the active self-hosted GitHub Actions execution "
+                "and release workspace. It holds two runner work directories and their envctl, nu_plugin, "
+                "and flexnetos_runner checkouts. The separate lifeos root is not an application checkout: "
+                "it contains only five envctl Codex-harness state and audit-ledger files."
             ),
             "flexnetos_usage": [
-                "Workspace root and peer-repo coordinator for the source fleet.",
-                "Meta/gitkb control plane and policy surface.",
-                "Envctl environment authority and state/catalog contract.",
-                "Runner/release/provenance lane that packages tools and product bundles.",
-                "Yazelix/Codex/local runtime proof surface and migration evidence sink.",
+                "Two-slot self-hosted GitHub Actions execution workspace.",
+                "Working checkouts for flexnetos_runner, envctl, nu_plugin, and support crates.",
+                "Local release compilation, staging, provenance, and proof lane.",
+                "A release builder capable of consuming a LifeOS bundle when a product source is supplied.",
             ],
             "lifeos_usage": [
-                "Vue 3/Vite/Tauri desktop and web product app.",
-                "Release catalog entry packaged through the FlexNetOS runner lane as a bun-tauri bundle.",
-                "Planning-spine state/proof work inside its own repo branch.",
-                "Future Rust workspace for lifeos-core, lifeos-daemon, and Tauri shell work.",
+                "Persistence location for envctl Codex-harness ledgers, counters, decisions, and model routing.",
+                "No Git repository, source manifest, application code, build output, or service definition was found.",
+                "Not represented as a node or dependency in the supplied service graph.",
             ],
             "answer_to_question": (
-                "The artifacts show FlexNetOS was used for the operating/control-plane work that lifeos did not own: "
-                "repo orchestration, runtime configuration, environment state, releases, local proof capture, and migration "
-                "artifact generation. lifeos was consumed by that system as an application artifact."
+                "Therefore FlexNetOS was used instead of lifeos as the automation host: it ran CI jobs, "
+                "held build checkouts, and owned release/provenance machinery. lifeos was only a small "
+                "runtime-state namespace in this snapshot. Historical release code preserves an integration "
+                "point for packaging a LifeOS bundle, but there is no LifeOS product checkout here to prove "
+                "that integration was exercised."
             ),
         },
         "artifact_evidence": {
             "repo_map_summary": repo_map.get("summary", {}),
             "lifeos_repo_entry": lifeos_repo,
+            "runner_repo_entry": runner_repo,
             "service_graph_summary": scrub_blocked_policy_literals(
                 {
                     **service_graph.get("scan_summary", {}),
@@ -365,7 +363,7 @@ def collect() -> dict[str, Any]:
         },
         "code_and_dependency_evidence": {
             "lifeos_tree_summary": lifeos_tree,
-            "lifeos_release_catalog_rows": lifeos_catalog_rows,
+            "lifeos_release_catalog_rows": [],
             "line_evidence": line_evidence,
         },
         "secret_exposure_control": {
@@ -390,8 +388,9 @@ def render_markdown(comparison: dict[str, Any]) -> str:
     lines = comparison["code_and_dependency_evidence"]["line_evidence"]
     catalog_rows = comparison["code_and_dependency_evidence"]["lifeos_release_catalog_rows"]
     git_state = comparison["history_and_state_evidence"]["lifeos_git_state"]
-    lifeos_activity = lifeos_repo.get("activity", {})
-    lifeos_contents = lifeos_repo.get("contents", {})
+    runner_repo = comparison["artifact_evidence"].get("runner_repo_entry") or {}
+    runner_activity = runner_repo.get("activity", {})
+    runner_contents = runner_repo.get("contents", {})
 
     def evidence_block(name: str, entries: list[dict[str, Any]]) -> list[str]:
         block = [f"### {name}"]
@@ -431,16 +430,18 @@ def render_markdown(comparison: dict[str, Any]) -> str:
             "## Artifact and code-map evidence",
             "",
             f"- Repository map: `{repo_summary.get('repository_count')}` repositories; scope rollup `{repo_summary.get('scope_rollup')}`.",
-            f"- lifeos repository entry: path `{lifeos_repo.get('path')}`, branch `{lifeos_activity.get('branch')}`, head `{lifeos_activity.get('head')}`, files `{lifeos_contents.get('tracked_or_scanned_files')}`.",
-            f"- Service graph: `{service_summary.get('node_count')}` nodes and `{service_summary.get('edge_count')}` service edges; lifeos is not modeled as the active control-plane service.",
+            f"- Runner repository entry: path `{runner_repo.get('path')}`, branch `{runner_activity.get('branch')}`, head `{runner_activity.get('head')}`, files `{runner_contents.get('tracked_or_scanned_files')}`.",
+            f"- lifeos repository entry: `{lifeos_repo or None}`; no LifeOS checkout was inventoried.",
+            f"- Service graph: `{service_summary.get('node_count')}` nodes and `{service_summary.get('edge_count')}` service edges; it models FlexNetOS runner services but no lifeos service.",
             f"- Debug code map summary: `{debug_summary}`.",
             "",
             "## Dependency and package evidence",
             "",
             f"- lifeos tree count: `{tree.get('file_count')}` files, `{tree.get('dir_count')}` directories; skipped blocked paths `{tree.get('blocked_paths_skipped')}`.",
             f"- Top suffixes: `{tree.get('suffix_counts')}`.",
-            f"- Release catalog lifeos rows: `{catalog_rows}`.",
-            f"- lifeos git state: branch `{git_state.get('lifeos_branch')}`, head `{git_state.get('lifeos_head')}`.",
+            f"- Release catalog lifeos rows in the captured checkout: `{catalog_rows}`.",
+            f"- lifeos is a Git repository: `{git_state.get('lifeos_git_repository')}`.",
+            f"- runner history: `{git_state.get('runner_latest_commit')}`.",
             "",
             "## Source line evidence",
             "",
@@ -472,8 +473,8 @@ def build_validation(comparison: dict[str, Any]) -> dict[str, Any]:
         "heartbeat_exists": HEARTBEAT_PATH.exists(),
         "log_exists": LOG_PATH.exists(),
         "primary_root_exists": root_state["primary_root_exists"],
-        "declared_compare_root_absence_recorded": root_state["declared_compare_root_exists"] is False,
-        "lifeos_peer_root_exists": root_state["lifeos_peer_root_exists"],
+        "declared_compare_root_exists": root_state["declared_compare_root_exists"],
+        "lifeos_peer_root_absence_recorded": root_state["lifeos_peer_root_exists"] is False,
         "line_evidence_present": any(evidence.values()),
         "secret_exposure_status_pass": comparison["secret_exposure_control"]["status"] == "pass",
     }
@@ -533,7 +534,7 @@ def generate() -> None:
     validation = build_validation(comparison)
     write_json(VALIDATION_PATH, validation)
 
-    files_changed = [ARTIFACT_JSON, ARTIFACT_MD, VALIDATION_PATH, HEARTBEAT_PATH, LOG_PATH, PROOF_PATH]
+    files_changed = [SCRIPT_PATH, ARTIFACT_JSON, ARTIFACT_MD, VALIDATION_PATH, HEARTBEAT_PATH, LOG_PATH, PROOF_PATH]
     checksums = {rel_workspace(path): sha256(path) for path in files_changed if path.exists() and path != PROOF_PATH}
     proof = {
         "proof_schema_version": "1.0",
@@ -561,12 +562,9 @@ def generate() -> None:
             rel_workspace(REPO_MAP_PATH),
             rel_workspace(SERVICE_GRAPH_PATH),
             rel_workspace(DEBUG_MAP_PATH),
-            str(PRIMARY_ROOT / "AGENTS.md"),
-            str(PRIMARY_ROOT / "WORKSPACE_LAYOUT.md"),
-            str(PRIMARY_ROOT / "src" / "flexnetos_runner" / "release" / "catalog.tsv"),
-            str(LIFEOS_PEER_ROOT / "README.md"),
-            str(LIFEOS_PEER_ROOT / "package.json"),
-            str(LIFEOS_PEER_ROOT / "Cargo.toml"),
+            str(RUNNER_CHECKOUT / "README.md"),
+            str(RUNNER_CHECKOUT / "scripts/build-local-ubuntu-release.sh"),
+            str(COMPARE_ROOT / "src/envctl/home/agent-env/codex-harness/state/model-router/last-route.json"),
         ],
         "failure_reason": "" if validation["status"] == "pass" else "validation failed",
         "next_action": "Use this comparison evidence for REQ-202_FLEXNETOS_ADAPTER_RECIPE.",

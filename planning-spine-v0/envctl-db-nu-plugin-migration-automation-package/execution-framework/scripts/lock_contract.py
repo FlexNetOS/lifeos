@@ -441,6 +441,20 @@ def update_task_index(manifest: dict, validation: dict) -> None:
     write_json(index_path, index)
 
 
+def write_heartbeat(manifest: dict, validation: dict) -> None:
+    write_json(
+        "state/REQ-010_CONTRACT_LOCK.heartbeat.json",
+        {
+            "task_id": "REQ-010_CONTRACT_LOCK",
+            "status": "completed" if validation["status"] == "passed" else "failed",
+            "updated_at": now(),
+            "contract_hash": manifest["contract"]["contract_hash"],
+            "artifact": "generated/contract_manifest.json",
+            "proof": "proof_records/REQ-010_CONTRACT_LOCK.proof.json",
+        },
+    )
+
+
 def main() -> None:
     base = package_root()
     tree_text = (base / TREE_PATH).read_text(encoding="utf-8")
@@ -495,6 +509,7 @@ def main() -> None:
     write_markdown(manifest, validation)
     write_sql_seed(manifest)
     update_task_index(manifest, validation)
+    write_heartbeat(manifest, validation)
     changed = [
         "execution-framework/scripts/lock_contract.py",
         "execution-framework/generated/contract_manifest.json",
@@ -502,6 +517,7 @@ def main() -> None:
         "execution-framework/generated/contract_manifest.seed.sql",
         "execution-framework/generated/task_graph.index.json",
         "execution-framework/docs/CONTRACT_MANIFEST.md",
+        "execution-framework/state/REQ-010_CONTRACT_LOCK.heartbeat.json",
         "execution-framework/logs/REQ-010_CONTRACT_LOCK.log",
         "execution-framework/proof_records/REQ-010_CONTRACT_LOCK.proof.json",
         "execution-framework/proof_records/proof_ledger.jsonl",
@@ -532,6 +548,7 @@ def main() -> None:
             "generated/contract_manifest.seed.sql",
             "docs/CONTRACT_MANIFEST.md",
             "generated/task_graph.index.json#contract_lock",
+            "state/REQ-010_CONTRACT_LOCK.heartbeat.json",
         ],
         "" if validation["status"] == "passed" else "see contract_manifest.validation_report.json",
         "run REQ-020_ENVCTL_DB_SCHEMA, REQ-030_PLUGIN_PROTOCOL_MANIFEST, and REQ-040_SHARED_PROTOCOL_SCHEMAS",

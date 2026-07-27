@@ -1,13 +1,13 @@
 # envctl migration automation database schema
 
-Generated at: `2026-07-05T05:51:29+00:00`
+Generated at: `2026-07-27T15:24:59+00:00`
 Status: `passed`
 
 ## Applied migrations
 
 - `sql/001_migration_automation_schema.sql` (`f0a8ad6ce7fba6023d8bfb765843fef07710387f9e720f7fe01305ce2d52bb0e`)
 - `sql/002_views_and_indexes.sql` (`b9c4fee76504746742695119c84bfbb46dedb1e29da480103f2e6b6c5a83106e`)
-- `execution-framework/generated/contract_manifest.seed.sql` (`399c1092118d57f78c7647a2d5c2fbd914c5b2ac97d5e41e4deda44722dc8c06`)
+- `execution-framework/generated/contract_manifest.seed.sql` (`b19c813b7b1205cc5fa7df2a135cab807c9a0c45af379c117056889b299c6435`)
 
 ## Capability coverage
 

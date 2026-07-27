@@ -3,11 +3,11 @@
 - Task: `ART-121_CUTOVER`
 - Contract artifact: `artifact:07-cutover-cutover-checklist-md`
 - Canonical path: `migration-artifacts/07-cutover/cutover-checklist.md`
-- Generated at: `2026-07-05T05:02:33+00:00`
+- Generated at: `2026-07-27T05:01:36+00:00`
 - Target: `flexnetos-vs-lifeos`
 - Safety mode: `approval-gated`
 - Readiness band: `conditional`
-- Execution ready now: `False`
+- Execution ready now: `True`
 
 ## Gate Summary
 
@@ -16,24 +16,24 @@
 | REQ-024_ENVCTL_ARTIFACT_REGISTRY | Implement artifact registry | completed | proof_records/REQ-024_ENVCTL_ARTIFACT_REGISTRY.proof.json |
 | REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS | Implement checkpoints and rollback handles | completed | proof_records/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.proof.json |
 | REQ-040_SHARED_PROTOCOL_SCHEMAS | Implement shared protocol schemas | completed | proof_records/REQ-040_SHARED_PROTOCOL_SCHEMAS.proof.json |
-| REQ-041_TWO_REPO_INTEGRATION | Implement two-repo integration | pending | proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json |
-| REQ-045_RUN_REPLAY | Implement run/replay templates | pending | proof_records/REQ-045_RUN_REPLAY.proof.json |
+| REQ-041_TWO_REPO_INTEGRATION | Implement two-repo integration | completed | proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json |
+| REQ-045_RUN_REPLAY | Implement run/replay templates | completed | proof_records/REQ-045_RUN_REPLAY.proof.json |
 | ART-120_WAVE_PLAN | Build Migration wave plan | completed | proof_records/ART-120_WAVE_PLAN.proof.json |
-| ART-122_ROLLBACK | Build Rollback plan | pending | proof_records/ART-122_ROLLBACK.proof.json |
+| ART-122_ROLLBACK | Build Rollback plan | completed | proof_records/ART-122_ROLLBACK.proof.json |
 | ART-125_RISK_REGISTER | Build Risk register | completed | proof_records/ART-125_RISK_REGISTER.proof.json |
 | ART-128_READINESS_SCORECARD | Build Migration readiness scorecard | completed | proof_records/ART-128_READINESS_SCORECARD.proof.json |
-| VER-300_UNIT_VALIDATION | Run unit/integration validation | pending | proof_records/VER-300_UNIT_VALIDATION.proof.json |
+| VER-300_UNIT_VALIDATION | Run unit/integration validation | completed | proof_records/VER-300_UNIT_VALIDATION.proof.json |
 
 ## Checklist
 
 | step | phase | status | blocking | title | intent | owner |
 |---|---|---|---|---|---|---|
 | CUT-001 | pre_cutover | ready | no | Confirm control-plane gating artifacts are complete | Do not start go-live work until registry, shared schemas, and rollback checkpoint capabilities are proven. | artifact-agent |
-| CUT-002 | pre_cutover | blocked | yes | Hold execution until validation and replay prerequisites clear | Make the current package state explicit: cutover planning exists, but live execution is still gated by unfinished validation and replay work. | validation-agent |
+| CUT-002 | pre_cutover | ready | no | Hold execution until validation and replay prerequisites clear | Make prerequisite state explicit and prevent live execution whenever validation or replay evidence is incomplete. | validation-agent |
 | CUT-003 | pre_cutover | ready | no | Review migration wave ordering and owner assignments | Use the registered wave plan, risk register, and readiness scorecard as the single checklist source before issuing a go-live window. | lane_d_filesystem |
 | CUT-004 | execution_window | ready | no | Freeze artifact inputs and record the exact release boundary | Avoid a moving target by pinning the descriptor, task graph, and proof/status projections used to justify the cutover. | artifact-agent |
 | CUT-005 | execution_window | ready | no | Publish the operator start signal with rollback checkpoint references | Every go-live attempt should name the safe rerun boundary and the approval-gated restore boundary before any irreversible action starts. | envctl-db-agent |
-| CUT-006 | execution_window | blocked | yes | Run the validated migration sequence only after gate clearance | Execute the move order from W6 after validation says the package is actually releasable. | release-operator |
+| CUT-006 | execution_window | ready | no | Run the validated migration sequence only after gate clearance | Execute the move order from W6 after validation says the package is actually releasable. | release-operator |
 | CUT-007 | stabilization | ready | no | Capture post-cutover validation evidence and parity outcome | Document whether the execution achieved the intended state and whether any rollback or exception path was needed. | validation-agent |
 | CUT-008 | abort_criteria | ready | no | Abort and escalate if rollback triggers fire | Stop the cutover if registry integrity, validation, or operator approval expectations are violated. | release-operator |
 
@@ -54,16 +54,17 @@
 ### CUT-002 - Hold execution until validation and replay prerequisites clear
 
 - Phase: `pre_cutover`
-- Status: `blocked`
-- Blocking: `yes`
+- Status: `ready`
+- Blocking: `no`
 - Owner: `validation-agent`
 - Success criteria:
   - REQ-041_TWO_REPO_INTEGRATION is completed.
   - REQ-045_RUN_REPLAY is completed.
   - VER-300_UNIT_VALIDATION is completed.
 - Notes:
-  - Current statuses: REQ-041=pending, REQ-045=pending, VER-300=pending.
-  - Readiness band remains conditional.
+  - Current statuses: REQ-041=completed, REQ-045=completed, VER-300=completed.
+  - Validation and replay prerequisites are complete.
+  - Readiness scorecard band: conditional.
 - Evidence refs:
   - `generated/status_from_proofs.json`
   - `migration-artifacts/art-128_readiness_scorecard/readiness-scorecard.md`
@@ -118,15 +119,15 @@
 ### CUT-006 - Run the validated migration sequence only after gate clearance
 
 - Phase: `execution_window`
-- Status: `blocked`
-- Blocking: `yes`
+- Status: `ready`
+- Blocking: `no`
 - Owner: `release-operator`
 - Success criteria:
   - All blocking tasks in the checklist are complete.
   - The release operator confirms the exact run and replay instructions to use.
   - No new unreviewed exceptions were added after sign-off.
 - Notes:
-  - This step is intentionally blocked in the current package snapshot because validation and replay tasks are still pending.
+  - All checklist gate tasks are complete; execution remains subject to the operator controls and abort criteria below.
 - Evidence refs:
   - `migration-artifacts/art-120_wave_plan/wave-plan.md`
   - `generated/status_from_proofs.json`

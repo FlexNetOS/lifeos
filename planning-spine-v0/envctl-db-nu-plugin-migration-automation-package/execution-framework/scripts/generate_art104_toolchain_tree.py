@@ -128,6 +128,26 @@ def target_root_from_registry() -> Path:
     return package_root()
 
 
+def find_envctl_root(target_root: Path) -> Path | None:
+    """Find the envctl checkout in both source trees and CI-runner snapshots."""
+    direct = target_root / "src" / "envctl"
+    if (direct / "manifest" / "base.toml").is_file():
+        return direct
+
+    candidates: list[Path] = []
+    for path in target_root.glob("**/manifest/base.toml"):
+        if is_blocked(Path(rel_to(path, target_root))):
+            continue
+        checkout = path.parent.parent
+        if checkout.name == "envctl" and (checkout / "Cargo.toml").is_file():
+            candidates.append(checkout)
+    if not candidates:
+        return None
+    # Runner snapshots may contain two copies. Prefer the newest checkout, then
+    # use its target-relative path as a deterministic tie-breaker.
+    return max(candidates, key=lambda path: (path.stat().st_mtime_ns, rel_to(path, target_root)))
+
+
 def scan_manifests(target_root: Path) -> dict[str, Any]:
     manifest_paths: list[Path] = []
     workflow_paths: list[Path] = []
@@ -309,8 +329,10 @@ def frontdoor_inventory(target_root: Path) -> list[dict[str, Any]]:
     return out
 
 
-def envctl_component_summary(target_root: Path) -> dict[str, Any]:
-    manifest_root = target_root / "src" / "envctl" / "manifest"
+def envctl_component_summary(target_root: Path, envctl_root: Path | None) -> dict[str, Any]:
+    if envctl_root is None:
+        return {"checkout_root": None, "component_count": 0, "components": []}
+    manifest_root = envctl_root / "manifest"
     files = [
         manifest_root / "base.toml",
         manifest_root / "components.d" / "epic-h-toolchains.toml",
@@ -350,15 +372,20 @@ def envctl_component_summary(target_root: Path) -> dict[str, Any]:
                         "path_entries": component.get("wiring", {}).get("path_entries", []),
                     }
                 )
-    return {"component_count": len(components), "components": components}
+    return {
+        "checkout_root": rel_to(envctl_root, target_root),
+        "component_count": len(components),
+        "components": components,
+    }
 
 
 def build_tree(target_root: Path) -> dict[str, Any]:
     scan = scan_manifests(target_root)
     frontdoors = frontdoor_inventory(target_root)
-    components = envctl_component_summary(target_root)
+    envctl_root = find_envctl_root(target_root)
+    components = envctl_component_summary(target_root, envctl_root)
 
-    envctl_cargo = load_toml(target_root / "src" / "envctl" / "Cargo.toml")
+    envctl_cargo = load_toml(envctl_root / "Cargo.toml") if envctl_root else {}
     rust_version = (
         envctl_cargo.get("workspace", {}).get("package", {}).get("rust-version")
         or scan["rust_versions"]

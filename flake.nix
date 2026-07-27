@@ -1,7 +1,8 @@
 {
-  # LifeOS web build — hermetic Nix packaging of the Vue 3 + Vite app.
+  # LifeOS web build — hermetic Nix packaging of the Svelte 5 + Vite app
+  # (post phase-3 Svelte cutover; Pinia/vue-router remain runtime deps).
   #
-  # Scope: the WEB BUILD ONLY (`bun run build` => vue-tsc --noEmit && vite build,
+  # Scope: the WEB BUILD ONLY (`bun run build` => svelte-check && vite build,
   # packaged as the dist/ directory). The Tauri native shell is intentionally out
   # of scope for this flake.
   #
@@ -30,7 +31,7 @@
   #
   # NOTE: the flake adapts to the app — package.json, vite.config.ts, and app
   # source are not modified for packaging (no-downgrade constraint).
-  description = "LifeOS web app (Vue 3 + Vite + bun) — hermetic dist/ build";
+  description = "LifeOS web app (Svelte 5 + Vite + bun) — hermetic dist/ build";
 
   inputs = {
     # Same pin as nix/gha-runner: a nixos-unstable rev whose toolchain closure
@@ -57,7 +58,8 @@
       # Build derivation sees exactly what `bun run build` consumes:
       # index.html entry, src/, the root-level content/style layer imported by
       # src/main.ts (data.js + 3 CSS files), fonts/ (Rigelstar.ttf via CSS
-      # url()), public/ (copied verbatim into dist/), and the TS/Vite configs.
+      # url()), public/ (copied verbatim into dist/), and the TS/Vite/Svelte
+      # configs.
       appSrc = fs.toSource {
         root = ./.;
         fileset = fs.unions [
@@ -66,6 +68,7 @@
           ./bun.lock
           ./tsconfig.json
           ./vite.config.ts
+          ./svelte.config.js
           ./src
           ./public
           ./fonts
@@ -116,7 +119,8 @@
         src = appSrc;
 
         # bun runs the package script verbatim; nodejs backs the
-        # `#!/usr/bin/env node` shebangs in node_modules/.bin (vue-tsc, vite).
+        # `#!/usr/bin/env node` shebangs in node_modules/.bin (svelte-check,
+        # vite).
         nativeBuildInputs = [ pkgs.bun pkgs.nodejs ];
         dontConfigure = true;
 
@@ -138,12 +142,12 @@
           runHook postInstall
         '';
 
-        meta.description = "LifeOS web app dist/ (vue-tsc --noEmit && vite build)";
+        meta.description = "LifeOS web app dist/ (svelte-check && vite build)";
       };
 
       # Cheap standalone type gate (same inputs, no bundling).
-      vue-tsc-check = pkgs.stdenvNoCC.mkDerivation {
-        pname = "lifeos-vue-tsc";
+      svelte-check = pkgs.stdenvNoCC.mkDerivation {
+        pname = "lifeos-svelte-check";
         inherit version;
         src = appSrc;
         nativeBuildInputs = [ pkgs.bun pkgs.nodejs ];
@@ -153,11 +157,11 @@
           export HOME=$TMPDIR
           cp -a ${node-modules} node_modules
           chmod -R u+w node_modules
-          ./node_modules/.bin/vue-tsc --noEmit
+          ./node_modules/.bin/svelte-check
           runHook postBuild
         '';
         installPhase = "touch $out";
-        meta.description = "LifeOS vue-tsc --noEmit type check";
+        meta.description = "LifeOS svelte-check type/diagnostic gate";
       };
     in
     {
@@ -167,9 +171,9 @@
       };
 
       checks.${system} = {
-        # Building dist/ IS the primary check; vue-tsc runs standalone too.
+        # Building dist/ IS the primary check; svelte-check runs standalone too.
         lifeos = lifeos;
-        vue-tsc = vue-tsc-check;
+        svelte-check = svelte-check;
       };
     };
 }

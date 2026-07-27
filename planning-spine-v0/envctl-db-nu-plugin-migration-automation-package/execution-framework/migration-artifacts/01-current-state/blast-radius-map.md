@@ -1,6 +1,6 @@
 # Blast-radius map
 
-Generated at: `2026-07-04T23:19:11+00:00`
+Generated at: `2026-07-27T05:03:27+00:00`
 Task: `ART-127_BLAST_RADIUS`
 Contract row: `artifact:01-current-state-blast-radius-map-md`
 Canonical path: `migration-artifacts/01-current-state/blast-radius-map.md`

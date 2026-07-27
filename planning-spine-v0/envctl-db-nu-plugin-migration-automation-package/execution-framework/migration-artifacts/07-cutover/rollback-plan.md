@@ -3,12 +3,12 @@
 - Task: `ART-122_ROLLBACK`
 - Contract artifact: `artifact:07-cutover-rollback-plan-md`
 - Canonical path: `migration-artifacts/07-cutover/rollback-plan.md`
-- Generated at: `2026-07-05T05:06:08+00:00`
+- Generated at: `2026-07-27T05:01:32+00:00`
 - Target: `flexnetos-vs-lifeos`
 - Safety mode: `approval-gated`
 - Max auto risk: `R2`
 - Readiness band: `conditional`
-- Execution ready now: `False`
+- Execution ready now: `True`
 
 ## Gate Summary
 
@@ -18,13 +18,13 @@
 | REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS | Implement checkpoints and rollback handles | completed | proof_records/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.proof.json |
 | REQ-027_ENVCTL_REPLAY_ENGINE | Implement replay/reproduce engine | completed | proof_records/REQ-027_ENVCTL_REPLAY_ENGINE.proof.json |
 | REQ-040_SHARED_PROTOCOL_SCHEMAS | Implement shared protocol schemas | completed | proof_records/REQ-040_SHARED_PROTOCOL_SCHEMAS.proof.json |
-| REQ-041_TWO_REPO_INTEGRATION | Implement two-repo integration | pending | proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json |
-| REQ-045_RUN_REPLAY | Implement run/replay templates | pending | proof_records/REQ-045_RUN_REPLAY.proof.json |
+| REQ-041_TWO_REPO_INTEGRATION | Implement two-repo integration | completed | proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json |
+| REQ-045_RUN_REPLAY | Implement run/replay templates | completed | proof_records/REQ-045_RUN_REPLAY.proof.json |
 | ART-120_WAVE_PLAN | Build Migration wave plan | completed | proof_records/ART-120_WAVE_PLAN.proof.json |
 | ART-121_CUTOVER | Build Cutover checklist | completed | proof_records/ART-121_CUTOVER.proof.json |
 | ART-125_RISK_REGISTER | Build Risk register | completed | proof_records/ART-125_RISK_REGISTER.proof.json |
 | ART-128_READINESS_SCORECARD | Build Migration readiness scorecard | completed | proof_records/ART-128_READINESS_SCORECARD.proof.json |
-| VER-300_UNIT_VALIDATION | Run unit/integration validation | pending | proof_records/VER-300_UNIT_VALIDATION.proof.json |
+| VER-300_UNIT_VALIDATION | Run unit/integration validation | completed | proof_records/VER-300_UNIT_VALIDATION.proof.json |
 
 ## Rollback Modes
 
@@ -166,7 +166,7 @@
   - REQ-045_RUN_REPLAY is completed before replaying operator steps from this package.
   - VER-300_UNIT_VALIDATION is completed before declaring rollback recovery releasable.
 - Notes:
-  - Current statuses: REQ-041=pending, REQ-045=pending, VER-300=pending.
+  - Current statuses: REQ-041=completed, REQ-045=completed, VER-300=completed.
   - Readiness band remains conditional.
 - Evidence refs:
   - `generated/status_from_proofs.json`

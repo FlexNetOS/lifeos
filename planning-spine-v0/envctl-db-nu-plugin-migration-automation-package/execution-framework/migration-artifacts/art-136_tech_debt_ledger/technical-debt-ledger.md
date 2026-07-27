@@ -3,7 +3,7 @@
 - Task: `ART-136_TECH_DEBT_LEDGER`
 - Contract artifact: `artifact:03-code-analysis-technical-debt-ledger-md`
 - Canonical path: `migration-artifacts/03-code-analysis/technical-debt-ledger.md`
-- Generated at: `2026-07-04T23:35:23+00:00`
+- Generated at: `2026-07-27T05:10:30+00:00`
 - Target: `flexnetos-vs-lifeos` (mixed)
 
 ## Summary

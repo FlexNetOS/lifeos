@@ -2,8 +2,8 @@
   "proof_schema_version": "1.0",
   "task_id": "VER-303_GOAL_LOOP_COMPUTE",
   "status": "completed",
-  "started_at": "2026-07-05T06:01:26+00:00",
-  "completed_at": "2026-07-05T06:01:26+00:00",
+  "started_at": "2026-07-27T15:28:06+00:00",
+  "completed_at": "2026-07-27T15:28:06+00:00",
   "actor": "goal-validation-agent",
   "helper_id": "helper-goal-validate-01",
   "model_tag": "gpt-5.3-spark",
@@ -17,7 +17,8 @@
     "execution-framework/proof_records/proof_ledger.jsonl",
     "execution-framework/state/goal_loop_state.json",
     "execution-framework/generated/status_report.json",
-    "execution-framework/generated/status_from_proofs.json"
+    "execution-framework/generated/status_from_proofs.json",
+    "history/verification_retry/2026-07-27T152806_0000.json"
   ],
   "commands_run": [
     "python3 scripts/verify_ver303_goal_loop_compute.py",
@@ -27,7 +28,7 @@
     "schema_version": "1.0",
     "task_id": "VER-303_GOAL_LOOP_COMPUTE",
     "status": "pass",
-    "generated_at": "2026-07-05T06:01:26+00:00",
+    "generated_at": "2026-07-27T15:28:06+00:00",
     "packet_summary": {
       "goal": "Ensure the /goal loop can compute a complete run path or stop at explicit approval blockers",
       "repo_target": "filesystem",
@@ -47,8 +48,17 @@
         "ok": true
       }
     },
+    "retry_context": {
+      "active": true,
+      "reset_tasks": [
+        "REL-400_PACKAGE_ARCHIVE",
+        "REL-401_HANDOFF",
+        "VER-303_GOAL_LOOP_COMPUTE",
+        "VER-304_FINAL_COMPLETENESS"
+      ]
+    },
     "current_state": {
-      "generated_at": "2026-07-05T06:01:26+00:00",
+      "generated_at": "2026-07-27T15:28:06+00:00",
       "dispatch_packets": [
         {
           "task_id": "VER-303_GOAL_LOOP_COMPUTE",
@@ -128,11 +138,11 @@
     "warnings": [],
     "errors": [],
     "sha256": {
-      "generated/execution_packets/VER-303_GOAL_LOOP_COMPUTE.json": "sha256:50751f2c157ff264c985651496826947c71c6c3de92b6bef04d367f257a3ffe4",
-      "generated/status_report.json": "sha256:899311abcd5bdf0f98b4022ed5eb878c604abf4f66212fdce77b123f4807822f",
-      "proof_records/proof_ledger.jsonl": "sha256:6df857f3f04fd97be4efe7905b66848d88a4e40ad8e3f11af80c5078256d69bf",
-      "proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json": "sha256:8eee6aa74eeadac471eb09043156d92ed4a9d8b2886e68a59adfc041cb95b899",
-      "proof_records/REQ-045_RUN_REPLAY.proof.json": "sha256:4193576929a715a017d7d0d699b5ed7d0b0ce3da28a50d4f03c629ffa2fca896"
+      "generated/execution_packets/VER-303_GOAL_LOOP_COMPUTE.json": "sha256:ad8b9d814c8c8424f1562d7bbbcfaa239d05dc6057fc1d0b9f3288bf08e4a5db",
+      "generated/status_report.json": "sha256:94005178d93013f197958a1f90dfd22a7523958306f3c1e303f0e3e22dcc02d7",
+      "proof_records/proof_ledger.jsonl": "sha256:bfcef6ab839dce7ce847e245cc494d6bab8336799143d45b10976f46274c5b7c",
+      "proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json": "sha256:87868b874406f3d0b48f8bb815e9d8fe5be2b4adaf03f93d21e2b3b33179a0bc",
+      "proof_records/REQ-045_RUN_REPLAY.proof.json": "sha256:de018dae64d7165bb3e65af3916c105ea045a2041b1fc94e30e46cee19e58fa0"
     },
     "secret_scan": {
       "paths": [
@@ -144,14 +154,16 @@
     }
   },
   "checksums": {
-    "execution-framework/scripts/verify_ver303_goal_loop_compute.py": "96b964ebd83eea94cbc215504efd13da93373cc29a8a974c8be9ceda45f3a17e",
-    "execution-framework/generated/ver303_goal_loop_compute_report.json": "ceaa4abb5fca1b2869ae6f8e8d1787aa9a2244645aa5fdb96fb15f0ee4f35186",
-    "execution-framework/state/VER-303_GOAL_LOOP_COMPUTE.heartbeat.json": "7a72e22828024940a7c81b683b79197c77ed72e78400b5e5e54bc8d2291c357f",
-    "execution-framework/logs/VER-303_GOAL_LOOP_COMPUTE.log": "ceaa4abb5fca1b2869ae6f8e8d1787aa9a2244645aa5fdb96fb15f0ee4f35186",
-    "execution-framework/proof_records/proof_ledger.jsonl": "6df857f3f04fd97be4efe7905b66848d88a4e40ad8e3f11af80c5078256d69bf",
-    "execution-framework/state/goal_loop_state.json": "899311abcd5bdf0f98b4022ed5eb878c604abf4f66212fdce77b123f4807822f",
-    "execution-framework/generated/status_report.json": "899311abcd5bdf0f98b4022ed5eb878c604abf4f66212fdce77b123f4807822f",
-    "execution-framework/generated/status_from_proofs.json": "6efa06f302f0da7cc3a309c4c397c543877522133241ba8a53750d858f511aeb"
+    "execution-framework/scripts/verify_ver303_goal_loop_compute.py": "0b6c61b4dee2bd221e0936f922a1c6f18f710c75dbe5e927613b340fe79603fe",
+    "execution-framework/generated/ver303_goal_loop_compute_report.json": "47e78054e4a541204f72f6c79151e879f418e935ce7a8d254bdfe22862aa211a",
+    "execution-framework/state/VER-303_GOAL_LOOP_COMPUTE.heartbeat.json": "1ee7ead23c888af2d943c72426cacda35e44882861198762aa49dab16fbd1ee2",
+    "execution-framework/logs/VER-303_GOAL_LOOP_COMPUTE.log": "47e78054e4a541204f72f6c79151e879f418e935ce7a8d254bdfe22862aa211a",
+    "execution-framework/proof_records/VER-303_GOAL_LOOP_COMPUTE.proof.json": "50b1195d0d9a7c478fe5eab3e7bbae5e356cd85274c1d8a71dd86aab88edb597",
+    "execution-framework/proof_records/proof_ledger.jsonl": "dbe3b55b574b63f986ad074c17b5889649aa9144253b479c0b559c524c6d8e6e",
+    "execution-framework/state/goal_loop_state.json": "94005178d93013f197958a1f90dfd22a7523958306f3c1e303f0e3e22dcc02d7",
+    "execution-framework/generated/status_report.json": "94005178d93013f197958a1f90dfd22a7523958306f3c1e303f0e3e22dcc02d7",
+    "execution-framework/generated/status_from_proofs.json": "908a12bfaa075b8a3142e4ed6189db20e7dbd59001973500c0354f2d5a2ea31f",
+    "history/verification_retry/2026-07-27T152806_0000.json": "3b0e050e61af3278984c99c1f9d3128782b95eb483a1d3a0b4bcb092f8802dbc"
   },
   "logs_uri": "logs/VER-303_GOAL_LOOP_COMPUTE.log",
   "rollback_point": "history/pre_execution_framework_manifest.json",
@@ -161,7 +173,8 @@
     "proof_records/proof_ledger.jsonl",
     "generated/ver303_goal_loop_compute_report.json",
     "proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json",
-    "proof_records/REQ-045_RUN_REPLAY.proof.json"
+    "proof_records/REQ-045_RUN_REPLAY.proof.json",
+    "../history/verification_retry/2026-07-27T152806_0000.json"
   ],
   "failure_reason": "",
   "next_action": "run VER-304_FINAL_COMPLETENESS"

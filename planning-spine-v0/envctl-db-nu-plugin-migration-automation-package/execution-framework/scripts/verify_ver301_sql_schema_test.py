@@ -188,7 +188,7 @@ def main() -> None:
         },
     )
 
-    secret_scan_paths = [base / REPORT_PATH, base / LOG_PATH, Path(__file__)]
+    secret_scan_paths = [base / REPORT_PATH, base / LOG_PATH, Path(__file__).resolve()]
     secret_hits = secret_findings(secret_scan_paths)
     report["secret_scan"] = {
         "paths": [str(path.relative_to(base)) for path in secret_scan_paths],
@@ -197,19 +197,19 @@ def main() -> None:
     if secret_hits:
         report["status"] = "fail"
         report["errors"].append("secret-like content detected in generated outputs: " + ", ".join(secret_hits))
-        write_json(REPORT_PATH, report)
-        write_json(LOG_PATH, report)
-        write_json(
-            HEARTBEAT_PATH,
-            {
-                "schema_version": "1.0",
-                "task_id": TASK_ID,
-                "status": report["status"],
-                "updated_at": generated_at,
-                "proof_uri": PROOF_PATH,
-                "validation_report": REPORT_PATH,
-            },
-        )
+    write_json(REPORT_PATH, report)
+    write_json(LOG_PATH, report)
+    write_json(
+        HEARTBEAT_PATH,
+        {
+            "schema_version": "1.0",
+            "task_id": TASK_ID,
+            "status": report["status"],
+            "updated_at": generated_at,
+            "proof_uri": PROOF_PATH,
+            "validation_report": REPORT_PATH,
+        },
+    )
 
     files_changed = [
         "execution-framework/scripts/verify_ver301_sql_schema_test.py",

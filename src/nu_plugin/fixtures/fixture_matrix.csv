@@ -1,0 +1,16 @@
+fixture,kind,entrypoint,expected_edges,notes
+single_simple_crate,cargo-crate,Cargo.toml,src/lib.rs,minimal library
+workspace_two_crates,cargo-workspace,Cargo.toml,crates/app->crates/helper,path dependency
+build_script,build-script,Cargo.toml,build.rs->build-input.txt,rerun directive names a synthetic input
+out_dir_generator,out-dir,Cargo.toml,src/lib.rs->OUT_DIR/generated.rs,generated Rust source
+proc_macro_consumer,proc-macro-workspace,Cargo.toml,consumer->demo_macro,local proc macro
+feature_cfg,cfg-and-feature,Cargo.toml,feature extra and unix_helper,target and feature gating
+include_edges,include-macros,Cargo.toml,src/lib.rs->assets,message and binary includes
+macro_rules,declarative-macro,Cargo.toml,definition->invocation,macro_rules expansion
+native_link,native-link,Cargo.toml,build.rs->codedb_fixture_native,analysis only
+non_rust_assets,assets,Cargo.toml,crate->JSON and KDL,package assets
+secret_like,secret-scanner,Cargo.toml,src/lib.rs,inert placeholders only
+clean_repo,repository-state,Cargo.toml,src/lib.rs,baseline content
+dirty_repo,repository-state,README.md,README instructions,materialize in a temporary repository
+nushell_syntax,nushell,stub_initializer.nu,source command and record,Nushell parser input
+symlink,symlink-spec,symlink_manifest.txt,link.txt->target.txt,portable manifest

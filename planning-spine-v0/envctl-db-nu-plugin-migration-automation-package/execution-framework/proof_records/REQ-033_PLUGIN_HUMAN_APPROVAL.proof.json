@@ -1,6 +1,7 @@
 {
   "actor": "codex-cli-local",
   "artifacts": [
+    "/home/flexnetos/Downloads/nu_plugin/crates/nu_plugin_codedb/src/main.rs",
     "generated/patches/REQ-033_PLUGIN_HUMAN_APPROVAL.nu_plugin.patch",
     "generated/REQ-033_PLUGIN_HUMAN_APPROVAL.contract.json",
     "state/REQ-033_PLUGIN_HUMAN_APPROVAL.heartbeat.json",
@@ -8,11 +9,12 @@
   ],
   "checksums": {
     "contract_sha256": "4b25c9e9dc5a98da42955ef3a83a41d67b017b9b1602428dacce30df8989d564",
-    "heartbeat_sha256": "1f049da5023c06d027fe947cf8b07e9fed6f70a4d80151a66b688757c3a8b207",
-    "log_sha256": "1add19b71bef6ba089daef6f1d1fa59b70d9d473277758f1197fafce5ad49004",
-    "patch_sha256": "abb68ac1c9c8986d6eab23005b2840fcb7b5736627604b8def4ee46f902026d3"
+    "heartbeat_sha256": "8dc223e64c64c66f40896d0b90a10c869452f6a2e53bd7008205c89e3fdc2f36",
+    "log_sha256": "37b134145f7ca33a03f9f700b76134934a1df75a6c01cfc17fefef579042d9ea",
+    "patch_sha256": "abb68ac1c9c8986d6eab23005b2840fcb7b5736627604b8def4ee46f902026d3",
+    "target_source_sha256": "7c54c92517d64b5f54bc7deacfcd76c389de5b9f163c3292ab5d4005c9ece46e"
   },
-  "completed_at": "2026-07-05T04:58:03+00:00",
+  "completed_at": "2026-07-27T04:39:10+00:00",
   "failure_reason": "",
   "helper_id": "helper-nu-approval-01",
   "implementation": {
@@ -36,7 +38,7 @@
     "target_file": "crates/nu_plugin_codedb/src/main.rs",
     "unit_tests_added": [
       "envctl_human_approval_rows_project_mode_and_actions",
-      "envctl_human_approval_rows_reject_bad_jsonl"
+      "envctl_human_approval_rows_reject_bad_jsonl_and_invalid_mode"
     ],
     "views": [
       "mode",
@@ -44,20 +46,20 @@
       "operation"
     ]
   },
-  "next_action": "Apply generated/patches/REQ-033_PLUGIN_HUMAN_APPROVAL.nu_plugin.patch in the Nu plugin repo and run cargo test -p nu_plugin_codedb envctl_human_approval_rows once a Rust toolchain is available.",
+  "next_action": "REQ-041_TWO_REPO_INTEGRATION can consume the verified human approval surface.",
   "owner_agent": "nu-plugin-agent",
   "owner_lane": "lane_c_repo_b",
   "parent_id": "REQ-010_CONTRACT_LOCK",
   "phase": "03-nu-plugin",
   "proof_schema_version": "1.0",
-  "repo_path": "/home/flexnetos/FlexNetOS/src/nu_plugin",
+  "repo_path": "/home/flexnetos/Downloads/nu_plugin",
   "repo_target": "repo_b",
   "rollback_plan": "Remove generated/patches/REQ-033_PLUGIN_HUMAN_APPROVAL.nu_plugin.patch, generated/REQ-033_PLUGIN_HUMAN_APPROVAL.contract.json, state/REQ-033_PLUGIN_HUMAN_APPROVAL.heartbeat.json, and this proof file. If the patch has been applied to repo_b, reverse only the hunks in the patch.",
-  "sandbox_note": "Direct writes to NU_PLUGIN_REPO were denied by this shell permission profile, so the implementation is delivered as a patch artifact under execution-framework.",
+  "sandbox_note": "The recorded /home/flexnetos/FlexNetOS/src/nu_plugin path was absent; implementation was applied to the available /home/flexnetos/Downloads/nu_plugin source snapshot.",
   "source_commit": "37e6d2a22994308f440da1ff3cb3fda9901c9e40",
   "started_at": "2026-07-05T04:53:39+00:00",
   "status": "completed",
-  "summary": "Implemented a read-only Nushell human approval surface as a Nu plugin patch artifact. The command projects approval requests and optional operation queue rows into a single envctl_human_approval_surface table with mode, approval, and operation views plus allowed actions for opt-in, approve, deny, pause, and delegate flows.",
+  "summary": "Implemented and verified the read-only Nushell human approval surface in the available Nu plugin source. The command projects approval requests and optional operation queue rows into a single envctl_human_approval_surface table with mode, approval, and operation views plus allowed actions for opt-in, approve, deny, pause, and delegate flows.",
   "task_id": "REQ-033_PLUGIN_HUMAN_APPROVAL",
   "title": "Implement human approval commands",
   "verification": {
@@ -65,9 +67,11 @@
     "patch_apply_check": "passed",
     "patch_whitespace_check": "passed",
     "patched_source_structural_gate": "passed",
-    "targeted_cargo_test": "not_run_toolchain_unavailable",
+    "targeted_cargo_test": "passed: 7 tests",
+    "workspace_cargo_test": "passed: 35 tests across 16 suites",
+    "cargo_fmt_check": "passed",
     "temp_copy_git_apply": "passed",
     "temp_tree_changed_file_check": "passed",
-    "toolchain_note": "cargo and rustc were not present on PATH in this execution shell; the patch includes task-specific Rust unit tests and was verified by git apply checks plus structural source gates."
+    "toolchain_note": "Rust toolchain was available; targeted and full workspace tests passed."
   }
 }

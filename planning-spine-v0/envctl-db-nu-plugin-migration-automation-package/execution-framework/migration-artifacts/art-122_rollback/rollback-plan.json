@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "task_id": "ART-122_ROLLBACK",
   "title": "Rollback Plan",
-  "generated_at": "2026-07-05T05:06:08+00:00",
+  "generated_at": "2026-07-27T05:01:32+00:00",
   "target": {
     "target_id": "flexnetos-vs-lifeos",
     "primary_root": "/home/flexnetos/FlexNetOS",
@@ -72,13 +72,13 @@
     {
       "task_id": "REQ-041_TWO_REPO_INTEGRATION",
       "title": "Implement two-repo integration",
-      "status": "pending",
+      "status": "completed",
       "proof_uri": "proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json"
     },
     {
       "task_id": "REQ-045_RUN_REPLAY",
       "title": "Implement run/replay templates",
-      "status": "pending",
+      "status": "completed",
       "proof_uri": "proof_records/REQ-045_RUN_REPLAY.proof.json"
     },
     {
@@ -108,15 +108,11 @@
     {
       "task_id": "VER-300_UNIT_VALIDATION",
       "title": "Run unit/integration validation",
-      "status": "pending",
+      "status": "completed",
       "proof_uri": "proof_records/VER-300_UNIT_VALIDATION.proof.json"
     }
   ],
-  "blocked_gate_tasks": [
-    "REQ-041_TWO_REPO_INTEGRATION",
-    "REQ-045_RUN_REPLAY",
-    "VER-300_UNIT_VALIDATION"
-  ],
+  "blocked_gate_tasks": [],
   "readiness_band": "conditional",
   "overall_readiness_score": 75.3,
   "wave_reference": {
@@ -458,7 +454,7 @@
         "VER-300_UNIT_VALIDATION is completed before declaring rollback recovery releasable."
       ],
       "notes": [
-        "Current statuses: REQ-041=pending, REQ-045=pending, VER-300=pending.",
+        "Current statuses: REQ-041=completed, REQ-045=completed, VER-300=completed.",
         "Readiness band remains conditional."
       ]
     },
@@ -491,6 +487,6 @@
     "blocks": [
       "VER-300_UNIT_VALIDATION"
     ],
-    "execution_ready_now": false
+    "execution_ready_now": true
   }
 }

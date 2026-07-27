@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import ast
 import json
+import os
 import re
 import sqlite3
-import sys
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -48,231 +48,163 @@ def contract_rows() -> list[dict[str, Any]]:
     ]
 
 
-def collect_python_imports() -> dict[str, Any]:
-    stdlib = set(getattr(sys, "stdlib_module_names", set()))
-    local_modules = {
-        path.stem
-        for path in package_root().rglob("*.py")
-        if "__pycache__" not in path.parts
-    }
-    records = []
-    external = set()
-    for path in sorted(package_root().rglob("*.py")):
-        if "__pycache__" in path.parts:
-            continue
-        try:
-            tree = ast.parse(path.read_text(encoding="utf-8"))
-        except (SyntaxError, UnicodeDecodeError):
-            continue
-        imports = set()
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                imports.update(alias.name.split(".", 1)[0] for alias in node.names)
-            elif isinstance(node, ast.ImportFrom) and node.module:
-                imports.add(node.module.split(".", 1)[0])
-        rel = str(path.relative_to(package_root()))
-        third_party = sorted(name for name in imports if name not in stdlib and name not in local_modules)
-        external.update(third_party)
-        records.append(
-            {
-                "path": rel,
-                "stdlib_imports": sorted(name for name in imports if name in stdlib),
-                "local_imports": sorted(name for name in imports if name in local_modules),
-                "third_party_imports": third_party,
-            }
-        )
-    return {"files": records, "third_party_imports": sorted(external)}
+SKIP_DIRS = {".git", ".venv", "__pycache__", "node_modules", "target", "dist", ".cache"}
+MANIFEST_NAMES = {"package.json", "Cargo.toml", "pyproject.toml", "go.mod"}
+LOCK_NAMES = {"bun.lock", "Cargo.lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "uv.lock", "poetry.lock"}
 
 
-def collect_shell_tools() -> list[dict[str, Any]]:
-    tool_names = {
-        "bash",
-        "codex",
-        "cp",
-        "date",
-        "find",
-        "git",
-        "mkdir",
-        "python",
-        "python3",
-        "rsync",
-        "sed",
-        "sha256sum",
-        "tee",
-        "timeout",
-    }
-    out = []
-    for path in sorted(package_root().rglob("*.sh")):
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        found = sorted({tool for tool in tool_names if re.search(rf"(^|[^A-Za-z0-9_-]){re.escape(tool)}([^A-Za-z0-9_-]|$)", text)})
-        out.append({"path": str(path.relative_to(package_root())), "tools": found})
-    return out
+def target_roots() -> list[dict[str, Any]]:
+    registry = read_json("execution-framework/generated/envctl_target_registry.json")
+    target = next(row for row in registry["registry_rows"] if row["target_id"] == "flexnetos-vs-lifeos")
+    roots = []
+    for role, key in (("primary", "primary_root"), ("comparison", "compare_root")):
+        value = target.get(key)
+        if value and Path(value).is_dir():
+            roots.append({"role": role, "path": Path(value).resolve()})
+    return roots
+
+
+def scan_manifests(roots: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    manifests: list[dict[str, Any]] = []
+    locks: list[dict[str, Any]] = []
+    for root_info in roots:
+        root_path = root_info["path"]
+        for current, dirs, files in os.walk(root_path):
+            dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS and not d.startswith(".direnv"))
+            base = Path(current)
+            for name in sorted(files):
+                if name not in MANIFEST_NAMES and name not in LOCK_NAMES:
+                    continue
+                path = base / name
+                rel = path.relative_to(root_path).as_posix()
+                record = {
+                    "root_role": root_info["role"],
+                    "path": rel,
+                    "evidence": f"{root_info['role']}:{rel}",
+                    "size_bytes": path.stat().st_size,
+                }
+                (manifests if name in MANIFEST_NAMES else locks).append(record)
+    return manifests, locks
+
+
+def version_text(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        return str(value.get("version") or ("workspace" if value.get("workspace") else "path/git/unspecified"))
+    return "unspecified"
+
+
+def parse_direct_dependencies(roots: list[dict[str, Any]], manifests: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    root_by_role = {item["role"]: item["path"] for item in roots}
+    packages: list[dict[str, Any]] = []
+    dependencies: list[dict[str, Any]] = []
+    for manifest in manifests:
+        path = root_by_role[manifest["root_role"]] / manifest["path"]
+        evidence = manifest["evidence"]
+        if path.name == "package.json":
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                continue
+            package_id = f"npm-project:{manifest['root_role']}:{path.parent.relative_to(root_by_role[manifest['root_role']]).as_posix() or '.'}"
+            packages.append({"id": package_id, "kind": "npm_project", "name": data.get("name", path.parent.name), "version": data.get("version"), "evidence": [evidence]})
+            for scope in ("dependencies", "devDependencies", "peerDependencies", "optionalDependencies"):
+                for name, version in sorted(data.get(scope, {}).items()):
+                    dependencies.append({"from": package_id, "to": f"npm:{name}", "type": scope, "requirement": str(version), "ecosystem": "npm", "evidence": [evidence]})
+        elif path.name == "Cargo.toml":
+            try:
+                data = tomllib.loads(path.read_text(encoding="utf-8"))
+            except (tomllib.TOMLDecodeError, UnicodeDecodeError):
+                continue
+            cargo_package = data.get("package", {})
+            package_name = cargo_package.get("name") or f"workspace:{path.parent.name}"
+            package_id = f"cargo-project:{manifest['root_role']}:{package_name}"
+            packages.append({"id": package_id, "kind": "cargo_project", "name": package_name, "version": cargo_package.get("version"), "evidence": [evidence]})
+            tables = [("dependencies", data.get("dependencies", {})), ("dev-dependencies", data.get("dev-dependencies", {})), ("build-dependencies", data.get("build-dependencies", {}))]
+            workspace = data.get("workspace", {})
+            tables.append(("workspace.dependencies", workspace.get("dependencies", {})))
+            for target_data in data.get("target", {}).values():
+                if isinstance(target_data, dict):
+                    tables.append(("target.dependencies", target_data.get("dependencies", {})))
+            for scope, table in tables:
+                for name, value in sorted(table.items()):
+                    dependencies.append({"from": package_id, "to": f"cargo:{name}", "type": scope, "requirement": version_text(value), "ecosystem": "cargo", "evidence": [evidence]})
+    unique_packages = {item["id"]: item for item in packages}
+    unique_deps = {(item["from"], item["to"], item["type"], item["requirement"]): item for item in dependencies}
+    return list(unique_packages.values()), list(unique_deps.values())
 
 
 def build_graph() -> dict[str, Any]:
-    package_manifest = read_json("PACKAGE_MANIFEST.json")
-    source_manifest = read_json("source/codex-flexnetos-migration-prompt-package/PACKAGE_MANIFEST.json")
     package_scan = read_json("execution-framework/generated/package_scan.json")
     target_registry = read_json("execution-framework/generated/envctl_target_registry.json")
     shared_protocol = read_json("execution-framework/generated/shared_protocol_manifest.json")
     rows = contract_rows()
-    py_imports = collect_python_imports()
-    shell_tools = collect_shell_tools()
-
-    schema_files = existing_files(
-        [
-            "schemas/artifact_record.schema.json",
-            "schemas/migration_recipe.schema.json",
-            "schemas/operation.schema.json",
-            "schemas/run_event.schema.json",
-            "schemas/target_descriptor.schema.json",
-            "schemas/validation_result.schema.json",
-            "execution-framework/schemas/shared_protocol.schema.json",
-            "execution-framework/schemas/proof_record.schema.json",
-        ]
-    )
-    sql_files = existing_files(
-        [
-            "sql/001_migration_automation_schema.sql",
-            "sql/002_views_and_indexes.sql",
-            "sql/003_seed_artifact_contract.sql",
-            "execution-framework/generated/contract_manifest.seed.sql",
-        ]
-    )
-
-    nodes = [
-        {
-            "id": "package:envctl-db-nu-plugin-migration-automation-package",
-            "kind": "package",
-            "name": "envctl-db-nu-plugin-migration-automation-package",
-            "evidence": ["PACKAGE_MANIFEST.json", "execution-framework/generated/package_scan.json"],
-        },
-        {
-            "id": "package:codex-flexnetos-migration-prompt-package",
-            "kind": "source_package",
-            "name": "codex-flexnetos-migration-prompt-package",
-            "evidence": ["source/codex-flexnetos-migration-prompt-package/PACKAGE_MANIFEST.json"],
-        },
-        {
-            "id": "runtime:python-stdlib",
-            "kind": "runtime_library",
-            "name": "Python standard library",
-            "evidence": ["execution-framework/scripts/*.py", "helpers/*.py"],
-        },
-        {
-            "id": "runtime:sqlite",
-            "kind": "embedded_database",
-            "name": "SQLite via python sqlite3",
-            "evidence": sql_files,
-        },
-        {
-            "id": "tool:codex-cli",
-            "kind": "tool",
-            "name": "codex CLI",
-            "evidence": ["RUN_WITH_CODEX_ENVCTL.sh", "codex/envctl-nu-plugin-migration.config.toml"],
-        },
-        {
-            "id": "schema:json-schema",
-            "kind": "schema_contract",
-            "name": "JSON Schema documents",
-            "evidence": schema_files,
-        },
-        {
-            "id": "contract:shared-protocol",
-            "kind": "protocol_contract",
-            "name": "Shared protocol manifest",
-            "evidence": ["execution-framework/generated/shared_protocol_manifest.json"],
-        },
-        {
-            "id": "contract:artifact-contract",
-            "kind": "artifact_contract",
-            "name": "Full migration artifact contract",
-            "evidence": ["execution-framework/generated/contract_manifest.json"],
-        },
-    ]
-    edges = [
-        {
-            "from": "package:envctl-db-nu-plugin-migration-automation-package",
-            "to": "package:codex-flexnetos-migration-prompt-package",
-            "type": "bundles_source_package",
-            "evidence": ["source/codex-flexnetos-migration-prompt-package/PACKAGE_MANIFEST.json"],
-        },
-        {
-            "from": "package:envctl-db-nu-plugin-migration-automation-package",
-            "to": "runtime:python-stdlib",
-            "type": "uses_runtime_libraries",
-            "evidence": ["execution-framework/scripts/*.py", "helpers/*.py"],
-        },
-        {
-            "from": "package:envctl-db-nu-plugin-migration-automation-package",
-            "to": "runtime:sqlite",
-            "type": "persists_registry_state",
-            "evidence": sql_files,
-        },
-        {
-            "from": "package:envctl-db-nu-plugin-migration-automation-package",
-            "to": "tool:codex-cli",
-            "type": "executed_by",
-            "evidence": ["generated/execution_packets/ART-105_PACKAGE_LIB_GRAPH.json"],
-        },
-        {
-            "from": "contract:artifact-contract",
-            "to": "schema:json-schema",
-            "type": "validated_by",
-            "evidence": schema_files,
-        },
-        {
-            "from": "contract:shared-protocol",
-            "to": "schema:json-schema",
-            "type": "materialized_as",
-            "evidence": ["execution-framework/schemas/shared_protocol.schema.json"],
-        },
-    ]
+    roots = target_roots()
+    manifests, locks = scan_manifests(roots)
+    projects, edges = parse_direct_dependencies(roots, manifests)
+    library_nodes: dict[str, dict[str, Any]] = {}
+    for edge in edges:
+        library_nodes.setdefault(edge["to"], {"id": edge["to"], "kind": f"{edge['ecosystem']}_library", "name": edge["to"].split(":", 1)[1], "evidence": edge["evidence"][:]})
+        library_nodes[edge["to"]]["evidence"] = sorted(set(library_nodes[edge["to"]]["evidence"] + edge["evidence"]))
+    nodes = projects + sorted(library_nodes.values(), key=lambda item: item["id"])
+    prerelease = sorted({edge["to"] for edge in edges if re.search(r"(alpha|beta|rc|pre|snapshot)", edge["requirement"], re.I)})
     issues = [
         {
             "id": "ART105-VULN-001",
             "category": "vulnerability",
             "severity": "unknown",
-            "component": "all",
-            "status": "no_external_lockfile_detected",
-            "finding": "The package contains no third-party package lockfile or version-pinned library manifest for CVE correlation; observed external Python imports are recorded without versions, so CVE status is unknown rather than clean.",
-            "evidence": ["PACKAGE_MANIFEST.json", "execution-framework/generated/package_scan.json"],
+            "component": "all lockfiles",
+            "status": "not_assessed_offline",
+            "finding": "Lockfiles were inventoried, but the target descriptor forbids network access and no authoritative offline advisory database was supplied. Vulnerability status is unknown, not clean; run ecosystem audits against an approved advisory snapshot before migration.",
+            "evidence": [item["evidence"] for item in locks[:20]],
         },
         {
             "id": "ART105-DEP-001",
             "category": "deprecation",
-            "severity": "medium",
-            "component": "source/codex-flexnetos-migration-prompt-package/helpers/__pycache__",
-            "status": "present_in_source_manifest",
-            "finding": "The source package manifest includes CPython 3.13 bytecode cache files; treat them as generated compatibility artifacts, not authoritative migration source.",
-            "evidence": ["source/codex-flexnetos-migration-prompt-package/PACKAGE_MANIFEST.json"],
+            "severity": "unknown",
+            "component": "package metadata",
+            "status": "not_declared_in_manifests",
+            "finding": "The scanned manifest formats do not provide authoritative deprecation notices. Registry/advisory metadata must be refreshed in an approved connected environment; absence here is not evidence that dependencies are supported.",
+            "evidence": [item["evidence"] for item in manifests[:20]],
         },
         {
             "id": "ART105-INCOMPAT-001",
             "category": "incompatibility",
             "severity": "medium",
-            "component": "sqlite schema",
-            "status": "requires_sqlite_features",
-            "finding": "Artifact registry verification depends on SQLite foreign keys, views, unique constraints, and upsert semantics; alternate DB backends need compatible migrations before replay.",
-            "evidence": sql_files,
+            "component": "JavaScript UI/build graph",
+            "status": "mixed_framework_toolchain",
+            "finding": "The LifeOS root manifest combines Vue, Svelte, Vite, Tauri, and their test plugins. Migration must preserve framework-specific compiler/plugin compatibility and cannot treat the JavaScript graph as a single-framework application.",
+            "evidence": ["comparison:package.json", "comparison:bun.lock"],
         },
         {
             "id": "ART105-INCOMPAT-002",
             "category": "incompatibility",
             "severity": "medium",
-            "component": "codex execution runtime",
-            "status": "tool_required",
-            "finding": "Execution packets require codex, python3, and shell tools. The package does not vendor these tools, so target hosts must provide them through the envctl runtime.",
-            "evidence": ["generated/execution_packets/ART-105_PACKAGE_LIB_GRAPH.json", "RUN_WITH_CODEX_ENVCTL.sh"],
+            "component": "Rust target graph",
+            "status": "separate_target_resolvers",
+            "finding": "LifeOS desktop/core/daemon crates share the root Cargo workspace, while firmware/esp32 is explicitly excluded and uses a separate target/toolchain. A unified dependency upgrade can therefore resolve differently across host and firmware targets.",
+            "evidence": ["comparison:Cargo.toml", "comparison:firmware/esp32/Cargo.toml"],
         },
     ]
+    if prerelease:
+        issues.append({
+            "id": "ART105-INCOMPAT-003",
+            "category": "incompatibility",
+            "severity": "medium",
+            "component": ", ".join(prerelease[:12]),
+            "status": "prerelease_dependency",
+            "finding": "Direct dependency requirements include prerelease channels, which may introduce API or lockfile churn across migration environments.",
+            "evidence": sorted({ref for edge in edges if edge["to"] in prerelease for ref in edge["evidence"]}),
+        })
     return {
         "schema_version": "1.0",
         "task_id": TASK_ID,
         "generated_at": now(),
         "source_inputs": {
-            "package_manifest_file_count": package_manifest.get("file_count"),
-            "source_manifest_file_count": len(source_manifest.get("files", [])),
+            "target_roots": [{"role": item["role"], "path": item["path"].as_posix()} for item in roots],
+            "manifest_count": len(manifests),
+            "lockfile_count": len(locks),
             "package_scan_folders": sorted(package_scan.get("scanned_folders", {}).keys()),
             "target_registry_status": target_registry.get("status"),
             "shared_protocol_status": shared_protocol.get("status"),
@@ -281,9 +213,10 @@ def build_graph() -> dict[str, Any]:
         "summary": {
             "node_count": len(nodes),
             "edge_count": len(edges),
-            "python_file_count": len(py_imports["files"]),
-            "third_party_python_import_count": len(py_imports["third_party_imports"]),
-            "shell_script_count": len(shell_tools),
+            "project_count": len(projects),
+            "library_count": len(library_nodes),
+            "manifest_count": len(manifests),
+            "lockfile_count": len(locks),
             "issue_count": len(issues),
             "vulnerability_count": len([i for i in issues if i["category"] == "vulnerability"]),
             "deprecation_count": len([i for i in issues if i["category"] == "deprecation"]),
@@ -291,8 +224,8 @@ def build_graph() -> dict[str, Any]:
         },
         "nodes": nodes,
         "edges": edges,
-        "python_imports": py_imports,
-        "shell_tools": shell_tools,
+        "manifests": manifests,
+        "lockfiles": locks,
         "issues": issues,
     }
 
@@ -308,9 +241,10 @@ def write_markdown(graph: dict[str, Any]) -> None:
         "",
         f"- Nodes: {graph['summary']['node_count']}",
         f"- Edges: {graph['summary']['edge_count']}",
-        f"- Python files scanned: {graph['summary']['python_file_count']}",
-        f"- Third-party Python imports: {graph['summary']['third_party_python_import_count']}",
-        f"- Shell scripts scanned: {graph['summary']['shell_script_count']}",
+        f"- Projects: {graph['summary']['project_count']}",
+        f"- Libraries: {graph['summary']['library_count']}",
+        f"- Manifests: {graph['summary']['manifest_count']}",
+        f"- Lockfiles: {graph['summary']['lockfile_count']}",
         f"- Issues: {graph['summary']['issue_count']}",
         "",
         "## Dependency graph",
@@ -324,7 +258,7 @@ def write_markdown(graph: dict[str, Any]) -> None:
                 from_node=edge["from"],
                 kind=edge["type"],
                 to_node=edge["to"],
-                evidence=", ".join(f"`{item}`" for item in edge["evidence"]),
+                evidence=", ".join(f"`{item}`" for item in edge["evidence"]) + f"; requirement `{edge['requirement']}`",
             )
         )
     lines.extend(["", "## Components", "", "| id | kind | evidence |", "|---|---|---|"])
@@ -347,19 +281,11 @@ def write_markdown(graph: dict[str, Any]) -> None:
                 finding=issue["finding"],
             )
         )
-    lines.extend(["", "## Python import scan", "", "| file | local imports | stdlib imports | third-party imports |", "|---|---|---|---|"])
-    for row in graph["python_imports"]["files"]:
-        lines.append(
-            "| `{path}` | {local} | {stdlib} | {third_party} |".format(
-                path=row["path"],
-                local=", ".join(f"`{item}`" for item in row["local_imports"]) or "",
-                stdlib=", ".join(f"`{item}`" for item in row["stdlib_imports"]) or "",
-                third_party=", ".join(f"`{item}`" for item in row["third_party_imports"]) or "",
-            )
-        )
-    lines.extend(["", "## Shell tool scan", "", "| script | tools |", "|---|---|"])
-    for row in graph["shell_tools"]:
-        lines.append("| `{}` | {} |".format(row["path"], ", ".join(f"`{item}`" for item in row["tools"])))
+    lines.extend(["", "## Manifest and lockfile inventory", "", "| role | path | kind |", "|---|---|---|"])
+    for row in graph["manifests"]:
+        lines.append(f"| {row['root_role']} | `{row['path']}` | manifest |")
+    for row in graph["lockfiles"]:
+        lines.append(f"| {row['root_role']} | `{row['path']}` | lockfile |")
     (package_root() / MD_REL).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

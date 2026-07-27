@@ -42,7 +42,6 @@ BLOCKED_PARTS = {
     ".direnv",
     ".toolchains",
     ".worktrees",
-    "_work",
     "build",
     "dist",
     "secrets",
@@ -860,6 +859,10 @@ def build_report(conn: sqlite3.Connection, catalog: dict[str, Any], registry_res
         errors.append(f"expected at least {len(registry_results) * 3} validation rows, got {validation_count}")
     if catalog["summary"]["schema_count"] < 10:
         errors.append("shared protocol schema coverage is unexpectedly low")
+    if catalog["summary"]["endpoint_count"] < 1:
+        errors.append("no API endpoints or OpenAPI documents were discovered")
+    if catalog["summary"]["auth_mechanism_count"] < 1:
+        errors.append("no authentication mechanisms were discovered")
     return {
         "schema_version": "1.0",
         "task_id": TASK_ID,

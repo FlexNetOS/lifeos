@@ -116,7 +116,11 @@ def main() -> None:
             "generated/ver304_final_completeness_report.json",
         ],
         "" if status == "pass" else "see generated/ver304_final_completeness_report.json",
-        "run REL-400_PACKAGE_ARCHIVE",
+        (
+            "run REL-400_PACKAGE_ARCHIVE"
+            if status == "pass"
+            else "resolve VER-303_GOAL_LOOP_COMPUTE and its failed dependencies, then rerun VER-304_FINAL_COMPLETENESS"
+        ),
     )
     append_proof(proof)
     print(

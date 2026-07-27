@@ -3,8 +3,8 @@
 Status: **pass_with_external_blocker**
 
 Task count: 80
-Execution packet count: 80
-Proof count: 88
+Execution packet count: 763
+Proof count: 86
 
 ## Coverage
 - system_inventory: covered via `ART-100_SYSTEM_INVENTORY`

@@ -8,8 +8,6 @@ import fnmatch
 import json
 import posixpath
 
-from jsonschema import Draft202012Validator
-
 from _common import append_proof, file_checksums, now, package_root, root, write_json
 
 
@@ -287,13 +285,82 @@ def build_config(packet: dict, redaction_patterns: list[str]) -> dict:
     }
 
 
+def validate_boundary_contract(config: dict, schema: dict) -> list[str]:
+    """Validate this small contract without undeclared third-party packages."""
+    errors: list[str] = []
+    required = schema.get("required", [])
+    for field in required:
+        if field not in config:
+            errors.append(f"schema: required property {field!r} is missing")
+
+    scalar_types = {
+        "schema_version": str,
+        "task_id": str,
+        "scope": str,
+        "repo_path": str,
+    }
+    for field, expected_type in scalar_types.items():
+        if field in config and not isinstance(config[field], expected_type):
+            errors.append(f"schema: {field} must be a string")
+
+    for collection, expected_mode in (
+        ("allowed_paths", "allow"),
+        ("blocked_paths", "block"),
+    ):
+        entries = config.get(collection)
+        if not isinstance(entries, list) or not entries:
+            errors.append(f"schema: {collection} must be a non-empty array")
+            continue
+        ids: set[str] = set()
+        for index, entry in enumerate(entries):
+            label = f"{collection}[{index}]"
+            if not isinstance(entry, dict):
+                errors.append(f"schema: {label} must be an object")
+                continue
+            for field in ("id", "pattern", "mode", "description"):
+                if not isinstance(entry.get(field), str) or not entry[field]:
+                    errors.append(f"schema: {label}.{field} must be a non-empty string")
+            entry_id = entry.get("id")
+            if isinstance(entry_id, str):
+                if entry_id in ids:
+                    errors.append(f"schema: duplicate path rule id {entry_id!r}")
+                ids.add(entry_id)
+            if entry.get("mode") != expected_mode:
+                errors.append(f"schema: {label}.mode must be {expected_mode!r}")
+            if entry.get("env_var") is not None and not isinstance(entry.get("env_var"), str):
+                errors.append(f"schema: {label}.env_var must be a string or null")
+
+    workspaces = config.get("safe_workspaces")
+    if not isinstance(workspaces, list) or not workspaces:
+        errors.append("schema: safe_workspaces must be a non-empty array")
+    else:
+        workspace_ids: set[str] = set()
+        for index, workspace in enumerate(workspaces):
+            label = f"safe_workspaces[{index}]"
+            if not isinstance(workspace, dict):
+                errors.append(f"schema: {label} must be an object")
+                continue
+            for field in ("id", "path", "purpose", "write_policy"):
+                if not isinstance(workspace.get(field), str) or not workspace[field]:
+                    errors.append(f"schema: {label}.{field} must be a non-empty string")
+            workspace_id = workspace.get("id")
+            if isinstance(workspace_id, str):
+                if workspace_id in workspace_ids:
+                    errors.append(f"schema: duplicate workspace id {workspace_id!r}")
+                workspace_ids.add(workspace_id)
+
+    rules = config.get("rules")
+    if (
+        not isinstance(rules, list)
+        or not rules
+        or any(not isinstance(rule, str) or not rule for rule in rules)
+    ):
+        errors.append("schema: rules must be a non-empty array of non-empty strings")
+    return errors
+
+
 def validate_config(config: dict, schema: dict, packet: dict) -> dict:
-    errors = []
-    Draft202012Validator.check_schema(schema)
-    schema_errors = sorted(
-        Draft202012Validator(schema).iter_errors(config), key=lambda err: err.path
-    )
-    errors.extend(f"schema: {error.message}" for error in schema_errors)
+    errors = validate_boundary_contract(config, schema)
 
     declared_allowed = [entry["pattern"] for entry in config["allowed_paths"]]
     declared_blocked = [entry["pattern"] for entry in config["blocked_paths"]]

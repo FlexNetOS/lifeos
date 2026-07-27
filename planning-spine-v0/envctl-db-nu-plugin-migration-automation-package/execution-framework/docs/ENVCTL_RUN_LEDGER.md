@@ -1,6 +1,6 @@
 # envctl migration run ledger
 
-Generated at: `2026-07-04T23:09:30+00:00`
+Generated at: `2026-07-27T04:19:14+00:00`
 Status: `passed`
 
 ## Ledger surfaces
@@ -34,5 +34,5 @@ Status: `passed`
 
 | kind | uri | sha256 |
 |---|---|---|
-| `proof_record` | `proof_records/REQ-020_ENVCTL_DB_SCHEMA.proof.json` | `sha256:b3a2108255360c6c2e1316e66c3da76562973ed45581c07132468531f589a8ea` |
 | `run_ledger_report` | `generated/envctl_run_ledger_report.json` | `` |
+| `proof_record` | `proof_records/REQ-020_ENVCTL_DB_SCHEMA.proof.json` | `sha256:ee945a8de9574528a7f2b0c7a275d86489f83bd8ccaf00bd77c972d4a55dc919` |

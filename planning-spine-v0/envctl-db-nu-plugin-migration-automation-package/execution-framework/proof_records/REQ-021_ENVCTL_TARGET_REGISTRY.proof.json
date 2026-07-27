@@ -2,61 +2,63 @@
   "proof_schema_version": "1.0",
   "task_id": "REQ-021_ENVCTL_TARGET_REGISTRY",
   "status": "completed",
-  "started_at": "2026-07-27T04:01:18Z",
-  "completed_at": "2026-07-27T04:17:23Z",
-  "actor": "envctl-db-agent",
+  "started_at": "2026-07-27T21:38:47+00:00",
+  "completed_at": "2026-07-27T21:38:47+00:00",
+  "actor": "codex-cli-local",
   "helper_id": "helper-envctl-target-01",
   "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/meta/.worktrees/req-021-envctl-target-registry/envctl",
+  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
   "files_changed": [
-    ".handoff/loop/cycle/01_architect_plan.md",
-    ".handoff/loop/cycle/02_implementer_log.md",
-    ".handoff/loop/cycle/03_guardian_report.md",
-    "crates/engine/src/migration_db/model.rs",
-    "crates/engine/src/migration_db/api.rs",
-    "crates/engine/src/migration_db/mod.rs",
-    "crates/engine/src/migration_db/tests.rs",
-    "crates/cli/src/migration_cmd.rs",
-    "crates/cli/tests/migration_target.rs"
+    "execution-framework/scripts/verify_target_registry.py",
+    "execution-framework/generated/envctl_target_registry.json",
+    "execution-framework/generated/envctl_target_registry_validation_report.json",
+    "execution-framework/docs/ENVCTL_TARGET_REGISTRY.md",
+    "execution-framework/logs/REQ-021_ENVCTL_TARGET_REGISTRY.log",
+    "execution-framework/state/REQ-021_ENVCTL_TARGET_REGISTRY.heartbeat.json",
+    "execution-framework/proof_records/REQ-021_ENVCTL_TARGET_REGISTRY.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl"
   ],
   "commands_run": [
-    "cargo test -p envctl-engine migration_db --lib",
-    "cargo test -p envctl --test migration_target",
-    "cargo check -p envctl-engine -p envctl",
-    "cargo clippy -p envctl-engine -p envctl -- -D warnings",
-    "bash ci/gates/no-c.sh",
-    "bash ci/gates/shape.sh",
-    "rustfmt --edition 2021 --check <touched Rust files>",
-    "envctl --json migration --db <temp>/registry.redb target validate/add/list/show"
+    "python3 scripts/verify_target_registry.py"
   ],
   "verification_output": {
+    "schema_version": "1.0",
+    "task_id": "REQ-021_ENVCTL_TARGET_REGISTRY",
     "status": "passed",
-    "engine_tests": "12 passed",
-    "cli_integration_tests": "1 passed",
-    "cargo_check": "passed",
-    "clippy": "passed",
-    "no_c_gate": "passed",
-    "shape_gate": "passed",
-    "format_and_diff": "passed",
-    "runtime_surface": "canonical generic-codebase.yaml validate/add/list/show passed",
-    "descriptor_hash": "e79f5c931d50fb8193c678d61ddecc1405c8030ab9528946fcb65a7bde06bff9"
+    "generated_at": "2026-07-27T21:38:47+00:00",
+    "summary": {
+      "input_descriptor_count": 2,
+      "registered_descriptor_count": 5,
+      "target_type_count": 5,
+      "target_type_covered_count": 5,
+      "row_count_after_first_pass": 5,
+      "row_count_after_second_pass": 5,
+      "invalid_descriptor_error_count": 2
+    },
+    "errors": [],
+    "evidence": [
+      "generated/envctl_target_registry.json",
+      "generated/envctl_target_registry_validation_report.json",
+      "docs/ENVCTL_TARGET_REGISTRY.md"
+    ]
   },
   "checksums": {
-    "crates/engine/src/migration_db/model.rs": "daed9854fd2c9f2fc7ff17757d4310a76349966a98abf95a05c81ef90064a9a9",
-    "crates/engine/src/migration_db/api.rs": "6856764c4bbe2ea96a7250204173541602105a307b0df9cd0f410f3dc1a0cdb0",
-    "crates/engine/src/migration_db/mod.rs": "96662e93dd248dcf265de771fc65ff56f3967c246f8ceb8756f52d1f91da2eee",
-    "crates/engine/src/migration_db/tests.rs": "2ea88ba5181772ca05cb3bfc41b910ff17556d7d83811fb116efe0e4d9dcf20d",
-    "crates/cli/src/migration_cmd.rs": "714ac7a34d9bcbcb8e24d59ab6bb30e25303555056b9af194fec1dbbfce38644",
-    "crates/cli/tests/migration_target.rs": "51d393d944867a85ed593b944713825b4c1adc5123d275ac384708da3d5cd3fc",
-    ".handoff/loop/cycle/03_guardian_report.md": "f2556acbda96c2e90ace195c97027efa001f29971e63ce95aeebe11fd7e3b0cb"
+    "execution-framework/scripts/verify_target_registry.py": "e83458854f3b647df12181d96431937b7c487af5f0799ac228acbb10e4505745",
+    "execution-framework/generated/envctl_target_registry.json": "6a4248bfc27acf25bb6a3b0bcc2128712263d53befa316449aa0f5efd00669c8",
+    "execution-framework/generated/envctl_target_registry_validation_report.json": "c7dce5ef5ff1a737ca1381d50e5a3e46b9f33e2f181f2126c8a0ef39f0efafa9",
+    "execution-framework/docs/ENVCTL_TARGET_REGISTRY.md": "4c28b4dfe0c51650e780d46f9b542a840e6d95b2089b870b37ae5cb119e9f6ec",
+    "execution-framework/logs/REQ-021_ENVCTL_TARGET_REGISTRY.log": "c7dce5ef5ff1a737ca1381d50e5a3e46b9f33e2f181f2126c8a0ef39f0efafa9",
+    "execution-framework/state/REQ-021_ENVCTL_TARGET_REGISTRY.heartbeat.json": "8117f22c750cc3c4b35dd2d39bbca1567ea8e84970199aa34730aec1efe28572",
+    "execution-framework/proof_records/REQ-021_ENVCTL_TARGET_REGISTRY.proof.json": "7efe1f46f4b46093a4cad4404ac33062a65020877f5abc0694909a148b13c4cb",
+    "execution-framework/proof_records/proof_ledger.jsonl": "de157eab00565063711c7c739b352432ff1cc506a6a626edece2b50e93894a04"
   },
   "logs_uri": "logs/REQ-021_ENVCTL_TARGET_REGISTRY.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json; remove only REQ-021 worktree changes",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
   "evidence": [
-    ".handoff/loop/cycle/03_guardian_report.md",
-    "crates/cli/tests/migration_target.rs",
-    "logs/REQ-021_ENVCTL_TARGET_REGISTRY.log"
+    "generated/envctl_target_registry.json",
+    "generated/envctl_target_registry_validation_report.json",
+    "docs/ENVCTL_TARGET_REGISTRY.md"
   ],
   "failure_reason": "",
-  "next_action": "REQ-027_ENVCTL_REPLAY_ENGINE may consume the validated target registry"
+  "next_action": "run REQ-027 replay engine once ledger/artifact registry tasks are complete"
 }

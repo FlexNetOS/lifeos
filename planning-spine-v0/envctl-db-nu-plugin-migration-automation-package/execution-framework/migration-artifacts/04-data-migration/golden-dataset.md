@@ -3,7 +3,7 @@
 - Task: `ART-131_GOLDEN_DATASET`
 - Contract artifact: `artifact:04-data-migration-golden-dataset-md`
 - Canonical path: `migration-artifacts/04-data-migration/golden-dataset.md`
-- Generated at: `2026-07-27T18:24:04+00:00`
+- Generated at: `2026-07-27T21:41:33+00:00`
 - Purpose: known-good validation sample for downstream unit validation.
 - Expected aggregate result: `pass`.
 

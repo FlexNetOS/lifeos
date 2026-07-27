@@ -526,6 +526,53 @@ class JsonTaskRunnerTests(unittest.TestCase):
 
         self.assertEqual(target, task.command_cwd)
 
+    def test_legacy_reference_packet_dot_repo_path_uses_repo_root(self) -> None:
+        packet_dir = (
+            self.root
+            / "planning-spine-v0"
+            / "reference-package"
+            / "execution-framework"
+            / "execution_packets"
+        )
+        packet_dir.mkdir(parents=True)
+        packet_path = packet_dir / "LEGACY_DOT_ROOTED.json"
+        value = packet("LEGACY_DOT_ROOTED")
+        value["repo_path"] = "."
+        packet_path.write_text(json.dumps(value), encoding="utf-8")
+
+        task = runner.load_task(packet_path, self.root)
+
+        self.assertEqual(self.root, task.command_cwd)
+
+    def test_resume_re_resolves_legacy_dot_repo_path(self) -> None:
+        packet_dir = (
+            self.root
+            / "planning-spine-v0"
+            / "reference-package"
+            / "execution-framework"
+            / "execution_packets"
+        )
+        packet_dir.mkdir(parents=True)
+        packet_path = packet_dir / "LEGACY_DOT_RESUMED.json"
+        value = packet("LEGACY_DOT_RESUMED")
+        value["repo_path"] = "."
+        packet_path.write_text(json.dumps(value), encoding="utf-8")
+        task = runner.load_task(packet_path, self.root)
+        tasks, run_dir = runner.snapshot_tasks(
+            {task.task_id: task},
+            self.receipts,
+            "legacy-dot-resume",
+        )
+        self.assertEqual(self.root, tasks["LEGACY_DOT_RESUMED"].command_cwd)
+        manifest_path = run_dir / "graph.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["tasks"][0]["command_cwd"] = str(packet_dir.parent)
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+        resumed, _ = runner.load_snapshot(run_dir, self.root)
+
+        self.assertEqual(self.root, resumed["LEGACY_DOT_RESUMED"].command_cwd)
+
     def test_resume_re_resolves_known_repo_placeholder(self) -> None:
         workspace = self.root / "meta"
         (workspace / ".meta").mkdir(parents=True)

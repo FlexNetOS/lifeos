@@ -550,7 +550,9 @@ def task_command_cwd(
             return default
         candidate = (workspace_root / placeholder_path).resolve()
         return candidate if candidate.is_dir() else default
-    if packet.get("schema") != "lifeos.execution-packet.v1" or "${" in repo_path:
+    if packet.get("schema") != "lifeos.execution-packet.v1":
+        return repo_root if repo_path == "." else default
+    if "${" in repo_path:
         return default
     declared = Path(repo_path)
     if declared.is_absolute():
@@ -809,6 +811,7 @@ def load_snapshot(run_dir: Path, repo_root: Path) -> tuple[dict[str, Task], str]
         if (
             task.packet.get("schema") != "lifeos.execution-packet.v1"
             and repo_path not in REPO_PATH_PLACEHOLDERS
+            and repo_path != "."
         ):
             task = replace(task, command_cwd=Path(command_cwd))
         if task.task_id in tasks:

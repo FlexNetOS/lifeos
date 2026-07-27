@@ -6,7 +6,7 @@
 - Compare root: `/home/flexnetos/lifeos`
 - Contract artifact: `06-testing-validation-shadow-traffic-comparison-report-md`
 - Canonical path: `migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md`
-- Generated: `2026-07-04T23:20:50+00:00`
+- Generated: `2026-07-27T03:57:35+00:00`
 
 ## Result
 
@@ -17,14 +17,14 @@ The artifact registry and shared protocol dependencies are present, and this rep
 | input | path | sha256 |
 | --- | --- | --- |
 | `target_descriptor` | `examples/target-descriptors/flexnetos-vs-lifeos.yaml` | `71f4aab77e91d0fa9a414350dee50f23fc3c6492b265c607fe9e4de93c3fe190` |
-| `repo_scan` | `execution-framework/generated/package_scan.json` | `0d851e9f6a67044bfd6b6df77231c518292a385304e1830d579e6520634b9487` |
-| `envctl_db_model` | `execution-framework/generated/envctl_migration_db_model.json` | `7347f6629cc4fb0dbae56105dec65d5937a2a55860e0df4215b309e3ef766cef` |
-| `envctl_db_validation` | `execution-framework/generated/envctl_migration_db_validation_report.json` | `652f839cfd8a46e3d9057588a051c56fc090dce0fbf7ed8c0407c032b4e19d84` |
-| `artifact_registry_report` | `execution-framework/generated/envctl_artifact_registry_report.json` | `b3d33175a5ec64d95bb2a2dc0b503ca897c97990bf78fd80fc159780b3df113c` |
+| `repo_scan` | `execution-framework/generated/package_scan.json` | `9072d7f7537e6a876321e4efff4b87c3a1f06278689881166cb8d9180b913a73` |
+| `envctl_db_model` | `execution-framework/generated/envctl_migration_db_model.json` | `53942087cf05d40c288f9e12701ed30d982d661084731b3e47cf0f8397ec200a` |
+| `envctl_db_validation` | `execution-framework/generated/envctl_migration_db_validation_report.json` | `f0f9bc03bbc895bf22520bef66d29907c316c1389811fe291128d8d91fbd9a6d` |
+| `artifact_registry_report` | `execution-framework/generated/envctl_artifact_registry_report.json` | `d008800edcc5eaea83ae79b045ff3fc3a0e61d16556e254631d892aa0f476c62` |
 | `shared_protocol_schema` | `execution-framework/schemas/shared_protocol.schema.json` | `a897b67a1ec37804d74cbc60eb1360667d823b4661016a76a29906f016275007` |
-| `contract_manifest` | `execution-framework/generated/contract_manifest.json` | `3c2e2a883b6dfc7f135c4dc101484cced9f877191b46bb378f1cc4fcd07e1270` |
-| `req024_proof` | `execution-framework/proof_records/REQ-024_ENVCTL_ARTIFACT_REGISTRY.proof.json` | `fb6103ba1e8ca4c520a43fa3a18bdae971af6296f714f96c9aab6eee34d37d64` |
-| `req040_proof` | `execution-framework/proof_records/REQ-040_SHARED_PROTOCOL_SCHEMAS.proof.json` | `88ecbe9517d4b24401ea1c5bbd072e1472aa0b9938c34e2c210173f521f1bea1` |
+| `contract_manifest` | `execution-framework/generated/contract_manifest.json` | `2f6efd26d5dc2dda57d6bedf923ead6c5ed1dec55d72214455878d657e60e0f0` |
+| `req024_proof` | `execution-framework/proof_records/REQ-024_ENVCTL_ARTIFACT_REGISTRY.proof.json` | `428d30bf165cf3ec749a9efc3b744a1cc66416701b6e08e76628ccc69a3534ed` |
+| `req040_proof` | `execution-framework/proof_records/REQ-040_SHARED_PROTOCOL_SCHEMAS.proof.json` | `f78f872c58c2826a7e83f934fb6c74de47c3377ea8e6374f3f3d281d82388797` |
 
 ## Source Summary
 

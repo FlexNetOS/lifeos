@@ -1,243 +1,61 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS",
-  "status": "completed",
-  "started_at": "2026-07-27T04:44:38+00:00",
-  "completed_at": "2026-07-27T04:44:38+00:00",
-  "actor": "codex-cli-local",
-  "helper_id": "helper-envctl-rollback-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
-  "files_changed": [
-    "execution-framework/scripts/rollback_checkpoints.py",
-    "execution-framework/scripts/verify_rollback_checkpoints.py",
-    "execution-framework/generated/envctl_rollback_checkpoints_report.json",
-    "execution-framework/docs/ENVCTL_ROLLBACK_CHECKPOINTS.md",
-    "execution-framework/state/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.heartbeat.json",
-    "execution-framework/logs/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.log",
-    "execution-framework/proof_records/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.proof.json",
-    "execution-framework/proof_records/proof_ledger.jsonl"
-  ],
-  "commands_run": [
-    "python3 scripts/verify_rollback_checkpoints.py",
-    "python3 -m py_compile scripts/rollback_checkpoints.py scripts/verify_rollback_checkpoints.py"
-  ],
-  "verification_output": {
-    "schema_version": "1.0",
-    "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS",
-    "status": "passed",
-    "generated_at": "2026-07-27T04:44:38+00:00",
-    "fixture": {
-      "run_id": "run-req026",
-      "safe_operation_id": "op-req026-safe",
-      "risky_operation_id": "op-req026-risky"
-    },
-    "counts": {
-      "checkpoint_rows": 2,
-      "rollback_rows": 2,
-      "approval_rows": 1,
-      "approved_rollback_approvals": 1,
-      "event_rows": 8
-    },
-    "coverage": {
-      "checkpoint_rows": true,
-      "idempotent_repeat": true,
-      "rollback_handles": true,
-      "safe_status_transitions": true,
-      "approval_gated_risky_rollback": true,
-      "event_chain": true,
-      "fail_closed_rejections": true
-    },
-    "safe_checkpoint": {
-      "checkpoint_id": "checkpoint-b7e1748bf5a2468bdddc2b20",
-      "run_id": "run-req026",
-      "operation_id": "op-req026-safe",
-      "checkpoint_kind": "artifact_boundary",
-      "checkpoint_ref": "execution-framework/generated/rollback_checkpoints/safe-artifact.json",
-      "checkpoint_hash": "sha256:51c8dd88807da6208ea982acf8ab4d675662b1ae2078f09d341de34fe8de32a6",
-      "metadata": {
-        "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS",
-        "boundary": "before repeatable artifact regeneration",
-        "repeat_safe": true
-      },
-      "inserted": true
-    },
-    "risky_checkpoint": {
-      "checkpoint_id": "checkpoint-ad12010e257fe10528594b89",
-      "run_id": "run-req026",
-      "operation_id": "op-req026-risky",
-      "checkpoint_kind": "pre_operation",
-      "checkpoint_ref": "history/pre_execution_framework_manifest.json",
-      "checkpoint_hash": "sha256:6bd3e9de4004907c01c8bb45e9e400f537140eadb002f3e068606276a875fb49",
-      "metadata": {
-        "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS",
-        "boundary": "before approval-gated target mutation",
-        "repeat_safe": false
-      },
-      "inserted": true
-    },
-    "safe_rollback": {
-      "rollback_id": "rollback-d57988dc47b0f1064b2c40b5",
-      "run_id": "run-req026",
-      "operation_id": "op-req026-safe",
-      "rollback_type": "rerun_from_checkpoint",
-      "status": "succeeded",
-      "plan": {
-        "approval_required": false,
-        "boundary": {
-          "operation_id": "op-req026-safe",
-          "operation_risk": "R2",
-          "run_id": "run-req026"
-        },
-        "checkpoint": {
-          "hash": "sha256:51c8dd88807da6208ea982acf8ab4d675662b1ae2078f09d341de34fe8de32a6",
-          "id": "checkpoint-b7e1748bf5a2468bdddc2b20",
-          "kind": "artifact_boundary",
-          "metadata": {
-            "boundary": "before repeatable artifact regeneration",
-            "repeat_safe": true,
-            "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS"
-          },
-          "ref": "execution-framework/generated/rollback_checkpoints/safe-artifact.json"
-        },
-        "instructions": {
-          "mode": "verify-only",
-          "remove_added_files": []
-        },
-        "non_destructive": true,
-        "reason": "prove repeat/revert boundary for generated artifact operation",
-        "requested_by": "envctl-db-agent",
-        "rollback_type": "rerun_from_checkpoint",
-        "schema_version": "1.0"
-      },
-      "result": {
-        "applied": false,
-        "mode": "verify-only",
-        "verified_checkpoint_hash": "sha256:51c8dd88807da6208ea982acf8ab4d675662b1ae2078f09d341de34fe8de32a6"
-      }
-    },
-    "risky_rollback": {
-      "rollback_id": "rollback-fd6d5b735a13d96ffbd7f2cd",
-      "run_id": "run-req026",
-      "operation_id": "op-req026-risky",
-      "rollback_type": "restore_checkpoint",
-      "status": "planned",
-      "plan": {
-        "approval_required": true,
-        "boundary": {
-          "operation_id": "op-req026-risky",
-          "operation_risk": "R4",
-          "run_id": "run-req026"
-        },
-        "checkpoint": {
-          "hash": "sha256:6bd3e9de4004907c01c8bb45e9e400f537140eadb002f3e068606276a875fb49",
-          "id": "checkpoint-ad12010e257fe10528594b89",
-          "kind": "pre_operation",
-          "metadata": {
-            "boundary": "before approval-gated target mutation",
-            "repeat_safe": false,
-            "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS"
-          },
-          "ref": "history/pre_execution_framework_manifest.json"
-        },
-        "instructions": {
-          "mode": "manual_operator",
-          "restore_ref": "history/pre_execution_framework_manifest.json"
-        },
-        "non_destructive": true,
-        "reason": "approval-gated rollback handle for high-risk operation",
-        "requested_by": "envctl-db-agent",
-        "rollback_type": "restore_checkpoint",
-        "schema_version": "1.0"
-      },
-      "result": null
-    },
-    "checkpoint_rows": [
-      {
-        "id": "checkpoint-ad12010e257fe10528594b89",
-        "run_id": "run-req026",
-        "operation_id": "op-req026-risky",
-        "checkpoint_kind": "pre_operation",
-        "checkpoint_ref": "history/pre_execution_framework_manifest.json",
-        "checkpoint_hash": "sha256:6bd3e9de4004907c01c8bb45e9e400f537140eadb002f3e068606276a875fb49",
-        "metadata_json": "{\"boundary\":\"before approval-gated target mutation\",\"repeat_safe\":false,\"task_id\":\"REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS\"}",
-        "created_at_utc": "2026-07-27T04:44:38.393Z",
-        "metadata": {
-          "boundary": "before approval-gated target mutation",
-          "repeat_safe": false,
-          "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS"
-        }
-      },
-      {
-        "id": "checkpoint-b7e1748bf5a2468bdddc2b20",
-        "run_id": "run-req026",
-        "operation_id": "op-req026-safe",
-        "checkpoint_kind": "artifact_boundary",
-        "checkpoint_ref": "execution-framework/generated/rollback_checkpoints/safe-artifact.json",
-        "checkpoint_hash": "sha256:51c8dd88807da6208ea982acf8ab4d675662b1ae2078f09d341de34fe8de32a6",
-        "metadata_json": "{\"boundary\":\"before repeatable artifact regeneration\",\"repeat_safe\":true,\"task_id\":\"REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS\"}",
-        "created_at_utc": "2026-07-27T04:44:38.393Z",
-        "metadata": {
-          "boundary": "before repeatable artifact regeneration",
-          "repeat_safe": true,
-          "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS"
-        }
-      }
-    ],
-    "rejection_cases": [
-      {
-        "case": "blocked-secret-checkpoint-ref",
-        "status": "rejected",
-        "message": "checkpoint_ref points at a blocked secret/private-key path"
-      },
-      {
-        "case": "operation-run-mismatch",
-        "status": "rejected",
-        "message": "unknown operation: missing-operation"
-      },
-      {
-        "case": "illegal-rollback-transition",
-        "status": "rejected",
-        "message": "illegal rollback transition: succeeded -> running"
-      }
-    ],
-    "event_chain": {
-      "run_id": "run-req026",
-      "event_count": 8,
-      "chain_valid": true,
-      "errors": [],
-      "head_event_hash": "sha256:6855b3ab833eed20bf31981f4b7f97909d27a863f986a24e7cc1edfacd7d218b"
-    },
-    "errors": [],
-    "evidence": [
-      "scripts/rollback_checkpoints.py",
-      "scripts/verify_rollback_checkpoints.py",
-      "generated/envctl_rollback_checkpoints_report.json",
-      "docs/ENVCTL_ROLLBACK_CHECKPOINTS.md",
-      "docs/ENVCTL_DB_SCHEMA.md",
-      "prompts/SECURITY_REPRODUCIBILITY_MODEL.md"
-    ]
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/scripts/rollback_checkpoints.py": "a8fc1af3f83b0c064c5e3bb0ae8f2428427f93cba67e800d4b2491256afe6a3c",
-    "execution-framework/scripts/verify_rollback_checkpoints.py": "2bc2fb37486cadc1e47777a71350ab2a66ca436c6ae376248cee933a555b6837",
-    "execution-framework/generated/envctl_rollback_checkpoints_report.json": "7181548a57ffb9bb7399c3b99f7c39484e4a44b7e8335129aabae5f79b9a0370",
-    "execution-framework/docs/ENVCTL_ROLLBACK_CHECKPOINTS.md": "1b5f4a947250691f373752d7f7cfcac9b834299bd1f94fe9b45083eebcd4922b",
-    "execution-framework/state/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.heartbeat.json": "0a58043ec361987b1c532ce5ac739ccdc953cb1d05bee9b0eec26180942caecb",
-    "execution-framework/logs/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.log": "7181548a57ffb9bb7399c3b99f7c39484e4a44b7e8335129aabae5f79b9a0370",
-    "execution-framework/proof_records/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.proof.json": "919d1e268ce64d45d04e4d22ec4294b8840372f7dc7002c52446cfd9589610f6",
-    "execution-framework/proof_records/proof_ledger.jsonl": "5e4e643f65d0438e32090c258ea3851b182142fba8331a9a3360fbb55d7d8f6a"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS/c7b0525d1469ec112ce8d1c7610ecd8837b804acd498137702a85f91e19280bb/20260727T212655426185Z-22976f511ae4.json": "39a455407215f100e988ea694d9bfa55e5231aadbdc42e0df2297242259cf046"
   },
-  "logs_uri": "logs/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS/20260727T212655426185Z-22976f511ae4 -"
+  ],
+  "completed_at": "2026-07-27T21:27:44.679701Z",
   "evidence": [
-    "scripts/rollback_checkpoints.py",
-    "scripts/verify_rollback_checkpoints.py",
-    "generated/envctl_rollback_checkpoints_report.json",
-    "docs/ENVCTL_ROLLBACK_CHECKPOINTS.md",
-    "docs/ENVCTL_DB_SCHEMA.md",
-    "prompts/SECURITY_REPRODUCIBILITY_MODEL.md"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS/c7b0525d1469ec112ce8d1c7610ecd8837b804acd498137702a85f91e19280bb/20260727T212655426185Z-22976f511ae4.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS/b431d944853878c7131652e4f5d4b5c9c73052cdfe926212ecb37c73e5c4e689.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "run REQ-027 replay engine against rollback checkpoint handles"
+  "files_changed": [],
+  "helper_id": "helper-envctl-rollback-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS/c7b0525d1469ec112ce8d1c7610ecd8837b804acd498137702a85f91e19280bb/logs/20260727T212655426185Z-22976f511ae4",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "${ENVCTL_REPO}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T21:26:55.475290Z",
+  "status": "completed",
+  "task_id": "REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "rollback substrate",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T212655426185Z-22976f511ae4",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS/c7b0525d1469ec112ce8d1c7610ecd8837b804acd498137702a85f91e19280bb/20260727T212655426185Z-22976f511ae4.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "39a455407215f100e988ea694d9bfa55e5231aadbdc42e0df2297242259cf046"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "c7b0525d1469ec112ce8d1c7610ecd8837b804acd498137702a85f91e19280bb",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS/b431d944853878c7131652e4f5d4b5c9c73052cdfe926212ecb37c73e5c4e689.proof.json",
+      "sha256": "b431d944853878c7131652e4f5d4b5c9c73052cdfe926212ecb37c73e5c4e689"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

@@ -1,183 +1,61 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "REQ-024_ENVCTL_ARTIFACT_REGISTRY",
-  "status": "completed",
-  "started_at": "2026-07-27T05:20:03+00:00",
-  "completed_at": "2026-07-27T05:20:03+00:00",
-  "actor": "codex-cli-local",
-  "helper_id": "helper-envctl-artifacts-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
-  "files_changed": [
-    "execution-framework/scripts/artifact_registry.py",
-    "execution-framework/scripts/verify_artifact_registry.py",
-    "execution-framework/generated/envctl_artifact_registry_report.json",
-    "execution-framework/generated/req024_artifact_registry_sample.md",
-    "execution-framework/docs/ENVCTL_ARTIFACT_REGISTRY.md",
-    "execution-framework/state/REQ-024_ENVCTL_ARTIFACT_REGISTRY.heartbeat.json",
-    "execution-framework/logs/REQ-024_ENVCTL_ARTIFACT_REGISTRY.log",
-    "execution-framework/proof_records/REQ-024_ENVCTL_ARTIFACT_REGISTRY.proof.json",
-    "execution-framework/proof_records/proof_ledger.jsonl"
-  ],
-  "commands_run": [
-    "python3 scripts/verify_artifact_registry.py",
-    "python3 -m py_compile scripts/artifact_registry.py scripts/verify_artifact_registry.py"
-  ],
-  "verification_output": {
-    "schema_version": "1.0",
-    "task_id": "REQ-024_ENVCTL_ARTIFACT_REGISTRY",
-    "status": "passed",
-    "generated_at": "2026-07-27T05:20:03+00:00",
-    "registry_result": {
-      "artifact_row_id": "artifact-dfdcd235057309cce430ae2a",
-      "artifact_id": "req024-artifact-registry-sample",
-      "run_id": "run-req024",
-      "path": "execution-framework/generated/req024_artifact_registry_sample.md",
-      "content_hash": "sha256:d83a779c4f5ba4274c455c016193ad62f58d974033e53f9b11a78369cb94cded",
-      "producer_operation_id": "op-req024-register",
-      "contract_id": "contract-req024",
-      "evidence_ids": [
-        "evidence-0013b40d7bdd9d1fc8b917fb",
-        "evidence-b9f684e41f26dba811f10054",
-        "evidence-f9254d640811e68d645b4de9"
-      ],
-      "graph_edge_ids": [
-        "edge-f5e0848675c0cfb0a485cb70",
-        "edge-838bb3e6c96c8425373b2c25",
-        "edge-4f6fe7692f695408f3178d31",
-        "edge-c78a9adacfd645f30577bf3f"
-      ],
-      "validation_ids": [
-        "validation-357c9902e01c44cf503d8ead",
-        "validation-67d0bd1204909ec64b8c0ab1"
-      ]
-    },
-    "artifact_row": {
-      "id": "artifact-dfdcd235057309cce430ae2a",
-      "run_id": "run-req024",
-      "artifact_id": "req024-artifact-registry-sample",
-      "title": "REQ-024 Artifact Registry Sample",
-      "artifact_type": "artifact_registry_smoke",
-      "status": "complete",
-      "path": "execution-framework/generated/req024_artifact_registry_sample.md",
-      "content_hash": "sha256:d83a779c4f5ba4274c455c016193ad62f58d974033e53f9b11a78369cb94cded",
-      "generated_by_operation_id": "op-req024-register",
-      "evidence": {
-        "contract_id": "contract-req024",
-        "evidence_ids": [
-          "evidence-0013b40d7bdd9d1fc8b917fb",
-          "evidence-b9f684e41f26dba811f10054",
-          "evidence-f9254d640811e68d645b4de9"
-        ],
-        "evidence_refs": [
-          "execution-framework/generated/req024_artifact_registry_sample.md",
-          "schemas/artifact_record.schema.json",
-          "expected-output/migration-automation-artifacts.md"
-        ],
-        "producer_operation_id": "op-req024-register",
-        "provenance": {
-          "expected_output": "expected-output/migration-automation-artifacts.md",
-          "owner_agent": "envctl-db-agent",
-          "source_schema": "schemas/artifact_record.schema.json",
-          "task_id": "REQ-024_ENVCTL_ARTIFACT_REGISTRY"
-        },
-        "validation_ids": [
-          "validation-357c9902e01c44cf503d8ead",
-          "validation-67d0bd1204909ec64b8c0ab1"
-        ]
-      },
-      "links": {
-        "contract_id": "contract-req024",
-        "graph_edge_ids": [
-          "edge-f5e0848675c0cfb0a485cb70",
-          "edge-838bb3e6c96c8425373b2c25",
-          "edge-4f6fe7692f695408f3178d31",
-          "edge-c78a9adacfd645f30577bf3f"
-        ],
-        "links": [
-          {
-            "to": "artifact:ART-100_SYSTEM_INVENTORY",
-            "type": "blocks"
-          },
-          {
-            "to": "artifact:Evidence register",
-            "type": "validated_by"
-          },
-          {
-            "to": "artifact:Link graph",
-            "type": "linked_in"
-          }
-        ]
-      }
-    },
-    "summary": {
-      "evidence_count": 3,
-      "graph_edge_count": 4,
-      "validation_count": 2,
-      "rejection_count": 3,
-      "expected_artifact_count": 16,
-      "artifact_index_row": [
-        "req024-artifact-registry-sample",
-        "complete",
-        "execution-framework/generated/req024_artifact_registry_sample.md",
-        "sha256:d83a779c4f5ba4274c455c016193ad62f58d974033e53f9b11a78369cb94cded"
-      ]
-    },
-    "coverage": {
-      "paths": true,
-      "hashes": true,
-      "producers": true,
-      "contract_ids": true,
-      "provenance": true,
-      "validation_links": true,
-      "fail_closed_rejections": true
-    },
-    "rejection_cases": [
-      {
-        "case": "blocked-secret-path",
-        "status": "rejected",
-        "message": "artifact registry path is blocked by policy: execution-framework/secrets/token.txt"
-      },
-      {
-        "case": "content-hash-mismatch",
-        "status": "rejected",
-        "message": "artifact content hash mismatch for execution-framework/generated/req024_artifact_registry_sample.md"
-      },
-      {
-        "case": "foreign-producer-operation",
-        "status": "rejected",
-        "message": "operation does not belong to run: op-does-not-exist"
-      }
-    ],
-    "errors": [],
-    "evidence": [
-      "scripts/artifact_registry.py",
-      "scripts/verify_artifact_registry.py",
-      "generated/envctl_artifact_registry_report.json",
-      "generated/req024_artifact_registry_sample.md",
-      "docs/ENVCTL_ARTIFACT_REGISTRY.md"
-    ]
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/scripts/artifact_registry.py": "275ac5bb7d70daff9060936f5d4d7ffcccba9d8a4123cf13df3a52980d603be0",
-    "execution-framework/scripts/verify_artifact_registry.py": "59faeb415bc932c0868bf8f2ab8ce34e5da3a69907581c07e79409be3cb5a00f",
-    "execution-framework/generated/envctl_artifact_registry_report.json": "d008800edcc5eaea83ae79b045ff3fc3a0e61d16556e254631d892aa0f476c62",
-    "execution-framework/generated/req024_artifact_registry_sample.md": "d83a779c4f5ba4274c455c016193ad62f58d974033e53f9b11a78369cb94cded",
-    "execution-framework/docs/ENVCTL_ARTIFACT_REGISTRY.md": "c41188c30acd5a128793e75cb1768e84ff45bfa6dca501cd08ec8ae512d4deb4",
-    "execution-framework/state/REQ-024_ENVCTL_ARTIFACT_REGISTRY.heartbeat.json": "09881d2a2fe8f893dff296530e8cc9bb6589c70f6a1dce3cefa37cb4b7b1a78d",
-    "execution-framework/logs/REQ-024_ENVCTL_ARTIFACT_REGISTRY.log": "d008800edcc5eaea83ae79b045ff3fc3a0e61d16556e254631d892aa0f476c62",
-    "execution-framework/proof_records/REQ-024_ENVCTL_ARTIFACT_REGISTRY.proof.json": "1f38558f2efc7ae6f941da0ac786d88869075603f913839b683fe509058890b9",
-    "execution-framework/proof_records/proof_ledger.jsonl": "3b0fbb895dcbb2e80eea54ae00d00acb4b3ae34e493449f94dc0ea94d3e03640"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-024_ENVCTL_ARTIFACT_REGISTRY/bb4c2c67e8fa5a5785f196e0ecf32c69ed8508d1a75359ed1872ce02d53d30f3/20260727T212535014129Z-742393d91938.json": "5703b3ca71659cafdbee4bcf4a3607638b7247e2be5c92dd070ae05691f38d3f"
   },
-  "logs_uri": "logs/REQ-024_ENVCTL_ARTIFACT_REGISTRY.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/REQ-024_ENVCTL_ARTIFACT_REGISTRY/20260727T212535014129Z-742393d91938 -"
+  ],
+  "completed_at": "2026-07-27T21:26:23.268787Z",
   "evidence": [
-    "scripts/artifact_registry.py",
-    "scripts/verify_artifact_registry.py",
-    "generated/envctl_artifact_registry_report.json",
-    "generated/req024_artifact_registry_sample.md",
-    "docs/ENVCTL_ARTIFACT_REGISTRY.md"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-024_ENVCTL_ARTIFACT_REGISTRY/bb4c2c67e8fa5a5785f196e0ecf32c69ed8508d1a75359ed1872ce02d53d30f3/20260727T212535014129Z-742393d91938.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-024_ENVCTL_ARTIFACT_REGISTRY/428d30bf165cf3ec749a9efc3b744a1cc66416701b6e08e76628ccc69a3534ed.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "run ART-100_SYSTEM_INVENTORY with artifact registry writes"
+  "files_changed": [],
+  "helper_id": "helper-envctl-artifacts-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-024_ENVCTL_ARTIFACT_REGISTRY/bb4c2c67e8fa5a5785f196e0ecf32c69ed8508d1a75359ed1872ce02d53d30f3/logs/20260727T212535014129Z-742393d91938",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "${ENVCTL_REPO}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T21:25:35.051471Z",
+  "status": "completed",
+  "task_id": "REQ-024_ENVCTL_ARTIFACT_REGISTRY",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "artifact registry",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T212535014129Z-742393d91938",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-024_ENVCTL_ARTIFACT_REGISTRY/bb4c2c67e8fa5a5785f196e0ecf32c69ed8508d1a75359ed1872ce02d53d30f3/20260727T212535014129Z-742393d91938.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "5703b3ca71659cafdbee4bcf4a3607638b7247e2be5c92dd070ae05691f38d3f"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "bb4c2c67e8fa5a5785f196e0ecf32c69ed8508d1a75359ed1872ce02d53d30f3",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-024_ENVCTL_ARTIFACT_REGISTRY/428d30bf165cf3ec749a9efc3b744a1cc66416701b6e08e76628ccc69a3534ed.proof.json",
+      "sha256": "428d30bf165cf3ec749a9efc3b744a1cc66416701b6e08e76628ccc69a3534ed"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

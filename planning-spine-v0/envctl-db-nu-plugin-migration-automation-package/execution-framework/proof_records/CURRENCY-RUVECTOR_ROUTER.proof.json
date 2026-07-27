@@ -1,0 +1,67 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/ef860cfca4101fc1f56d78689e879d109956274e0142f1f8b18b0c271a458c61/20260727T223041339906Z-96f7896a4220.json": "749b06d28b66d2f6426bb6b9f645b822fa3932ebf313273e0a21fe1ba33f585d",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_router/result.json": "c08a0bfec60dfaac90990782a906313a56c0cb4fe5a3057b49734cb6ef4e63c9"
+  },
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'@ruvector/router'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'@ruvector/router'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'@ruvector/router@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'@ruvector/router'\"'\"' version'"
+  ],
+  "completed_at": "2026-07-27T22:30:41.821550Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_router/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/ef860cfca4101fc1f56d78689e879d109956274e0142f1f8b18b0c271a458c61/20260727T223041339906Z-96f7896a4220.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/CURRENCY-RUVECTOR_ROUTER/0d4a496c5d0bc72cdaec1bbfcc4fc8a83b27b0d77bbb3b7c3a67d4403ae705b0.proof.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_router/result.json"
+  ],
+  "helper_id": "helper-currency-ruvector_router",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/ef860cfca4101fc1f56d78689e879d109956274e0142f1f8b18b0c271a458c61/logs/20260727T223041339906Z-96f7896a4220",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T22:30:41.341364Z",
+  "status": "completed",
+  "task_id": "CURRENCY-RUVECTOR_ROUTER",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/currency-ruvector_router/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_router/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T223041339906Z-96f7896a4220",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/ef860cfca4101fc1f56d78689e879d109956274e0142f1f8b18b0c271a458c61/20260727T223041339906Z-96f7896a4220.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "749b06d28b66d2f6426bb6b9f645b822fa3932ebf313273e0a21fe1ba33f585d"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "ef860cfca4101fc1f56d78689e879d109956274e0142f1f8b18b0c271a458c61",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/CURRENCY-RUVECTOR_ROUTER/0d4a496c5d0bc72cdaec1bbfcc4fc8a83b27b0d77bbb3b7c3a67d4403ae705b0.proof.json",
+      "sha256": "0d4a496c5d0bc72cdaec1bbfcc4fc8a83b27b0d77bbb3b7c3a67d4403ae705b0"
+    },
+    "probe_class": "currency",
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

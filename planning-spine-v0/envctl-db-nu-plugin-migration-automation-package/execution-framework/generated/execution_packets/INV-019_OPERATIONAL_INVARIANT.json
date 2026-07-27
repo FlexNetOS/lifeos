@@ -19,7 +19,7 @@
   ],
   "blocks": [],
   "can_run_parallel": true,
-  "command_template": "python3 -c \"import re;t=open('Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md',encoding='utf-8').read();a=len(re.findall(r'^\\\\| A\\\\d{2} \\\\|',t,re.M));d=len(re.findall(r'^#### D\\\\d{2}',t,re.M));raise SystemExit(0 if (a==15 and d==24) else 1)\"",
+  "command_template": "python3 -c \"import re;t=open('../../../Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md',encoding='utf-8').read();a=len(re.findall(r'^\\\\| A\\\\d{2} \\\\|',t,re.M));d=len(re.findall(r'^#### D\\\\d{2}',t,re.M));raise SystemExit(0 if (a==15 and d==24) else 1)\"",
   "completion_gate": "probe exits 0 against the live system; a non-zero exit is a real invariant violation and must not be recorded as pending or proposed",
   "depends_on": [],
   "execution_cell": "anchor-conformance",
@@ -61,5 +61,5 @@
   "target_files": [],
   "task_id": "INV-019_OPERATIONAL_INVARIANT",
   "title": "Invariant 19: All fifteen anchor sections, fourteen source diagrams, and ten operational invariants are represented in th...",
-  "verification_command": "test -f Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  "verification_command": "test -f ../../../Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 }

@@ -1,0 +1,43 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "CURRENCY-AGENTIC_FLOW",
+  "status": "completed",
+  "started_at": "2026-07-27T22:30:41.343327Z",
+  "completed_at": "2026-07-27T22:30:41.923339Z",
+  "actor": "json-task-runner",
+  "helper_id": "helper-currency-agentic_flow",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/migration-artifacts/currency-agentic_flow/result.json"
+  ],
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'agentic-flow'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'agentic-flow'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'agentic\\-flow@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'agentic-flow'\"'\"' version'"
+  ],
+  "verification_output": {
+    "task_completion_proven": true,
+    "implementation_scope": "installed_registry_current_only",
+    "needs_capability_probe": false,
+    "probe_class": "currency",
+    "packet_sha256": "9f4402f5f0d93ee43c4e0ae642ba4c46dceb4779307e26610c5752ecfc572afe",
+    "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+    "run_id": "20260727T212315401740Z-f7b145f5f97d",
+    "attempt_id": "20260727T223041342141Z-6ce0b0f69ca8",
+    "receipt_sha256": "756699b7aaf31f07b0dbe83aa0c11b9dc6a01863c7eb842dcd16cad769f7c437",
+    "command_exit_code": 0,
+    "verification_exit_code": 0
+  },
+  "checksums": {
+    "execution-framework/migration-artifacts/currency-agentic_flow/result.json": "b66be65cefdf47fcd7af4c0c18d02698e6463baa4313a64ba7fb075f60374793",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-AGENTIC_FLOW/9f4402f5f0d93ee43c4e0ae642ba4c46dceb4779307e26610c5752ecfc572afe/20260727T223041342141Z-6ce0b0f69ca8.json": "756699b7aaf31f07b0dbe83aa0c11b9dc6a01863c7eb842dcd16cad769f7c437"
+  },
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-AGENTIC_FLOW/9f4402f5f0d93ee43c4e0ae642ba4c46dceb4779307e26610c5752ecfc572afe/logs/20260727T223041342141Z-6ce0b0f69ca8",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "execution-framework/migration-artifacts/currency-agentic_flow/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-AGENTIC_FLOW/9f4402f5f0d93ee43c4e0ae642ba4c46dceb4779307e26610c5752ecfc572afe/20260727T223041342141Z-6ce0b0f69ca8.json"
+  ],
+  "failure_reason": "",
+  "next_action": "none"
+}

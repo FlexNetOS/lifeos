@@ -19,7 +19,7 @@
   ],
   "blocks": [],
   "can_run_parallel": true,
-  "command_template": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc \"select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='extensions' and p.proname ~ 'branch|cow'\" | awk '{exit ($1>0)?0:1}'",
+  "command_template": "bash -lc 'PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" '\"'\"'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql'\"'\"' -tAc \"select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='\"'\"'extensions'\"'\"' and p.proname ~ '\"'\"'branch|cow'\"'\"'\" | awk '\"'\"'{exit ($1>0)?0:1}'\"'\"''",
   "completion_gate": "probe exits 0 against the live system; a non-zero exit is a real invariant violation and must not be recorded as pending or proposed",
   "depends_on": [],
   "execution_cell": "cow-branching",
@@ -61,5 +61,5 @@
   "target_files": [],
   "task_id": "INV-011_OPERATIONAL_INVARIANT",
   "title": "Invariant 11: COW branches isolate proposals and simulations; witnessed merge gates and pointer promotion select winning ...",
-  "verification_command": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select extensions.ruvector_version()'"
+  "verification_command": "bash -lc 'PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" '\"'\"'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql'\"'\"' -tAc '\"'\"'select extensions.ruvector_version()'\"'\"''"
 }

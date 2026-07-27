@@ -1,49 +1,61 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "REQ-028_ENVCTL_AGENT_CONTROL_API",
-  "status": "completed",
-  "started_at": "2026-07-05T04:50:07+00:00",
-  "completed_at": "2026-07-05T04:50:07+00:00",
-  "actor": "envctl-runner-agent",
-  "helper_id": "helper-envctl-agent-api-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "execution-framework",
-  "files_changed": [
-    "execution-framework/scripts/agent_control_api.py",
-    "execution-framework/scripts/verify_agent_control_api.py",
-    "execution-framework/generated/envctl_agent_control_report.json",
-    "execution-framework/docs/ENVCTL_AGENT_CONTROL_API.md",
-    "execution-framework/logs/REQ-028_ENVCTL_AGENT_CONTROL_API.log",
-    "execution-framework/state/REQ-028_ENVCTL_AGENT_CONTROL_API.heartbeat.json"
-  ],
-  "commands_run": [
-    "python3 scripts/verify_agent_control_api.py",
-    "python3 -m py_compile scripts/agent_control_api.py scripts/verify_agent_control_api.py"
-  ],
-  "verification_output": {
-    "agent_control_report": "generated/envctl_agent_control_report.json",
-    "status": "pass",
-    "event_chain_valid": true,
-    "cli_smoke_passed": true,
-    "open_approvals": 0,
-    "operation_count": 4
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/scripts/agent_control_api.py": "c6450006ac22e6aa6608d9436a79bf8e8a4962e568d43bb6f1d37b543225fd7e",
-    "execution-framework/scripts/verify_agent_control_api.py": "ed1d259322dfba411a4beadfd1a0a240e338dfabe98be20333740a312f538e0b",
-    "execution-framework/generated/envctl_agent_control_report.json": "791d1fa69aa046a4b7bcd58c510416b3b904d7eb407a244d9673d317198ca2e2",
-    "execution-framework/docs/ENVCTL_AGENT_CONTROL_API.md": "93bd9d0967d9ed4c6dd7817235e72eff97e72980f62ecee31e930dbaf4a664c6",
-    "execution-framework/logs/REQ-028_ENVCTL_AGENT_CONTROL_API.log": "539b53cba3d22a94e73c271189c1d90217a0cc33ef462eb7912fcdb0f3b20296",
-    "execution-framework/state/REQ-028_ENVCTL_AGENT_CONTROL_API.heartbeat.json": "9b2e0eb1cea588d8d3068de03615740f5091c33ae8b7d0b3d5f7bb2d09478868"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-028_ENVCTL_AGENT_CONTROL_API/46c2238a851e59af30fcb77fcce4172ca45ada9cde8e84a0ffb5d28034a08df2/20260727T213201898392Z-a25e4e37fe55.json": "38cadc72fd002f5a15e61c16a780f93c4165c3f08dc17d8e44b0ab19b63cb542"
   },
-  "logs_uri": "logs/REQ-028_ENVCTL_AGENT_CONTROL_API.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/REQ-028_ENVCTL_AGENT_CONTROL_API/20260727T213201898392Z-a25e4e37fe55 -"
+  ],
+  "completed_at": "2026-07-27T21:32:38.362453Z",
   "evidence": [
-    "generated/envctl_agent_control_report.json",
-    "docs/ENVCTL_AGENT_CONTROL_API.md",
-    "logs/REQ-028_ENVCTL_AGENT_CONTROL_API.log",
-    "state/REQ-028_ENVCTL_AGENT_CONTROL_API.heartbeat.json"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-028_ENVCTL_AGENT_CONTROL_API/46c2238a851e59af30fcb77fcce4172ca45ada9cde8e84a0ffb5d28034a08df2/20260727T213201898392Z-a25e4e37fe55.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-028_ENVCTL_AGENT_CONTROL_API/f67d7e8991f23c72144ce377f0930ef2592c918622b62d56ae6f085907ddc79e.proof.json"
   ],
   "failure_reason": "",
-  "next_action": ""
+  "files_changed": [],
+  "helper_id": "helper-envctl-agent-api-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-028_ENVCTL_AGENT_CONTROL_API/46c2238a851e59af30fcb77fcce4172ca45ada9cde8e84a0ffb5d28034a08df2/logs/20260727T213201898392Z-a25e4e37fe55",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "${ENVCTL_REPO}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T21:32:01.947395Z",
+  "status": "completed",
+  "task_id": "REQ-028_ENVCTL_AGENT_CONTROL_API",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "agent control API",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T213201898392Z-a25e4e37fe55",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-028_ENVCTL_AGENT_CONTROL_API/46c2238a851e59af30fcb77fcce4172ca45ada9cde8e84a0ffb5d28034a08df2/20260727T213201898392Z-a25e4e37fe55.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "38cadc72fd002f5a15e61c16a780f93c4165c3f08dc17d8e44b0ab19b63cb542"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "46c2238a851e59af30fcb77fcce4172ca45ada9cde8e84a0ffb5d28034a08df2",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-028_ENVCTL_AGENT_CONTROL_API/f67d7e8991f23c72144ce377f0930ef2592c918622b62d56ae6f085907ddc79e.proof.json",
+      "sha256": "f67d7e8991f23c72144ce377f0930ef2592c918622b62d56ae6f085907ddc79e"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

@@ -1,65 +1,61 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "REQ-044_INSTALL_BOOTSTRAP",
-  "status": "completed",
-  "started_at": "2026-07-27T04:41:25+00:00",
-  "completed_at": "2026-07-27T04:41:25+00:00",
-  "actor": "codex-cli-local",
-  "helper_id": "helper-bootstrap-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
-  "files_changed": [
-    "execution-framework/README.md",
-    "execution-framework/scripts/verify_install_bootstrap.py",
-    "execution-framework/docs/INSTALL_BOOTSTRAP.md",
-    "execution-framework/generated/install_bootstrap_manifest.json",
-    "execution-framework/state/REQ-044_INSTALL_BOOTSTRAP.heartbeat.json",
-    "execution-framework/logs/REQ-044_INSTALL_BOOTSTRAP.log",
-    "execution-framework/proof_records/REQ-044_INSTALL_BOOTSTRAP.proof.json"
-  ],
-  "commands_run": [
-    "python3 scripts/verify_install_bootstrap.py"
-  ],
-  "verification_output": {
-    "schema_version": "1.0",
-    "task_id": "REQ-044_INSTALL_BOOTSTRAP",
-    "status": "passed",
-    "generated_at": "2026-07-27T04:41:25+00:00",
-    "summary": {
-      "source_file_count": 3,
-      "install_target_count": 2,
-      "command_template_count": 4
-    },
-    "command_template_ids": [
-      "install-into-repos",
-      "run-codex-master-prompt",
-      "run-single-execution-packet",
-      "run-background-helper"
-    ],
-    "errors": [],
-    "evidence": [
-      "execution-framework/docs/INSTALL_BOOTSTRAP.md",
-      "execution-framework/generated/install_bootstrap_manifest.json",
-      "execution-framework/state/REQ-044_INSTALL_BOOTSTRAP.heartbeat.json",
-      "execution-framework/logs/REQ-044_INSTALL_BOOTSTRAP.log"
-    ]
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/README.md": "d1820c96e40715379cce7707c5a7763d983ee3f8cc46d63392aeff99d80a79de",
-    "execution-framework/scripts/verify_install_bootstrap.py": "975526eb275c9ce82b8a1e491b3d9d4f21f6d0d37d87e4a0872007f571839b14",
-    "execution-framework/docs/INSTALL_BOOTSTRAP.md": "ff956152555f945088b37dc92686408a5114d4a3e72ccb56bb8ccd6bdcceb92b",
-    "execution-framework/generated/install_bootstrap_manifest.json": "48cac6e7904a593dae61a9ee10ae2a1ba3b27e1ff1a39c685886cce0deb258c5",
-    "execution-framework/state/REQ-044_INSTALL_BOOTSTRAP.heartbeat.json": "cca4285b572ae71a7334f6e91258319164c6d67df4671846e25265067f3c9126",
-    "execution-framework/logs/REQ-044_INSTALL_BOOTSTRAP.log": "8c82f3e54f0b2592fa06dafc5331f5fa174c9e91d3209ce6f7ca999858890f8f"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-044_INSTALL_BOOTSTRAP/2b3cd81ca1c8fdc819ea58973edf77e9c47e29916b0d152b002f52e2f2d112cf/20260727T213201903493Z-a258a5548fe1.json": "726f6aff81a5a9477c96872c352b179d65884ff9eccdab3d4f5c4d3fda3af6a5"
   },
-  "logs_uri": "logs/REQ-044_INSTALL_BOOTSTRAP.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/REQ-044_INSTALL_BOOTSTRAP/20260727T213201903493Z-a258a5548fe1 -"
+  ],
+  "completed_at": "2026-07-27T21:32:39.109780Z",
   "evidence": [
-    "execution-framework/docs/INSTALL_BOOTSTRAP.md",
-    "execution-framework/generated/install_bootstrap_manifest.json",
-    "execution-framework/state/REQ-044_INSTALL_BOOTSTRAP.heartbeat.json",
-    "execution-framework/logs/REQ-044_INSTALL_BOOTSTRAP.log"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-044_INSTALL_BOOTSTRAP/2b3cd81ca1c8fdc819ea58973edf77e9c47e29916b0d152b002f52e2f2d112cf/20260727T213201903493Z-a258a5548fe1.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-044_INSTALL_BOOTSTRAP/786cf9331edde0f40c3c299d722ab1d42f947528b8ddcb4f822ddcebb76c78a7.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "run REQ-045_RUN_REPLAY with generated install/bootstrap command templates"
+  "files_changed": [],
+  "helper_id": "helper-bootstrap-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-044_INSTALL_BOOTSTRAP/2b3cd81ca1c8fdc819ea58973edf77e9c47e29916b0d152b002f52e2f2d112cf/logs/20260727T213201903493Z-a258a5548fe1",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "..",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T21:32:01.947326Z",
+  "status": "completed",
+  "task_id": "REQ-044_INSTALL_BOOTSTRAP",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "install bootstrap",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T213201903493Z-a258a5548fe1",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-044_INSTALL_BOOTSTRAP/2b3cd81ca1c8fdc819ea58973edf77e9c47e29916b0d152b002f52e2f2d112cf/20260727T213201903493Z-a258a5548fe1.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "726f6aff81a5a9477c96872c352b179d65884ff9eccdab3d4f5c4d3fda3af6a5"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "2b3cd81ca1c8fdc819ea58973edf77e9c47e29916b0d152b002f52e2f2d112cf",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-044_INSTALL_BOOTSTRAP/786cf9331edde0f40c3c299d722ab1d42f947528b8ddcb4f822ddcebb76c78a7.proof.json",
+      "sha256": "786cf9331edde0f40c3c299d722ab1d42f947528b8ddcb4f822ddcebb76c78a7"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

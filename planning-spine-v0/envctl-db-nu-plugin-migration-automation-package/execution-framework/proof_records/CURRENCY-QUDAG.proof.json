@@ -1,0 +1,67 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-QUDAG/7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03/20260727T223042177666Z-346f8dc56f7e.json": "a34637de268a036ceddf242b08c2d841530289f273d6aa75fcdcd29b6390a566",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-qudag/result.json": "3a58602039092d8dfb802239196f942827aa335f9c11532f5d03adfbe72e87b7"
+  },
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'qudag'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'qudag'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'qudag@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'qudag'\"'\"' version'"
+  ],
+  "completed_at": "2026-07-27T22:30:42.710949Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-qudag/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-QUDAG/7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03/20260727T223042177666Z-346f8dc56f7e.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/CURRENCY-QUDAG/fc6d6a719ae7c19591aebcb4c0617530b6295f639813631c1b4b690c6d6bb5d5.proof.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-qudag/result.json"
+  ],
+  "helper_id": "helper-currency-qudag",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-QUDAG/7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03/logs/20260727T223042177666Z-346f8dc56f7e",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T22:30:42.178816Z",
+  "status": "completed",
+  "task_id": "CURRENCY-QUDAG",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/currency-qudag/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-qudag/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T223042177666Z-346f8dc56f7e",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-QUDAG/7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03/20260727T223042177666Z-346f8dc56f7e.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "a34637de268a036ceddf242b08c2d841530289f273d6aa75fcdcd29b6390a566"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/CURRENCY-QUDAG/fc6d6a719ae7c19591aebcb4c0617530b6295f639813631c1b4b690c6d6bb5d5.proof.json",
+      "sha256": "fc6d6a719ae7c19591aebcb4c0617530b6295f639813631c1b4b690c6d6bb5d5"
+    },
+    "probe_class": "currency",
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

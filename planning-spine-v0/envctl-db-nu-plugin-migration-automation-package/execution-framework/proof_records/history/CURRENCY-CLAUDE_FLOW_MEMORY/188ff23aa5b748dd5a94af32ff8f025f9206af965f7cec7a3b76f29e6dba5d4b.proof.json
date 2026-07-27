@@ -1,0 +1,43 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "CURRENCY-CLAUDE_FLOW_MEMORY",
+  "status": "completed",
+  "started_at": "2026-07-27T22:30:40.556722Z",
+  "completed_at": "2026-07-27T22:30:41.088719Z",
+  "actor": "json-task-runner",
+  "helper_id": "helper-currency-claude_flow_memory",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/migration-artifacts/currency-claude_flow_memory/result.json"
+  ],
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'@claude-flow/memory'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'@claude-flow/memory'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'@claude\\-flow/memory@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'@claude-flow/memory'\"'\"' version'"
+  ],
+  "verification_output": {
+    "task_completion_proven": true,
+    "implementation_scope": "installed_registry_current_only",
+    "needs_capability_probe": false,
+    "probe_class": "currency",
+    "packet_sha256": "4b2c50f71a8d66e12e559937be44c20ded9cd7aa78ed7a05a0ecd5cc3f65258c",
+    "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+    "run_id": "20260727T212315401740Z-f7b145f5f97d",
+    "attempt_id": "20260727T223040554552Z-6199b8c08cb0",
+    "receipt_sha256": "58a883f5b9ec47a0c97165b58c2556ea3c76a14cfeb6a4b6171f2da2ba7bb060",
+    "command_exit_code": 0,
+    "verification_exit_code": 0
+  },
+  "checksums": {
+    "execution-framework/migration-artifacts/currency-claude_flow_memory/result.json": "96448a726b6bc2378dceea74f2dcb9521ec1b30041704ea216cc6ac50b8bd910",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW_MEMORY/4b2c50f71a8d66e12e559937be44c20ded9cd7aa78ed7a05a0ecd5cc3f65258c/20260727T223040554552Z-6199b8c08cb0.json": "58a883f5b9ec47a0c97165b58c2556ea3c76a14cfeb6a4b6171f2da2ba7bb060"
+  },
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW_MEMORY/4b2c50f71a8d66e12e559937be44c20ded9cd7aa78ed7a05a0ecd5cc3f65258c/logs/20260727T223040554552Z-6199b8c08cb0",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "execution-framework/migration-artifacts/currency-claude_flow_memory/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW_MEMORY/4b2c50f71a8d66e12e559937be44c20ded9cd7aa78ed7a05a0ecd5cc3f65258c/20260727T223040554552Z-6199b8c08cb0.json"
+  ],
+  "failure_reason": "",
+  "next_action": "none"
+}

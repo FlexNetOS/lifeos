@@ -62,6 +62,10 @@ chrono = { version = "0.4", default-features = false, features = ["std", "clock"
 # Legacy file imports are retained byte-for-byte in PostgreSQL with a stable
 # SHA-256 identity before their source file is retired.
 sha2 = { version = "0.10", optional = true }
+# PostgreSQL stores fixed-width SHAKE256-256 witnesses supplied by envctl.
+# Keeping the digest implementation in the storage feature lets tests and
+# authorized callers produce those witnesses without mislabelling SHA-256.
+sha3 = { version = "0.10", optional = true }
 
 [features]
 # Default keeps the HTTP transport on — daemon + Tauri shell both need it.
@@ -75,7 +79,7 @@ mcp-http = ["dep:reqwest"]
 plugin-host = ["dep:mlua"]
 # PostgreSQL/RuVector canonical storage. ESP32 consumers turn it off with
 # `default-features = false`.
-storage = ["dep:sqlx", "dep:tokio", "dep:chrono", "dep:sha2"]
+storage = ["dep:sqlx", "dep:tokio", "dep:chrono", "dep:sha2", "dep:sha3"]
 # One-way, read-only SQLite import used only to retire pre-cutover app-data
 # databases into PostgreSQL. It is deliberately separate from `storage`: no
 # new product record may be written to SQLite after the import completes.

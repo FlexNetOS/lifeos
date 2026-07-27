@@ -1,65 +1,62 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "REQ-050_DB_MODULE_SCAFFOLD",
-  "status": "passed",
-  "started_at": "2026-07-27T03:38:28Z",
-  "completed_at": "2026-07-27T11:58:51Z",
-  "actor": "codex-cli-background-shell",
-  "helper_id": "helper-req-050_db_module_scaffold",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/meta/src/envctl",
-  "repo_head": "dbcc8374a9502773670ba6cb40f6cdb08c337750",
-  "files_changed": [
-    "execution-framework/heartbeats/REQ-050_DB_MODULE_SCAFFOLD.heartbeat",
-    "execution-framework/logs/REQ-050_DB_MODULE_SCAFFOLD.log",
-    "execution-framework/proof_records/REQ-050_DB_MODULE_SCAFFOLD.proof.json"
-  ],
-  "target_state": {
-    "origin_commit": "f6659ba1e7c5d6f67f91f80b98360f0d9c964055",
-    "target_diff_clean": true,
-    "modules_tracked": [
-      "crates/engine/src/db.rs",
-      "crates/engine/src/db_index.rs",
-      "crates/engine/src/db_query.rs",
-      "crates/engine/src/db_symbols.rs",
-      "crates/engine/src/db_refactor.rs",
-      "crates/engine/src/db_deploy.rs"
-    ],
-    "lib_exports_present": true
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-050_DB_MODULE_SCAFFOLD/0dac883058cfe75ae790e0c86a8f572b170ecb4096b50e21cebcbf8b28ae44e6/20260727T122222954683Z-96f265b77604.json": "2a8312aeb491a83ed0cfc1dfef278566a2e86896edc3c401759ece1b6bc03ca6"
   },
   "commands_run": [
-    "rtk git-kb code symbols --file crates/engine/src/db.rs --json",
-    "rtk git diff -- <declared target files>",
-    "rtk git status --short -- <declared target files>",
-    "rtk cargo build -p envctl-engine",
-    "rtk cargo test -p envctl-engine db::tests::scaffold_seams_are_wired_and_fail_closed -- --exact",
-    "rtk git ls-files <declared target files>",
-    "rtk git show --stat --oneline f6659ba -- <declared target files>"
+    "codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --cd /run/user/1001/lifeos-json-task-runner/20260727T033323851132Z-b4e24d277985/REQ-050_DB_MODULE_SCAFFOLD/20260727T122222954683Z-96f265b77604 -",
+    "/bin/bash -lc 'cargo build -p envctl-engine'"
   ],
-  "verification_output": {
-    "command": "cargo build -p envctl-engine",
-    "status": "passed",
-    "output": "Finished dev profile [unoptimized + debuginfo] target(s) in 0.14s",
-    "scaffold_test": "1 passed; 0 failed; 347 filtered out"
-  },
-  "checksums": {
-    "crates/engine/src/db.rs": "a1149859853802d4f363325967c975d18a19924d3a06bc4a11cd13b3b3a36ac8",
-    "crates/engine/src/db_index.rs": "835a6da560c5010162d0a02ad5c1aabf05741b92532c30f18b5a0875213838d0",
-    "crates/engine/src/db_query.rs": "bb51f8509f7aab0d9dea8ae0dc2051a48a289b5c4297b0222a1ac153144f9e79",
-    "crates/engine/src/db_symbols.rs": "3ee884f0aea802b76efe52e49d3de07ed7b3443bcbf9d821be7109c5b5534bc7",
-    "crates/engine/src/db_refactor.rs": "59b7c9661312add995ca3ac6c0ccceb1356344df2331a424f3288ca50d2ff6d9",
-    "crates/engine/src/db_deploy.rs": "76c92d4d32b3604cd9d77cb168f59124392e9cfa97938d6fef286df4c4d1e1db",
-    "crates/engine/src/lib.rs": "663ed50894fcc245117b00eddbccb6c611accdccfecb51e02cdf57b5cfd2bb0e"
-  },
-  "logs_uri": "execution-framework/logs/REQ-050_DB_MODULE_SCAFFOLD.log",
-  "heartbeat_uri": "execution-framework/heartbeats/REQ-050_DB_MODULE_SCAFFOLD.heartbeat",
-  "rollback_point": "No target-file changes were made; the requested implementation remains at origin commit f6659ba1e7c5d6f67f91f80b98360f0d9c964055.",
+  "completed_at": "2026-07-27T12:24:57.087933Z",
   "evidence": [
-    "All six requested db modules and crates/engine/src/lib.rs are tracked and clean at HEAD.",
-    "Commit f6659ba introduced the complete requested module tree and exports.",
-    "The exact completion gate cargo build -p envctl-engine exits 0.",
-    "The scaffold seam test exits 0."
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-050_DB_MODULE_SCAFFOLD/0dac883058cfe75ae790e0c86a8f572b170ecb4096b50e21cebcbf8b28ae44e6/20260727T122222954683Z-96f265b77604.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-050_DB_MODULE_SCAFFOLD/26b0dc8e72d6b52e9a9826e6742da8259974817a58ca18cbdd595672183207fc.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "Unblock dependent tasks REQ-051_MULTI_ROOT_MODEL and REQ-052_FILE_INDEX."
+  "files_changed": [],
+  "helper_id": "helper-req-050_db_module_scaffold",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-050_DB_MODULE_SCAFFOLD/0dac883058cfe75ae790e0c86a8f572b170ecb4096b50e21cebcbf8b28ae44e6/logs/20260727T122222954683Z-96f265b77604",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": "${ENVCTL_REPO}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T12:22:22.957796Z",
+  "status": "completed",
+  "task_id": "REQ-050_DB_MODULE_SCAFFOLD",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "engine db module tree",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T122222954683Z-96f265b77604",
+      "graph_sha256": "c1191ba7886c0a1ac8e854b54601dc7772c29d1653645636c107e3472e2efb6c",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-050_DB_MODULE_SCAFFOLD/0dac883058cfe75ae790e0c86a8f572b170ecb4096b50e21cebcbf8b28ae44e6/20260727T122222954683Z-96f265b77604.json",
+      "run_id": "20260727T033323851132Z-b4e24d277985",
+      "sha256": "2a8312aeb491a83ed0cfc1dfef278566a2e86896edc3c401759ece1b6bc03ca6"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "0dac883058cfe75ae790e0c86a8f572b170ecb4096b50e21cebcbf8b28ae44e6",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-050_DB_MODULE_SCAFFOLD/26b0dc8e72d6b52e9a9826e6742da8259974817a58ca18cbdd595672183207fc.proof.json",
+      "sha256": "26b0dc8e72d6b52e9a9826e6742da8259974817a58ca18cbdd595672183207fc"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
 }

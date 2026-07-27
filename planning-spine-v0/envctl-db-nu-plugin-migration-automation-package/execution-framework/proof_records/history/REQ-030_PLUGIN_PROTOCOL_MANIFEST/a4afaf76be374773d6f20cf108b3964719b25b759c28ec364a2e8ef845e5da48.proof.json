@@ -1,0 +1,56 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "REQ-030_PLUGIN_PROTOCOL_MANIFEST",
+  "status": "completed",
+  "started_at": "2026-07-27T03:35:00Z",
+  "completed_at": "2026-07-27T03:39:03Z",
+  "actor": "codex-cli-local",
+  "helper_id": "helper-nu-manifest-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "/home/flexnetos/Downloads/nu_plugin",
+  "files_changed": [
+    "manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json",
+    "execution-framework/proof_records/REQ-030_PLUGIN_PROTOCOL_MANIFEST.proof.json",
+    "execution-framework/state/REQ-030_PLUGIN_PROTOCOL_MANIFEST.heartbeat.json",
+    "execution-framework/logs/REQ-030_PLUGIN_PROTOCOL_MANIFEST.log"
+  ],
+  "commands_run": [
+    "git-kb code symbols \"nu plugin command manifest\" --json",
+    "git-kb search \"REQ-030 nu plugin manifest\" --json",
+    "cargo metadata --no-deps --format-version 1 --manifest-path /home/flexnetos/Downloads/nu_plugin/Cargo.toml",
+    "python3 task-specific schema and contract validation",
+    "jq -e . /home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json"
+  ],
+  "verification_output": {
+    "status": "passed",
+    "manifest": "/home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json",
+    "schema": "schemas/nu_plugin_command_manifest.schema.json",
+    "plugin_name": "nu_plugin_codedb",
+    "nu_plugin_version": "0.1.0",
+    "command_count": 23,
+    "read_command_count": 15,
+    "mutating_command_count": 8,
+    "contract_command_count": 23,
+    "missing_contract_commands": [],
+    "mutation_endpoint_violations": [],
+    "notes": [
+      "All required NU_PLUGIN_CONTRACT commands are represented.",
+      "Every mutating command delegates to envctl with --emit-event.",
+      "Every command declares a Nushell-native table or record shape and named columns.",
+      "The initial jsonschema Python import was unavailable; validation was completed with an exact task-specific validator over every constraint in the locked schema."
+    ]
+  },
+  "checksums": {
+    "/home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json": "9abdd56be395951c44aa5da6ec6d4750af70af89a7d0bb60fd1ef0262b94a83b"
+  },
+  "logs_uri": "logs/REQ-030_PLUGIN_PROTOCOL_MANIFEST.log",
+  "rollback_point": "Remove /home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json; no existing plugin source files were modified.",
+  "evidence": [
+    "/home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json",
+    "schemas/nu_plugin_command_manifest.schema.json",
+    "prompts/NU_PLUGIN_CONTRACT.md",
+    "logs/REQ-030_PLUGIN_PROTOCOL_MANIFEST.log"
+  ],
+  "failure_reason": "",
+  "next_action": "REQ-041_TWO_REPO_INTEGRATION may consume the manifest."
+}

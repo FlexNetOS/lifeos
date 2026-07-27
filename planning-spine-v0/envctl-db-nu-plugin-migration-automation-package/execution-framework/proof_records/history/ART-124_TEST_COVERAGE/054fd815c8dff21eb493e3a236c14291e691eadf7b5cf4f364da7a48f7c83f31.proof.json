@@ -1,0 +1,75 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "ART-124_TEST_COVERAGE",
+  "status": "completed",
+  "started_at": "2026-07-27T21:39:17+00:00",
+  "completed_at": "2026-07-27T21:39:17+00:00",
+  "actor": "codex-cli-local",
+  "helper_id": "helper-artifact-25",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
+  "files_changed": [
+    "execution-framework/scripts/generate_art124_test_coverage.py",
+    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md",
+    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json",
+    "execution-framework/migration-artifacts/06-testing-validation/test-coverage-matrix.md",
+    "execution-framework/generated/art124_test_coverage_report.json",
+    "execution-framework/logs/ART-124_TEST_COVERAGE.log",
+    "execution-framework/state/ART-124_TEST_COVERAGE.heartbeat.json",
+    "execution-framework/proof_records/ART-124_TEST_COVERAGE.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl"
+  ],
+  "commands_run": [
+    "python3 scripts/generate_art124_test_coverage.py",
+    "python3 -m py_compile scripts/generate_art124_test_coverage.py"
+  ],
+  "verification_output": {
+    "status": "passed",
+    "covered_class_count": 6,
+    "automation_status_counts": {
+      "ready": 2,
+      "partial": 2,
+      "planned": 2
+    },
+    "artifact_index_rows": 3,
+    "validation_scorecard_row": [
+      15,
+      0,
+      0,
+      0,
+      0
+    ],
+    "replay_readiness_row": [
+      1,
+      0,
+      0,
+      0
+    ]
+  },
+  "checksums": {
+    "execution-framework/scripts/generate_art124_test_coverage.py": "22e387745be1addc7e1977dc099eef9876b7f9944f3161a57f463b2bde97ae78",
+    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md": "5291596b072a429a5bacd658f114f6509f2ab046f39ef3be1c8f4272641d243c",
+    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json": "c7dc7c47b1b3d3bf1ea2bac96735eac2fa341fd8221f9698459809545067b87d",
+    "execution-framework/migration-artifacts/06-testing-validation/test-coverage-matrix.md": "5291596b072a429a5bacd658f114f6509f2ab046f39ef3be1c8f4272641d243c",
+    "execution-framework/generated/art124_test_coverage_report.json": "4a7d6772877e7b60fc94472273fb1200a95e73945548dac2dafca4c34a9acdd9",
+    "execution-framework/logs/ART-124_TEST_COVERAGE.log": "4a7d6772877e7b60fc94472273fb1200a95e73945548dac2dafca4c34a9acdd9",
+    "execution-framework/state/ART-124_TEST_COVERAGE.heartbeat.json": "94d96c480d1b629b17812d03d86f9e5b4302520ae71ea5c95c97bb8a82a471ac",
+    "execution-framework/proof_records/ART-124_TEST_COVERAGE.proof.json": "b521125bd79a4cb09a08eab8f15aa9f280aedffa69b4e08eee469e78428dd1e3",
+    "execution-framework/proof_records/proof_ledger.jsonl": "04e3a1c141280a204b0ef6c79b90d27d709e7a6c20643a65cd00955cab3713d8"
+  },
+  "logs_uri": "logs/ART-124_TEST_COVERAGE.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md",
+    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json",
+    "execution-framework/migration-artifacts/06-testing-validation/test-coverage-matrix.md",
+    "execution-framework/generated/art124_test_coverage_report.json",
+    "execution-framework/generated/envctl_artifact_registry_report.json",
+    "execution-framework/generated/envctl_validation_evidence_report.json",
+    "execution-framework/generated/shared_protocol_validation_report.json",
+    "execution-framework/generated/status_from_proofs.json",
+    "execution-framework/generated/contract_manifest.json"
+  ],
+  "failure_reason": "",
+  "next_action": "run VER-300_UNIT_VALIDATION to execute the coverage matrix against runtime fixtures"
+}

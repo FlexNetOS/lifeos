@@ -1,0 +1,72 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "EF-006_TASK_GRAPH_TO_PACKETS",
+  "status": "completed",
+  "started_at": "2026-07-27T22:53:16+00:00",
+  "completed_at": "2026-07-27T22:53:16+00:00",
+  "actor": "local-execution-framework",
+  "helper_id": "helper-packet-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/generated/execution_manifest.json",
+    "execution-framework/generated/execution_packets/EF-001_SCAN_PACKAGE.json",
+    "execution-framework/generated/execution_packets/EF-002_GAP_REPORT.json",
+    "execution-framework/generated/execution_packets/EF-003_APPLY_FRAMEWORK.json",
+    "execution-framework/generated/execution_packets/EF-004_GENERATE_TASK_GRAPH.json",
+    "execution-framework/generated/execution_packets/EF-005_VALIDATE_TASK_GRAPH.json",
+    "execution-framework/generated/execution_packets/EF-006_TASK_GRAPH_TO_PACKETS.json",
+    "execution-framework/generated/execution_packets/EF-007_GOAL_LOOP.json",
+    "execution-framework/generated/execution_packets/EF-008_VERIFY_HISTORY_COMPLETENESS.json",
+    "execution-framework/generated/execution_packets/REQ-010_CONTRACT_LOCK.json",
+    "execution-framework/generated/execution_packets/REQ-020_ENVCTL_DB_SCHEMA.json",
+    "execution-framework/generated/execution_packets/REQ-021_ENVCTL_TARGET_REGISTRY.json",
+    "execution-framework/generated/execution_packets/REQ-022_ENVCTL_RUN_LEDGER.json",
+    "execution-framework/generated/execution_packets/REQ-023_ENVCTL_OPERATION_STATE.json",
+    "execution-framework/generated/execution_packets/REQ-024_ENVCTL_ARTIFACT_REGISTRY.json",
+    "execution-framework/generated/execution_packets/REQ-025_ENVCTL_VALIDATION_EVIDENCE.json",
+    "execution-framework/generated/execution_packets/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.json",
+    "execution-framework/generated/execution_packets/REQ-027_ENVCTL_REPLAY_ENGINE.json",
+    "execution-framework/generated/execution_packets/REQ-028_ENVCTL_AGENT_CONTROL_API.json",
+    "execution-framework/generated/execution_packets/REQ-030_PLUGIN_PROTOCOL_MANIFEST.json",
+    "execution-framework/generated/execution_packets/REQ-031_PLUGIN_COMMAND_SURFACE.json"
+  ],
+  "commands_run": [
+    "python3 scripts/task_graph_to_packets.py generated/task_graph.csv"
+  ],
+  "verification_output": {
+    "packet_count": 763,
+    "manifest": "generated/execution_manifest.json"
+  },
+  "checksums": {
+    "execution-framework/generated/execution_manifest.json": "7f067fe8dd1a838b4c2183dfde3d74c7aa8c2ab1e89f4067d4c734302f9e8560",
+    "execution-framework/generated/execution_packets/EF-001_SCAN_PACKAGE.json": "b4aa3a74f5d6696d2ceb687de6b10441cdb2df367cfcbff1de70c515195557c7",
+    "execution-framework/generated/execution_packets/EF-002_GAP_REPORT.json": "69967b9c6390e5b3925dfea63dfeb3dc9612a319b9c89b933c66e98c018c604a",
+    "execution-framework/generated/execution_packets/EF-003_APPLY_FRAMEWORK.json": "4399a56c7a685584e1e24c73e473413ca7bc9bbab23d1ab1128c418fa196bc6a",
+    "execution-framework/generated/execution_packets/EF-004_GENERATE_TASK_GRAPH.json": "f65719087f605e2af595129860aa3f2142b8e5093a7f90a79a197fcbde4bf063",
+    "execution-framework/generated/execution_packets/EF-005_VALIDATE_TASK_GRAPH.json": "6ec7dafbb343a555aad0e1d577f50a9c99a3da3abece0616aeca25cc371634de",
+    "execution-framework/generated/execution_packets/EF-006_TASK_GRAPH_TO_PACKETS.json": "35e009f857f7658fd5460ab29f717acbcb95adea64ab110a6e79491aba1da698",
+    "execution-framework/generated/execution_packets/EF-007_GOAL_LOOP.json": "000a45133e27704aa8cdc1af1266f90224e6ec6cc0888a3a5c02b9fc09d58501",
+    "execution-framework/generated/execution_packets/EF-008_VERIFY_HISTORY_COMPLETENESS.json": "09353bfc0c37f09ad652c00a186ab2aeecf277a5307b818c7da7271af4941cc7",
+    "execution-framework/generated/execution_packets/REQ-010_CONTRACT_LOCK.json": "a7ee3ab26d93e97d4f42b29cba3f18b9dd85581ccac414d5376d388307b078fc",
+    "execution-framework/generated/execution_packets/REQ-020_ENVCTL_DB_SCHEMA.json": "52e9583cfffdda2f044ebdc7a2a7278525426c1ac8f0cd8abfa30449371c65ea",
+    "execution-framework/generated/execution_packets/REQ-021_ENVCTL_TARGET_REGISTRY.json": "a27d934cd3da755e26626d5b1df6c77330107b31c3b1234c7a3fa76e434bbae6",
+    "execution-framework/generated/execution_packets/REQ-022_ENVCTL_RUN_LEDGER.json": "4eef781fca0d56a8e27f7c6d3a3287a692cd8a2f95dca332f9ae90f343cb1a6c",
+    "execution-framework/generated/execution_packets/REQ-023_ENVCTL_OPERATION_STATE.json": "6933e6d4c7f92a3c74f0aee7112a0afa902c11f1c409e092d11be54de450ead1",
+    "execution-framework/generated/execution_packets/REQ-024_ENVCTL_ARTIFACT_REGISTRY.json": "bb4c2c67e8fa5a5785f196e0ecf32c69ed8508d1a75359ed1872ce02d53d30f3",
+    "execution-framework/generated/execution_packets/REQ-025_ENVCTL_VALIDATION_EVIDENCE.json": "42ea6a694d0957f1ddbb9a5ab5b3aadb24b88f9cfaaf60fb9095d4dde2db7083",
+    "execution-framework/generated/execution_packets/REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS.json": "c7b0525d1469ec112ce8d1c7610ecd8837b804acd498137702a85f91e19280bb",
+    "execution-framework/generated/execution_packets/REQ-027_ENVCTL_REPLAY_ENGINE.json": "68d27a18a22689d41f209db09084bfa0d8aee4149fa84cc5314214f56850431b",
+    "execution-framework/generated/execution_packets/REQ-028_ENVCTL_AGENT_CONTROL_API.json": "46c2238a851e59af30fcb77fcce4172ca45ada9cde8e84a0ffb5d28034a08df2",
+    "execution-framework/generated/execution_packets/REQ-030_PLUGIN_PROTOCOL_MANIFEST.json": "3960832e792a5cfa5df1bd1d8372d61da1bf5897884b6fa016cacffacc7e3cad",
+    "execution-framework/generated/execution_packets/REQ-031_PLUGIN_COMMAND_SURFACE.json": "161c4017bfde6f7a52e20a33074568bda40a31efc70124cafe633a413a90d843"
+  },
+  "logs_uri": "logs/EF-006_TASK_GRAPH_TO_PACKETS.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "generated/execution_manifest.json",
+    "generated/execution_packets/"
+  ],
+  "failure_reason": "",
+  "next_action": "run goal_loop.py"
+}

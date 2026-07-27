@@ -34,6 +34,22 @@ def convert(row):
     return packet
 
 
+def write_packet(out, packet):
+    if out.is_file():
+        try:
+            previous = json.loads(out.read_text(encoding='utf-8'))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            previous = None
+        if isinstance(previous, dict):
+            previous_content = {k: v for k, v in previous.items() if k != 'generated_at'}
+            packet_content = {k: v for k, v in packet.items() if k != 'generated_at'}
+            if previous_content == packet_content and previous.get('generated_at'):
+                packet['generated_at'] = previous['generated_at']
+                return False
+    out.write_text(json.dumps(packet, indent=2, sort_keys=False) + '\n', encoding='utf-8')
+    return True
+
+
 def main():
     graph_arg = sys.argv[1] if len(sys.argv) > 1 else 'generated/task_graph.csv'
     rows = read_task_graph(graph_arg)
@@ -43,7 +59,7 @@ def main():
     for row in rows:
         packet = convert(row)
         out = packet_dir / f"{row['task_id']}.json"
-        out.write_text(json.dumps(packet, indent=2, sort_keys=False) + '\n', encoding='utf-8')
+        write_packet(out, packet)
         packets.append({'task_id':row['task_id'],'packet_uri':f'generated/execution_packets/{row["task_id"]}.json','phase':row['phase'],'owner_lane':row['owner_lane'],'parallel_group':row['parallel_group'],'depends_on':split_list(row.get('depends_on',''))})
     manifest = {'schema_version':'1.0','generated_at':now(),'task_count':len(rows),'packet_count':len(packets),'packets':packets}
     write_json('generated/execution_manifest.json', manifest)

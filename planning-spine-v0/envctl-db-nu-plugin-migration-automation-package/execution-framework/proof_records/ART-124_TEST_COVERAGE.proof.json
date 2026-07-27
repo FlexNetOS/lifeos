@@ -1,75 +1,87 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "ART-124_TEST_COVERAGE",
-  "status": "completed",
-  "started_at": "2026-07-27T21:39:17+00:00",
-  "completed_at": "2026-07-27T21:39:17+00:00",
-  "actor": "codex-cli-local",
-  "helper_id": "helper-artifact-25",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
-  "files_changed": [
-    "execution-framework/scripts/generate_art124_test_coverage.py",
-    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md",
-    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json",
-    "execution-framework/migration-artifacts/06-testing-validation/test-coverage-matrix.md",
-    "execution-framework/generated/art124_test_coverage_report.json",
-    "execution-framework/logs/ART-124_TEST_COVERAGE.log",
-    "execution-framework/state/ART-124_TEST_COVERAGE.heartbeat.json",
-    "execution-framework/proof_records/ART-124_TEST_COVERAGE.proof.json",
-    "execution-framework/proof_records/proof_ledger.jsonl"
-  ],
-  "commands_run": [
-    "python3 scripts/generate_art124_test_coverage.py",
-    "python3 -m py_compile scripts/generate_art124_test_coverage.py"
-  ],
-  "verification_output": {
-    "status": "passed",
-    "covered_class_count": 6,
-    "automation_status_counts": {
-      "ready": 2,
-      "partial": 2,
-      "planned": 2
-    },
-    "artifact_index_rows": 3,
-    "validation_scorecard_row": [
-      15,
-      0,
-      0,
-      0,
-      0
-    ],
-    "replay_readiness_row": [
-      1,
-      0,
-      0,
-      0
-    ]
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/scripts/generate_art124_test_coverage.py": "22e387745be1addc7e1977dc099eef9876b7f9944f3161a57f463b2bde97ae78",
-    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md": "5291596b072a429a5bacd658f114f6509f2ab046f39ef3be1c8f4272641d243c",
-    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json": "c7dc7c47b1b3d3bf1ea2bac96735eac2fa341fd8221f9698459809545067b87d",
-    "execution-framework/migration-artifacts/06-testing-validation/test-coverage-matrix.md": "5291596b072a429a5bacd658f114f6509f2ab046f39ef3be1c8f4272641d243c",
-    "execution-framework/generated/art124_test_coverage_report.json": "4a7d6772877e7b60fc94472273fb1200a95e73945548dac2dafca4c34a9acdd9",
-    "execution-framework/logs/ART-124_TEST_COVERAGE.log": "4a7d6772877e7b60fc94472273fb1200a95e73945548dac2dafca4c34a9acdd9",
-    "execution-framework/state/ART-124_TEST_COVERAGE.heartbeat.json": "94d96c480d1b629b17812d03d86f9e5b4302520ae71ea5c95c97bb8a82a471ac",
-    "execution-framework/proof_records/ART-124_TEST_COVERAGE.proof.json": "b521125bd79a4cb09a08eab8f15aa9f280aedffa69b4e08eee469e78428dd1e3",
-    "execution-framework/proof_records/proof_ledger.jsonl": "04e3a1c141280a204b0ef6c79b90d27d709e7a6c20643a65cd00955cab3713d8"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-124_TEST_COVERAGE/9986078b8b5a5c40706472dd4320fdcf8267d960f801d99293212e537c41d684/20260727T213812262346Z-3864040546c7.json": "61f559a04187534d88019e09fb0086666a2eacf52f13f47cb775daa6c771437c",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json": "c7dc7c47b1b3d3bf1ea2bac96735eac2fa341fd8221f9698459809545067b87d",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md": "5291596b072a429a5bacd658f114f6509f2ab046f39ef3be1c8f4272641d243c"
   },
-  "logs_uri": "logs/ART-124_TEST_COVERAGE.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/ART-124_TEST_COVERAGE/20260727T213812262346Z-3864040546c7 -"
+  ],
+  "completed_at": "2026-07-27T21:39:30.114563Z",
   "evidence": [
-    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md",
-    "execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json",
-    "execution-framework/migration-artifacts/06-testing-validation/test-coverage-matrix.md",
-    "execution-framework/generated/art124_test_coverage_report.json",
-    "execution-framework/generated/envctl_artifact_registry_report.json",
-    "execution-framework/generated/envctl_validation_evidence_report.json",
-    "execution-framework/generated/shared_protocol_validation_report.json",
-    "execution-framework/generated/status_from_proofs.json",
-    "execution-framework/generated/contract_manifest.json"
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-124_TEST_COVERAGE/9986078b8b5a5c40706472dd4320fdcf8267d960f801d99293212e537c41d684/20260727T213812262346Z-3864040546c7.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/ART-124_TEST_COVERAGE/054fd815c8dff21eb493e3a236c14291e691eadf7b5cf4f364da7a48f7c83f31.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "run VER-300_UNIT_VALIDATION to execute the coverage matrix against runtime fixtures"
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json"
+  ],
+  "helper_id": "helper-artifact-25",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-124_TEST_COVERAGE/9986078b8b5a5c40706472dd4320fdcf8267d960f801d99293212e537c41d684/logs/20260727T213812262346Z-3864040546c7",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "${MIGRATION_TARGET_ROOT}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T21:38:12.322793Z",
+  "status": "completed",
+  "task_id": "ART-124_TEST_COVERAGE",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/art-124_test_coverage/*.md",
+        "kind": "glob",
+        "matches": [
+          {
+            "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.md",
+            "sha256": "5291596b072a429a5bacd658f114f6509f2ab046f39ef3be1c8f4272641d243c"
+          }
+        ],
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/*.md",
+        "status": "existing_glob"
+      },
+      {
+        "declaration": "migration-artifacts/art-124_test_coverage/*.json",
+        "kind": "glob",
+        "matches": [
+          {
+            "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/test-coverage-matrix.json",
+            "sha256": "c7dc7c47b1b3d3bf1ea2bac96735eac2fa341fd8221f9698459809545067b87d"
+          }
+        ],
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/art-124_test_coverage/*.json",
+        "status": "existing_glob"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T213812262346Z-3864040546c7",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/ART-124_TEST_COVERAGE/9986078b8b5a5c40706472dd4320fdcf8267d960f801d99293212e537c41d684/20260727T213812262346Z-3864040546c7.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "61f559a04187534d88019e09fb0086666a2eacf52f13f47cb775daa6c771437c"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "9986078b8b5a5c40706472dd4320fdcf8267d960f801d99293212e537c41d684",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/ART-124_TEST_COVERAGE/054fd815c8dff21eb493e3a236c14291e691eadf7b5cf4f364da7a48f7c83f31.proof.json",
+      "sha256": "054fd815c8dff21eb493e3a236c14291e691eadf7b5cf4f364da7a48f7c83f31"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

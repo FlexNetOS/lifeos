@@ -1,36 +1,67 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "INV-002_OPERATIONAL_INVARIANT",
-  "status": "completed",
-  "started_at": "2026-07-27T21:24:33Z",
-  "completed_at": "2026-07-27T21:24:33Z",
-  "actor": "codex-cli-background-shell",
-  "helper_id": "helper-invariant-02",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": ".",
-  "files_changed": [
-    "migration-artifacts/inv-002/result.json",
-    "execution-framework/proof_records/INV-002_OPERATIONAL_INVARIANT.proof.json"
-  ],
-  "commands_run": [
-    "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \'$PSQL\' 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select pg_database_size(current_database())' | grep -qE '\''^[0-9]+$'\''"
-  ],
-  "verification_output": {
-    "status": "passed",
-    "generated_at": "2026-07-27T21:24:33Z",
-    "summary": {
-      "database_size_bytes": 23278515891
-    },
-    "errors": []
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "migration-artifacts/inv-002/result.json": "a958db9a16e4d35475891ce5614c54f062cd020a763e394045da0caaeaac25fb",
-    "execution-framework/proof_records/INV-002_OPERATIONAL_INVARIANT.proof.json": "4bd7c45ed4cdf1a703a681e61f446f398918096a4beb140ad101462468db926d"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-002_OPERATIONAL_INVARIANT/9e2ed2178c0f1a8190ababe34531c0c0f769c267cf97001ab32c2b7534f36773/20260727T225340425823Z-f1c4cac099e9.json": "aac616733b336e183ffcb3ebdce85d39eb5190822678e1d048d5a5a7cdc5e260",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-002/result.json": "86c0ffe64c0172750e9acd1aab2e2516c683c351ddc0b94dd5d27d8292143ecc"
   },
+  "commands_run": [
+    "/bin/bash -lc 'bash -lc '\"'\"'PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && test \"$(\"$PSQL\" '\"'\"'\"'\"'\"'\"'\"'\"'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql'\"'\"'\"'\"'\"'\"'\"'\"' -tAc \"select count(*) from information_schema.tables where table_schema not in ('\"'\"'\"'\"'\"'\"'\"'\"'pg_catalog'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'information_schema'\"'\"'\"'\"'\"'\"'\"'\"')\")\" -gt 0'\"'\"''",
+    "/bin/bash -lc 'bash -lc '\"'\"'PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" '\"'\"'\"'\"'\"'\"'\"'\"'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql'\"'\"'\"'\"'\"'\"'\"'\"' -tAc '\"'\"'\"'\"'\"'\"'\"'\"'select pg_database_size(current_database())'\"'\"'\"'\"'\"'\"'\"'\"' | grep -qE '\"'\"'\"'\"'\"'\"'\"'\"'^[0-9]+$'\"'\"'\"'\"'\"'\"'\"'\"''\"'\"''"
+  ],
+  "completed_at": "2026-07-27T22:53:40.758893Z",
   "evidence": [
-    "migration-artifacts/inv-002/result.json",
-    "execution-framework/proof_records/INV-002_OPERATIONAL_INVARIANT.proof.json"
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-002/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-002_OPERATIONAL_INVARIANT/9e2ed2178c0f1a8190ababe34531c0c0f769c267cf97001ab32c2b7534f36773/20260727T225340425823Z-f1c4cac099e9.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/INV-002_OPERATIONAL_INVARIANT/95a910d7f5d8c9d8b7eaa738c1a48861281a0c11d97b7eb87236207a9e26547d.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "Continue with remaining invariant verifications."
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-002/result.json"
+  ],
+  "helper_id": "helper-invariant-02",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-002_OPERATIONAL_INVARIANT/9e2ed2178c0f1a8190ababe34531c0c0f769c267cf97001ab32c2b7534f36773/logs/20260727T225340425823Z-f1c4cac099e9",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "cross-check the probe against every invariant clause before claiming implementation",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T22:53:40.429192Z",
+  "status": "completed",
+  "task_id": "INV-002_OPERATIONAL_INVARIANT",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/inv-002/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-002/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The declared live invariant command and its verification exited zero; this proves that probe, not every semantic clause of the invariant.",
+    "implementation_scope": "declared_live_probe_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T225340425823Z-f1c4cac099e9",
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-002_OPERATIONAL_INVARIANT/9e2ed2178c0f1a8190ababe34531c0c0f769c267cf97001ab32c2b7534f36773/20260727T225340425823Z-f1c4cac099e9.json",
+      "run_id": "20260727T225340189121Z-479767e62e9e",
+      "sha256": "aac616733b336e183ffcb3ebdce85d39eb5190822678e1d048d5a5a7cdc5e260"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "9e2ed2178c0f1a8190ababe34531c0c0f769c267cf97001ab32c2b7534f36773",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/INV-002_OPERATIONAL_INVARIANT/95a910d7f5d8c9d8b7eaa738c1a48861281a0c11d97b7eb87236207a9e26547d.proof.json",
+      "sha256": "95a910d7f5d8c9d8b7eaa738c1a48861281a0c11d97b7eb87236207a9e26547d"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
 }

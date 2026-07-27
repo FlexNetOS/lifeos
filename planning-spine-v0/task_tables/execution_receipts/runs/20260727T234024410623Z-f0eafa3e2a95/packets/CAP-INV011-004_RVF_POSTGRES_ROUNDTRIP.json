@@ -1,0 +1,85 @@
+{
+  "schema": "lifeos.execution-packet.v1",
+  "packet_schema_version": "1.0",
+  "task_id": "CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP",
+  "parent_id": "INV-011_OPERATIONAL_INVARIANT",
+  "phase": "00-invariants",
+  "title": "Close INV-011 with a native RVF, AgentDB, PostgreSQL, and rollback acceptance receipt",
+  "goal": "Integrate the repaired RVF runtime with ruvector-postgres and LifeOS so an actual RVF store persists validated COW_MAP and MEMBERSHIP segments, closes, reopens, reconstructs exact branch membership, round-trips through the canonical PostgreSQL/AgentDB representation, and emits a content-addressed native acceptance receipt. Make lifeos_runtime.cow_branch_capability implemented=true only when the current versioned database semantic suite and native RVF receipt both pass against the installed extension/library digests. Re-run the full adversarial suite and the immutable INV-011 live probe without weakening either.",
+  "owner_lane": "lane_e_invariants",
+  "owner_agent": "inv011-integration-agent",
+  "helper_id": "helper-inv011-rvf-postgres-roundtrip",
+  "model_tag": "gpt-5.6-sol",
+  "agent_runtime": "codex-cli-background-shell",
+  "shell_mode": "write-and-verify",
+  "repo_target": "meta",
+  "repo_path": "/home/flexnetos/meta",
+  "filesystem_scope": "/home/flexnetos/meta/src/meta-ruvector/**,/home/flexnetos/meta/src/lifeos/**,/home/flexnetos/meta/var/**",
+  "input_files": [
+    "src/meta-ruvector/crates/rvf/**",
+    "src/meta-ruvector/crates/ruvector-postgres/**",
+    "src/lifeos/crates/lifeos-core/**",
+    "src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "target_files": [
+    "src/meta-ruvector/crates/ruvector-postgres/**",
+    "src/lifeos/crates/lifeos-core/migrations/0008_*.sql",
+    "src/lifeos/crates/lifeos-core/src/storage/branches.rs",
+    "src/lifeos/planning-spine-v0/scripts/verify_inv011_native_roundtrip.py",
+    "src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/**"
+  ],
+  "target_artifacts": [
+    "src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/native-rvf-postgres-roundtrip.json"
+  ],
+  "allowed_paths": [
+    "/home/flexnetos/meta/src/meta-ruvector/crates/ruvector-postgres/**",
+    "/home/flexnetos/meta/src/meta-ruvector/crates/rvf/**",
+    "/home/flexnetos/meta/src/lifeos/crates/lifeos-core/**",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/verify_inv011_native_roundtrip.py",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/**",
+    "/home/flexnetos/meta/var/lib/postgresql/**",
+    "/home/flexnetos/meta/var/run/postgresql/**",
+    "/home/flexnetos/meta/var/**/ruvector*"
+  ],
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key",
+    "/nix/store/**",
+    "src/lifeos/crates/lifeos-core/migrations/0005_cow_branch_runtime.sql",
+    "src/lifeos/crates/lifeos-core/migrations/0006_cow_capability_boundary.sql"
+  ],
+  "depends_on": [
+    "CAP-INV011-002_RVF_CANONICAL_COW_FORMAT",
+    "CAP-INV011-003_COW_DB_SEMANTICS"
+  ],
+  "blocks": [],
+  "parallel_group": "inv011-integration",
+  "can_run_parallel": false,
+  "max_parallel": 1,
+  "start_after": "",
+  "priority": 4,
+  "execution_cell": "inv011-native-roundtrip",
+  "required_tools": [
+    "rtk",
+    "cargo",
+    "pgrx",
+    "psql",
+    "python3",
+    "nix"
+  ],
+  "command_template": "Implement the exact packet goal completely, preserve existing work, apply only additive migrations, and keep capability reporting fail closed until every native and database verification is green.",
+  "verification_command": "/home/flexnetos/.nix-profile/bin/rtk proxy python3 src/lifeos/planning-spine-v0/scripts/verify_inv011_native_roundtrip.py",
+  "completion_gate": "A real RvfStore COW_MAP/MEMBERSHIP close-reopen round trip, native segment validation, PostgreSQL/AgentDB reconstruction, witness-chain verification, deterministic promotion snapshot, exact rollback, fresh bootstrap, upgrade migration, least-privilege/RLS audit, and live capability report all pass; the durable artifact binds every source/library/schema/test digest; INV-011 is rerun through json_task_runner and receives a new completed receipt.",
+  "proof_required": true,
+  "proof_uri": "proof_records/CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP.proof.json",
+  "heartbeat_file": "state/CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP.heartbeat.json",
+  "logs_uri": "logs/CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP.log",
+  "rollback_plan": "Preserve all durable PostgreSQL and RVF bytes. Roll back only via additive schema correction and the captured content-addressed extension payload; never delete live data, rewrite immutable receipts, or reset either repository.",
+  "risk_level": "critical",
+  "human_approval_required": false,
+  "notes": "The workspace owner already granted digest-bound approval for every packet and every local blocker fix under /home/flexnetos/meta. Every shell command must use /home/flexnetos/.nix-profile/bin/rtk, with rtk proxy for raw evidence. Do not commit or push. Do not edit GitKB. Do not mistake a synthetic SQL membership count for an RVF round trip. Do not accept the legacy rvf-runtime checksum mismatch as canonical.",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md#operational-invariant-11",
+  "generated_at": "2026-07-27T23:38:42Z"
+}

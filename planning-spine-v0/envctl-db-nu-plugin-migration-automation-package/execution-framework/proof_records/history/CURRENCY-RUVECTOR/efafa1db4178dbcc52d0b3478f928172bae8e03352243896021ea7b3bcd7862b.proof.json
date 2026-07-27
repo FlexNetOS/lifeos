@@ -1,0 +1,43 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "CURRENCY-RUVECTOR",
+  "status": "completed",
+  "started_at": "2026-07-27T22:30:42.182020Z",
+  "completed_at": "2026-07-27T22:30:42.661351Z",
+  "actor": "json-task-runner",
+  "helper_id": "helper-currency-ruvector",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/migration-artifacts/currency-ruvector/result.json"
+  ],
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'ruvector'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'ruvector'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'ruvector@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'ruvector'\"'\"' version'"
+  ],
+  "verification_output": {
+    "task_completion_proven": true,
+    "implementation_scope": "installed_registry_current_only",
+    "needs_capability_probe": false,
+    "probe_class": "currency",
+    "packet_sha256": "8f8b580879c9080f4c95748fc83f03e92bf54378fd51ce17b14a8132bf22d2a4",
+    "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+    "run_id": "20260727T212315401740Z-f7b145f5f97d",
+    "attempt_id": "20260727T223042178610Z-2d4d7cd6971b",
+    "receipt_sha256": "013a656f83d9af21d326ce2295116a30610b8feedb366f1866b4d68100afa3ab",
+    "command_exit_code": 0,
+    "verification_exit_code": 0
+  },
+  "checksums": {
+    "execution-framework/migration-artifacts/currency-ruvector/result.json": "face96ae3736f4ff6e08de880aa46cb5d82f5514b94308d6cea66de1f0804db0",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR/8f8b580879c9080f4c95748fc83f03e92bf54378fd51ce17b14a8132bf22d2a4/20260727T223042178610Z-2d4d7cd6971b.json": "013a656f83d9af21d326ce2295116a30610b8feedb366f1866b4d68100afa3ab"
+  },
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR/8f8b580879c9080f4c95748fc83f03e92bf54378fd51ce17b14a8132bf22d2a4/logs/20260727T223042178610Z-2d4d7cd6971b",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "execution-framework/migration-artifacts/currency-ruvector/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR/8f8b580879c9080f4c95748fc83f03e92bf54378fd51ce17b14a8132bf22d2a4/20260727T223042178610Z-2d4d7cd6971b.json"
+  ],
+  "failure_reason": "",
+  "next_action": "none"
+}

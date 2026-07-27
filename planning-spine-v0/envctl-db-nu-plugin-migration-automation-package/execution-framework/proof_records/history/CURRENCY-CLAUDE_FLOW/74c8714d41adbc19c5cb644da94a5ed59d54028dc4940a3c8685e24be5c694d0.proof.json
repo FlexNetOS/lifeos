@@ -1,0 +1,43 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "CURRENCY-CLAUDE_FLOW",
+  "status": "completed",
+  "started_at": "2026-07-27T22:30:41.344411Z",
+  "completed_at": "2026-07-27T22:30:42.176615Z",
+  "actor": "json-task-runner",
+  "helper_id": "helper-currency-claude_flow",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/migration-artifacts/currency-claude_flow/result.json"
+  ],
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'claude-flow'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'claude-flow'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'claude\\-flow@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'claude-flow'\"'\"' version'"
+  ],
+  "verification_output": {
+    "task_completion_proven": true,
+    "implementation_scope": "installed_registry_current_only",
+    "needs_capability_probe": false,
+    "probe_class": "currency",
+    "packet_sha256": "2fe3609c7512c09370b9487ee105ec957440235253beef92458233610bc58f71",
+    "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+    "run_id": "20260727T212315401740Z-f7b145f5f97d",
+    "attempt_id": "20260727T223041343394Z-851503db0b65",
+    "receipt_sha256": "bc6252bd9ce1bd5d5da7fccab26c5d4e984b111159b777319a0fecc571c1fb37",
+    "command_exit_code": 0,
+    "verification_exit_code": 0
+  },
+  "checksums": {
+    "execution-framework/migration-artifacts/currency-claude_flow/result.json": "332125ccb96d55fa8d33d24c9060b61c85a861fb0cd7a5b32f1f9e8c840744e9",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW/2fe3609c7512c09370b9487ee105ec957440235253beef92458233610bc58f71/20260727T223041343394Z-851503db0b65.json": "bc6252bd9ce1bd5d5da7fccab26c5d4e984b111159b777319a0fecc571c1fb37"
+  },
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW/2fe3609c7512c09370b9487ee105ec957440235253beef92458233610bc58f71/logs/20260727T223041343394Z-851503db0b65",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "execution-framework/migration-artifacts/currency-claude_flow/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW/2fe3609c7512c09370b9487ee105ec957440235253beef92458233610bc58f71/20260727T223041343394Z-851503db0b65.json"
+  ],
+  "failure_reason": "",
+  "next_action": "none"
+}

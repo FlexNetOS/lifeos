@@ -1,0 +1,72 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/polyglot-import/polyglot-schema-extension.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB092",
+    "decision": null,
+    "intent_lock_digest": "blake3:18165f23bba268b7518469e15bfac4e4b694efdfd8b7f3b7e3ccfb380b3226c8",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB092",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB092",
+  "depends_on": [
+    "TASK-CDB091"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "planned schema does not break Rust-first tables",
+    "deterministic": true,
+    "verification_command": "planned schema does not break Rust-first tables"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:18165f23bba268b7518469e15bfac4e4b694efdfd8b7f3b7e3ccfb380b3226c8"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:c3f9aaee7c5b8a3c58e348578d2cea64761b486f768475f87a8da8a504098d06",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB092",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB092"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB092 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/polyglot-import/polyglot-schema-extension.md"
+  ],
+  "task_id": "TASK-CDB092",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB092"
+}

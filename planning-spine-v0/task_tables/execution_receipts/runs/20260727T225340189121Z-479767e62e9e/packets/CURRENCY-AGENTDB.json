@@ -1,0 +1,66 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 0,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "fcf02b777d25357ebd14f67510881551b454103525ae3a37251fe66fdf215c73"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "test -n \"$(bun info 'agentdb' version 2>/dev/null)\" && test \"$(bun info 'agentdb' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE 'agentdb@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+  "completion_gate": "probe exits 0 against the live system",
+  "depends_on": [],
+  "execution_cell": "toolchain-currency",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Installed agentdb must equal the registry latest. NOTE: bun's global root resolves under BUN_INSTALL_CACHE_DIR, which on this host is the XDG_RUNTIME_DIR tmpfs -- global installs there do not survive a reboot, so a failing probe may mean 'installed then evaporated', not 'never installed'.",
+  "heartbeat_file": "state/CURRENCY-AGENTDB.heartbeat.json",
+  "helper_id": "helper-currency-agentdb",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/CURRENCY-AGENTDB.log",
+  "max_parallel": 8,
+  "model_tag": "gpt-5.3-spark",
+  "needs_capability_probe": false,
+  "notes": "Structurally extracted from the blueprint anchor.",
+  "owner_agent": "anchor-agent",
+  "owner_lane": "lane_f_anchor",
+  "packet_schema_version": "1.0",
+  "parallel_group": "anchor_toolchain-currency",
+  "parent_id": "CURRENCY",
+  "phase": "00-currency",
+  "priority": 1616,
+  "probe_class": "currency",
+  "proof_required": true,
+  "proof_uri": "proof_records/CURRENCY-AGENTDB.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "bun"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/currency-agentdb/result.json"
+  ],
+  "target_files": [],
+  "task_id": "CURRENCY-AGENTDB",
+  "title": "Toolchain currency: agentdb (npm latest at extraction 3.0.0-alpha.18)",
+  "verification_command": "bun info 'agentdb' version"
+}

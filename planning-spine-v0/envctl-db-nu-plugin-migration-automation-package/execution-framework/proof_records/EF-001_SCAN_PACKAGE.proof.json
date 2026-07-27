@@ -1,43 +1,62 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "EF-001_SCAN_PACKAGE",
-  "status": "completed",
-  "started_at": "2026-07-27T21:23:16+00:00",
-  "completed_at": "2026-07-27T21:23:16+00:00",
-  "actor": "local-execution-framework",
-  "helper_id": "helper-scan-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "execution-framework",
-  "files_changed": [
-    "execution-framework/generated/package_scan.json"
-  ],
-  "commands_run": [
-    "python3 scripts/scan_package.py --gaps"
-  ],
-  "verification_output": {
-    "scanned_folders": [
-      "specs",
-      "prompts",
-      "codex",
-      "schemas",
-      "examples",
-      "helpers",
-      "sql",
-      "source",
-      "expected-output",
-      "history",
-      "execution-framework",
-      "execution-templates"
-    ]
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/generated/package_scan.json": "9072d7f7537e6a876321e4efff4b87c3a1f06278689881166cb8d9180b913a73"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-001_SCAN_PACKAGE/b4aa3a74f5d6696d2ceb687de6b10441cdb2df367cfcbff1de70c515195557c7/20260727T212315544121Z-8a9ced8b2555.json": "eb42e23601ed8d02b2b5f55ca644859cffaecdc9ea05c3554a21bb64f4914060"
   },
-  "logs_uri": "logs/EF-001_SCAN_PACKAGE.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/bin/bash -lc 'python3 scripts/scan_package.py'",
+    "/bin/bash -lc 'test -f generated/package_scan.json'"
+  ],
+  "completed_at": "2026-07-27T21:23:16.024067Z",
   "evidence": [
-    "generated/package_scan.json"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-001_SCAN_PACKAGE/b4aa3a74f5d6696d2ceb687de6b10441cdb2df367cfcbff1de70c515195557c7/20260727T212315544121Z-8a9ced8b2555.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/EF-001_SCAN_PACKAGE/c477fff5b23db5c9dde4e0a26c9c4102d09f398f8051f28328b5e7be4975c410.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "generate/validate task graph"
+  "files_changed": [],
+  "helper_id": "helper-scan-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-001_SCAN_PACKAGE/b4aa3a74f5d6696d2ceb687de6b10441cdb2df367cfcbff1de70c515195557c7/logs/20260727T212315544121Z-8a9ced8b2555",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": "..",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T21:23:15.544867Z",
+  "status": "completed",
+  "task_id": "EF-001_SCAN_PACKAGE",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "package scan",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T212315544121Z-8a9ced8b2555",
+      "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-001_SCAN_PACKAGE/b4aa3a74f5d6696d2ceb687de6b10441cdb2df367cfcbff1de70c515195557c7/20260727T212315544121Z-8a9ced8b2555.json",
+      "run_id": "20260727T212315401740Z-f7b145f5f97d",
+      "sha256": "eb42e23601ed8d02b2b5f55ca644859cffaecdc9ea05c3554a21bb64f4914060"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "b4aa3a74f5d6696d2ceb687de6b10441cdb2df367cfcbff1de70c515195557c7",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/EF-001_SCAN_PACKAGE/c477fff5b23db5c9dde4e0a26c9c4102d09f398f8051f28328b5e7be4975c410.proof.json",
+      "sha256": "c477fff5b23db5c9dde4e0a26c9c4102d09f398f8051f28328b5e7be4975c410"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
 }

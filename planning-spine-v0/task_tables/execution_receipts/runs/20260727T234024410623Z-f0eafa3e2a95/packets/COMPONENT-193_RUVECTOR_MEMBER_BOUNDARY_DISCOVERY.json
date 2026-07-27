@@ -1,0 +1,66 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 335153,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "addd8a490a46df226095a2dbb5cec584c5ab6aabe83256a3f664a3271df0c9ef"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "grep -Fq 'RuVector member: boundary-discovery' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "completion_gate": "anchor still contains this unit; NOT evidence of implementation",
+  "depends_on": [],
+  "execution_cell": "components",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Component 'RuVector member: boundary-discovery' must be installed and used, not replaced (hard rule 15).",
+  "heartbeat_file": "state/COMPONENT-193_RUVECTOR_MEMBER_BOUNDARY_DISCOVERY.heartbeat.json",
+  "helper_id": "helper-component-193_ruvector_member_boundary_discovery",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/COMPONENT-193_RUVECTOR_MEMBER_BOUNDARY_DISCOVERY.log",
+  "max_parallel": 8,
+  "model_tag": "gpt-5.3-spark",
+  "needs_capability_probe": true,
+  "notes": "Structurally extracted from the blueprint anchor.",
+  "owner_agent": "anchor-agent",
+  "owner_lane": "lane_f_anchor",
+  "packet_schema_version": "1.0",
+  "parallel_group": "anchor_components",
+  "parent_id": "COMPONENTS",
+  "phase": "00-components",
+  "priority": 1193,
+  "probe_class": "drift-canary",
+  "proof_required": true,
+  "proof_uri": "proof_records/COMPONENT-193_RUVECTOR_MEMBER_BOUNDARY_DISCOVERY.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "shell"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/component-193_ruvector_member_boundary_discovery/result.json"
+  ],
+  "target_files": [],
+  "task_id": "COMPONENT-193_RUVECTOR_MEMBER_BOUNDARY_DISCOVERY",
+  "title": "Component: RuVector member: boundary-discovery",
+  "verification_command": "grep -Fq 'RuVector member: boundary-discovery' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+}

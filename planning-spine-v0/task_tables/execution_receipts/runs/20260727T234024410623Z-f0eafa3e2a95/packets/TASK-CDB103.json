@@ -1,0 +1,74 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/polyglot-import/whole-repo-import-architecture.md",
+    "src/nu_plugin/docs/polyglot-import/security-and-execution-policy.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB103",
+    "decision": null,
+    "intent_lock_digest": "blake3:ce9ee7622f27203728f670e857771ebb4c37f2e65df49b7e4a1c5ad6d68320b2",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB103",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB103",
+  "depends_on": [
+    "TASK-CDB095"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "bounded view policy documented",
+    "deterministic": true,
+    "verification_command": "bounded view policy documented"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:ce9ee7622f27203728f670e857771ebb4c37f2e65df49b7e4a1c5ad6d68320b2"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:eb5ef3cc3424a8b5e24e7aca6d6fef3eab6decafe53fadd26c4dcbcc1693957c",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB103",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB103"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB103 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/polyglot-import/whole-repo-import-architecture.md",
+    "src/nu_plugin/docs/polyglot-import/security-and-execution-policy.md"
+  ],
+  "task_id": "TASK-CDB103",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB103"
+}

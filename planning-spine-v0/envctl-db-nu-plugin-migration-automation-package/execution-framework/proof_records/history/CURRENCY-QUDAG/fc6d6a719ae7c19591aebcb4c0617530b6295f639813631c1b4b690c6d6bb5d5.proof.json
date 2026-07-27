@@ -1,0 +1,43 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "CURRENCY-QUDAG",
+  "status": "completed",
+  "started_at": "2026-07-27T22:30:42.178816Z",
+  "completed_at": "2026-07-27T22:30:42.710949Z",
+  "actor": "json-task-runner",
+  "helper_id": "helper-currency-qudag",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/migration-artifacts/currency-qudag/result.json"
+  ],
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'qudag'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'qudag'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'qudag@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'qudag'\"'\"' version'"
+  ],
+  "verification_output": {
+    "task_completion_proven": true,
+    "implementation_scope": "installed_registry_current_only",
+    "needs_capability_probe": false,
+    "probe_class": "currency",
+    "packet_sha256": "7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03",
+    "graph_sha256": "049a6599681bd19a353b8ddd9cf16a5da5bda3545377c3aa45502b14bcd03bbc",
+    "run_id": "20260727T212315401740Z-f7b145f5f97d",
+    "attempt_id": "20260727T223042177666Z-346f8dc56f7e",
+    "receipt_sha256": "a34637de268a036ceddf242b08c2d841530289f273d6aa75fcdcd29b6390a566",
+    "command_exit_code": 0,
+    "verification_exit_code": 0
+  },
+  "checksums": {
+    "execution-framework/migration-artifacts/currency-qudag/result.json": "2d71c5a18dedfc5d0d26d2b44255bc3bceb39610e8990bea737edf7d4aed4aad",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-QUDAG/7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03/20260727T223042177666Z-346f8dc56f7e.json": "a34637de268a036ceddf242b08c2d841530289f273d6aa75fcdcd29b6390a566"
+  },
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-QUDAG/7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03/logs/20260727T223042177666Z-346f8dc56f7e",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "execution-framework/migration-artifacts/currency-qudag/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-QUDAG/7b43eddde9d3306e366cc637269097eaeb43a9539da93d525f2a80a1779aed03/20260727T223042177666Z-346f8dc56f7e.json"
+  ],
+  "failure_reason": "",
+  "next_action": "none"
+}

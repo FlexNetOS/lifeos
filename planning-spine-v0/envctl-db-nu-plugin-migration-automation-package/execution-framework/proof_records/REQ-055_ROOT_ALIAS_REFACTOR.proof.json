@@ -1,0 +1,57 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-055_ROOT_ALIAS_REFACTOR/e585581fe51db30fdf4a5499917ec33e04083d42778898987a0f87305cc28321/20260727T163451994955Z-13c99ed110db.json": "76470cc4c3b784dfc60d8f55308ca5279f5603a5b7dd139b156c47ca51ab1956"
+  },
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T033323851132Z-b4e24d277985/REQ-055_ROOT_ALIAS_REFACTOR/20260727T163451994955Z-13c99ed110db -",
+    "/bin/bash -lc 'cargo test -p envctl-engine db_refactor'"
+  ],
+  "completed_at": "2026-07-27T16:35:50.252166Z",
+  "evidence": [
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-055_ROOT_ALIAS_REFACTOR/e585581fe51db30fdf4a5499917ec33e04083d42778898987a0f87305cc28321/20260727T163451994955Z-13c99ed110db.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [],
+  "helper_id": "helper-req-055_root_alias_refactor",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-055_ROOT_ALIAS_REFACTOR/e585581fe51db30fdf4a5499917ec33e04083d42778898987a0f87305cc28321/logs/20260727T163451994955Z-13c99ed110db",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": "${ENVCTL_REPO}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T16:34:52.000762Z",
+  "status": "completed",
+  "task_id": "REQ-055_ROOT_ALIAS_REFACTOR",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "envctl db refactor root-alias command",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "8f2a8a7dc77f3d768f8c3936e6c2f91d0ab8249f683366d6308a7d4bbcdf3e4e",
+      "run_id": "20260727T225340189121Z-479767e62e9e"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T163451994955Z-13c99ed110db",
+      "graph_sha256": "c1191ba7886c0a1ac8e854b54601dc7772c29d1653645636c107e3472e2efb6c",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-055_ROOT_ALIAS_REFACTOR/e585581fe51db30fdf4a5499917ec33e04083d42778898987a0f87305cc28321/20260727T163451994955Z-13c99ed110db.json",
+      "run_id": "20260727T033323851132Z-b4e24d277985",
+      "sha256": "76470cc4c3b784dfc60d8f55308ca5279f5603a5b7dd139b156c47ca51ab1956"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "e585581fe51db30fdf4a5499917ec33e04083d42778898987a0f87305cc28321",
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

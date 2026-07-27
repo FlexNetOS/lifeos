@@ -1,0 +1,65 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 969853,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "invariant_number": 5,
+    "invariant_sha256": "4636a5bc1c2fa95da007b68be159b1ad701fb5dd3548a2c1d6859f511eab348d"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "codedb ingest-envelope --help >/dev/null 2>&1 || nu -c 'codedb ingest-envelope --help' >/dev/null 2>&1",
+  "completion_gate": "probe exits 0 against the live system; a non-zero exit is a real invariant violation and must not be recorded as pending or proposed",
+  "depends_on": [],
+  "execution_cell": "codedb-ingress",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Prove operational invariant 5 holds against the live system. Shipped evidence only: a design document, a proposed ADR, or an intent to build never satisfies this probe.",
+  "heartbeat_file": "state/INV-005_OPERATIONAL_INVARIANT.heartbeat.json",
+  "helper_id": "helper-invariant-05",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/INV-005_OPERATIONAL_INVARIANT.log",
+  "max_parallel": 6,
+  "model_tag": "gpt-5.3-spark",
+  "notes": "Extracted structurally from the anchor's acceptance-invariant list. Anchor invariant sha256=4636a5bc1c2fa95da007b68be159b1ad701fb5dd3548a2c1d6859f511eab348d; anchor document sha256=78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee.",
+  "owner_agent": "invariant-agent",
+  "owner_lane": "lane_e_invariants",
+  "packet_schema_version": "1.0",
+  "parallel_group": "invariant_codedb-ingress",
+  "parent_id": "INVARIANTS",
+  "phase": "00-invariants",
+  "priority": 105,
+  "proof_required": true,
+  "proof_uri": "proof_records/INV-005_OPERATIONAL_INVARIANT.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "shell"
+  ],
+  "risk_level": "critical",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/inv-005/result.json"
+  ],
+  "target_files": [],
+  "task_id": "INV-005_OPERATIONAL_INVARIANT",
+  "title": "Invariant 5: nu_plugin / CodeDB remains byte-complete ingress and query under the Nushell child-plugin process model; Nu...",
+  "verification_command": "command -v codedb || nu -c 'help commands' 2>/dev/null | grep -q 'codedb ingest-envelope'"
+}

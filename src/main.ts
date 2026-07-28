@@ -19,6 +19,22 @@ import "../styles.css";
 // reach the authenticated redb owner.
 const mainBootstrapInvoke =
   typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || tauriInvoke;
+const recordMainFailure = (error: unknown) => {
+  if (!mainBootstrapInvoke) return;
+  void mainBootstrapInvoke("redb_state_write", {
+    key: "lifeos.main.error",
+    value: JSON.stringify({
+      schemaVersion: "lifeos.main-error.v1",
+      observedAt: Date.now(),
+      message: error instanceof Error ? error.message : String(error),
+      href: window.location.href,
+    }),
+  }).catch(() => {});
+};
+if (typeof window !== "undefined") {
+  window.addEventListener("error", (event) => recordMainFailure(event.error ?? event.message));
+  window.addEventListener("unhandledrejection", (event) => recordMainFailure(event.reason));
+}
 if (mainBootstrapInvoke) {
   void mainBootstrapInvoke("redb_state_write", {
     key: "lifeos.main.loaded",

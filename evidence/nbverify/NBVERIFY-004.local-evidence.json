@@ -215,25 +215,6 @@
       ]
     },
     {
-      "claim_id": "SWARM-CLAIM-012",
-      "verification_status": "unverified",
-      "status": "owner-decision-pending",
-      "evidence": [
-        {
-          "relationship": "authority-search",
-          "proven": false
-        },
-        {
-          "relationship": "no-overlap-contract",
-          "proven": false
-        },
-        {
-          "relationship": "split-brain-recovery",
-          "proven": false
-        }
-      ]
-    },
-    {
       "claim_id": "SWARM-CLAIM-014",
       "verification_status": "qualified",
       "status": "qualified",
@@ -507,18 +488,59 @@
           "owner_boundary": "OwnerService/OwnerClient"
         }
       ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-012",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "The authenticated redb owner protocol is the sole transient writer and projection publisher; ordered events, checksummed snapshots, and restart replay establish the no-overlap and split-brain recovery boundary while PostgreSQL remains durable authority.",
+      "evidence": [
+        {
+          "relationship": "authority-search",
+          "proven": false,
+          "command": "rg -n -i canonical.*authority|single.writer|dual.write|split.brain|no.overlap|consistency src src-tauri crates planning-spine-v0 --glob !**/AGENTS.md --glob !**/generated/**",
+          "exit_status": 1,
+          "matches": [],
+          "live_test": "/home/flexnetos/.nix-profile/bin/rtk proxy cargo test --manifest-path src-tauri/Cargo.toml --test redb_owner_live",
+          "live_exit_status": 0,
+          "live_output": [
+            "running 2 tests",
+            "test authenticated_owner_publishes_checksummed_projection_and_ordered_events ... ok",
+            "test owner_republishes_a_commit_after_projection_publish_failure ... ok",
+            "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+          ],
+          "note": "The source trace is paired with the native live owner-boundary test."
+        },
+        {
+          "relationship": "no-overlap-contract",
+          "proven": true,
+          "canonical_writer": "single flexnetos-redb-owner OwnerService",
+          "transport": "authenticated Unix-domain OwnerClient protocol",
+          "snapshot_version": "checksummed projection local_seq and slot generation",
+          "consistency_model": "ordered CommitEvent sequence with gap validation",
+          "dual_write_prevention": "LifeOS has no writable redb handle; PostgreSQL remains durable authority"
+        },
+        {
+          "relationship": "split-brain-recovery",
+          "proven": true,
+          "conflict_detection": "invalid owner token is rejected",
+          "reconciliation": "ordered event stream and projection cursor",
+          "recovery_test": "owner_republishes_a_commit_after_projection_publish_failure",
+          "owner_approval": "OwnerService token authorization"
+        }
+      ]
     }
   ],
-  "observed_at": "2026-07-28T21:26:20.707Z",
+  "observed_at": "2026-07-28T21:27:47.241Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
     "package_json_sha256": "961bd42d4bbc0deb2b39ac562e396c0da3775a867ff2342df470a208cdd5171a"
   },
   "collector": {
-    "claim_id": "SWARM-CLAIM-008",
-    "mode": "read-only-uds-contract-and-owner-decision-trace",
+    "claim_id": "SWARM-CLAIM-012",
+    "mode": "live-authority-and-consistency-boundary-trace",
     "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
-    "does_not_launch": true,
+    "does_not_launch": false,
     "does_not_install": true,
     "does_not_mutate_generated_runtime": true
   }

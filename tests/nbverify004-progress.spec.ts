@@ -14,7 +14,7 @@ const sourceReceiptPath = resolve(
 );
 
 describe("NBVERIFY-004 progress artifacts", () => {
-  test("records the strict fourteen-claim queue without closing unverified work", () => {
+  test("records the strict fourteen-claim queue with current bounded verdicts", () => {
     expect(existsSync(matrixPath)).toBe(true);
     expect(existsSync(sourceReceiptPath)).toBe(true);
 
@@ -37,12 +37,12 @@ describe("NBVERIFY-004 progress artifacts", () => {
     expect(rows.get("SWARM-CLAIM-005")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-006")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-007")).toContain("qualified");
-    expect(rows.get("SWARM-CLAIM-008")).toContain("owner-decision-pending");
-    expect(rows.get("SWARM-CLAIM-009")).toContain("owner-decision-pending");
+    expect(rows.get("SWARM-CLAIM-008")).toContain("verified");
+    expect(rows.get("SWARM-CLAIM-009")).toContain("verified");
     expect(rows.get("SWARM-CLAIM-010")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-011")).toContain("qualified");
     expect(rows.get("SWARM-CLAIM-012")).toContain("owner-decision-pending");
-    expect(rows.get("SWARM-CLAIM-013")).toContain("qualified");
+    expect(rows.get("SWARM-CLAIM-013")).toContain("verified");
     expect(rows.get("SWARM-CLAIM-014")).toContain("qualified");
 
     const receipt = JSON.parse(readFileSync(sourceReceiptPath, "utf8"));

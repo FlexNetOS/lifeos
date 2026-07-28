@@ -580,12 +580,10 @@ fn telemetry_read(state: tauri::State<'_, TelemetryState>) -> Result<TelemetrySn
     })
 }
 
-// ---------- Lua plugin host (Wave 3 spike) ----------
+// ---------- Lua plugin host ----------
 // Thin pass-through to `lifeos_core::plugin::PluginHost`. A fresh host is built
-// per call so a misbehaving script can't poison the next caller's globals; the
-// Luau VM is cheap to construct (no I/O, vendored) so this is fine for the
-// spike. Errors are flattened to strings — the calm-error UI contract lives at
-// the Vue layer, this Rust surface stays mechanical.
+// per call so a script cannot poison the next caller's globals; the host has
+// no filesystem, process, network, or application capability injection.
 #[tauri::command]
 fn plugin_run(script: String) -> Result<String, String> {
     let host = lifeos_core::plugin::PluginHost::new().map_err(|e| e.to_string())?;

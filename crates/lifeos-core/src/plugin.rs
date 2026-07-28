@@ -1,4 +1,4 @@
-//! Lua/Luau plugin host — Wave 3 spike.
+//! Lua/Luau plugin host.
 //!
 //! Embeds Roblox's Luau dialect (via `mlua`) so LifeOS can execute user-authored
 //! scripts without dragging arbitrary FFI into the process. Luau is the chosen
@@ -32,12 +32,9 @@
 //! no I/O on construction). The Tauri command builds one per call so a
 //! misbehaving script can't poison the next caller's globals.
 //!
-//! # Wave-4 follow-ups
-//!
-//! - Table return values serialize to `"<table>"`; a future pass should JSON-
-//!   encode them via mlua's `serde` feature.
-//! - No script-side time limit — `lua.set_interrupt` can wire one in.
-//! - No capability injection yet (LifeOS APIs the script *is* allowed to call).
+//! Results are serialized as JSON without silently discarding table contents.
+//! The host currently exposes no filesystem, process, network, or LifeOS
+//! capability to scripts; future capabilities must be explicitly injected.
 
 use std::fmt;
 
@@ -64,6 +61,8 @@ pub enum PluginError {
     /// `Lua::sandbox(true)` rejected the request. Any of these means the host
     /// is unsafe to run third-party code, so callers should refuse to proceed.
     Sandbox(String),
+    /// A returned value could not be represented without losing information.
+    Serialize(String),
 }
 
 impl fmt::Display for PluginError {
@@ -72,6 +71,7 @@ impl fmt::Display for PluginError {
             PluginError::Compile(msg) => write!(f, "plugin compile error: {msg}"),
             PluginError::Runtime(msg) => write!(f, "plugin runtime error: {msg}"),
             PluginError::Sandbox(msg) => write!(f, "plugin sandbox error: {msg}"),
+            PluginError::Serialize(msg) => write!(f, "plugin serialization error: {msg}"),
         }
     }
 }
@@ -113,22 +113,19 @@ impl PluginHost {
         Ok(Self { lua })
     }
 
-    /// Compile + execute `script`, then coerce its return value to a string.
+    /// Compile + execute `script`, then serialize its return value as JSON.
     ///
-    /// Coercion rules (the Wave-4 follow-up replaces #4 with a real
-    /// serializer):
-    ///
-    /// 1. `nil` → `""`
-    /// 2. `string` → the string verbatim
-    /// 3. `integer` / `number` → `to_string()`
-    /// 4. `table` → `"<table>"` placeholder
-    /// 5. `boolean` → `"true"` / `"false"`
-    /// 6. anything else (function, userdata, thread, light userdata, …) →
-    ///    `"<unknown>"`
+    /// Primitive values use their JSON equivalents. Tables become JSON arrays
+    /// when their keys are the contiguous sequence `1..n`, otherwise they
+    /// become JSON objects with string or integer keys. Unsupported values,
+    /// mixed table key domains, cyclic/deep tables, and non-finite numbers are
+    /// rejected rather than replaced with a lossy placeholder.
     pub fn run(&self, script: &str) -> Result<String, PluginError> {
         let chunk = self.lua.load(script);
         let value: mlua::Value = chunk.eval().map_err(classify_lua_error)?;
-        Ok(coerce_to_string(value))
+        let json = value_to_json(value, 0, &mut std::collections::HashSet::new())?;
+        serde_json::to_string(&json)
+            .map_err(|error| PluginError::Serialize(format!("encode JSON result: {error}")))
     }
 }
 
@@ -143,16 +140,98 @@ fn classify_lua_error(err: mlua::Error) -> PluginError {
     }
 }
 
-fn coerce_to_string(value: mlua::Value) -> String {
-    match value {
-        mlua::Value::Nil => String::new(),
-        mlua::Value::String(s) => s.to_str().map(|cow| cow.to_string()).unwrap_or_default(),
-        mlua::Value::Integer(i) => i.to_string(),
-        mlua::Value::Number(n) => n.to_string(),
-        mlua::Value::Boolean(b) => b.to_string(),
-        mlua::Value::Table(_) => "<table>".to_string(),
-        _ => "<unknown>".to_string(),
+fn value_to_json(
+    value: mlua::Value,
+    depth: usize,
+    seen: &mut std::collections::HashSet<usize>,
+) -> Result<serde_json::Value, PluginError> {
+    if depth > 64 {
+        return Err(PluginError::Serialize(
+            "table nesting exceeds the 64-level limit".into(),
+        ));
     }
+    match value {
+        mlua::Value::Nil => Ok(serde_json::Value::Null),
+        mlua::Value::String(s) => s
+            .to_str()
+            .map(|value| serde_json::Value::String(value.to_string()))
+            .map_err(|error| PluginError::Serialize(format!("invalid UTF-8 string: {error}"))),
+        mlua::Value::Integer(i) => Ok(serde_json::json!(i)),
+        mlua::Value::Number(n) if n.is_finite() => Ok(serde_json::json!(n)),
+        mlua::Value::Number(_) => Err(PluginError::Serialize(
+            "non-finite numbers cannot be encoded as JSON".into(),
+        )),
+        mlua::Value::Boolean(value) => Ok(serde_json::Value::Bool(value)),
+        mlua::Value::Table(table) => {
+            let pointer = table.to_pointer() as usize;
+            if !seen.insert(pointer) {
+                return Err(PluginError::Serialize(
+                    "cyclic tables cannot be encoded as JSON".into(),
+                ));
+            }
+            let result = table_to_json(table, depth + 1, seen);
+            seen.remove(&pointer);
+            result
+        }
+        other => Err(PluginError::Serialize(format!(
+            "unsupported return value: {}",
+            other.type_name()
+        ))),
+    }
+}
+
+fn table_to_json(
+    table: mlua::Table,
+    depth: usize,
+    seen: &mut std::collections::HashSet<usize>,
+) -> Result<serde_json::Value, PluginError> {
+    let mut strings = serde_json::Map::new();
+    let mut integers = std::collections::BTreeMap::new();
+    for pair in table.pairs::<mlua::Value, mlua::Value>() {
+        let (key, value) =
+            pair.map_err(|error| PluginError::Serialize(format!("iterate table result: {error}")))?;
+        let value = value_to_json(value, depth, seen)?;
+        match key {
+            mlua::Value::String(key) => {
+                let key = key.to_str().map_err(|error| {
+                    PluginError::Serialize(format!("invalid UTF-8 table key: {error}"))
+                })?;
+                strings.insert(key.to_string(), value);
+            }
+            mlua::Value::Integer(key) if key > 0 => {
+                integers.insert(key, value);
+            }
+            mlua::Value::Integer(_) => {
+                return Err(PluginError::Serialize(
+                    "table integer keys must be positive".into(),
+                ));
+            }
+            other => {
+                return Err(PluginError::Serialize(format!(
+                    "table key type {} is not JSON-compatible",
+                    other.type_name()
+                )));
+            }
+        }
+    }
+    if !strings.is_empty() && !integers.is_empty() {
+        return Err(PluginError::Serialize(
+            "table cannot mix string and integer keys".into(),
+        ));
+    }
+    if !integers.is_empty() {
+        let contiguous = integers
+            .keys()
+            .enumerate()
+            .all(|(index, key)| *key == (index + 1) as i64);
+        if contiguous {
+            return Ok(serde_json::Value::Array(integers.into_values().collect()));
+        }
+        for (key, value) in integers {
+            strings.insert(key.to_string(), value);
+        }
+    }
+    Ok(serde_json::Value::Object(strings))
 }
 
 #[cfg(test)]
@@ -181,10 +260,37 @@ mod tests {
     }
 
     #[test]
-    fn coerces_table_return_to_placeholder() {
+    fn serializes_table_return_as_json_array() {
         let host = PluginHost::new().expect("host construction");
         let out = host.run("return {1, 2, 3}").expect("script ok");
-        assert_eq!(out, "<table>");
+        assert_eq!(out, "[1,2,3]");
+    }
+
+    #[test]
+    fn serializes_nested_object_return_as_json() {
+        let host = PluginHost::new().expect("host construction");
+        let out = host
+            .run(r#"return {name = "lifeos", meta = {version = 1}}"#)
+            .expect("script ok");
+        assert_eq!(out, r#"{"meta":{"version":1},"name":"lifeos"}"#);
+    }
+
+    #[test]
+    fn rejects_mixed_table_key_domains() {
+        let host = PluginHost::new().expect("host construction");
+        let err = host
+            .run(r#"return {[1] = "one", name = "lifeos"}"#)
+            .expect_err("mixed keys must not be lossy");
+        assert!(matches!(err, PluginError::Serialize(_)), "got {err:?}");
+    }
+
+    #[test]
+    fn rejects_cyclic_table_return() {
+        let host = PluginHost::new().expect("host construction");
+        let err = host
+            .run("local value = {}; value.self = value; return value")
+            .expect_err("cyclic tables must not recurse forever");
+        assert!(matches!(err, PluginError::Serialize(_)), "got {err:?}");
     }
 
     #[test]

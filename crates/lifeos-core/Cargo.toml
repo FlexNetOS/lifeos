@@ -40,7 +40,7 @@ uuid = { version = "1", features = ["serde"], optional = true }
 # feature flag (default-on) so a future no_std slice of the crate can drop the
 # transport and keep just the typed wrappers + `Transport` trait.
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "rustls-tls-native-roots", "blocking", "json"], optional = true }
-# Wave 3 (TODO 1d / C4): Luau plugin host spike. `luau` picks Roblox's
+# Luau plugin host. `luau` picks Roblox's
 # sandboxed Lua dialect (the foundation doc recommends it whenever third-party
 # scripts are in scope); `vendored` builds the Luau C VM from source so the
 # crate compiles cleanly on every host without a system Lua install; `send`
@@ -70,7 +70,7 @@ sha2 = { version = "0.10", optional = true }
 # (e.g. a future WASM target) can opt out with `default-features = false`.
 default = ["mcp-http", "storage"]
 mcp-http = ["dep:reqwest"]
-# Wave 3 (TODO 1d / C4): opt-in Luau scripting. Off by default so the standard
+# Opt-in Luau scripting. Off by default so the standard
 # workspace build doesn't pay the vendored Luau C compile cost; the Tauri
 # shell enables it explicitly in `src-tauri/Cargo.toml`.
 plugin-host = ["dep:mlua"]

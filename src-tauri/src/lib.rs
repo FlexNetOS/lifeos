@@ -1144,6 +1144,27 @@ async fn ai_complete(
     let provider = read_provider(&storage)
         .await
         .map_err(|_| AI_ERROR_MSG.to_string())?;
+    let route = provider.as_str();
+    let signals = serde_json::json!({
+        "promptBytes": prompt.len(),
+        "source": source,
+        "privacy": false,
+        "providerConfigured": true,
+    });
+    let policy = serde_json::json!({
+        "selection": "canonical-ai-provider-projection",
+        "failClosed": true,
+    });
+    lifeos_core::storage::routing::append_decision(
+        storage.pool(),
+        route,
+        "provider-selected",
+        signals,
+        policy,
+        "tauri.ai_complete",
+    )
+    .await
+    .map_err(|_| AI_ERROR_MSG.to_string())?;
     match provider {
         AiProvider::Openai => call_openai(&prompt).await,
         AiProvider::Gemini => call_gemini(&prompt).await,

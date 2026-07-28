@@ -6,6 +6,7 @@ pub mod legacy_sqlite;
 pub mod mempalace;
 pub mod logs;
 pub mod ruvector;
+pub mod routing;
 pub mod security;
 pub mod seed_vault;
 pub mod state;
@@ -107,12 +108,22 @@ impl Storage {
         url: &str,
         runtime_context: Option<RuntimeContext>,
     ) -> Result<Self, StorageError> {
+        Self::new_with_context_and_pool_size(url, runtime_context, 10).await
+    }
+
+    async fn new_with_context_and_pool_size(
+        url: &str,
+        runtime_context: Option<RuntimeContext>,
+        max_connections: u32,
+    ) -> Result<Self, StorageError> {
         if !(url.starts_with("postgres://") || url.starts_with("postgresql://")) {
             return Err(StorageError::UnsupportedDatabaseUrl);
         }
 
         let options = PgConnectOptions::from_str(url).map_err(sqlx::Error::from)?;
-        let mut pool_options = PgPoolOptions::new().max_connections(10).min_connections(1);
+        let mut pool_options = PgPoolOptions::new()
+            .max_connections(max_connections)
+            .min_connections(1);
         if let Some(context) = runtime_context {
             pool_options = pool_options.after_connect(move |connection, _meta| {
                 let context = context.clone();
@@ -307,9 +318,16 @@ impl Storage {
     pub async fn new_for_test() -> Result<Self, StorageError> {
         let url = std::env::var("LIFEOS_TEST_DATABASE_URL")
             .map_err(|_| StorageError::MissingTestDatabaseUrl)?;
-        let storage = Self::new(&url).await?;
-        storage.migrate().await?;
-        storage.verify_required_extensions().await?;
+        let bootstrap = Self::new(&url).await?;
+        bootstrap.migrate().await?;
+        bootstrap.pool.close().await;
+        let context = RuntimeContext {
+            tenant_id: uuid::uuid!("00000000-0000-4000-8000-000000000001"),
+            identity_id: uuid::uuid!("00000000-0000-4000-8000-000000000002"),
+            grant_id: uuid::uuid!("00000000-0000-4000-8000-000000000003"),
+            binding_bytes: br#"{"tenant_id":"00000000-0000-4000-8000-000000000001","identity_id":"00000000-0000-4000-8000-000000000002","grant_id":"00000000-0000-4000-8000-000000000003","purpose":"envctl-session-binding"}"#.to_vec(),
+        };
+        let storage = Self::new_with_context_and_pool_size(&url, Some(context), 1).await?;
         storage.reset_for_test().await?;
         Ok(storage)
     }
@@ -317,17 +335,23 @@ impl Storage {
     #[cfg(test)]
     async fn reset_for_test(&self) -> Result<(), StorageError> {
         sqlx::query(
-            "TRUNCATE TABLE
-               lifeos_semantic.embedding,
-               lifeos_agentdb.exp_edges,
-               lifeos_agentdb.exp_nodes,
-               lifeos_runtime.projection,
-               lifeos_security.identity,
-               lifeos_blob.object
-             RESTART IDENTITY CASCADE",
+            "DELETE FROM lifeos_security.identity
+             WHERE subject_kind = 'human'",
         )
         .execute(&self.pool)
         .await?;
+        sqlx::query("DELETE FROM lifeos_semantic.embedding")
+            .execute(&self.pool)
+            .await?;
+        for table in [
+            "lifeos_agentdb.exp_edges",
+            "lifeos_agentdb.exp_nodes",
+            "lifeos_runtime.ui_projection",
+        ] {
+            sqlx::query(&format!("TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))
+                .execute(&self.pool)
+                .await?;
+        }
         Ok(())
     }
 }

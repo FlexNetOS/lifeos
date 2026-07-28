@@ -8,7 +8,7 @@ use super::StorageError;
 pub async fn read(pool: &PgPool, key: &str) -> Result<String, StorageError> {
     let payload = sqlx::query_scalar::<_, serde_json::Value>(
         "SELECT payload_json
-         FROM lifeos_runtime.projection
+         FROM lifeos_runtime.ui_projection
          WHERE tenant_id = lifeos_security.current_tenant()
            AND projection_key = $1",
     )
@@ -83,7 +83,7 @@ pub async fn migrate_from_json_file(
     .await?;
     let existed: bool = sqlx::query_scalar(
         "SELECT EXISTS(
-           SELECT 1 FROM lifeos_runtime.projection
+           SELECT 1 FROM lifeos_runtime.ui_projection
            WHERE tenant_id = lifeos_security.current_tenant()
              AND projection_key = $1
          )",

@@ -40,6 +40,8 @@ pub enum StorageError {
     CowSemanticReceipt,
     /// A frontend projection write did not contain valid JSON.
     InvalidProjectionJson,
+    /// A live route decision had invalid route context.
+    InvalidRouteDecision,
     /// Underlying sqlx error.
     Sqlx(sqlx::Error),
     /// Filesystem I/O error (archive rename, etc.).
@@ -101,6 +103,7 @@ impl fmt::Display for StorageError {
                 "COW database semantics are not accepted by a valid v2 receipt"
             ),
             Self::InvalidProjectionJson => write!(f, "projection payload must be valid JSON"),
+            Self::InvalidRouteDecision => write!(f, "route decisions require non-empty route context objects"),
             Self::Sqlx(e) => write!(f, "database error: {e}"),
             Self::Io(e) => write!(f, "I/O error: {e}"),
         }

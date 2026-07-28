@@ -20,9 +20,9 @@ export const INVENTORY_PATH = path.join(
 
 export const SOURCE_ID = "ARCHANCHOR-001";
 export const SOURCE_SHA256 =
-  "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee";
-export const SOURCE_BYTES = 977_386;
-export const SOURCE_LINES = 6_347;
+  "53874603122796994030d0afe71dccc4361ed89c6a5d31ea433cac137a132adb";
+export const SOURCE_BYTES = 979_314;
+export const SOURCE_LINES = 6_355;
 export const MEMOIR_NAME = "architecture-data-pipeline-ruvector";
 export const TOPIC_PREFIX = MEMOIR_NAME;
 export const MAX_RAW_CHUNK_BYTES = 8_192;
@@ -167,9 +167,9 @@ const RECALL_PROBES = [
   },
   {
     id: "release-gate",
-    evidence: ["database-gated", "envctl-activated", "zero undeclared loss"],
+    evidence: ["envctl", "PostgreSQL/RuVector accepts", "zero undeclared loss"],
     query:
-      "database-gated envctl-activated release zero undeclared loss release gate"
+      "envctl PostgreSQL RuVector accepts release zero undeclared loss release gate"
   }
 ];
 
@@ -1114,6 +1114,57 @@ function addRelation(relation) {
   ]);
 }
 
+function postgresStableId(prefix, value) {
+  return `${prefix}-${sha256(Buffer.from(value, "utf8")).slice(0, 32)}`;
+}
+
+function postgresUpsertGraph(plan) {
+  const memoirId = postgresStableId("memoir", plan.memoir.name);
+  const conceptStatements = [
+    `INSERT INTO memoirs (id, name, description, created_at, updated_at) VALUES (${sqlLiteral(memoirId)}, ${sqlLiteral(plan.memoir.name)}, ${sqlLiteral(plan.memoir.description)}, now(), now()) ON CONFLICT (name) DO UPDATE SET description = EXCLUDED.description, updated_at = now()`
+  ];
+  const linkStatements = [];
+  const conceptIds = new Map();
+  for (const concept of plan.concepts) {
+    const conceptId = postgresStableId("concept", `${plan.memoir.name}:${concept.name}`);
+    conceptIds.set(concept.name, conceptId);
+    const labels = JSON.stringify(
+      concept.labels.map((label) => {
+        const separator = label.indexOf(":");
+        return {
+          namespace: separator === -1 ? "label" : label.slice(0, separator),
+          value: separator === -1 ? label : label.slice(separator + 1)
+        };
+      })
+    );
+    conceptStatements.push(
+      `INSERT INTO concepts (id, memoir_id, name, definition, labels, confidence, revision, created_at, updated_at, source_memory_ids) VALUES (${sqlLiteral(conceptId)}, ${sqlLiteral(memoirId)}, ${sqlLiteral(concept.name)}, ${sqlLiteral(concept.definition)}, ${sqlLiteral(labels)}, 1.0, 1, now(), now(), '[]') ON CONFLICT (memoir_id, name) DO UPDATE SET definition = EXCLUDED.definition, labels = EXCLUDED.labels, updated_at = now()`
+    );
+  }
+  for (const relation of plan.relations) {
+    const sourceId = conceptIds.get(relation.from);
+    const targetId = conceptIds.get(relation.to);
+    if (!sourceId || !targetId) {
+      fail(`cannot materialize relation without concept IDs: ${relation.from} -> ${relation.to}`);
+    }
+    const normalizedRelation = relation.relation.replaceAll("-", "_");
+    const linkId = postgresStableId(
+      "link",
+      `${plan.memoir.name}:${relation.from}:${normalizedRelation}:${relation.to}`
+    );
+    linkStatements.push(
+      `INSERT INTO concept_links (id, source_id, target_id, relation, weight, created_at) VALUES (${sqlLiteral(linkId)}, ${sqlLiteral(sourceId)}, ${sqlLiteral(targetId)}, ${sqlLiteral(normalizedRelation)}, 1.0, now()) ON CONFLICT (source_id, target_id, relation) DO UPDATE SET weight = EXCLUDED.weight`
+    );
+  }
+  const runBatches = (statements) => {
+    for (let index = 0; index < statements.length; index += 16) {
+      runPsql(`BEGIN;\n${statements.slice(index, index + 16).join(";\n")};\nCOMMIT;`);
+    }
+  };
+  runBatches(conceptStatements);
+  runBatches(linkStatements);
+}
+
 function embedFingerprint() {
   const payload = {
     dimension: EXPECTED_EMBEDDING_DIMENSION,
@@ -1535,44 +1586,20 @@ function execute(options) {
       }
     }
 
-    if (graphState.memoirMissing) {
-      runIcm([
-        "memoir",
-        "create",
-        "--name",
-        MEMOIR_NAME,
-        "--description",
-        MEMOIR_DESCRIPTION,
-        "--no-embeddings"
-      ]);
-      mutations.memoirs += 1;
+    if (
+      graphState.memoirMissing ||
+      graphState.missingConcepts.length ||
+      graphState.missingRelations.length ||
+      graphState.drift.length
+    ) {
+      postgresUpsertGraph(plan);
+      mutations.memoirs += graphState.memoirMissing ? 1 : 0;
+      mutations.concepts += graphState.missingConcepts.length;
+      mutations.relations += graphState.missingRelations.length;
     }
-
     graph = readGraph();
     graphState = reconcileGraph(plan, graph);
     assertNoDrift(reconcileMemories(plan.memories, readImportMemories()), graphState);
-    for (const [index, concept] of graphState.missingConcepts.entries()) {
-      addConcept(concept);
-      mutations.concepts += 1;
-      if ((index + 1) % 25 === 0) {
-        console.error(
-          `stored ${index + 1}/${graphState.missingConcepts.length} concepts`
-        );
-      }
-    }
-
-    graph = readGraph();
-    graphState = reconcileGraph(plan, graph);
-    assertNoDrift(reconcileMemories(plan.memories, readImportMemories()), graphState);
-    for (const [index, relation] of graphState.missingRelations.entries()) {
-      addRelation(relation);
-      mutations.relations += 1;
-      if ((index + 1) % 25 === 0) {
-        console.error(
-          `stored ${index + 1}/${graphState.missingRelations.length} relations`
-        );
-      }
-    }
   }
 
   memories = readImportMemories();

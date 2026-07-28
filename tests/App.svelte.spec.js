@@ -14,7 +14,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import App from "@/App.svelte";
 import { useAuth } from "@/stores/auth";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () =>
   createRouter({
@@ -31,6 +31,7 @@ describe("App.svelte auth gate", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();
@@ -83,6 +84,7 @@ describe("App.svelte shell layout + main-pane gate", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();

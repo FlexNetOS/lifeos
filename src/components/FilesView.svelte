@@ -3,7 +3,7 @@
   // Two-column files browser: folder tree on the left, recent files list on the right.
   // Workspace-aware: reads window.LIFEOS_DATA.files[workspaceId] (work | personal).
   // Folder click filters the recent list; clicking a recent file shows an info toast.
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { useToasts } from "@/stores/toasts-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";

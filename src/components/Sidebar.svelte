@@ -5,7 +5,7 @@
   // header comment for why this doesn't use nav.js's useNav() directly (vue-router's
   // useRouter() needs Vue component injection, which doesn't exist in a Svelte tree).
   import { onMount, onDestroy } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";

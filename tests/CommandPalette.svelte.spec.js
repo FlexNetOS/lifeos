@@ -8,7 +8,7 @@ import { render, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import CommandPalette from "@/components/CommandPalette.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -28,6 +28,7 @@ describe("CommandPalette.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/workspace/ai");
     await router.isReady();

@@ -1,7 +1,7 @@
 <script>
   // LifeOS — Dashboard SFC (Svelte port of Dashboard.vue)
   // Main canvas: greeting + 4 stat cards + agent-team grid (drag+click) + activity + agenda + AI suggest.
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { useAuth } from "@/stores/auth";
   import { useToasts } from "@/stores/toasts-native";
   import { createNav } from "@/lib/svelte-nav.js";

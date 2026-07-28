@@ -7,7 +7,7 @@ import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import CalendarView from "@/components/CalendarView.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -24,6 +24,7 @@ describe("CalendarView.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();

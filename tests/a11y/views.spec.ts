@@ -24,6 +24,7 @@ import ContactsView from "@/components/ContactsView.svelte";
 import SettingsView from "@/components/SettingsView.svelte";
 import N8nFlowView from "@/components/N8nFlowView.svelte";
 import OpenPencilEditor from "@/components/OpenPencilEditor.svelte";
+import { useLifeos } from "@/stores/lifeos-native";
 
 // Real router via createMemoryHistory — the Svelte components take it as a
 // direct `router` prop (see src/lib/svelte-nav.js).
@@ -34,6 +35,7 @@ const makeRouter = () => createRouter({
 
 beforeEach(() => {
   setActivePinia(createPinia());
+  useLifeos().resetUiState();
 });
 
 afterEach(() => cleanup());
@@ -120,7 +122,7 @@ describe("ContactsView (aggregator)", () => {
   it("has no a11y violations in aggregator mode", async () => {
     // Aggregator mode is store-driven: the footer "contacts" entry resolves via
     // LIFEOS_AGGREGATORS when it is the active workspace.
-    const { useLifeos } = await import("@/stores/lifeos.js");
+    const { useLifeos } = await import("@/stores/lifeos-native");
     useLifeos().pickWorkspace("contacts");
     const { container } = render(ContactsView, { props: { router: makeRouter() } });
     expect(await axe(axeTarget(container), axeOptions)).toHaveNoViolations();

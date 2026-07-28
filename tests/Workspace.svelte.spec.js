@@ -6,7 +6,7 @@ import { tick } from "svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import Workspace from "@/components/Workspace.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -22,6 +22,7 @@ describe("Workspace.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();

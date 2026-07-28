@@ -9,7 +9,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { useToasts } from "@/stores/toasts-native";
 import FilesView from "@/components/FilesView.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -26,6 +26,7 @@ describe("FilesView.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     useToasts().clear();
     router = makeRouter();
     await router.push("/");

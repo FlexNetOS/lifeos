@@ -20,7 +20,7 @@ import CommandPalette from "@/components/CommandPalette.svelte";
 import KeyboardHelp from "@/components/KeyboardHelp.svelte";
 import NotificationsDrawer from "@/components/NotificationsDrawer.svelte";
 import ToastContainer from "@/components/ToastContainer.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -29,6 +29,7 @@ const makeRouter = () => createRouter({
 
 beforeEach(() => {
   setActivePinia(createPinia());
+  useLifeos().resetUiState();
   useToasts().clear();
 });
 

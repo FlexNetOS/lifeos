@@ -9,7 +9,7 @@ import { render, cleanup } from "@testing-library/svelte";
 import { tick } from "svelte";
 import { createPinia, setActivePinia } from "pinia";
 import TelemetryWidget from "@/components/TelemetryWidget.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 // Microtask-based (not setTimeout-based) so it also resolves under
 // vi.useFakeTimers, matching how the fake-timer tests below use it.
@@ -42,6 +42,7 @@ describe("TelemetryWidget.svelte", () => {
     setTauri(null);
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
   });
 

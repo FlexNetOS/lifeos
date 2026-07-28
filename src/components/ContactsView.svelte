@@ -5,7 +5,7 @@
   // Canvas pattern: 1fr 320px on desktop, 1fr below 960 px.
   // Static-first, token-only, no new deps.
 
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { useToasts } from "@/stores/toasts-native";

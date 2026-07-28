@@ -24,6 +24,7 @@ describe("LightsView.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();
@@ -195,7 +196,7 @@ describe("LightsView.svelte", () => {
     });
     // Clicking edit calls lifeos.sendAiMessage — verify by message count + content
     const editBtn = rows[0].querySelectorAll(".schedule-action")[0];
-    const { useLifeos } = await import("@/stores/lifeos.js");
+    const { useLifeos } = await import("@/stores/lifeos-native");
     const store = useLifeos();
     const startLen = store.aiMessages.length;
     await fireEvent.click(editBtn);

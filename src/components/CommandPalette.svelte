@@ -6,7 +6,7 @@
   // Ported from design-system-reference/lifeos_app_react/CommandPalette.jsx via CommandPalette.vue.
 
   import { onMount, onDestroy, tick } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";

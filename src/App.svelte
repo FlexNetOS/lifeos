@@ -17,7 +17,7 @@
   // gate reflects the backend (no account → signup; account but no session →
   // welcome-back signin).
   import { onMount } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { useAuth } from "@/stores/auth";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";

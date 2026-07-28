@@ -4,21 +4,21 @@
 # src
 
 ## Purpose
-LifeOS **Svelte 5** application source. Pinia store + headless vue-router + Vite-bundled
+LifeOS **Svelte 5** application source. Native subscribable stores + headless vue-router + Vite-bundled
 Svelte components that render the dark-first six-workspace shell defined in the root
 contract. Tauri's `beforeBuildCommand` consumes the Vite output of this tree as
 `frontendDist`.
 
 > **Framework note (phase-3 cutover).** The Vue SFC toolchain is retired — every component
 > here is `.svelte` using Svelte 5 runes. The `vue` package is still a runtime dependency
-> for exactly two reasons: it is Pinia's reactivity engine, and `vue-router` runs headless.
+> Legacy Pinia remains only for the browser-preview compatibility path; the mounted Glass shell uses native stores. `vue-router` remains headless for URL history.
 > There are no Vue components. `vite.config.ts` loads only `svelte()`; the typecheck is
 > `svelte-check`, not `vue-tsc`.
 
 ## Key Files
 | File | Description |
 |------|-------------|
-| `main.ts` | Bootstraps the app: `createPinia()` + `setActivePinia()` (with the `tauriPersistence` plugin registered **before** activation) → explicit ordered CSS imports → manual `router.push(router.options.history.location)` headless boot → `mount(App, { target: #app })`. Side-effect imports `../data.js`. Bridges `lifeos:navigate` Tauri events → `router.push`. |
+| `main.ts` | Bootstraps the app: data/CSS imports → native LifeOS projection hydration → manual headless router boot → `mount(App, { target: #app })`. Side-effect imports `../data.js`. Bridges `lifeos:navigate` Tauri events → `router.push`. |
 | `App.svelte` | Root shell: `Sidebar \| Workspace \| main \| AIAvatar` plus the global `CommandPalette`, `KeyboardHelp`, `NotificationsDrawer`, and `ToastContainer` overlays. The `<main>` swaps SettingsView / ContactsView / Dashboard / OpenPencilEditor / N8nFlowView / LightsView / CalendarView / FilesView / HealthView / IoTView / SubsectionView based on `lifeos.activeId` and `lifeos.activeSub.item?.view` (gate at `App.svelte:70`). |
 | `shims-svelte.d.ts` | `*.svelte` module declaration for `svelte-check` / TypeScript. |
 
@@ -27,9 +27,9 @@ contract. Tauri's `beforeBuildCommand` consumes the Vite output of this tree as
 |-----------|---------|
 | `components/` | 24 Svelte components — shell, view panes, overlays, primitives (see `components/AGENTS.md`) |
 | `views/` | `Login.svelte` (pre-shell auth surface) |
-| `stores/` | Pinia stores with `.ts` (canonical) ↔ `.js` (preview-path sibling), plus `auth.ts` (see `stores/AGENTS.md`) |
-| `lib/` | Resolver, nav, persistence plugin, Pinia↔Svelte bridge, icon barrels (see `lib/AGENTS.md`) |
-| `router/` | vue-router config; URL → Pinia state sync |
+| `stores/` | Native Svelte runtime stores plus legacy Pinia `.ts` ↔ `.js` preview-path siblings, plus `auth.ts` (see `stores/AGENTS.md`) |
+| `lib/` | Resolver, navigation, native/legacy persistence boundaries, store↔Svelte bridge, icon barrels (see `lib/AGENTS.md`) |
+| `router/` | vue-router config; URL → native LifeOS state sync |
 | `data/` | TypeScript types for `window.LIFEOS_DATA` (see `data/AGENTS.md`) |
 
 ## For AI Agents
@@ -42,9 +42,9 @@ contract. Tauri's `beforeBuildCommand` consumes the Vite output of this tree as
   AUDIT.md icon-click bug.
 - Use **callback props** (`onclick={fn}`), not `createEventDispatcher`. Children render
   via `{@render children?.()}`.
-- **Pinia is bridged, never consumed raw in a component:**
+- **Native stores are bridged through the Svelte adapter; legacy Pinia is preview-only:**
   ```svelte
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   const lifeosState = bindStore(useLifeos(), ["activeId", "wsCollapsed"]);
   ```
@@ -53,7 +53,8 @@ contract. Tauri's `beforeBuildCommand` consumes the Vite output of this tree as
   injection that no longer exists in a Svelte tree.
 - TypeScript for everything new. Where a `.ts` has a `.js` sibling (`stores/lifeos`,
   `stores/toasts`, `lib/resolve`, `lib/nav`, `lib/persistence`), edit both together until
-  the preview path is retired. `lib/icons-svelte.js` is **exempt** — it is Svelte-only glue,
+  the preview path is retired. Native runtime stores (`stores/*-native.ts`) are Svelte-only
+  boundaries and do not replace the legacy preview siblings. `lib/icons-svelte.js` is **exempt** — it is Svelte-only glue,
   deliberately not a third sibling of `icons.ts`.
 - Tauri-only branches must be guarded by `window.__TAURI__` (or the `tauriInvoke()` helper)
   so Vitest + the plain Vite dev server stay green.

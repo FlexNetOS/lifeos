@@ -21,7 +21,7 @@ import TelemetryWidget from "@/components/TelemetryWidget.svelte";
 import Badge from "@/components/Badge.svelte";
 import Icon from "@/components/Icon.svelte";
 import MenuRow from "@/components/MenuRow.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -30,6 +30,7 @@ const makeRouter = () => createRouter({
 
 beforeEach(() => {
   setActivePinia(createPinia());
+  useLifeos().resetUiState();
 });
 
 afterEach(() => cleanup());

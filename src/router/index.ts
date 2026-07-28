@@ -6,7 +6,7 @@
 // URL ⇄ store bridge (beforeEach below, plus createNav() pushes from Svelte).
 
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import { useLifeos } from "@/stores/lifeos";
+import { useLifeos } from "@/stores/lifeos-native";
 import { resolveWorkspace } from "@/lib/resolve";
 
 // Never rendered (no RouterView anywhere) — satisfies the route-record shape only.
@@ -27,18 +27,16 @@ export const router = createRouter({
 router.beforeEach((to) => {
   const lifeos = useLifeos();
   const id = to.name === "settings" ? "settings" : (to.params.id as string);
-  if (id && id !== lifeos.activeId) lifeos.activeId = id;
   const sec = to.params.section as string | undefined;
-  if (sec) lifeos.sectionByWs[id] = decodeURIComponent(sec);
+  const sectionTitle = sec ? decodeURIComponent(sec) : undefined;
   const sub = to.params.sub as string | undefined;
+  let item;
   if (sub) {
     // Find the item in the current section to populate activeSub
     const ws = resolveWorkspace(id);
-    const section = ws?.sections?.find((s: any) => s.title === lifeos.sectionByWs[id]);
-    const item = section?.items?.find((i: any) => i.label === decodeURIComponent(sub));
-    if (item) lifeos.activeSub = { workspaceId: id, sectionTitle: section!.title, item };
-  } else {
-    lifeos.activeSub = null;
+    const section = ws?.sections?.find((s: any) => s.title === sectionTitle || (!sectionTitle && s.title === lifeos.currentSection));
+    item = section?.items?.find((i: any) => i.label === decodeURIComponent(sub));
   }
+  lifeos.syncRoute(id, sectionTitle, item);
   return true;
 });

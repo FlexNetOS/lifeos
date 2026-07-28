@@ -5,7 +5,7 @@
   // AI chat strip. The real Skia/CanvasKit runtime is embedded via iframe when available;
   // when not, falls back to a static placeholder so the rest of the prototype keeps working.
   import { untrack } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";

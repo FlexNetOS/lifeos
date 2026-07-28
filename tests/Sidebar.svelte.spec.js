@@ -6,7 +6,7 @@ import { tick } from "svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import Sidebar from "@/components/Sidebar.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -24,6 +24,7 @@ describe("Sidebar.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();

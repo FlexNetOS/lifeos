@@ -17,6 +17,7 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::PathBuf;
+use std::process::Command;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
@@ -250,8 +251,41 @@ fn envctl_commit_conn() -> Result<String, String> {
         .map_err(|_| "LIFEOS_ENVCTL_COMMIT_CONN is required for envctl reconciliation".into())
 }
 
+/// Flush CodeDB's ordered redb outbox into the non-authoritative PostgreSQL
+/// export contract before envctl drains it. The DSN stays in the inherited
+/// environment and never enters process arguments; envctl remains the only
+/// authoritative committer.
+fn codedb_outbox_sync() -> Result<(), String> {
+    let Some(store) = std::env::var_os("LIFEOS_CODEDB_REDB_STORE") else {
+        return Ok(());
+    };
+    let binary = std::env::var_os("LIFEOS_CODEDB_BIN")
+        .or_else(|| std::env::var_os("CODEDB_BIN"))
+        .unwrap_or_else(|| "codedb".into());
+    let conn = envctl_commit_conn()?;
+    let output = Command::new(binary)
+        .args(["outbox-sync", "--store"])
+        .arg(store)
+        .args(["--format", "json"])
+        .env("CODEDB_PG_CONN", conn)
+        .output()
+        .map_err(|error| format!("launching CodeDB outbox sync: {error}"))?;
+    if !output.status.success() {
+        return Err(format!(
+            "CodeDB outbox sync exited with {}",
+            output
+                .status
+                .code()
+                .map(|code| code.to_string())
+                .unwrap_or_else(|| "signal".to_string())
+        ));
+    }
+    Ok(())
+}
+
 #[tauri::command]
 fn envctl_drain(max_batch: Option<usize>) -> Result<envctl_commit_worker::DrainReceipt, String> {
+    codedb_outbox_sync()?;
     envctl_commit_worker::drain_and_commit(&envctl_commit_conn()?, max_batch.unwrap_or(500), false)
         .map_err(|error| error.to_string())
 }
@@ -280,12 +314,18 @@ impl EnvctlReconciler {
             .spawn(move || {
                 while !thread_stop.load(Ordering::SeqCst) {
                     if let Ok(conn) = std::env::var("LIFEOS_ENVCTL_COMMIT_CONN") {
-                        if let Ok(receipt) =
-                            envctl_commit_worker::drain_and_commit(&conn, 500, false)
-                        {
-                            if !receipt.committed.is_empty() || !receipt.skipped_existing.is_empty()
+                        if codedb_outbox_sync().is_ok() {
+                            if let Ok(receipt) =
+                                envctl_commit_worker::drain_and_commit(&conn, 500, false)
                             {
-                                let _ = envctl_commit_worker::return_projection(&conn, &owner_root);
+                                if !receipt.committed.is_empty()
+                                    || !receipt.skipped_existing.is_empty()
+                                {
+                                    let _ = envctl_commit_worker::return_projection(
+                                        &conn,
+                                        &owner_root,
+                                    );
+                                }
                             }
                         }
                     }

@@ -6,6 +6,7 @@
   let output = $state("");
   let input = $state("");
   let connected = $state(false);
+  let redbSeq = $state(null);
   let terminalEl = $state(null);
   let stopOutput = null;
   let stopExit = null;
@@ -52,6 +53,10 @@
         if (event.payload?.sessionId === sessionId) connected = false;
       });
     }
+    if (invoke()) {
+      const projection = await invoke()("redb_projection_read").catch(() => null);
+      redbSeq = projection?.localSeq ?? null;
+    }
     await start();
   });
 
@@ -70,6 +75,7 @@
       <span class="eyebrow">ENGINE ROOM</span>
       <h1>Yazelix</h1>
       <p><code>yzx enter</code> · repository-backed terminal</p>
+      {#if redbSeq !== null}<p class="redb-status">redb projection · generation {redbSeq}</p>{/if}
     </div>
     <span class:online={connected} class="status">{connected ? "connected" : "browser preview"}</span>
   </header>

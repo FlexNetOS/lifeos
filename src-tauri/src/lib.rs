@@ -8,16 +8,42 @@ mod auth;
 // Portable types live in lifeos-core (Stage 1b). The Tauri shell re-uses them
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
+use flexnetos_redb_owner::{OwnerClient, ProjectionReader};
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
 use std::collections::HashMap;
 use std::io::{Read, Write};
+use std::path::PathBuf;
 use std::sync::Mutex;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
 // against `tauri::menu`, and a top-level `use` would break them.
 use tauri::{Emitter, Manager};
+
+fn redb_root() -> PathBuf {
+    std::env::var_os("LIFEOS_REDB_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("/home/flexnetos/meta/var/lib/redb"))
+}
+
+#[tauri::command]
+fn redb_projection_read() -> Result<serde_json::Value, String> {
+    let projection = ProjectionReader::read(redb_root()).map_err(|error| error.to_string())?;
+    Ok(serde_json::json!({
+        "localSeq": projection.local_seq,
+        "slot": projection.slot,
+        "checksum": projection.checksum,
+        "degraded": projection.degraded,
+        "entries": projection.entries,
+    }))
+}
+
+#[tauri::command]
+fn redb_state_write(key: String, value: String) -> Result<u64, String> {
+    let mut client = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
+    client.put(&key, &value).map_err(|error| error.to_string())
+}
 
 struct TerminalSession {
     master: Box<dyn MasterPty + Send>,
@@ -526,6 +552,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             vault_list,
             open_settings,
+            redb_projection_read,
+            redb_state_write,
             terminal_spawn,
             terminal_write,
             terminal_resize,

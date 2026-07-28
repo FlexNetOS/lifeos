@@ -4,7 +4,7 @@
 # stores
 
 ## Purpose
-Pinia stores for LifeOS. The `lifeos` store holds workspace nav, AI chat, telemetry config, command-palette state, notifications state, and the drag/drop reorder maps. The `toasts` store backs `ToastContainer.vue`. **Strict `.ts` ↔ `.js` parity** with the preview path is enforced by a test — see below.
+Stores for LifeOS. The legacy Pinia `lifeos` and `toasts` siblings remain the browser-preview compatibility surface, with strict `.ts` ↔ `.js` parity enforced by a test. Native Svelte runtime surfaces use `toasts-native.ts` and its subscribable contract; the Pinia `lifeos` boundary is being migrated separately.
 
 ## Key Files
 | File | Description |

@@ -4,7 +4,7 @@
   // Workspace-aware: reads window.LIFEOS_DATA.files[workspaceId] (work | personal).
   // Folder click filters the recent list; clicking a recent file shows an info toast.
   import { useLifeos } from "@/stores/lifeos.js";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";

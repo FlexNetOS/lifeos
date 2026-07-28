@@ -6,7 +6,7 @@
   // and a Tauri-backed persistence layer that no-ops outside the desktop shell.
   import { onMount, onDestroy, tick } from "svelte";
   import { useLifeos } from "@/stores/lifeos.js";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { router as appRouter } from "@/router";
   import Icon from "./Icon.svelte";

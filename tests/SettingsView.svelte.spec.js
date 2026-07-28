@@ -10,7 +10,7 @@ import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import SettingsView from "@/components/SettingsView.svelte";
 import { useLifeos } from "@/stores/lifeos.js";
-import { useToasts } from "@/stores/toasts.js";
+import { useToasts } from "@/stores/toasts-native";
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -26,6 +26,7 @@ describe("SettingsView.svelte", () => {
     setTauri(null);
     pinia = createPinia();
     setActivePinia(pinia);
+    useToasts().clear();
   });
 
   afterEach(() => {

@@ -3,7 +3,7 @@
   // Main canvas: greeting + 4 stat cards + agent-team grid (drag+click) + activity + agenda + AI suggest.
   import { useLifeos } from "@/stores/lifeos.js";
   import { useAuth } from "@/stores/auth";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";

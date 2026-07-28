@@ -7,6 +7,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
+import { useToasts } from "@/stores/toasts-native";
 import FilesView from "@/components/FilesView.svelte";
 import { useLifeos } from "@/stores/lifeos.js";
 
@@ -25,6 +26,7 @@ describe("FilesView.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useToasts().clear();
     router = makeRouter();
     await router.push("/");
     await router.isReady();
@@ -134,7 +136,6 @@ describe("FilesView.svelte", () => {
 
   it("clicking a recent file row shows an info toast", async () => {
     const { container } = renderWithSub("work");
-    const { useToasts } = await import("@/stores/toasts.js");
     const toastStore = useToasts();
     const before = toastStore.items.length;
     const firstItem = container.querySelector('[role="listitem"]');

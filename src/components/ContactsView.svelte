@@ -8,7 +8,7 @@
   import { useLifeos } from "@/stores/lifeos.js";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { router as appRouter } from "@/router";
   import Icon from "./Icon.svelte";
 

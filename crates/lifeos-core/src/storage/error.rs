@@ -25,6 +25,8 @@ pub enum StorageError {
     MissingRuntimeContext,
     /// The envctl-issued PostgreSQL runtime context was malformed.
     InvalidRuntimeContext(String),
+    /// A ciphertext-backed secret registration failed its Rust-side input guard.
+    InvalidSecretRegistration,
     /// RuVector must be installed in the dedicated `extensions` schema.
     RequiredExtension,
     /// The durable schema has fewer applied migrations than the embedded set.
@@ -71,6 +73,10 @@ impl fmt::Display for StorageError {
             Self::InvalidRuntimeContext(reason) => {
                 write!(f, "invalid envctl-issued runtime context: {reason}")
             }
+            Self::InvalidSecretRegistration => write!(
+                f,
+                "secret registration requires a non-empty key, purpose scope, and ciphertext"
+            ),
             Self::RequiredExtension => {
                 write!(f, "ruvector must be installed in the extensions schema")
             }

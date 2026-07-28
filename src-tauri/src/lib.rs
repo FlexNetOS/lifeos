@@ -1,7 +1,7 @@
 // LifeOS — Tauri 2.x application library
 // `lib.rs` holds everything except the platform-specific `main()`. This split is the
 // Tauri 2 convention so the same crate can be reused on desktop and mobile targets.
-// Native menu, window management, vault command stubs.
+// Native menu, window management, and canonical vault commands.
 
 mod auth;
 
@@ -259,6 +259,28 @@ async fn vault_list(storage: tauri::State<'_, Storage>) -> Result<Vec<VaultEntry
     lifeos_core::storage::vault::list(storage.pool())
         .await
         .map_err(|error| error.to_string())
+}
+
+/// Register already-encrypted secret bytes in canonical custody. Plaintext is
+/// deliberately not accepted by this IPC boundary; mint/relay authorization
+/// remains enforced by PostgreSQL's S16 security procedures.
+#[tauri::command]
+async fn vault_register_ciphertext(
+    storage: tauri::State<'_, Storage>,
+    secret_key: String,
+    target_scope: serde_json::Value,
+    purpose_scope: Vec<String>,
+    ciphertext: Vec<u8>,
+) -> Result<lifeos_core::storage::security::SecretObjectRegistration, String> {
+    lifeos_core::storage::security::register_ciphertext(
+        storage.pool(),
+        &secret_key,
+        target_scope,
+        &purpose_scope,
+        &ciphertext,
+    )
+    .await
+    .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -632,6 +654,7 @@ pub fn run() {
             auth::auth_signin,
             auth::auth_signout,
             auth::auth_reset_vault,
+            vault_register_ciphertext,
             plugin_run,
             db_health,
             db_migrate

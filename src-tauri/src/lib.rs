@@ -205,17 +205,11 @@ fn terminal_close(
         .ok_or_else(|| "terminal session is not active".to_string())
 }
 
-// Stub commands — wire to OS keyring (security-framework on macOS, secret-service
-// on Linux, credentials-manager on Windows) in a follow-on round.
 #[tauri::command]
-fn vault_list() -> Vec<VaultEntry> {
-    vec![VaultEntry {
-        id: "aws-prod".into(),
-        label: "AWS Production".into(),
-        kind: "api_key".into(),
-        masked_preview: "AKIA…WX5R".into(),
-        last_rotated: "2025-04-12".into(),
-    }]
+async fn vault_list(storage: tauri::State<'_, Storage>) -> Result<Vec<VaultEntry>, String> {
+    lifeos_core::storage::vault::list(storage.pool())
+        .await
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]

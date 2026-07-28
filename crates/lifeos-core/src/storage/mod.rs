@@ -6,6 +6,7 @@ pub mod legacy_sqlite;
 pub mod mempalace;
 pub mod ruvector;
 pub mod state;
+pub mod vault;
 
 pub use error::StorageError;
 

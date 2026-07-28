@@ -8,7 +8,8 @@ const root = process.cwd();
 const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/var/lib/redb");
 const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root, "evidence/glass/live-launch-receipt.json"));
 const failureReceiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_FAILURE_RECEIPT ?? join(root, "evidence/glass/live-launch-failure-receipt.json"));
-const port = process.env.LIFEOS_GLASS_PORT ?? "1420";
+// The native binary embeds tauri.conf.json's localhost:1420 dev URL.
+const port = "1420";
 const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
 const runtime = {
   LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql",
@@ -82,10 +83,31 @@ function terminateTree(rootPid) {
 
 const startedAt = Date.now();
 const childEnv = { ...process.env, ...runtime };
+const frontend = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "dev", "--", "--host", "127.0.0.1", "--port", port], {
+  cwd: root,
+  env: { ...childEnv, VITE_LIFEOS_ENGINE_PROBE: "1" },
+  detached: true,
+  stdio: ["ignore", "pipe", "pipe"],
+});
+let frontendOutput = "";
+frontend.stdout.on("data", (chunk) => { frontendOutput = `${frontendOutput}${chunk}`.slice(-8192); });
+frontend.stderr.on("data", (chunk) => { frontendOutput = `${frontendOutput}${chunk}`.slice(-8192); });
+let frontendError = null;
+frontend.once("error", (error) => { frontendError = error; });
+let frontendReady = false;
+const frontendDeadline = Date.now() + 15_000;
+while (Date.now() < frontendDeadline && !frontendError) {
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/`);
+    if (response.ok) { frontendReady = true; break; }
+  } catch {}
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 250));
+}
 const config = JSON.stringify({
   build: {
+    frontendDist: "../dist",
     devUrl: `http://127.0.0.1:${port}/?probe=engine-room`,
-    beforeDevCommand: `bun run dev -- --host 127.0.0.1 --port ${port}`,
+    beforeDevCommand: "",
   },
   app: {
     withGlobalTauri: true,
@@ -106,7 +128,7 @@ const config = JSON.stringify({
     }],
   },
 });
-const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev"], {
+const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--no-watch", "--no-dev-server", "--no-dev-server-wait", "--config", config], {
   cwd: root,
   env: childEnv,
   detached: true,
@@ -156,6 +178,7 @@ while (Date.now() < deadline && !launchError && !childExited) {
 const tree = processTree(child.pid);
 let shutdown = { signal: "SIGTERM", exit_code: null };
 terminateTree(child.pid);
+terminateTree(frontend.pid);
 await new Promise((resolvePromise) => {
   const timer = setTimeout(resolvePromise, 8_000);
   child.once("exit", (code, signal) => {
@@ -170,18 +193,24 @@ const result = {
   authority: "Tauri process and authenticated redb owner projection",
   started_at: new Date(startedAt).toISOString(),
   launch: {
-    command: "bun run tauri -- dev",
+    command: `bun run dev -- --host 127.0.0.1 --port ${port} (VITE_LIFEOS_ENGINE_PROBE=1); bun run tauri -- dev --no-watch --no-dev-server --no-dev-server-wait`,
     pid: child.pid,
     process_tree: tree,
     launch_error: launchError?.message ?? null,
     output_head: launchOutputHead,
     output_tail: launchOutput.slice(-4096),
   },
+  frontend: {
+    pid: frontend.pid,
+    ready: frontendReady,
+    error: frontendError?.message ?? null,
+    output_tail: frontendOutput.slice(-4096),
+  },
   main_loaded: mainLoaded,
     readiness,
     engine_room: engineRoom,
   shutdown,
-  ok: !launchError && Boolean(mainLoaded) && Boolean(readiness) && Boolean(engineRoom) && shutdown.signal === "SIGTERM",
+  ok: frontendReady && !launchError && !frontendError && Boolean(mainLoaded) && Boolean(readiness) && Boolean(engineRoom) && shutdown.signal === "SIGTERM",
 };
 mkdirSync(join(root, "evidence/glass"), { recursive: true });
 if (!result.ok) {

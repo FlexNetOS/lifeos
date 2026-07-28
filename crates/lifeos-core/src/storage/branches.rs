@@ -52,12 +52,20 @@ pub async fn create(
     policy: Value,
     creator: Uuid,
 ) -> Result<Uuid, StorageError> {
-    sqlx::query_scalar("SELECT lifeos_runtime.create_branch($1, $2, $3, $4, $5)")
+    let execution = Uuid::new_v4();
+    let effect = Uuid::new_v4();
+    let idempotency_key = format!("lifeos:cow:create:{}", Uuid::new_v4());
+    sqlx::query_scalar(
+        "SELECT lifeos_runtime.cow_frontdoor_create_v2($1, $2, $3, $4, $5, $6, $7, $8)",
+    )
         .bind(parent_branch)
         .bind(kind)
         .bind(purpose)
         .bind(policy)
         .bind(creator)
+        .bind(execution)
+        .bind(effect)
+        .bind(idempotency_key)
         .fetch_one(pool)
         .await
         .map_err(StorageError::from)
@@ -70,10 +78,18 @@ pub async fn merge(
     target_branch: Uuid,
     merge_record: Value,
 ) -> Result<Uuid, StorageError> {
-    sqlx::query_scalar("SELECT lifeos_runtime.merge_branch($1, $2, $3)")
+    let execution = Uuid::new_v4();
+    let effect = Uuid::new_v4();
+    let idempotency_key = format!("lifeos:cow:merge:{}", Uuid::new_v4());
+    sqlx::query_scalar(
+        "SELECT lifeos_runtime.cow_frontdoor_merge_v2($1, $2, $3, $4, $5, $6)",
+    )
         .bind(source_branch)
         .bind(target_branch)
         .bind(merge_record)
+        .bind(execution)
+        .bind(effect)
+        .bind(idempotency_key)
         .fetch_one(pool)
         .await
         .map_err(StorageError::from)
@@ -100,10 +116,18 @@ pub async fn promote(
     target_branch: Uuid,
     promotion_record: Value,
 ) -> Result<Uuid, StorageError> {
-    sqlx::query_scalar("SELECT lifeos_runtime.promote_branch($1, $2, $3)")
+    let execution = Uuid::new_v4();
+    let effect = Uuid::new_v4();
+    let idempotency_key = format!("lifeos:cow:promote:{}", Uuid::new_v4());
+    sqlx::query_scalar(
+        "SELECT lifeos_runtime.cow_frontdoor_promote_v2($1, $2, $3, $4, $5, $6)",
+    )
         .bind(source_branch)
         .bind(target_branch)
         .bind(promotion_record)
+        .bind(execution)
+        .bind(effect)
+        .bind(idempotency_key)
         .fetch_one(pool)
         .await
         .map_err(StorageError::from)

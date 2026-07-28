@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 const repoRoot = resolve(import.meta.dirname, "..");
 const rtkNuRoot = resolve(repoRoot, process.env.LIFEOS_RTK_NU_ROOT ?? "../rtk-tokenkill");
 const codeDbRoot = resolve(repoRoot, process.env.LIFEOS_CODEDB_ROOT ?? "../nu_plugin");
-const expectedCodeDbRevision = "c49af6e5a9301296d9ff0133c04acd987363155f";
+const expectedCodeDbRevision = "71c631f2b9d28aa9f274b07bd2b791273bb40c4f";
 
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });

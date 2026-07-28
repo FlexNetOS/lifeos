@@ -32,7 +32,7 @@ argon2 = { version = "0.5", default-features = false, features = ["std", "alloc"
 # that hands back the underlying `serde_json::Value` for callers that want
 # fields we haven't typed yet.
 serde_json = "1"
-uuid = { version = "1", features = ["serde"], optional = true }
+uuid = { version = "1", features = ["serde", "v4"], optional = true }
 # Stage 1d (Wave 3): HTTP transport for the MCP REST mirror surfaces. Blocking
 # client so both the daemon and the Tauri shell can call from worker threads
 # without dragging tokio into `lifeos-core`. Rustls feature set mirrors

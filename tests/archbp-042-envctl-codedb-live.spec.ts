@@ -9,7 +9,7 @@ describe("ARCHBP-042 envctl-only CodeDB commit boundary", () => {
     const receipt = JSON.parse(readFileSync(receiptPath, "utf8"));
     expect(receipt.schema_version).toBe("lifeos.evidence.envctl-codedb-live.v1");
     expect(receipt.authority_invariants).toEqual(expect.arrayContaining([5, 7, 10, 12, 14]));
-    expect(receipt.code_db.revision).toBe("c49af6e5a9301296d9ff0133c04acd987363155f");
+    expect(receipt.code_db.revision).toBe("71c631f2b9d28aa9f274b07bd2b791273bb40c4f");
     expect(receipt.code_db.worktree).toBe("clean");
     expect(receipt.code_db.path).toBe("rtk_nu → CodeDB → redb");
     expect(receipt.envctl.revision).toBe("7ab63ea74a72868adec0091aa8bc4b10119f8f33");

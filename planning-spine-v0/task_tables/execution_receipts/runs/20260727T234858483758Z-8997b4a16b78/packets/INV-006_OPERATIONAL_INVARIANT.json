@@ -1,0 +1,65 @@
+{
+  "packet_schema_version": "1.0",
+  "task_id": "INV-006_OPERATIONAL_INVARIANT",
+  "parent_id": "INVARIANTS",
+  "phase": "00-invariants",
+  "title": "Invariant 6: redb retains its pure-Rust ACID file backend, MVCC, zero-copy API, transactional buffer, AI scratchpad, ret...",
+  "goal": "Prove operational invariant 6 holds against the live system. Shipped evidence only: a design document, a proposed ADR, or an intent to build never satisfies this probe.",
+  "owner_lane": "lane_e_invariants",
+  "owner_agent": "invariant-agent",
+  "helper_id": "helper-invariant-06",
+  "model_tag": "gpt-5.3-spark",
+  "agent_runtime": "codex-cli-background-shell",
+  "shell_mode": "read-only",
+  "repo_target": "lifeos",
+  "repo_path": ".",
+  "filesystem_scope": "read-only-probe",
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "target_files": [],
+  "target_artifacts": [
+    "migration-artifacts/inv-006/result.json"
+  ],
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "depends_on": [],
+  "blocks": [],
+  "parallel_group": "invariant_redb-state-plane",
+  "can_run_parallel": true,
+  "max_parallel": 6,
+  "start_after": "",
+  "priority": 106,
+  "execution_cell": "redb-state-plane",
+  "required_tools": [
+    "shell"
+  ],
+  "command_template": "command -v flexnetos-redb-owner",
+  "verification_command": "systemctl --user is-active flexnetos-redb-owner 2>/dev/null | grep -qE 'active|activating'",
+  "completion_gate": "probe exits 0 against the live system; a non-zero exit is a real invariant violation and must not be recorded as pending or proposed",
+  "proof_required": true,
+  "proof_uri": "proof_records/INV-006_OPERATIONAL_INVARIANT.proof.json",
+  "heartbeat_file": "state/INV-006_OPERATIONAL_INVARIANT.heartbeat.json",
+  "logs_uri": "logs/INV-006_OPERATIONAL_INVARIANT.log",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "risk_level": "critical",
+  "human_approval_required": false,
+  "notes": "Extracted structurally from the anchor's acceptance-invariant list. Anchor invariant sha256=5d71121f2fde283ee5c5a44cbe099864eddb1d5fae73e1e3ed1ba03a51a641da; anchor document sha256=78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee.",
+  "anchor_binding": {
+    "byte_offset": 970094,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "invariant_number": 6,
+    "invariant_sha256": "5d71121f2fde283ee5c5a44cbe099864eddb1d5fae73e1e3ed1ba03a51a641da"
+  },
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "generated_at": "2026-07-27T23:47:51+00:00"
+}

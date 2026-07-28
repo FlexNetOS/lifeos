@@ -1,0 +1,65 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 971422,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "invariant_number": 12,
+    "invariant_sha256": "757de4b2d7773abd081e6a5a2804f1077310359ba0bc1cb8468a8dee029628f6"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "grep -rqi 'shake256' /home/flexnetos/meta/src/envctl/crates /home/flexnetos/meta/src/nu_plugin 2>/dev/null",
+  "completion_gate": "probe exits 0 against the live system; a non-zero exit is a real invariant violation and must not be recorded as pending or proposed",
+  "depends_on": [],
+  "execution_cell": "witness-chain",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Prove operational invariant 12 holds against the live system. Shipped evidence only: a design document, a proposed ADR, or an intent to build never satisfies this probe.",
+  "heartbeat_file": "state/INV-012_OPERATIONAL_INVARIANT.heartbeat.json",
+  "helper_id": "helper-invariant-12",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/INV-012_OPERATIONAL_INVARIANT.log",
+  "max_parallel": 6,
+  "model_tag": "gpt-5.3-spark",
+  "notes": "Extracted structurally from the anchor's acceptance-invariant list. Anchor invariant sha256=757de4b2d7773abd081e6a5a2804f1077310359ba0bc1cb8468a8dee029628f6; anchor document sha256=78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee.",
+  "owner_agent": "invariant-agent",
+  "owner_lane": "lane_e_invariants",
+  "packet_schema_version": "1.0",
+  "parallel_group": "invariant_witness-chain",
+  "parent_id": "INVARIANTS",
+  "phase": "00-invariants",
+  "priority": 112,
+  "proof_required": true,
+  "proof_uri": "proof_records/INV-012_OPERATIONAL_INVARIANT.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "shell"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/inv-012/result.json"
+  ],
+  "target_files": [],
+  "task_id": "INV-012_OPERATIONAL_INVARIANT",
+  "title": "Invariant 12: SHAKE256 witnesses bind source bytes, vectors, graph/causal lineage, transformations, executions, model sta...",
+  "verification_command": "grep -rli 'shake256' /home/flexnetos/meta/src/envctl/crates 2>/dev/null | head -1 | grep -q ."
+}

@@ -1,0 +1,66 @@
+{
+  "packet_schema_version": "1.0",
+  "task_id": "COMPONENT-386_BUN_BUNX",
+  "parent_id": "COMPONENTS",
+  "phase": "00-components",
+  "title": "Component: Bun/Bunx",
+  "goal": "Component 'Bun/Bunx' must be installed and used, not replaced (hard rule 15).",
+  "owner_lane": "lane_f_anchor",
+  "owner_agent": "anchor-agent",
+  "helper_id": "helper-component-386_bun_bunx",
+  "model_tag": "gpt-5.3-spark",
+  "agent_runtime": "codex-cli-background-shell",
+  "shell_mode": "read-only",
+  "repo_target": "lifeos",
+  "repo_path": ".",
+  "filesystem_scope": "read-only-probe",
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "target_files": [],
+  "target_artifacts": [
+    "migration-artifacts/component-386_bun_bunx/result.json"
+  ],
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "depends_on": [],
+  "blocks": [],
+  "parallel_group": "anchor_components",
+  "can_run_parallel": true,
+  "max_parallel": 8,
+  "start_after": "",
+  "priority": 1386,
+  "execution_cell": "components",
+  "required_tools": [
+    "shell"
+  ],
+  "command_template": "grep -Fq 'Bun/Bunx' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "verification_command": "grep -Fq 'Bun/Bunx' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "completion_gate": "anchor still contains this unit; NOT evidence of implementation",
+  "proof_required": true,
+  "proof_uri": "proof_records/COMPONENT-386_BUN_BUNX.proof.json",
+  "heartbeat_file": "state/COMPONENT-386_BUN_BUNX.heartbeat.json",
+  "logs_uri": "logs/COMPONENT-386_BUN_BUNX.log",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "risk_level": "high",
+  "human_approval_required": false,
+  "notes": "Structurally extracted from the blueprint anchor.",
+  "anchor_binding": {
+    "byte_offset": 335153,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "6f9c901bc17fee4d890a278e5c5ae8d77fa67143e40de8a4ee09c0f9caacd2db"
+  },
+  "needs_capability_probe": true,
+  "probe_class": "drift-canary",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "generated_at": "2026-07-27T23:47:50+00:00"
+}

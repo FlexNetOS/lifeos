@@ -1,0 +1,74 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/polyglot-import/proof-and-round-trip-gates.md",
+    "src/nu_plugin/docs/polyglot-import/whole-repo-import-architecture.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB094",
+    "decision": null,
+    "intent_lock_digest": "blake3:553f82f4cbe4c8d701f7eee1472455b83dee3a4760dca7ddc91bcb8af2c9f327",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB094",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB094",
+  "depends_on": [
+    "TASK-CDB091"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "raw-byte fixture families documented",
+    "deterministic": true,
+    "verification_command": "raw-byte fixture families documented"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:553f82f4cbe4c8d701f7eee1472455b83dee3a4760dca7ddc91bcb8af2c9f327"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:8cb5ef366917201c685f5e9219eb1eab1fea1756e38f4151b80174a358f6cacf",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB094",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB094"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB094 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/polyglot-import/proof-and-round-trip-gates.md",
+    "src/nu_plugin/docs/polyglot-import/whole-repo-import-architecture.md"
+  ],
+  "task_id": "TASK-CDB094",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB094"
+}

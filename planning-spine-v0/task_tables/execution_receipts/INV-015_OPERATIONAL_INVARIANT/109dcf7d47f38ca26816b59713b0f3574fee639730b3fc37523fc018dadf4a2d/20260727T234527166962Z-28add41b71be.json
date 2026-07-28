@@ -1,0 +1,65 @@
+{
+  "attempt_id": "20260727T234527166962Z-28add41b71be",
+  "authorization": null,
+  "cargo_target_dir": "/home/flexnetos/meta/var/cargo-target/lifeos-json-task-cargo/20260727T234526980451Z-ef6aa12ff359/lifeos-9a3a3d5c7b9f0200",
+  "command": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "bash -lc 'PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" '\"'\"'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql'\"'\"' -tAc \"select count(*) from information_schema.tables where table_name ~ '\"'\"'raw|object|blob|ingest'\"'\"'\" | awk '\"'\"'{exit ($1>0)?0:1}'\"'\"''"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "duration_seconds": 0.171357,
+    "exit_code": 0,
+    "finished_at": "2026-07-27T23:45:27.343021Z",
+    "started_at": "2026-07-27T23:45:27.171666Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-015_OPERATIONAL_INVARIANT/109dcf7d47f38ca26816b59713b0f3574fee639730b3fc37523fc018dadf4a2d/logs/20260727T234527166962Z-28add41b71be/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-015_OPERATIONAL_INVARIANT/109dcf7d47f38ca26816b59713b0f3574fee639730b3fc37523fc018dadf4a2d/logs/20260727T234527166962Z-28add41b71be/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "timed_out": false
+  },
+  "depends_on": [],
+  "execution_input_sha256": "109dcf7d47f38ca26816b59713b0f3574fee639730b3fc37523fc018dadf4a2d",
+  "execution_mode": "declared-command",
+  "executor_refusal": null,
+  "exit_code": 0,
+  "finished_at": "2026-07-27T23:45:27.507691Z",
+  "graph_sha256": "d504cf0898ba41d131779e04d62a1061d208707681cab3fec9eb66513aee9dc4",
+  "packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/runs/20260727T234526980451Z-ef6aa12ff359/packets/INV-015_OPERATIONAL_INVARIANT.json",
+  "packet_sha256": "109dcf7d47f38ca26816b59713b0f3574fee639730b3fc37523fc018dadf4a2d",
+  "run_id": "20260727T234526980451Z-ef6aa12ff359",
+  "runner_schema": "lifeos.json-task-runner.v1",
+  "schema": "lifeos.json-task-execution-receipt.v1",
+  "source_packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/generated/execution_packets/INV-015_OPERATIONAL_INVARIANT.json",
+  "started_at": "2026-07-27T23:45:27.171666Z",
+  "status": "completed",
+  "task_id": "INV-015_OPERATIONAL_INVARIANT",
+  "task_root": "/home/flexnetos/meta/src/lifeos",
+  "verification": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "bash -lc 'PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" '\"'\"'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql'\"'\"' -tAc '\"'\"'select current_database()'\"'\"' | grep -q lifeos'"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "duration_seconds": 0.164229,
+    "exit_code": 0,
+    "finished_at": "2026-07-27T23:45:27.507691Z",
+    "started_at": "2026-07-27T23:45:27.343474Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-015_OPERATIONAL_INVARIANT/109dcf7d47f38ca26816b59713b0f3574fee639730b3fc37523fc018dadf4a2d/logs/20260727T234527166962Z-28add41b71be/verification.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-015_OPERATIONAL_INVARIANT/109dcf7d47f38ca26816b59713b0f3574fee639730b3fc37523fc018dadf4a2d/logs/20260727T234527166962Z-28add41b71be/verification.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "timed_out": false
+  },
+  "workspace_root": "/home/flexnetos/meta/src/lifeos"
+}

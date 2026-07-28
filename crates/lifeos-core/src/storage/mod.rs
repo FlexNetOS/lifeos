@@ -1,4 +1,5 @@
 pub mod accounts;
+pub mod branches;
 pub mod error;
 #[cfg(feature = "legacy-sqlite-import")]
 pub mod legacy_sqlite;
@@ -135,7 +136,7 @@ impl Storage {
             applied_migrations: applied,
             last_migration_version,
             ruvector_extension_version,
-            schema_version: "2",
+            schema_version: "3",
         })
     }
 

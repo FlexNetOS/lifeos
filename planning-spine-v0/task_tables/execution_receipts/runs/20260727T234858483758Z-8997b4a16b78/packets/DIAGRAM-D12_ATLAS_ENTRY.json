@@ -1,0 +1,66 @@
+{
+  "packet_schema_version": "1.0",
+  "task_id": "DIAGRAM-D12_ATLAS_ENTRY",
+  "parent_id": "ATLAS",
+  "phase": "00-atlas",
+  "title": "Atlas D12: #### D12 \u2014 Database-to-Engine/Glass return and acknowledgement",
+  "goal": "Mermaid atlas entry D12 must remain present (anchor rule 21 forbids narrowing the atlas).",
+  "owner_lane": "lane_f_anchor",
+  "owner_agent": "anchor-agent",
+  "helper_id": "helper-diagram-d12_atlas_entry",
+  "model_tag": "gpt-5.3-spark",
+  "agent_runtime": "codex-cli-background-shell",
+  "shell_mode": "read-only",
+  "repo_target": "lifeos",
+  "repo_path": ".",
+  "filesystem_scope": "read-only-probe",
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "target_files": [],
+  "target_artifacts": [
+    "migration-artifacts/diagram-d12_atlas_entry/result.json"
+  ],
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "depends_on": [],
+  "blocks": [],
+  "parallel_group": "anchor_atlas",
+  "can_run_parallel": true,
+  "max_parallel": 8,
+  "start_after": "",
+  "priority": 611,
+  "execution_cell": "atlas",
+  "required_tools": [
+    "shell"
+  ],
+  "command_template": "grep -Fq '#### D12' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "verification_command": "grep -Fq '#### D12' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "completion_gate": "anchor still contains this unit; NOT evidence of implementation",
+  "proof_required": true,
+  "proof_uri": "proof_records/DIAGRAM-D12_ATLAS_ENTRY.proof.json",
+  "heartbeat_file": "state/DIAGRAM-D12_ATLAS_ENTRY.heartbeat.json",
+  "logs_uri": "logs/DIAGRAM-D12_ATLAS_ENTRY.log",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "risk_level": "medium",
+  "human_approval_required": false,
+  "notes": "Structurally extracted from the blueprint anchor.",
+  "anchor_binding": {
+    "byte_offset": 31349,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "8caaa6bf73a2aa2ebad9493eb9c168738e734d7e95f2865c56348df0fc6cdd37"
+  },
+  "needs_capability_probe": false,
+  "probe_class": "drift-canary",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "generated_at": "2026-07-27T23:47:51+00:00"
+}

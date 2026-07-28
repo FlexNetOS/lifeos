@@ -1,0 +1,66 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 959381,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "ebb80c554e95c2ca67ad71d42ab79c6db307c0bf2956330ce2608bd3294287af"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "grep -Fq '| R10 |' ../../../Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "completion_gate": "anchor still contains this unit; NOT evidence of implementation",
+  "depends_on": [],
+  "execution_cell": "review-ledger",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Ledger row R10 must remain present and reconciled in the anchor.",
+  "heartbeat_file": "state/REVIEW-R10_LEDGER_ROW.heartbeat.json",
+  "helper_id": "helper-review-r10_ledger_row",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/REVIEW-R10_LEDGER_ROW.log",
+  "max_parallel": 8,
+  "model_tag": "gpt-5.3-spark",
+  "needs_capability_probe": true,
+  "notes": "Structurally extracted from the blueprint anchor.",
+  "owner_agent": "anchor-agent",
+  "owner_lane": "lane_f_anchor",
+  "packet_schema_version": "1.0",
+  "parallel_group": "anchor_review-ledger",
+  "parent_id": "REVIEW_LEDGER",
+  "phase": "00-review",
+  "priority": 509,
+  "probe_class": "drift-canary",
+  "proof_required": true,
+  "proof_uri": "proof_records/REVIEW-R10_LEDGER_ROW.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "shell"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/review-r10_ledger_row/result.json"
+  ],
+  "target_files": [],
+  "task_id": "REVIEW-R10_LEDGER_ROW",
+  "title": "REVIEW_LEDGER R10: | R10 | \u00a7\u00a73.4, 4.5, 4.7; CodeDB/envctl rows | envctl is the only authoritative PostgreSQL ",
+  "verification_command": "grep -Fq '| R10 |' ../../../Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+}

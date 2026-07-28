@@ -1,0 +1,97 @@
+{
+  "schema": "lifeos.migration-artifact.ruvector-shake256-sql.v2",
+  "task_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+  "status": "passed",
+  "verified_at": "2026-07-28T01:10:03Z",
+  "source": {
+    "revision": "c115eff5227e38d8c5f45818c6d676fc62b350aa",
+    "dirty": true,
+    "target_files_sha256": "68401b57917824ae9b9d46c110049b6d36222e334fd0139a93d63f7a88cc78da"
+  },
+  "nix": {
+    "profile_resolved": "/nix/store/m36f1wnqmwpfhm54lnh7iivykmrifr3p-profile",
+    "build_closure": "/nix/store/ss9zvf1nrmnxnwf1v595siykjx6pz7p4-lifeos-foundation-yzx",
+    "extension_package": "/nix/store/jin0kwqgr59y1l28mvadrb0y9wpcnvph-ruvector-postgres-0.3.1-5f0a2c2-cap001",
+    "extension_deriver": "/nix/store/mskq515zdrb738ygdwkcc0miri28l9bw-ruvector-postgres-0.3.1-5f0a2c2-cap001.drv",
+    "source_marker": "5f0a2c2cc049dfe35f142cd58ab8c966bedef785+cap-inv011-001",
+    "direct_store_write": false
+  },
+  "installation": {
+    "library": "/nix/store/jin0kwqgr59y1l28mvadrb0y9wpcnvph-ruvector-postgres-0.3.1-5f0a2c2-cap001/lib/ruvector.so",
+    "library_sha256": "7178aebf3ed40f13df6d2daed4785d9ec15db80a3716364d2697c550997abb1d",
+    "control_sha256": "f1a29c7713a34b7c8e81743061d5cd3771396ec00a4ce2f2ad8cde0132c8c8e8",
+    "base_sql_sha256": "d804ecc0a56370b7bc7ec8a001ee24fcc13b5e6f033f868b7ac8dccef10dfc53",
+    "upgrade_sql_sha256": "1df9b7fbece96896c884591e22fbf65586b177bf3ca246e79e25485f30b110c1"
+  },
+  "toolchain": {
+    "rustc": "rustc 1.98.0-nightly (f8a08b688 2026-05-30)",
+    "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)",
+    "postgresql": "psql (PostgreSQL) 17.10",
+    "nix": "nix (Nix) 2.34.7"
+  },
+  "databases": {
+    "ruvector": {
+      "database": "ruvector",
+      "extversion": "0.3.1",
+      "extension_schema": "public",
+      "function": "ruvector_shake256_256(bytea)",
+      "owner": "lifeos_migrator",
+      "language": "c",
+      "library": "$libdir/ruvector",
+      "symbol": "ruvector_shake256_256_wrapper",
+      "immutable": true,
+      "strict": true,
+      "parallel_safe": true,
+      "security_definer": false,
+      "extension_member": true,
+      "schema_usage": {
+        "lifeos_migrator": true,
+        "lifeos_envctl": true,
+        "lifeos_runtime": true
+      },
+      "execute_grantees": [
+        "lifeos_envctl",
+        "lifeos_migrator",
+        "lifeos_runtime"
+      ],
+      "nist_empty": "46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762f",
+      "nist_abc": "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b5739",
+      "output_bytes": 32,
+      "strict_null": true
+    },
+    "lifeos": {
+      "database": "lifeos",
+      "extversion": "0.3.1",
+      "extension_schema": "extensions",
+      "function": "ruvector_shake256_256(bytea)",
+      "owner": "lifeos_migrator",
+      "language": "c",
+      "library": "$libdir/ruvector",
+      "symbol": "ruvector_shake256_256_wrapper",
+      "immutable": true,
+      "strict": true,
+      "parallel_safe": true,
+      "security_definer": false,
+      "extension_member": true,
+      "schema_usage": {
+        "lifeos_migrator": true,
+        "lifeos_envctl": true,
+        "lifeos_runtime": true
+      },
+      "execute_grantees": [
+        "lifeos_envctl",
+        "lifeos_migrator",
+        "lifeos_runtime"
+      ],
+      "nist_empty": "46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762f",
+      "nist_abc": "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b5739",
+      "output_bytes": 32,
+      "strict_null": true
+    }
+  },
+  "commands": [
+    "cargo test --offline --manifest-path <temporary-rvf-crypto-harness>/Cargo.toml --test nist",
+    "nix build --no-link --print-out-paths path:/home/flexnetos/meta/src/yazelix#lifeos_foundation_yzx",
+    "psql native extension identity, NIST vectors, extension membership, and ACL assertions in ruvector and lifeos"
+  ]
+}

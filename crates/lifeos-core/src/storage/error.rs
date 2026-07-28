@@ -23,6 +23,9 @@ pub enum StorageError {
     RequiredExtension,
     /// The durable schema has fewer applied migrations than the embedded set.
     IncompleteMigrations { applied: u32, expected: u32 },
+    /// Migration 0007 is present but its versioned semantic acceptance receipt
+    /// is missing, invalid, or no longer agrees with the database self-check.
+    CowSemanticReceipt,
     /// A frontend projection write did not contain valid JSON.
     InvalidProjectionJson,
     /// Underlying sqlx error.
@@ -58,6 +61,10 @@ impl fmt::Display for StorageError {
             Self::IncompleteMigrations { applied, expected } => write!(
                 f,
                 "database has {applied} applied migrations but {expected} are required"
+            ),
+            Self::CowSemanticReceipt => write!(
+                f,
+                "COW database semantics are not accepted by a valid v2 receipt"
             ),
             Self::InvalidProjectionJson => write!(f, "projection payload must be valid JSON"),
             Self::Sqlx(e) => write!(f, "database error: {e}"),

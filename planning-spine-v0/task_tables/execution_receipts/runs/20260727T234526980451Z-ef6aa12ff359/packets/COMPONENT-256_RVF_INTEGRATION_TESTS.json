@@ -1,0 +1,66 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 335153,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "33a455fcdefd8990b8b74bd33767fb264b834b59a5607d818abd1f6f0a90c516"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "grep -Fq 'rvf-integration-tests' ../../../Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "completion_gate": "anchor still contains this unit; NOT evidence of implementation",
+  "depends_on": [],
+  "execution_cell": "components",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Component 'rvf-integration-tests' must be installed and used, not replaced (hard rule 15).",
+  "heartbeat_file": "state/COMPONENT-256_RVF_INTEGRATION_TESTS.heartbeat.json",
+  "helper_id": "helper-component-256_rvf_integration_tests",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/COMPONENT-256_RVF_INTEGRATION_TESTS.log",
+  "max_parallel": 8,
+  "model_tag": "gpt-5.3-spark",
+  "needs_capability_probe": true,
+  "notes": "Structurally extracted from the blueprint anchor.",
+  "owner_agent": "anchor-agent",
+  "owner_lane": "lane_f_anchor",
+  "packet_schema_version": "1.0",
+  "parallel_group": "anchor_components",
+  "parent_id": "COMPONENTS",
+  "phase": "00-components",
+  "priority": 1256,
+  "probe_class": "drift-canary",
+  "proof_required": true,
+  "proof_uri": "proof_records/COMPONENT-256_RVF_INTEGRATION_TESTS.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "shell"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/component-256_rvf_integration_tests/result.json"
+  ],
+  "target_files": [],
+  "task_id": "COMPONENT-256_RVF_INTEGRATION_TESTS",
+  "title": "Component: rvf-integration-tests",
+  "verification_command": "grep -Fq 'rvf-integration-tests' ../../../Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+}

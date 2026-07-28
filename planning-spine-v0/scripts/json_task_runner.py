@@ -949,6 +949,11 @@ def looks_executable(command: str, cwd: Path | None = None) -> bool:
     if normalized_words & NARRATIVE_GATE_WORDS:
         return False
     first = words[0]
+    if (
+        re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", first)
+        and any(operator in command for operator in (";", "&&", "||"))
+    ):
+        return True
     if first in DIRECT_SHELL_PREFIXES or shutil.which(first) is not None:
         return True
     if "/" not in first and not first.startswith("."):

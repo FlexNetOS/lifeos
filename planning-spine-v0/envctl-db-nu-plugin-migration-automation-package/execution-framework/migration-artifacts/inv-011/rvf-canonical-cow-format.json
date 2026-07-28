@@ -1,0 +1,32 @@
+{
+  "schema": "lifeos.migration-artifact.v1",
+  "task_id": "CAP-INV011-002_RVF_CANONICAL_COW_FORMAT",
+  "status": "verified",
+  "verified_at": "2026-07-28T00:23:48Z",
+  "repository": "/home/flexnetos/meta/src/meta-ruvector",
+  "verification": {
+    "command": "/home/flexnetos/.nix-profile/bin/rtk proxy bash scripts/verify-rvf-cow-format.sh",
+    "exit_code": 0,
+    "tests_passed": 628,
+    "format_check": "passed",
+    "diff_check": "passed",
+    "diff_sha256": "2896c35cf5b56a43888f58fb256f528971ed67b7b7b23bea9bf722b0546a446e",
+    "verification_script_sha256": "973e5ea039f14b29944e566df171237b73b12f69a927a80bdedde7eb5a20e361"
+  },
+  "evidence": {
+    "cow_v2_header_bytes": 96,
+    "legacy_cow_v1_header_bytes": 64,
+    "canonical_checksum_algo": 2,
+    "canonical_hash": "rvf_crypto::shake256_128",
+    "canonical_alignment_bytes": 64,
+    "legacy_policy": "Read-only compatibility requires checksum_algo=0, the historical CRC32-rotation digest, and unpadded framing. Canonical and legacy fields may not be mixed.",
+    "store_round_trip": "A parent RvfStore and branched child were closed; the child reopened, reconstructed byte-equal COW_MAP and MEMBERSHIP state, rediscovered its parent by file identity, and queried inherited data.",
+    "manifest_integration": "COW_MAP and MEMBERSHIP segments are directory-linked and guarded by manifest generations; superseded generations remain listed.",
+    "cli_integration": "filter uses append_membership_filter; rebuild-refcounts reads cow_stats and appends a manifest-linked canonical REFCOUNT segment."
+  },
+  "key_digests": {
+    "cow_map_codec_sha256": "66954cd718c65e7590e8cfb5bb0e3f9fb1111199bd16a9cc390e5c3107898019",
+    "membership_codec_sha256": "27a53093aabd38997fe33228370506ad9a20d3d580d01379ba27371ecf55c28a",
+    "store_sha256": "968ca62695635a6a39065eb8f124140bdc576c4f1280c877d776acf2407fb51b"
+  }
+}

@@ -646,6 +646,18 @@ class JsonTaskRunnerTests(unittest.TestCase):
                 self.root,
             )
         )
+        self.assertTrue(
+            runner.looks_executable(
+                'PSQL="$(command -v psql)"; test -x "$PSQL" && "$PSQL" -c "select 1"',
+                self.root,
+            )
+        )
+        self.assertFalse(
+            runner.looks_executable(
+                "CONFIG=value documented",
+                self.root,
+            )
+        )
 
     def test_executor_refusal_is_detected(self) -> None:
         stdout = self.root / "stdout.log"

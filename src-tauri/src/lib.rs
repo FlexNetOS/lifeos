@@ -584,6 +584,18 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     ]
 }
 
+fn yazelix_runtime_dir() -> Result<PathBuf, String> {
+    if let Some(value) = std::env::var_os("YAZELIX_RUNTIME_DIR") {
+        return Ok(PathBuf::from(value));
+    }
+    let state_dir = std::env::var_os("YAZELIX_STATE_DIR").ok_or_else(|| {
+        "YAZELIX_RUNTIME_DIR or YAZELIX_STATE_DIR is required for Engine Room".to_string()
+    })?;
+    PathBuf::from(state_dir).parent().map(PathBuf::from).ok_or_else(|| {
+        "YAZELIX_STATE_DIR has no profile-runtime parent".to_string()
+    })
+}
+
 #[tauri::command]
 fn terminal_spawn(
     app: tauri::AppHandle,
@@ -603,8 +615,10 @@ fn terminal_spawn(
         .map_err(|error| format!("open terminal: {error}"))?;
     let session_name = engine_room_session_name()?;
     let argv = engine_room_argv(&session_name);
+    let runtime_dir = yazelix_runtime_dir()?;
     let mut command = CommandBuilder::new(&argv[0]);
     command.args(&argv[1..]);
+    command.env("YAZELIX_RUNTIME_DIR", runtime_dir);
     let child = pair
         .slave
         .spawn_command(command)

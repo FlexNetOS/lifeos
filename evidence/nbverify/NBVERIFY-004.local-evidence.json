@@ -1,7 +1,7 @@
 {
   "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
   "task_id": "NBVERIFY-004",
-  "observed_at": "2026-07-28T21:58:19.858Z",
+  "observed_at": "2026-07-28T22:10:35.278Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
     "package_json_sha256": "086d1a263750229e127f9eba978deee7eed2b7151205bc17746b11ce4745601a"
@@ -9,33 +9,75 @@
   "claims": [
     {
       "claim_id": "SWARM-CLAIM-003",
-      "verification_status": "unverified",
-      "status": "qualified",
+      "verification_status": "verified",
+      "status": "verified",
       "evidence": [
         {
           "relationship": "runtime-package",
-          "proven": false
+          "proven": true,
+          "implementation": "installed yzx executable"
         },
         {
           "relationship": "provider-boundary",
-          "proven": false
+          "proven": true,
+          "implementation": "profile-owned zellij layout and launcher"
+        },
+        {
+          "relationship": "installed-engine-room-live-trace",
+          "proven": true,
+          "receipt": "evidence/engine-room/live-receipt.json",
+          "receipt_sha256": "c76e61d61c998e68a3cb96d171474799193840e2e7b226069f7d7bd24c220345",
+          "session": "lifeos-engine-proof-2",
+          "argv": [
+            "yzx",
+            "enter",
+            "--session",
+            "lifeos-engine-proof-2"
+          ],
+          "zellij_launch": "1543415 1543389 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --config /run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl --new-session-with-layout /nix/store/4vfb6pya8wl1w3a7jip23bq67x7p7kb9-flexnetos-zellij-layout/layout.kdl --session lifeos-engine-proof-2",
+          "zellij_server": "  30744    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/stellar-yak",
+          "nushell": "  30824   30744 nu              /nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu --env-config /run/user/1001/yazelix/profile-runtime/yazelix/nu/env.nu --config /run/user/1001/yazelix/profile-runtime/yazelix/nu/config.nu",
+          "nushell_config": "/run/user/1001/yazelix/profile-runtime/yazelix/nu/env.nu",
+          "ready": true
         }
-      ]
+      ],
+      "conclusion": "The installed profile-owned Yazelix frontdoor initialized the configured Zellij layout and a live session during the bounded Engine Room launch."
     },
     {
       "claim_id": "SWARM-CLAIM-004",
-      "verification_status": "unverified",
-      "status": "qualified",
+      "verification_status": "verified",
+      "status": "verified",
       "evidence": [
         {
           "relationship": "deployment-surface",
-          "proven": false
+          "proven": true,
+          "implementation": "live Zellij session with Nushell panes"
         },
         {
           "relationship": "durable-runtime",
-          "proven": false
+          "proven": true,
+          "implementation": "/run/user/1001/yazelix/profile-runtime/yazelix/nu/env.nu"
+        },
+        {
+          "relationship": "installed-engine-room-live-trace",
+          "proven": true,
+          "receipt": "evidence/engine-room/live-receipt.json",
+          "receipt_sha256": "c76e61d61c998e68a3cb96d171474799193840e2e7b226069f7d7bd24c220345",
+          "session": "lifeos-engine-proof-2",
+          "argv": [
+            "yzx",
+            "enter",
+            "--session",
+            "lifeos-engine-proof-2"
+          ],
+          "zellij_launch": "1543415 1543389 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --config /run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl --new-session-with-layout /nix/store/4vfb6pya8wl1w3a7jip23bq67x7p7kb9-flexnetos-zellij-layout/layout.kdl --session lifeos-engine-proof-2",
+          "zellij_server": "  30744    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/stellar-yak",
+          "nushell": "  30824   30744 nu              /nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu --env-config /run/user/1001/yazelix/profile-runtime/yazelix/nu/env.nu --config /run/user/1001/yazelix/profile-runtime/yazelix/nu/config.nu",
+          "nushell_config": "/run/user/1001/yazelix/profile-runtime/yazelix/nu/env.nu",
+          "ready": true
         }
-      ]
+      ],
+      "conclusion": "The same installed launch initialized live Nushell processes with the profile-generated env.nu configuration inside the Engine Room session."
     },
     {
       "claim_id": "SWARM-CLAIM-014",

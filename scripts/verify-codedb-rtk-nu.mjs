@@ -4,9 +4,9 @@ import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const rtkNuRoot = resolve(repoRoot, "../rtk-tokenkill");
-const codeDbRoot = resolve(repoRoot, "../nu_plugin");
-const expectedCodeDbRevision = "06590085eefc8712ffc09969d2b0815a036bea3f";
+const rtkNuRoot = resolve(repoRoot, process.env.LIFEOS_RTK_NU_ROOT ?? "../rtk-tokenkill");
+const codeDbRoot = resolve(repoRoot, process.env.LIFEOS_CODEDB_ROOT ?? "../nu_plugin");
+const expectedCodeDbRevision = "958fd4d7acfdaabcac65c0093a2fc2a00f86c0e9";
 
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });
@@ -95,14 +95,21 @@ try {
       codeDbRoot,
     ),
   );
-  if (!receipt.files?.length || receipt.summary?.file_count !== receipt.files.length) {
-    throw new Error("CodeDB returned no complete raw-frame receipt");
+  if (receipt.schema_version !== "codedb.raw-ingest-receipt.v0") {
+    throw new Error("CodeDB returned an unexpected raw-ingest receipt schema");
   }
-  if (!receipt.files.every((file) => file.blob_ref && file.sha256 && file.blake3)) {
-    throw new Error("CodeDB receipt omitted canonical byte identities");
+  if (!receipt.raw_objects?.length) {
+    throw new Error("CodeDB returned no canonical raw-object receipt");
+  }
+  if (!receipt.raw_objects.every((object) =>
+    /^sha256:[0-9a-f]{64}$/.test(object.raw_object_id) &&
+    Number.isInteger(object.byte_length) && object.byte_length > 0 &&
+    Number.isInteger(object.frame_count) && object.frame_count > 0
+  )) {
+    throw new Error("CodeDB receipt omitted canonical byte identities or frame metadata");
   }
   console.log(
-    `rtk_nu → codedb → redb live path verified at ${expectedCodeDbRevision}: ${receipt.files.length} frame(s)`,
+    `rtk_nu → codedb → redb live path verified at ${expectedCodeDbRevision}: ${receipt.raw_objects.length} raw object(s)`,
   );
 } finally {
   rmSync(scratch, { recursive: true, force: true });

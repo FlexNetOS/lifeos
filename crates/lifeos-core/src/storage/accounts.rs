@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use std::path::Path;
+use uuid::Uuid;
 
 use super::StorageError;
 
 /// A row from the canonical `lifeos_security.identity` table.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct AccountRow {
-    pub id: i64,
+    pub id: Uuid,
     pub email: String,
     pub display_name: String,
     pub password_hash: String,
@@ -18,9 +18,13 @@ pub struct AccountRow {
     pub updated_at: i64,
 }
 
-const ACCOUNT_COLUMNS: &str = "id, email, display_name, password_hash,
-    EXTRACT(EPOCH FROM created_at)::BIGINT AS created_at,
-    EXTRACT(EPOCH FROM updated_at)::BIGINT AS updated_at";
+const ACCOUNT_COLUMNS: &str = "identity_id AS id, subject_key AS email,
+    attributes->>'display_name' AS display_name,
+    attributes->>'password_hash' AS password_hash,
+    coalesce((attributes->>'created_at')::BIGINT,
+             EXTRACT(EPOCH FROM active_from)::BIGINT) AS created_at,
+    coalesce((attributes->>'created_at')::BIGINT,
+             EXTRACT(EPOCH FROM coalesce(active_until, active_from))::BIGINT) AS updated_at";
 
 /// Insert a new account and return the inserted row.
 pub async fn insert(
@@ -29,24 +33,34 @@ pub async fn insert(
     display_name: &str,
     password_hash: &str,
 ) -> Result<AccountRow, StorageError> {
-    let row = sqlx::query_as::<_, AccountRow>(&format!(
-        "INSERT INTO lifeos_security.identity (email, display_name, password_hash)
-         VALUES ($1, $2, $3)
-         RETURNING {ACCOUNT_COLUMNS}"
-    ))
+    let raw = serde_json::json!({
+        "email": email,
+        "display_name": display_name,
+        "password_hash": password_hash,
+        "created_at": chrono::Utc::now().timestamp(),
+    });
+    let identity_id = sqlx::query_scalar::<_, Uuid>(
+        "SELECT lifeos_security.register_identity(
+           'human', $1, $2, convert_to($3::text, 'UTF8')
+         )",
+    )
     .bind(email)
-    .bind(display_name)
-    .bind(password_hash)
+    .bind(&raw)
+    .bind(raw.to_string())
     .fetch_one(pool)
     .await?;
-    Ok(row)
+    get_by_id(pool, identity_id)
+        .await?
+        .ok_or_else(|| StorageError::Sqlx(sqlx::Error::RowNotFound))
 }
 
 /// Look up an account by email (case-sensitive, matching the unique key).
 pub async fn get_by_email(pool: &PgPool, email: &str) -> Result<Option<AccountRow>, StorageError> {
     let row = sqlx::query_as::<_, AccountRow>(&format!(
         "SELECT {ACCOUNT_COLUMNS}
-         FROM lifeos_security.identity WHERE email = $1"
+         FROM lifeos_security.identity
+         WHERE subject_kind = 'human' AND subject_key = $1
+           AND active_until IS NULL"
     ))
     .bind(email)
     .fetch_optional(pool)
@@ -59,7 +73,9 @@ pub async fn get_by_email(pool: &PgPool, email: &str) -> Result<Option<AccountRo
 pub async fn get_first(pool: &PgPool) -> Result<Option<AccountRow>, StorageError> {
     let row = sqlx::query_as::<_, AccountRow>(&format!(
         "SELECT {ACCOUNT_COLUMNS}
-         FROM lifeos_security.identity ORDER BY id LIMIT 1"
+         FROM lifeos_security.identity
+         WHERE subject_kind = 'human' AND active_until IS NULL
+         ORDER BY active_from LIMIT 1"
     ))
     .fetch_optional(pool)
     .await?;
@@ -67,11 +83,12 @@ pub async fn get_first(pool: &PgPool) -> Result<Option<AccountRow>, StorageError
 }
 
 /// Update the password hash and canonical update timestamp.
-pub async fn update_password(pool: &PgPool, id: i64, new_hash: &str) -> Result<(), StorageError> {
+pub async fn update_password(pool: &PgPool, id: Uuid, new_hash: &str) -> Result<(), StorageError> {
     sqlx::query(
         "UPDATE lifeos_security.identity
-         SET password_hash = $1, updated_at = CURRENT_TIMESTAMP
-         WHERE id = $2",
+         SET attributes = attributes || jsonb_build_object('password_hash', $1)
+         WHERE identity_id = $2 AND subject_kind = 'human'
+           AND active_until IS NULL",
     )
     .bind(new_hash)
     .bind(id)
@@ -82,10 +99,26 @@ pub async fn update_password(pool: &PgPool, id: i64, new_hash: &str) -> Result<(
 
 /// Delete all accounts. Called only by the explicit vault-reset command.
 pub async fn delete_all(pool: &PgPool) -> Result<u64, StorageError> {
-    let result = sqlx::query("DELETE FROM lifeos_security.identity")
-        .execute(pool)
-        .await?;
+    let result = sqlx::query(
+        "UPDATE lifeos_security.identity
+         SET active_until = CURRENT_TIMESTAMP
+         WHERE subject_kind = 'human' AND active_until IS NULL",
+    )
+    .execute(pool)
+    .await?;
     Ok(result.rows_affected())
+}
+
+async fn get_by_id(pool: &PgPool, id: Uuid) -> Result<Option<AccountRow>, StorageError> {
+    Ok(sqlx::query_as::<_, AccountRow>(&format!(
+        "SELECT {ACCOUNT_COLUMNS}
+         FROM lifeos_security.identity
+         WHERE identity_id = $1 AND subject_kind = 'human'
+           AND active_until IS NULL"
+    ))
+    .bind(id)
+    .fetch_optional(pool)
+    .await?)
 }
 
 // ---------------------------------------------------------------------------
@@ -154,9 +187,12 @@ pub async fn migrate_from_json(
     app_data_dir: &Path,
 ) -> Result<MigrateOutcome, MigrateError> {
     let json_path = app_data_dir.join("account.json");
-    let (count,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM lifeos_security.identity")
-        .fetch_one(pool)
-        .await?;
+    let (count,): (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM lifeos_security.identity
+         WHERE subject_kind = 'human' AND active_until IS NULL",
+    )
+    .fetch_one(pool)
+    .await?;
     if count > 0 {
         retire_captured_legacy_source(pool, &json_path).await?;
         return Ok(MigrateOutcome::AlreadyMigrated);
@@ -174,30 +210,22 @@ pub async fn migrate_from_json(
         .strip_prefix("epoch:")
         .and_then(|s| s.parse::<i64>().ok())
         .unwrap_or_else(|| chrono::Utc::now().timestamp());
-    let sha256 = format!("{:x}", Sha256::digest(&raw));
-
     let mut tx = pool.begin().await?;
-    sqlx::query(
-        "INSERT INTO lifeos_blob.object (sha256, byte_length, raw_bytes, source_kind)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (sha256) DO NOTHING",
-    )
-    .bind(&sha256)
-    .bind(raw.len() as i64)
-    .bind(&raw)
-    .bind("legacy-account-json")
-    .execute(&mut *tx)
-    .await?;
-    sqlx::query(
-        "INSERT INTO lifeos_security.identity
-           (email, display_name, password_hash, created_at, updated_at)
-         VALUES ($1, $2, $3, to_timestamp($4), CURRENT_TIMESTAMP)",
+    let attributes = serde_json::json!({
+        "display_name": legacy.display_name,
+        "password_hash": legacy.password_hash,
+        "created_at": created_ts,
+        "source": "legacy-account-json",
+    });
+    sqlx::query_scalar::<_, Uuid>(
+        "SELECT lifeos_security.register_identity(
+           'human', $1, $2, $3
+         )",
     )
     .bind(&legacy.email)
-    .bind(&legacy.display_name)
-    .bind(&legacy.password_hash)
-    .bind(created_ts as f64)
-    .execute(&mut *tx)
+    .bind(attributes)
+    .bind(&raw)
+    .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
 
@@ -213,11 +241,14 @@ async fn retire_captured_legacy_source(
         return Ok(());
     }
     let raw = std::fs::read(json_path)?;
-    let sha256 = format!("{:x}", Sha256::digest(&raw));
     let captured = sqlx::query_scalar::<_, bool>(
-        "SELECT EXISTS(SELECT 1 FROM lifeos_blob.object WHERE sha256 = $1)",
+        "SELECT EXISTS(
+           SELECT 1 FROM lifeos_blob.object
+           WHERE sha256 = extensions.digest($1, 'sha256')
+             AND bytes_inline = $1
+         )",
     )
-    .bind(sha256)
+    .bind(&raw)
     .fetch_one(pool)
     .await?;
     if !captured {
@@ -287,7 +318,8 @@ mod tests {
         assert!(!dir.path().join("account.json").exists());
 
         let captured: (i64, Vec<u8>) = sqlx::query_as(
-            "SELECT byte_length, raw_bytes FROM lifeos_blob.object WHERE source_kind = $1",
+            "SELECT byte_length, bytes_inline FROM lifeos_blob.object
+             WHERE provenance->>'source' = $1",
         )
         .bind("legacy-account-json")
         .fetch_one(pool)

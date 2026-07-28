@@ -340,7 +340,7 @@ impl Storage {
         )
         .execute(&self.pool)
         .await?;
-        sqlx::query("DELETE FROM lifeos_semantic.embedding")
+        sqlx::query("SELECT lifeos_semantic.retire_embedding_collection('test')")
             .execute(&self.pool)
             .await?;
         for table in [

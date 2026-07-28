@@ -12,7 +12,7 @@ describe("ARCHBP-042 envctl-only CodeDB commit boundary", () => {
     expect(receipt.code_db.revision).toBe("c49af6e5a9301296d9ff0133c04acd987363155f");
     expect(receipt.code_db.worktree).toBe("clean");
     expect(receipt.code_db.path).toBe("rtk_nu → CodeDB → redb");
-    expect(receipt.envctl.revision).toBe("359bd6dcad13c12f0fe975dac8f4071b18cba83a");
+    expect(receipt.envctl.revision).toBe("7ab63ea74a72868adec0091aa8bc4b10119f8f33");
     expect(receipt.envctl.worktree).toBe("clean");
     expect(receipt.envctl.committer_role).toBe("lifeos_envctl");
     expect(receipt.envctl.tests).toHaveLength(4);

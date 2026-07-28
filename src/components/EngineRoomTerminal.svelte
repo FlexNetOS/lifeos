@@ -88,10 +88,10 @@
         window.setTimeout(() => {
           void sendBytes(
             new TextEncoder().encode(
-              "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\n",
+              "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r",
             ),
           );
-        }, 1_000);
+        }, 5_000);
       }
     } catch {
       reconcileMessage = "Engine Room unavailable";

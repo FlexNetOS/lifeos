@@ -8,7 +8,10 @@ use super::StorageError;
 /// empty object so first-run frontend behavior stays stable.
 pub async fn read(pool: &PgPool, key: &str) -> Result<String, StorageError> {
     let payload = sqlx::query_scalar::<_, serde_json::Value>(
-        "SELECT payload_json FROM lifeos_runtime.projection WHERE projection_key = $1",
+        "SELECT payload_json
+         FROM lifeos_runtime.projection
+         WHERE tenant_id = lifeos_security.current_tenant()
+           AND projection_key = $1",
     )
     .bind(key)
     .fetch_optional(pool)
@@ -20,14 +23,7 @@ pub async fn read(pool: &PgPool, key: &str) -> Result<String, StorageError> {
 pub async fn write(pool: &PgPool, key: &str, payload: &str) -> Result<(), StorageError> {
     let value: serde_json::Value =
         serde_json::from_str(payload).map_err(|_| StorageError::InvalidProjectionJson)?;
-    sqlx::query(
-        "INSERT INTO lifeos_runtime.projection (projection_key, payload_json, generation, updated_at)
-         VALUES ($1, $2, 1, CURRENT_TIMESTAMP)
-         ON CONFLICT (projection_key) DO UPDATE SET
-           payload_json = EXCLUDED.payload_json,
-           generation = lifeos_runtime.projection.generation + 1,
-           updated_at = CURRENT_TIMESTAMP",
-    )
+    sqlx::query("SELECT lifeos_runtime.put_projection($1, $2)")
     .bind(key)
     .bind(value)
     .execute(pool)
@@ -82,20 +78,25 @@ pub async fn migrate_from_json_file(
     .bind(source_kind)
     .execute(&mut *tx)
     .await?;
-    let result = sqlx::query(
-        "INSERT INTO lifeos_runtime.projection
-           (projection_key, payload_json, generation, updated_at)
-         VALUES ($1, $2, 1, CURRENT_TIMESTAMP)
-         ON CONFLICT (projection_key) DO NOTHING",
+    let existed: bool = sqlx::query_scalar(
+        "SELECT EXISTS(
+           SELECT 1 FROM lifeos_runtime.projection
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND projection_key = $1
+         )",
     )
     .bind(projection_key)
-    .bind(value)
-    .execute(&mut *tx)
+    .fetch_one(&mut *tx)
     .await?;
+    sqlx::query("SELECT lifeos_runtime.put_projection($1, $2)")
+        .bind(projection_key)
+        .bind(value)
+        .execute(&mut *tx)
+        .await?;
     tx.commit().await?;
     std::fs::remove_file(path)?;
 
-    if result.rows_affected() == 1 {
+    if !existed {
         Ok(LegacyProjectionOutcome::Migrated)
     } else {
         Ok(LegacyProjectionOutcome::CanonicalValueRetained)

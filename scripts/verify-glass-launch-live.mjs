@@ -1,11 +1,14 @@
 // ARCHBP-001/002 — causal Tauri launch -> mounted Glass receipt -> shutdown.
 import { createHash } from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const root = process.cwd();
-const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/var/lib/redb");
+const redbRoot = resolve(
+  process.env.LIFEOS_REDB_ROOT ??
+    mkdtempSync(join("/home/flexnetos/meta/var/tmp", `lifeos-glass-launch-${process.pid}-`)),
+);
 const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root, "evidence/glass/live-launch-receipt.json"));
 const failureReceiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_FAILURE_RECEIPT ?? join(root, "evidence/glass/live-launch-failure-receipt.json"));
 const port = process.env.LIFEOS_GLASS_PORT ?? "1421";
@@ -87,11 +90,21 @@ const config = JSON.stringify({
     beforeDevCommand: `bun run dev -- --host 127.0.0.1 --port ${port}`,
   },
 });
-const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--config", config], {
+const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--no-watch", "--config", config], {
   cwd: root,
   env: { ...process.env, ...runtime },
   detached: true,
-  stdio: "ignore",
+  stdio: ["ignore", "pipe", "pipe"],
+});
+let launchOutput = "";
+let launchOutputHead = "";
+child.stdout.on("data", (chunk) => {
+  launchOutput = `${launchOutput}${chunk}`.slice(-16_384);
+  launchOutputHead = `${launchOutputHead}${chunk}`.slice(0, 8_192);
+});
+child.stderr.on("data", (chunk) => {
+  launchOutput = `${launchOutput}${chunk}`.slice(-16_384);
+  launchOutputHead = `${launchOutputHead}${chunk}`.slice(0, 8_192);
 });
 let launchError = null;
 child.once("error", (error) => { launchError = error; });
@@ -145,6 +158,8 @@ const result = {
     pid: child.pid,
     process_tree: tree,
     launch_error: launchError?.message ?? null,
+    output_head: launchOutputHead,
+    output_tail: launchOutput.slice(-4096),
   },
   main_loaded: mainLoaded,
     readiness,

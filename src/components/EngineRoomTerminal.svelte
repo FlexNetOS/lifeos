@@ -75,8 +75,13 @@
                 argv: [
                   "yzx",
                   "enter",
-                  "--session",
+                  "options",
+                  "--session-name",
                   "<database-derived>",
+                  "--attach-to-session",
+                  "true",
+                  "--on-force-close",
+                  "detach",
                 ],
                 nushellMarker: probeOutput.includes("LIFEOS_NUSHELL_PROBE"),
                 outputTail: probeOutput.slice(-2_048),
@@ -99,7 +104,7 @@
       if (probe && !probeSent) {
         probeSent = true;
         window.setTimeout(() => {
-          void sendBytes(new TextEncoder().encode("\u001bl"));
+          void sendBytes(new TextEncoder().encode("\u001b\u0007\u001bl"));
           window.setTimeout(() => {
             void sendBytes(
               new TextEncoder().encode(

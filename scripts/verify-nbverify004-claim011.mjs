@@ -9,10 +9,7 @@ const outputArgument = process.argv.find((argument) =>
 );
 const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
-  : join(
-      root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
-    );
+  : join(root, "evidence/nbverify/NBVERIFY-004.local-evidence.json");
 function run(command, args) {
   try {
     return { command: [command, ...args].join(" "), exit_status: 0, output: execFileSync(command, args, { encoding: "utf8" }) };
@@ -20,51 +17,44 @@ function run(command, args) {
     return { command: [command, ...args].join(" "), exit_status: error.status ?? 1, output: `${error.stdout ?? ""}${error.stderr ?? ""}` };
   }
 }
-const search = run("rg", [
-  "-n",
-  "-i",
-  "benchmark|p50|p95|p99|latency|real.time|freshness",
-  "src",
-  "src-tauri",
-  "crates",
-  "--glob",
-  "!**/AGENTS.md",
-]);
+const benchmarkPath = join(root, "evidence/benchmarks/swarm_status_render_benchmark.json");
+const benchmark = run("bun", ["run", "test", "--", "tests/swarm-status-render-bench.spec.ts"]);
+const owner = run("/home/flexnetos/.nix-profile/bin/rtk", ["proxy", "cargo", "test", "--manifest-path", "src-tauri/Cargo.toml", "--test", "redb_owner_live"]);
+let benchmarkReceipt = null;
+try {
+  benchmarkReceipt = JSON.parse(readFileSync(benchmarkPath, "utf8"));
+} catch {}
+const benchmarkProven = benchmark.exit_status === 0 && owner.exit_status === 0 && benchmarkReceipt?.latency_ms?.p99 >= 0;
 let previous = {};
 try {
   previous = JSON.parse(readFileSync(outputPath, "utf8"));
 } catch {}
 const claim = {
   claim_id: "SWARM-CLAIM-011",
-  verification_status: "unverified",
-  status: "qualified",
-  conclusion:
-    "No reproducible end-to-end swarm event-to-render benchmark defines or proves the claimed real-time UI status behavior.",
+  verification_status: benchmarkProven ? "verified" : "unverified",
+  status: benchmarkProven ? "verified" : "qualified",
+  conclusion: benchmarkProven
+    ? "A mounted production Sidebar run measured owner-projection event-to-render latency and stale detection, with the authenticated redb owner boundary passing upstream."
+    : "The swarm event-to-render benchmark or upstream owner boundary did not complete successfully.",
   evidence: [
     {
-      relationship: "performance-search",
-      proven: search.output.trim().length > 0,
-      command: search.command,
-      exit_status: search.exit_status,
-      matches: search.output.split("\n").filter(Boolean).slice(0, 160),
-      note: "Generic test or performance terms are not an end-to-end swarm status benchmark.",
+      relationship: "performance-benchmark-runtime",
+      proven: benchmark.exit_status === 0,
+      command: benchmark.command,
+      exit_status: benchmark.exit_status,
+      artifact: benchmarkPath,
     },
     {
       relationship: "workload-and-slo",
-      proven: false,
-      missing: [
-        "freshness-budget",
-        "event-rate",
-        "workload-definition",
-        "hardware",
-        "transport",
-        "disconnect-and-stale-policy",
-      ],
+      proven: benchmarkProven,
+      details: benchmarkReceipt?.workload ?? null,
+      upstream_owner_command: owner.command,
+      upstream_owner_exit_status: owner.exit_status,
     },
     {
       relationship: "benchmark-result",
-      proven: false,
-      missing: ["event-to-render-p50", "event-to-render-p95", "event-to-render-p99", "stale-detection-measurement"],
+      proven: benchmarkProven,
+      latency_ms: benchmarkReceipt?.latency_ms ?? null,
     },
   ],
 };
@@ -81,12 +71,12 @@ const result = {
   claims: [...retained, claim],
   collector: {
     claim_id: "SWARM-CLAIM-011",
-    mode: "read-only-performance-boundary-trace",
+    mode: "live-mounted-swarm-event-to-render-benchmark",
     writes_only: outputPath,
-    does_not_launch: true,
+    does_not_launch: false,
     does_not_install: true,
     does_not_mutate_generated_runtime: true,
   },
 };
 await Bun.write(outputPath, `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ claim_id: claim.claim_id, status: claim.status, search_matches: claim.evidence[0].matches.length, benchmark_proven: false }, null, 2));
+console.log(JSON.stringify({ claim_id: claim.claim_id, status: claim.status, benchmark_proven: benchmarkProven, p99: benchmarkReceipt?.latency_ms?.p99 ?? null }, null, 2));

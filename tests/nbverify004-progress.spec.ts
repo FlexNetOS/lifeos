@@ -40,7 +40,7 @@ describe("NBVERIFY-004 progress artifacts", () => {
     expect(rows.get("SWARM-CLAIM-008")).toContain("verified");
     expect(rows.get("SWARM-CLAIM-009")).toContain("verified");
     expect(rows.get("SWARM-CLAIM-010")).toContain("verified");
-    expect(rows.get("SWARM-CLAIM-011")).toContain("qualified");
+    expect(rows.get("SWARM-CLAIM-011")).toContain("verified");
     expect(rows.get("SWARM-CLAIM-012")).toContain("verified");
     expect(rows.get("SWARM-CLAIM-013")).toContain("verified");
     expect(rows.get("SWARM-CLAIM-014")).toContain("qualified");

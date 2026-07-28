@@ -8,7 +8,7 @@ const evidencePath = resolve(
 );
 
 describe("NBVERIFY-004 SWARM-CLAIM-011 evidence", () => {
-  test("does not call UI status real time without an end-to-end benchmark", () => {
+  test("records the mounted event-to-render benchmark", () => {
     expect(existsSync(evidencePath)).toBe(true);
     const receipt = JSON.parse(readFileSync(evidencePath, "utf8"));
     const claim = receipt.claims.find(
@@ -16,13 +16,13 @@ describe("NBVERIFY-004 SWARM-CLAIM-011 evidence", () => {
         candidate.claim_id === "SWARM-CLAIM-011",
     );
     expect(claim).toBeDefined();
-    expect(claim.verification_status).toBe("unverified");
-    expect(claim.status).toBe("qualified");
+    expect(claim.verification_status).toBe("verified");
+    expect(claim.status).toBe("verified");
     expect(claim.evidence).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ relationship: "performance-search" }),
-        expect.objectContaining({ relationship: "workload-and-slo" }),
-        expect.objectContaining({ relationship: "benchmark-result" }),
+        expect.objectContaining({ relationship: "performance-benchmark-runtime", proven: true }),
+        expect.objectContaining({ relationship: "workload-and-slo", proven: true }),
+        expect.objectContaining({ relationship: "benchmark-result", proven: true }),
       ]),
     );
     expect(
@@ -30,6 +30,6 @@ describe("NBVERIFY-004 SWARM-CLAIM-011 evidence", () => {
         (candidate: { relationship: string }) =>
           candidate.relationship === "benchmark-result",
       ),
-    ).toEqual(expect.objectContaining({ proven: false }));
+    ).toEqual(expect.objectContaining({ proven: true }));
   });
 });

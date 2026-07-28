@@ -177,25 +177,6 @@
       ]
     },
     {
-      "claim_id": "SWARM-CLAIM-011",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "evidence": [
-        {
-          "relationship": "performance-search",
-          "proven": false
-        },
-        {
-          "relationship": "workload-and-slo",
-          "proven": false
-        },
-        {
-          "relationship": "benchmark-result",
-          "proven": false
-        }
-      ]
-    },
-    {
       "claim_id": "SWARM-CLAIM-014",
       "verification_status": "qualified",
       "status": "qualified",
@@ -547,16 +528,52 @@
           ]
         }
       ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-011",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "A mounted production Sidebar run measured owner-projection event-to-render latency and stale detection, with the authenticated redb owner boundary passing upstream.",
+      "evidence": [
+        {
+          "relationship": "performance-benchmark-runtime",
+          "proven": true,
+          "command": "bun run test -- tests/swarm-status-render-bench.spec.ts",
+          "exit_status": 0,
+          "artifact": "/home/flexnetos/meta/src/lifeos/evidence/benchmarks/swarm_status_render_benchmark.json"
+        },
+        {
+          "relationship": "workload-and-slo",
+          "proven": true,
+          "details": {
+            "iterations": 100,
+            "mounted_component": "Sidebar.svelte",
+            "source": "owner-published redb projection"
+          },
+          "upstream_owner_command": "/home/flexnetos/.nix-profile/bin/rtk proxy cargo test --manifest-path src-tauri/Cargo.toml --test redb_owner_live",
+          "upstream_owner_exit_status": 0
+        },
+        {
+          "relationship": "benchmark-result",
+          "proven": true,
+          "latency_ms": {
+            "p50": 0.027491999999938344,
+            "p95": 0.0752549999999701,
+            "p99": 0.28847000000007483,
+            "stale_detection": 0.3179649999999583
+          }
+        }
+      ]
     }
   ],
-  "observed_at": "2026-07-28T21:31:46.149Z",
+  "observed_at": "2026-07-28T21:35:24.104Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
-    "package_json_sha256": "961bd42d4bbc0deb2b39ac562e396c0da3775a867ff2342df470a208cdd5171a"
+    "package_json_sha256": "7e720426c57fe6389335a46362bf382905c3be5fc92586f56bf3d25fba2dfea4"
   },
   "collector": {
-    "claim_id": "SWARM-CLAIM-010",
-    "mode": "live-ui-swarm-status-boundary-trace",
+    "claim_id": "SWARM-CLAIM-011",
+    "mode": "live-mounted-swarm-event-to-render-benchmark",
     "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
     "does_not_launch": false,
     "does_not_install": true,

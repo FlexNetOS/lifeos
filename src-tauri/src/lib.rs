@@ -47,13 +47,8 @@ mod terminal_tests {
             vec![
                 "yzx",
                 "enter",
-                "options",
-                "--session-name",
+                "--session",
                 "lifeos-tenant-session",
-                "--attach-to-session",
-                "true",
-                "--on-force-close",
-                "detach",
             ]
         );
     }
@@ -589,13 +584,8 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     vec![
         "yzx".into(),
         "enter".into(),
-        "options".into(),
-        "--session-name".into(),
+        "--session".into(),
         session_name.into(),
-        "--attach-to-session".into(),
-        "true".into(),
-        "--on-force-close".into(),
-        "detach".into(),
     ]
 }
 
@@ -1504,13 +1494,6 @@ pub fn run() {
             if let Some(reconciler) = EnvctlReconciler::start() {
                 app.manage(reconciler);
             }
-            if std::env::var_os("VITE_LIFEOS_ENGINE_PROBE").as_deref() == Some(std::ffi::OsStr::new("1")) {
-                if let Some(window) = app.get_webview_window("main") {
-                    window
-                        .eval("window.location.replace(window.location.origin + '/?probe=engine-room')")
-                        .map_err(|error| std::io::Error::other(format!("redirect Engine Room probe: {error}")))?;
-                }
-            }
             // ── Storage initialization ──────────────────────────────────────
             // Runs synchronously (via block_on) before the event loop starts so
             // every command handler can safely assume `State<Storage>` is ready.
@@ -1592,6 +1575,13 @@ pub fn run() {
                         }
                     }
                 });
+            }
+            if std::env::var_os("VITE_LIFEOS_ENGINE_PROBE").as_deref() == Some(std::ffi::OsStr::new("1")) {
+                if let Some(window) = app.get_webview_window("main") {
+                    window
+                        .eval("window.location.replace(window.location.origin + '/?probe=engine-room')")
+                        .map_err(|error| std::io::Error::other(format!("redirect Engine Room probe: {error}")))?;
+                }
             }
             Ok(())
         })

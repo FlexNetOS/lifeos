@@ -225,7 +225,7 @@
   </div>
 
   <div class="terminal-output" bind:this={terminalEl} role="application" aria-label="Yazelix terminal"></div>
-  {#if !connected}<p class="terminal-hint"><Icon name="info" size={14} /> Terminal input is available in the Tauri shell.</p>{/if}
+  {#if !connected}<p class="terminal-hint"><Icon name="info" size={14} /> Terminal input is available in the Yazelix Nushell Engine Room.</p>{/if}
 </section>
 
 <style>

@@ -63,7 +63,7 @@ mod terminal_tests {
         let shell = engine_room_shell_argv("lifeos-tenant-session");
         assert_eq!(shell[0], "/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu");
         assert_eq!(&shell[1..3], ["-l", "-c"]);
-        assert!(shell[3].starts_with("^/home/flexnetos/.nix-profile/bin/yzx enter options --session-name"));
+        assert!(shell[3].starts_with("^/home/flexnetos/.nix-profile/bin/yzx enter --session"));
     }
 
     #[test]
@@ -611,7 +611,7 @@ fn engine_room_shell_argv(session_name: &str) -> Vec<String> {
     let yzx = std::env::var("YZX_BIN")
         .unwrap_or_else(|_| "/home/flexnetos/.nix-profile/bin/yzx".into());
     let inner = format!(
-        "^{yzx} enter options --session-name {session_name} --attach-to-session true --on-force-close detach"
+        "^{yzx} enter --session {session_name}"
     );
     vec![
         std::env::var("LIFEOS_NUSHELL_PATH").unwrap_or_else(|_| {

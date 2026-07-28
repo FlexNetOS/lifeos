@@ -8,6 +8,7 @@ pub mod ruvector;
 pub mod security;
 pub mod seed_vault;
 pub mod state;
+pub mod tasks;
 pub mod vault;
 
 pub use error::StorageError;

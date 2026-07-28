@@ -27,6 +27,8 @@ pub enum StorageError {
     InvalidRuntimeContext(String),
     /// A ciphertext-backed secret registration failed its Rust-side input guard.
     InvalidSecretRegistration,
+    /// A task claim or execution completion failed its Rust-side input guard.
+    InvalidTaskExecution,
     /// RuVector must be installed in the dedicated `extensions` schema.
     RequiredExtension,
     /// The durable schema has fewer applied migrations than the embedded set.
@@ -76,6 +78,10 @@ impl fmt::Display for StorageError {
             Self::InvalidSecretRegistration => write!(
                 f,
                 "secret registration requires a non-empty key, purpose scope, and ciphertext"
+            ),
+            Self::InvalidTaskExecution => write!(
+                f,
+                "task execution requires valid worker, capability, lease, result, effect, and witness data"
             ),
             Self::RequiredExtension => {
                 write!(f, "ruvector must be installed in the extensions schema")

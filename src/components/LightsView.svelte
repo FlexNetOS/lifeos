@@ -15,7 +15,7 @@
 
   const lifeos = useLifeos();
   const toasts = useToasts();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
 
   let lighting = $derived(globalThis.LIFEOS_DATA?.lighting || { scenes: [], rooms: [], schedules: [] });
 
@@ -48,7 +48,7 @@
   let totalCount = $derived(lighting.rooms.reduce((n, r) => n + (r.devices?.length || 0), 0));
   let activeCount = $derived(lighting.rooms.reduce((n, r) => n + activeInRoom(r), 0));
 
-  let activeSceneId = $state(lighting.scenes.find((s) => s.active)?.id || lighting.scenes[0]?.id || "");
+  let activeSceneId = $state(globalThis.LIFEOS_DATA?.lighting?.scenes?.find((s) => s.active)?.id || globalThis.LIFEOS_DATA?.lighting?.scenes?.[0]?.id || "");
   let announcement = $state("");
 
   const pickScene = (id) => {

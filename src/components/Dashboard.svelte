@@ -15,7 +15,7 @@
   const lifeos = useLifeos();
   const auth = useAuth();
   const toasts = useToasts();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, ["teams"]);
   const authState = bindStore(auth, ["account"]);
   const d = globalThis.LIFEOS_DATA?.dashboardCanvas;

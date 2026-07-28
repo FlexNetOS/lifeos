@@ -106,27 +106,49 @@ export class NativeLifeosStore {
   }
 
   get activeId() { return this.state.activeId; }
+  set activeId(value: string) { this.patch({ activeId: value }); }
   get wsCollapsed() { return this.state.wsCollapsed; }
+  set wsCollapsed(value: boolean) { this.patch({ wsCollapsed: value }); }
   get pendingExpand() { return this.state.pendingExpand; }
+  set pendingExpand(value: string | null) { this.patch({ pendingExpand: value }); }
   get sectionByWs() { return this.state.sectionByWs; }
+  set sectionByWs(value: Record<string, string>) { this.patch({ sectionByWs: value }); }
   get activeSub() { return this.state.activeSub; }
+  set activeSub(value: ActiveSub | null) { this.patch({ activeSub: value }); }
   get teamOrder() { return this.state.teamOrder; }
+  set teamOrder(value: string[] | null) { this.patch({ teamOrder: value }); }
   get sectionOrder() { return this.state.sectionOrder; }
+  set sectionOrder(value: Record<string, string[]>) { this.patch({ sectionOrder: value }); }
   get itemOrder() { return this.state.itemOrder; }
+  set itemOrder(value: Record<string, Record<string, string[]>>) { this.patch({ itemOrder: value }); }
   get extraItems() { return this.state.extraItems; }
+  set extraItems(value: Record<string, Record<string, any[]>>) { this.patch({ extraItems: value }); }
   get extraSections() { return this.state.extraSections; }
+  set extraSections(value: Record<string, any[]>) { this.patch({ extraSections: value }); }
   get aiAvatarHidden() { return this.state.aiAvatarHidden; }
+  set aiAvatarHidden(value: boolean) { this.patch({ aiAvatarHidden: value }); }
   get aiChatOpen() { return this.state.aiChatOpen; }
+  set aiChatOpen(value: boolean) { this.patch({ aiChatOpen: value }); }
   get avatarPos() { return this.state.avatarPos; }
+  set avatarPos(value: AvatarPos) { this.patch({ avatarPos: value }); }
   get aiMessages() { return this.state.aiMessages; }
+  set aiMessages(value: AiMessage[]) { this.patch({ aiMessages: value }); }
   get aiProvider() { return this.state.aiProvider; }
+  set aiProvider(value: string) { this.patch({ aiProvider: value }); }
   get telemetryEnabled() { return this.state.telemetryEnabled; }
+  set telemetryEnabled(value: boolean) { this.patch({ telemetryEnabled: value }); }
   get telemetryRefreshMs() { return this.state.telemetryRefreshMs; }
+  set telemetryRefreshMs(value: number) { this.patch({ telemetryRefreshMs: value }); }
   get cmdkOpen() { return this.state.cmdkOpen; }
+  set cmdkOpen(value: boolean) { this.patch({ cmdkOpen: value }); }
   get cmdkSeed() { return this.state.cmdkSeed; }
+  set cmdkSeed(value: string) { this.patch({ cmdkSeed: value }); }
   get notificationsDrawerOpen() { return this.state.notificationsDrawerOpen; }
+  set notificationsDrawerOpen(value: boolean) { this.patch({ notificationsDrawerOpen: value }); }
   get dismissedNotificationIds() { return this.state.dismissedNotificationIds; }
+  set dismissedNotificationIds(value: string[]) { this.patch({ dismissedNotificationIds: value }); }
   get readNotificationIds() { return this.state.readNotificationIds; }
+  set readNotificationIds(value: string[]) { this.patch({ readNotificationIds: value }); }
 
   get workspace() { return resolveWorkspace(this.state.activeId); }
 

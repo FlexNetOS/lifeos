@@ -14,7 +14,7 @@
 
   const lifeos = useLifeos();
   const toasts = useToasts();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, ["activeSub"]);
 
   let workspaceId = $derived(lifeosState.activeSub?.workspaceId || "");

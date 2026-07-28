@@ -15,7 +15,7 @@
   let { router = appRouter } = $props();
 
   const lifeos = useLifeos();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   // Reactive reads: cmdkOpen drives the overlay + the open-watch below. cmdkSeed is
   // deliberately read straight off the store (non-reactively) inside the open effect,
   // mirroring Vue's watch(() => lifeos.cmdkOpen, ...) which does NOT re-fire when only

@@ -14,7 +14,7 @@
   let { router = appRouter, redbProjection = null } = $props();
 
   const lifeos = useLifeos();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, [
     "activeId",
     "wsCollapsed",

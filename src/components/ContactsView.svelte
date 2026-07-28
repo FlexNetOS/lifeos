@@ -15,7 +15,7 @@
   let { router = appRouter } = $props();
 
   const lifeos  = useLifeos();
-  const nav     = createNav(router);
+  let nav     = $derived(createNav(router));
   const toasts  = useToasts();
   const lifeosState = bindStore(lifeos, ["activeId"]);
 

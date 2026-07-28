@@ -11,7 +11,7 @@
   let { router = appRouter } = $props();
 
   const lifeos = useLifeos();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, ["activeSub"]);
 
   let sub = $derived(lifeosState.activeSub);
@@ -143,8 +143,7 @@
 }
 
 .cal-day--today {
-  border-color: var(--lifeos-cyan, #00d4ff);
-  border-opacity: 0.4;
+  border-color: color-mix(in srgb, var(--lifeos-cyan, #00d4ff) 40%, transparent);
 }
 
 .cal-day-label {

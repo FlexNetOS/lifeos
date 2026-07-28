@@ -17,8 +17,9 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
+use std::thread::JoinHandle;
 use uuid::Uuid;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
@@ -125,6 +126,53 @@ fn envctl_drain(max_batch: Option<usize>) -> Result<envctl_commit_worker::DrainR
 fn envctl_return_projection() -> Result<Vec<(String, String)>, String> {
     envctl_commit_worker::return_projection(&envctl_commit_conn()?, &redb_root())
         .map_err(|error| error.to_string())
+}
+
+struct EnvctlReconciler {
+    stop: Arc<AtomicBool>,
+    thread: Option<JoinHandle<()>>,
+}
+
+impl EnvctlReconciler {
+    fn start() -> Option<Self> {
+        if std::env::var_os("LIFEOS_ENVCTL_COMMIT_CONN").is_none() {
+            return None;
+        }
+        let stop = Arc::new(AtomicBool::new(false));
+        let thread_stop = Arc::clone(&stop);
+        let owner_root = redb_root();
+        let thread = std::thread::Builder::new()
+            .name("lifeos-envctl-reconciler".into())
+            .spawn(move || {
+                while !thread_stop.load(Ordering::SeqCst) {
+                    if let Ok(conn) = std::env::var("LIFEOS_ENVCTL_COMMIT_CONN") {
+                        if let Ok(receipt) =
+                            envctl_commit_worker::drain_and_commit(&conn, 500, false)
+                        {
+                            if !receipt.committed.is_empty() || !receipt.skipped_existing.is_empty()
+                            {
+                                let _ = envctl_commit_worker::return_projection(&conn, &owner_root);
+                            }
+                        }
+                    }
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                }
+            })
+            .ok()?;
+        Some(Self {
+            stop,
+            thread: Some(thread),
+        })
+    }
+}
+
+impl Drop for EnvctlReconciler {
+    fn drop(&mut self) {
+        self.stop.store(true, Ordering::SeqCst);
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
 }
 
 struct TerminalSession {
@@ -1071,6 +1119,9 @@ pub fn run() {
                 ))) as Box<dyn std::error::Error>
             })?;
             app.manage(owner);
+            if let Some(reconciler) = EnvctlReconciler::start() {
+                app.manage(reconciler);
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

@@ -80,6 +80,6 @@ Every interactive component has a spec under `../../tests/<Name>.spec.js`. Addin
 
 ### External
 - `lucide-vue-next@^0.475.0` (Vitest aliases this to `../../tests/__mocks__/lucide-vue-next.js`).
-- `vue-router@^4` (`useRouter` in nav-aware components).
+- `vue-router` is legacy preview/test infrastructure; mounted Svelte components use the native hash router.
 
 <!-- MANUAL: Add notes below; this section is preserved on regeneration. -->

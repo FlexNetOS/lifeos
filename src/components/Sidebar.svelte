@@ -1,9 +1,8 @@
 <script>
   // LifeOS — Sidebar SFC (Svelte port of Sidebar.vue)
   // Primary rail: logo toggle + workspace switcher dropdown + rail icons + footer cluster.
-  // Navigation goes through the Pinia store via svelte-nav's createNav() — see that file's
-  // header comment for why this doesn't use nav.js's useNav() directly (vue-router's
-  // useRouter() needs Vue component injection, which doesn't exist in a Svelte tree).
+  // Navigation goes through the native LifeOS store via svelte-nav's createNav().
+  // The legacy nav.js composable remains only for the preview compatibility path.
   import { onMount, onDestroy } from "svelte";
   import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";

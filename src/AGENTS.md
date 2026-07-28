@@ -4,14 +4,14 @@
 # src
 
 ## Purpose
-LifeOS **Svelte 5** application source. Native subscribable stores + headless vue-router + Vite-bundled
+LifeOS **Svelte 5** application source. Native subscribable stores + native hash router + Vite-bundled
 Svelte components that render the dark-first six-workspace shell defined in the root
 contract. Tauri's `beforeBuildCommand` consumes the Vite output of this tree as
 `frontendDist`.
 
 > **Framework note (phase-3 cutover).** The Vue SFC toolchain is retired — every component
 > here is `.svelte` using Svelte 5 runes. The `vue` package is still a runtime dependency
-> Legacy Pinia remains only for the browser-preview compatibility path; the mounted Glass shell uses native stores. `vue-router` remains headless for URL history.
+> Legacy Pinia and vue-router remain only for browser-preview compatibility; the mounted Glass shell uses native stores and the native hash router.
 > There are no Vue components. `vite.config.ts` loads only `svelte()`; the typecheck is
 > `svelte-check`, not `vue-tsc`.
 
@@ -29,7 +29,7 @@ contract. Tauri's `beforeBuildCommand` consumes the Vite output of this tree as
 | `views/` | `Login.svelte` (pre-shell auth surface) |
 | `stores/` | Native Svelte runtime stores plus legacy Pinia `.ts` ↔ `.js` preview-path siblings, plus `auth.ts` (see `stores/AGENTS.md`) |
 | `lib/` | Resolver, navigation, native/legacy persistence boundaries, store↔Svelte bridge, icon barrels (see `lib/AGENTS.md`) |
-| `router/` | vue-router config; URL → native LifeOS state sync |
+| `router/` | Native hash-router config; URL → native LifeOS state sync |
 | `data/` | TypeScript types for `window.LIFEOS_DATA` (see `data/AGENTS.md`) |
 
 ## For AI Agents

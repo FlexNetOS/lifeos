@@ -40,7 +40,7 @@ Shared helpers used across SFCs and the store: data resolver, navigation composa
 - `@/stores/lifeos` — `useNav()` imports `useLifeos()` for state mutation.
 
 ### External
-- `vue-router@^4` — `useRouter` inside `nav.ts`.
+- `vue-router` — legacy `useRouter` inside `nav.ts`; the mounted Glass path uses `src/router/index.ts` natively.
 - `lucide-vue-next@^0.475.0` — icon source for `icons.ts`.
 - `pinia@^2` — `PiniaPluginContext` type only.
 

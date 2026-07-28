@@ -12,6 +12,7 @@ use flexnetos_redb_owner::{OwnerClient, ProjectionReader};
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::PathBuf;
@@ -25,6 +26,54 @@ fn redb_root() -> PathBuf {
     std::env::var_os("LIFEOS_REDB_ROOT")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("/home/flexnetos/meta/var/lib/redb"))
+}
+
+fn hex_bytes(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+fn seed_vault_secret() -> Result<Vec<u8>, String> {
+    let entry = keyring::Entry::new("lifeos", "seed-vault")
+        .map_err(|error| format!("seed vault keyring: {error}"))?;
+    if let Ok(value) = entry.get_password() {
+        let bytes = value.into_bytes();
+        if bytes.len() >= 32 {
+            return Ok(bytes);
+        }
+    }
+    if let Ok(value) = std::env::var("LIFEOS_SEED_VAULT_SEED") {
+        let bytes = value.into_bytes();
+        if bytes.len() >= 32 {
+            let _ = entry.set_password(&String::from_utf8_lossy(&bytes));
+            return Ok(bytes);
+        }
+    }
+    let mut bytes = Vec::with_capacity(32);
+    bytes.extend_from_slice(uuid::Uuid::new_v4().as_bytes());
+    bytes.extend_from_slice(uuid::Uuid::new_v4().as_bytes());
+    let encoded = hex_bytes(&bytes);
+    entry
+        .set_password(&encoded)
+        .map_err(|error| format!("seed vault keyring write: {error}"))?;
+    Ok(encoded.into_bytes())
+}
+
+async fn register_seed_vault(storage: &Storage) -> Result<(), String> {
+    let secret = seed_vault_secret()?;
+    let digest = Sha256::digest(&secret);
+    lifeos_core::storage::seed_vault::register(
+        storage.pool(),
+        &digest,
+        "os-keyring",
+        serde_json::json!({
+            "algorithm": "sha256",
+            "purpose": "lifeos-seed-vault-root",
+            "version": 1,
+        }),
+    )
+    .await
+    .map(|_| ())
+    .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -609,6 +658,7 @@ pub fn run() {
                     s.verify_required_extensions()
                         .await
                         .map_err(|e| e.to_string())?;
+                    register_seed_vault(&s).await?;
                     for (file_name, projection_key) in [
                         ("ui-state.json", "ui-state"),
                         ("lighting.json", "lighting-state"),

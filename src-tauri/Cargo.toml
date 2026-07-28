@@ -31,6 +31,8 @@ keyring = "3"
 # uptime without pulling per-OS crates. `default-features = false` strips the
 # component / disks / users probes we don't render.
 sysinfo = { version = "0.39", default-features = false, features = ["system", "network"] }
+portable-pty = "0.9"
+uuid = { version = "1", features = ["v4"] }
 # Local account login — Argon2id password hashing is provided by `lifeos-core`
 # (Stage 1c). The shell only needs the JSON storage helpers + Tauri command
 # wrappers in src-tauri/src/auth.rs.

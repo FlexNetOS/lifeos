@@ -10,10 +10,157 @@ mod auth;
 // along with the struct definitions.
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
+use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
+use std::collections::HashMap;
+use std::io::{Read, Write};
+use std::sync::Mutex;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
 // against `tauri::menu`, and a top-level `use` would break them.
 use tauri::{Emitter, Manager};
+
+struct TerminalSession {
+    master: Box<dyn MasterPty + Send>,
+    writer: Box<dyn Write + Send>,
+    child: Box<dyn Child + Send>,
+}
+
+#[derive(Default)]
+struct TerminalState {
+    sessions: Mutex<HashMap<String, TerminalSession>>,
+}
+
+#[tauri::command]
+fn terminal_spawn(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, TerminalState>,
+    cols: Option<u16>,
+    rows: Option<u16>,
+) -> Result<String, String> {
+    let size = PtySize {
+        rows: rows.unwrap_or(24).max(1),
+        cols: cols.unwrap_or(80).max(1),
+        pixel_width: 0,
+        pixel_height: 0,
+    };
+    let pair = native_pty_system()
+        .openpty(size)
+        .map_err(|error| format!("open terminal: {error}"))?;
+    let mut command = CommandBuilder::new("yzx");
+    command.arg("enter");
+    let child = pair
+        .slave
+        .spawn_command(command)
+        .map_err(|error| format!("start yzx enter: {error}"))?;
+    drop(pair.slave);
+
+    let mut reader = pair
+        .master
+        .try_clone_reader()
+        .map_err(|error| format!("clone terminal reader: {error}"))?;
+    let writer = pair
+        .master
+        .take_writer()
+        .map_err(|error| format!("open terminal writer: {error}"))?;
+    let session_id = uuid::Uuid::new_v4().to_string();
+    let event_session = session_id.clone();
+    std::thread::spawn(move || {
+        let mut buffer = [0_u8; 8192];
+        loop {
+            match reader.read(&mut buffer) {
+                Ok(0) => break,
+                Ok(length) => {
+                    let payload = serde_json::json!({
+                        "sessionId": event_session,
+                        "bytes": buffer[..length].to_vec(),
+                    });
+                    if app.emit("lifeos:terminal-output", payload).is_err() {
+                        break;
+                    }
+                }
+                Err(_) => break,
+            }
+        }
+        let _ = app.emit(
+            "lifeos:terminal-exit",
+            serde_json::json!({ "sessionId": event_session }),
+        );
+    });
+
+    state
+        .sessions
+        .lock()
+        .map_err(|error| format!("terminal state lock: {error}"))?
+        .insert(
+            session_id.clone(),
+            TerminalSession {
+                master: pair.master,
+                writer,
+                child,
+            },
+        );
+    Ok(session_id)
+}
+
+#[tauri::command]
+fn terminal_write(
+    state: tauri::State<'_, TerminalState>,
+    session_id: String,
+    bytes: Vec<u8>,
+) -> Result<(), String> {
+    let mut sessions = state
+        .sessions
+        .lock()
+        .map_err(|error| format!("terminal state lock: {error}"))?;
+    let session = sessions
+        .get_mut(&session_id)
+        .ok_or_else(|| "terminal session is not active".to_string())?;
+    session
+        .writer
+        .write_all(&bytes)
+        .and_then(|_| session.writer.flush())
+        .map_err(|error| format!("write terminal input: {error}"))
+}
+
+#[tauri::command]
+fn terminal_resize(
+    state: tauri::State<'_, TerminalState>,
+    session_id: String,
+    cols: u16,
+    rows: u16,
+) -> Result<(), String> {
+    let sessions = state
+        .sessions
+        .lock()
+        .map_err(|error| format!("terminal state lock: {error}"))?;
+    let session = sessions
+        .get(&session_id)
+        .ok_or_else(|| "terminal session is not active".to_string())?;
+    session
+        .master
+        .resize(PtySize {
+            rows: rows.max(1),
+            cols: cols.max(1),
+            pixel_width: 0,
+            pixel_height: 0,
+        })
+        .map_err(|error| format!("resize terminal: {error}"))
+}
+
+#[tauri::command]
+fn terminal_close(
+    state: tauri::State<'_, TerminalState>,
+    session_id: String,
+) -> Result<(), String> {
+    let mut sessions = state
+        .sessions
+        .lock()
+        .map_err(|error| format!("terminal state lock: {error}"))?;
+    sessions
+        .remove(&session_id)
+        .map(|_| ())
+        .ok_or_else(|| "terminal session is not active".to_string())
+}
 
 // Stub commands — wire to OS keyring (security-framework on macOS, secret-service
 // on Linux, credentials-manager on Windows) in a follow-on round.
@@ -379,6 +526,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             vault_list,
             open_settings,
+            terminal_spawn,
+            terminal_write,
+            terminal_resize,
+            terminal_close,
             lights_state_read,
             lights_state_write,
             ui_state_read,
@@ -398,6 +549,7 @@ pub fn run() {
             db_migrate
         ])
         .manage(TelemetryState::new())
+        .manage(TerminalState::default())
         .manage(auth::AuthState::new())
         .setup(|app| {
             // ── Storage initialization ──────────────────────────────────────

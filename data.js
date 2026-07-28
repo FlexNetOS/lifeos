@@ -34,6 +34,7 @@ window.LIFEOS_DATA = {
       sections: [
         { title: "Your AI", items: [
           { icon: "bot", label: "LifeOS", meta: "Always on · running your day", status: "online", shortcut: "⌘1" },
+          { icon: "terminal", label: "Engine Room", meta: "Yazelix · yzx enter", status: "online", view: "terminal" },
         ]},
         // UI-Editor — OpenPencil integration. The AI uses these to edit & ship its own UI.
         // Each item opens a dedicated view in the right canvas.

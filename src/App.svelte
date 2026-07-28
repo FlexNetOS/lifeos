@@ -28,6 +28,7 @@
   import SubsectionView from "./components/SubsectionView.svelte";
   import N8nFlowView from "./components/N8nFlowView.svelte";
   import OpenPencilEditor from "./components/OpenPencilEditor.svelte";
+  import EngineRoomTerminal from "./components/EngineRoomTerminal.svelte";
   import LightsView from "./components/LightsView.svelte";
   import CalendarView from "./components/CalendarView.svelte";
   import FilesView from "./components/FilesView.svelte";
@@ -69,6 +70,8 @@
         <Dashboard {router} />
       {:else if lifeosState.activeSub.item?.view === "open-pencil"}
         <OpenPencilEditor sub={lifeosState.activeSub} {router} />
+      {:else if lifeosState.activeSub.item?.view === "terminal"}
+        <EngineRoomTerminal />
       {:else if lifeosState.activeSub.item?.view === "n8n-flow"}
         <N8nFlowView />
       {:else if lifeosState.activeSub.item?.view === "lights"}

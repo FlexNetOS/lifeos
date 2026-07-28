@@ -35,7 +35,7 @@ export interface DataItem {
   status?: Status;
   badge?: { count?: number; tone?: Tone };
   shortcut?: string;
-  view?: "n8n-flow" | "open-pencil";
+  view?: "n8n-flow" | "open-pencil" | "terminal";
   flowId?: string;
   pane?: string;
   folder?: string;

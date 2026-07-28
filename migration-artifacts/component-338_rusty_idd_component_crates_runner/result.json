@@ -1,0 +1,36 @@
+{
+  "task_id": "COMPONENT-338_RUSTY_IDD_COMPONENT_CRATES_RUNNER",
+  "title": "Component: rusty-idd component: crates/runner",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "hard_rule": 15,
+  "requirement": "rusty-idd component: crates/runner must be installed and used, not replaced.",
+  "component": {
+    "owner": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/rusty-idd",
+    "name": "crates/runner",
+    "revision": "4c47c67fe088e99868d8ccf74d6cbe1aa2af2856"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "line": 6046,
+    "actual_byte_offset": 674376,
+    "supplied_byte_offset": 335153,
+    "supplied_unit_sha256": "7dc7527ec894b96e4067a5536885af14c049bc72c36ca41cf6ade722d5c78961",
+    "actual_unit_sha256": "e142d86bc4a9e10dd33dc4dd7bbee0260008b880118d8e69ff5ef21160cb4ea3",
+    "literal_present": true,
+    "verification_command": "grep -Fq 'rusty-idd component: crates/runner' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  },
+  "runtime_evidence": {
+    "execution_framework_available": false,
+    "installation_verified": false,
+    "usage_verified": false,
+    "reason": "No execution-framework directory or non-blueprint pinned rusty-idd/crates/runner integration reference was available in the permitted read-only probe scope."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "The task is a read-only probe and hard rule 15 prohibits replacing the component."
+  },
+  "next_action": "Provide the execution-framework component closure or a pinned rusty-idd checkout at 4c47c67fe088e99868d8ccf74d6cbe1aa2af2856, then rerun the read-only installation and usage probe."
+}

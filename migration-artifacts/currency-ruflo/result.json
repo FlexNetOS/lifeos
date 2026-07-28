@@ -1,0 +1,13 @@
+{
+  "task_id": "CURRENCY-RUFLO",
+  "title": "Toolchain currency: ruflo",
+  "checked_at": "2026-07-28T16:43:51Z",
+  "status": "failed",
+  "registry_latest": "3.32.25",
+  "global_installed": "3.32.22",
+  "installed_package": "ruflo@3.32.22",
+  "bun_version": "1.3.14",
+  "probe_exit_code": 1,
+  "command": "test -n \"$(bun info 'ruflo' version 2>/dev/null)\" && test \"$(bun info 'ruflo' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE 'ruflo@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+  "note": "The installed global version is behind the registry latest by three patch releases. Bun global installs resolve under BUN_INSTALL_CACHE_DIR (/run/user/1001/yazelix/volatile/cache/bun), a runtime tmpfs location, and may disappear after reboot."
+}

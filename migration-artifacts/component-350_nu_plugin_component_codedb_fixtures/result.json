@@ -1,0 +1,39 @@
+{
+  "task_id": "COMPONENT-350_NU_PLUGIN_COMPONENT_CODEDB_FIXTURES",
+  "title": "Component: nu_plugin component: codedb-fixtures",
+  "status": "not_verified",
+  "probe_mode": "read-only",
+  "command_template": "grep -Fq 'nu_plugin component: codedb-fixtures' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_line": 6058,
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "71099dd373072b287d9333fedb861dc547e89280b2d34820973274d568bf43d7"
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/nu_plugin",
+    "path": "codedb-fixtures",
+    "revision": "63d6874314031471213fe9f51d9706820bc254e1",
+    "hard_rule": "Must be installed and used, not replaced.",
+    "verification": "Pinned revision; locked package tests; interruption/replay and byte round trip"
+  },
+  "evidence": {
+    "nu_version": "0.113.1",
+    "loaded_plugin": {
+      "name": "codedb",
+      "version": "0.1.0",
+      "status": "loaded",
+      "binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb",
+      "registered_command_count": 24
+    },
+    "fixture_component_identity": "No codedb-fixtures or fixture symbol/marker was present in printable binary metadata.",
+    "runtime_use_probe": "nu -l -c 'codedb build scripts | to json -r'",
+    "runtime_use_probe_passed": true,
+    "runtime_use_probe_result": "The installed generic codedb plugin executed the read-only command and returned an empty array. Its published command registry has no fixtures command, so this does not establish use of the required codedb-fixtures component.",
+    "replacement_introduced": false
+  },
+  "conclusion": "The canonical requirement and blueprint hash are verified, but codedb-fixtures itself is not verifiably installed or used in this read-only closure. The loaded nu_plugin_codedb runtime is a distinct generic component and cannot be substituted for codedb-fixtures under hard rule 15. No replacement was introduced.",
+  "next_action": "In an installation-authorized execution-framework closure, obtain/build codedb-fixtures from the pinned nu_plugin revision, register or otherwise expose its component identity in the Nu runtime, and execute its dedicated read-only fixture probe."
+}

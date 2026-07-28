@@ -1,0 +1,41 @@
+{
+  "task_id": "COMPONENT-390_CANDLE",
+  "component": "Candle",
+  "status": "blocked",
+  "conclusion": "The blueprint requires Candle to be installed and used; this read-only checkout supplies specification evidence but no installed component, lockfile, or runtime manifest that can prove that requirement is satisfied.",
+  "hard_rule_15": {
+    "required": "Candle must be installed and used, not replaced.",
+    "satisfied_by_available_evidence": false,
+    "substitution_introduced": false
+  },
+  "source_verification": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_actual": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "command_template": "grep -Fq 'Candle' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0
+  },
+  "blueprint_evidence": [
+    {
+      "line": 6098,
+      "finding": "Candle is pinned as version 0.9 in the RuVector lock and required for CPU/SIMD/CUDA tensor/model execution, with installation order 9 and a pinned revision/closure verification requirement."
+    },
+    {
+      "line": 614,
+      "finding": "ruvllm/Candle is the default approved local embedding path; ONNX/ort is optional only under a separately approved closure."
+    },
+    {
+      "line": 5574,
+      "finding": "Installation order explicitly provisions approved ruvllm/Candle executors."
+    },
+    {
+      "line": 1002,
+      "finding": "The ruvector-timesfm-forecast target requires the candle feature."
+    }
+  ],
+  "probe_scope": {
+    "mode": "read-only",
+    "repository_observation": "No Cargo.toml, Cargo.lock, package.json, flake.lock, or other runtime/source manifest was present in the supplied checkout to verify an installed Candle dependency or executable use.",
+    "required_to_unblock": "Provide the pinned RuVector/runtime checkout and its lockfile or build/runtime evidence showing Candle 0.9 is resolved and exercised."
+  }
+}

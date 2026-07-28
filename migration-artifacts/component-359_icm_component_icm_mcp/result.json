@@ -1,0 +1,33 @@
+{
+  "task_id": "COMPONENT-359_ICM_COMPONENT_ICM_MCP",
+  "status": "passed",
+  "probe_type": "read-only",
+  "component": "icm-mcp",
+  "requirement": "ICM MCP component is installed and used; it is not replaced.",
+  "evidence": {
+    "blueprint_declaration": {
+      "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "line": 6067,
+      "match": "icm component: icm-mcp"
+    },
+    "installed_binary": "/home/flexnetos/.nix-profile/bin/icm",
+    "server_command": "icm serve",
+    "mcp_configuration": {
+      "transport": "stdio",
+      "compact": true
+    },
+    "live_mcp_handshake": {
+      "request_method": "initialize",
+      "server_name": "icm",
+      "server_version": "0.10.34",
+      "negotiated_protocol_version": "2024-11-05"
+    },
+    "active_use": [
+      "icm recall-context was invoked before the probe",
+      "icm health completed successfully"
+    ]
+  },
+  "mutations": [
+    "Created this required result artifact only."
+  ]
+}

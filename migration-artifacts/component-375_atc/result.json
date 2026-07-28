@@ -1,0 +1,40 @@
+{
+  "task_id": "COMPONENT-375_ATC",
+  "component": "ATC",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "verified": {
+    "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_binding": {
+      "byte_offset": 335153,
+      "unit_sha256": "c2f2a583c466fd2d0157c3507d665034a0d17949cc1fb4ab38932e8f3bef76bc",
+      "unit_sha256_validation": "unavailable: the packet does not define the source-unit byte range needed to recompute this digest"
+    },
+    "hard_rule_15": "ATC must be installed and used, not replaced.",
+    "canonical_component": {
+      "blueprint_line": 6083,
+      "source": "https://github.com/FlexNetOS/atc",
+      "package": "atc runtime/CLI",
+      "version": "0.1.9",
+      "revision": "1d9a89551ca7fb932a2b5b413cae5cab90231ff3",
+      "role": "Runner agent/review dispatch target"
+    },
+    "command_template": "grep -Fq 'ATC' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0
+  },
+  "runtime_evidence": {
+    "permitted_implementation_path": "execution-framework",
+    "execution_framework_present": false,
+    "installation_verified": false,
+    "usage_verified": false,
+    "atc_command_available": false,
+    "reason": "The authorized execution-framework path is absent and the atc command is not available in the probe environment. No installation, invocation, or database-controlled integration can be demonstrated by this read-only packet."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "No implementation changes were authorized; hard rule 15 prohibits replacement."
+  },
+  "finding": "The SHA-256-bound blueprint requires the canonical FlexNetOS ATC runtime/CLI at 0.1.9 (revision 1d9a89551ca7fb932a2b5b413cae5cab90231ff3) as the runner agent/review dispatch target. The requirement is verified, but this probe cannot demonstrate that ATC is installed and actively used.",
+  "mutation": "None to the component or runtime; result artifact only.",
+  "rollback": "Read-only probe; no implementation changes were made."
+}

@@ -1,0 +1,41 @@
+{
+  "task_id": "COMPONENT-352_NU_PLUGIN_COMPONENT_CODEDB_MCP",
+  "component": "nu_plugin component: codedb-mcp",
+  "status": "verified",
+  "verified_at": "2026-07-28T12:48:59-05:00",
+  "scope": "read-only-probe",
+  "blueprint": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "byte_offset": 335153,
+    "entry_line": 6060,
+    "entry_present": true
+  },
+  "installation": {
+    "nushell_version": "0.113.1",
+    "plugin_name": "codedb",
+    "plugin_version": "0.1.0",
+    "plugin_status": "loaded",
+    "plugin_binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb"
+  },
+  "use_evidence": {
+    "commands_exercised": ["codedb doctor", "codedb schema"],
+    "doctor": {
+      "host_nu": "observed",
+      "codedb_store": "degraded",
+      "note": "redb store is not implemented until CDB015"
+    },
+    "schema": {
+      "schema_versions": "planned",
+      "store_metadata": "planned",
+      "note": "redb schema versioning and metadata start after CDB015"
+    }
+  },
+  "hard_rule_15": {
+    "satisfied": true,
+    "evidence": "The installed codedb Nushell plugin was directly invoked; no replacement component was used."
+  },
+  "limitations": [
+    "The plugin's redb-backed store and schema-versioning capabilities are reported by the plugin itself as planned/degraded pending CDB015."
+  ]
+}

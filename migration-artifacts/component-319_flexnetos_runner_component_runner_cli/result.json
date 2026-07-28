@@ -1,0 +1,34 @@
+{
+  "task_id": "COMPONENT-319_FLEXNETOS_RUNNER_COMPONENT_RUNNER_CLI",
+  "component": "flexnetos_runner component: runner-cli",
+  "probe_mode": "read-only",
+  "status": "blocked",
+  "compliant": false,
+  "hard_rule_15": "Component must be installed and used, not replaced.",
+  "anchor": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "67caf7daa9bddcfb8666ae339b600bdc891936a4ac191860e14aa1200e5d554e",
+    "line": 6027,
+    "required_revision": "e6ccf7138b5fb38ad7d6472dc0df144993edc86c"
+  },
+  "observations": {
+    "source_checkout": "/home/flexnetos/meta/flexnetos_runner",
+    "source_checkout_head": "998c3db9bbf5b0d79045b94f34b850cdc3482091",
+    "required_revision_present_in_checkout": true,
+    "runner_cli_package_present": true,
+    "runner_cli_declared_binary": "fxrun",
+    "runner_cli_on_path": false,
+    "built_runner_cli_binary_found": false,
+    "task_workspace_integration_found": false
+  },
+  "blocking_reasons": [
+    "The only discovered checkout is not at the blueprint-pinned revision.",
+    "No installed runner CLI executable was found on PATH or under the checkout build output.",
+    "No task-workspace configuration, dependency, or invocation establishes use of the runner CLI."
+  ],
+  "recommended_next_action": "Outside this read-only probe, install/build the pinned flexnetos_runner revision's runner-cli binary (fxrun) and add a real task execution integration that invokes it; retain the upstream component rather than substituting another runner.",
+  "mutations": [
+    "Created this result artifact only."
+  ]
+}

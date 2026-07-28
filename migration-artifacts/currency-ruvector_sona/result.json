@@ -1,0 +1,10 @@
+{
+  "task_id": "CURRENCY-RUVECTOR_SONA",
+  "status": "passed",
+  "package": "ruvector-sona",
+  "registry_latest": "0.1.4",
+  "global_installed": "0.1.4",
+  "probe": "test -n \"$(bun info 'ruvector-sona' version 2>/dev/null)\" && test \"$(bun info 'ruvector-sona' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE 'ruvector\\-sona@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+  "verified_at": "2026-07-28T16:50:47-05:00",
+  "note": "Read-only probe. Bun global installs reside in runtime tmpfs on this host and may not survive reboot."
+}

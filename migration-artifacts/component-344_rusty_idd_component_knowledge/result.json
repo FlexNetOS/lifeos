@@ -1,0 +1,31 @@
+{
+  "task_id": "COMPONENT-344_RUSTY_IDD_COMPONENT_KNOWLEDGE",
+  "title": "Component: rusty-idd component: knowledge",
+  "status": "unverified",
+  "probe_mode": "read-only",
+  "command_template": "grep -Fq 'rusty-idd component: knowledge' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_line": 6052,
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "135cfb15080a483c6af52e07a00ff9be901f4100023a99463bf2cb02155d7781"
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/rusty-idd",
+    "path": "knowledge",
+    "revision": "4c47c67fe088e99868d8ccf74d6cbe1aa2af2856",
+    "hard_rule": "Must be installed and used, not replaced.",
+    "verification": "Pinned revision; locked package tests; interruption/replay and byte round trip"
+  },
+  "evidence": {
+    "execution_framework_present": false,
+    "permitted_dependency_manifests_found": 0,
+    "permitted_non_blueprint_integration_references_found": 0,
+    "rusty_idd_on_path": false,
+    "replacement_introduced": false
+  },
+  "conclusion": "The canonical blueprint requirement and pinned upstream revision are verified. The permitted probe workspace has no execution-framework directory, dependency manifest, lockfile, component checkout, build output, or runtime wiring from which installation and actual use of knowledge can be demonstrated. No replacement implementation was introduced.",
+  "next_action": "Provide the permitted execution-framework component closure or a pinned rusty-idd checkout at 4c47c67fe088e99868d8ccf74d6cbe1aa2af2856, then rerun the read-only installation and usage probe."
+}

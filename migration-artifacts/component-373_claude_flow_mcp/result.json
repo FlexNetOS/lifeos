@@ -1,0 +1,27 @@
+{
+  "task_id": "COMPONENT-373_CLAUDE_FLOW_MCP",
+  "component": "@claude-flow/mcp",
+  "probe_mode": "read-only",
+  "status": "not_demonstrated",
+  "verified": {
+    "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_binding": {
+      "byte_offset": 335153,
+      "unit_sha256": "c9d641b250df89d944d19b3f17baa13a2f46ffe0d0a31feeac973ac7e6a7457e"
+    },
+    "hard_rule_15": "@claude-flow/mcp must be installed and used, not replaced.",
+    "canonical_component": {
+      "blueprint_line": 6081,
+      "source": "https://github.com/ruvnet/ruflo",
+      "package": "MCP",
+      "version": "3.0.0-alpha.9",
+      "revision": "12ede21767a6dd669df1b79392a5d27d9154f237",
+      "role": "MCP tool/swarm interface"
+    },
+    "command_template": "grep -Fq '@claude-flow/mcp' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0,
+    "global_installation": "bun pm ls -g reports @claude-flow/mcp@3.0.0-alpha.9"
+  },
+  "finding": "The required package is explicitly recorded in the SHA-256-bound blueprint and is installed globally at the canonical version. This read-only packet has no execution-framework files or other in-scope configuration, invocation, or integration evidence, so active use and the absence of replacement cannot be demonstrated.",
+  "mutation": "None to the component or runtime; result artifact only."
+}

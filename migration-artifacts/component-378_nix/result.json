@@ -1,0 +1,27 @@
+{
+  "task_id": "COMPONENT-378_NIX",
+  "title": "Component: Nix",
+  "status": "verified",
+  "verification_mode": "read-only-probe",
+  "goal": "Component 'Nix' must be installed and used, not replaced (hard rule 15).",
+  "source": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "packet_sha256_match": true
+  },
+  "evidence": {
+    "prescribed_probe": "grep -Fq 'Nix' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "prescribed_probe_exit_code": 0,
+    "blueprint_requirements": [
+      "Nix pins source revisions and supplies exact Rust, PostgreSQL, Nushell, Bun, Node/TypeScript/NAPI/WASM, C/C++ and musl toolchains.",
+      "The executable build shell evaluates the pinned Yazelix flake and composes around its lifeos_foundation_yzx package.",
+      "Yazelix provides the Nix-owned Engine Room and its pinned runtime closure."
+    ],
+    "runtime": {
+      "nix_path": "/home/flexnetos/.nix-profile/bin/nix",
+      "nix_version": "nix (Nix) 2.34.7"
+    }
+  },
+  "conclusion": "Verified: Nix is installed in the current runtime and remains the required, explicitly used build and operator-runtime closure mechanism in the blueprint; no replacement was introduced by this read-only probe.",
+  "changed_files": []
+}

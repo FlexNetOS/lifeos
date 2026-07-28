@@ -1,0 +1,30 @@
+{
+  "task_id": "COMPONENT-514_RUVECTOR_MANIFEST_RVF_DESKTOP",
+  "title": "Component: RuVector manifest: rvf-desktop",
+  "status": "passed",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector manifest: rvf-desktop' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "anchor_binding": {
+    "packet_byte_offset": 335153,
+    "actual_manifest_row_byte_offset": 900080,
+    "packet_unit_sha256": "a306942c8618688e72ce470a79b7eef5c2489535fb3f823061e3bdf9373173a9",
+    "manifest_row_sha256_with_newline": "8bbf3e87cd05744405b3817df4b7466f0d96264387ad01b0952ae1a3cb05ec5d",
+    "binding_status": "document hash matches; packet offset and unit hash do not identify the current manifest row"
+  },
+  "evidence": {
+    "exact_manifest_row_line": 6222,
+    "repository": "https://github.com/ruvnet/RuVector",
+    "manifest_path": "examples/rvf-desktop",
+    "package": "rvf-desktop",
+    "version": "2.0.0",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "hard_rule_15": "The native RuVector rvf-desktop manifest is required to be installed and used; it must not be replaced.",
+  "changes_made": [
+    "Recorded verification evidence only."
+  ],
+  "rollback": "No rollback required; this was a read-only verification."
+}

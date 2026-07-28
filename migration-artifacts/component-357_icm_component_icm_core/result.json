@@ -1,0 +1,29 @@
+{
+  "task_id": "COMPONENT-357_ICM_COMPONENT_ICM_CORE",
+  "title": "Component: icm component: icm-core",
+  "status": "passed",
+  "probe_mode": "read-only",
+  "component": {
+    "name": "icm-core",
+    "cli": "icm",
+    "installed_path": "/home/flexnetos/.nix-profile/bin/icm",
+    "version": "0.10.57",
+    "actively_used": true,
+    "usage_evidence": "icm recall-context and icm recall completed successfully during this probe"
+  },
+  "blueprint": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_text": "icm component: icm-core",
+    "anchor_present": true,
+    "pinned_revision": "03d63a9102ce7f2c17cc7df66ac1aded46def88e"
+  },
+  "verification": [
+    "grep -Fq 'icm component: icm-core' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "icm --version",
+    "icm recall-context 'icm-core component installation usage' --limit 5",
+    "icm recall 'icm core architecture context memory memo graph' -t context-icm",
+    "icm health"
+  ],
+  "result": "The installed ICM component is used directly; no replacement implementation was introduced and no source files were changed."
+}

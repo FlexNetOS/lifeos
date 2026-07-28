@@ -1,0 +1,33 @@
+{
+  "task_id": "COMPONENT-533_RUVECTOR_NAMED_SURFACE_RUVECTOR_HNSW_REPAIR",
+  "title": "Component: RuVector named surface: ruvector-hnsw-repair",
+  "status": "noncompliant_unverified",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector named surface: ruvector-hnsw-repair' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "995150b7a5d295249461e42ebc748bd1bfabd00aba5d602221eb9658fe2c90a2",
+    "verified_row_line": 6241,
+    "verified_row_byte_offset": 923172,
+    "verified_row_sha256_newline_free": "995150b7a5d295249461e42ebc748bd1bfabd00aba5d602221eb9658fe2c90a2",
+    "finding": "The declared byte offset points to unrelated prose in the hash-matching document. The canonical named-surface row begins at byte offset 923172 and matches the declared unit SHA-256 when hashed without its trailing newline."
+  },
+  "required_component": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "crates/ruvector-hnsw-repair",
+    "package": "ruvector-hnsw-repair",
+    "version": "2.3.0 workspace",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae",
+    "purpose": "HNSW diagnosis and graph repair"
+  },
+  "hard_rule_15": "The native RuVector ruvector-hnsw-repair component is required to be installed and used; it must not be replaced.",
+  "probe_finding": "The permitted execution-framework/ directory is absent. No Cargo manifest, lockfile entry, source reference, or runtime-use evidence for ruvector-hnsw-repair was found under the permitted migration-artifacts/ path. This read-only probe therefore cannot verify installation or use of the required native component.",
+  "changes_made": [
+    "Created this evidence receipt only."
+  ],
+  "rollback": "No rollback required; no implementation or dependency state was changed.",
+  "result": "fail"
+}

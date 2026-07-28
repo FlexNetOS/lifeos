@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "scope": "/home/flexnetos",
+  "law": "EVERYTHING means EVERYTHING. EVERY BYTE means EVERY BYTE. Zero undeclared loss.",
+  "target": {
+    "database": "lifeos",
+    "socket": "/home/flexnetos/meta/var/run/postgresql",
+    "port": 5432,
+    "extension_required": "ruvector"
+  },
+  "ingress": {
+    "tool": "codedb",
+    "commands": ["scan", "capture"],
+    "hard_rules": "blueprint HARD RULES 10-12: nu_plugin/CodeDB is the byte-complete ingress; hashes/manifests supplement, never replace bytes"
+  },
+  "declared_exclusions": [
+    {
+      "pattern": "sockets, FIFOs, device nodes (non-regular files)",
+      "match": "file type != regular && != symlink && != directory",
+      "reason": "No byte stream exists to capture; presence+metadata recorded (path, type, mode, owner, mtime)",
+      "capture": "metadata-only"
+    },
+    {
+      "pattern": "/home/flexnetos/meta/var/run/**",
+      "match": "prefix",
+      "reason": "Live runtime pids/sockets; volatile by definition; metadata recorded",
+      "capture": "metadata-only"
+    },
+    {
+      "pattern": "/home/flexnetos/meta/var/lib/postgresql/**",
+      "match": "prefix",
+      "reason": "Live PG datadir cannot ingest itself mid-write (self-recursion + torn pages). Bytes ARE captured — via pg_basebackup consistent snapshot imported as the datadir's byte representation, plus WAL. Declared transform, not loss.",
+      "capture": "via-pg_basebackup"
+    },
+    {
+      "pattern": "**/.swarm/memory.db*, **/*.db-wal, **/*.db-shm (live sqlite handles)",
+      "match": "glob",
+      "reason": "Mid-write SQLite files captured from a quiesced copy (sqlite3 .backup or fs snapshot) to avoid torn reads. Declared transform, not loss.",
+      "capture": "via-quiesced-copy"
+    }
+  ],
+  "reconciliation": {
+    "identity": "per-file SHA-256 + byte length",
+    "db_inventory_query": "select r.module_path as path, b.bytes as byte_len, b.sha256 from lifeos_runtime.codebase_codedb_path_refs r join lifeos_runtime.codebase_codedb_blobs b on b.sha256 = r.sha256",
+    "path_mapping": "codedb stores repo-relative module_path per capture root; reconcile joins fs path = <capture_root>/<module_path> using the wave ledger of capture roots",
+    "denied_class_manifest": "files codedb declines (classifier-secret, and uncertain when policy says metadata-only) are recorded with exact_source_sha256 + byte length from the capture CSV ledger; they are DECLARED entries pending secret-plane capture, not losses",
+    "acceptance": "every regular file under scope appears in DB with matching sha256+len, or matches exactly one declared exclusion or the denied-class ledger; zero undeclared loss"
+  },
+  "witness": "SHAKE256 session witness per capture batch (blueprint invariant 12)"
+}

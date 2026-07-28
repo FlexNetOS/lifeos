@@ -1,0 +1,41 @@
+{
+  "task_id": "COMPONENT-311_WEAVE_COMPONENT_WEAVE_MCP",
+  "status": "passed",
+  "probe_type": "read-only",
+  "component": "weave component: weave-mcp",
+  "hard_rule": "Component must be installed and used, not replaced (hard rule 15).",
+  "evidence": {
+    "blueprint": {
+      "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+      "unit_sha256": "ca07475443e41e0d79ced572d05ee7efed1ccb0c1c3ec82f57c85149f2ea2d26",
+      "matched_line": 6019,
+      "matched_text": "weave component: weave-mcp",
+      "pinned_revision": "b0ccd2278b2df689390023e590cc3c1eb60f9a80"
+    },
+    "installation": {
+      "executable": "/home/flexnetos/.nix-profile/bin/weave",
+      "version": "weave 0.2.0",
+      "backend": "sqlite"
+    },
+    "use": {
+      "native_command": "weave mcp",
+      "help_verified": true,
+      "transport": "stdio",
+      "session_option": "--session <SESSION>",
+      "doctor_session_injectable": true,
+      "registered_peers": 0,
+      "mcp_server_started": false,
+      "reason": "Read-only probe: starting the stdio server requires a client session and could create or mutate persisted mesh state. The installed native MCP command was verified through its help interface."
+    }
+  },
+  "commands": [
+    "grep -Fq 'weave component: weave-mcp' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "weave --version",
+    "weave mcp --help",
+    "weave doctor"
+  ],
+  "mutations": [
+    "migration-artifacts/component-311_weave_component_weave_mcp/result.json"
+  ]
+}

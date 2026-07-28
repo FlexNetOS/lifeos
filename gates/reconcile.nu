@@ -48,8 +48,8 @@ def main [--sha, --canary, --sample: int = 0] {
   mut checked = 0
   for root in $ok_roots {
     let esc = ($root | str replace -a "'" "''")
-    let q = ("select module_path, bytes from public.codebase_codedb_path_refs r " +
-             "join public.codebase_codedb_blobs b on b.sha256 = r.sha256 " +
+    let q = ("select module_path, bytes from lifeos_runtime.codebase_codedb_path_refs r " +
+             "join lifeos_runtime.codebase_codedb_blobs b on b.sha256 = r.sha256 " +
              "where r.metadata->>'repo_path' = '" + $esc + "'")
     let res = (psql-rows $m.target.database $q)
     if $res.exit_code != 0 { print $"FAIL db query for ($root)"; exit 1 }
@@ -74,7 +74,7 @@ def main [--sha, --canary, --sample: int = 0] {
           if $mismatched <= 8 { print $"  size-mismatch ($f)" }
         } else if $sha {
           let fs_sha = (open --raw $f | hash sha256)
-          let db_sha_q = ("select r.sha256 from public.codebase_codedb_path_refs r " +
+          let db_sha_q = ("select r.sha256 from lifeos_runtime.codebase_codedb_path_refs r " +
             "where r.metadata->>'repo_path' = '" + $esc + "' and r.module_path = '" +
             ($rel | str replace -a "'" "''") + "'")
           let db_sha = (psql-rows $m.target.database $db_sha_q | get stdout | str trim)

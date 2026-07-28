@@ -1,0 +1,22 @@
+{
+  "task_id": "COMPONENT-303_ENVCTL_COMPONENT_GUI",
+  "component": "envctl component: gui",
+  "status": "blocked",
+  "probe_mode": "read-only",
+  "verified": {
+    "blueprint_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "blueprint_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "blueprint_row": 6011,
+    "declared_component": "gui",
+    "declared_envctl_revision": "48368a97f7d1388cea247dd4ebdc32a8193743fb",
+    "envctl_binary": "/home/flexnetos/.nix-profile/bin/envctl",
+    "envctl_version": "0.1.0",
+    "command_used": "envctl --json install gui --dry-run"
+  },
+  "result": {
+    "installed_or_used_envctl": true,
+    "gui_installation_attested": false,
+    "reason": "The installed envctl CLI accepted the GUI dry-run, but this isolated workspace has no readable manifest directory: manifest dir not found or unreadable: manifest."
+  },
+  "next_action": "Run the same envctl GUI component command from a workspace containing the authoritative envctl manifest; do not replace envctl with another installer."
+}

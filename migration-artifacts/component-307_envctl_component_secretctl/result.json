@@ -1,0 +1,33 @@
+{
+  "task_id": "COMPONENT-307_ENVCTL_COMPONENT_SECRETCTL",
+  "status": "not_satisfied",
+  "probe_mode": "read-only",
+  "checked_at": "2026-07-28T17:08:55Z",
+  "requirement": "Component 'envctl component: secretctl' must be installed and used, not replaced (hard rule 15).",
+  "evidence": {
+    "blueprint": {
+      "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+      "required_literal_present": true,
+      "anchor_line": 6015,
+      "anchor_row_sha256": "d9db34926bf0115d3a2d87fae1243076fe189cb37e80e27950677db2608ac384"
+    },
+    "envctl": {
+      "version": "0.1.0",
+      "secret_subcommand_exposed": true,
+      "secret_status": {
+        "attempted": true,
+        "exit_code": 1,
+        "error": "manifest dir not found or unreadable: manifest"
+      },
+      "secretctl_install_preview": {
+        "command": "envctl install secretctl --dry-run --json",
+        "attempted": true,
+        "exit_code": 1,
+        "error": "manifest dir not found or unreadable: manifest"
+      }
+    }
+  },
+  "conclusion": "envctl is installed and its native secret subsystem is available, but the isolated read-only environment does not expose a readable manifest directory. The probe therefore cannot prove that the required secretctl component is installed and used; no replacement component was introduced.",
+  "remediation": "Run the same read-only probes from a workspace with the envctl manifest directory available, then verify envctl's declared secretctl component state before any use."
+}

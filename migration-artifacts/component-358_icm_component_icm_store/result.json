@@ -1,0 +1,28 @@
+{
+  "task_id": "COMPONENT-358_ICM_COMPONENT_ICM_STORE",
+  "component": "icm-store",
+  "status": "verified",
+  "probe_mode": "read-only",
+  "evidence": {
+    "blueprint": {
+      "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "line": 6066,
+      "required_revision": "03d63a9102ce7f2c17cc7df66ac1aded46def88e",
+      "command": "grep -Fq 'icm component: icm-store' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "exit_code": 0
+    },
+    "installation": {
+      "executable": "/home/flexnetos/.nix-profile/bin/icm",
+      "version": "icm 0.10.57",
+      "store_command_available": true
+    },
+    "usage": {
+      "command": "icm recall-context \"icm-store component installation and usage\" --limit 5",
+      "result": "returned persisted project context"
+    }
+  },
+  "conclusion": "The canonical ICM CLI, including its store command, is installed and was used for persistent-memory recall during this probe; no replacement component was introduced.",
+  "mutations": [
+    "migration-artifacts/component-358_icm_component_icm_store/result.json"
+  ]
+}

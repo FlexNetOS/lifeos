@@ -1,0 +1,15 @@
+{
+  "task_id": "CURRENCY-CLAUDE_FLOW_MCP",
+  "title": "Toolchain currency: @claude-flow/mcp",
+  "checked_at": "2026-07-28T16:30:00-05:00",
+  "package": "@claude-flow/mcp",
+  "registry_latest_version": "3.0.0-alpha.9",
+  "global_installed_version": "3.0.0-alpha.9",
+  "probe_exit_code": 0,
+  "status": "current",
+  "command_template": "test -n \"$(bun info '@claude-flow/mcp' version 2>/dev/null)\" && test \"$(bun info '@claude-flow/mcp' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '@claude\\-flow/mcp@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+  "notes": [
+    "The supplied grep expression emitted a non-fatal stray-backslash warning.",
+    "Bun's global root is runtime-cache-backed on this host, so the global installation may disappear after a reboot."
+  ]
+}

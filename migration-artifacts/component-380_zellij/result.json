@@ -1,0 +1,26 @@
+{
+  "task_id": "COMPONENT-380_ZELLIJ",
+  "title": "Component: Zellij",
+  "status": "passed",
+  "probe_mode": "read-only",
+  "source": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "bound_unit_sha256": "c11c85024369fe8bb8e36cf5ce6d83054be752b4a49b7a75cd15589ac82f3490",
+    "anchor_byte_offset": 335153
+  },
+  "requirement": "Zellij must be installed and used, not replaced.",
+  "evidence": {
+    "executable": "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij",
+    "version_command": "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --version",
+    "version_output": "zellij 0.44.3",
+    "active_runtime_command": "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --config /run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl --new-session-with-layout /nix/store/4vfb6pya8wl1w3a7jip23bq67x7p7kb9-flexnetos-zellij-layout/layout.kdl",
+    "active_runtime_pid": 3633043,
+    "blueprint_contracts": [
+      "Yazelix remains the Nix-owned Zellij runtime.",
+      "yzx enter replaces the launcher process with the pinned Zellij runtime and forwards Zellij arguments.",
+      "LifeOS embeds this runtime through a real PTY and does not reimplement it."
+    ]
+  },
+  "conclusion": "Zellij 0.44.3 is installed and directly verified. An active Yazelix-managed Zellij client is running with its pinned config and layout, demonstrating use rather than substitution."
+}

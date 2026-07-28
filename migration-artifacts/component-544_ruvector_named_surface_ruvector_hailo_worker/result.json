@@ -1,0 +1,30 @@
+{
+  "task_id": "COMPONENT-544_RUVECTOR_NAMED_SURFACE_RUVECTOR_HAILO_WORKER",
+  "title": "Component: RuVector named surface: ruvector-hailo-worker",
+  "status": "structural_verification_passed",
+  "mode": "read-only-probe",
+  "verification": {
+    "command_template_passed": true,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "92bff78655b20dfca802bac1eb10f150dd9ea2bdccc02aabb5d165c84de78def",
+    "line": 6252,
+    "actual_byte_offset": 942401,
+    "supplied_byte_offset": 335153,
+    "anchor_finding": "The supplied byte offset is stale; the canonical row starts at byte offset 942401 and its trailing-newline-free SHA-256 matches the supplied unit hash.",
+    "canonical_source": "https://github.com/ruvnet/RuVector",
+    "package": "ruvector-hailo-cluster",
+    "target_path": "crates/ruvector-hailo-cluster/src/bin/worker.rs",
+    "version": "0.1.0",
+    "source_commit": "6a6c39e662a4c3184dcb913db91a09401c84b2ae",
+    "purpose": "Hailo embedding worker"
+  },
+  "hard_rule_15": {
+    "named_surface_declared": true,
+    "required_behavior": "The native RuVector ruvector-hailo-worker target must be installed and used, not replaced.",
+    "installation_and_runtime_use_verified": false,
+    "reason": "The permitted execution-framework/ directory is absent, and migration-artifacts/ contains no Cargo manifest, lockfile, source reference, or runtime-use evidence for this worker. The assigned read-only probe cannot establish installation or use."
+  },
+  "changes": "Created this evidence receipt only; no implementation or dependency state was changed.",
+  "result": "structural requirement verified; installation and runtime use remain unverified"
+}

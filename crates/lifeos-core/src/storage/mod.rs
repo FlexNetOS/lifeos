@@ -4,6 +4,7 @@ pub mod error;
 #[cfg(feature = "legacy-sqlite-import")]
 pub mod legacy_sqlite;
 pub mod mempalace;
+pub mod logs;
 pub mod ruvector;
 pub mod security;
 pub mod seed_vault;

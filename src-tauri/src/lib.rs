@@ -462,6 +462,31 @@ async fn vault_list(storage: tauri::State<'_, Storage>) -> Result<Vec<VaultEntry
         .map_err(|error| error.to_string())
 }
 
+#[tauri::command]
+async fn execution_log_frame_append(
+    storage: tauri::State<'_, Storage>,
+    execution_id: String,
+    stream_name: String,
+    frame_no: i64,
+    byte_offset: i64,
+    frame: Vec<u8>,
+    context: serde_json::Value,
+) -> Result<String, String> {
+    let execution_id = parse_vault_uuid(&execution_id, "execution_id")?;
+    lifeos_core::storage::logs::append_frame(
+        storage.pool(),
+        execution_id,
+        &stream_name,
+        frame_no,
+        byte_offset,
+        &frame,
+        context,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
 /// Register already-encrypted secret bytes in canonical custody. Plaintext is
 /// deliberately not accepted by this IPC boundary; mint/relay authorization
 /// remains enforced by PostgreSQL's S16 security procedures.
@@ -1053,6 +1078,7 @@ pub fn run() {
             auth::auth_signout,
             auth::auth_reset_vault,
             vault_register_ciphertext,
+            execution_log_frame_append,
             vault_mint_secret,
             vault_authorize_secret,
             vault_relay_secret,

@@ -29,6 +29,8 @@ pub enum StorageError {
     InvalidSecretRegistration,
     /// A task claim or execution completion failed its Rust-side input guard.
     InvalidTaskExecution,
+    /// A canonical execution log frame failed its Rust-side input guard.
+    InvalidLogFrame,
     /// RuVector must be installed in the dedicated `extensions` schema.
     RequiredExtension,
     /// The durable schema has fewer applied migrations than the embedded set.
@@ -82,6 +84,10 @@ impl fmt::Display for StorageError {
             Self::InvalidTaskExecution => write!(
                 f,
                 "task execution requires valid worker, capability, lease, result, effect, and witness data"
+            ),
+            Self::InvalidLogFrame => write!(
+                f,
+                "execution log frames require a valid execution, stream, non-negative sequence, offset, and context"
             ),
             Self::RequiredExtension => {
                 write!(f, "ruvector must be installed in the extensions schema")

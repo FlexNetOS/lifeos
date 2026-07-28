@@ -17,6 +17,7 @@ if (!psql) {
 const expectedMigrations = (await readdir(resolve("crates/lifeos-core/migrations")))
   .filter((entry) => /^\d+_.+\.sql$/.test(entry))
   .length;
+const supportedRuVectorVersions = new Set(["0.3.0", "0.3.1"]);
 
 const sql = `
 WITH ruvector_extension AS (
@@ -70,7 +71,9 @@ try {
 
 const failures = [];
 if (receipt.ruvector?.schema !== "extensions") failures.push("ruvector is not installed in schema extensions");
-if (receipt.ruvector?.version !== "0.3.0") failures.push("ruvector version is not 0.3.0");
+if (!supportedRuVectorVersions.has(receipt.ruvector?.version)) {
+  failures.push(`unsupported ruvector version ${receipt.ruvector?.version ?? "none"}`);
+}
 if (receipt.migrations?.count !== expectedMigrations) {
   failures.push(`expected ${expectedMigrations} migrations, found ${receipt.migrations?.count ?? "none"}`);
 }

@@ -119,6 +119,7 @@ struct TerminalSession {
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send>,
     output_offset: Arc<AtomicU64>,
+    input_offset: Arc<AtomicU64>,
 }
 
 #[derive(Default)]
@@ -127,6 +128,35 @@ struct TerminalState {
 }
 
 static TERMINAL_FRAME_SEQUENCE: AtomicU64 = AtomicU64::new(1);
+
+fn selected_environment_digest() -> String {
+    let mut selected: Vec<_> = std::env::vars()
+        .filter(|(name, _)| {
+            name.starts_with("LIFEOS_RUNTIME_") || name == "LIFEOS_ENGINE_SESSION_NAME"
+        })
+        .collect();
+    selected.sort_unstable_by(|left, right| left.0.cmp(&right.0));
+    let material = selected
+        .into_iter()
+        .map(|(name, value)| format!("{name}={value}\n"))
+        .collect::<String>();
+    format!("{:x}", Sha256::digest(material.as_bytes()))
+}
+
+fn runtime_lineage(session_id: &str) -> serde_json::Value {
+    let value = |name: &str| std::env::var(name).ok();
+    serde_json::json!({
+        "tenant_id": value("LIFEOS_RUNTIME_TENANT_ID"),
+        "identity_id": value("LIFEOS_RUNTIME_IDENTITY_ID"),
+        "grant_id": value("LIFEOS_RUNTIME_GRANT_ID"),
+        "lease_id": value("LIFEOS_RUNTIME_LEASE_ID"),
+        "session_id": session_id,
+        "request_id": value("LIFEOS_RUNTIME_REQUEST_ID"),
+        "execution_id": value("LIFEOS_RUNTIME_EXECUTION_ID"),
+        "task_id": value("LIFEOS_RUNTIME_TASK_ID"),
+        "branch_id": value("LIFEOS_RUNTIME_BRANCH_ID"),
+    })
+}
 
 fn append_terminal_spool(envelope: &str) -> Result<(), String> {
     let spool_root = redb_root().join("terminal-spool");
@@ -155,6 +185,9 @@ fn capture_terminal_frame(
     let sequence = TERMINAL_FRAME_SEQUENCE.fetch_add(1, Ordering::Relaxed);
     let envelope = serde_json::json!({
         "schema_version": "lifeos.terminal-frame.v1",
+        "lineage": runtime_lineage(session_id),
+        "environment_digest": selected_environment_digest(),
+        "cwd": std::env::current_dir().ok().map(|path| path.display().to_string()),
         "session_id": session_id,
         "frame_sequence": sequence,
         "frame_kind": frame_kind,
@@ -172,6 +205,39 @@ fn capture_terminal_frame(
             format!("owner capture failed: {owner_error}; spool failed: {spool_error}")
         }),
     }
+}
+
+/// Replay every emergency-spooled frame through deterministic owner keys.
+/// The spool remains intact as recoverable evidence; deterministic keys make
+/// replay idempotent until envctl acknowledges durable materialization.
+#[tauri::command]
+fn terminal_replay_spool() -> Result<usize, String> {
+    let path = redb_root().join("terminal-spool").join("frames.jsonl");
+    if !path.is_file() {
+        return Ok(0);
+    }
+    let text =
+        std::fs::read_to_string(&path).map_err(|error| format!("read terminal spool: {error}"))?;
+    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
+    let mut replayed = 0;
+    for line in text.lines().filter(|line| !line.trim().is_empty()) {
+        let envelope: serde_json::Value = serde_json::from_str(line)
+            .map_err(|error| format!("decode terminal spool frame: {error}"))?;
+        let session_id = envelope
+            .get("session_id")
+            .and_then(serde_json::Value::as_str)
+            .ok_or_else(|| "terminal spool frame lacks session_id".to_string())?;
+        let sequence = envelope
+            .get("frame_sequence")
+            .and_then(serde_json::Value::as_u64)
+            .ok_or_else(|| "terminal spool frame lacks frame_sequence".to_string())?;
+        let key = format!("terminal/frame/{session_id}/{sequence:020}");
+        owner
+            .put(&key, line)
+            .map_err(|error| format!("replay terminal frame: {error}"))?;
+        replayed += 1;
+    }
+    Ok(replayed)
 }
 
 fn engine_room_session_name() -> Result<String, String> {
@@ -242,6 +308,7 @@ fn terminal_spawn(
         ]}),
     )?;
     let output_offset = Arc::new(AtomicU64::new(0));
+    let input_offset = Arc::new(AtomicU64::new(0));
     let reader_output_offset = Arc::clone(&output_offset);
     let event_session = session_id.clone();
     std::thread::spawn(move || {
@@ -305,6 +372,7 @@ fn terminal_spawn(
                 writer,
                 child,
                 output_offset,
+                input_offset,
             },
         );
     Ok(session_id)
@@ -323,11 +391,14 @@ fn terminal_write(
     let session = sessions
         .get_mut(&session_id)
         .ok_or_else(|| "terminal session is not active".to_string())?;
+    let offset = session
+        .input_offset
+        .fetch_add(bytes.len() as u64, Ordering::Relaxed);
     capture_terminal_frame(
         &session_id,
         "input",
         &bytes,
-        serde_json::json!({"stream": "pty"}),
+        serde_json::json!({"stream": "pty", "offset": offset}),
     )?;
     session
         .writer
@@ -376,12 +447,12 @@ fn terminal_close(
         .sessions
         .lock()
         .map_err(|error| format!("terminal state lock: {error}"))?;
-    sessions
-        .remove(&session_id)
-        .map(|_| {
-            let _ = capture_terminal_frame(&session_id, "close", &[], serde_json::json!({}));
-        })
-        .ok_or_else(|| "terminal session is not active".to_string())
+    if !sessions.contains_key(&session_id) {
+        return Err("terminal session is not active".into());
+    }
+    capture_terminal_frame(&session_id, "close", &[], serde_json::json!({}))?;
+    sessions.remove(&session_id);
+    Ok(())
 }
 
 #[tauri::command]
@@ -966,6 +1037,7 @@ pub fn run() {
             terminal_write,
             terminal_resize,
             terminal_close,
+            terminal_replay_spool,
             lights_state_read,
             lights_state_write,
             ui_state_read,

@@ -29,5 +29,17 @@ describe("NBVERIFY-004 SWARM-CLAIM-001 evidence", () => {
         expect.objectContaining({ relationship: "ui-readiness" }),
       ]),
     );
+    expect(
+      claim.evidence.find(
+        (candidate: { relationship: string }) =>
+          candidate.relationship === "portable-artifact-identity",
+      ),
+    ).toEqual(expect.objectContaining({ proven: true }));
+    expect(
+      claim.evidence.find(
+        (candidate: { relationship: string }) =>
+          candidate.relationship === "ui-readiness",
+      ),
+    ).toEqual(expect.objectContaining({ proven: true }));
   });
 });

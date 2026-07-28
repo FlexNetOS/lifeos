@@ -1,47 +1,12 @@
 {
   "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
   "task_id": "NBVERIFY-004",
-  "observed_at": "2026-07-28T21:56:20.115Z",
+  "observed_at": "2026-07-28T21:58:19.858Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
     "package_json_sha256": "086d1a263750229e127f9eba978deee7eed2b7151205bc17746b11ce4745601a"
   },
-  "collector": {
-    "claim_id": "SWARM-CLAIM-002",
-    "mode": "read-only-installed-runtime-trace",
-    "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
-    "does_not_launch": true,
-    "does_not_install": true,
-    "does_not_mutate_generated_runtime": true
-  },
   "claims": [
-    {
-      "claim_id": "SWARM-CLAIM-001",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "evidence": [
-        {
-          "relationship": "portable-artifact-identity",
-          "proven": false
-        },
-        {
-          "relationship": "profile-frontdoor",
-          "proven": true
-        },
-        {
-          "relationship": "launcher-target",
-          "proven": false
-        },
-        {
-          "relationship": "process-tree",
-          "proven": false
-        },
-        {
-          "relationship": "ui-readiness",
-          "proven": false
-        }
-      ]
-    },
     {
       "claim_id": "SWARM-CLAIM-003",
       "verification_status": "unverified",
@@ -1005,6 +970,200 @@
           },
           "missing": [],
           "boundary": "Yazelix workspace orchestration is not proof of LifeOS launch ownership."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-001",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "conclusion": "The profile-owned Yazelix frontdoor, measured portable-release artifacts, and causal LifeOS/Tauri UI readiness receipt are present; the claim remains qualified because the portable receipt explicitly records host WebKitGTK, PostgreSQL/RuVector, and profiled bwrap dependencies that block a stronger full-stack portability claim.",
+      "evidence": [
+        {
+          "relationship": "portable-artifact-identity",
+          "proven": true,
+          "candidates": [],
+          "receipt_path": "/home/flexnetos/meta/src/lifeos/evidence/packaging/portable_release_root_coverage.json",
+          "receipt_sha256": "bf0fd0ccd9f9ec2a58868d7887f6ff84e868f24f7baa74b0b0fe9c235777cc52",
+          "receipt": {
+            "schema_version": "lifeos.evidence.portable-release-root-coverage.v1",
+            "recorded_at": "2026-07-28",
+            "implements": [
+              "ARCHBP-021",
+              "YZXCONV-021"
+            ],
+            "bundle_root": "/home/flexnetos/meta/var/cache/archbp021/bundle-moved",
+            "musl_artifacts": [
+              {
+                "name": "yzx-open",
+                "path": "bin/yzx-open",
+                "reproducible": true,
+                "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked, not stripped",
+                "sha256": "f670a111f767539ba391aa33e1ec44bacfb60e709e1192947e32d97dac7526c0"
+              },
+              {
+                "name": "yzx-tutor",
+                "path": "bin/yzx-tutor",
+                "reproducible": true,
+                "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked, not stripped",
+                "sha256": "07e046f56c573d116906bae84389bfdc0741fc4dc17c3c26f9d2a49e2e32a8d3"
+              },
+              {
+                "name": "yzx-yazi-config",
+                "path": "bin/yzx-yazi-config",
+                "reproducible": true,
+                "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked, not stripped",
+                "sha256": "c445a884b27c41c888f05b83ded6204a33090641d45473b7aa82b6498d48df28"
+              }
+            ],
+            "non_musl_classification": [
+              {
+                "dependency": "WebKitGTK",
+                "owner": "host desktop integration",
+                "fallback": "The desktop host supplies WebKitGTK; the receipt keeps this dependency visible and does not claim headless portability."
+              },
+              {
+                "dependency": "PostgreSQL/RuVector",
+                "owner": "canonical database runtime",
+                "fallback": "Connect to the provisioned PostgreSQL/RuVector service; the portable UI bundle never substitutes local SQLite state."
+              },
+              {
+                "dependency": "bwrap",
+                "owner": "Yazelix Nix closure with profiled host fallback",
+                "fallback": "Use the pinned closure bwrap when permitted, otherwise record and use the AppArmor-profiled /usr/bin/bwrap."
+              },
+              {
+                "dependency": "yzx-config",
+                "owner": "Yazelix runtime closure",
+                "fallback": "The moved closure provides yzx-config and its data; a missing closure entry is a release failure, not a silent host lookup."
+              },
+              {
+                "dependency": "Nushell",
+                "owner": "yzx-envelope closure",
+                "fallback": "The release closure supplies the Nushell interpreter used by the packaged envelope engine."
+              },
+              {
+                "dependency": "glibc support libraries",
+                "owner": "relocatable Nix closure",
+                "fallback": "Dynamic support libraries remain inside the extracted closure and are exposed only through the envelope's /nix bind."
+              }
+            ],
+            "closure": {
+              "paths": 20,
+              "source": "bundle-moved/closure.txt",
+              "host_store_hidden": true
+            },
+            "relocation": {
+              "moved_prefix": "/home/flexnetos/meta/var/cache/archbp021/bundle-moved",
+              "launcher": "launcher",
+              "store_workload": "/nix/store/gik3rh1vz2jlgnifb9dh6vc6sxwwz9jj-bash-5.3p9/bin/bash",
+              "empty_store_root": "/tmp",
+              "tests": [
+                "store-hidden relocation using closure bash and coreutils",
+                "static musl workload with durable binary bind"
+              ]
+            },
+            "host_nix_dependence": {
+              "remaining": [
+                "WebKitGTK desktop host",
+                "PostgreSQL/RuVector service",
+                "AppArmor-profiled /usr/bin/bwrap fallback"
+              ],
+              "blocks_stronger_claims": true
+            }
+          },
+          "note": "Static-pie artifacts and the moved relocatable closure are proven from the measured release receipt; remaining host dependencies intentionally keep this claim qualified."
+        },
+        {
+          "relationship": "profile-frontdoor",
+          "proven": true,
+          "frontdoor": "/home/flexnetos/.nix-profile/bin/yzx",
+          "frontdoor_realpath": "/nix/store/9hhkily1khas9wykgk3v6g1dkpjv6ffz-yzx/bin/yzx",
+          "frontdoor_sha256": "38d2e27f72ad4f96d3142f9fddedb2e50d03f8c82d450ffd14644f6a64e0a446",
+          "layout": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_realpath": "/nix/store/0adalxsvl0rgikyr2hnjrl12m3cyly67-lifeos-foundation-yzx/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_sha256": "b5100ea236d503ea54bfeea50a000fcab15f28a749f751217e27b25b474d9d1c",
+          "doctor_exit_status": 0,
+          "doctor_output": "Yazelix Nova doctor\nok config home: /home/flexnetos/.config/yazelix\nok state dir: /run/user/1001/yazelix/profile-runtime/yazelix\nok runtime identity: /run/user/1001/yazelix/profile-runtime/yazelix/runtime_identity.json\nok shell.program: nu\nok editor.command: yzx-hx\nok editor: /nix/store/m923vd2yl77z4df6mws0v0n2nvrih9pq-yzx-hx/bin/yzx-hx\nok agent.command: auto\nok agent.args: []\nok open.log_level: info\nok welcome.enabled: true\nok welcome.style: random\nok welcome.duration_seconds: 3\nok mars config: packaged (/nix/store/qydw7cmmwi9qxzn6kcc9k5dfpxrwf21a-yzx-mars-config/config.toml)\nok zellij config: runtime (/run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl)\nok zellij sidecar: /home/flexnetos/.config/yazelix/zellij/config.kdl\nok bar.widgets: [\"editor\",\"shell\",\"term\",\"codex_usage\",\"cpu\",\"ram\"]\nok popup.side_margin: 1\nok popup.vertical_margin: 0\nok keybindings.config: Alt Shift K\nok keybindings.agent: Alt Shift L\nok keybindings.git: Alt Shift J\nok keybindings.menu: Alt Shift M\nok keybindings.sidebar: Alt Shift H\nok keybindings.sidebar_focus: Ctrl y\nok zellij status cache: /run/user/1001/yazelix/profile-runtime/yazelix/zellij/session/status_bar_cache.json\nok zellij permissions: /run/user/1001/yazelix/profile-runtime/yazelix/zellij/permissions.kdl\nok layout: packaged (/nix/store/4vfb6pya8wl1w3a7jip23bq67x7p7kb9-flexnetos-zellij-layout/layout.kdl)\nok config helper: /nix/store/b8dycakjjb6qj3754p0303a4qszqks7c-yzx-config-0.1.0/bin/yzx-config\nok tutor helper: /nix/store/8hcq485a4as9k2qa178ggvdjiihd73j2-yzx-tutor-0.1.0/bin/yzx-tutor\nok screen helper: /nix/store/7d7sxbas6a8l7shmh487sijpgnca4xjy-yzs-0.1.0/bin/yzs\nok welcome helper: /nix/store/sz41lixd1fd6yf4ac36zacj7h764ymn8-yzx-welcome/bin/yzx-welcome\nok zellij helper: /nix/store/isi2zmv8v5axj0qmr712z6ifvfwim7l5-yzx-zellij-config/bin/yzx-zellij-config\nok reveal helper: /nix/store/hhwfkxrwi0x22c3y6z0yb3wl41kgmp6n-yzx-open-0.1.0/bin/yzx-reveal\nok sidebar refresh helper: /nix/store/hhwfkxrwi0x22c3y6z0yb3wl41kgmp6n-yzx-open-0.1.0/bin/yzx-sidebar-refresh\nok yazi source: bundled\nok yazi lookup PATH: /nix/store/9ypz3flqsrl5xl495mm8h645gadjsxi1-coreutils-9.11/bin:/nix/store/bcnisk3ydfgv26v2gw3zlky24g00yww2-git-2.54.0/bin:/nix/store/szn6pw9lc9n6agk4x6cqpdqhi457kk25-lazygit-0.62.2/bin:/nix/store/l3c0df03d7ljdld1az1g83lj347lhdrs-tokenusage-1.5.2/bin:/nix/store/m923vd2yl77z4df6mws0v0n2nvrih9pq-yzx-hx/bin:/nix/store/nbdp4gq2ha332jxrik97laz75lza00kz-flexnetos-foundation-tools/bin:/nix/store/ql4wjqv1dvkm17q47sa6cm8ivyvysj2p-codex-cli-0.144.0/codex-path:/home/flexnetos/.nix-profile/bin:/home/flexnetos/.nix-profile/toolbin:/nix/var/nix/profiles/default/bin:/run/user/1001/yazelix/profile-runtime/codex/tmp/arg0/codex-arg0HOqI7W:/nix/store/ql4wjqv1dvkm17q47sa6cm8ivyvysj2p-codex-cli-0.144.0/codex-path:/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin:/nix/store/2iyzhxjwbpir2n2xaqgq14v8455kbrri-starship-1.25.1/bin:/nix/store/7y85jx151zndxx1yyanlqfbrz6i6p165-carapace-1.6.3/bin:/nix/store/rm4j8cv6xnmwc6ys4zdfpwamkmn8g1cd-zoxide-0.9.9/bin:/nix/store/9ypz3flqsrl5xl495mm8h645gadjsxi1-coreutils-9.11/bin:/nix/store/bcnisk3ydfgv26v2gw3zlky24g00yww2-git-2.54.0/bin:/nix/store/szn6pw9lc9n6agk4x6cqpdqhi457kk25-lazygit-0.62.2/bin:/nix/store/l3c0df03d7ljdld1az1g83lj347lhdrs-tokenusage-1.5.2/bin:/nix/store/m923vd2yl77z4df6mws0v0n2nvrih9pq-yzx-hx/bin:/nix/store/ik8r0cc3b2h7hjfqzdns9k5727cs210g-flexnetos-foundation-tools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin\nok yazi: /nix/store/x2dj1va31ggr9glpdnwjr90ahm2i4n77-yazi-26.5.6/bin/yazi\nok ya: /nix/store/x2dj1va31ggr9glpdnwjr90ahm2i4n77-yazi-26.5.6/bin/ya\nok yazi version: 26.5.6\nok yazi tested version: 26.5.6\nok zellij: /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij\nok mars: /nix/store/4ap1rcxxj3hp23yalsafpi63gynv83zv-mars/bin/mars\nok yazi opener: /nix/store/bdkz4kcjd8g32j55jwnls9rcsgv0brrv-yzx-yazi/bin/yzx-yazi\nok pane orchestrator plugin: /nix/store/zm06wsdxnr7727cqbymn5w6xasybkf16-yazelix-zellij-pane-orchestrator-0.1.0/share/yazelix_zellij_pane_orchestrator/yazelix_pane_orchestrator.wasm\nwarn session: already inside zellij\n",
+          "profile_exit_status": 0,
+          "profile_output": "Name:               \u001b[1mlifeos_foundation_yzx\u001b[0m\nFlake attribute:    packages.x86_64-linux.lifeos_foundation_yzx\nOriginal flake URL: path:/home/flexnetos/meta/src/yazelix\nLocked flake URL:   path:/home/flexnetos/meta/src/yazelix?lastModified=1785265378&narHash=sha256-oTRvRCAvxaO0sj%2B7PhHUBk21BD8DD5DMbuXZiTKcZuI%3D\nStore paths:        /nix/store/0adalxsvl0rgikyr2hnjrl12m3cyly67-lifeos-foundation-yzx\n"
+        },
+        {
+          "relationship": "launcher-target",
+          "proven": false,
+          "desktop_path": null,
+          "exec": null
+        },
+        {
+          "relationship": "process-tree",
+          "proven": true,
+          "relevant_processes": [
+            "  30744    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/stellar-yak",
+            " 842091  297473 bash            /bin/bash -c source /home/flexnetos/meta/var/lib/claude/shell-snapshots/snapshot-bash-1785271583226-0vibz5.sh 2>/dev/null || true && shopt -u extglob 2>/dev/null || true && { \\builtin unalias -- 'unsetenv'; \\builtin unset -f -- 'unsetenv'; } >/dev/null 2>&1 || true && eval 'rtk proxy -- /home/flexnetos/.nix-profile/toolbin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu' < /dev/null && pwd -P >| /run/user/1001/yazelix/volatile/tmp/claude-a61a-cwd",
+            " 842117  842091 rtk             /nix/store/ng6fk1vrsap7s8dzqj1d63wc5ssypghz-rtk-0.43.0/bin/rtk proxy -- /home/flexnetos/.nix-profile/toolbin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu",
+            " 842158  842117 nu              /nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu",
+            " 842188  842158 flexnetos-redb- /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/codedb-rt/bin/flexnetos-redb-owner serve /run/user/1001/bpredb",
+            " 971327  971325 MainThread      node /home/flexnetos/meta/src/lifeos/.claude/worktrees/archbp-frontier/node_modules/.bin/vite",
+            "1008149    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/splendid-tiger",
+            "1078375 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+            "1080733 1008149 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+            "1197827 3392658 .claude-wrapped /nix/store/7cshnmk3kcc6m5q41gja5kcsayrw93yq-claude-code-2.1.207/bin/.claude-wrapped daemon run --origin transient --spawned-by {\"label\":\"claude\",\"cwd\":\"/home/flexnetos/meta/src/lifeos\",\"pid\":3392658}",
+            "1214140    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/friendly-newt",
+            "1529294    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/fascinating-mountain",
+            "3633043 3623321 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --config /run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl --new-session-with-layout /nix/store/4vfb6pya8wl1w3a7jip23bq67x7p7kb9-flexnetos-zellij-layout/layout.kdl",
+            "3634917    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/unique-elephant",
+            "4125286 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/--help"
+          ]
+        },
+        {
+          "relationship": "ui-readiness",
+          "proven": true,
+          "receipt_path": "/home/flexnetos/meta/src/lifeos/evidence/glass/live-launch-receipt.json",
+          "receipt_sha256": "a94f5e52455ed37a425fa3c5c069b2fa538a9aa7acf16b8296c9499eb6ea6f99",
+          "receipt": {
+            "schema_version": "lifeos.evidence.glass-launch-live.v1",
+            "authority": "Tauri process and authenticated redb owner projection",
+            "started_at": "2026-07-28T21:55:20.433Z",
+            "launch": {
+              "command": "bun run tauri -- dev --config <isolated-port-1421-config>",
+              "pid": 1418615,
+              "process_tree": [
+                " 842091  297473 bash            /bin/bash -c source /home/flexnetos/meta/var/lib/claude/shell-snapshots/snapshot-bash-1785271583226-0vibz5.sh 2>/dev/null || true && shopt -u extglob 2>/dev/null || true && { \\builtin unalias -- 'unsetenv'; \\builtin unset -f -- 'unsetenv'; } >/dev/null 2>&1 || true && eval 'rtk proxy -- /home/flexnetos/.nix-profile/toolbin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu' < /dev/null && pwd -P >| /run/user/1001/yazelix/volatile/tmp/claude-a61a-cwd",
+                " 842117  842091 rtk             /nix/store/ng6fk1vrsap7s8dzqj1d63wc5ssypghz-rtk-0.43.0/bin/rtk proxy -- /home/flexnetos/.nix-profile/toolbin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu",
+                " 842158  842117 nu              /nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu",
+                " 842188  842158 flexnetos-redb- /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/codedb-rt/bin/flexnetos-redb-owner serve /run/user/1001/bpredb",
+                " 971327  971325 MainThread      node /home/flexnetos/meta/src/lifeos/.claude/worktrees/archbp-frontier/node_modules/.bin/vite",
+                "1078375 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+                "1080733 1008149 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+                "1197827 3392658 .claude-wrapped /nix/store/7cshnmk3kcc6m5q41gja5kcsayrw93yq-claude-code-2.1.207/bin/.claude-wrapped daemon run --origin transient --spawned-by {\"label\":\"claude\",\"cwd\":\"/home/flexnetos/meta/src/lifeos\",\"pid\":3392658}",
+                "1415993 1415990 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/vite --host 127.0.0.1 --port 1421",
+                "1418576  864881 rtk             /nix/store/ng6fk1vrsap7s8dzqj1d63wc5ssypghz-rtk-0.43.0/bin/rtk proxy env LIFEOS_GLASS_PORT=1421 /home/flexnetos/.nix-profile/bin/bun scripts/verify-glass-launch-live.mjs",
+                "1421342 1421330 bun             /home/flexnetos/.nix-profile/bin/bun run tauri -- dev --config {\"build\":{\"devUrl\":\"http://localhost:1422\",\"beforeDevCommand\":\"bun run dev -- --port 1422\"}}",
+                "1421343 1421342 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/tauri dev --config {\"build\":{\"devUrl\":\"http://localhost:1422\",\"beforeDevCommand\":\"bun run dev -- --port 1422\"}}",
+                "1421402 1421398 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/vite --port 1422",
+                "1421642 1421343 lifeos          /home/flexnetos/meta/var/cargo-target/debug/lifeos",
+                "1422383 3688804 .postgres-wrapp postgres: flexnetos lifeos [local] idle",
+                "1422384 3688804 .postgres-wrapp postgres: flexnetos lifeos [local] idle",
+                "4125286 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/--help"
+              ],
+              "launch_error": null
+            },
+            "readiness": {
+              "schemaVersion": "lifeos.glass-ui-ready.v1",
+              "state": "ready",
+              "mountedAt": 1785275744758,
+              "surface": "workstation",
+              "identity": "lifeos-glass",
+              "owner_local_seq": 156,
+              "owner_checksum": "ce209aa46093c67c204d78476d6b749e8493ef86a47b33857797613220bb73a8"
+            },
+            "shutdown": {
+              "signal": "SIGTERM",
+              "exit_code": null
+            },
+            "ok": true
+          },
+          "reason": "The current-worktree Tauri launch receipt records mounted Glass readiness through the authenticated redb owner."
         }
       ]
     }

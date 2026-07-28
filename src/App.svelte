@@ -60,9 +60,25 @@
     const invoke = tauriInvoke();
     if (!invoke) return;
 
+    // This is the causal Glass readiness receipt: it is emitted only after
+    // Svelte has mounted the root component and is written through the
+    // authenticated owner, so a launcher/process snapshot cannot masquerade
+    // as a mounted LifeOS UI.
+    void invoke("redb_state_write", {
+      key: "glass.ui.ready",
+      value: JSON.stringify({
+        schemaVersion: "lifeos.glass-ui-ready.v1",
+        state: "ready",
+        mountedAt: Date.now(),
+        surface: document.documentElement.dataset.surface ?? "workstation",
+        identity: "lifeos-glass",
+      }),
+    }).catch(() => {});
+
     let afterSeq = 0;
     let initialized = false;
     let syncing = false;
+    let uiReadyPublished = false;
     const syncProjection = async () => {
       if (syncing) return;
       syncing = true;
@@ -83,6 +99,10 @@
         const updatedAt = Number(redbProjection?.entries?.["swarm.updatedAt"]);
         if (!Number.isFinite(updatedAt) || Date.now() - updatedAt > 5_000) {
           await invoke("redb_swarm_heartbeat");
+        }
+        if (!uiReadyPublished) {
+          await invoke("redb_ui_ready");
+          uiReadyPublished = true;
         }
       } catch {
         // A reconnect, gap, or checksum failure must restart from a fresh

@@ -106,8 +106,10 @@ describe("App.svelte shell layout + main-pane gate", () => {
           if (command === "redb_projection_read") {
             return { localSeq: 7, checksum: "abc", degraded: false, entries: {} };
           }
+          if (command === "redb_state_write") return 8;
           if (command === "redb_events_read") return [];
           if (command === "redb_swarm_heartbeat") return 8;
+          if (command === "redb_ui_ready") return 9;
           throw new Error(`unexpected command: ${command}`);
         },
       },
@@ -123,6 +125,10 @@ describe("App.svelte shell layout + main-pane gate", () => {
       expect(projectionIndex).toBeGreaterThanOrEqual(0);
       expect(eventIndex).toBeGreaterThan(projectionIndex);
       expect(calls[eventIndex]).toEqual(["redb_events_read", { afterSeq: 7 }]);
+      expect(calls).toContainEqual([
+        "redb_state_write",
+        expect.objectContaining({ key: "glass.ui.ready" }),
+      ]);
     } finally {
       window.__TAURI__ = originalTauri;
     }

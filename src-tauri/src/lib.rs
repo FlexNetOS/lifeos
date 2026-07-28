@@ -221,6 +221,19 @@ fn publish_swarm_runtime_status() -> Result<u64, String> {
 }
 
 #[tauri::command]
+fn redb_ui_ready() -> Result<u64, String> {
+    let ready_at = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| format!("ui readiness clock: {error}"))?
+        .as_millis()
+        .to_string();
+    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
+    owner
+        .put("lifeos.ui.ready", &ready_at)
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
 fn redb_swarm_heartbeat() -> Result<u64, String> {
     publish_swarm_runtime_status()
 }
@@ -1421,6 +1434,7 @@ pub fn run() {
             redb_events_read,
             redb_state_write,
             redb_swarm_heartbeat,
+            redb_ui_ready,
             codedb_ingest_envelope,
             envctl_drain,
             envctl_return_projection,

@@ -1,4 +1,5 @@
 import { mount } from "svelte";
+import { invoke as tauriInvoke } from "@tauri-apps/api/core";
 import { router } from "@/router";
 import App from "@/App.svelte";
 import { createSurface } from "@/lib/surface.svelte.js";
@@ -17,7 +18,7 @@ import "../styles.css";
 // WebKit page load from a page that actually has the Tauri IPC bridge and can
 // reach the authenticated redb owner.
 const mainBootstrapInvoke =
-  typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || null;
+  typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || tauriInvoke;
 if (mainBootstrapInvoke) {
   void mainBootstrapInvoke("redb_state_write", {
     key: "lifeos.main.loaded",

@@ -17,6 +17,7 @@
   // gate reflects the backend (no account → signup; account but no session →
   // welcome-back signin).
   import { onMount } from "svelte";
+  import { invoke as tauriCoreInvoke } from "@tauri-apps/api/core";
   import { useLifeos } from "@/stores/lifeos-native";
   import { useAuth } from "@/stores/auth";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
@@ -54,7 +55,7 @@
   let swarmStatus = $derived(deriveSwarmStatus(redbProjection));
 
   const tauriInvoke = () =>
-    typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || null;
+    typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || tauriCoreInvoke;
   const engineRoomProbe =
     import.meta.env.VITE_LIFEOS_ENGINE_PROBE === "1" ||
     (typeof window !== "undefined" &&

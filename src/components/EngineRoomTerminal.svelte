@@ -3,7 +3,7 @@
   import { Terminal } from "@xterm/xterm";
   import { FitAddon } from "@xterm/addon-fit";
   import { WebglAddon } from "@xterm/addon-webgl";
-  import { Channel } from "@tauri-apps/api/core";
+  import { Channel, invoke as tauriCoreInvoke } from "@tauri-apps/api/core";
   import "@xterm/xterm/css/xterm.css";
   import Icon from "./Icon.svelte";
 
@@ -26,7 +26,7 @@
   let resizeFrame = null;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
-  const invoke = () => tauri()?.core?.invoke || null;
+  const invoke = () => tauri()?.core?.invoke || tauriCoreInvoke;
 
   const resizeTerminal = async () => {
     if (!terminal || !fitAddon) return;

@@ -8,7 +8,7 @@ const root = process.cwd();
 const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/var/lib/redb");
 const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root, "evidence/glass/live-launch-receipt.json"));
 const failureReceiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_FAILURE_RECEIPT ?? join(root, "evidence/glass/live-launch-failure-receipt.json"));
-const port = process.env.LIFEOS_GLASS_PORT ?? "1421";
+const port = process.env.LIFEOS_GLASS_PORT ?? "1420";
 const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
 const runtime = {
   LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql",
@@ -87,8 +87,26 @@ const config = JSON.stringify({
     devUrl: `http://127.0.0.1:${port}/?probe=engine-room`,
     beforeDevCommand: `bun run dev -- --host 127.0.0.1 --port ${port}`,
   },
+  app: {
+    withGlobalTauri: true,
+    windows: [{
+      label: "main",
+      title: "LifeOS",
+      width: 1280,
+      height: 800,
+      minWidth: 960,
+      minHeight: 640,
+      center: true,
+      resizable: true,
+      decorations: true,
+      transparent: false,
+      backgroundColor: "#0A0A0A",
+      fullscreen: false,
+      theme: "Dark",
+    }],
+  },
 });
-const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--config", config], {
+const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev"], {
   cwd: root,
   env: childEnv,
   detached: true,
@@ -121,7 +139,7 @@ while (Date.now() < deadline && !launchError && !childExited) {
     if (
       mainCandidate?.schemaVersion === "lifeos.main-loaded.v1" &&
       Number(mainCandidate.loadedAt) >= startedAt &&
-      mainCandidate.href?.includes(`127.0.0.1:${port}`)
+      (mainCandidate.href?.includes(`127.0.0.1:${port}`) || mainCandidate.href?.includes(`localhost:${port}`))
     ) {
       mainLoaded = { ...mainCandidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
     }
@@ -152,7 +170,7 @@ const result = {
   authority: "Tauri process and authenticated redb owner projection",
   started_at: new Date(startedAt).toISOString(),
   launch: {
-    command: `bun run tauri -- dev --config <isolated-loopback-port-${port}-config>`,
+    command: "bun run tauri -- dev",
     pid: child.pid,
     process_tree: tree,
     launch_error: launchError?.message ?? null,

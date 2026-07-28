@@ -47,13 +47,8 @@ mod terminal_tests {
             vec![
                 "yzx",
                 "enter",
-                "options",
-                "--session-name",
+                "--session",
                 "lifeos-tenant-session",
-                "--attach-to-session",
-                "true",
-                "--on-force-close",
-                "detach",
             ]
         );
     }
@@ -198,8 +193,13 @@ fn validate_redb_event_stream(
 
 #[tauri::command]
 fn redb_state_write(key: String, value: String) -> Result<u64, String> {
-    let mut client = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
-    client.put(&key, &value).map_err(|error| error.to_string())
+    let result = OwnerClient::connect(redb_root())
+        .and_then(|mut client| client.put(&key, &value))
+        .map_err(|error| error.to_string());
+    if let Err(error) = &result {
+        eprintln!("lifeos redb_state_write failed for {key}: {error}");
+    }
+    result
 }
 
 fn publish_swarm_runtime_status() -> Result<u64, String> {
@@ -584,13 +584,8 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     vec![
         "yzx".into(),
         "enter".into(),
-        "options".into(),
-        "--session-name".into(),
+        "--session".into(),
         session_name.into(),
-        "--attach-to-session".into(),
-        "true".into(),
-        "--on-force-close".into(),
-        "detach".into(),
     ]
 }
 

@@ -22,7 +22,9 @@ const engine = engineCandidates.find(({ path }) => {
 if (!engine) throw new Error("yzx-envelope engine not found");
 
 const python = execFileSync("bash", ["-c", 'readlink -f "$(command -v python3)"'], { encoding: "utf8" }).trim();
-const WORKLOAD = "import time; t=time.perf_counter(); sum(i*i for i in range(20_000_000)); print(time.perf_counter()-t)";
+// Two identical timed passes make scheduler noise a smaller fraction of the
+// sample while keeping the comparison inside the same process and namespace.
+const WORKLOAD = "import time; t=time.perf_counter(); [sum(i*i for i in range(20_000_000)) for _ in range(2)]; print(time.perf_counter()-t)";
 const RUNS = 9;
 
 function median(xs) {

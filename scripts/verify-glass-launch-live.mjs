@@ -87,12 +87,33 @@ const startedAt = Date.now();
 const config = JSON.stringify({
   build: {
     devUrl: `http://127.0.0.1:${port}/?probe=engine-room`,
-    beforeDevCommand: `bun run dev -- --host 127.0.0.1 --port ${port}`,
+    beforeDevCommand: "",
   },
 });
-const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--no-watch", "--config", config], {
+const childEnv = { ...process.env, ...runtime };
+const frontend = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "dev", "--", "--host", "127.0.0.1", "--port", port], {
   cwd: root,
-  env: { ...process.env, ...runtime },
+  env: childEnv,
+  detached: true,
+  stdio: ["ignore", "pipe", "pipe"],
+});
+let frontendOutput = "";
+frontend.stdout.on("data", (chunk) => { frontendOutput = `${frontendOutput}${chunk}`.slice(-8192); });
+frontend.stderr.on("data", (chunk) => { frontendOutput = `${frontendOutput}${chunk}`.slice(-8192); });
+let frontendError = null;
+frontend.once("error", (error) => { frontendError = error; });
+let frontendReady = false;
+const frontendDeadline = Date.now() + 15_000;
+while (Date.now() < frontendDeadline && !frontendError) {
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/`);
+    if (response.ok) { frontendReady = true; break; }
+  } catch {}
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 250));
+}
+const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--no-watch", "--no-dev-server", "--no-dev-server-wait", "--config", config], {
+  cwd: root,
+  env: childEnv,
   detached: true,
   stdio: ["ignore", "pipe", "pipe"],
 });
@@ -140,6 +161,7 @@ while (Date.now() < deadline && !launchError && !childExited) {
 const tree = processTree(child.pid);
 let shutdown = { signal: "SIGTERM", exit_code: null };
 terminateTree(child.pid);
+terminateTree(frontend.pid);
 await new Promise((resolvePromise) => {
   const timer = setTimeout(resolvePromise, 8_000);
   child.once("exit", (code, signal) => {
@@ -154,18 +176,24 @@ const result = {
   authority: "Tauri process and authenticated redb owner projection",
   started_at: new Date(startedAt).toISOString(),
   launch: {
-    command: `bun run tauri -- dev --config <isolated-loopback-port-${port}-config>`,
+    command: `bun run tauri -- dev --no-watch --no-dev-server --no-dev-server-wait --config <isolated-loopback-port-${port}-config>`,
     pid: child.pid,
     process_tree: tree,
     launch_error: launchError?.message ?? null,
     output_head: launchOutputHead,
     output_tail: launchOutput.slice(-4096),
   },
+  frontend: {
+    pid: frontend.pid,
+    ready: frontendReady,
+    error: frontendError?.message ?? null,
+    output_tail: frontendOutput.slice(-4096),
+  },
   main_loaded: mainLoaded,
     readiness,
     engine_room: engineRoom,
   shutdown,
-  ok: !launchError && Boolean(mainLoaded) && Boolean(readiness) && Boolean(engineRoom) && shutdown.signal === "SIGTERM",
+  ok: frontendReady && !launchError && !frontendError && Boolean(mainLoaded) && Boolean(readiness) && Boolean(engineRoom) && shutdown.signal === "SIGTERM",
 };
 mkdirSync(join(root, "evidence/glass"), { recursive: true });
 if (!result.ok) {

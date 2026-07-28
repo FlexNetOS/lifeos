@@ -1,16 +1,16 @@
 //! MCP client surface for LifeOS.
 //!
-//! Stage 1d of the TODO: module scaffolds for the two MCP servers the foundation
-//! plan calls out as priority integrations — Cognitum-Seed (custody / sensor
-//! appliance) and RuVector (vector DB + GNN inference). Wave 3 fills in the
-//! read-only client bodies on top of a shared `Transport` trait.
+//! Read-only clients for the two MCP-backed servers the foundation plan calls
+//! out as priority integrations — Cognitum-Seed (custody / sensor appliance)
+//! and RuVector (vector DB + GNN inference). Both use the shared `Transport`
+//! trait so production HTTP and deterministic tests share the same contracts.
 //!
 //! The shared `McpError` is intentionally minimal so cognitum.rs and
 //! ruvector.rs converge on a single error vocabulary as they grow. The
 //! `Transport` abstraction lets us swap real `reqwest::blocking` for an
 //! in-memory fake under `#[cfg(test)]` without dragging HTTP into unit specs.
 //!
-//! Wave-2 → Wave-3 evidence (recorded in `.omc/handoffs/team-exec-wave2.md`):
+//! Source-grounded endpoint evidence:
 //! the live Cognitum endpoint is HTTP (`http://169.254.42.1/mcp`), and every
 //! one of the 40 live MCP tools mirrors a REST endpoint. So the cross-platform
 //! client speaks REST through `reqwest::blocking`; MCP-over-HTTP stays

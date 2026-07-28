@@ -1,9 +1,19 @@
 {
   "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
   "task_id": "NBVERIFY-004",
-  "source_task_id": "NBSOURCE-004",
-  "recorded_at": "2026-07-28",
-  "authority": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "observed_at": "2026-07-28T21:53:54.912Z",
+  "repository": {
+    "root": "/home/flexnetos/meta/src/lifeos",
+    "package_json_sha256": "086d1a263750229e127f9eba978deee7eed2b7151205bc17746b11ce4745601a"
+  },
+  "collector": {
+    "claim_id": "SWARM-CLAIM-002",
+    "mode": "read-only-installed-runtime-trace",
+    "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
+    "does_not_launch": true,
+    "does_not_install": true,
+    "does_not_mutate_generated_runtime": true
+  },
   "claims": [
     {
       "claim_id": "SWARM-CLAIM-001",
@@ -29,42 +39,6 @@
         {
           "relationship": "ui-readiness",
           "proven": false
-        }
-      ]
-    },
-    {
-      "claim_id": "SWARM-CLAIM-002",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "evidence": [
-        {
-          "relationship": "profile-owner",
-          "proven": true
-        },
-        {
-          "relationship": "launcher-code",
-          "proven": false
-        },
-        {
-          "relationship": "process-tree",
-          "proven": false
-        },
-        {
-          "relationship": "environment-allowlist",
-          "proven": false
-        },
-        {
-          "relationship": "workspace-responsibility",
-          "proven": true
-        },
-        {
-          "relationship": "lifeos-binding",
-          "proven": false,
-          "missing": [
-            "lifeos_process_receipt_missing",
-            "lifeos_ui_acceptance_receipt_missing",
-            "lifeos_bridge_contract_missing"
-          ]
         }
       ]
     },
@@ -773,19 +747,181 @@
           ]
         }
       ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-002",
+      "verification_status": "unverified",
+      "status": "qualified",
+      "confidence": "medium",
+      "conclusion": "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, and the source now contains a causal Glass-to-redb readiness bridge; a fresh Tauri process and UI acceptance receipt are still required to prove that Yazelix is the background workspace engine for a LifeOS application launch.",
+      "evidence": [
+        {
+          "relationship": "profile-owner",
+          "proven": true,
+          "profile_root": "/home/flexnetos/.nix-profile",
+          "manifest_element": "lifeos_foundation_yzx",
+          "flake_attr": "packages.x86_64-linux.lifeos_foundation_yzx",
+          "locked_revision": null,
+          "store_path": "/nix/store/9hhkily1khas9wykgk3v6g1dkpjv6ffz-yzx",
+          "frontdoor": "/home/flexnetos/.nix-profile/bin/yzx",
+          "frontdoor_realpath": "/nix/store/9hhkily1khas9wykgk3v6g1dkpjv6ffz-yzx/bin/yzx",
+          "frontdoor_sha256": "38d2e27f72ad4f96d3142f9fddedb2e50d03f8c82d450ffd14644f6a64e0a446",
+          "profile_listing_exit_status": 0,
+          "profile_listing_sha256": "dc7e2d3a6284c20408f2988f3154e906c9d13cada107ba8ccc75b0a2d8b11faa",
+          "profile_entries": []
+        },
+        {
+          "relationship": "launcher-code",
+          "proven": false,
+          "desktop_path": null,
+          "desktop_sha256": null,
+          "exec": null,
+          "layout_override": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "layout_override_exists": true,
+          "profile_layout": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "profile_layout_sha256": "b5100ea236d503ea54bfeea50a000fcab15f28a749f751217e27b25b474d9d1c"
+        },
+        {
+          "relationship": "process-tree",
+          "proven": false,
+          "observed_at_utc": "2026-07-28T21:53:54.911Z",
+          "process_snapshot_command": "ps -eo pid=,ppid=,comm=,args=",
+          "process_snapshot_exit_status": 0,
+          "process_tree": [
+            "  30744    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/stellar-yak",
+            "1008149    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/splendid-tiger",
+            "1214140    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/friendly-newt",
+            "1529294    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/fascinating-mountain",
+            "3633043 3623321 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --config /run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl --new-session-with-layout /nix/store/4vfb6pya8wl1w3a7jip23bq67x7p7kb9-flexnetos-zellij-layout/layout.kdl",
+            "3634917    3826 zellij          /nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij --server /run/user/1001/zellij/contract_version_1/unique-elephant"
+          ],
+          "active_store_processes": []
+        },
+        {
+          "relationship": "environment-allowlist",
+          "proven": true,
+          "allowed_names": [
+            "YAZELIX_RUNTIME_DIR",
+            "YAZELIX_CONFIG_DIR",
+            "YAZELIX_STATE_DIR",
+            "YAZELIX_LAYOUT_OVERRIDE",
+            "YAZELIX_SESSION_CONFIG_PATH",
+            "YAZELIX_SESSION_TERMINAL",
+            "ZELLIJ_DEFAULT_LAYOUT",
+            "ZELLIJ_SESSION_NAME"
+          ],
+          "values_by_process": [
+            {
+              "pid": 30744,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "mars",
+                "YAZELIX_STATE_DIR": "/run/user/1001/yazelix/profile-runtime/yazelix",
+                "ZELLIJ_SESSION_NAME": "stellar-yak"
+              }
+            },
+            {
+              "pid": 1008149,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "ghostty",
+                "YAZELIX_STATE_DIR": "/run/user/1001/yazelix/profile-runtime/yazelix",
+                "ZELLIJ_SESSION_NAME": "splendid-tiger"
+              }
+            },
+            {
+              "pid": 1214140,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "ghostty",
+                "YAZELIX_STATE_DIR": "/run/user/1001/yazelix/profile-runtime/yazelix",
+                "ZELLIJ_SESSION_NAME": "friendly-newt"
+              }
+            },
+            {
+              "pid": 1529294,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "ghostty",
+                "YAZELIX_STATE_DIR": "/run/user/1001/yazelix/profile-runtime/yazelix",
+                "ZELLIJ_SESSION_NAME": "fascinating-mountain"
+              }
+            },
+            {
+              "pid": 3633043,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "ghostty",
+                "YAZELIX_STATE_DIR": "/run/user/1001/yazelix/profile-runtime/yazelix"
+              }
+            },
+            {
+              "pid": 3634917,
+              "comm": "zellij",
+              "values": {
+                "YAZELIX_SESSION_TERMINAL": "ghostty",
+                "YAZELIX_STATE_DIR": "/run/user/1001/yazelix/profile-runtime/yazelix",
+                "ZELLIJ_SESSION_NAME": "unique-elephant"
+              }
+            }
+          ],
+          "secret_policy": "Only allowlisted runtime-boundary variable names are recorded; all other environment entries are excluded."
+        },
+        {
+          "relationship": "workspace-responsibility",
+          "proven": true,
+          "source_layout": "/home/flexnetos/meta/src/yazelix/defaults/zellij/flexnetos_agent_workspace.kdl",
+          "source_layout_sha256": "b82578e140825f26cfd9e9dffc8fbd52a6046872f4555072646c07704231825d",
+          "generated_layout": "/home/flexnetos/.local/share/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "generated_layout_sha256": null,
+          "active_layout": "/home/flexnetos/.nix-profile/configs/zellij/layouts/flexnetos_agent_workspace.kdl",
+          "active_layout_sha256": "b5100ea236d503ea54bfeea50a000fcab15f28a749f751217e27b25b474d9d1c",
+          "pane_map": [
+            "sidebar/yazi",
+            "workspace/env",
+            "tools/env",
+            "agent",
+            "Mission Control"
+          ],
+          "owner_boundary": "Yazelix owns terminal workspace layout, session, environment, and pane orchestration; this does not establish LifeOS launch ownership.",
+          "source_anchors": [
+            {
+              "path": "/home/flexnetos/meta/src/yazelix/defaults/zellij/flexnetos_agent_workspace.kdl",
+              "exists": true,
+              "sha256": "b82578e140825f26cfd9e9dffc8fbd52a6046872f4555072646c07704231825d",
+              "lines": {
+                "pane name=\"workspace\"": 21,
+                "pane name=\"agent\"": 22
+              }
+            }
+          ]
+        },
+        {
+          "relationship": "lifeos-bridge-contract",
+          "proven": true,
+          "glass_source": "/home/flexnetos/meta/src/lifeos/src/App.svelte",
+          "glass_source_sha256": "28959d95a79922a966adc05ad9f1f334ec616281da0673335732f221cc88c52a",
+          "tauri_source": "/home/flexnetos/meta/src/lifeos/src-tauri/src/lib.rs",
+          "tauri_source_sha256": "70ade3a54fd351a63ad6c618bcd8a3aba5b51870d172016e5cb6a48c7e555a98",
+          "readiness_contract": {
+            "mounted_signal": "glass.ui.ready",
+            "owner_signal": "lifeos.ui.ready",
+            "owner_boundary": "redb owner"
+          }
+        },
+        {
+          "relationship": "lifeos-binding",
+          "proven": false,
+          "lifeos_processes": [],
+          "missing": [
+            "lifeos_process_receipt_missing",
+            "lifeos_ui_acceptance_receipt_missing",
+            "fresh_launch_causality_missing",
+            "failure_shutdown_behavior_missing"
+          ],
+          "boundary": "Yazelix workspace orchestration is not proof of LifeOS launch ownership."
+        }
+      ]
     }
-  ],
-  "observed_at": "2026-07-28T21:45:58.280Z",
-  "repository": {
-    "root": "/home/flexnetos/meta/src/lifeos",
-    "package_json_sha256": "281cf46ccdd3b14ec12ab2aac1cd2ad347aafb3cf403aded0343ecbf96eb6f91"
-  },
-  "collector": {
-    "claim_id": "SWARM-CLAIM-007",
-    "mode": "live-agent-rvf-registry-boundary-trace",
-    "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
-    "does_not_launch": false,
-    "does_not_install": true,
-    "does_not_mutate_generated_runtime": true
-  }
+  ]
 }

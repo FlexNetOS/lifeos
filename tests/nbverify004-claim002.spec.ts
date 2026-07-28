@@ -40,6 +40,7 @@ describe("NBVERIFY-004 SWARM-CLAIM-002 evidence", () => {
         expect.objectContaining({ relationship: "process-tree" }),
         expect.objectContaining({ relationship: "environment-allowlist" }),
         expect.objectContaining({ relationship: "workspace-responsibility" }),
+        expect.objectContaining({ relationship: "lifeos-bridge-contract" }),
         expect.objectContaining({ relationship: "lifeos-binding" }),
       ]),
     );
@@ -54,9 +55,14 @@ describe("NBVERIFY-004 SWARM-CLAIM-002 evidence", () => {
         missing: expect.arrayContaining([
           "lifeos_process_receipt_missing",
           "lifeos_ui_acceptance_receipt_missing",
-          "lifeos_bridge_contract_missing",
         ]),
       }),
     );
+    expect(
+      claim.evidence.find(
+        (candidate: { relationship: string }) =>
+          candidate.relationship === "lifeos-bridge-contract",
+      ),
+    ).toEqual(expect.objectContaining({ proven: true }));
   });
 });

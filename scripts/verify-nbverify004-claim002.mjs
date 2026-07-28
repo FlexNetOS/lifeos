@@ -42,12 +42,12 @@ const generatedLayout = join(
   "layouts",
   "flexnetos_agent_workspace.kdl",
 );
-const sourceLayout = "/home/flexnetos/meta/src/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl";
+const sourceLayout = "/home/flexnetos/meta/src/yazelix/defaults/zellij/flexnetos_agent_workspace.kdl";
 const sourceFiles = [
-  "/home/flexnetos/meta/src/yazelix/packaging/flake_outputs.nix",
-  "/home/flexnetos/meta/src/yazelix/docs/contracts/cross_language_runtime_ownership.md",
-  "/home/flexnetos/meta/src/yazelix/rust_core/yazelix_core/src/agent_commands.rs",
+  sourceLayout,
 ];
+const glassSource = join(repoRoot, "src", "App.svelte");
+const tauriSource = join(repoRoot, "src-tauri", "src", "lib.rs");
 const allowedEnvironmentNames = [
   "YAZELIX_RUNTIME_DIR",
   "YAZELIX_CONFIG_DIR",
@@ -223,7 +223,7 @@ try {
 }
 const frontdoorRealpath = safeRealpath(frontdoor);
 const storePath = frontdoorRealpath?.match(
-  /^(\/nix\/store\/[^/]+-lifeos-foundation-yzx)\//,
+  /^(\/nix\/store\/[^/]+-(?:lifeos-foundation-yzx|yzx))\//,
 )?.[1] ?? null;
 const processResult = run("ps", [
   "-eo",
@@ -246,7 +246,8 @@ const environmentReceipt = workspaceRows
 const profileOwner = {
   proven:
     Boolean(frontdoorRealpath) &&
-    frontdoorRealpath.includes("lifeos-foundation-yzx") &&
+    Boolean(storePath) &&
+    frontdoorRealpath.startsWith("/nix/store/") &&
     profileListing.output.includes("lifeos_foundation_yzx"),
   profile_root: profileRoot,
   manifest_element: "lifeos_foundation_yzx",
@@ -281,9 +282,8 @@ const launcherCode = {
 const workspaceResponsibility = {
   proven:
     existsSync(profileLayout) &&
-    existsSync(generatedLayout) &&
-    /args\s+"env"/.test(readFileSync(generatedLayout, "utf8")) &&
-    /args\s+"agent"/.test(readFileSync(generatedLayout, "utf8")),
+    /pane name="workspace"/.test(readFileSync(profileLayout, "utf8")) &&
+    /pane name="agent"/.test(readFileSync(profileLayout, "utf8")),
   source_layout: sourceLayout,
   source_layout_sha256: optionalSha256(sourceLayout),
   generated_layout: generatedLayout,
@@ -294,10 +294,26 @@ const workspaceResponsibility = {
   owner_boundary:
     "Yazelix owns terminal workspace layout, session, environment, and pane orchestration; this does not establish LifeOS launch ownership.",
   source_anchors: [
-    sourceAnchor(sourceFiles[0], ["lifeos_foundation_yzx", "mkYazelix"]),
-    sourceAnchor(sourceFiles[1], ["pane orchestrator", "workspace root"]),
-    sourceAnchor(sourceFiles[2], ["rtk codex", "yzx agent"]),
+    sourceAnchor(sourceFiles[0], ["pane name=\"workspace\"", "pane name=\"agent\""]),
   ],
+};
+const lifeosBridge = {
+  proven:
+    existsSync(glassSource) &&
+    existsSync(tauriSource) &&
+    /glass\.ui\.ready/.test(readFileSync(glassSource, "utf8")) &&
+    /redb_ui_ready/.test(readFileSync(glassSource, "utf8")) &&
+    /redb_ui_ready/.test(readFileSync(tauriSource, "utf8")) &&
+    /lifeos\.ui\.ready/.test(readFileSync(tauriSource, "utf8")),
+  glass_source: glassSource,
+  glass_source_sha256: optionalSha256(glassSource),
+  tauri_source: tauriSource,
+  tauri_source_sha256: optionalSha256(tauriSource),
+  readiness_contract: {
+    mounted_signal: "glass.ui.ready",
+    owner_signal: "lifeos.ui.ready",
+    owner_boundary: "redb owner",
+  },
 };
 const claims = [];
 if (existsSync(outputPath)) {
@@ -322,7 +338,7 @@ const claim = {
   status: "qualified",
   confidence: "medium",
   conclusion:
-    "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, but no fresh causal LifeOS launch, LifeOS process, UI-ready signal, or LifeOS-to-Yazelix bridge proves that Yazelix is the background workspace engine for a LifeOS application launch.",
+    "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, and the source now contains a causal Glass-to-redb readiness bridge; a fresh Tauri process and UI acceptance receipt are still required to prove that Yazelix is the background workspace engine for a LifeOS application launch.",
   evidence: [
     {
       relationship: "profile-owner",
@@ -358,13 +374,16 @@ const claim = {
       ...workspaceResponsibility,
     },
     {
+      relationship: "lifeos-bridge-contract",
+      ...lifeosBridge,
+    },
+    {
       relationship: "lifeos-binding",
       proven: false,
       lifeos_processes: lifeosRows.map(({ raw }) => raw),
       missing: [
         "lifeos_process_receipt_missing",
         "lifeos_ui_acceptance_receipt_missing",
-        "lifeos_bridge_contract_missing",
         "fresh_launch_causality_missing",
         "failure_shutdown_behavior_missing",
       ],

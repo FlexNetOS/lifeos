@@ -14,7 +14,7 @@ const required = (name, pattern) => {
 };
 
 required("schema version", /schema_version = "flexnetos\.rtk_nu\.envelope\.v1"/);
-required("revision", /revision = "e446998cafe1c20eb23a371f65e6f5c3ed6f16fa"/);
+required("revision", /revision = "eee0dfbd3cf3dc82f5604c77ccc4f93c4a5f0c45"/);
 required("binary", /binary = "rtk_nu"/);
 required("fixture", /fixture_test = "tests\/rtk_nu_envelope_test\.rs"/);
 
@@ -35,7 +35,7 @@ const run = (command, args, options = {}) => {
 };
 
 const revision = run("git", ["rev-parse", "HEAD"]);
-if (revision !== "e446998cafe1c20eb23a371f65e6f5c3ed6f16fa") {
+if (revision !== "eee0dfbd3cf3dc82f5604c77ccc4f93c4a5f0c45") {
   throw new Error(`rtk_n checkout is ${revision}, expected the pinned revision`);
 }
 if (run("git", ["status", "--porcelain"])) {

@@ -67,18 +67,21 @@ pub async fn upsert_node(
 
 pub async fn get_node(pool: &PgPool, id: &str) -> Result<Option<Node>, StorageError> {
     let row = sqlx::query_as::<_, Node>(
-        "SELECT typed_payload->>'logical_key' AS id,
-           typed_payload->>'kind' AS kind,
-           typed_payload->>'label' AS label,
-           (typed_payload->'payload')::text AS payload_json,
-           coalesce((typed_payload->>'last_synced_at')::BIGINT,
-                    EXTRACT(EPOCH FROM observed_at)::BIGINT) AS last_synced_at
-         FROM lifeos_agentdb.exp_nodes
-         WHERE tenant_id = lifeos_security.current_tenant()
-           AND record_kind = 'exp-node'
-           AND typed_payload->>'logical_key' = $1
-           AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
-         ORDER BY sequence DESC LIMIT 1",
+        "SELECT latest.typed_payload->>'logical_key' AS id,
+           latest.typed_payload->>'kind' AS kind,
+           latest.typed_payload->>'label' AS label,
+           (latest.typed_payload->'payload')::text AS payload_json,
+           coalesce((latest.typed_payload->>'last_synced_at')::BIGINT,
+                    EXTRACT(EPOCH FROM latest.observed_at)::BIGINT) AS last_synced_at
+         FROM (
+           SELECT DISTINCT ON (typed_payload->>'logical_key') typed_payload, observed_at
+           FROM lifeos_agentdb.exp_nodes
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND record_kind = 'exp-node'
+           ORDER BY typed_payload->>'logical_key', sequence DESC
+         ) latest
+         WHERE latest.typed_payload->>'logical_key' = $1
+           AND coalesce((latest.typed_payload->>'tombstone')::boolean, false) = false",
     )
     .bind(id)
     .fetch_optional(pool)
@@ -150,20 +153,23 @@ pub async fn get_edge(
     kind: &str,
 ) -> Result<Option<Edge>, StorageError> {
     let row = sqlx::query_as::<_, Edge>(
-        "SELECT typed_payload->>'from_id' AS from_id,
-           typed_payload->>'to_id' AS to_id,
-           typed_payload->>'kind' AS kind,
-           (typed_payload->'payload')::text AS payload_json,
-           coalesce((typed_payload->>'last_synced_at')::BIGINT,
-                    EXTRACT(EPOCH FROM observed_at)::BIGINT) AS last_synced_at
-         FROM lifeos_agentdb.exp_edges
-         WHERE tenant_id = lifeos_security.current_tenant()
-           AND record_kind = 'exp-edge'
-           AND typed_payload->>'from_id' = $1
-           AND typed_payload->>'to_id' = $2
-           AND typed_payload->>'kind' = $3
-           AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
-         ORDER BY sequence DESC LIMIT 1",
+        "SELECT latest.typed_payload->>'from_id' AS from_id,
+           latest.typed_payload->>'to_id' AS to_id,
+           latest.typed_payload->>'kind' AS kind,
+           (latest.typed_payload->'payload')::text AS payload_json,
+           coalesce((latest.typed_payload->>'last_synced_at')::BIGINT,
+                    EXTRACT(EPOCH FROM latest.observed_at)::BIGINT) AS last_synced_at
+         FROM (
+           SELECT DISTINCT ON (typed_payload->>'logical_key') typed_payload, observed_at
+           FROM lifeos_agentdb.exp_edges
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND record_kind = 'exp-edge'
+           ORDER BY typed_payload->>'logical_key', sequence DESC
+         ) latest
+         WHERE latest.typed_payload->>'from_id' = $1
+           AND latest.typed_payload->>'to_id' = $2
+           AND latest.typed_payload->>'kind' = $3
+           AND coalesce((latest.typed_payload->>'tombstone')::boolean, false) = false",
     )
     .bind(from_id)
     .bind(to_id)
@@ -201,17 +207,20 @@ pub async fn upsert_drawer(
 
 pub async fn get_drawer(pool: &PgPool, id: &str) -> Result<Option<Drawer>, StorageError> {
     let row = sqlx::query_as::<_, Drawer>(
-        "SELECT typed_payload->>'logical_key' AS id,
-           typed_payload->>'name' AS name,
-           (typed_payload->'payload')::text AS payload_json,
-           coalesce((typed_payload->>'last_synced_at')::BIGINT,
-                    EXTRACT(EPOCH FROM observed_at)::BIGINT) AS last_synced_at
-         FROM lifeos_agentdb.exp_nodes
-         WHERE tenant_id = lifeos_security.current_tenant()
-           AND record_kind = 'note'
-           AND typed_payload->>'logical_key' = $1
-           AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
-         ORDER BY sequence DESC LIMIT 1",
+        "SELECT latest.typed_payload->>'logical_key' AS id,
+           latest.typed_payload->>'name' AS name,
+           (latest.typed_payload->'payload')::text AS payload_json,
+           coalesce((latest.typed_payload->>'last_synced_at')::BIGINT,
+                    EXTRACT(EPOCH FROM latest.observed_at)::BIGINT) AS last_synced_at
+         FROM (
+           SELECT DISTINCT ON (typed_payload->>'logical_key') typed_payload, observed_at
+           FROM lifeos_agentdb.exp_nodes
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND record_kind = 'note'
+           ORDER BY typed_payload->>'logical_key', sequence DESC
+         ) latest
+         WHERE latest.typed_payload->>'logical_key' = $1
+           AND coalesce((latest.typed_payload->>'tombstone')::boolean, false) = false",
     )
     .bind(id)
     .fetch_optional(pool)

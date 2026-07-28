@@ -206,15 +206,18 @@ pub async fn upsert_gnn(
 
 pub async fn get_gnn(pool: &PgPool, cache_key: &str) -> Result<Option<GnnCacheRow>, StorageError> {
     let row = sqlx::query_as::<_, GnnCacheRow>(
-        "SELECT typed_payload->>'logical_key' AS cache_key,
-           decode(typed_payload->>'payload_base64', 'base64') AS payload,
-           (typed_payload->>'computed_at')::BIGINT AS computed_at
-         FROM lifeos_agentdb.exp_nodes
-         WHERE tenant_id = lifeos_security.current_tenant()
-           AND record_kind = 'gnn-cache'
-           AND typed_payload->>'logical_key' = $1
-           AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
-         ORDER BY sequence DESC LIMIT 1",
+        "SELECT latest.typed_payload->>'logical_key' AS cache_key,
+           decode(latest.typed_payload->>'payload_base64', 'base64') AS payload,
+           (latest.typed_payload->>'computed_at')::BIGINT AS computed_at
+         FROM (
+           SELECT DISTINCT ON (typed_payload->>'logical_key') typed_payload
+           FROM lifeos_agentdb.exp_nodes
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND record_kind = 'gnn-cache'
+           ORDER BY typed_payload->>'logical_key', sequence DESC
+         ) latest
+         WHERE latest.typed_payload->>'logical_key' = $1
+           AND coalesce((latest.typed_payload->>'tombstone')::boolean, false) = false",
     )
     .bind(cache_key)
     .fetch_optional(pool)
@@ -287,7 +290,7 @@ mod tests {
              WHERE metadata->>'logical_id' = $1 ORDER BY generation DESC LIMIT 1",
         )
         .bind("v1")
-        .fetch_one(pool)
+        .fetch_optional(pool)
         .await
         .unwrap();
         assert!(non_finite.is_none());

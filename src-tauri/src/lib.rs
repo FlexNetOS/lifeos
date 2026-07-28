@@ -9,7 +9,7 @@ mod auth;
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
-use flexnetos_redb_owner::{OwnerClient, ProjectionReader};
+use flexnetos_redb_owner::{OwnerClient, OwnerService, ProjectionReader};
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
@@ -1051,6 +1051,15 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
+        .setup(|app| {
+            let owner = OwnerService::start(redb_root()).map_err(|error| {
+                Box::new(std::io::Error::other(format!(
+                    "start LifeOS redb owner: {error}"
+                ))) as Box<dyn std::error::Error>
+            })?;
+            app.manage(owner);
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             vault_list,
             open_settings,

@@ -99,15 +99,12 @@
       if (probe && !probeSent) {
         probeSent = true;
         window.setTimeout(() => {
-          void sendBytes(new TextEncoder().encode("\u001b\u0007\u001bl"));
-          window.setTimeout(() => {
-            void sendBytes(
-              new TextEncoder().encode(
-                "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r",
-              ),
-            );
-          }, 250);
-        }, 10_000);
+          void sendBytes(
+            new TextEncoder().encode(
+              "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r",
+            ),
+          );
+        }, 3_000);
       }
     } catch {
       reconcileMessage = "Engine Room unavailable";

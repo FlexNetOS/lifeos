@@ -37,7 +37,7 @@ fn redb_root() -> PathBuf {
 
 #[cfg(test)]
 mod terminal_tests {
-    use super::{engine_room_argv, scoped_prompt, validate_redb_event_stream};
+    use super::{engine_room_argv, engine_room_shell_argv, scoped_prompt, validate_redb_event_stream};
     use flexnetos_redb_owner::CommitEvent;
 
     #[test]
@@ -47,10 +47,23 @@ mod terminal_tests {
             vec![
                 "yzx",
                 "enter",
-                "--session",
+                "options",
+                "--session-name",
                 "lifeos-tenant-session",
+                "--attach-to-session",
+                "true",
+                "--on-force-close",
+                "detach",
             ]
         );
+    }
+
+    #[test]
+    fn engine_room_shell_uses_profile_nushell_for_the_exact_command() {
+        let shell = engine_room_shell_argv("lifeos-tenant-session");
+        assert_eq!(shell[0], "/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu");
+        assert_eq!(&shell[1..3], ["-l", "-c"]);
+        assert!(shell[3].starts_with("^/home/flexnetos/.nix-profile/bin/yzx enter options --session-name"));
     }
 
     #[test]
@@ -584,8 +597,29 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     vec![
         "yzx".into(),
         "enter".into(),
-        "--session".into(),
+        "options".into(),
+        "--session-name".into(),
         session_name.into(),
+        "--attach-to-session".into(),
+        "true".into(),
+        "--on-force-close".into(),
+        "detach".into(),
+    ]
+}
+
+fn engine_room_shell_argv(session_name: &str) -> Vec<String> {
+    let yzx = std::env::var("YZX_BIN")
+        .unwrap_or_else(|_| "/home/flexnetos/.nix-profile/bin/yzx".into());
+    let inner = format!(
+        "^{yzx} enter options --session-name {session_name} --attach-to-session true --on-force-close detach"
+    );
+    vec![
+        std::env::var("LIFEOS_NUSHELL_PATH").unwrap_or_else(|_| {
+            "/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu".into()
+        }),
+        "-l".into(),
+        "-c".into(),
+        inner,
     ]
 }
 
@@ -619,7 +653,8 @@ fn terminal_spawn(
         .openpty(size)
         .map_err(|error| format!("open terminal: {error}"))?;
     let session_name = engine_room_session_name()?;
-    let argv = engine_room_argv(&session_name);
+    let engine_argv = engine_room_argv(&session_name);
+    let argv = engine_room_shell_argv(&session_name);
     let runtime_dir = yazelix_runtime_dir()?;
     let mut command = CommandBuilder::new(&argv[0]);
     command.args(&argv[1..]);
@@ -627,7 +662,7 @@ fn terminal_spawn(
     let child = pair
         .slave
         .spawn_command(command)
-        .map_err(|error| format!("start yzx enter: {error}"))?;
+        .map_err(|error| format!("start Nushell Engine Room: {error}"))?;
     drop(pair.slave);
 
     let mut reader = pair
@@ -643,7 +678,12 @@ fn terminal_spawn(
         &session_id,
         "start",
         &[],
-        serde_json::json!({"cols": size.cols, "rows": size.rows, "argv": argv}),
+        serde_json::json!({
+            "cols": size.cols,
+            "rows": size.rows,
+            "argv": engine_argv,
+            "shell_argv": argv,
+        }),
     )?;
     let output_offset = Arc::new(AtomicU64::new(0));
     let input_offset = Arc::new(AtomicU64::new(0));
@@ -716,6 +756,34 @@ fn terminal_spawn(
                 input_offset,
             },
         );
+    let focus_session_name = session_name.clone();
+    let focus_capture_session = session_id.clone();
+    std::thread::spawn(move || {
+        let zellij = std::env::var_os("YZX_ZELLIJ").unwrap_or_else(|| "zellij".into());
+        for _ in 0..20 {
+            std::thread::sleep(std::time::Duration::from_millis(250));
+            let pane_id = "terminal_1";
+            let focused = Command::new(&zellij)
+                .args([
+                    "--session",
+                    &focus_session_name,
+                    "action",
+                    "focus-pane-id",
+                    &pane_id,
+                ])
+                .status()
+                .is_ok_and(|status| status.success());
+            if focused {
+                let _ = capture_terminal_frame(
+                    &focus_capture_session,
+                    "focus",
+                    &[],
+                    serde_json::json!({"pane": pane_id, "title": "workspace"}),
+                );
+                break;
+            }
+        }
+    });
     Ok(session_id)
 }
 

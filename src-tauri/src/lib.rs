@@ -17,6 +17,7 @@ use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::Mutex;
+use uuid::Uuid;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
 // against `tauri::menu`, and a top-level `use` would break them.
@@ -281,6 +282,125 @@ async fn vault_register_ciphertext(
     )
     .await
     .map_err(|error| error.to_string())
+}
+
+fn parse_vault_uuid(value: &str, field: &str) -> Result<Uuid, String> {
+    Uuid::parse_str(value).map_err(|error| format!("{field}: {error}"))
+}
+
+#[tauri::command]
+async fn vault_mint_secret(
+    storage: tauri::State<'_, Storage>,
+    secret_object_id: String,
+    ciphertext_object_id: String,
+    wrapping_key_ref: String,
+    algorithm: String,
+    nonce: Vec<u8>,
+) -> Result<String, String> {
+    let secret_object_id = parse_vault_uuid(&secret_object_id, "secret_object_id")?;
+    let ciphertext_object_id = parse_vault_uuid(&ciphertext_object_id, "ciphertext_object_id")?;
+    lifeos_core::storage::security::mint_secret(
+        storage.pool(),
+        secret_object_id,
+        ciphertext_object_id,
+        &wrapping_key_ref,
+        &algorithm,
+        &nonce,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn vault_authorize_secret(
+    storage: tauri::State<'_, Storage>,
+    identity_id: String,
+    task_id: String,
+    lease_id: String,
+    secret_object_id: String,
+    purpose: String,
+) -> Result<String, String> {
+    let identity_id = parse_vault_uuid(&identity_id, "identity_id")?;
+    let task_id = parse_vault_uuid(&task_id, "task_id")?;
+    let lease_id = parse_vault_uuid(&lease_id, "lease_id")?;
+    let secret_object_id = parse_vault_uuid(&secret_object_id, "secret_object_id")?;
+    lifeos_core::storage::security::authorize_secret(
+        storage.pool(),
+        identity_id,
+        task_id,
+        lease_id,
+        secret_object_id,
+        &purpose,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn vault_relay_secret(
+    storage: tauri::State<'_, Storage>,
+    secret_version_id: String,
+    grant_id: String,
+    task_lease_id: String,
+    target_identity_id: String,
+    purpose: String,
+    relay_nonce: Vec<u8>,
+) -> Result<String, String> {
+    let secret_version_id = parse_vault_uuid(&secret_version_id, "secret_version_id")?;
+    let grant_id = parse_vault_uuid(&grant_id, "grant_id")?;
+    let task_lease_id = parse_vault_uuid(&task_lease_id, "task_lease_id")?;
+    let target_identity_id = parse_vault_uuid(&target_identity_id, "target_identity_id")?;
+    lifeos_core::storage::security::relay_secret(
+        storage.pool(),
+        secret_version_id,
+        grant_id,
+        task_lease_id,
+        target_identity_id,
+        &purpose,
+        &relay_nonce,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn vault_rotate_secret(
+    storage: tauri::State<'_, Storage>,
+    secret_object_id: String,
+    ciphertext_object_id: String,
+    wrapping_key_ref: String,
+    algorithm: String,
+    nonce: Vec<u8>,
+) -> Result<String, String> {
+    let secret_object_id = parse_vault_uuid(&secret_object_id, "secret_object_id")?;
+    let ciphertext_object_id = parse_vault_uuid(&ciphertext_object_id, "ciphertext_object_id")?;
+    lifeos_core::storage::security::rotate_secret(
+        storage.pool(),
+        secret_object_id,
+        ciphertext_object_id,
+        &wrapping_key_ref,
+        &algorithm,
+        &nonce,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn vault_revoke_secret(
+    storage: tauri::State<'_, Storage>,
+    secret_object_id: String,
+    reason: String,
+) -> Result<String, String> {
+    let secret_object_id = parse_vault_uuid(&secret_object_id, "secret_object_id")?;
+    lifeos_core::storage::security::revoke_secret(storage.pool(), secret_object_id, &reason)
+        .await
+        .map(|id| id.to_string())
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -655,6 +775,11 @@ pub fn run() {
             auth::auth_signout,
             auth::auth_reset_vault,
             vault_register_ciphertext,
+            vault_mint_secret,
+            vault_authorize_secret,
+            vault_relay_secret,
+            vault_rotate_secret,
+            vault_revoke_secret,
             plugin_run,
             db_health,
             db_migrate

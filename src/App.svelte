@@ -8,10 +8,9 @@
   // App.vue 1:1 (same branch order, same discriminators, including the
   // OpenPencil mounting gate `activeSub.item?.view === 'open-pencil'`).
   //
-  // This component is NOT wired into src/main.ts or src/router/index.ts yet:
-  // the Vue App stays the sole mounted app until the Svelte tree passes parity
-  // review and is explicitly cut over in phase 3 (never remove Vue
-  // functionality before its Svelte replacement is proven — see CLAUDE.md).
+  // This component is the mounted Glass root from src/main.ts. Navigation still
+  // uses the shared router/store contract so the Svelte shell preserves the
+  // existing route and persistence behavior while Vue artifacts are retired.
   //
   // The auth gate is the only top-level branch: Login covers the viewport until
   // the auth store reports `signed_in`. loadStatus() runs once on mount so the

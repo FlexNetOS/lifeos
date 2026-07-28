@@ -18,6 +18,19 @@ use super::Transport;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+fn collection_path(collection: &str) -> Result<String, McpError> {
+    if collection.is_empty()
+        || !collection
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
+    {
+        return Err(McpError::Unsupported(
+            "collection names must be a single URL-safe path segment".into(),
+        ));
+    }
+    Ok(format!("/collections/{collection}"))
+}
+
 /// Vector DB stats — wraps the REST mirror of `vector_db_stats`.
 ///
 /// Path unverified — confirm against live RuVector once endpoint is reachable.
@@ -81,6 +94,37 @@ impl<T: Transport> RuvectorClient<T> {
     /// Wrap an existing `Transport`. No handshake — Wave 3 reads only.
     pub fn connect(transport: T) -> Result<Self, McpError> {
         Ok(Self { transport })
+    }
+
+    /// Upsert points through RuVector's server collection route.
+    /// `points` must contain the server's `{"points":[...]}` payload.
+    pub fn upsert_points(&self, collection: &str, points: Value) -> Result<Value, McpError> {
+        let path = format!("{}/points", collection_path(collection)?);
+        let body = self.transport.put(&path, &points)?;
+        serde_json::from_str(&body)
+            .map_err(|e| McpError::Protocol(format!("upsert_points: invalid JSON: {e}")))
+    }
+
+    /// Search points through RuVector's server collection route.
+    /// The request accepts the server's `vector`, `k`, and optional filter fields.
+    pub fn search_points(&self, collection: &str, request: Value) -> Result<Value, McpError> {
+        let path = format!("{}/points/search", collection_path(collection)?);
+        let body = self.transport.post(&path, &request)?;
+        serde_json::from_str(&body)
+            .map_err(|e| McpError::Protocol(format!("search_points: invalid JSON: {e}")))
+    }
+
+    /// Fetch one point by its collection-local id.
+    pub fn get_point(&self, collection: &str, id: &str) -> Result<Value, McpError> {
+        if id.is_empty() || id.contains('/') {
+            return Err(McpError::Unsupported(
+                "point ids must not be empty or contain '/'".into(),
+            ));
+        }
+        let path = format!("{}/points/{id}", collection_path(collection)?);
+        let body = self.transport.get(&path)?;
+        serde_json::from_str(&body)
+            .map_err(|e| McpError::Protocol(format!("get_point: invalid JSON: {e}")))
     }
 
     /// Vector DB stats. **Path unverified — confirm against live RuVector

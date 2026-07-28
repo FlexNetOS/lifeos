@@ -9,7 +9,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const decisionPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/portable_release_packaging_decision.json",
+  "evidence/packaging/portable_release_packaging_decision.json",
 );
 const load = () => JSON.parse(readFileSync(decisionPath, "utf8"));
 
@@ -17,9 +17,7 @@ describe("ARCHBP-134 portable-release packaging decision", () => {
   test("a strategy is chosen and justified", () => {
     expect(existsSync(decisionPath)).toBe(true);
     const d = load();
-    expect(d.schema_version).toBe(
-      "lifeos-planning-spine.portable-release-packaging-decision.v0",
-    );
+    expect(d.schema_version).toBe("lifeos.evidence.portable-release-packaging-decision.v1");
     expect(d.strategy).toContain("static-musl");
     expect(d.strategy).toContain("relocatable");
     // The justification must be substantive, name the concrete toolchain, and

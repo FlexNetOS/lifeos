@@ -1,0 +1,41 @@
+{
+  "schema_version": "lifeos.evidence.portable-release-packaging-decision.v1",
+  "recorded_at": "2026-07-28",
+  "implements": ["ARCHBP-134", "ARCHBP-021", "YZXCONV-021"],
+  "strategy": "static-musl eligible binaries inside a relocatable Nix closure launched by yzx-envelope",
+  "justification": "LifeOS uses the flexnetosMuslToolchain for the eligible Rust and launcher binaries so the shipped executable surface is static-pie and does not require a host dynamic loader. The complete runtime is not honestly reducible to one static file: PostgreSQL/RuVector, WebKitGTK, bwrap, and the Nushell yzx-envelope engine have distinct host or closure ownership. Therefore the release combines static-musl artifacts with a relocatable extracted closure, binds that closure at /nix through yzx-envelope, and reports every remaining non-musl dependency and fallback. This is the smallest strategy that preserves the PostgreSQL/RuVector authority boundary while proving the portable execution surface from the moved bundle.",
+  "options_considered": [
+    {
+      "option": "nix bundle",
+      "verdict": "rejected as the sole release format",
+      "trade_offs": "Nix bundle preserves dependency closure fidelity and is easy to reproduce, but it does not by itself establish a clean-prefix launch contract or hide the host store. It also leaves the native PostgreSQL/RuVector and desktop dependency boundary implicit unless the launcher and receipt classify each dependency explicitly."
+    },
+    {
+      "option": "static-musl",
+      "verdict": "accepted for eligible binaries",
+      "trade_offs": "Static musl produces small, host-loader-independent binaries and is directly reproducible with flexnetosMuslToolchain. It cannot cover WebKitGTK, PostgreSQL/RuVector, bwrap, or other dynamically loaded platform surfaces, so using it alone would make a false full-stack portability claim."
+    },
+    {
+      "option": "relocatable",
+      "verdict": "accepted for the complete closure",
+      "trade_offs": "A relocatable extracted closure retains the exact Nix runtime needed by yzx-envelope and the native support tools, and the moved-prefix test proves the host store is hidden. It is larger than a single static binary and still requires explicit classification of host-owned PostgreSQL/RuVector and desktop integrations."
+    },
+    {
+      "option": "nix-user-chroot",
+      "verdict": "rejected",
+      "trade_offs": "nix-user-chroot would provide a familiar closure entry point, but the live host has kernel.apparmor_restrict_unprivileged_userns enabled and the required unprofiled userns path is denied. The resulting userns failure is not an acceptable portable release mechanism; yzx-envelope records the same policy boundary and uses the profiled bwrap fallback."
+    }
+  ],
+  "prototype_path": {
+    "task": "ARCHBP-021 portable release proof",
+    "steps": [
+      "Build eligible Rust and launcher binaries with flexnetosMuslToolchain and record file type and SHA-256.",
+      "Classify PostgreSQL/RuVector, WebKitGTK, bwrap, and every other non-musl dependency with an owner and fallback.",
+      "Extract the Nix closure into the bundle's nixroot and verify closure paths are complete.",
+      "Launch the moved prefix through yzx-envelope with the extracted closure bound at /nix.",
+      "Run a store-hidden relocation test and a static musl workload with an empty /nix surface.",
+      "Retain the measured receipt and block stronger portability claims when host-Nix dependence remains."
+    ],
+    "invariants": ["I09", "I17"]
+  }
+}

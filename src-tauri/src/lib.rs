@@ -9,7 +9,7 @@ mod auth;
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
-use flexnetos_redb_owner::{OwnerClient, OwnerService, ProjectionReader};
+use flexnetos_redb_owner::{OwnerClient, ProjectionReader};
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
@@ -1417,12 +1417,24 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
-            let owner = OwnerService::start(redb_root()).map_err(|error| {
-                Box::new(std::io::Error::other(format!(
-                    "start LifeOS redb owner: {error}"
-                ))) as Box<dyn std::error::Error>
+            let setup_at = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map_err(|error| std::io::Error::other(format!("setup clock: {error}")))?
+                .as_millis();
+            let setup_receipt = serde_json::json!({
+                "schemaVersion": "lifeos.tauri-setup.v1",
+                "setupAt": setup_at,
+                "devUrl": format!("{:?}", app.config().build.dev_url),
+                "frontendDist": format!("{:?}", app.config().build.frontend_dist),
+                "tauriConfigEnvPresent": std::env::var_os("TAURI_CONFIG").is_some(),
+            });
+            let mut setup_owner = OwnerClient::connect(redb_root()).map_err(|error| {
+                std::io::Error::other(format!("connect setup receipt owner: {error}"))
             })?;
-            app.manage(owner);
+            setup_owner
+                .put("lifeos.tauri.setup", &setup_receipt.to_string())
+                .map_err(|error| std::io::Error::other(format!("write setup receipt: {error}")))?;
+            eprintln!("lifeos setup: receipt written");
             publish_swarm_runtime_status().map_err(std::io::Error::other)?;
             let agent_runtime = AgentRuntimeSupervisor::start().map_err(std::io::Error::other)?;
             app.manage(agent_runtime);

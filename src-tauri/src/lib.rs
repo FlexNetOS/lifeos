@@ -36,7 +36,7 @@ fn redb_root() -> PathBuf {
 
 #[cfg(test)]
 mod terminal_tests {
-    use super::{engine_room_argv, validate_redb_event_stream};
+    use super::{engine_room_argv, scoped_prompt, validate_redb_event_stream};
     use flexnetos_redb_owner::CommitEvent;
 
     #[test]
@@ -76,6 +76,18 @@ mod terminal_tests {
         assert!(validate_redb_event_stream(&invalid, 1)
             .expect_err("an invalid slot must not reach the renderer")
             .contains("invalid projection slot"));
+    }
+
+    #[test]
+    fn ai_prompt_keeps_the_supported_surface_context_and_fails_closed() {
+        assert_eq!(
+            scoped_prompt("open-pencil", "refactor this"),
+            "[LifeOS surface: open-pencil]\nrefactor this"
+        );
+        assert_eq!(
+            scoped_prompt("untrusted-surface", "hello"),
+            "[LifeOS surface: chat]\nhello"
+        );
     }
 }
 
@@ -1001,6 +1013,14 @@ async fn ui_state_write(storage: tauri::State<'_, Storage>, state: String) -> Re
 
 const AI_ERROR_MSG: &str = "LifeOS couldn't reach the AI provider right now — try again.";
 
+fn scoped_prompt(source: &str, prompt: &str) -> String {
+    let surface = match source {
+        "chat" | "open-pencil" | "lights" => source,
+        _ => "chat",
+    };
+    format!("[LifeOS surface: {surface}]\n{prompt}")
+}
+
 async fn read_provider(storage: &Storage) -> Result<AiProvider, String> {
     let raw = state::read(storage.pool(), "ai-provider")
         .await
@@ -1120,7 +1140,7 @@ async fn ai_complete(
     prompt: String,
     source: String,
 ) -> Result<String, String> {
-    let _ = source; // reserved for future per-surface routing (chat / open-pencil / lights)
+    let prompt = scoped_prompt(&source, &prompt);
     let provider = read_provider(&storage)
         .await
         .map_err(|_| AI_ERROR_MSG.to_string())?;

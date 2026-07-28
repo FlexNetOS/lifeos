@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 const repoRoot = resolve(import.meta.dirname, "..");
 const rtkNuRoot = resolve(repoRoot, "../rtk-tokenkill");
 const codeDbRoot = resolve(repoRoot, "../nu_plugin");
-const expectedCodeDbRevision = "925538f8f8b0fee7d9e6bf708a7ad5d77e4aafa9";
+const expectedCodeDbRevision = "06590085eefc8712ffc09969d2b0815a036bea3f";
 
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });
@@ -34,8 +34,9 @@ for (const contract of [
 
 const scratch = mkdtempSync(resolve(tmpdir(), "lifeos-rtk-nu-codedb-"));
 try {
-  const envelope = run(
-    process.env.LIFEOS_RTK_BIN ?? "/home/flexnetos/.nix-profile/bin/rtk",
+  const rtk = process.env.LIFEOS_RTK_BIN ?? "/home/flexnetos/.nix-profile/bin/rtk";
+  const rawJsonl = run(
+    rtk,
     [
       "proxy",
       "cargo",
@@ -47,20 +48,32 @@ try {
       "rtk_nu",
       "--",
       "--format",
-      "json",
+      "jsonl",
       "--",
       "printf",
       "lifeos rtk_nu codedb integration\n",
     ],
     rtkNuRoot,
   );
-  const envelopePath = resolve(scratch, "envelope.json");
+  const jsonlPath = resolve(scratch, "envelope.jsonl");
+  const envelopePath = resolve(scratch, "parsed-envelope.json");
   const storePath = resolve(scratch, "store");
-  writeFileSync(envelopePath, envelope);
+  writeFileSync(jsonlPath, rawJsonl);
+  const parsed = run(
+    rtk,
+    [
+      "proxy",
+      "nu",
+      "-c",
+      `open --raw '${jsonlPath}' | from json --objects | to json`,
+    ],
+    repoRoot,
+  );
+  writeFileSync(envelopePath, parsed);
 
   const receipt = JSON.parse(
     run(
-      process.env.LIFEOS_RTK_BIN ?? "/home/flexnetos/.nix-profile/bin/rtk",
+      rtk,
       [
         "proxy",
         "cargo",

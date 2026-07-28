@@ -3,6 +3,7 @@
   import { Terminal } from "@xterm/xterm";
   import { FitAddon } from "@xterm/addon-fit";
   import { WebglAddon } from "@xterm/addon-webgl";
+  import { Channel } from "@tauri-apps/api/core";
   import "@xterm/xterm/css/xterm.css";
   import Icon from "./Icon.svelte";
 
@@ -14,9 +15,9 @@
   let terminal = null;
   let fitAddon = null;
   let resizeObserver = null;
-  let stopOutput = null;
   let stopExit = null;
   let stopCaptureError = null;
+  let outputChannel = null;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
   const invoke = () => tauri()?.core?.invoke || null;
@@ -37,9 +38,14 @@
     const call = invoke();
     if (!call) return;
     try {
+      outputChannel = new Channel();
+      outputChannel.onmessage = (bytes) => {
+        terminal?.write(new Uint8Array(bytes));
+      };
       sessionId = await call("terminal_spawn", {
         cols: terminal?.cols || 100,
         rows: terminal?.rows || 30,
+        onOutput: outputChannel,
       });
       connected = true;
       await resizeTerminal();
@@ -106,9 +112,6 @@
 
     const events = tauri()?.event;
     if (events) {
-      stopOutput = await events.listen("lifeos:terminal-output", (event) => {
-        if (event.payload?.sessionId === sessionId) terminal?.write(new Uint8Array(event.payload.bytes || []));
-      });
       stopExit = await events.listen("lifeos:terminal-exit", (event) => {
         if (event.payload?.sessionId === sessionId) connected = false;
       });
@@ -129,12 +132,12 @@
 
   onDestroy(async () => {
     resizeObserver?.disconnect();
-    stopOutput?.();
     stopExit?.();
     stopCaptureError?.();
     if (sessionId && invoke()) {
       await invoke()("terminal_close", { sessionId }).catch(() => {});
     }
+    outputChannel = null;
     terminal?.dispose();
   });
 </script>

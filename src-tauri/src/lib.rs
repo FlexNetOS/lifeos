@@ -24,6 +24,7 @@ use uuid::Uuid;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
 // against `tauri::menu`, and a top-level `use` would break them.
+use tauri::ipc::Channel;
 use tauri::{Emitter, Manager};
 
 fn redb_root() -> PathBuf {
@@ -360,6 +361,7 @@ fn terminal_spawn(
     state: tauri::State<'_, TerminalState>,
     cols: Option<u16>,
     rows: Option<u16>,
+    on_output: Channel<Vec<u8>>,
 ) -> Result<String, String> {
     let size = PtySize {
         rows: rows.unwrap_or(24).max(1),
@@ -421,11 +423,14 @@ fn terminal_spawn(
                         );
                         break;
                     }
-                    let payload = serde_json::json!({
-                        "sessionId": event_session,
-                        "bytes": buffer[..length].to_vec(),
-                    });
-                    if app.emit("lifeos:terminal-output", payload).is_err() {
+                    if let Err(error) = on_output.send(buffer[..length].to_vec()) {
+                        let _ = app.emit(
+                            "lifeos:terminal-capture-error",
+                            serde_json::json!({
+                                "sessionId": event_session,
+                                "error": format!("PTY output channel closed: {error}"),
+                            }),
+                        );
                         break;
                     }
                 }

@@ -9,7 +9,7 @@ mod auth;
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
-use flexnetos_redb_owner::{read_events, OwnerClient, OwnerService, ProjectionReader};
+use flexnetos_redb_owner::{OwnerClient, OwnerService, ProjectionReader};
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
@@ -140,7 +140,10 @@ fn redb_projection_read() -> Result<serde_json::Value, String> {
 
 #[tauri::command]
 fn redb_events_read(after_seq: u64) -> Result<serde_json::Value, String> {
-    let events = read_events(redb_root(), after_seq).map_err(|error| error.to_string())?;
+    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
+    let events = owner
+        .events(after_seq, 256)
+        .map_err(|error| error.to_string())?;
     validate_redb_event_stream(&events, after_seq)?;
     Ok(serde_json::json!(events
         .into_iter()

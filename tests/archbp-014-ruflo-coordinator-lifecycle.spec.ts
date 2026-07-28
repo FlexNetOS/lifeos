@@ -157,6 +157,10 @@ describe("ARCHBP-014 coordinator proof (real ruflo primary source + real binding
       expect(r.binding.agentIdentityBound).toBe(true);
       expect(typeof r.binding.agentFileId).toBe("string");
       expect(r.binding.routeIsLocalDefault).toBe(true);
+      expect(r.routingRuntime.nativeLoaded).toBe(true);
+      expect(typeof r.routingRuntime.model).toBe("string");
+      expect(Number.isFinite(r.routingRuntime.confidence)).toBe(true);
+      expect(r.routingRuntime.fastGrnnMeasured).toBe(true);
       expect(r.retry.bounded).toBe(true);
       expect(r.cancellation.stopped).toBe(true);
       expect(r.timeout.timedOut).toBe(true);

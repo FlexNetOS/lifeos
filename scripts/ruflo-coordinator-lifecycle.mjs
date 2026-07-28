@@ -179,12 +179,37 @@ async function emitProof() {
     publisher: "ruvnet (npm ~ruvnet)",
   };
 
-  // Real RuvLTRA route (ARCHBP-013) — local-only default.
-  const { decideRoute, defaultPolicy } = await import("./ruvltra-routing-lifecycle.mjs");
-  const routed = decideRoute(
-    { complexity: 0.9, confidence: 0.9, privacy: false, estimatedCost: 0.1, resourceExhausted: false, cloudOutage: false },
-    defaultPolicy(),
-  );
+  // Real RuvLTRA route (ARCHBP-013): native ruvllm query + embedding feeds
+  // the installed FastGRNN/Tiny-Dancer classifier before policy selection.
+  const { RuvLLM } = await import("@ruvector/ruvllm");
+  const { decideRoute, defaultPolicy, RuvltraRouter } = await import("./ruvltra-routing-lifecycle.mjs");
+  const routeWorkDir = mkdtempSync(join(tmpdir(), "archbp014-fastgrnn-"));
+  let routed;
+  let routingRuntime;
+  try {
+    const llm = new RuvLLM({ embeddingDim: 8 });
+    const query = llm.query("coordinate the next authorized LifeOS task");
+    const embedding = llm.embed("coordinate the next authorized LifeOS task").slice(0, 8);
+    const rows = Array.from({ length: 12 }, (_, i) => ({
+      embedding: embedding.map((value, j) => value + ((i + j) % 3) * 0.01),
+      scores: i % 2 === 0 ? { cheap: 0.9, strong: 0.92 } : { cheap: 0.2, strong: 0.95 },
+    }));
+    const router = await RuvltraRouter.train(rows, join(routeWorkDir, "router.safetensors"), 8);
+    const complexity = await router.complexityScore(embedding);
+    routed = decideRoute(
+      { complexity, confidence: query.confidence, privacy: false, estimatedCost: 0.1, resourceExhausted: false, cloudOutage: false },
+      defaultPolicy(),
+    );
+    routingRuntime = {
+      nativeLoaded: llm.isNativeLoaded(),
+      model: query.model,
+      confidence: query.confidence,
+      complexity,
+      fastGrnnMeasured: Number.isFinite(complexity),
+    };
+  } finally {
+    rmSync(routeWorkDir, { recursive: true, force: true });
+  }
 
   // Real AgentDB identity (ARCHBP-007).
   const { AgentRvfMemory } = await import("./agentdb-rvf-lifecycle.mjs");
@@ -273,6 +298,7 @@ async function emitProof() {
     primarySource,
     authority,
     binding: binding_,
+    routingRuntime,
     cancellation: { stopped: cancelStopped },
     timeout: { timedOut },
     retry: { bounded: retryBounded },

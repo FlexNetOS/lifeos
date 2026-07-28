@@ -9,6 +9,8 @@ pub enum StorageError {
     ForeignKeyViolation,
     /// `decode_vector` received a byte slice whose length is not divisible by 4.
     InvalidVectorBytes,
+    /// The vector contains NaN or infinity and cannot be projected into RuVector.
+    NonFiniteVector,
     /// Rust-side guard: `vector_bytes.len() != dim * 4`.
     VectorLengthMismatch,
     /// Migration source JSON could not be parsed as a valid `AccountRecord`.
@@ -45,6 +47,9 @@ impl fmt::Display for StorageError {
             Self::ForeignKeyViolation => write!(f, "referenced row does not exist"),
             Self::InvalidVectorBytes => {
                 write!(f, "vector byte slice length is not a multiple of 4")
+            }
+            Self::NonFiniteVector => {
+                write!(f, "vector contains non-finite coordinates")
             }
             Self::VectorLengthMismatch => {
                 write!(f, "vector bytes length does not match declared dim")

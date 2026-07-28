@@ -1,4 +1,3 @@
-use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use std::path::Path;
 
@@ -63,20 +62,24 @@ pub async fn migrate_from_json_file(
     let payload = std::str::from_utf8(&bytes).map_err(|_| StorageError::InvalidProjectionJson)?;
     let value: serde_json::Value =
         serde_json::from_str(payload).map_err(|_| StorageError::InvalidProjectionJson)?;
-    let sha256 = format!("{:x}", Sha256::digest(&bytes));
     let source_kind = format!("legacy-projection-json:{file_name}");
 
     let mut tx = pool.begin().await?;
-    sqlx::query(
-        "INSERT INTO lifeos_blob.object (sha256, byte_length, raw_bytes, source_kind)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (sha256) DO NOTHING",
+    let tenant: uuid::Uuid = sqlx::query_scalar("SELECT lifeos_security.current_tenant()")
+        .fetch_one(&mut *tx)
+        .await?;
+    sqlx::query_scalar::<_, uuid::Uuid>(
+        "SELECT lifeos_blob.store_bytes(
+           $1, $2, 'application/json', $3, 'legacy-projection-json', NULL)",
     )
-    .bind(sha256)
-    .bind(bytes.len() as i64)
+    .bind(tenant)
     .bind(&bytes)
-    .bind(source_kind)
-    .execute(&mut *tx)
+    .bind(serde_json::json!({
+        "producer": "lifeos-legacy-projection-import",
+        "source": source_kind,
+        "file_name": file_name,
+    }))
+    .fetch_one(&mut *tx)
     .await?;
     let existed: bool = sqlx::query_scalar(
         "SELECT EXISTS(
@@ -88,11 +91,13 @@ pub async fn migrate_from_json_file(
     .bind(projection_key)
     .fetch_one(&mut *tx)
     .await?;
-    sqlx::query("SELECT lifeos_runtime.put_projection($1, $2)")
-        .bind(projection_key)
-        .bind(value)
-        .execute(&mut *tx)
-        .await?;
+    if !existed {
+        sqlx::query("SELECT lifeos_runtime.put_projection($1, $2)")
+            .bind(projection_key)
+            .bind(value)
+            .execute(&mut *tx)
+            .await?;
+    }
     tx.commit().await?;
     std::fs::remove_file(path)?;
 
@@ -164,7 +169,7 @@ mod tests {
         );
         let archived: i64 = sqlx::query_scalar(
             "SELECT COUNT(*) FROM lifeos_blob.object
-             WHERE source_kind = 'legacy-projection-json:ui-state.json'",
+             WHERE provenance->>'source' = 'legacy-projection-json:ui-state.json'",
         )
         .fetch_one(storage.pool())
         .await

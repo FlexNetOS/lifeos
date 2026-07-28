@@ -790,7 +790,8 @@ mod tests {
             assert_eq!(count, expected, "{table}");
         }
         let archived: i64 = sqlx::query_scalar(
-            "SELECT COUNT(*) FROM lifeos_blob.object WHERE source_kind = 'legacy-sqlite-database'",
+            "SELECT COUNT(*) FROM lifeos_blob.object
+             WHERE provenance->>'source_kind' = 'legacy-sqlite-database'",
         )
         .fetch_one(storage.pool())
         .await

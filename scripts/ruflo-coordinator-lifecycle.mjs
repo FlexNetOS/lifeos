@@ -186,10 +186,12 @@ async function emitProof() {
   const routeWorkDir = mkdtempSync(join(tmpdir(), "archbp014-fastgrnn-"));
   let routed;
   let routingRuntime;
+  let routeEmbedding;
   try {
     const llm = new RuvLLM({ embeddingDim: 8 });
     const query = llm.query("coordinate the next authorized LifeOS task");
     const embedding = llm.embed("coordinate the next authorized LifeOS task").slice(0, 8);
+    routeEmbedding = embedding;
     const rows = Array.from({ length: 12 }, (_, i) => ({
       embedding: embedding.map((value, j) => value + ((i + j) % 3) * 0.01),
       scores: i % 2 === 0 ? { cheap: 0.9, strong: 0.92 } : { cheap: 0.2, strong: 0.95 },
@@ -216,9 +218,13 @@ async function emitProof() {
   const workDir = mkdtempSync(join(tmpdir(), "archbp014-agent-"));
   let agentFileId;
   let agentRegistry;
+  let agentMemoryBound = false;
   try {
     agentRegistry = await AgentRvfRegistry.open({ storageRoot: workDir });
     const agent = await agentRegistry.openAgent({ agentId: "coordinator-agent", dimension: 8 });
+    await agent.remember("route-embedding-1", Float32Array.from(routeEmbedding), { source: "native-ruvllm", model: routingRuntime.model });
+    await agent.learn();
+    agentMemoryBound = true;
     agentFileId = (await agent.identity()).fileId;
     if (!agentRegistry.discover().some((entry) => entry.agentId === "coordinator-agent")) {
       throw new Error("coordinator-agent RVF was not discoverable through the registry");
@@ -238,7 +244,7 @@ async function emitProof() {
     Array.from({ length: 24 }, (_, i) => 1 + Math.sin(i / 3) * 0.2 + i * 0.01),
     4,
   );
-  const binding = { agentIdentity: agentFileId, cartridgeId: "cart-1", route: routed.route, cost: 1 };
+  const binding = { agentIdentity: agentFileId, cartridgeId: "cart-1", route: routed.route, cost: 1, agentMemoryBound };
 
   // authority
   const authority = {
@@ -255,6 +261,7 @@ async function emitProof() {
     agentFileId,
     routeIsLocalDefault: d.route === "local",
     cartridgeBound: d.cartridgeId === "cart-1",
+    agentMemoryBound: d.agentMemoryBound === true,
   };
 
   // cancellation

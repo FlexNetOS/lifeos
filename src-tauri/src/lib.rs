@@ -142,7 +142,7 @@ fn redb_projection_read() -> Result<serde_json::Value, String> {
 fn redb_events_read(after_seq: u64) -> Result<serde_json::Value, String> {
     let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
     let events = owner
-        .events(after_seq, 256)
+        .watch(after_seq, 256)
         .map_err(|error| error.to_string())?;
     validate_redb_event_stream(&events, after_seq)?;
     Ok(serde_json::json!(events

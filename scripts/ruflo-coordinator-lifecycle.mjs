@@ -14,6 +14,7 @@
 // Runs under Bun.
 
 import { createHash } from "node:crypto";
+import { forecast as runAtasForecast } from "./atas-forecast-lifecycle.mjs";
 
 /** Only a task that exists in the canonical graph AND is Ready may be dispatched. */
 export function authorizeDispatch(taskId, taskGraph) {
@@ -147,6 +148,14 @@ export class RufloCoordinator {
     this.proofLog.push(candidate);
     return candidate;
   }
+
+  /**
+   * Forecast a bounded timeline from observed coordinator costs. The result is
+   * a candidate only; database promotion remains the sole activation path.
+   */
+  forecastTimeline(observations, horizon = 8) {
+    return runAtasForecast(observations, { horizon, reservoirSize: 16, seed: 17 });
+  }
   // NB: there is deliberately no `completeTask` method — the coordinator cannot
   // authorize completion.
 }
@@ -195,6 +204,10 @@ async function emitProof() {
     "ARCHBP-102": { status: "Complete" },
   };
   const c = new RufloCoordinator(graph, { maxRetries: 2, budget: 10, primarySourceVersion: primarySource.version });
+  const timelineForecast = c.forecastTimeline(
+    Array.from({ length: 24 }, (_, i) => 1 + Math.sin(i / 3) * 0.2 + i * 0.01),
+    4,
+  );
   const binding = { agentIdentity: agentFileId, cartridgeId: "cart-1", route: routed.route, cost: 1 };
 
   // authority
@@ -266,6 +279,13 @@ async function emitProof() {
     budget: { failsClosed: budgetFailsClosed },
     completion,
     proof,
+    forecast: {
+      schemaVersion: timelineForecast.schemaVersion,
+      candidateId: timelineForecast.candidateId,
+      calibrated: timelineForecast.uncertainty.calibrated,
+      points: timelineForecast.forecast.length,
+      selfPromoted: timelineForecast.promotion.selfPromoted,
+    },
   };
 
   const outputArg = process.argv.find((a) => a.startsWith("--output="));

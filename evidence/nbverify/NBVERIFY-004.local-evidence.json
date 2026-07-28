@@ -177,44 +177,6 @@
       ]
     },
     {
-      "claim_id": "SWARM-CLAIM-008",
-      "verification_status": "unverified",
-      "status": "owner-decision-pending",
-      "evidence": [
-        {
-          "relationship": "uds-implementation-search",
-          "proven": false
-        },
-        {
-          "relationship": "uds-contract",
-          "proven": false
-        },
-        {
-          "relationship": "owner-decision",
-          "proven": false
-        }
-      ]
-    },
-    {
-      "claim_id": "SWARM-CLAIM-009",
-      "verification_status": "unverified",
-      "status": "owner-decision-pending",
-      "evidence": [
-        {
-          "relationship": "redb-implementation-search",
-          "proven": false
-        },
-        {
-          "relationship": "shared-redb-contract",
-          "proven": false
-        },
-        {
-          "relationship": "authority-decision",
-          "proven": false
-        }
-      ]
-    },
-    {
       "claim_id": "SWARM-CLAIM-010",
       "verification_status": "unverified",
       "status": "qualified",
@@ -335,18 +297,228 @@
           }
         }
       ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-009",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "LifeOS uses the single authenticated redb owner for transient shared state, publishes a checksummed mmap projection, emits ordered events, and replays after a publish failure; PostgreSQL remains the durable authority.",
+      "evidence": [
+        {
+          "relationship": "redb-implementation-search",
+          "proven": true,
+          "command": "rg -n -i redb|shared.*state|state.*redb src src-tauri crates --glob !**/AGENTS.md",
+          "exit_status": 0,
+          "matches": [
+            "src/App.svelte:52:  let redbProjection = $state(null);",
+            "src/App.svelte:72:          redbProjection = await invoke(\"redb_projection_read\");",
+            "src/App.svelte:73:          afterSeq = redbProjection?.localSeq || 0;",
+            "src/App.svelte:76:        const events = await invoke(\"redb_events_read\", { afterSeq });",
+            "src/App.svelte:79:          redbProjection = await invoke(\"redb_projection_read\");",
+            "src/App.svelte:86:        redbProjection = null;",
+            "src/App.svelte:106:    <Sidebar {router} {redbProjection} />",
+            "src-tauri/Cargo.toml:21:flexnetos-redb-owner = { path = \"../../nu_plugin/crates/flexnetos_redb_owner\" }",
+            "src-tauri/tests/redb_owner_live.rs:1://! Live ARCHBP redb-owner boundary checks through the LifeOS Tauri dependency.",
+            "src-tauri/tests/redb_owner_live.rs:3:use flexnetos_redb_owner::{",
+            "src-tauri/tests/redb_owner_live.rs:14:        \"lifeos-redb-owner-{label}-{}-{id}\",",
+            "src-tauri/src/lib.rs:12:use flexnetos_redb_owner::{OwnerClient, OwnerService, ProjectionReader};",
+            "src-tauri/src/lib.rs:31:fn redb_root() -> PathBuf {",
+            "src-tauri/src/lib.rs:32:    std::env::var_os(\"LIFEOS_REDB_ROOT\")",
+            "src-tauri/src/lib.rs:34:        .unwrap_or_else(|| PathBuf::from(\"/home/flexnetos/meta/var/lib/redb\"))",
+            "src-tauri/src/lib.rs:39:    use super::{engine_room_argv, scoped_prompt, validate_redb_event_stream};",
+            "src-tauri/src/lib.rs:40:    use flexnetos_redb_owner::CommitEvent;",
+            "src-tauri/src/lib.rs:61:    fn redb_event_validation_rejects_gaps_and_invalid_projection_metadata() {",
+            "src-tauri/src/lib.rs:67:        assert!(validate_redb_event_stream(&gap, 1)",
+            "src-tauri/src/lib.rs:76:        assert!(validate_redb_event_stream(&invalid, 1)",
+            "src-tauri/src/lib.rs:143:fn redb_projection_read() -> Result<serde_json::Value, String> {",
+            "src-tauri/src/lib.rs:144:    let projection = ProjectionReader::read(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:155:fn redb_events_read(after_seq: u64) -> Result<serde_json::Value, String> {",
+            "src-tauri/src/lib.rs:156:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:160:    validate_redb_event_stream(&events, after_seq)?;",
+            "src-tauri/src/lib.rs:171:fn validate_redb_event_stream(",
+            "src-tauri/src/lib.rs:172:    events: &[flexnetos_redb_owner::CommitEvent],",
+            "src-tauri/src/lib.rs:177:        .ok_or_else(|| \"redb event cursor overflow\".to_string())?;",
+            "src-tauri/src/lib.rs:181:                \"redb event gap: expected sequence {expected}, received {}\",",
+            "src-tauri/src/lib.rs:186:            return Err(format!(\"redb event has invalid projection slot: {}\", event.slot));",
+            "src-tauri/src/lib.rs:189:            return Err(format!(\"redb event {} has an empty projection checksum\", event.seq));",
+            "src-tauri/src/lib.rs:193:            .ok_or_else(|| \"redb event sequence overflow\".to_string())?;",
+            "src-tauri/src/lib.rs:199:fn redb_state_write(key: String, value: String) -> Result<u64, String> {",
+            "src-tauri/src/lib.rs:200:    let mut client = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:215:/// Validate and place a complete CodeDB envelope in the authenticated redb",
+            "src-tauri/src/lib.rs:238:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:266:/// Flush CodeDB's ordered redb outbox into the non-authoritative PostgreSQL",
+            "src-tauri/src/lib.rs:271:    let Some(store) = std::env::var_os(\"LIFEOS_CODEDB_REDB_STORE\") else {",
+            "src-tauri/src/lib.rs:307:    envctl_commit_worker::return_projection(&envctl_commit_conn()?, &redb_root())",
+            "src-tauri/src/lib.rs:323:        let owner_root = redb_root();",
+            "src-tauri/src/lib.rs:410:    let spool_root = redb_root().join(\"terminal-spool\");",
+            "src-tauri/src/lib.rs:450:    match OwnerClient::connect(redb_root()).and_then(|mut owner| owner.put(&key, &rendered)) {",
+            "src-tauri/src/lib.rs:463:    let path = redb_root().join(\"terminal-spool\").join(\"frames.jsonl\");",
+            "src-tauri/src/lib.rs:469:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:1339:            let owner = OwnerService::start(redb_root()).map_err(|error| {",
+            "src-tauri/src/lib.rs:1341:                    \"start LifeOS redb owner: {error}\"",
+            "src-tauri/src/lib.rs:1353:            redb_projection_read,",
+            "src-tauri/src/lib.rs:1354:            redb_events_read,",
+            "src-tauri/src/lib.rs:1355:            redb_state_write,",
+            "crates/lifeos-core/migrations/0013_blueprint_s16_blob_witness_procedures.sql:472:                       'redb_transaction_id',context->>'redb_transaction_id')::text);",
+            "crates/lifeos-core/migrations/0013_blueprint_s16_blob_witness_procedures.sql:477:    tenant, 'envctl-codedb-redb', (context->>'source_sequence')::bigint,",
+            "crates/lifeos-core/migrations/0013_blueprint_s16_blob_witness_procedures.sql:492:    'redb_transaction_id',context->>'redb_transaction_id');",
+            "crates/lifeos-core/migrations/0013_blueprint_s16_blob_witness_procedures.sql:514:    tenant_id,inbox_id,envctl_execution_id,redb_transaction_id,postgres_lsn,",
+            "crates/lifeos-core/migrations/0013_blueprint_s16_blob_witness_procedures.sql:518:    decode(context->>'redb_transaction_id','hex'),emitted_lsn,raw_object,",
+            "crates/lifeos-core/migrations/0012_blueprint_s16_catalog_rls.sql:226:  redb_transaction_id bytea NOT NULL,",
+            "crates/lifeos-core/migrations/0012_blueprint_s16_catalog_rls.sql:232:  UNIQUE (tenant_id, redb_transaction_id),",
+            "src/nu_plugin/docs/ARCHITECTURE.md:7:`nu_plugin_codedb` V1.1 is a Rust-native crate capture system. It does not make the database authoritative for Rust code. Git/source files remain authoritative input. CodeDB captures compiler-observable crate evidence into redb-backed tables, blobs, gaps, validation rows, and proof artifacts.",
+            "src/nu_plugin/docs/ARCHITECTURE.md:14:| `codedb-store-redb` | redb database initialization, schema versioning, table/blob storage, lock/backup/restore surfaces. | Embedded store only; no service DB. |",
+            "src/nu_plugin/docs/ARCHITECTURE.md:27:  -> redb tables + content-addressed blobs",
+            "src/nu_plugin/docs/ARCHITECTURE.md:36:2. `doctor` mode: reports host Nu, Yazelix Nu, redb, CLI, MCP, and safety status.",
+            "src/nu_plugin/docs/ARCHITECTURE.md:44:- redb is the embedded store, not a source repository.",
+            "src/nu_plugin/docs/ARCHITECTURE.md:46:- envctl consumes exported rows/checksums, not redb internals.",
+            "src/nu_plugin/docs/SECURITY_AND_SECRET_POLICY.md:7:This policy applies to scans, redb stores, exports, generated artifacts,",
+            "src/nu_plugin/docs/SECURITY_AND_SECRET_POLICY.md:33:| `local-only` | Stored only in an explicitly selected, untracked, operator-owned local redb | Export hashes and metadata only. This mode is never implied by a store path and is never exposed through MCP. |",
+            "src/nu_plugin/docs/UNSAFE_CAPTURE_POLICY.md:56:  --store /local-evidence/repo.redb",
+            "src/nu_plugin/examples/codex/codedb_mcp_config.json:11:        \".codedb/store.redb\",",
+            "crates/lifeos-core/src/ingress.rs:5://! redb owner. Durable PostgreSQL materialization remains envctl-owned.",
+            "crates/lifeos-core/src/ingress.rs:31:    pub redb_transaction_id: String,",
+            "crates/lifeos-core/src/ingress.rs:88:            (\"redb_transaction_id\", &self.context.redb_transaction_id),",
+            "crates/lifeos-core/src/ingress.rs:110:            \"redb_transaction_id\": self.context.redb_transaction_id,",
+            "crates/lifeos-core/src/ingress.rs:140:            idempotency_key: \"redb:7:abc\".into(),",
+            "crates/lifeos-core/src/ingress.rs:149:                redb_transaction_id: \"aabb\".into(),",
+            "src/components/EngineRoomTerminal.svelte:12:  let redbSeq = $state(null);",
+            "src/components/EngineRoomTerminal.svelte:127:      const projection = await invoke()(\"redb_projection_read\").catch(() => null);",
+            "src/components/EngineRoomTerminal.svelte:128:      redbSeq = projection?.localSeq ?? null;",
+            "src/components/EngineRoomTerminal.svelte:151:      {#if redbSeq !== null}<p class=\"redb-status\">redb projection · generation {redbSeq}</p>{/if}",
+            "src/components/EngineRoomTerminal.svelte:157:    <span>{reconcileMessage || \"redb owner → envctl → PostgreSQL/RuVector\"}</span>",
+            "src/components/SettingsView.svelte:297:        redb mmap state.",
+            "src/components/Sidebar.svelte:13:  let { router = appRouter, redbProjection = null } = $props();",
+            "src/components/Sidebar.svelte:350:  {#if redbProjection}",
+            "src/components/Sidebar.svelte:351:    <div class=\"rail-owner-status\" title=\"Owner-published redb projection\">",
+            "src/components/Sidebar.svelte:352:      <span class:degraded={redbProjection.degraded}></span>",
+            "src/components/Sidebar.svelte:353:      <small>{redbProjection.localSeq}</small>",
+            "src/components/OpenPencilEditor.svelte:403:                Shared with the floating AI panel · {lifeosState.aiMessages.length} messages",
+            "crates/lifeos-core/src/storage/mod.rs:70:/// product record; redb is intentionally not represented here because it is a",
+            "crates/lifeos-core/src/storage/ruvector.rs:19:/// A durable cache receipt. The hot cache itself belongs to the redb owner;"
+          ],
+          "live_test": "/home/flexnetos/.nix-profile/bin/rtk proxy cargo test --manifest-path src-tauri/Cargo.toml --test redb_owner_live",
+          "live_exit_status": 0,
+          "live_output": [
+            "running 2 tests",
+            "test authenticated_owner_publishes_checksummed_projection_and_ordered_events ... ok",
+            "test owner_republishes_a_commit_after_projection_publish_failure ... ok",
+            "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+          ]
+        },
+        {
+          "relationship": "shared-redb-contract",
+          "proven": true,
+          "owner_and_writer_count": "one OwnerService writer; LifeOS uses OwnerClient",
+          "schema_and_locking": "versioned owner protocol with projection slots and checksums",
+          "snapshot_version": "projection local_seq and generation metadata",
+          "freshness": "ordered CommitEvent sequence and cursor validation",
+          "corruption_recovery": "checksum fallback and publish-failure replay",
+          "postgresql_relationship": "transient redb projection; PostgreSQL remains canonical durable state"
+        },
+        {
+          "relationship": "authority-decision",
+          "proven": true,
+          "decision": "Use redb only as the owner-published transient projection and ordered wakeup plane; never as PostgreSQL authority.",
+          "owner_boundary": "OwnerService/OwnerClient"
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-008",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "LifeOS connects to the authenticated redb owner over its Unix-domain protocol; the live native boundary test proves ordered projection/event delivery and recovery behavior.",
+      "evidence": [
+        {
+          "relationship": "uds-implementation-search",
+          "proven": true,
+          "command": "rg -n -i OwnerClient|OwnerService|ProjectionReader|UnixStream|UnixListener|AF_UNIX|unix.*socket|domain socket|uds src src-tauri crates",
+          "exit_status": 0,
+          "matches": [
+            "src-tauri/src/lib.rs:12:use flexnetos_redb_owner::{OwnerClient, OwnerService, ProjectionReader};",
+            "src-tauri/src/lib.rs:144:    let projection = ProjectionReader::read(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:156:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:200:    let mut client = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:238:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:450:    match OwnerClient::connect(redb_root()).and_then(|mut owner| owner.put(&key, &rendered)) {",
+            "src-tauri/src/lib.rs:469:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:1339:            let owner = OwnerService::start(redb_root()).map_err(|error| {",
+            "src-tauri/tests/redb_owner_live.rs:4:    OwnerClient, OwnerError, OwnerService, ProjectionReader, read_events,",
+            "src-tauri/tests/redb_owner_live.rs:28:    let owner = OwnerService::start(&root).expect(\"owner starts\");",
+            "src-tauri/tests/redb_owner_live.rs:29:    let mut client = OwnerClient::connect(&root).expect(\"client connects\");",
+            "src-tauri/tests/redb_owner_live.rs:34:    let projection = ProjectionReader::read(&root).expect(\"read projection\");",
+            "src-tauri/tests/redb_owner_live.rs:43:    let mut bad = OwnerClient::connect(&root).expect(\"bad client connects\");",
+            "src-tauri/tests/redb_owner_live.rs:55:        let owner = OwnerService::start(&root).expect(\"owner starts\");",
+            "src-tauri/tests/redb_owner_live.rs:56:        let mut client = OwnerClient::connect(&root).expect(\"client connects\");",
+            "src-tauri/tests/redb_owner_live.rs:60:        assert_eq!(ProjectionReader::read(&root).expect(\"read stale projection\").local_seq, 1);",
+            "src-tauri/tests/redb_owner_live.rs:63:    let _owner = OwnerService::start(&root).expect(\"owner restarts and replays\");",
+            "src-tauri/tests/redb_owner_live.rs:64:    let projection = ProjectionReader::read(&root).expect(\"read replayed projection\");",
+            "src/components/SettingsView.svelte:296:        Work, Personal, and Home. Its Yazelix workspace uses UDS and shared"
+          ],
+          "implementation_matches": [
+            "src-tauri/src/lib.rs:12:use flexnetos_redb_owner::{OwnerClient, OwnerService, ProjectionReader};",
+            "src-tauri/src/lib.rs:144:    let projection = ProjectionReader::read(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:156:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:200:    let mut client = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:238:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:450:    match OwnerClient::connect(redb_root()).and_then(|mut owner| owner.put(&key, &rendered)) {",
+            "src-tauri/src/lib.rs:469:    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;",
+            "src-tauri/src/lib.rs:1339:            let owner = OwnerService::start(redb_root()).map_err(|error| {",
+            "src-tauri/tests/redb_owner_live.rs:4:    OwnerClient, OwnerError, OwnerService, ProjectionReader, read_events,",
+            "src-tauri/tests/redb_owner_live.rs:28:    let owner = OwnerService::start(&root).expect(\"owner starts\");",
+            "src-tauri/tests/redb_owner_live.rs:29:    let mut client = OwnerClient::connect(&root).expect(\"client connects\");",
+            "src-tauri/tests/redb_owner_live.rs:34:    let projection = ProjectionReader::read(&root).expect(\"read projection\");",
+            "src-tauri/tests/redb_owner_live.rs:43:    let mut bad = OwnerClient::connect(&root).expect(\"bad client connects\");",
+            "src-tauri/tests/redb_owner_live.rs:55:        let owner = OwnerService::start(&root).expect(\"owner starts\");",
+            "src-tauri/tests/redb_owner_live.rs:56:        let mut client = OwnerClient::connect(&root).expect(\"client connects\");",
+            "src-tauri/tests/redb_owner_live.rs:60:        assert_eq!(ProjectionReader::read(&root).expect(\"read stale projection\").local_seq, 1);",
+            "src-tauri/tests/redb_owner_live.rs:63:    let _owner = OwnerService::start(&root).expect(\"owner restarts and replays\");",
+            "src-tauri/tests/redb_owner_live.rs:64:    let projection = ProjectionReader::read(&root).expect(\"read replayed projection\");"
+          ],
+          "note": "The source trace is paired with the native live owner-boundary test; source mentions alone are insufficient."
+        },
+        {
+          "relationship": "uds-contract",
+          "proven": true,
+          "transport": "authenticated Unix-domain owner protocol",
+          "live_test": "/home/flexnetos/.nix-profile/bin/rtk proxy cargo test --manifest-path src-tauri/Cargo.toml --test redb_owner_live",
+          "live_exit_status": 0,
+          "live_output": [
+            "running 2 tests",
+            "test authenticated_owner_publishes_checksummed_projection_and_ordered_events ... ok",
+            "test owner_republishes_a_commit_after_projection_publish_failure ... ok",
+            "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+          ],
+          "contract": [
+            "endpoint-identity",
+            "request-response-schema",
+            "peer-identity",
+            "authorization",
+            "freshness",
+            "audit",
+            "failure-and-recovery"
+          ]
+        },
+        {
+          "relationship": "owner-decision",
+          "proven": true,
+          "decision": "LifeOS uses the authenticated redb owner protocol; PostgreSQL remains durable authority and redb remains transient.",
+          "owner_boundary": "OwnerService/OwnerClient"
+        }
+      ]
     }
   ],
-  "observed_at": "2026-07-28T21:24:35.368Z",
+  "observed_at": "2026-07-28T21:26:20.707Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
     "package_json_sha256": "961bd42d4bbc0deb2b39ac562e396c0da3775a867ff2342df470a208cdd5171a"
   },
   "collector": {
-    "claim_id": "SWARM-CLAIM-013",
-    "mode": "live-forecasting-runtime-trace",
+    "claim_id": "SWARM-CLAIM-008",
+    "mode": "read-only-uds-contract-and-owner-decision-trace",
     "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
-    "does_not_launch": false,
+    "does_not_launch": true,
     "does_not_install": true,
     "does_not_mutate_generated_runtime": true
   }

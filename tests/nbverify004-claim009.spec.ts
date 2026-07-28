@@ -8,7 +8,7 @@ const evidencePath = resolve(
 );
 
 describe("NBVERIFY-004 SWARM-CLAIM-009 evidence", () => {
-  test("keeps shared redb as an unresolved authority proposal", () => {
+  test("records the live single-owner redb boundary", () => {
     expect(existsSync(evidencePath)).toBe(true);
     const receipt = JSON.parse(readFileSync(evidencePath, "utf8"));
     const claim = receipt.claims.find(
@@ -16,8 +16,8 @@ describe("NBVERIFY-004 SWARM-CLAIM-009 evidence", () => {
         candidate.claim_id === "SWARM-CLAIM-009",
     );
     expect(claim).toBeDefined();
-    expect(claim.verification_status).toBe("unverified");
-    expect(claim.status).toBe("owner-decision-pending");
+    expect(claim.verification_status).toBe("verified");
+    expect(claim.status).toBe("verified");
     expect(claim.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ relationship: "redb-implementation-search" }),
@@ -30,12 +30,12 @@ describe("NBVERIFY-004 SWARM-CLAIM-009 evidence", () => {
         (candidate: { relationship: string }) =>
           candidate.relationship === "shared-redb-contract",
       ),
-    ).toEqual(expect.objectContaining({ proven: false }));
+    ).toEqual(expect.objectContaining({ proven: true }));
     expect(
       claim.evidence.find(
         (candidate: { relationship: string }) =>
           candidate.relationship === "redb-implementation-search",
       ),
-    ).toEqual(expect.objectContaining({ proven: false }));
+    ).toEqual(expect.objectContaining({ proven: true }));
   });
 });

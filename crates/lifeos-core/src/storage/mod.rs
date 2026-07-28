@@ -278,11 +278,9 @@ impl Storage {
     async fn reset_for_test(&self) -> Result<(), StorageError> {
         sqlx::query(
             "TRUNCATE TABLE
-               lifeos_semantic.gnn_cache,
                lifeos_semantic.embedding,
                lifeos_agentdb.exp_edges,
                lifeos_agentdb.exp_nodes,
-               lifeos_agentdb.notes,
                lifeos_runtime.projection,
                lifeos_security.identity,
                lifeos_blob.object

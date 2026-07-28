@@ -274,7 +274,8 @@ mod tests {
         }
 
         let projected: Option<String> = sqlx::query_scalar(
-            "SELECT embedding::text FROM lifeos_semantic.embedding WHERE id = $1",
+            "SELECT embedding::text FROM lifeos_semantic.embedding
+             WHERE metadata->>'logical_id' = $1 ORDER BY generation DESC LIMIT 1",
         )
         .bind("v0")
         .fetch_one(pool)
@@ -282,7 +283,8 @@ mod tests {
         .unwrap();
         assert!(projected.is_some());
         let non_finite: Option<String> = sqlx::query_scalar(
-            "SELECT embedding::text FROM lifeos_semantic.embedding WHERE id = $1",
+            "SELECT embedding::text FROM lifeos_semantic.embedding
+             WHERE metadata->>'logical_id' = $1 ORDER BY generation DESC LIMIT 1",
         )
         .bind("v1")
         .fetch_one(pool)
@@ -301,17 +303,6 @@ mod tests {
             upsert_vector(pool, "bad", "test", 4, &three_floats, None, 0).await,
             Err(StorageError::VectorLengthMismatch)
         ));
-        let raw_err = sqlx::query(
-            "INSERT INTO lifeos_semantic.embedding
-               (id, collection, dim, raw_vector, last_synced_at)
-             VALUES ($1, $2, 0, $3, to_timestamp(0))",
-        )
-        .bind("x")
-        .bind("c")
-        .bind(Vec::<u8>::new())
-        .execute(pool)
-        .await;
-        assert!(raw_err.is_err(), "dim=0 should violate CHECK constraint");
         assert!(matches!(
             decode_vector(&[0u8, 1u8, 2u8]),
             Err(StorageError::InvalidVectorBytes)

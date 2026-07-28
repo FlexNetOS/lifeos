@@ -123,6 +123,21 @@ struct TerminalState {
     sessions: Mutex<HashMap<String, TerminalSession>>,
 }
 
+fn engine_room_session_name() -> Result<String, String> {
+    let name = std::env::var("LIFEOS_ENGINE_SESSION_NAME").map_err(|_| {
+        "LIFEOS_ENGINE_SESSION_NAME is required for Engine Room reattachment".to_string()
+    })?;
+    if name.is_empty()
+        || name.len() > 128
+        || !name
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
+    {
+        return Err("LIFEOS_ENGINE_SESSION_NAME is not a valid Zellij session name".into());
+    }
+    Ok(name)
+}
+
 #[tauri::command]
 fn terminal_spawn(
     app: tauri::AppHandle,
@@ -139,8 +154,18 @@ fn terminal_spawn(
     let pair = native_pty_system()
         .openpty(size)
         .map_err(|error| format!("open terminal: {error}"))?;
+    let session_name = engine_room_session_name()?;
     let mut command = CommandBuilder::new("yzx");
-    command.arg("enter");
+    command.args([
+        "enter",
+        "options",
+        "--session-name",
+        &session_name,
+        "--attach-to-session",
+        "true",
+        "--on-force-close",
+        "detach",
+    ]);
     let child = pair
         .slave
         .spawn_command(command)

@@ -45,6 +45,7 @@ export default defineConfig(async () => ({
         codeSplitting: {
           groups: [
             { name: "lucide", test: /[\\/]node_modules[\\/]lucide-svelte[\\/]/, priority: 40 },
+            { name: "xterm", test: /[\\/]node_modules[\\/]@xterm[\\/]/, priority: 35 },
             { name: "svelte", test: /[\\/]node_modules[\\/]svelte[\\/]/, priority: 10 },
           ],
         },

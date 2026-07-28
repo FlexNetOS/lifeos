@@ -1,14 +1,19 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import { Terminal } from "@xterm/xterm";
+  import { FitAddon } from "@xterm/addon-fit";
+  import { WebglAddon } from "@xterm/addon-webgl";
+  import "@xterm/xterm/css/xterm.css";
   import Icon from "./Icon.svelte";
 
   let sessionId = $state("");
-  let output = $state("");
-  let input = $state("");
   let connected = $state(false);
   let redbSeq = $state(null);
   let reconcileMessage = $state("");
   let terminalEl = $state(null);
+  let terminal = null;
+  let fitAddon = null;
+  let resizeObserver = null;
   let stopOutput = null;
   let stopExit = null;
   let stopCaptureError = null;
@@ -16,26 +21,39 @@
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
   const invoke = () => tauri()?.core?.invoke || null;
 
-  const append = (bytes) => {
-    output += new TextDecoder().decode(new Uint8Array(bytes));
-    queueMicrotask(() => {
-      if (terminalEl) terminalEl.scrollTop = terminalEl.scrollHeight;
-    });
+  const resizeTerminal = async () => {
+    if (!terminal || !fitAddon) return;
+    fitAddon.fit();
+    const call = invoke();
+    if (!call || !sessionId) return;
+    await call("terminal_resize", {
+      sessionId,
+      cols: terminal.cols,
+      rows: terminal.rows,
+    }).catch(() => {});
   };
 
   const start = async () => {
     const call = invoke();
     if (!call) return;
-    sessionId = await call("terminal_spawn", { cols: 100, rows: 30 });
-    connected = true;
+    try {
+      sessionId = await call("terminal_spawn", {
+        cols: terminal?.cols || 100,
+        rows: terminal?.rows || 30,
+      });
+      connected = true;
+      await resizeTerminal();
+    } catch {
+      reconcileMessage = "Engine Room unavailable";
+    }
   };
 
-  const send = async () => {
+  const sendBytes = async (bytes) => {
     const call = invoke();
-    if (!call || !sessionId || !input) return;
-    const bytes = Array.from(new TextEncoder().encode(`${input}\n`));
-    await call("terminal_write", { sessionId, bytes });
-    input = "";
+    if (!call || !sessionId || !bytes?.length) return;
+    await call("terminal_write", { sessionId, bytes: Array.from(bytes) }).catch(() => {
+      connected = false;
+    });
   };
 
   const reconcile = async () => {
@@ -51,18 +69,45 @@
     reconcileMessage = `Committed ${receipt.committed?.length || 0} record(s) · generation ${receipt.generation}`;
   };
 
-  const onKeydown = (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      send();
-    }
-  };
-
   onMount(async () => {
+    terminal = new Terminal({
+      cols: 100,
+      rows: 30,
+      cursorBlink: true,
+      convertEol: true,
+      fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+      fontSize: 12,
+      theme: {
+        background: "#08090d",
+        foreground: "#d9e1ea",
+        cursor: "#00d4ff",
+        selectionBackground: "rgba(0, 212, 255, 0.25)",
+      },
+    });
+    fitAddon = new FitAddon();
+    terminal.loadAddon(fitAddon);
+    let webgl2 = false;
+    try {
+      const canvas = document.createElement("canvas");
+      webgl2 = !!canvas.getContext("webgl2");
+    } catch {
+      webgl2 = false;
+    }
+    if (webgl2) {
+      terminal.loadAddon(new WebglAddon());
+    }
+    terminal.open(terminalEl);
+    terminal.onData((data) => sendBytes(new TextEncoder().encode(data)));
+    await resizeTerminal();
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => resizeTerminal());
+      resizeObserver.observe(terminalEl);
+    }
+
     const events = tauri()?.event;
     if (events) {
       stopOutput = await events.listen("lifeos:terminal-output", (event) => {
-        if (event.payload?.sessionId === sessionId) append(event.payload.bytes || []);
+        if (event.payload?.sessionId === sessionId) terminal?.write(new Uint8Array(event.payload.bytes || []));
       });
       stopExit = await events.listen("lifeos:terminal-exit", (event) => {
         if (event.payload?.sessionId === sessionId) connected = false;
@@ -83,12 +128,14 @@
   });
 
   onDestroy(async () => {
+    resizeObserver?.disconnect();
     stopOutput?.();
     stopExit?.();
     stopCaptureError?.();
     if (sessionId && invoke()) {
       await invoke()("terminal_close", { sessionId }).catch(() => {});
     }
+    terminal?.dispose();
   });
 </script>
 
@@ -108,16 +155,8 @@
     <button type="button" onclick={reconcile} disabled={!connected}>Reconcile</button>
   </div>
 
-  <pre class="terminal-output" bind:this={terminalEl} aria-live="polite">{output || "Waiting for the Engine Room…"}</pre>
-  <form class="terminal-input" onsubmit={(event) => { event.preventDefault(); send(); }}>
-    <Icon name="chevron-right" size={15} />
-    <textarea bind:value={input} onkeydown={onKeydown} aria-label="Engine Room command"
-      placeholder={connected ? "Enter a command" : "Terminal is available in the Tauri shell"}
-      disabled={!connected} rows="1"></textarea>
-    <button type="submit" disabled={!connected || !input.trim()} aria-label="Send command">
-      <Icon name="corner-down-left" size={15} />
-    </button>
-  </form>
+  <div class="terminal-output" bind:this={terminalEl} role="application" aria-label="Yazelix terminal"></div>
+  {#if !connected}<p class="terminal-hint"><Icon name="info" size={14} /> Terminal input is available in the Tauri shell.</p>{/if}
 </section>
 
 <style>
@@ -129,11 +168,10 @@
   code { color: var(--lifeos-green); }
   .status { color: var(--fg-3); font-size: 11px; }
   .status.online { color: var(--lifeos-green); }
-  .terminal-output { flex: 1; min-height: 260px; overflow: auto; margin: 0; padding: 18px; border: 1px solid var(--bg-3); border-radius: var(--radius-lg); background: #08090d; color: var(--fg-2); font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+  .terminal-output { flex: 1; min-height: 260px; overflow: hidden; margin: 0; padding: 10px; border: 1px solid var(--bg-3); border-radius: var(--radius-lg); background: #08090d; }
   .reconcile-bar { display: flex; justify-content: space-between; align-items: center; color: var(--fg-3); font-size: 11px; }
   .reconcile-bar button { border: 1px solid var(--bg-3); border-radius: var(--radius-md); padding: 6px 10px; }
-  .terminal-input { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--bg-3); border-radius: var(--radius-md); background: var(--bg-1); color: var(--lifeos-cyan); }
-  textarea { flex: 1; resize: none; border: 0; outline: 0; background: transparent; color: var(--fg-1); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .terminal-hint { display: flex; align-items: center; gap: 6px; color: var(--fg-3); font-size: 11px; }
   button { border: 0; background: transparent; color: var(--fg-3); cursor: pointer; }
   button:not(:disabled):hover { color: var(--lifeos-cyan); }
   button:disabled { opacity: .4; cursor: default; }

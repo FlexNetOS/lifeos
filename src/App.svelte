@@ -59,18 +59,29 @@
     if (!invoke) return;
 
     let afterSeq = 0;
+    let initialized = false;
     let syncing = false;
     const syncProjection = async () => {
       if (syncing) return;
       syncing = true;
       try {
+        // Hydrate from the owner-published mmap on first mount. A reopened
+        // Glass must render the current snapshot even when no new event was
+        // appended while it was offline.
+        if (!initialized) {
+          redbProjection = await invoke("redb_projection_read");
+          afterSeq = redbProjection?.localSeq || 0;
+          initialized = true;
+        }
         const events = await invoke("redb_events_read", { afterSeq });
         if (events.length) {
           afterSeq = Math.max(afterSeq, ...events.map((event) => event.seq));
           redbProjection = await invoke("redb_projection_read");
         }
       } catch {
-        redbProjection = null;
+        // Preserve the last verified generation during a transient owner
+        // reconnect; retry initial hydration on the next timer tick.
+        if (!initialized) redbProjection = null;
       } finally {
         syncing = false;
       }

@@ -1,0 +1,35 @@
+{
+  "task_id": "COMPONENT-372_CLAUDE_FLOW_MEMORY",
+  "probe_mode": "read-only",
+  "status": "noncompliant",
+  "goal": "Component '@claude-flow/memory' must be installed and used, not replaced (hard rule 15).",
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "reference_present": true,
+    "required_version": "3.0.0-alpha.21"
+  },
+  "installation": {
+    "installed": true,
+    "path": "node_modules/@claude-flow/memory/package.json",
+    "version": "3.0.0-alpha.21",
+    "lockfile": "bun.lock",
+    "resolution": "Transitive optional dependency of @claude-flow/cli 3.32.9 (via ruflo)."
+  },
+  "module_probe": {
+    "importable": true,
+    "required_exports": ["MemoryService", "UnifiedMemoryService"],
+    "missing_exports": [],
+    "export_count": 43
+  },
+  "usage": {
+    "project_source_references": 0,
+    "search_exclusions": ["node_modules/**", "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"],
+    "result": "No project-level import or invocation was found; the hard rule's 'used' condition is not evidenced."
+  },
+  "verification": {
+    "command_template": "grep -Fq '@claude-flow/memory' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_passed": true
+  },
+  "recommended_follow_up": "Add a project-owned integration that imports and invokes @claude-flow/memory; retain the real package rather than substituting another memory implementation."
+}

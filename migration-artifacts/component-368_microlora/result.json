@@ -1,46 +1,24 @@
 {
   "task_id": "COMPONENT-368_MICROLORA",
-  "component": "MicroLoRA",
+  "component": "ruvector-sona MicroLoRA / ruvllm LoRA",
   "status": "passed_with_version_drift",
-  "probe_mode": "read-only",
   "hard_rule_15": {
     "installed": true,
     "used": true,
     "replaced": false
   },
-  "implementation": {
-    "provider": "@ruvector/sona",
-    "installed_version": "0.1.7",
-    "native_platform_package": "@ruvector/sona-linux-x64-gnu@0.1.7",
-    "note": "MicroLoRA is provided by the installed SONA runtime, not by a separate MicroLoRA package."
-  },
   "evidence": {
-    "blueprint": {
-      "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
-      "command_template": "grep -Fq 'MicroLoRA' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
-      "command_template_passed": true,
-      "requirements": [
-        "ruvllm assigns MicroLoRA adapters per agent and hot-swaps them through database-approved agent, task, domain, branch, and generation selection.",
-        "SONA combines BaseLoRA, MicroLoRA, EWC++, trajectory learning, and witnessed database-controlled promotion or rollback."
-      ]
-    },
-    "installation": [
-      "package.json pins @ruvector/sona to exact version 0.1.7.",
-      "bun.lock resolves @ruvector/sona@0.1.7.",
-      "node_modules/@ruvector/sona and node_modules/@ruvector/sona-linux-x64-gnu are present.",
-      "@ruvector/sona/package.json identifies the Rust/NAPI SONA runtime and LoRA/low-rank-adaptation support."
-    ],
+    "blueprint_inventory": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md:6256 identifies MicroLoRA as ruvector-sona MicroLoRA/ruvllm LoRA; rule 15 requires ruvnet/rUv components to be installed and used, not replaced.",
+    "manifest": "package.json: @ruvector/sona 0.1.7 and @ruvector/ruvllm 2.6.0",
+    "lockfile": "bun.lock: @ruvector/sona@0.1.7",
+    "installed_module": "node_modules/@ruvector/sona",
     "runtime_use": [
-      "scripts/learning-boundary-lifecycle.mjs dynamically imports @ruvector/sona, constructs SonaEngine instances with microLoraRank, and uses the real learning lifecycle.",
-      "scripts/verify-node-authority.mjs imports SonaEngine, configures microLoraRank: 2, and invokes sona.applyMicroLora(sonaInput).",
-      "tests/archbp-009-learning-boundary-lifecycle.spec.ts allows microlora only in its supported primary-source component whitelist and exercises the real SONA lifecycle proof."
+      "scripts/learning-boundary-lifecycle.mjs constructs real @ruvector/sona SonaEngine instances with microLoraRank: 2 and executes the witness-gated learning lifecycle.",
+      "A read-only Bun probe constructed SonaEngine with microLoraRank: 2 and applyMicroLora returned an enabled, finite 8-value output for an 8-value input.",
+      "scripts/verify-node-authority.mjs calls sona.applyMicroLora(sonaInput) and uses @ruvector/ruvllm LoraManager for adapter creation and activation."
     ],
-    "non_replacement": "The learning boundary explicitly states that no model is replaced; it keeps a frozen baseline and permits learned state to affect execution only after witness-backed promotion, with deterministic rollback."
+    "test": "bun scripts/learning-boundary-lifecycle.mjs --output=/tmp/component-368-microlora-proof.json completed: sandbox isolation, witnessed promotion, deterministic rollback, zero dropped trajectories, and the MicroLoRA-supported component guard all passed."
   },
-  "warning": "The blueprint inventory names @ruvector/sona 0.1.8, while the installed root dependency and lockfile pin 0.1.7. No dependency mutation was authorized in this read-only probe.",
-  "anchor": {
-    "supplied_byte_offset": 335153,
-    "unit_sha256": "f0231977c83b7141522129ef396571f69000925d38d8d5dbb4bdc75f846f285b",
-    "note": "The supplied offset is not the MicroLoRA architecture section; verification used the canonical document hash and direct MicroLoRA occurrences."
-  }
+  "warning": "The blueprint inventory specifies SONA 0.2.1, while package.json and bun.lock pin @ruvector/sona 0.1.7. This read-only probe did not modify dependencies. The configured Vitest target could not load its repository-external setup file /home/flexnetos/meta/src/lifeos/tests/setup.js; the lifecycle adapter itself completed successfully under Bun.",
+  "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee"
 }

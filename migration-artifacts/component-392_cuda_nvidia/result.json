@@ -1,0 +1,32 @@
+{
+  "task_id": "COMPONENT-392_CUDA_NVIDIA",
+  "status": "verified_requirement",
+  "probe_mode": "read-only",
+  "source": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "bound_byte_offset": 335153,
+    "bound_unit_sha256": "22146c72207eb058133481fe77fc43a10a71ae641ba90484057e944567e93de8"
+  },
+  "evidence": {
+    "component_row_line": 6100,
+    "component": "CUDA/NVIDIA",
+    "upstream": "https://github.com/NVIDIA/cuda-samples",
+    "closure": "CUDA/cudarc/driver closure",
+    "pinned_coordinate": "cudarc 0.19; database release manifest",
+    "use": "GPU/model driver/fused kernels",
+    "integration": "PostgreSQL ↔ envctl/CodeDB/redb ↔ component ↔ PostgreSQL return",
+    "verification": "Pinned revision/closure; component test; byte/effect/provenance/witness query"
+  },
+  "hard_rule_15": {
+    "requirement": "CUDA/NVIDIA must be installed and used, not replaced.",
+    "result": "Blueprint requirement is present and unambiguous; no replacement was introduced.",
+    "operational_installation_performed": false,
+    "reason": "The task packet authorizes a read-only probe and specifies no implementation targets."
+  },
+  "checks": {
+    "document_sha256_matches_binding": true,
+    "cuda_nvidia_literal_present": true,
+    "component_row_present": true
+  }
+}

@@ -7,6 +7,7 @@ import { join, resolve } from "node:path";
 const root = process.cwd();
 const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/var/lib/redb");
 const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root, "evidence/glass/live-launch-receipt.json"));
+const failureReceiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_FAILURE_RECEIPT ?? join(root, "evidence/glass/live-launch-failure-receipt.json"));
 const port = process.env.LIFEOS_GLASS_PORT ?? "1421";
 const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
 const runtime = {
@@ -80,7 +81,12 @@ function terminateTree(rootPid) {
 }
 
 const startedAt = Date.now();
-const config = JSON.stringify({ build: { devUrl: `http://localhost:${port}`, beforeDevCommand: `bun run dev -- --port ${port}` } });
+const config = JSON.stringify({
+  build: {
+    devUrl: `http://127.0.0.1:${port}/?probe=engine-room`,
+    beforeDevCommand: `bun run dev -- --host 127.0.0.1 --port ${port}`,
+  },
+});
 const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--config", config], {
   cwd: root,
   env: { ...process.env, ...runtime },
@@ -93,13 +99,22 @@ let childExited = false;
 child.once("exit", () => { childExited = true; });
 let readiness = null;
 let engineRoom = null;
+let mainLoaded = null;
 const deadline = Date.now() + 45_000;
 while (Date.now() < deadline && !launchError && !childExited) {
   try {
     const current = projection();
+    const mainCandidate = JSON.parse(current.entries["lifeos.main.loaded"] ?? "null");
     const candidate = JSON.parse(current.entries["glass.ui.ready"] ?? "null");
     const engineCandidate = JSON.parse(current.entries["lifeos.engine-room.ready"] ?? "null");
-    if (candidate?.schemaVersion === "lifeos.glass-ui-ready.v1" && Number(candidate.mountedAt) >= startedAt) {
+    if (
+      mainCandidate?.schemaVersion === "lifeos.main-loaded.v1" &&
+      Number(mainCandidate.loadedAt) >= startedAt &&
+      mainCandidate.href?.includes(`127.0.0.1:${port}`)
+    ) {
+      mainLoaded = { ...mainCandidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
+    }
+    if (mainLoaded && candidate?.schemaVersion === "lifeos.glass-ui-ready.v1" && Number(candidate.mountedAt) >= startedAt) {
       readiness = { ...candidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
       if (engineCandidate?.schemaVersion === "lifeos.engine-room-ready.v1" && engineCandidate.state === "ready") {
         engineRoom = { ...engineCandidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
@@ -126,17 +141,23 @@ const result = {
   authority: "Tauri process and authenticated redb owner projection",
   started_at: new Date(startedAt).toISOString(),
   launch: {
-    command: `bun run tauri -- dev --config <isolated-port-${port}-config>`,
+    command: `bun run tauri -- dev --config <isolated-loopback-port-${port}-config>`,
     pid: child.pid,
     process_tree: tree,
     launch_error: launchError?.message ?? null,
   },
+  main_loaded: mainLoaded,
     readiness,
     engine_room: engineRoom,
   shutdown,
-  ok: !launchError && Boolean(readiness) && Boolean(engineRoom) && shutdown.signal === "SIGTERM",
+  ok: !launchError && Boolean(mainLoaded) && Boolean(readiness) && Boolean(engineRoom) && shutdown.signal === "SIGTERM",
 };
-if (!result.ok) throw new Error(JSON.stringify(result));
 mkdirSync(join(root, "evidence/glass"), { recursive: true });
-writeFileSync(receiptPath, `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ status: "ok", receipt: receiptPath, pid: child.pid, shutdown }, null, 2));
+if (!result.ok) {
+  writeFileSync(failureReceiptPath, `${JSON.stringify(result, null, 2)}\n`);
+  console.error(JSON.stringify(result));
+  process.exitCode = 1;
+} else {
+  writeFileSync(receiptPath, `${JSON.stringify(result, null, 2)}\n`);
+  console.log(JSON.stringify({ status: "ok", receipt: receiptPath, pid: child.pid, shutdown }, null, 2));
+}

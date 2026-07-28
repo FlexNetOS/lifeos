@@ -13,6 +13,23 @@ import "../colors_and_type.css";
 import "../lifeos_app.css";
 import "../styles.css";
 
+// Record the earliest production bootstrap boundary. This distinguishes a
+// WebKit page load from a page that actually has the Tauri IPC bridge and can
+// reach the authenticated redb owner.
+const mainBootstrapInvoke =
+  typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || null;
+if (mainBootstrapInvoke) {
+  void mainBootstrapInvoke("redb_state_write", {
+    key: "lifeos.main.loaded",
+    value: JSON.stringify({
+      schemaVersion: "lifeos.main-loaded.v1",
+      loadedAt: Date.now(),
+      tauriBridge: true,
+      href: window.location.href,
+    }),
+  }).catch(() => {});
+}
+
 // Stamp [data-surface] on <html> before mount so the density tokens in
 // colors_and_type.css §9 are resolved on the very first paint (no reflow flash).
 // Build-time target wins over width auto-detection: VITE_LIFEOS_SURFACE=tv-10ft.

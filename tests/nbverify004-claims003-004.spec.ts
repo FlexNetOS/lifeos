@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
@@ -8,6 +9,10 @@ const evidencePath = resolve(
   "evidence/nbverify/NBVERIFY-004.local-evidence.json",
 );
 const receiptPath = resolve(root, "evidence/engine-room/live-receipt.json");
+
+function sha256(value: Buffer | string) {
+  return createHash("sha256").update(value).digest("hex");
+}
 
 describe("NBVERIFY-004 SWARM-CLAIM-003/004 evidence", () => {
   test("binds both claims to the installed Engine Room live trace", () => {
@@ -28,15 +33,30 @@ describe("NBVERIFY-004 SWARM-CLAIM-003/004 evidence", () => {
           status: "verified",
         }),
       );
-      expect(claim.evidence).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            relationship: "installed-engine-room-live-trace",
-            proven: true,
-            session: receipt.session,
-          }),
-        ]),
+      const trace = claim.evidence.find(
+        (candidate: { relationship: string }) =>
+          candidate.relationship === "installed-engine-room-live-trace",
       );
+      expect(trace).toEqual(
+        expect.objectContaining({
+          relationship: "installed-engine-room-live-trace",
+          proven: true,
+          ready: true,
+          session: expect.any(String),
+          argv: ["yzx", "enter", "--session", expect.any(String)],
+          receipt_path: expect.stringMatching(
+            /^evidence\/engine-room\/runs\/[^/]+\.json$/,
+          ),
+          receipt_sha256: expect.stringMatching(/^[0-9a-f]{64}$/),
+        }),
+      );
+      const immutablePath = resolve(root, trace.receipt_path);
+      expect(existsSync(immutablePath)).toBe(true);
+      const immutableReceipt = JSON.parse(readFileSync(immutablePath, "utf8"));
+      expect(immutableReceipt.session).toBe(trace.session);
+      expect(immutableReceipt.ready).toBe(true);
+      expect(immutableReceipt.argv).toEqual(trace.argv);
+      expect(trace.receipt_sha256).toBe(sha256(readFileSync(immutablePath)));
     }
 
     expect(receipt.ready).toBe(true);

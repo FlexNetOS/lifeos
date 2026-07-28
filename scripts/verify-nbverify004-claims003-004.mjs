@@ -25,6 +25,10 @@ function sha256(value) {
 }
 
 const session = engine.session;
+const immutableEnginePath = join(root, "evidence", "engine-room", "runs", `${session}.json`);
+if (!readFileSync(immutableEnginePath, "utf8")) {
+  throw new Error(`immutable engine-room receipt is missing: ${immutableEnginePath}`);
+}
 const processTree = Array.isArray(engine.process_tree) ? engine.process_tree : [];
 const launchLine = processTree.find(
   (line) =>
@@ -64,7 +68,8 @@ const receiptEvidence = {
   relationship: "installed-engine-room-live-trace",
   proven: true,
   receipt: "evidence/engine-room/live-receipt.json",
-  receipt_sha256: sha256(readFileSync(enginePath)),
+  receipt_path: `evidence/engine-room/runs/${session}.json`,
+  receipt_sha256: sha256(readFileSync(immutableEnginePath)),
   session,
   argv: engine.argv,
   zellij_launch: launchLine,

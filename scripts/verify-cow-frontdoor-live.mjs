@@ -58,6 +58,18 @@ const child = uuid(`lifeos_runtime.cow_frontdoor_create_v2(
   '${identity}', '75000000-0000-0000-8000-000000000001',
   '75000000-0000-0000-8000-000000000002', '${operation("create")}')`);
 const rootBranch = scalar(`cow_branch_id FROM lifeos_runtime.cow_frontdoor_binding WHERE current_branch_id='${currentBootstrap}'`);
+const rootGeneration = Number(scalar(
+  `head_generation FROM lifeos_runtime.branch_pre_s16 WHERE branch_id='${rootBranch}'`,
+));
+const rootMembersBeforeOverlay = Number(scalar(
+  `count(*) FROM lifeos_runtime.resolved_branch_members_v2('${rootBranch}',${rootGeneration})`,
+));
+const childGenerationBeforeOverlay = Number(scalar(
+  `head_generation FROM lifeos_runtime.branch_pre_s16 WHERE branch_id='${child}'`,
+));
+const childMembersBeforeOverlay = Number(scalar(
+  `count(*) FROM lifeos_runtime.resolved_branch_members_v2('${child}',${childGenerationBeforeOverlay})`,
+));
 const overlay = json(`lifeos_runtime.append_branch_overlay_v2(
   '${child}', 'lifeos_runtime.canonical_projection'::regclass,
   '{"probe":"${runTag}"}'::jsonb, 'insert', NULL,
@@ -65,12 +77,15 @@ const overlay = json(`lifeos_runtime.append_branch_overlay_v2(
   '{"value":"frontdoor-${runTag}","bytes":true}'::jsonb,
   '75000000-0000-0000-8000-000000000003',
   '75000000-0000-0000-8000-000000000004', '${operation("overlay")}')`);
+const childGenerationAfterOverlay = Number(scalar(
+  `head_generation FROM lifeos_runtime.branch_pre_s16 WHERE branch_id='${child}'`,
+));
 const beforeMerge = json(`jsonb_build_object(
-  'child_members', (SELECT count(*) FROM lifeos_runtime.resolved_branch_members_v2('${child}',1)),
-  'root_members', (SELECT count(*) FROM lifeos_runtime.resolved_branch_members_v2('${rootBranch}',0))
+  'child_members', (SELECT count(*) FROM lifeos_runtime.resolved_branch_members_v2('${child}',${childGenerationAfterOverlay})),
+  'root_members', (SELECT count(*) FROM lifeos_runtime.resolved_branch_members_v2('${rootBranch}',${rootGeneration}))
 )`);
-if (beforeMerge.child_members !== 1 || beforeMerge.root_members !== 0) {
-  throw new Error("front-door proposal leaked its overlay into the root");
+if (beforeMerge.child_members !== childMembersBeforeOverlay + 1 || beforeMerge.root_members !== rootMembersBeforeOverlay) {
+  throw new Error(`front-door proposal isolation failed: ${JSON.stringify({ beforeMerge, rootMembersBeforeOverlay, childMembersBeforeOverlay, rootGeneration, childGenerationBeforeOverlay, childGenerationAfterOverlay })}`);
 }
 
 const gateKinds = ["build", "byte-reconstruction", "security", "static-analysis", "test", "witness-integrity"];
@@ -124,7 +139,7 @@ const verification = json(`jsonb_build_object(
     (SELECT promotion_id FROM lifeos_runtime.promotion_pre_s16
      WHERE promotion_id='${rollback}'::uuid)
   ),
-  'proposal_isolation_before_merge', '${JSON.stringify(beforeMerge)}'::jsonb
+  'proposal_isolation_before_merge', '${JSON.stringify({ ...beforeMerge, root_members_before_overlay: rootMembersBeforeOverlay, child_members_before_overlay: childMembersBeforeOverlay, root_generation: rootGeneration, child_generation_before_overlay: childGenerationBeforeOverlay, child_generation_after_overlay: childGenerationAfterOverlay })}'::jsonb
 )`);
 
 if (verification.capability?.implemented !== true ||

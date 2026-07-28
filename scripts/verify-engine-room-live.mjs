@@ -7,6 +7,7 @@ const root = process.cwd();
 const yzx = "/home/flexnetos/.nix-profile/bin/yzx";
 const session = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-engine-${Date.now()}`;
 const receiptPath = join(root, "evidence/engine-room/live-receipt.json");
+const immutableReceiptPath = join(root, "evidence/engine-room/runs", `${session}.json`);
 
 function snapshot() {
   try {
@@ -88,5 +89,7 @@ const result = {
 };
 if (!result.ok) throw new Error(JSON.stringify(result));
 mkdirSync(join(root, "evidence/engine-room"), { recursive: true });
+mkdirSync(join(root, "evidence/engine-room/runs"), { recursive: true });
 await Bun.write(receiptPath, `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ status: "ok", receipt: receiptPath, session, shutdown }, null, 2));
+await Bun.write(immutableReceiptPath, `${JSON.stringify(result, null, 2)}\n`);
+console.log(JSON.stringify({ status: "ok", receipt: receiptPath, immutable_receipt: immutableReceiptPath, session, shutdown }, null, 2));

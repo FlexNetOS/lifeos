@@ -782,6 +782,7 @@ export function reconcileGraph(plan, graph) {
 
 function parseArgs(argv) {
   const options = {
+    acceptSourceUpdate: false,
     batchSize: 32,
     dryRun: false,
     forceEmbed: false,
@@ -798,7 +799,8 @@ function parseArgs(argv) {
       }
       options.batchSize = value;
       index += 1;
-    } else if (argument === "--dry-run") options.dryRun = true;
+    } else if (argument === "--accept-source-update") options.acceptSourceUpdate = true;
+    else if (argument === "--dry-run") options.dryRun = true;
     else if (argument === "--force-embed") options.forceEmbed = true;
     else if (argument === "--skip-embed") options.skipEmbed = true;
     else if (argument === "--skip-recall") options.skipRecall = true;
@@ -807,6 +809,9 @@ function parseArgs(argv) {
   }
   if (options.dryRun && options.verifyOnly) {
     fail("--dry-run and --verify-only are mutually exclusive");
+  }
+  if (options.acceptSourceUpdate && (options.dryRun || options.verifyOnly)) {
+    fail("--accept-source-update requires a writable ingest run");
   }
   if (options.forceEmbed && options.skipEmbed) {
     fail("--force-embed and --skip-embed are mutually exclusive");
@@ -1080,6 +1085,11 @@ export function storeMemoryArgs(memory) {
 
 function storeMemory(memory) {
   runIcm(storeMemoryArgs(memory));
+}
+
+function replaceMemory(memoryId, memory) {
+  runIcm(["forget", String(memoryId)]);
+  storeMemory(memory);
 }
 
 function addConcept(concept) {
@@ -1534,6 +1544,26 @@ function execute(options) {
   let graph = readGraph({ readOnly: options.verifyOnly });
   let memoryState = reconcileMemories(plan.memories, memories);
   let graphState = reconcileGraph(plan, graph);
+  if (options.acceptSourceUpdate) {
+    if (memoryState.unexpected.length || graphState.unexpectedConcepts.length || graphState.unexpectedRelations.length) {
+      fail("--accept-source-update cannot reconcile unexpected memories or graph records");
+    }
+    const expectedById = new Map(plan.memories.map((memory) => [memory.logicalId, memory]));
+    const driftIds = new Set(memoryState.drift.map((item) => item.split(".")[0]));
+    for (const actual of memories) {
+      const logicalId = logicalIdFromSummary(actual.summary);
+      if (logicalId && driftIds.has(logicalId)) {
+        replaceMemory(actual.id, expectedById.get(logicalId));
+      }
+    }
+    if (graphState.memoirMissing || graphState.drift.length || graphState.missingConcepts.length || graphState.missingRelations.length) {
+      postgresUpsertGraph(plan);
+    }
+    memories = readImportMemories();
+    graph = readGraph();
+    memoryState = reconcileMemories(plan.memories, memories);
+    graphState = reconcileGraph(plan, graph);
+  }
   assertNoDrift(memoryState, graphState);
 
   const mutations = {

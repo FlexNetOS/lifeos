@@ -14,7 +14,7 @@ const packageJsonPath = resolve(repoRoot, "package.json");
 const proofScriptPath = resolve(repoRoot, "scripts/verify-node-authority.mjs");
 const protocolPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+  "evidence/nbverify/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
 );
 const agentsPath = resolve(repoRoot, "AGENTS.md");
 const ciPath = resolve(repoRoot, ".github/workflows/ci.yml");

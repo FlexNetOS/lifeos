@@ -10,7 +10,7 @@ import { describe, expect, test, afterAll } from "vitest";
 // no code edit. Root application of holds/hooks stays ARCHBP-111/112.
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const policyPath = resolve(repoRoot, "planning-spine-v0/docs/update_governance_policy.json");
+const policyPath = resolve(repoRoot, "evidence/governance/update_governance_policy.json");
 const observer = resolve(repoRoot, "scripts/os-update-observer.mjs");
 const scratch = `/home/flexnetos/meta/var/tmp/archbp-116-${process.pid}`;
 afterAll(() => rmSync(scratch, { recursive: true, force: true }));
@@ -21,7 +21,7 @@ describe("ARCHBP-116 declarative update governance", () => {
   test("the policy is declared in config with holds, gate, and reboot intent", () => {
     expect(existsSync(policyPath)).toBe(true);
     const p = policy();
-    expect(p.schema_version).toBe("lifeos-planning-spine.update-governance-policy.v0");
+    expect(p.schema_version).toBe("lifeos.evidence.update-governance-policy.v1");
     const held = p.holds.map((h: { pattern: string }) => h.pattern).join(" ");
     expect(held).toContain("linux-image");
     expect(held).toContain("snapd");
@@ -71,7 +71,7 @@ describe("ARCHBP-116 declarative update governance", () => {
     // Every held class traces to a desktop-breaking pattern in the 109 map —
     // the policy cites its evidence rather than inventing classes.
     const map = JSON.parse(readFileSync(
-      resolve(repoRoot, "planning-spine-v0/docs/os_update_lifecycle_map.json"), "utf8"));
+      resolve(repoRoot, "evidence/governance/os_update_lifecycle_map.json"), "utf8"));
     const mapPatterns = map.desktop_breaking_packages.map((d: { pattern: string }) => d.pattern).join(" ");
     for (const h of p.holds) {
       expect(mapPatterns, h.pattern).toContain(h.pattern.split("*")[0].replace(/-$/, ""));

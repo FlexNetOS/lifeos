@@ -1,4 +1,4 @@
-// yzx-iso T7 (spine ARCHBP-093..098) — boot re-attach of the isolation
+// ARCHBP-093..098 — boot re-attach of the isolation
 // envelope, durable services, and resumable sessions, per the ratified
 // isolation spec v1.0.0 (Survival = durable tier + re-attach, I10).
 //
@@ -7,7 +7,7 @@
 //   sessions [--root PATH] [--json]       list resumable sessions (durable only)
 //   unit                                  print the declarative user unit
 // The engine touches NO host system service: it is triggered by a systemd
-// USER unit (docs/lifeos-reattach.service) or invoked directly — the single
+// USER unit (evidence/isolation/lifeos-reattach.service) or invoked directly — the single
 // deliberate command of G7. Runs under Bun/Node.
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync, spawn } from "node:child_process";
@@ -73,8 +73,7 @@ export function productionServices() {
 
 const ENGINE_CANDIDATES = [
   process.env.YZX_ENVELOPE_BIN,
-  "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.sh",
-  "/home/flexnetos/meta/src/yazelix/.claude/worktrees/archbp-065-envelope/envelope/yzx-envelope.sh",
+  "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.nu",
 ].filter(Boolean);
 
 export function envelopeEngine() {
@@ -85,7 +84,8 @@ export function envelopeEngine() {
 export function rematerializeEnvelope() {
   const engine = envelopeEngine();
   if (!engine) return { ok: false, reason: "envelope engine missing" };
-  const out = execFileSync("bash", [engine, "probe", "--id", "reattach-check"], {
+  const command = engine.endsWith(".nu") ? "nu" : "bash";
+  const out = execFileSync(command, [engine, "probe", "--id", "reattach-check"], {
     encoding: "utf8",
     timeout: 60000,
   });
@@ -190,7 +190,7 @@ export async function reattach({ services, sessionRoot } = {}) {
   const sessions = listSessions(sessionRoot);
   const ok = envelope.ok && durable.ok && svc.ok;
   return {
-    schema_version: "lifeos-planning-spine.boot-reattach-report.v0",
+    schema_version: "lifeos.evidence.boot-reattach-report.v1",
     ok,
     already_attached: ok && svc.report.every((s) => !s.started),
     envelope,

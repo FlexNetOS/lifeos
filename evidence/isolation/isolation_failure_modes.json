@@ -1,0 +1,13 @@
+{
+  "schema_version": "lifeos.evidence.isolation-failure-modes.v1",
+  "failure_modes": [
+    {"id":"FM-01","summary":"unattended-upgrades can perform a kernel swap while an envelope is live","root_cause":"The user namespace shares the host kernel, so a host upgrade can terminate processes without corrupting durable state.","owning_task":"ARCHBP-060","feeds":["T5","T6"]},
+    {"id":"FM-02","summary":"profile-runtime is currently on tmpfs and can disappear on restart","root_cause":"Yazelix runtime state is bound to /run/user/1001 before the restart-gated XDG migration.","owning_task":"ARCHBP-072","feeds":["T5","T9"]},
+    {"id":"FM-03","summary":"home residuals can remain outside the profile-owned durable roots","root_cause":"Legacy ~/.claude, ~/.codex, and ~/.local tool state may still be active owners until migration and restart.","owning_task":"ARCHBP-082","feeds":["T5","T9"]},
+    {"id":"FM-04","summary":"host docker or kvm surfaces could accidentally consume meta/var","root_cause":"A broad bind or overlay lowerdir could make canonical durable state visible to a container runtime.","owning_task":"ARCHBP-091","feeds":["T6","T9"]}
+  ],
+  "incident_2026_07_21": {
+    "summary":"The host kernel changed from the live session kernel and the host reboot ended processes while the filesystem remained intact.",
+    "timeline":["2026-07-21 21:28: kernel 7.0.0-28 selected by unattended-upgrades","2026-07-21 21:28: active session processes were terminated during reboot","2026-07-21 21:29: durable filesystem and PostgreSQL/RuVector bytes remained intact","2026-07-21 21:30: the correct response was re-attach, not state reconstruction"]
+  }
+}

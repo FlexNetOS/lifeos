@@ -7,7 +7,7 @@ import { describe, expect, test } from "vitest";
 // and peers currently on /run/user tmpfs. (yzx-iso t3, G4.)
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const artifact = resolve(repoRoot, "planning-spine-v0/docs/runtime_env_enumeration.json");
+const artifact = resolve(repoRoot, "evidence/isolation/runtime_env_enumeration.json");
 
 describe("ARCHBP-072 runtime env enumeration", () => {
   test("the complete var list is captured with durable/volatile tags", () => {
@@ -42,7 +42,7 @@ describe("ARCHBP-072 runtime env enumeration", () => {
     expect(e.cross_checked_against).toContain("isolation_tier_map.json");
     // Every tier-map-known var carries the map's tier and misplaced flag.
     const map = JSON.parse(
-      readFileSync(resolve(repoRoot, "planning-spine-v0/docs/isolation_tier_map.json"), "utf8"),
+      readFileSync(resolve(repoRoot, "evidence/isolation/isolation_tier_map.json"), "utf8"),
     );
     const mapByName = new Map(map.entries.map((m: { name: string }) => [m.name, m]));
     for (const entry of e.entries.filter((x: { tier_map_entry: boolean }) => x.tier_map_entry)) {
@@ -60,6 +60,6 @@ describe("ARCHBP-072 runtime env enumeration", () => {
     // This session runs with the pre-migration env: the misplaced residents
     // must be enumerated honestly, not hidden.
     expect(e.durable_on_run_count).toBe(onRunDurable.length);
-    expect(onRunDurable).toContain("CLAUDE_CONFIG_DIR");
+    expect(onRunDurable).toContain("CODEX_HOME");
   });
 });

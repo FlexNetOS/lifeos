@@ -5,7 +5,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const evidencePath = resolve(
   repoRoot,
-  "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+  "evidence/nbverify/NBVERIFY-004.local-evidence.json",
 );
 
 describe("NBVERIFY-004 SWARM-CLAIM-002 evidence", () => {

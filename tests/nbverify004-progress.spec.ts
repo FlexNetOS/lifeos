@@ -5,7 +5,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const generatedRoot = resolve(
   repoRoot,
-  "planning-spine-v0/generated/notebooklm_claim_verification",
+  "evidence/nbverify",
 );
 const matrixPath = resolve(generatedRoot, "NBVERIFY-004.truth-matrix.csv");
 const sourceReceiptPath = resolve(

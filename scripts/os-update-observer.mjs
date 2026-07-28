@@ -1,4 +1,4 @@
-// yzx-iso T9.2 (spine ARCHBP-110) — hook host update events so LifeOS can
+// ARCHBP-110 — hook host update events so LifeOS can
 // observe or gate them during active work.
 //
 // Observe (unprivileged, live):
@@ -20,10 +20,10 @@ import { HostControlPlane } from "./host-control-plane.mjs";
 import { listSessions } from "./boot-reattach.mjs";
 
 const repoRoot = resolve(new URL(".", import.meta.url).pathname, "..");
-const MAP_PATH = resolve(repoRoot, "planning-spine-v0/docs/os_update_lifecycle_map.json");
+const MAP_PATH = resolve(repoRoot, "evidence/governance/os_update_lifecycle_map.json");
 // ARCHBP-116: governance is DECLARED, not hardcoded — the guard consumes the
 // committed policy; changing governance means changing that reviewable file.
-const POLICY_DEFAULT = resolve(repoRoot, "planning-spine-v0/docs/update_governance_policy.json");
+const POLICY_DEFAULT = resolve(repoRoot, "evidence/governance/update_governance_policy.json");
 const SCRATCH_DEFAULT = "/home/flexnetos/meta/var/xdg-data/lifeos/os-update-gate";
 const HOLD_RESOURCE = "os-update-hold";
 
@@ -87,7 +87,7 @@ export function observeTimers(units = ["apt-daily.timer", "apt-daily-upgrade.tim
 // --- gate (T8 control plane) ------------------------------------------------
 function plane(scratch, owner = "lifeos") {
   const registry = {
-    schema_version: "lifeos-planning-spine.host-control-registry.v0",
+    schema_version: "lifeos.evidence.host-control-registry.v1",
     resources: [
       { name: HOLD_RESOURCE, adapter: "lease-dir", params: { path: `${scratch}/${HOLD_RESOURCE}.lease`, owner }, class: "daemons" },
     ],
@@ -125,7 +125,7 @@ export function gateCheck({ scratch = SCRATCH_DEFAULT, policyPath = POLICY_DEFAU
   // says the gate is enabled — behavior flips by config, never by code edit.
   const block = heldNow && policy.gate.enabled === true;
   return {
-    schema_version: "lifeos-planning-spine.os-update-gate-verdict.v0",
+    schema_version: "lifeos.evidence.os-update-gate-verdict.v1",
     decision: block ? "block" : "allow",
     hold: heldNow,
     policy_source: policyPath,

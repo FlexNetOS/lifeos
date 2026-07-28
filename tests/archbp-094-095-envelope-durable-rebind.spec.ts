@@ -30,7 +30,7 @@ describe("ARCHBP-095 durable-plane rebind", () => {
     const byName = new Map(r.roots.map((x: { name: string }) => [x.name, x]));
     // Paths are exactly the tier map's durable roots (T3/T4 authority).
     const map = JSON.parse(
-      readFileSync(resolve(repoRoot, "planning-spine-v0/docs/isolation_tier_map.json"), "utf8"),
+      readFileSync(resolve(repoRoot, "evidence/isolation/isolation_tier_map.json"), "utf8"),
     );
     const durableTargets = map.entries
       .filter((e: { tier: string }) => e.tier === "durable")

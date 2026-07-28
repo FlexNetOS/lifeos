@@ -10,7 +10,9 @@ import { BASH, engine, enginePath } from "./helpers/yzx-envelope";
 
 function enterAsync(args: string[]): Promise<{ status: number; stdout: string }> {
   return new Promise((resolvePromise) => {
-    const child = spawn("bash", [enginePath(), "enter", ...args], { stdio: ["ignore", "pipe", "pipe"] });
+      const path = enginePath();
+      const command = path.endsWith(".nu") ? "nu" : "bash";
+      const child = spawn(command, [path, "enter", ...args], { stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     child.stdout.on("data", (d) => { stdout += d; });
     child.on("close", (status) => resolvePromise({ status: status ?? 1, stdout }));

@@ -9,7 +9,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const catalogPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation_failure_modes.json",
+  "evidence/isolation/isolation_failure_modes.json",
 );
 
 function loadCatalog() {
@@ -41,7 +41,7 @@ describe("ARCHBP-063 isolation failure-mode catalog", () => {
       expect(fm.root_cause.length).toBeGreaterThan(10);
       expect(typeof fm.owning_task).toBe("string");
       // Owning tasks are spine tasks or yzx-iso lanes — never unassigned.
-      expect(fm.owning_task).toMatch(/ARCHBP-\d{3}|tasks\/yzx-iso\//);
+      expect(fm.owning_task).toMatch(/ARCHBP-\d{3}|scripts\//);
     }
   });
 

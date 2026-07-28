@@ -9,7 +9,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const specPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation-architecture-spec.md",
+  "evidence/isolation/isolation-architecture-spec.md",
 );
 
 describe("ARCHBP-058 two-brother control model", () => {
@@ -39,6 +39,6 @@ describe("ARCHBP-058 two-brother control model", () => {
 
   test("the two-brother section declares its consumer (t8 host-control lane)", () => {
     const spec = readFileSync(specPath, "utf8");
-    expect(spec).toContain("tasks/yzx-iso/t8-0-lane-index");
+    expect(spec).toContain("ARCHBP-069");
   });
 });

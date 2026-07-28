@@ -7,7 +7,7 @@ import { describe, expect, test } from "vitest";
 // the envelope and re-attaches state. (yzx-iso t7, G7.)
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const unitPath = resolve(repoRoot, "planning-spine-v0/docs/lifeos-reattach.service");
+const unitPath = resolve(repoRoot, "evidence/isolation/lifeos-reattach.service");
 
 describe("ARCHBP-093 re-attach trigger unit", () => {
   test("the trigger and idempotency are defined in a declarative user unit", () => {

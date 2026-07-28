@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 
 const evidencePath = resolve(
   import.meta.dirname,
-  "../planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+  "../evidence/nbverify/NBVERIFY-004.local-evidence.json",
 );
 
 describe("NBVERIFY-004 SWARM-CLAIM-007 evidence", () => {

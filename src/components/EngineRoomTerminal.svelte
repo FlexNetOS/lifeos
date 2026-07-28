@@ -11,6 +11,7 @@
   let terminalEl = $state(null);
   let stopOutput = null;
   let stopExit = null;
+  let stopCaptureError = null;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
   const invoke = () => tauri()?.core?.invoke || null;
@@ -66,6 +67,12 @@
       stopExit = await events.listen("lifeos:terminal-exit", (event) => {
         if (event.payload?.sessionId === sessionId) connected = false;
       });
+      stopCaptureError = await events.listen("lifeos:terminal-capture-error", (event) => {
+        if (event.payload?.sessionId === sessionId) {
+          reconcileMessage = "Terminal capture unavailable — output paused";
+          connected = false;
+        }
+      });
     }
     if (invoke()) {
       const projection = await invoke()("redb_projection_read").catch(() => null);
@@ -77,6 +84,7 @@
   onDestroy(async () => {
     stopOutput?.();
     stopExit?.();
+    stopCaptureError?.();
     if (sessionId && invoke()) {
       await invoke()("terminal_close", { sessionId }).catch(() => {});
     }

@@ -8,6 +8,7 @@ mod auth;
 // Portable types live in lifeos-core (Stage 1b). The Tauri shell re-uses them
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use flexnetos_redb_owner::{OwnerClient, ProjectionReader};
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
@@ -16,7 +17,8 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use std::sync::Mutex;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
@@ -116,11 +118,60 @@ struct TerminalSession {
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send>,
+    output_offset: Arc<AtomicU64>,
 }
 
 #[derive(Default)]
 struct TerminalState {
     sessions: Mutex<HashMap<String, TerminalSession>>,
+}
+
+static TERMINAL_FRAME_SEQUENCE: AtomicU64 = AtomicU64::new(1);
+
+fn append_terminal_spool(envelope: &str) -> Result<(), String> {
+    let spool_root = redb_root().join("terminal-spool");
+    std::fs::create_dir_all(&spool_root)
+        .map_err(|error| format!("create terminal spool: {error}"))?;
+    let path = spool_root.join("frames.jsonl");
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .map_err(|error| format!("open terminal spool: {error}"))?;
+    writeln!(file, "{envelope}").map_err(|error| format!("write terminal spool: {error}"))?;
+    file.sync_all()
+        .map_err(|error| format!("sync terminal spool: {error}"))
+}
+
+/// Capture a lossless terminal lifecycle frame through the authenticated owner.
+/// If the owner is temporarily unavailable, the exact envelope is fsynced to
+/// the emergency spool so output is never silently discarded.
+fn capture_terminal_frame(
+    session_id: &str,
+    frame_kind: &str,
+    bytes: &[u8],
+    metadata: serde_json::Value,
+) -> Result<(), String> {
+    let sequence = TERMINAL_FRAME_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let envelope = serde_json::json!({
+        "schema_version": "lifeos.terminal-frame.v1",
+        "session_id": session_id,
+        "frame_sequence": sequence,
+        "frame_kind": frame_kind,
+        "byte_length": bytes.len(),
+        "payload_base64": BASE64.encode(bytes),
+        "sha256": format!("{:x}", Sha256::digest(bytes)),
+        "metadata": metadata,
+    });
+    let rendered = serde_json::to_string(&envelope)
+        .map_err(|error| format!("encode terminal frame: {error}"))?;
+    let key = format!("terminal/frame/{session_id}/{sequence:020}");
+    match OwnerClient::connect(redb_root()).and_then(|mut owner| owner.put(&key, &rendered)) {
+        Ok(_) => Ok(()),
+        Err(owner_error) => append_terminal_spool(&rendered).map_err(|spool_error| {
+            format!("owner capture failed: {owner_error}; spool failed: {spool_error}")
+        }),
+    }
 }
 
 fn engine_room_session_name() -> Result<String, String> {
@@ -181,6 +232,17 @@ fn terminal_spawn(
         .take_writer()
         .map_err(|error| format!("open terminal writer: {error}"))?;
     let session_id = uuid::Uuid::new_v4().to_string();
+    capture_terminal_frame(
+        &session_id,
+        "start",
+        &[],
+        serde_json::json!({"cols": size.cols, "rows": size.rows, "argv": [
+            "yzx", "enter", "options", "--session-name", session_name,
+            "--attach-to-session", "true", "--on-force-close", "detach"
+        ]}),
+    )?;
+    let output_offset = Arc::new(AtomicU64::new(0));
+    let reader_output_offset = Arc::clone(&output_offset);
     let event_session = session_id.clone();
     std::thread::spawn(move || {
         let mut buffer = [0_u8; 8192];
@@ -188,6 +250,22 @@ fn terminal_spawn(
             match reader.read(&mut buffer) {
                 Ok(0) => break,
                 Ok(length) => {
+                    let offset = reader_output_offset.fetch_add(length as u64, Ordering::Relaxed);
+                    if let Err(error) = capture_terminal_frame(
+                        &event_session,
+                        "output",
+                        &buffer[..length],
+                        serde_json::json!({"stream": "pty", "offset": offset}),
+                    ) {
+                        let _ = app.emit(
+                            "lifeos:terminal-capture-error",
+                            serde_json::json!({
+                                "sessionId": event_session,
+                                "error": error,
+                            }),
+                        );
+                        break;
+                    }
                     let payload = serde_json::json!({
                         "sessionId": event_session,
                         "bytes": buffer[..length].to_vec(),
@@ -198,6 +276,17 @@ fn terminal_spawn(
                 }
                 Err(_) => break,
             }
+        }
+        if let Err(error) = capture_terminal_frame(
+            &event_session,
+            "exit",
+            &[],
+            serde_json::json!({"reason": "pty-eof"}),
+        ) {
+            let _ = app.emit(
+                "lifeos:terminal-capture-error",
+                serde_json::json!({"sessionId": event_session, "error": error}),
+            );
         }
         let _ = app.emit(
             "lifeos:terminal-exit",
@@ -215,6 +304,7 @@ fn terminal_spawn(
                 master: pair.master,
                 writer,
                 child,
+                output_offset,
             },
         );
     Ok(session_id)
@@ -233,6 +323,12 @@ fn terminal_write(
     let session = sessions
         .get_mut(&session_id)
         .ok_or_else(|| "terminal session is not active".to_string())?;
+    capture_terminal_frame(
+        &session_id,
+        "input",
+        &bytes,
+        serde_json::json!({"stream": "pty"}),
+    )?;
     session
         .writer
         .write_all(&bytes)
@@ -254,6 +350,12 @@ fn terminal_resize(
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| "terminal session is not active".to_string())?;
+    capture_terminal_frame(
+        &session_id,
+        "resize",
+        &[],
+        serde_json::json!({"cols": cols, "rows": rows}),
+    )?;
     session
         .master
         .resize(PtySize {
@@ -276,7 +378,9 @@ fn terminal_close(
         .map_err(|error| format!("terminal state lock: {error}"))?;
     sessions
         .remove(&session_id)
-        .map(|_| ())
+        .map(|_| {
+            let _ = capture_terminal_frame(&session_id, "close", &[], serde_json::json!({}));
+        })
         .ok_or_else(|| "terminal session is not active".to_string())
 }
 

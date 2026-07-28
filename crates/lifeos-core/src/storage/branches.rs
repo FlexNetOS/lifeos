@@ -1,5 +1,6 @@
 use serde_json::Value;
 use sqlx::PgPool;
+use uuid::Uuid;
 
 use super::StorageError;
 
@@ -40,6 +41,72 @@ pub async fn require_accepted_semantics(pool: &PgPool) -> Result<Value, StorageE
         return Err(StorageError::CowSemanticReceipt);
     }
     Ok(report)
+}
+
+/// Create an isolated COW branch from a canonical parent branch.
+pub async fn create(
+    pool: &PgPool,
+    parent_branch: Uuid,
+    kind: &str,
+    purpose: &str,
+    policy: Value,
+    creator: Uuid,
+) -> Result<Uuid, StorageError> {
+    sqlx::query_scalar("SELECT lifeos_runtime.create_branch($1, $2, $3, $4, $5)")
+        .bind(parent_branch)
+        .bind(kind)
+        .bind(purpose)
+        .bind(policy)
+        .bind(creator)
+        .fetch_one(pool)
+        .await
+        .map_err(StorageError::from)
+}
+
+/// Append a witnessed merge gate between two tenant-scoped branches.
+pub async fn merge(
+    pool: &PgPool,
+    source_branch: Uuid,
+    target_branch: Uuid,
+    merge_record: Value,
+) -> Result<Uuid, StorageError> {
+    sqlx::query_scalar("SELECT lifeos_runtime.merge_branch($1, $2, $3)")
+        .bind(source_branch)
+        .bind(target_branch)
+        .bind(merge_record)
+        .fetch_one(pool)
+        .await
+        .map_err(StorageError::from)
+}
+
+/// Record an explicit resolution for a database conflict.
+pub async fn resolve(
+    pool: &PgPool,
+    conflict_id: Uuid,
+    resolution: Value,
+) -> Result<Uuid, StorageError> {
+    sqlx::query_scalar("SELECT lifeos_runtime.resolve_conflict($1, $2)")
+        .bind(conflict_id)
+        .bind(resolution)
+        .fetch_one(pool)
+        .await
+        .map_err(StorageError::from)
+}
+
+/// Promote a conflict-free source branch into the target branch.
+pub async fn promote(
+    pool: &PgPool,
+    source_branch: Uuid,
+    target_branch: Uuid,
+    promotion_record: Value,
+) -> Result<Uuid, StorageError> {
+    sqlx::query_scalar("SELECT lifeos_runtime.promote_branch($1, $2, $3)")
+        .bind(source_branch)
+        .bind(target_branch)
+        .bind(promotion_record)
+        .fetch_one(pool)
+        .await
+        .map_err(StorageError::from)
 }
 
 #[cfg(test)]

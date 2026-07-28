@@ -404,6 +404,83 @@ async fn vault_revoke_secret(
 }
 
 #[tauri::command]
+async fn cow_branch_create(
+    storage: tauri::State<'_, Storage>,
+    parent_branch: String,
+    kind: String,
+    purpose: String,
+    policy: serde_json::Value,
+    creator: String,
+) -> Result<String, String> {
+    let parent_branch = parse_vault_uuid(&parent_branch, "parent_branch")?;
+    let creator = parse_vault_uuid(&creator, "creator")?;
+    lifeos_core::storage::branches::create(
+        storage.pool(),
+        parent_branch,
+        &kind,
+        &purpose,
+        policy,
+        creator,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn cow_branch_merge(
+    storage: tauri::State<'_, Storage>,
+    source_branch: String,
+    target_branch: String,
+    merge_record: serde_json::Value,
+) -> Result<String, String> {
+    let source_branch = parse_vault_uuid(&source_branch, "source_branch")?;
+    let target_branch = parse_vault_uuid(&target_branch, "target_branch")?;
+    lifeos_core::storage::branches::merge(
+        storage.pool(),
+        source_branch,
+        target_branch,
+        merge_record,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn cow_branch_resolve(
+    storage: tauri::State<'_, Storage>,
+    conflict_id: String,
+    resolution: serde_json::Value,
+) -> Result<String, String> {
+    let conflict_id = parse_vault_uuid(&conflict_id, "conflict_id")?;
+    lifeos_core::storage::branches::resolve(storage.pool(), conflict_id, resolution)
+        .await
+        .map(|id| id.to_string())
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn cow_branch_promote(
+    storage: tauri::State<'_, Storage>,
+    source_branch: String,
+    target_branch: String,
+    promotion_record: serde_json::Value,
+) -> Result<String, String> {
+    let source_branch = parse_vault_uuid(&source_branch, "source_branch")?;
+    let target_branch = parse_vault_uuid(&target_branch, "target_branch")?;
+    lifeos_core::storage::branches::promote(
+        storage.pool(),
+        source_branch,
+        target_branch,
+        promotion_record,
+    )
+    .await
+    .map(|id| id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
 fn open_settings(window: tauri::Window) -> Result<(), String> {
     window
         .emit("lifeos:navigate", "/settings")
@@ -780,6 +857,10 @@ pub fn run() {
             vault_relay_secret,
             vault_rotate_secret,
             vault_revoke_secret,
+            cow_branch_create,
+            cow_branch_merge,
+            cow_branch_resolve,
+            cow_branch_promote,
             plugin_run,
             db_health,
             db_migrate

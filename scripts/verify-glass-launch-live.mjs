@@ -1,0 +1,133 @@
+// ARCHBP-001/002 — causal Tauri launch -> mounted Glass receipt -> shutdown.
+import { createHash } from "node:crypto";
+import { execFileSync, spawn } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+const root = process.cwd();
+const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/var/lib/redb");
+const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root, "evidence/glass/live-launch-receipt.json"));
+const port = process.env.LIFEOS_GLASS_PORT ?? "1421";
+const runtime = {
+  LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql",
+  LIFEOS_RUNTIME_TENANT_ID: process.env.LIFEOS_RUNTIME_TENANT_ID ?? "00000000-0000-4000-8000-000000000001",
+  LIFEOS_RUNTIME_IDENTITY_ID: process.env.LIFEOS_RUNTIME_IDENTITY_ID ?? "00000000-0000-4000-8000-000000000002",
+  LIFEOS_RUNTIME_GRANT_ID: process.env.LIFEOS_RUNTIME_GRANT_ID ?? "00000000-0000-4000-8000-000000000003",
+  LIFEOS_RUNTIME_BINDING_JSON: process.env.LIFEOS_RUNTIME_BINDING_JSON ?? JSON.stringify({
+    tenant_id: "00000000-0000-4000-8000-000000000001",
+    identity_id: "00000000-0000-4000-8000-000000000002",
+    grant_id: "00000000-0000-4000-8000-000000000003",
+    purpose: "envctl-session-binding",
+  }),
+  LIFEOS_REDB_ROOT: redbRoot,
+};
+
+function projection() {
+  const pointer = JSON.parse(readFileSync(join(redbRoot, "projection.pointer"), "utf8"));
+  const slotPath = join(redbRoot, `projection.${pointer.slot}.slot`);
+  const body = readFileSync(slotPath);
+  const checksum = createHash("sha256").update(body).digest("hex");
+  if (checksum !== pointer.checksum) throw new Error("owner projection checksum mismatch");
+  const rows = body.toString("utf8").trim().split("\n").slice(1).filter(Boolean).map((line) => JSON.parse(line));
+  return { pointer, entries: Object.fromEntries(rows.map((row) => [row.k, row.v])) };
+}
+
+function processRows() {
+  try {
+    return execFileSync("ps", ["-eo", "pid=,ppid=,comm=,args="], { encoding: "utf8" })
+      .split("\n").map((line) => {
+        const match = line.match(/^\s*(\d+)\s+(\d+)\s+(.*)$/);
+        return match ? { pid: Number(match[1]), ppid: Number(match[2]), line } : null;
+      }).filter(Boolean);
+  } catch { return []; }
+}
+
+function processTree(rootPid) {
+  const rows = processRows();
+  const seen = new Set([rootPid]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const row of rows) {
+      if (seen.has(row.pid) || !seen.has(row.ppid)) continue;
+      seen.add(row.pid);
+      changed = true;
+    }
+  }
+  return rows.filter((row) => seen.has(row.pid)).map((row) => row.line);
+}
+
+function terminateTree(rootPid) {
+  const rows = processRows();
+  const seen = new Set([rootPid]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const row of rows) {
+      if (seen.has(row.pid) || !seen.has(row.ppid)) continue;
+      seen.add(row.pid);
+      changed = true;
+    }
+  }
+  const descendants = rows.filter((row) => seen.has(row.pid));
+  for (const row of descendants.sort((a, b) => b.pid - a.pid)) {
+    try { process.kill(row.pid, "SIGTERM"); } catch {}
+  }
+  try { process.kill(-rootPid, "SIGTERM"); } catch {}
+}
+
+const startedAt = Date.now();
+const config = JSON.stringify({ build: { devUrl: `http://localhost:${port}`, beforeDevCommand: `bun run dev -- --port ${port}` } });
+const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--config", config], {
+  cwd: root,
+  env: { ...process.env, ...runtime },
+  detached: true,
+  stdio: "ignore",
+});
+let launchError = null;
+child.once("error", (error) => { launchError = error; });
+let childExited = false;
+child.once("exit", () => { childExited = true; });
+let readiness = null;
+const deadline = Date.now() + 45_000;
+while (Date.now() < deadline && !launchError && !childExited) {
+  try {
+    const current = projection();
+    const candidate = JSON.parse(current.entries["glass.ui.ready"] ?? "null");
+    if (candidate?.schemaVersion === "lifeos.glass-ui-ready.v1" && Number(candidate.mountedAt) >= startedAt) {
+      readiness = { ...candidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
+      break;
+    }
+  } catch {}
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 500));
+}
+const tree = processTree(child.pid);
+let shutdown = { signal: "SIGTERM", exit_code: null };
+terminateTree(child.pid);
+await new Promise((resolvePromise) => {
+  const timer = setTimeout(resolvePromise, 8_000);
+  child.once("exit", (code, signal) => {
+    clearTimeout(timer);
+    shutdown = { signal, exit_code: code };
+    resolvePromise();
+  });
+});
+
+const result = {
+  schema_version: "lifeos.evidence.glass-launch-live.v1",
+  authority: "Tauri process and authenticated redb owner projection",
+  started_at: new Date(startedAt).toISOString(),
+  launch: {
+    command: `bun run tauri -- dev --config <isolated-port-${port}-config>`,
+    pid: child.pid,
+    process_tree: tree,
+    launch_error: launchError?.message ?? null,
+  },
+  readiness,
+  shutdown,
+  ok: !launchError && Boolean(readiness) && shutdown.signal === "SIGTERM",
+};
+if (!result.ok) throw new Error(JSON.stringify(result));
+mkdirSync(join(root, "evidence/glass"), { recursive: true });
+writeFileSync(receiptPath, `${JSON.stringify(result, null, 2)}\n`);
+console.log(JSON.stringify({ status: "ok", receipt: receiptPath, pid: child.pid, shutdown }, null, 2));

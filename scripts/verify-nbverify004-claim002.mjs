@@ -48,6 +48,18 @@ const sourceFiles = [
 ];
 const glassSource = join(repoRoot, "src", "App.svelte");
 const tauriSource = join(repoRoot, "src-tauri", "src", "lib.rs");
+const liveReadinessPath = join(
+  repoRoot,
+  "evidence",
+  "glass",
+  "live-readiness-receipt.json",
+);
+const liveLaunchPath = join(
+  repoRoot,
+  "evidence",
+  "glass",
+  "live-launch-receipt.json",
+);
 const allowedEnvironmentNames = [
   "YAZELIX_RUNTIME_DIR",
   "YAZELIX_CONFIG_DIR",
@@ -315,6 +327,65 @@ const lifeosBridge = {
     owner_boundary: "redb owner",
   },
 };
+let liveReadiness = null;
+try {
+  liveReadiness = JSON.parse(readFileSync(liveReadinessPath, "utf8"));
+} catch {
+  liveReadiness = null;
+}
+const uiAcceptanceReceipt = {
+  proven:
+    liveReadiness?.schema_version === "lifeos.evidence.glass-ui-live.v1" &&
+    liveReadiness?.authority === "authenticated redb owner projection" &&
+    liveReadiness?.projection?.checksum_verified === true &&
+    liveReadiness?.readiness?.schemaVersion === "lifeos.glass-ui-ready.v1" &&
+    liveReadiness?.readiness?.state === "ready" &&
+    liveReadiness?.readiness?.identity === "lifeos-glass" &&
+    liveReadiness?.fresh === true,
+  path: liveReadinessPath,
+  sha256: optionalSha256(liveReadinessPath),
+  receipt: liveReadiness,
+};
+let liveLaunch = null;
+try {
+  liveLaunch = JSON.parse(readFileSync(liveLaunchPath, "utf8"));
+} catch {
+  liveLaunch = null;
+}
+const causalLaunch = {
+  proven:
+    liveLaunch?.schema_version === "lifeos.evidence.glass-launch-live.v1" &&
+    liveLaunch?.authority?.includes("Tauri process") &&
+    liveLaunch?.ok === true &&
+    liveLaunch?.launch?.launch_error === null &&
+    liveLaunch?.launch?.process_tree?.some((line) => /\blifeos\b/i.test(line)) &&
+    liveLaunch?.readiness?.schemaVersion === "lifeos.glass-ui-ready.v1" &&
+    Number(liveLaunch?.readiness?.mountedAt) >=
+      Date.parse(liveLaunch?.started_at ?? "") &&
+    liveLaunch?.shutdown?.signal === "SIGTERM",
+  path: liveLaunchPath,
+  sha256: optionalSha256(liveLaunchPath),
+  receipt: liveLaunch,
+};
+const lifeosBinding = {
+  proven: causalLaunch.proven,
+  lifeos_processes: [
+    ...lifeosRows.map(({ raw }) => raw),
+    ...(liveLaunch?.launch?.process_tree ?? []).filter((line) =>
+      /\blifeos\b/i.test(line),
+    ),
+  ],
+  ui_acceptance_receipt: uiAcceptanceReceipt,
+  causal_launch: causalLaunch,
+  missing: [
+    ...(causalLaunch.proven ? [] : ["lifeos_process_receipt_missing"]),
+    ...(uiAcceptanceReceipt.proven ? [] : ["lifeos_ui_acceptance_receipt_missing"]),
+    ...(causalLaunch.proven ? [] : ["fresh_launch_causality_missing"]),
+    ...(causalLaunch.proven ? [] : ["failure_shutdown_behavior_missing"]),
+  ],
+  boundary:
+    "Yazelix workspace orchestration is not proof of LifeOS launch ownership.",
+};
 const claims = [];
 if (existsSync(outputPath)) {
   try {
@@ -334,11 +405,13 @@ if (existsSync(outputPath)) {
 const claimId = "SWARM-CLAIM-002";
 const claim = {
   claim_id: claimId,
-  verification_status: "unverified",
-  status: "qualified",
-  confidence: "medium",
+  verification_status: lifeosBinding.proven ? "verified" : "unverified",
+  status: lifeosBinding.proven ? "verified" : "qualified",
+  confidence: lifeosBinding.proven ? "high" : "medium",
   conclusion:
-    "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, and the source now contains a causal Glass-to-redb readiness bridge; a fresh Tauri process and UI acceptance receipt are still required to prove that Yazelix is the background workspace engine for a LifeOS application launch.",
+    lifeosBinding.proven
+      ? "The active profile-owned Yazelix package and launcher establish the terminal workspace, and a current-worktree Tauri launch produced a causal LifeOS process, mounted Glass readiness receipt, authenticated redb owner sequence, and SIGTERM shutdown receipt."
+      : "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, and the source contains a causal Glass-to-redb readiness bridge; a fresh Tauri process and UI acceptance receipt are still required to prove that Yazelix is the background workspace engine for a LifeOS application launch.",
   evidence: [
     {
       relationship: "profile-owner",
@@ -379,16 +452,7 @@ const claim = {
     },
     {
       relationship: "lifeos-binding",
-      proven: false,
-      lifeos_processes: lifeosRows.map(({ raw }) => raw),
-      missing: [
-        "lifeos_process_receipt_missing",
-        "lifeos_ui_acceptance_receipt_missing",
-        "fresh_launch_causality_missing",
-        "failure_shutdown_behavior_missing",
-      ],
-      boundary:
-        "Yazelix workspace orchestration is not proof of LifeOS launch ownership.",
+      ...lifeosBinding,
     },
   ],
 };

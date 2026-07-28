@@ -1,0 +1,43 @@
+{
+  "schema_version": "lifeos.evidence.glass-launch-live.v1",
+  "authority": "Tauri process and authenticated redb owner projection",
+  "started_at": "2026-07-28T21:55:20.433Z",
+  "launch": {
+    "command": "bun run tauri -- dev --config <isolated-port-1421-config>",
+    "pid": 1418615,
+    "process_tree": [
+      " 842091  297473 bash            /bin/bash -c source /home/flexnetos/meta/var/lib/claude/shell-snapshots/snapshot-bash-1785271583226-0vibz5.sh 2>/dev/null || true && shopt -u extglob 2>/dev/null || true && { \\builtin unalias -- 'unsetenv'; \\builtin unset -f -- 'unsetenv'; } >/dev/null 2>&1 || true && eval 'rtk proxy -- /home/flexnetos/.nix-profile/toolbin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu' < /dev/null && pwd -P >| /run/user/1001/yazelix/volatile/tmp/claude-a61a-cwd",
+      " 842117  842091 rtk             /nix/store/ng6fk1vrsap7s8dzqj1d63wc5ssypghz-rtk-0.43.0/bin/rtk proxy -- /home/flexnetos/.nix-profile/toolbin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu",
+      " 842158  842117 nu              /nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu -l /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/owner2.nu",
+      " 842188  842158 flexnetos-redb- /run/user/1001/yazelix/volatile/tmp/claude-1001/-home-flexnetos-meta-src-lifeos/fe938188-16a9-4dce-aec4-e3613984c716/scratchpad/codedb-rt/bin/flexnetos-redb-owner serve /run/user/1001/bpredb",
+      " 971327  971325 MainThread      node /home/flexnetos/meta/src/lifeos/.claude/worktrees/archbp-frontier/node_modules/.bin/vite",
+      "1078375 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "1080733 1008149 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "1197827 3392658 .claude-wrapped /nix/store/7cshnmk3kcc6m5q41gja5kcsayrw93yq-claude-code-2.1.207/bin/.claude-wrapped daemon run --origin transient --spawned-by {\"label\":\"claude\",\"cwd\":\"/home/flexnetos/meta/src/lifeos\",\"pid\":3392658}",
+      "1415993 1415990 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/vite --host 127.0.0.1 --port 1421",
+      "1418576  864881 rtk             /nix/store/ng6fk1vrsap7s8dzqj1d63wc5ssypghz-rtk-0.43.0/bin/rtk proxy env LIFEOS_GLASS_PORT=1421 /home/flexnetos/.nix-profile/bin/bun scripts/verify-glass-launch-live.mjs",
+      "1421342 1421330 bun             /home/flexnetos/.nix-profile/bin/bun run tauri -- dev --config {\"build\":{\"devUrl\":\"http://localhost:1422\",\"beforeDevCommand\":\"bun run dev -- --port 1422\"}}",
+      "1421343 1421342 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/tauri dev --config {\"build\":{\"devUrl\":\"http://localhost:1422\",\"beforeDevCommand\":\"bun run dev -- --port 1422\"}}",
+      "1421402 1421398 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/vite --port 1422",
+      "1421642 1421343 lifeos          /home/flexnetos/meta/var/cargo-target/debug/lifeos",
+      "1422383 3688804 .postgres-wrapp postgres: flexnetos lifeos [local] idle",
+      "1422384 3688804 .postgres-wrapp postgres: flexnetos lifeos [local] idle",
+      "4125286 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/--help"
+    ],
+    "launch_error": null
+  },
+  "readiness": {
+    "schemaVersion": "lifeos.glass-ui-ready.v1",
+    "state": "ready",
+    "mountedAt": 1785275744758,
+    "surface": "workstation",
+    "identity": "lifeos-glass",
+    "owner_local_seq": 156,
+    "owner_checksum": "ce209aa46093c67c204d78476d6b749e8493ef86a47b33857797613220bb73a8"
+  },
+  "shutdown": {
+    "signal": "SIGTERM",
+    "exit_code": null
+  },
+  "ok": true
+}

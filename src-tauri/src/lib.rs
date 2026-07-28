@@ -44,7 +44,17 @@ mod terminal_tests {
     fn engine_room_argv_matches_the_reattach_contract() {
         assert_eq!(
             engine_room_argv("lifeos-tenant-session"),
-            vec!["yzx", "enter", "--session", "lifeos-tenant-session"]
+            vec![
+                "yzx",
+                "enter",
+                "options",
+                "--session-name",
+                "lifeos-tenant-session",
+                "--attach-to-session",
+                "true",
+                "--on-force-close",
+                "detach",
+            ]
         );
     }
 
@@ -587,8 +597,13 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     vec![
         "yzx".into(),
         "enter".into(),
-        "--session".into(),
+        "options".into(),
+        "--session-name".into(),
         session_name.into(),
+        "--attach-to-session".into(),
+        "true".into(),
+        "--on-force-close".into(),
+        "detach".into(),
     ]
 }
 

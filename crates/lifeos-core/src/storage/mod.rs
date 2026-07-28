@@ -186,10 +186,38 @@ async fn migrate_pool(pool: PgPool) -> Result<MigrateReport, StorageError> {
         .execute(&mut *connection)
         .await?;
 
+    // Run on a fresh canonical connection. The connection used for the
+    // ledger relocation/search-path bootstrap can retain session state from
+    // that pre-migration work; migrations must execute against a clean
+    // session whose ledger is explicitly the runtime ledger.
+    connection.close().await?;
+    let mut connection = pool.acquire().await?;
+    sqlx::query("SET search_path TO lifeos_runtime, extensions, pg_catalog")
+        .execute(&mut *connection)
+        .await?;
+
     sqlx::migrate!("./migrations")
-        .run(&pool)
+        .run_direct(&mut *connection)
         .await
         .map_err(|e| StorageError::Sqlx(sqlx::Error::Protocol(e.to_string())))?;
+
+    let embedded = sqlx::migrate!("./migrations");
+    let (applied_after_run,): (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM lifeos_runtime._sqlx_migrations")
+            .fetch_one(&mut *connection)
+            .await?;
+    if applied_after_run < embedded.migrations.len() as i64 {
+        connection.close().await?;
+        let mut retry_connection = pool.acquire().await?;
+        sqlx::query("SET search_path TO lifeos_runtime, extensions, pg_catalog")
+            .execute(&mut *retry_connection)
+            .await?;
+        embedded
+            .run_direct(&mut *retry_connection)
+            .await
+            .map_err(|e| StorageError::Sqlx(sqlx::Error::Protocol(e.to_string())))?;
+        connection = retry_connection;
+    }
 
     let (applied,): (i64,) =
         sqlx::query_as("SELECT COUNT(*) FROM lifeos_runtime._sqlx_migrations")

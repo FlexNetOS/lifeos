@@ -35,7 +35,8 @@ fn redb_root() -> PathBuf {
 
 #[cfg(test)]
 mod terminal_tests {
-    use super::engine_room_argv;
+    use super::{engine_room_argv, validate_redb_event_stream};
+    use flexnetos_redb_owner::CommitEvent;
 
     #[test]
     fn engine_room_argv_matches_the_reattach_contract() {
@@ -53,6 +54,27 @@ mod terminal_tests {
                 "detach",
             ]
         );
+    }
+
+    #[test]
+    fn redb_event_validation_rejects_gaps_and_invalid_projection_metadata() {
+        let gap = vec![CommitEvent {
+            seq: 3,
+            slot: "a".to_string(),
+            checksum: "checksum".to_string(),
+        }];
+        assert!(validate_redb_event_stream(&gap, 1)
+            .expect_err("a sequence gap must force snapshot recovery")
+            .contains("event gap"));
+
+        let invalid = vec![CommitEvent {
+            seq: 2,
+            slot: "unexpected".to_string(),
+            checksum: "checksum".to_string(),
+        }];
+        assert!(validate_redb_event_stream(&invalid, 1)
+            .expect_err("an invalid slot must not reach the renderer")
+            .contains("invalid projection slot"));
     }
 }
 
@@ -119,6 +141,7 @@ fn redb_projection_read() -> Result<serde_json::Value, String> {
 #[tauri::command]
 fn redb_events_read(after_seq: u64) -> Result<serde_json::Value, String> {
     let events = read_events(redb_root(), after_seq).map_err(|error| error.to_string())?;
+    validate_redb_event_stream(&events, after_seq)?;
     Ok(serde_json::json!(events
         .into_iter()
         .map(|event| serde_json::json!({
@@ -127,6 +150,33 @@ fn redb_events_read(after_seq: u64) -> Result<serde_json::Value, String> {
             "checksum": event.checksum,
         }))
         .collect::<Vec<_>>()))
+}
+
+fn validate_redb_event_stream(
+    events: &[flexnetos_redb_owner::CommitEvent],
+    after_seq: u64,
+) -> Result<(), String> {
+    let mut expected = after_seq
+        .checked_add(1)
+        .ok_or_else(|| "redb event cursor overflow".to_string())?;
+    for event in events {
+        if event.seq != expected {
+            return Err(format!(
+                "redb event gap: expected sequence {expected}, received {}",
+                event.seq
+            ));
+        }
+        if event.slot != "a" && event.slot != "b" {
+            return Err(format!("redb event has invalid projection slot: {}", event.slot));
+        }
+        if event.checksum.is_empty() {
+            return Err(format!("redb event {} has an empty projection checksum", event.seq));
+        }
+        expected = expected
+            .checked_add(1)
+            .ok_or_else(|| "redb event sequence overflow".to_string())?;
+    }
+    Ok(())
 }
 
 #[tauri::command]

@@ -79,9 +79,11 @@
           redbProjection = await invoke("redb_projection_read");
         }
       } catch {
-        // Preserve the last verified generation during a transient owner
-        // reconnect; retry initial hydration on the next timer tick.
-        if (!initialized) redbProjection = null;
+        // A reconnect, gap, or checksum failure must restart from a fresh
+        // owner-published snapshot instead of advancing a stale cursor.
+        initialized = false;
+        afterSeq = 0;
+        redbProjection = null;
       } finally {
         syncing = false;
       }

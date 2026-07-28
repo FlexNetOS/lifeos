@@ -33,6 +33,10 @@ MIGRATION_0009 = (
     LIFEOS_ROOT
     / "crates/lifeos-core/migrations/0009_native_rvf_postgres_acceptance.sql"
 )
+MIGRATION_0010 = (
+    LIFEOS_ROOT
+    / "crates/lifeos-core/migrations/0010_native_rvf_catalog_binding.sql"
+)
 DB_ARTIFACT = (
     LIFEOS_ROOT
     / "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package"
@@ -191,6 +195,13 @@ def installed_libraries(database: str = "lifeos") -> list[dict[str, Any]]:
 
 def extension_version(database: str = "lifeos") -> str:
     return dbsuite.scalar(database, "SELECT extensions.ruvector_version()")
+
+
+def extension_catalog_version(database: str = "lifeos") -> str:
+    return dbsuite.scalar(
+        database,
+        "SELECT extversion FROM pg_extension WHERE extname='ruvector'",
+    )
 
 
 def record_receipt(
@@ -518,6 +529,7 @@ def verify_upgrade(database: str) -> dict[str, Any]:
         tenant=TENANT,
     )
     dbsuite.apply_migration(database, 9)
+    dbsuite.apply_migration(database, 10)
     after = dbsuite.scalar(
         database,
         "SELECT count(*) FROM lifeos_runtime.branch",
@@ -539,49 +551,59 @@ def verify_upgrade(database: str) -> dict[str, Any]:
 
 
 def apply_live_migration() -> dict[str, Any]:
-    version = int(
-        dbsuite.scalar(
-            "lifeos",
-            "SELECT coalesce(max(version),0) "
-            "FROM lifeos_runtime._sqlx_migrations WHERE success",
-        )
+    migrations = (
+        (9, "native rvf postgres acceptance", MIGRATION_0009),
+        (10, "native rvf catalog binding", MIGRATION_0010),
     )
-    checksum = sha384(MIGRATION_0009)
-    if version < 9:
-        assert_true(version == 8, f"live migration predecessor is {version}, expected 8")
-        insert = (
-            "INSERT INTO lifeos_runtime._sqlx_migrations("
-            "version, description, installed_on, success, checksum, execution_time"
-            ") VALUES (9, 'native rvf postgres acceptance', clock_timestamp(), "
-            f"true, decode('{checksum}','hex'), 0)"
-        )
-        run(
-            [
-                "psql",
-                "-h",
-                str(dbsuite.SOCKET),
-                "-d",
+    for target_version, description, migration in migrations:
+        version = int(
+            dbsuite.scalar(
                 "lifeos",
-                "-X",
-                "-v",
-                "ON_ERROR_STOP=1",
-                "-1",
-                "-f",
-                str(MIGRATION_0009),
-                "-c",
-                insert,
-            ]
+                "SELECT coalesce(max(version),0) "
+                "FROM lifeos_runtime._sqlx_migrations WHERE success",
+            )
         )
-    else:
-        ledger_checksum = dbsuite.scalar(
-            "lifeos",
-            "SELECT encode(checksum,'hex') "
-            "FROM lifeos_runtime._sqlx_migrations WHERE version=9 AND success",
-        )
-        assert_true(
-            ledger_checksum == checksum,
-            "live 0009 SQLx checksum differs from current migration source",
-        )
+        checksum = sha384(migration)
+        if version < target_version:
+            assert_true(
+                version == target_version - 1,
+                f"live migration predecessor is {version}, expected {target_version - 1}",
+            )
+            insert = (
+                "INSERT INTO lifeos_runtime._sqlx_migrations("
+                "version, description, installed_on, success, checksum, execution_time"
+                f") VALUES ({target_version}, {dbsuite.sql_text(description)}, "
+                "clock_timestamp(), "
+                f"true, decode('{checksum}','hex'), 0)"
+            )
+            run(
+                [
+                    "psql",
+                    "-h",
+                    str(dbsuite.SOCKET),
+                    "-d",
+                    "lifeos",
+                    "-X",
+                    "-v",
+                    "ON_ERROR_STOP=1",
+                    "-1",
+                    "-f",
+                    str(migration),
+                    "-c",
+                    insert,
+                ]
+            )
+        else:
+            ledger_checksum = dbsuite.scalar(
+                "lifeos",
+                "SELECT encode(checksum,'hex') "
+                "FROM lifeos_runtime._sqlx_migrations "
+                f"WHERE version={target_version} AND success",
+            )
+            assert_true(
+                ledger_checksum == checksum,
+                f"live {target_version:04d} SQLx checksum differs from current source",
+            )
     report = dbsuite.json_result(
         dbsuite.scalar("lifeos", "SELECT lifeos_runtime.cow_branch_capability()")
     )
@@ -595,6 +617,7 @@ def apply_live_migration() -> dict[str, Any]:
 def source_digests() -> dict[str, str]:
     paths = [
         MIGRATION_0009,
+        MIGRATION_0010,
         LIFEOS_ROOT / "crates/lifeos-core/migrations/0007_cow_truthful_semantics.sql",
         LIFEOS_ROOT / "crates/lifeos-core/migrations/0008_cow_least_privilege_closure.sql",
         LIFEOS_ROOT / "crates/lifeos-core/src/storage/branches.rs",
@@ -611,7 +634,7 @@ def source_digests() -> dict[str, str]:
 
 
 def main() -> int:
-    migration_suffix = sha256(MIGRATION_0009)[:8]
+    migration_suffix = sha256(MIGRATION_0010)[:8]
     fresh_db = f"lifeos_inv011_fresh_suite_{migration_suffix}"
     upgrade_db = f"lifeos_inv011_upgrade_suite_{migration_suffix}"
     dbsuite.validate_database_name(fresh_db)
@@ -632,9 +655,11 @@ def main() -> int:
         native_binary = build_native_tool()
         libraries = installed_libraries()
         current_extension_version = extension_version()
+        live_catalog_version = extension_catalog_version()
         db_artifact_sha = sha256(DB_ARTIFACT)
 
-        dbsuite.setup_database(fresh_db, 9)
+        dbsuite.setup_database(fresh_db, 10)
+        fresh_catalog_version = extension_catalog_version(fresh_db)
         initial = dbsuite.json_result(
             dbsuite.scalar(fresh_db, "SELECT lifeos_runtime.cow_branch_capability()")
         )
@@ -688,6 +713,7 @@ def main() -> int:
             },
             "installed_extension": {
                 "version": current_extension_version,
+                "catalog_version": fresh_catalog_version,
             },
             "installed_libraries": libraries,
             "native_binary": native_binary,
@@ -733,6 +759,7 @@ def main() -> int:
         live_evidence["database_semantics"]["receipt_digest"] = live_database_receipt[
             "receipt_digest"
         ]
+        live_evidence["installed_extension"]["catalog_version"] = live_catalog_version
         live_evidence_bytes = canonical_bytes(live_evidence)
         live_native_receipt_id = record_receipt(
             "lifeos",

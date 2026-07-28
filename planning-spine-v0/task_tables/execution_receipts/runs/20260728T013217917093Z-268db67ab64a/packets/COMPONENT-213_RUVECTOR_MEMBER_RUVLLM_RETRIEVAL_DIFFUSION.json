@@ -1,0 +1,66 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 335153,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256": "a5b0d9f96fdedb3ddb79b962834f784d703fdf6eecfb87315cd2d46899b9e36d"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "grep -Fq 'RuVector member: ruvllm_retrieval_diffusion' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "completion_gate": "anchor still contains this unit; NOT evidence of implementation",
+  "depends_on": [],
+  "execution_cell": "components",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Component 'RuVector member: ruvllm_retrieval_diffusion' must be installed and used, not replaced (hard rule 15).",
+  "heartbeat_file": "state/COMPONENT-213_RUVECTOR_MEMBER_RUVLLM_RETRIEVAL_DIFFUSION.heartbeat.json",
+  "helper_id": "helper-component-213_ruvector_member_ruvllm_retrieval_diffusion",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/COMPONENT-213_RUVECTOR_MEMBER_RUVLLM_RETRIEVAL_DIFFUSION.log",
+  "max_parallel": 8,
+  "model_tag": "gpt-5.3-spark",
+  "needs_capability_probe": true,
+  "notes": "Structurally extracted from the blueprint anchor.",
+  "owner_agent": "anchor-agent",
+  "owner_lane": "lane_f_anchor",
+  "packet_schema_version": "1.0",
+  "parallel_group": "anchor_components",
+  "parent_id": "COMPONENTS",
+  "phase": "00-components",
+  "priority": 1213,
+  "probe_class": "drift-canary",
+  "proof_required": true,
+  "proof_uri": "proof_records/COMPONENT-213_RUVECTOR_MEMBER_RUVLLM_RETRIEVAL_DIFFUSION.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "shell"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/component-213_ruvector_member_ruvllm_retrieval_diffusion/result.json"
+  ],
+  "target_files": [],
+  "task_id": "COMPONENT-213_RUVECTOR_MEMBER_RUVLLM_RETRIEVAL_DIFFUSION",
+  "title": "Component: RuVector member: ruvllm_retrieval_diffusion",
+  "verification_command": "grep -Fq 'RuVector member: ruvllm_retrieval_diffusion' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+}

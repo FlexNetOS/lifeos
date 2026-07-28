@@ -135,6 +135,63 @@ fn redb_state_write(key: String, value: String) -> Result<u64, String> {
     client.put(&key, &value).map_err(|error| error.to_string())
 }
 
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CodeDbIngestReceipt {
+    schema_version: &'static str,
+    idempotency_key: String,
+    owner_key: String,
+    local_seq: u64,
+    raw_sha256: String,
+    typed_sha256: String,
+}
+
+/// Validate and place a complete CodeDB envelope in the authenticated redb
+/// owner. PostgreSQL materialization is intentionally not reachable here;
+/// envctl remains the sole durable committer.
+#[tauri::command]
+fn codedb_ingest_envelope(
+    envelope: lifeos_core::ingress::CodeDbIngestEnvelope,
+) -> Result<CodeDbIngestReceipt, String> {
+    envelope.validate().map_err(|error| error.to_string())?;
+    let typed_bytes = serde_json::to_vec(&envelope.typed_payload)
+        .map_err(|error| format!("encode typed CodeDB payload: {error}"))?;
+    let raw_sha256 = format!("{:x}", Sha256::digest(&envelope.raw_bytes));
+    let typed_sha256 = format!("{:x}", Sha256::digest(&typed_bytes));
+    let idempotency_digest = format!("{:x}", Sha256::digest(envelope.idempotency_key.as_bytes()));
+    let owner_key = format!("codedb/ingress/{idempotency_digest}");
+    let rendered = serde_json::json!({
+        "schemaVersion": lifeos_core::ingress::CODEDB_INGEST_SCHEMA,
+        "idempotencyKey": envelope.idempotency_key,
+        "rawBytesBase64": BASE64.encode(&envelope.raw_bytes),
+        "rawSha256": raw_sha256,
+        "typedPayload": envelope.typed_payload,
+        "typedSha256": typed_sha256,
+        "context": envelope.database_context(),
+    });
+    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
+    let local_seq = owner
+        .put(&owner_key, &rendered.to_string())
+        .map_err(|error| format!("CodeDB envelope owner write: {error}"))?;
+    Ok(CodeDbIngestReceipt {
+        schema_version: lifeos_core::ingress::CODEDB_INGEST_SCHEMA,
+        idempotency_key: rendered["idempotencyKey"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string(),
+        owner_key,
+        local_seq,
+        raw_sha256: rendered["rawSha256"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string(),
+        typed_sha256: rendered["typedSha256"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string(),
+    })
+}
+
 fn envctl_commit_conn() -> Result<String, String> {
     std::env::var("LIFEOS_ENVCTL_COMMIT_CONN")
         .map_err(|_| "LIFEOS_ENVCTL_COMMIT_CONN is required for envctl reconciliation".into())
@@ -1162,6 +1219,7 @@ pub fn run() {
             redb_projection_read,
             redb_events_read,
             redb_state_write,
+            codedb_ingest_envelope,
             envctl_drain,
             envctl_return_projection,
             terminal_spawn,

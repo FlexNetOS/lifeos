@@ -1,6 +1,8 @@
 //! LifeOS portable core. See `crates/lifeos-core/Cargo.toml` for the stage roadmap.
 
 pub mod auth;
+#[cfg(feature = "storage")]
+pub mod ingress;
 pub mod mcp;
 pub mod types;
 

@@ -32,6 +32,29 @@ fn redb_root() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("/home/flexnetos/meta/var/lib/redb"))
 }
 
+#[cfg(test)]
+mod terminal_tests {
+    use super::engine_room_argv;
+
+    #[test]
+    fn engine_room_argv_matches_the_reattach_contract() {
+        assert_eq!(
+            engine_room_argv("lifeos-tenant-session"),
+            vec![
+                "yzx",
+                "enter",
+                "options",
+                "--session-name",
+                "lifeos-tenant-session",
+                "--attach-to-session",
+                "true",
+                "--on-force-close",
+                "detach",
+            ]
+        );
+    }
+}
+
 fn hex_bytes(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
@@ -212,6 +235,7 @@ fn runtime_lineage(session_id: &str) -> serde_json::Value {
         "grant_id": value("LIFEOS_RUNTIME_GRANT_ID"),
         "lease_id": value("LIFEOS_RUNTIME_LEASE_ID"),
         "session_id": session_id,
+        "engine_session_name": value("LIFEOS_ENGINE_SESSION_NAME"),
         "request_id": value("LIFEOS_RUNTIME_REQUEST_ID"),
         "execution_id": value("LIFEOS_RUNTIME_EXECUTION_ID"),
         "task_id": value("LIFEOS_RUNTIME_TASK_ID"),
@@ -316,6 +340,20 @@ fn engine_room_session_name() -> Result<String, String> {
     Ok(name)
 }
 
+fn engine_room_argv(session_name: &str) -> Vec<String> {
+    vec![
+        "yzx".into(),
+        "enter".into(),
+        "options".into(),
+        "--session-name".into(),
+        session_name.into(),
+        "--attach-to-session".into(),
+        "true".into(),
+        "--on-force-close".into(),
+        "detach".into(),
+    ]
+}
+
 #[tauri::command]
 fn terminal_spawn(
     app: tauri::AppHandle,
@@ -333,17 +371,9 @@ fn terminal_spawn(
         .openpty(size)
         .map_err(|error| format!("open terminal: {error}"))?;
     let session_name = engine_room_session_name()?;
-    let mut command = CommandBuilder::new("yzx");
-    command.args([
-        "enter",
-        "options",
-        "--session-name",
-        &session_name,
-        "--attach-to-session",
-        "true",
-        "--on-force-close",
-        "detach",
-    ]);
+    let argv = engine_room_argv(&session_name);
+    let mut command = CommandBuilder::new(&argv[0]);
+    command.args(&argv[1..]);
     let child = pair
         .slave
         .spawn_command(command)
@@ -363,10 +393,7 @@ fn terminal_spawn(
         &session_id,
         "start",
         &[],
-        serde_json::json!({"cols": size.cols, "rows": size.rows, "argv": [
-            "yzx", "enter", "options", "--session-name", session_name,
-            "--attach-to-session", "true", "--on-force-close", "detach"
-        ]}),
+        serde_json::json!({"cols": size.cols, "rows": size.rows, "argv": argv}),
     )?;
     let output_offset = Arc::new(AtomicU64::new(0));
     let input_offset = Arc::new(AtomicU64::new(0));

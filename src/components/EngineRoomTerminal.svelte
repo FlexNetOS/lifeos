@@ -144,7 +144,12 @@
       webgl2 = false;
     }
     if (webgl2) {
-      terminal.loadAddon(new WebglAddon());
+      try {
+        terminal.loadAddon(new WebglAddon());
+      } catch {
+        // WebGL is an optional renderer; xterm's DOM renderer remains the
+        // authoritative byte-preserving fallback for the PTY surface.
+      }
     }
     terminal.open(terminalEl);
     terminal.onData((data) => sendBytes(new TextEncoder().encode(data)));

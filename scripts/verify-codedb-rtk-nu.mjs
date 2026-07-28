@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 const repoRoot = resolve(import.meta.dirname, "..");
 const rtkNuRoot = resolve(repoRoot, "../rtk-tokenkill");
 const codeDbRoot = resolve(repoRoot, "../nu_plugin");
-const expectedCodeDbRevision = "4275d629aab3159fc7e1612f60a1b3bcc3a57e04";
+const expectedCodeDbRevision = "925538f8f8b0fee7d9e6bf708a7ad5d77e4aafa9";
 
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });

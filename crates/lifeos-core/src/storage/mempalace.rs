@@ -222,12 +222,24 @@ pub async fn get_drawer(pool: &PgPool, id: &str) -> Result<Option<Drawer>, Stora
 /// Delete all mempalace projections in dependency order within one PostgreSQL
 /// transaction. Canonical raw source objects remain untouched.
 pub async fn clear(pool: &PgPool) -> Result<(), StorageError> {
-    sqlx::query("SELECT lifeos_agentdb.clear_projection('lifeos_agentdb.exp_edges'::regclass)")
-        .execute(pool)
-        .await?;
-    sqlx::query("SELECT lifeos_agentdb.clear_projection('lifeos_agentdb.exp_nodes'::regclass)")
-        .execute(pool)
-        .await?;
+    sqlx::query(
+        "SELECT lifeos_agentdb.clear_projection_kind(
+           'lifeos_agentdb.exp_edges'::regclass, 'exp-edge')",
+    )
+    .execute(pool)
+    .await?;
+    sqlx::query(
+        "SELECT lifeos_agentdb.clear_projection_kind(
+           'lifeos_agentdb.exp_nodes'::regclass, 'exp-node')",
+    )
+    .execute(pool)
+    .await?;
+    sqlx::query(
+        "SELECT lifeos_agentdb.clear_projection_kind(
+           'lifeos_agentdb.exp_nodes'::regclass, 'note')",
+    )
+    .execute(pool)
+    .await?;
     Ok(())
 }
 

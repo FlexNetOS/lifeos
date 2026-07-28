@@ -1,7 +1,8 @@
 //! Cognitum-Seed MCP client.
 //!
-//! Source-grounded endpoint evidence identifies the live Cognitum endpoint as
-//! HTTP at `http://169.254.42.1/mcp`, with REST mirrors under `/api/v1/...`.
+//! Current Cognitum SDK documentation identifies the Seed appliance as HTTPS
+//! at port `8443`, with REST resources under `/api/v1/...` and MCP available
+//! through both HTTP and stdio transports.
 //! This client speaks those REST routes through a `Transport` (production:
 //! `ReqwestTransport`; tests: in-memory fake) instead of marshalling JSON-RPC
 //! over stdio.
@@ -13,7 +14,7 @@
 //! client wraps are:
 //! - `seed.cogs.list` → `GET /api/v1/apps` → `cogs_list()`
 //! - `seed.sensor.snapshot` → `GET /api/v1/sensor/stream` → `sensor_snapshot()`
-//! - `seed.coherence.profile` → REST mirror path *unverified* → `coherence_profile()`
+//! - `seed.coherence.profile` → `GET /api/v1/coherence/profile` → `coherence_profile()`
 //!
 //! Response types are deliberately permissive: each wrapper holds a
 //! `serde_json::Value` and exposes 1-2 typed accessors plus `raw()` so callers
@@ -30,7 +31,7 @@ use serde_json::Value;
 /// advertises. Includes the `/mcp` suffix because that's the MCP-over-HTTP
 /// path; the REST mirror lives at the bare host (no `/mcp`). See
 /// `rest_base_from_mcp_url` for how the helper strips the suffix.
-pub const DEFAULT_COGNITUM_URL: &str = "http://169.254.42.1/mcp";
+pub const DEFAULT_COGNITUM_URL: &str = "https://169.254.42.1:8443/mcp";
 
 /// Translate an MCP-over-HTTP URL into the REST-mirror base URL. The live
 /// Cognitum exposes both: `http://169.254.42.1/mcp` for MCP tooling and
@@ -86,10 +87,9 @@ impl CogsListResponse {
     }
 }
 
-/// Sensor snapshot — wraps `GET /api/v1/sensor/stream`. The foundation doc
-/// notes 10 sensor channels; the on-wire layout is **inferred**, so the typed
-/// accessor pulls just the timestamp and lets callers reach for `raw()` for
-/// per-channel values until Wave 4 locks the schema.
+/// Sensor snapshot — decodes the latest JSON event from the SSE
+/// `GET /api/v1/sensor/stream` resource. The on-wire channel layout remains
+/// open-ended, so callers can inspect the complete event through `raw()`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SensorSnapshot {
     raw: Value,
@@ -116,11 +116,29 @@ impl SensorSnapshot {
     }
 }
 
+fn parse_sensor_event(body: &str) -> Result<Value, McpError> {
+    let trimmed = body.trim();
+    if trimmed.starts_with('{') || trimmed.starts_with('[') {
+        return serde_json::from_str(trimmed)
+            .map_err(|e| McpError::Protocol(format!("sensor_snapshot: invalid JSON: {e}")));
+    }
+    let data = trimmed
+        .lines()
+        .filter_map(|line| line.strip_prefix("data:"))
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .last()
+        .ok_or_else(|| {
+            McpError::Protocol("sensor_snapshot: SSE stream had no data event".into())
+        })?;
+    serde_json::from_str(data)
+        .map_err(|e| McpError::Protocol(format!("sensor_snapshot: invalid SSE JSON: {e}")))
+}
+
 /// Coherence profile — wraps the REST mirror of `seed.coherence.profile`.
 ///
-/// Path unverified — confirm against live Cognitum once endpoint is reachable.
-/// Best guess `/api/v1/coherence/profile`; the typed accessor pulls a single
-/// `score` field (also best-guess) and the rest stays in `raw()`.
+/// The `/api/v1/coherence/profile` response. The typed accessor pulls a
+/// `score` field when present and the rest stays in `raw()`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CoherenceProfile {
     raw: Value,
@@ -176,13 +194,11 @@ impl<T: Transport> CognitumClient<T> {
     /// `seed.sensor.snapshot` MCP tool.
     pub fn sensor_snapshot(&self) -> Result<SensorSnapshot, McpError> {
         let body = self.transport.get("/api/v1/sensor/stream")?;
-        let raw: Value = serde_json::from_str(&body)
-            .map_err(|e| McpError::Protocol(format!("sensor_snapshot: invalid JSON: {e}")))?;
+        let raw = parse_sensor_event(&body)?;
         Ok(SensorSnapshot { raw })
     }
 
-    /// Coherence profile. **Path unverified — confirm against live Cognitum
-    /// once endpoint is reachable.** Best guess `/api/v1/coherence/profile`.
+    /// Coherence profile from `/api/v1/coherence/profile`.
     pub fn coherence_profile(&self) -> Result<CoherenceProfile, McpError> {
         let body = self.transport.get("/api/v1/coherence/profile")?;
         let raw: Value = serde_json::from_str(&body)
@@ -255,6 +271,21 @@ mod tests {
         let client = CognitumClient::connect(t).unwrap();
         let snap = client.sensor_snapshot().unwrap();
         assert_eq!(snap.timestamp().as_deref(), Some("2026-05-25T12:00:00Z"));
+    }
+
+    #[test]
+    fn sensor_snapshot_extracts_latest_sse_event() {
+        let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
+            .with(
+                "/api/v1/sensor/stream",
+                "event: sensor\ndata: {\"ts\":1748131200000}\n\nevent: sensor\ndata: {\"timestamp\":\"2026-05-25T12:00:00Z\"}\n",
+            );
+        let client = CognitumClient::connect(t).unwrap();
+        assert_eq!(
+            client.sensor_snapshot().unwrap().timestamp().as_deref(),
+            Some("2026-05-25T12:00:00Z")
+        );
     }
 
     #[test]

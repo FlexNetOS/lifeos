@@ -84,14 +84,37 @@ pub async fn get_first(pool: &PgPool) -> Result<Option<AccountRow>, StorageError
 
 /// Update the password hash and canonical update timestamp.
 pub async fn update_password(pool: &PgPool, id: Uuid, new_hash: &str) -> Result<(), StorageError> {
-    sqlx::query(
-        "UPDATE lifeos_security.identity
-         SET attributes = attributes || jsonb_build_object('password_hash', $1)
-         WHERE identity_id = $2 AND subject_kind = 'human'
+    let current: serde_json::Value = sqlx::query_scalar(
+        "SELECT attributes FROM lifeos_security.identity
+         WHERE identity_id = $1 AND subject_kind = 'human'
            AND active_until IS NULL",
     )
-    .bind(new_hash)
     .bind(id)
+    .fetch_one(pool)
+    .await?;
+    let attributes = current
+        .as_object()
+        .cloned()
+        .map(|mut values| {
+            values.insert(
+                "password_hash".into(),
+                serde_json::Value::String(new_hash.to_string()),
+            );
+            serde_json::Value::Object(values)
+        })
+        .unwrap_or_else(|| serde_json::json!({"password_hash": new_hash}));
+    let raw = serde_json::json!({
+        "identity_id": id,
+        "operation": "password-update",
+        "attributes": attributes,
+    });
+    sqlx::query(
+        "SELECT lifeos_security.update_identity_attributes(
+           $1, $2, convert_to($3::text, 'UTF8'))",
+    )
+    .bind(id)
+    .bind(attributes)
+    .bind(raw)
     .execute(pool)
     .await?;
     Ok(())
@@ -99,14 +122,24 @@ pub async fn update_password(pool: &PgPool, id: Uuid, new_hash: &str) -> Result<
 
 /// Delete all accounts. Called only by the explicit vault-reset command.
 pub async fn delete_all(pool: &PgPool) -> Result<u64, StorageError> {
-    let result = sqlx::query(
-        "UPDATE lifeos_security.identity
-         SET active_until = CURRENT_TIMESTAMP
+    let identities: Vec<Uuid> = sqlx::query_scalar(
+        "SELECT identity_id FROM lifeos_security.identity
          WHERE subject_kind = 'human' AND active_until IS NULL",
     )
-    .execute(pool)
+    .fetch_all(pool)
     .await?;
-    Ok(result.rows_affected())
+    for id in &identities {
+        let raw = serde_json::json!({
+            "identity_id": id,
+            "operation": "deactivate",
+        });
+        sqlx::query("SELECT lifeos_security.deactivate_identity($1, convert_to($2::text, 'UTF8'))")
+            .bind(id)
+            .bind(raw)
+            .execute(pool)
+            .await?;
+    }
+    Ok(identities.len() as u64)
 }
 
 async fn get_by_id(pool: &PgPool, id: Uuid) -> Result<Option<AccountRow>, StorageError> {

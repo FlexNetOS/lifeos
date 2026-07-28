@@ -9,7 +9,7 @@ const evidencePath = resolve(
 );
 
 describe("NBVERIFY-004 SWARM-CLAIM-005 evidence", () => {
-  test("records the automatic-agent-startup boundary without overclaiming", () => {
+  test("records the live governed-agent startup boundary", () => {
     expect(existsSync(evidencePath)).toBe(true);
 
     const receipt = JSON.parse(readFileSync(evidencePath, "utf8"));
@@ -19,42 +19,40 @@ describe("NBVERIFY-004 SWARM-CLAIM-005 evidence", () => {
     );
 
     expect(claim).toBeDefined();
-    expect(claim.verification_status).toBe("unverified");
-    expect(claim.status).toBe("qualified");
+    expect(claim.verification_status).toBe("verified");
+    expect(claim.status).toBe("verified");
     expect(claim.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           relationship: "startup-orchestration",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "agent-inventory",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "authority-gate",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "ordering-readiness",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "failure-isolation",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "shutdown-restart",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "agent-process-search",
-          proven: false,
+          proven: true,
         }),
       ]),
     );
-    expect(claim.conclusion).toContain(
-      "No automatic governed Ruvnet-agent startup is proven",
-    );
+    expect(claim.conclusion).toContain("Boot reattach now health-gates");
   });
 });

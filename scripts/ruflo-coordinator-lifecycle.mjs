@@ -74,6 +74,7 @@ export class RufloCoordinator {
       agentIdentity: binding.agentIdentity ?? null,
       cartridgeId: binding.cartridgeId ?? null,
       route: binding.route ?? "local",
+      agentMemoryBound: binding.agentMemoryBound === true,
       cost,
       deadline: binding.deadline ?? null,
       state: "dispatched",

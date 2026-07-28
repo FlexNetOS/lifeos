@@ -8,7 +8,7 @@ const evidencePath = resolve(
 );
 
 describe("NBVERIFY-004 SWARM-CLAIM-006 evidence", () => {
-  test("separates native RuvLLM capability from static automatic-agent usage", () => {
+  test("records live native RuvLLM usage by the Ruflo coordinator", () => {
     expect(existsSync(evidencePath)).toBe(true);
     const receipt = JSON.parse(readFileSync(evidencePath, "utf8"));
     const claim = receipt.claims.find(
@@ -16,14 +16,14 @@ describe("NBVERIFY-004 SWARM-CLAIM-006 evidence", () => {
         candidate.claim_id === "SWARM-CLAIM-006",
     );
     expect(claim).toBeDefined();
-    expect(claim.verification_status).toBe("unverified");
-    expect(claim.status).toBe("qualified");
+    expect(claim.verification_status).toBe("verified");
+    expect(claim.status).toBe("verified");
     expect(claim.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ relationship: "ruvllm-package" }),
         expect.objectContaining({ relationship: "native-capability" }),
-        expect.objectContaining({ relationship: "static-engine-boundary" }),
-        expect.objectContaining({ relationship: "automatic-agent-usage" }),
+        expect.objectContaining({ relationship: "static-engine-boundary", proven: true }),
+        expect.objectContaining({ relationship: "automatic-agent-usage", proven: true }),
       ]),
     );
     expect(
@@ -31,6 +31,6 @@ describe("NBVERIFY-004 SWARM-CLAIM-006 evidence", () => {
         (candidate: { relationship: string }) =>
           candidate.relationship === "static-engine-boundary",
       ),
-    ).toEqual(expect.objectContaining({ proven: false }));
+    ).toEqual(expect.objectContaining({ proven: true }));
   });
 });

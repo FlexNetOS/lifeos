@@ -17,7 +17,7 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Child as ProcessChild, Command, Stdio};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -335,6 +335,46 @@ fn envctl_return_projection() -> Result<Vec<(String, String)>, String> {
 struct EnvctlReconciler {
     stop: Arc<AtomicBool>,
     thread: Option<JoinHandle<()>>,
+}
+
+/// Owns the automatically started profile-owned agent runtime. The runtime
+/// publishes only transient owner status and per-agent RVF state; durable
+/// task, policy, and completion authority remains PostgreSQL/RuVector.
+struct AgentRuntimeSupervisor {
+    child: Arc<Mutex<ProcessChild>>,
+}
+
+impl AgentRuntimeSupervisor {
+    fn start() -> Result<Self, String> {
+        let script = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("..")
+            .join("scripts/lifeos-agent-runtime.mjs");
+        if !script.exists() {
+            return Err(format!("agent runtime script is missing: {}", script.display()));
+        }
+        let bun = std::env::var_os("LIFEOS_BUN_BIN")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("/home/flexnetos/.nix-profile/bin/bun"));
+        let child = Command::new(&bun)
+            .arg(&script)
+            .current_dir(script.parent().and_then(|path| path.parent()).unwrap_or_else(|| std::path::Path::new(".")))
+            .env("LIFEOS_REDB_ROOT", redb_root())
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .map_err(|error| format!("start LifeOS agent runtime with {}: {error}", bun.display()))?;
+        Ok(Self { child: Arc::new(Mutex::new(child)) })
+    }
+}
+
+impl Drop for AgentRuntimeSupervisor {
+    fn drop(&mut self) {
+        if let Ok(mut child) = self.child.lock() {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
+    }
 }
 
 impl EnvctlReconciler {
@@ -1367,6 +1407,8 @@ pub fn run() {
             })?;
             app.manage(owner);
             publish_swarm_runtime_status().map_err(std::io::Error::other)?;
+            let agent_runtime = AgentRuntimeSupervisor::start().map_err(std::io::Error::other)?;
+            app.manage(agent_runtime);
             if let Some(reconciler) = EnvctlReconciler::start() {
                 app.manage(reconciler);
             }

@@ -23,7 +23,7 @@ const DURABLE_ROOTS = [
   { name: "xdg-data", path: "/home/flexnetos/meta/var/xdg-data", need: "writable" },
 ];
 
-// Production service order (postgres -> redb -> front door). Health gates are
+// Production service order (postgres -> redb -> front door -> governed agents). Health gates are
 // real; postgres actually STARTS from the intact durable datadir with a
 // user-owned socket dir — the canonical macro-state comes back up at
 // re-attach, exactly what the 2026-07-21 incident lacked.
@@ -49,6 +49,8 @@ function pgBin() {
 
 const PG_DATA = "/home/flexnetos/meta/var/lib/postgresql/17";
 const PG_SOCKET_DIR = "/home/flexnetos/meta/var/run/postgresql";
+const AGENT_STATUS = process.env.LIFEOS_AGENT_STATUS ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/status.json";
+const AGENT_ROOT = process.env.LIFEOS_AGENT_RVF_ROOT ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/rvf";
 
 export function productionServices() {
   const pgCtl = pgBin();
@@ -68,6 +70,14 @@ export function productionServices() {
     // first re-attach initializes it, later runs find it — idempotent.
     { name: "redb-plane", order: 2, health: ["test", "-d", "/home/flexnetos/meta/var/lib/redb"], start: ["mkdir", "-p", "/home/flexnetos/meta/var/lib/redb"], timeoutMs: 5000 },
     { name: "glass-engine-frontdoor", order: 3, health: ["test", "-x", "/home/flexnetos/.nix-profile/bin/yzx"] },
+    {
+      name: "governed-ruvnet-agents",
+      order: 4,
+      health: ["test", "-s", AGENT_STATUS],
+      start: ["/home/flexnetos/.nix-profile/toolbin/bun", `${repoRoot}/scripts/lifeos-agent-runtime.mjs`],
+      timeoutMs: 15000,
+      environment: { LIFEOS_REDB_ROOT: "/home/flexnetos/meta/var/lib/redb", LIFEOS_AGENT_STATUS: AGENT_STATUS, LIFEOS_AGENT_RVF_ROOT: AGENT_ROOT },
+    },
   ];
 }
 
@@ -145,7 +155,11 @@ export async function startServicesOrdered(services) {
       // health never passes.
       while (!started && Date.now() < deadline) {
         try {
-          const child = spawn(svc.start[0], svc.start.slice(1), { detached: true, stdio: "ignore" });
+          const child = spawn(svc.start[0], svc.start.slice(1), {
+            detached: true,
+            stdio: "ignore",
+            env: svc.environment ? { ...process.env, ...svc.environment } : process.env,
+          });
           child.on("error", () => {});
           child.unref();
           started = true;

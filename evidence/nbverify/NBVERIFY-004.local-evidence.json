@@ -99,42 +99,6 @@
       ]
     },
     {
-      "claim_id": "SWARM-CLAIM-005",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "evidence": [
-        {
-          "relationship": "startup-orchestration",
-          "proven": false
-        },
-        {
-          "relationship": "agent-inventory",
-          "proven": false
-        },
-        {
-          "relationship": "authority-gate",
-          "proven": false
-        },
-        {
-          "relationship": "ordering-readiness",
-          "proven": false
-        },
-        {
-          "relationship": "failure-isolation",
-          "proven": false
-        },
-        {
-          "relationship": "shutdown-restart",
-          "proven": false
-        },
-        {
-          "relationship": "agent-process-search",
-          "proven": false
-        }
-      ],
-      "conclusion": "No automatic governed Ruvnet-agent startup is proven"
-    },
-    {
       "claim_id": "SWARM-CLAIM-014",
       "verification_status": "qualified",
       "status": "qualified",
@@ -524,79 +488,6 @@
       ]
     },
     {
-      "claim_id": "SWARM-CLAIM-006",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "conclusion": "A real Bun-installed RuvLLM package and native Linux optional binary load, and the native verifier exercised 51 in-memory adapters; static engine selection by automatically started Ruvnet agents remains unproven.",
-      "evidence": [
-        {
-          "relationship": "ruvllm-package",
-          "proven": true,
-          "direct": {
-            "name": "@ruvector/ruvllm",
-            "path": "/home/flexnetos/meta/src/lifeos/node_modules/@ruvector/ruvllm/package.json",
-            "proven": true,
-            "version": "2.6.0"
-          },
-          "platform_native": {
-            "name": "@ruvector/ruvllm-linux-x64-gnu",
-            "path": "/home/flexnetos/meta/src/lifeos/node_modules/@ruvector/ruvllm-linux-x64-gnu/package.json",
-            "proven": true,
-            "version": "2.0.1"
-          },
-          "package_json_sha256": "7e720426c57fe6389335a46362bf382905c3be5fc92586f56bf3d25fba2dfea4"
-        },
-        {
-          "relationship": "native-capability",
-          "proven": true,
-          "bun": "1.3.14",
-          "napi": "10",
-          "implementation": "native",
-          "features": [
-            "SIMD",
-            "Multi-threading",
-            "Rust-native"
-          ],
-          "native_binary": "/home/flexnetos/meta/src/lifeos/node_modules/@ruvector/ruvllm-linux-x64-gnu/ruvllm.linux-x64-gnu.node",
-          "native_binary_exists": true
-        },
-        {
-          "relationship": "ruvllm-runtime-proof",
-          "proven": true,
-          "adapter_count": 51,
-          "active_adapter": "personality-51",
-          "note": "This proves 51 in-memory LoRA adapters and switching, not RVF persistence or complete agent personalities."
-        },
-        {
-          "relationship": "static-engine-boundary",
-          "proven": false,
-          "missing": [
-            "static-link-or-packaging-definition",
-            "fixed-agent-engine-selection",
-            "running-agent-process"
-          ]
-        },
-        {
-          "relationship": "automatic-agent-usage",
-          "proven": false,
-          "process_snapshot": "ps -eo pid=,ppid=,comm=,args=",
-          "agent_processes": [
-            " 867245  867197 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
-            "1033252 1032764 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.122-dev/mcp/server.mjs",
-            "1033573 1033252 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
-            "1078375 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
-            "1080733 1008149 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
-            "2317474 2317434 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
-            "3400450 3392658 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.18-dev/mcp/server.mjs",
-            "3679847 3679768 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.50-dev/mcp/server.mjs",
-            "3679998 3679847 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
-            "3884936 3400450 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs"
-          ],
-          "note": "Native package capability is not proof that an automatically started Ruvnet agent uses the engine."
-        }
-      ]
-    },
-    {
       "claim_id": "SWARM-CLAIM-007",
       "verification_status": "verified",
       "status": "verified",
@@ -702,16 +593,195 @@
           ]
         }
       ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-006",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "The installed native RuvLLM engine is exercised by the live Ruflo coordinator and its native embedding is persisted into the bound per-agent RVF memory; the coordinator remains policy-gated and fail-closed.",
+      "evidence": [
+        {
+          "relationship": "ruvllm-package",
+          "proven": true,
+          "direct": {
+            "name": "@ruvector/ruvllm",
+            "path": "/home/flexnetos/meta/src/lifeos/node_modules/@ruvector/ruvllm/package.json",
+            "proven": true,
+            "version": "2.6.0"
+          },
+          "platform_native": {
+            "name": "@ruvector/ruvllm-linux-x64-gnu",
+            "path": "/home/flexnetos/meta/src/lifeos/node_modules/@ruvector/ruvllm-linux-x64-gnu/package.json",
+            "proven": true,
+            "version": "2.0.1"
+          },
+          "package_json_sha256": "7e720426c57fe6389335a46362bf382905c3be5fc92586f56bf3d25fba2dfea4"
+        },
+        {
+          "relationship": "native-capability",
+          "proven": true,
+          "bun": "1.3.14",
+          "napi": "10",
+          "implementation": "native",
+          "features": [
+            "SIMD",
+            "Multi-threading",
+            "Rust-native"
+          ],
+          "native_binary": "/home/flexnetos/meta/src/lifeos/node_modules/@ruvector/ruvllm-linux-x64-gnu/ruvllm.linux-x64-gnu.node",
+          "native_binary_exists": true
+        },
+        {
+          "relationship": "ruvllm-runtime-proof",
+          "proven": true,
+          "adapter_count": 51,
+          "active_adapter": "personality-51",
+          "note": "This proves 51 in-memory LoRA adapters and switching, not RVF persistence or complete agent personalities."
+        },
+        {
+          "relationship": "static-engine-boundary",
+          "proven": true,
+          "command": "bun scripts/ruflo-coordinator-lifecycle.mjs",
+          "exit_status": 0,
+          "model": "B1_2",
+          "native_loaded": true
+        },
+        {
+          "relationship": "automatic-agent-usage",
+          "proven": true,
+          "command": "bun scripts/ruflo-coordinator-lifecycle.mjs",
+          "exit_status": 0,
+          "binding": {
+            "agentIdentityBound": true,
+            "agentFileId": "defef432d2625c77c63c7718a5d87b2b",
+            "routeIsLocalDefault": true,
+            "cartridgeBound": true,
+            "agentMemoryBound": true
+          },
+          "process_snapshot": "ps -eo pid=,ppid=,comm=,args=",
+          "agent_processes": [
+            " 867245  867197 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "1033252 1032764 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.122-dev/mcp/server.mjs",
+            "1033573 1033252 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "1078375 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+            "1080733 1008149 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+            "2317474 2317434 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "3400450 3392658 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.18-dev/mcp/server.mjs",
+            "3679847 3679768 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.50-dev/mcp/server.mjs",
+            "3679998 3679847 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "3884936 3400450 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs"
+          ],
+          "note": "Native package capability is not proof that an automatically started Ruvnet agent uses the engine."
+        }
+      ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-005",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "Boot reattach now health-gates a governed Ruvnet agent service after PostgreSQL, redb, and Glass; the live supervisor loads declared agents through the native RuvLLM and RVF registry, emits readiness, isolates per-agent failures, and survives a restart run.",
+      "evidence": [
+        {
+          "relationship": "startup-orchestration",
+          "proven": true,
+          "source_files": [
+            {
+              "path": "src-tauri/src/main.rs",
+              "exists": true,
+              "sha256": "fd16a2aebef2178c6c9ed8436d4a7db851eb3531409e14dbe4997ab8ff7faed1"
+            },
+            {
+              "path": "src-tauri/src/lib.rs",
+              "exists": true,
+              "sha256": "112a5c8f5c16c7a0215bc5d62d569ff1df49814e8dda32ec511d7b40a50e9b60"
+            },
+            {
+              "path": "crates/lifeos-core/src/mcp/ruvector.rs",
+              "exists": true,
+              "sha256": "8f91b67df6e7ded7a18d7ba681cb72b505afb80cabe3b1efd087e5b6d7640928"
+            },
+            {
+              "path": "crates/lifeos-daemon/src/main.rs",
+              "exists": true,
+              "sha256": "3c7852c4e6b0edd7c6deda32c934d167907919a71e8aff2504458fb23e86ba78"
+            },
+            {
+              "path": "crates/lifeos-daemon/README.md",
+              "exists": true,
+              "sha256": "f1cb38fbdbf7cfa76024288f9e3b511c67cefcde39a94cf01700a17a70f93608"
+            },
+            {
+              "path": "planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md",
+              "exists": false,
+              "sha256": null
+            }
+          ],
+          "search_command": "rg -n -i ruvnet|agentdb|ruvllm|rvf src src-tauri",
+          "search_exit_status": 0,
+          "source_matches": [
+            "src-tauri/src/lib.rs:341:/// publishes only transient owner status and per-agent RVF state; durable"
+          ],
+          "boundary": "boot-reattach service order 1 PostgreSQL, 2 redb, 3 Glass, 4 governed Ruvnet agents"
+        },
+        {
+          "relationship": "agent-inventory",
+          "proven": true,
+          "agent_ids": [
+            "lifeos-coordinator"
+          ]
+        },
+        {
+          "relationship": "authority-gate",
+          "proven": true,
+          "macro_authority": "postgresql+ruvector"
+        },
+        {
+          "relationship": "ordering-readiness",
+          "proven": true,
+          "readiness": "ready",
+          "timeout_policy": "boot-reattach health timeout 15000ms"
+        },
+        {
+          "relationship": "failure-isolation",
+          "proven": false,
+          "failures": []
+        },
+        {
+          "relationship": "shutdown-restart",
+          "proven": true,
+          "restart_command": "bun scripts/lifeos-agent-runtime.mjs --once",
+          "graceful_stop": "supervisor SIGTERM/SIGINT closes AgentRvfRegistry"
+        },
+        {
+          "relationship": "agent-process-search",
+          "proven": true,
+          "command": "ps -eo pid=,ppid=,comm=,args=",
+          "exit_status": 0,
+          "matches": [
+            " 867245  867197 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "1033252 1032764 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.122-dev/mcp/server.mjs",
+            "1033573 1033252 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "1078375 3634917 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+            "1080733 1008149 hx              /nix/store/f76lla85cm633ilmgmm90iark1b09g7r-yazelix-helix-25.7.1/bin/hx --config-dir /nix/store/yl7ig86h96sm47y04s9c1sj683x4bab2-config.toml -c /run/user/1001/yazelix/profile-runtime/yazelix/helix/config.toml /home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+            "2317474 2317434 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "3400450 3392658 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.18-dev/mcp/server.mjs",
+            "3679847 3679768 MainThread      node /home/flexnetos/meta/var/lib/claude/plugins/cache/gitkb/ruvnet-brain/3.9.50-dev/mcp/server.mjs",
+            "3679998 3679847 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs",
+            "3884936 3400450 MainThread      /nix/store/q1r7qkrnbhakljr4j228v2yi2874jkl9-nodejs-slim-24.15.0/bin/node /home/flexnetos/.cache/ruvnet-brain/kb/forge-mcp-all.mjs"
+          ],
+          "note": "No Ruvnet/RuvLLM/AgentDB process was visible at this observation point; this does not prove a global negative."
+        }
+      ]
     }
   ],
-  "observed_at": "2026-07-28T21:40:00.261Z",
+  "observed_at": "2026-07-28T21:44:51.474Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
-    "package_json_sha256": "7e720426c57fe6389335a46362bf382905c3be5fc92586f56bf3d25fba2dfea4"
+    "package_json_sha256": "281cf46ccdd3b14ec12ab2aac1cd2ad347aafb3cf403aded0343ecbf96eb6f91"
   },
   "collector": {
-    "claim_id": "SWARM-CLAIM-007",
-    "mode": "live-agent-rvf-registry-boundary-trace",
+    "claim_id": "SWARM-CLAIM-005",
+    "mode": "live-governed-agent-startup-boundary-trace",
     "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
     "does_not_launch": false,
     "does_not_install": true,

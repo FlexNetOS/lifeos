@@ -8,13 +8,16 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 
 const repoRoot = resolve(new URL(".", import.meta.url).pathname, "..");
-const ENGINE_CANDIDATES = [
-  process.env.YZX_ENVELOPE_BIN,
-  "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.sh",
-  "/home/flexnetos/meta/src/yazelix/.claude/worktrees/archbp-065-envelope/envelope/yzx-envelope.sh",
+const engineCandidates = [
+  process.env.YZX_ENVELOPE_BIN
+    ? { kind: "shell", path: process.env.YZX_ENVELOPE_BIN }
+    : null,
+  { kind: "nu", path: "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.nu" },
+  { kind: "shell", path: "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.sh" },
+  { kind: "shell", path: "/home/flexnetos/meta/src/yazelix/.claude/worktrees/archbp-065-envelope/envelope/yzx-envelope.sh" },
 ].filter(Boolean);
-const engine = ENGINE_CANDIDATES.find((c) => {
-  try { execFileSync("test", ["-f", c]); return true; } catch { return false; }
+const engine = engineCandidates.find(({ path }) => {
+  try { execFileSync("test", ["-f", path]); return true; } catch { return false; }
 });
 if (!engine) throw new Error("yzx-envelope engine not found");
 
@@ -33,9 +36,12 @@ function bareRun() {
 
 function envelopeRun(i) {
   const wall0 = process.hrtime.bigint();
+  const launcher = engine.kind === "nu"
+    ? ["/home/flexnetos/.nix-profile/bin/nu", engine.path]
+    : ["bash", engine.path];
   const out = execFileSync(
-    "bash",
-    [engine, "enter", "--id", `bench-${i}`, "--", python, "-c", WORKLOAD],
+    launcher[0],
+    [...launcher.slice(1), "enter", "--id", `bench-${i}`, "--", python, "-c", WORKLOAD],
     { encoding: "utf8" },
   ).trim();
   const wallMs = Number(process.hrtime.bigint() - wall0) / 1e6;
@@ -56,7 +62,7 @@ const overheadPct = ((envMedian - bareMedian) / bareMedian) * 100;
 const setupMedianMs = median(enveloped.map((e) => e.wallMs - e.compute * 1000));
 
 const result = {
-  schema_version: "lifeos-planning-spine.envelope-latency-bench.v0",
+  schema_version: "lifeos.envelope-latency-bench.v1",
   recorded_for: "yzx-iso t10-7-latency-benchmark (T10.7 release gauntlet)",
   workload: "python3 sum(i*i for i in range(20_000_000)) self-timed via perf_counter",
   runs_per_arm: RUNS,
@@ -72,7 +78,7 @@ const result = {
 const outputArg = process.argv.find((a) => a.startsWith("--output="));
 const outPath = outputArg
   ? resolve(process.cwd(), outputArg.slice("--output=".length))
-  : resolve(repoRoot, "planning-spine-v0/docs/envelope_latency_benchmark.json");
+  : resolve(repoRoot, "evidence/benchmarks/envelope_latency_benchmark.json");
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, `${JSON.stringify(result, null, 2)}\n`);
 console.log(

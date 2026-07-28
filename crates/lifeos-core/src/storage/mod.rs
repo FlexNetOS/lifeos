@@ -15,6 +15,50 @@ use sqlx::{
     PgPool,
 };
 use std::str::FromStr;
+use uuid::Uuid;
+
+/// The envctl-issued authority needed to bind one PostgreSQL connection to a
+/// tenant. Binding is connection-local because the database records the
+/// backend PID and expiry in `lifeos_security.backend_binding`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RuntimeContext {
+    pub tenant_id: Uuid,
+    pub identity_id: Uuid,
+    pub grant_id: Uuid,
+    pub binding_bytes: Vec<u8>,
+}
+
+impl RuntimeContext {
+    /// Read the context delivered by envctl. The binding is intentionally raw
+    /// UTF-8 JSON bytes: the database validates its exact tenant, identity,
+    /// grant, purpose, and provenance before creating a backend binding.
+    pub fn from_env() -> Result<Self, StorageError> {
+        let read =
+            |name: &str| std::env::var(name).map_err(|_| StorageError::MissingRuntimeContext);
+        let parse_uuid = |name: &str, value: String| {
+            Uuid::parse_str(&value)
+                .map_err(|error| StorageError::InvalidRuntimeContext(format!("{name}: {error}")))
+        };
+        let binding = read("LIFEOS_RUNTIME_BINDING_JSON")?.into_bytes();
+        if binding.is_empty() {
+            return Err(StorageError::InvalidRuntimeContext(
+                "LIFEOS_RUNTIME_BINDING_JSON is empty".into(),
+            ));
+        }
+        Ok(Self {
+            tenant_id: parse_uuid(
+                "LIFEOS_RUNTIME_TENANT_ID",
+                read("LIFEOS_RUNTIME_TENANT_ID")?,
+            )?,
+            identity_id: parse_uuid(
+                "LIFEOS_RUNTIME_IDENTITY_ID",
+                read("LIFEOS_RUNTIME_IDENTITY_ID")?,
+            )?,
+            grant_id: parse_uuid("LIFEOS_RUNTIME_GRANT_ID", read("LIFEOS_RUNTIME_GRANT_ID")?)?,
+            binding_bytes: binding,
+        })
+    }
+}
 
 /// The canonical durable LifeOS storage handle. PostgreSQL/RuVector owns every
 /// product record; redb is intentionally not represented here because it is a
@@ -50,14 +94,38 @@ impl Storage {
     /// Open a PostgreSQL/RuVector database. SQLite is deliberately rejected:
     /// it is not a canonical durable product-data tier in LifeOS.
     pub async fn new(url: &str) -> Result<Self, StorageError> {
+        Self::new_with_context(url, None).await
+    }
+
+    async fn new_with_context(
+        url: &str,
+        runtime_context: Option<RuntimeContext>,
+    ) -> Result<Self, StorageError> {
         if !(url.starts_with("postgres://") || url.starts_with("postgresql://")) {
             return Err(StorageError::UnsupportedDatabaseUrl);
         }
 
         let options = PgConnectOptions::from_str(url).map_err(sqlx::Error::from)?;
-        let pool = PgPoolOptions::new()
-            .max_connections(10)
-            .min_connections(1)
+        let mut pool_options = PgPoolOptions::new().max_connections(10).min_connections(1);
+        if let Some(context) = runtime_context {
+            pool_options = pool_options.after_connect(move |connection, _meta| {
+                let context = context.clone();
+                Box::pin(async move {
+                    sqlx::query(
+                        "SELECT binding_id, session_nonce
+                         FROM lifeos_security.bootstrap_envctl_context($1, $2, $3, $4)",
+                    )
+                    .bind(context.tenant_id)
+                    .bind(context.identity_id)
+                    .bind(context.grant_id)
+                    .bind(context.binding_bytes)
+                    .fetch_one(connection)
+                    .await?;
+                    Ok(())
+                })
+            });
+        }
+        let pool = pool_options
             .connect_with(options)
             .await
             .map_err(sqlx::Error::from)?;
@@ -73,7 +141,13 @@ impl Storage {
     pub async fn from_runtime_env() -> Result<Self, StorageError> {
         let url =
             std::env::var("LIFEOS_DATABASE_URL").map_err(|_| StorageError::MissingDatabaseUrl)?;
-        Self::new(&url).await
+        // Migrations create the envctl binding function itself. Bootstrap the
+        // schema through an unbound connection, then reopen the pool with the
+        // connection hook that binds every application connection.
+        let bootstrap = Self::new(&url).await?;
+        bootstrap.migrate().await?;
+        let context = RuntimeContext::from_env()?;
+        Self::new_with_context(&url, Some(context)).await
     }
 
     /// Run embedded PostgreSQL migrations. Idempotent: sqlx records applied
@@ -168,6 +242,27 @@ impl Storage {
         &self.pool
     }
 
+    /// Acquire a connection and bind it through the database-owned envctl
+    /// security boundary. Callers must use the returned connection for all
+    /// tenant-scoped work; a different pool connection has no tenant context.
+    pub async fn bind_runtime_context(
+        &self,
+        context: &RuntimeContext,
+    ) -> Result<sqlx::pool::PoolConnection<sqlx::Postgres>, StorageError> {
+        let mut connection = self.pool.acquire().await?;
+        sqlx::query(
+            "SELECT binding_id, session_nonce
+             FROM lifeos_security.bootstrap_envctl_context($1, $2, $3, $4)",
+        )
+        .bind(context.tenant_id)
+        .bind(context.identity_id)
+        .bind(context.grant_id)
+        .bind(&context.binding_bytes)
+        .fetch_one(&mut *connection)
+        .await?;
+        Ok(connection)
+    }
+
     #[cfg(test)]
     pub async fn new_for_test() -> Result<Self, StorageError> {
         let url = std::env::var("LIFEOS_TEST_DATABASE_URL")
@@ -211,7 +306,8 @@ fn redact_database_url(url: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{redact_database_url, Storage, StorageError};
+    use super::{redact_database_url, RuntimeContext, Storage, StorageError};
+    use uuid::Uuid;
 
     #[test]
     fn redacts_user_and_password() {
@@ -219,6 +315,34 @@ mod tests {
             redact_database_url("postgresql://user:secret@db.example:5432/lifeos?sslmode=require"),
             "postgresql://db.example:5432/lifeos"
         );
+    }
+
+    #[test]
+    fn runtime_context_preserves_envctl_binding_bytes() {
+        let context = RuntimeContext {
+            tenant_id: uuid::uuid!("00000000-0000-4000-8000-000000000001"),
+            identity_id: uuid::uuid!("00000000-0000-4000-8000-000000000002"),
+            grant_id: uuid::uuid!("00000000-0000-4000-8000-000000000003"),
+            binding_bytes: br#"{"purpose":"envctl-session-binding"}"#.to_vec(),
+        };
+        assert_eq!(
+            context.binding_bytes,
+            br#"{"purpose":"envctl-session-binding"}"#
+        );
+    }
+
+    #[tokio::test]
+    #[ignore = "requires a live PostgreSQL database and envctl-issued context"]
+    async fn runtime_context_binds_a_live_postgres_connection() {
+        let url = std::env::var("LIFEOS_DATABASE_URL").unwrap();
+        let storage = Storage::new(&url).await.unwrap();
+        let context = RuntimeContext::from_env().unwrap();
+        let mut connection = storage.bind_runtime_context(&context).await.unwrap();
+        let tenant: Uuid = sqlx::query_scalar("SELECT lifeos_security.current_tenant()")
+            .fetch_one(&mut *connection)
+            .await
+            .unwrap();
+        assert_eq!(tenant, context.tenant_id);
     }
 
     #[tokio::test]

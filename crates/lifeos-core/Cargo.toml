@@ -32,6 +32,7 @@ argon2 = { version = "0.5", default-features = false, features = ["std", "alloc"
 # that hands back the underlying `serde_json::Value` for callers that want
 # fields we haven't typed yet.
 serde_json = "1"
+uuid = { version = "1", features = ["serde"], optional = true }
 # Stage 1d (Wave 3): HTTP transport for the MCP REST mirror surfaces. Blocking
 # client so both the daemon and the Tauri shell can call from worker threads
 # without dragging tokio into `lifeos-core`. Rustls feature set mirrors
@@ -51,7 +52,7 @@ mlua = { version = "0.11", default-features = false, features = ["luau", "send",
 # Durable product state is PostgreSQL/RuVector. rustls keeps the client free of
 # OpenSSL; `storage` remains optional so no_std / ESP32 consumers keep a clean
 # dependency tree.
-sqlx = { version = "0.8", default-features = false, features = ["postgres", "tls-rustls", "macros", "migrate", "runtime-tokio", "chrono"], optional = true }
+sqlx = { version = "0.8", default-features = false, features = ["postgres", "tls-rustls", "macros", "migrate", "runtime-tokio", "chrono", "uuid"], optional = true }
 # tokio listed explicitly so storage code can call tokio::* without relying on
 # sqlx's transitive re-export. The Tauri shell owns the actual runtime; we only
 # need the feature tag here so async storage functions compile.
@@ -75,7 +76,7 @@ mcp-http = ["dep:reqwest"]
 plugin-host = ["dep:mlua"]
 # PostgreSQL/RuVector canonical storage. ESP32 consumers turn it off with
 # `default-features = false`.
-storage = ["dep:sqlx", "dep:tokio", "dep:chrono", "dep:sha2"]
+storage = ["dep:sqlx", "dep:tokio", "dep:chrono", "dep:sha2", "dep:uuid"]
 # One-way, read-only SQLite import used only to retire pre-cutover app-data
 # databases into PostgreSQL. It is deliberately separate from `storage`: no
 # new product record may be written to SQLite after the import completes.

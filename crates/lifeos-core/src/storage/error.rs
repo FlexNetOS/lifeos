@@ -19,6 +19,10 @@ pub enum StorageError {
     MissingDatabaseUrl,
     /// Storage tests require an explicitly provisioned disposable PostgreSQL URL.
     MissingTestDatabaseUrl,
+    /// The envctl-issued PostgreSQL runtime context was not supplied.
+    MissingRuntimeContext,
+    /// The envctl-issued PostgreSQL runtime context was malformed.
+    InvalidRuntimeContext(String),
     /// RuVector must be installed in the dedicated `extensions` schema.
     RequiredExtension,
     /// The durable schema has fewer applied migrations than the embedded set.
@@ -54,6 +58,13 @@ impl fmt::Display for StorageError {
             }
             Self::MissingTestDatabaseUrl => {
                 write!(f, "LIFEOS_TEST_DATABASE_URL is required for storage tests")
+            }
+            Self::MissingRuntimeContext => write!(
+                f,
+                "an envctl-issued runtime context is required for canonical PostgreSQL access"
+            ),
+            Self::InvalidRuntimeContext(reason) => {
+                write!(f, "invalid envctl-issued runtime context: {reason}")
             }
             Self::RequiredExtension => {
                 write!(f, "ruvector must be installed in the extensions schema")

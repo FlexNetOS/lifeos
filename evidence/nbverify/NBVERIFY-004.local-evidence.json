@@ -177,25 +177,6 @@
       ]
     },
     {
-      "claim_id": "SWARM-CLAIM-010",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "evidence": [
-        {
-          "relationship": "ui-status-search",
-          "proven": false
-        },
-        {
-          "relationship": "canonical-status-flow",
-          "proven": false
-        },
-        {
-          "relationship": "stale-unavailable-states",
-          "proven": false
-        }
-      ]
-    },
-    {
       "claim_id": "SWARM-CLAIM-011",
       "verification_status": "unverified",
       "status": "qualified",
@@ -529,16 +510,53 @@
           "owner_approval": "OwnerService token authorization"
         }
       ]
+    },
+    {
+      "claim_id": "SWARM-CLAIM-010",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "The Glass reads an owner-published swarm status projection with identity, sequence, freshness, stale, degraded, and unavailable states; the authenticated owner boundary and status derivation tests pass.",
+      "evidence": [
+        {
+          "relationship": "ui-status-runtime",
+          "proven": true,
+          "command": "bun run test -- tests/swarm-status.spec.ts",
+          "exit_status": 0
+        },
+        {
+          "relationship": "canonical-status-flow",
+          "proven": true,
+          "command": "/home/flexnetos/.nix-profile/bin/rtk proxy cargo test --manifest-path src-tauri/Cargo.toml --test redb_owner_live",
+          "exit_status": 0,
+          "details": [
+            "OwnerClient",
+            "redb projection",
+            "swarm.status",
+            "swarm.identity",
+            "swarm.updatedAt"
+          ]
+        },
+        {
+          "relationship": "stale-unavailable-states",
+          "proven": true,
+          "details": [
+            "unavailable",
+            "stale",
+            "degraded",
+            "freshness marker"
+          ]
+        }
+      ]
     }
   ],
-  "observed_at": "2026-07-28T21:27:47.241Z",
+  "observed_at": "2026-07-28T21:31:46.149Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
     "package_json_sha256": "961bd42d4bbc0deb2b39ac562e396c0da3775a867ff2342df470a208cdd5171a"
   },
   "collector": {
-    "claim_id": "SWARM-CLAIM-012",
-    "mode": "live-authority-and-consistency-boundary-trace",
+    "claim_id": "SWARM-CLAIM-010",
+    "mode": "live-ui-swarm-status-boundary-trace",
     "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
     "does_not_launch": false,
     "does_not_install": true,

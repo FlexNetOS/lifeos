@@ -107,6 +107,7 @@ describe("App.svelte shell layout + main-pane gate", () => {
             return { localSeq: 7, checksum: "abc", degraded: false, entries: {} };
           }
           if (command === "redb_events_read") return [];
+          if (command === "redb_swarm_heartbeat") return 8;
           throw new Error(`unexpected command: ${command}`);
         },
       },

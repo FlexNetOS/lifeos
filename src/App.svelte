@@ -20,6 +20,7 @@
   import { useLifeos } from "@/stores/lifeos-native";
   import { useAuth } from "@/stores/auth";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
+  import { deriveSwarmStatus } from "@/lib/swarm-status";
   import { router as appRouter } from "@/router";
   import Sidebar from "./components/Sidebar.svelte";
   import Workspace from "./components/Workspace.svelte";
@@ -50,6 +51,7 @@
   const lifeosState = bindStore(lifeos, ["wsCollapsed", "activeId", "activeSub"]);
 
   let redbProjection = $state(null);
+  let swarmStatus = $derived(deriveSwarmStatus(redbProjection));
 
   const tauriInvoke = () =>
     typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || null;
@@ -78,6 +80,10 @@
           afterSeq = Math.max(afterSeq, ...events.map((event) => event.seq));
           redbProjection = await invoke("redb_projection_read");
         }
+        const updatedAt = Number(redbProjection?.entries?.["swarm.updatedAt"]);
+        if (!Number.isFinite(updatedAt) || Date.now() - updatedAt > 5_000) {
+          await invoke("redb_swarm_heartbeat");
+        }
       } catch {
         // A reconnect, gap, or checksum failure must restart from a fresh
         // owner-published snapshot instead of advancing a stale cursor.
@@ -103,7 +109,7 @@
   <Login />
 {:else}
   <div class="shell" class:ws-collapsed={lifeosState.wsCollapsed}>
-    <Sidebar {router} {redbProjection} />
+    <Sidebar {router} {redbProjection} {swarmStatus} />
     <Workspace {router} />
     <main class="main" id="main" tabindex="-1">
       {#if lifeosState.activeId === "settings" && !lifeosState.activeSub}

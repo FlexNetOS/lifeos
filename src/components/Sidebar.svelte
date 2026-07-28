@@ -10,7 +10,7 @@
   import { router as appRouter } from "@/router";
   import Icon from "./Icon.svelte";
 
-  let { router = appRouter, redbProjection = null } = $props();
+  let { router = appRouter, redbProjection = null, swarmStatus = null } = $props();
 
   const lifeos = useLifeos();
   let nav = $derived(createNav(router));
@@ -347,12 +347,10 @@
       </button>
     {/each}
   </div>
-  {#if redbProjection}
-    <div class="rail-owner-status" title="Owner-published redb projection">
-      <span class:degraded={redbProjection.degraded}></span>
-      <small>{redbProjection.localSeq}</small>
-    </div>
-  {/if}
+  <div class="rail-owner-status" data-owner-status={swarmStatus?.state ?? "unavailable"} class:degraded={swarmStatus?.state === "degraded" || swarmStatus?.state === "stale"} title="Owner-published swarm status">
+    <span></span>
+    <small>{swarmStatus ? `${swarmStatus.state} · ${swarmStatus.localSeq}` : "unavailable"}</small>
+  </div>
 </aside>
 
 <style>
@@ -366,7 +364,7 @@
   width: 5px; height: 5px; border-radius: 50%;
   background: var(--lifeos-green); box-shadow: 0 0 5px var(--tint-green-glow-hi);
 }
-.rail-owner-status span.degraded { background: var(--status-warn); box-shadow: none; }
+.rail-owner-status.degraded span { background: var(--status-warn); box-shadow: none; }
 .rail-switcher-link {
   position: absolute; right: 3px; bottom: 3px;
   width: 5px; height: 5px; border-radius: 50%;

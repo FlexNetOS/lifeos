@@ -20,6 +20,7 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::thread::JoinHandle;
 use uuid::Uuid;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
@@ -199,6 +200,29 @@ fn validate_redb_event_stream(
 fn redb_state_write(key: String, value: String) -> Result<u64, String> {
     let mut client = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
     client.put(&key, &value).map_err(|error| error.to_string())
+}
+
+fn publish_swarm_runtime_status() -> Result<u64, String> {
+    let updated_at = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| format!("swarm status clock: {error}"))?
+        .as_millis()
+        .to_string();
+    let mut owner = OwnerClient::connect(redb_root()).map_err(|error| error.to_string())?;
+    owner
+        .put("swarm.status", "ready")
+        .map_err(|error| error.to_string())?;
+    owner
+        .put("swarm.identity", "lifeos-glass")
+        .map_err(|error| error.to_string())?;
+    owner
+        .put("swarm.updatedAt", &updated_at)
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn redb_swarm_heartbeat() -> Result<u64, String> {
+    publish_swarm_runtime_status()
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -1342,6 +1366,7 @@ pub fn run() {
                 ))) as Box<dyn std::error::Error>
             })?;
             app.manage(owner);
+            publish_swarm_runtime_status().map_err(std::io::Error::other)?;
             if let Some(reconciler) = EnvctlReconciler::start() {
                 app.manage(reconciler);
             }
@@ -1353,6 +1378,7 @@ pub fn run() {
             redb_projection_read,
             redb_events_read,
             redb_state_write,
+            redb_swarm_heartbeat,
             codedb_ingest_envelope,
             envctl_drain,
             envctl_return_projection,

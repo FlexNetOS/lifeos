@@ -28,6 +28,7 @@
     "blueprint:diagrams": "bun scripts/verify-blueprint-diagrams.mjs",
     "storage:verify": "bun scripts/verify-postgres-ruvector.mjs",
     "verify:rtk-nu": "bun scripts/verify-rtk-nu.mjs",
+    "verify:codedb-rtk-nu": "bun scripts/verify-codedb-rtk-nu.mjs",
     "verify:nbverify004:claim001": "bun scripts/verify-nbverify004-claim001.mjs",
     "verify:nbverify004:claim002": "bun scripts/verify-nbverify004-claim002.mjs",
     "verify:nbverify004:claims003-004": "bun scripts/verify-nbverify004-claims003-004.mjs",
@@ -59,7 +60,7 @@
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md > design-system-reference/exports/tailwind.theme.json",
     "design:export": "bun run design:export:dtcg && bun run design:export:tailwind",
     "test:a11y": "vitest run --config vitest.a11y.config.ts",
-    "check": "svelte-check && bun run test && bun run test:a11y && bun run design:lint && bun run blueprint:diagrams && bun run tauri:icons:check && bun run verify:rtk-nu"
+    "check": "svelte-check && bun run test && bun run test:a11y && bun run design:lint && bun run blueprint:diagrams && bun run tauri:icons:check && bun run verify:rtk-nu && bun run verify:codedb-rtk-nu"
   },
   "dependencies": {
     "@lucide/vue": "^1.16.0",

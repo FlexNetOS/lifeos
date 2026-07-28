@@ -15,7 +15,7 @@ describe("ARCHBP-001/002 PostgreSQL and RuVector authority", () => {
     expect(receipt.migrations.versions).toEqual(expect.arrayContaining([1, 28, 40, 49, 50, 51, 52, 53]));
     expect(receipt.witness).toEqual(expect.objectContaining({
       chain_count: 2,
-      entry_count: 30,
+      entry_count: 57,
       append_witness: true,
       shake256: true,
       broken_links: 0,

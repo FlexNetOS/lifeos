@@ -1,12 +1,37 @@
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { spawn } from "node:child_process";
+import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const ownerRoot = "/home/flexnetos/meta/var/lib/redb";
 const runtimeScript = resolve(repoRoot, "scripts/lifeos-agent-runtime.mjs");
+
+function canConnect(root: string) {
+  return new Promise<boolean>((resolveConnection) => {
+    const socket = createConnection({ path: join(root, "owner.sock") });
+    const finish = (available: boolean) => {
+      socket.destroy();
+      resolveConnection(available);
+    };
+    socket.setTimeout(1000, () => finish(false));
+    socket.once("connect", () => finish(true));
+    socket.once("error", () => finish(false));
+  });
+}
+
+async function activeOwnerRoot() {
+  const roots = [
+    process.env.LIFEOS_REDB_ROOT,
+    "/home/flexnetos/meta/var/lib/redb",
+    "/run/user/1001/bpredb",
+  ].filter((root): root is string => Boolean(root));
+  for (const root of [...new Set(roots)]) {
+    if (await canConnect(root)) return root;
+  }
+  return null;
+}
 
 function firstLine(child: ReturnType<typeof spawn>) {
   return new Promise<string>((resolveLine, reject) => {
@@ -28,7 +53,9 @@ function firstLine(child: ReturnType<typeof spawn>) {
 }
 
 describe("ARCHBP-005 supervised LifeOS agent runtime", () => {
-  test.skipIf(!existsSync(join(ownerRoot, "owner.sock")))("starts native RuvLLM + per-agent RVF and publishes readiness", async () => {
+  test("starts native RuvLLM + per-agent RVF and publishes readiness", async ({ skip }) => {
+    const ownerRoot = await activeOwnerRoot();
+    if (!ownerRoot) skip("no reachable redb owner socket");
     const rvfRoot = mkdtempSync(join(tmpdir(), "lifeos-agent-runtime-"));
     const child = spawn("/home/flexnetos/.nix-profile/bin/bun", [runtimeScript], {
       cwd: repoRoot,

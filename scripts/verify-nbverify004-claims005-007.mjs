@@ -9,13 +9,10 @@ const outputArgument = process.argv.find((argument) =>
 );
 const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
-  : join(
-      root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
-    );
+  : join(root, "evidence/nbverify/NBVERIFY-004.local-evidence.json");
 const rawProofPath = join(
   root,
-  "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-RUNTIME-001.node-authority-proof.raw.json",
+  "evidence/nbverify/NBVERIFY-001.node-authority-proof.raw.json",
 );
 const packagePath = join(root, "package.json");
 const rawProof = JSON.parse(readFileSync(rawProofPath, "utf8"));

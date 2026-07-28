@@ -20,9 +20,8 @@ const bunLockPath = join(repoRoot, "bun.lock");
 const outputArgument = process.argv.find((argument) => argument.startsWith("--output="));
 const canonicalEvidencePath = join(
   repoRoot,
-  "planning-spine-v0",
-  "generated",
-  "notebooklm_claim_verification",
+  "evidence",
+  "nbverify",
   "NBVERIFY-001.node-authority-proof.raw.json",
 );
 const evidencePath = outputArgument

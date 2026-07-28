@@ -50,7 +50,7 @@ async function publish(status, identity, engine) {
   await ownerPut("agent.runtime.engine", engine);
   await ownerPut("agent.runtime.updatedAt", now);
   mkdirSync(dirname(statusPath), { recursive: true });
-  writeFileSync(statusPath, `${JSON.stringify({ schema_version: "lifeos.agent-runtime-status.v1", state: status, updated_at: Number(now), native_loaded: engine === "ruvllm-native", agents: [identity], identity_bound: true, macro_authority: "postgresql+ruvector" }, null, 2)}\n`);
+  writeFileSync(statusPath, `${JSON.stringify({ schema_version: "lifeos.agent-runtime-status.v1", state: status, updated_at: Number(now), native_loaded: engine === "ruvllm-native", agents: [identity], identity_bound: true, failure_isolation: true, macro_authority: "postgresql+ruvector" }, null, 2)}\n`);
 }
 
 export async function startAgentRuntime() {

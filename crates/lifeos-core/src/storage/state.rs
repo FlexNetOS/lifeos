@@ -24,10 +24,10 @@ pub async fn write(pool: &PgPool, key: &str, payload: &str) -> Result<(), Storag
     let value: serde_json::Value =
         serde_json::from_str(payload).map_err(|_| StorageError::InvalidProjectionJson)?;
     sqlx::query("SELECT lifeos_runtime.put_projection($1, $2)")
-    .bind(key)
-    .bind(value)
-    .execute(pool)
-    .await?;
+        .bind(key)
+        .bind(value)
+        .execute(pool)
+        .await?;
     Ok(())
 }
 

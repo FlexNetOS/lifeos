@@ -1,12 +1,9 @@
 //! RuVector MCP client.
 //!
-//! Wave 3 mirrors the Cognitum client shape: a generic `RuvectorClient<T>`
-//! that speaks REST over an arbitrary `Transport`. RuVector's REST surface is
-//! **not visible to LifeOS yet** — we know from the live MCP probe that the
-//! tool catalog includes `vector_db_stats` and `gnn_cache_stats`, but the
-//! corresponding HTTP paths are unverified. Best-guess paths are flagged in
-//! doc comments and TODOs so Wave 4+ can correct them against a reachable
-//! endpoint.
+//! The source-aligned production path is `RuvectorMcpClient`, which launches
+//! the RuVector MCP server over stdio and calls its JSON-RPC tools. The
+//! generic `RuvectorClient<T>` REST shape remains only as an explicit legacy
+//! compatibility surface for callers that already provide a transport.
 //!
 //! Write operations stay out of scope until the semantic-retrieval design
 //! lands.
@@ -17,6 +14,10 @@ use super::ReqwestTransport;
 use super::Transport;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::io::{BufRead, BufReader, Write};
+use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Mutex;
 
 fn collection_path(collection: &str) -> Result<String, McpError> {
     if collection.is_empty()
@@ -31,7 +32,8 @@ fn collection_path(collection: &str) -> Result<String, McpError> {
     Ok(format!("/collections/{collection}"))
 }
 
-/// Vector DB stats — wraps the REST mirror of `vector_db_stats`.
+/// Vector DB stats returned by either the source-aligned MCP client or the
+/// legacy REST compatibility client.
 ///
 /// Path unverified — confirm against live RuVector once endpoint is reachable.
 /// Best guess `/api/vector_db/stats`. Typed accessor pulls a single `count`
@@ -58,7 +60,8 @@ impl VectorDbStats {
     }
 }
 
-/// GNN cache stats — wraps the REST mirror of `gnn_cache_stats`.
+/// GNN cache stats returned by either the source-aligned MCP client or the
+/// legacy REST compatibility client.
 ///
 /// Path unverified — confirm against live RuVector once endpoint is reachable.
 /// Best guess `/api/gnn/cache_stats`. Typed accessor pulls a single
@@ -127,10 +130,8 @@ impl<T: Transport> RuvectorClient<T> {
             .map_err(|e| McpError::Protocol(format!("get_point: invalid JSON: {e}")))
     }
 
-    /// Vector DB stats. **Path unverified — confirm against live RuVector
-    /// before relying on this in production.** Best guess
-    /// `/api/vector_db/stats`.
-    // TODO(wave-4): replace path once the RuVector REST endpoint is reachable.
+    /// Legacy REST compatibility accessor. The production protocol is
+    /// `RuvectorMcpClient::vector_db_stats`; this method is not source-aligned.
     pub fn vector_db_stats(&self) -> Result<VectorDbStats, McpError> {
         let body = self.transport.get("/api/vector_db/stats")?;
         let raw: Value = serde_json::from_str(&body)
@@ -138,15 +139,212 @@ impl<T: Transport> RuvectorClient<T> {
         Ok(VectorDbStats { raw })
     }
 
-    /// GNN cache stats. **Path unverified — confirm against live RuVector
-    /// before relying on this in production.** Best guess
-    /// `/api/gnn/cache_stats`.
-    // TODO(wave-4): replace path once the RuVector REST endpoint is reachable.
+    /// Legacy REST compatibility accessor. The production protocol is
+    /// `RuvectorMcpClient::gnn_cache_stats`; this method is not source-aligned.
     pub fn gnn_cache_stats(&self) -> Result<GnnCacheStats, McpError> {
         let body = self.transport.get("/api/gnn/cache_stats")?;
         let raw: Value = serde_json::from_str(&body)
             .map_err(|e| McpError::Protocol(format!("gnn_cache_stats: invalid JSON: {e}")))?;
         Ok(GnnCacheStats { raw })
+    }
+}
+
+/// A source-aligned RuVector MCP stdio client.
+///
+/// The RuVector server registers its vector/GNN operations as JSON-RPC
+/// tools/call methods over stdio. This client keeps one supervised child
+/// alive, serializes request/response pairs, and never treats an unverified
+/// REST mirror as the production protocol.
+pub struct RuvectorMcpClient {
+    child: Mutex<Child>,
+    stdin: Mutex<ChildStdin>,
+    stdout: Mutex<BufReader<ChildStdout>>,
+    io_lock: Mutex<()>,
+    next_id: AtomicU64,
+}
+
+impl RuvectorMcpClient {
+    /// Spawn the configured MCP server and complete the protocol handshake.
+    pub fn spawn(binary: &str, args: &[String]) -> Result<Self, McpError> {
+        if binary.trim().is_empty() {
+            return Err(McpError::NotConnected(
+                "RuVector MCP binary must not be empty".into(),
+            ));
+        }
+        let mut child = Command::new(binary)
+            .args(args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::inherit())
+            .spawn()
+            .map_err(|error| McpError::NotConnected(format!("spawn RuVector MCP: {error}")))?;
+        let stdin = child
+            .stdin
+            .take()
+            .ok_or_else(|| McpError::NotConnected("RuVector MCP stdin unavailable".into()))?;
+        let stdout = child
+            .stdout
+            .take()
+            .ok_or_else(|| McpError::NotConnected("RuVector MCP stdout unavailable".into()))?;
+        let client = Self {
+            child: Mutex::new(child),
+            stdin: Mutex::new(stdin),
+            stdout: Mutex::new(BufReader::new(stdout)),
+            io_lock: Mutex::new(()),
+            next_id: AtomicU64::new(1),
+        };
+        client.request(
+            "initialize",
+            serde_json::json!({
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "lifeos", "version": env!("CARGO_PKG_VERSION")}
+            }),
+        )?;
+        client.notify("notifications/initialized", serde_json::json!({}))?;
+        Ok(client)
+    }
+
+    /// Spawn from LIFEOS_RUVECTOR_MCP_BIN and optional JSON-array
+    /// LIFEOS_RUVECTOR_MCP_ARGS.
+    pub fn from_env() -> Result<Self, McpError> {
+        let binary = std::env::var("LIFEOS_RUVECTOR_MCP_BIN").map_err(|_| {
+            McpError::NotConnected("set LIFEOS_RUVECTOR_MCP_BIN to the pinned server".into())
+        })?;
+        let args = std::env::var("LIFEOS_RUVECTOR_MCP_ARGS")
+            .ok()
+            .map(|raw| {
+                serde_json::from_str::<Vec<String>>(&raw).map_err(|error| {
+                    McpError::Protocol(format!(
+                        "LIFEOS_RUVECTOR_MCP_ARGS must be JSON array: {error}"
+                    ))
+                })
+            })
+            .transpose()?
+            .unwrap_or_default();
+        Self::spawn(&binary, &args)
+    }
+
+    fn request(&self, method: &str, params: Value) -> Result<Value, McpError> {
+        let id = self.next_id.fetch_add(1, Ordering::Relaxed);
+        let _io_guard = self
+            .io_lock
+            .lock()
+            .map_err(|_| McpError::Protocol("RuVector MCP I/O lock poisoned".into()))?;
+        let request = serde_json::json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "method": method,
+            "params": params,
+        });
+        {
+            let mut stdin = self
+                .stdin
+                .lock()
+                .map_err(|_| McpError::Protocol("RuVector MCP stdin lock poisoned".into()))?;
+            writeln!(stdin, "{request}")
+                .and_then(|_| stdin.flush())
+                .map_err(|error| {
+                    McpError::NotConnected(format!("write RuVector MCP request: {error}"))
+                })?;
+        }
+        let mut line = String::new();
+        self.stdout
+            .lock()
+            .map_err(|_| McpError::Protocol("RuVector MCP stdout lock poisoned".into()))?
+            .read_line(&mut line)
+            .map_err(|error| {
+                McpError::NotConnected(format!("read RuVector MCP response: {error}"))
+            })?;
+        if line.trim().is_empty() {
+            return Err(McpError::NotConnected(
+                "RuVector MCP closed stdout without a response".into(),
+            ));
+        }
+        let response: Value = serde_json::from_str(&line).map_err(|error| {
+            McpError::Protocol(format!("RuVector MCP invalid JSON-RPC: {error}"))
+        })?;
+        if response.get("id").and_then(Value::as_u64) != Some(id) {
+            return Err(McpError::Protocol(
+                "RuVector MCP response id did not match request".into(),
+            ));
+        }
+        if let Some(error) = response.get("error") {
+            return Err(McpError::Protocol(format!(
+                "RuVector MCP tool error: {error}"
+            )));
+        }
+        response
+            .get("result")
+            .cloned()
+            .ok_or_else(|| McpError::Protocol("RuVector MCP response lacks result".into()))
+    }
+
+    fn notify(&self, method: &str, params: Value) -> Result<(), McpError> {
+        let _io_guard = self
+            .io_lock
+            .lock()
+            .map_err(|_| McpError::Protocol("RuVector MCP I/O lock poisoned".into()))?;
+        let request = serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": method,
+            "params": params,
+        });
+        let mut stdin = self
+            .stdin
+            .lock()
+            .map_err(|_| McpError::Protocol("RuVector MCP stdin lock poisoned".into()))?;
+        writeln!(stdin, "{request}")
+            .and_then(|_| stdin.flush())
+            .map_err(|error| {
+                McpError::NotConnected(format!("write RuVector MCP notification: {error}"))
+            })
+    }
+
+    /// Call an exact RuVector MCP tool and decode its text content as JSON.
+    pub fn call_tool(&self, name: &str, arguments: Value) -> Result<Value, McpError> {
+        if name.trim().is_empty() || !arguments.is_object() {
+            return Err(McpError::Unsupported(
+                "RuVector MCP tool calls require a name and object arguments".into(),
+            ));
+        }
+        let result = self.request(
+            "tools/call",
+            serde_json::json!({"name": name, "arguments": arguments}),
+        )?;
+        let text = result
+            .get("content")
+            .and_then(Value::as_array)
+            .and_then(|content| content.first())
+            .and_then(|item| item.get("text"))
+            .and_then(Value::as_str)
+            .ok_or_else(|| McpError::Protocol("RuVector tool result lacks text content".into()))?;
+        serde_json::from_str(text).map_err(|error| {
+            McpError::Protocol(format!("RuVector tool result is not JSON: {error}"))
+        })
+    }
+
+    pub fn vector_db_stats(&self, db_path: &str) -> Result<Value, McpError> {
+        if db_path.trim().is_empty() {
+            return Err(McpError::Unsupported("db_path must not be empty".into()));
+        }
+        self.call_tool("vector_db_stats", serde_json::json!({"db_path": db_path}))
+    }
+
+    pub fn gnn_cache_stats(&self, include_details: bool) -> Result<Value, McpError> {
+        self.call_tool(
+            "gnn_cache_stats",
+            serde_json::json!({"include_details": include_details}),
+        )
+    }
+}
+
+impl Drop for RuvectorMcpClient {
+    fn drop(&mut self) {
+        if let Ok(mut child) = self.child.lock() {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
     }
 }
 

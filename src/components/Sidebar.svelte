@@ -112,6 +112,7 @@
 
 <aside class="rail" data-figma-component="Sidebar Companion/Icon rail">
   <button class="rail-brand" class:collapsed={lifeosState.wsCollapsed}
+          data-figma-component="LifeOS Brand/App mark"
           title={lifeosState.wsCollapsed ? "Open LifeOS workspace panel" : "Close LifeOS workspace panel"}
           aria-label="Toggle LifeOS workspace panel"
           onclick={() => lifeos.toggleWs()}>
@@ -302,7 +303,8 @@
     {/if}
   </div>
 
-  <nav class="rail-list" aria-label="Workspaces">
+  <nav class="rail-list" aria-label="Workspaces"
+       data-figma-component="LifeOS Product Identity/Navigation triad">
     {#each rail as item (item.id)}
       <button class="rail-btn" class:active={isActive(item.id)}
               title={item.tooltip || item.label}

@@ -3,7 +3,7 @@
 - Task: `ART-134_EXCEPTION_INVENTORY`
 - Contract artifact: `artifact:01-current-state-exception-inventory-md`
 - Canonical path: `migration-artifacts/01-current-state/exception-inventory.md`
-- Generated at: `2026-07-27T05:08:01+00:00`
+- Generated at: `2026-07-28T12:13:47+00:00`
 - Scope: special cases, one-off scripts, manual processes, and explicit approval/rollback boundaries in the migration package.
 
 ## Summary

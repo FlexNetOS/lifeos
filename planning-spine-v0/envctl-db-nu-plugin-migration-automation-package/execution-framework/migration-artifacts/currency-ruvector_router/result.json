@@ -1,0 +1,68 @@
+{
+  "artifact_declarations": [
+    {
+      "declaration": "migration-artifacts/currency-ruvector_router/result.json",
+      "kind": "receipt_result",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_router/result.json",
+      "status": "receipt_result_materialized"
+    }
+  ],
+  "artifact_path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_router/result.json",
+  "command": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "test -n \"$(bun info '@ruvector/router' version 2>/dev/null)\" && test \"$(bun info '@ruvector/router' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '@ruvector/router@[0-9][^ ]*' | head -1 | sed 's/.*@//')\""
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "exit_code": 0,
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/6face8677fed90ade29736e681105ae8c220d569fd933b761d59dfed58c91f9a/logs/20260728T014730826875Z-ba39fb38f107/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/6face8677fed90ade29736e681105ae8c220d569fd933b761d59dfed58c91f9a/logs/20260728T014730826875Z-ba39fb38f107/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "completed_at": "2026-07-28T01:47:31.513143Z",
+  "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+  "implementation_scope": "command_and_verification_passed",
+  "needs_capability_probe": false,
+  "orchestration": {
+    "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+    "run_id": "20260727T234858483758Z-8997b4a16b78"
+  },
+  "origin_receipt": {
+    "attempt_id": "20260728T014730826875Z-ba39fb38f107",
+    "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+    "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/6face8677fed90ade29736e681105ae8c220d569fd933b761d59dfed58c91f9a/20260728T014730826875Z-ba39fb38f107.json",
+    "run_id": "20260727T234858483758Z-8997b4a16b78",
+    "sha256": "380e606c6f533f1187861477b6b5ab0d7ce697056aa9b01ca92806943776003c"
+  },
+  "packet_execution_proven": true,
+  "packet_sha256": "6face8677fed90ade29736e681105ae8c220d569fd933b761d59dfed58c91f9a",
+  "prior_artifact_sha256": null,
+  "probe_class": "currency",
+  "schema": "lifeos.receipt-bound-task-result.v1",
+  "status": "passed",
+  "task_completion_proven": true,
+  "task_id": "CURRENCY-RUVECTOR_ROUTER",
+  "verification": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "bun info '@ruvector/router' version"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "exit_code": 0,
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/6face8677fed90ade29736e681105ae8c220d569fd933b761d59dfed58c91f9a/logs/20260728T014730826875Z-ba39fb38f107/verification.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ROUTER/6face8677fed90ade29736e681105ae8c220d569fd933b761d59dfed58c91f9a/logs/20260728T014730826875Z-ba39fb38f107/verification.stdout.log",
+      "sha256": "2622ca328c7b1324e68d4116c0765138da26de706f9945b903c20ea4e99d491e"
+    }
+  }
+}

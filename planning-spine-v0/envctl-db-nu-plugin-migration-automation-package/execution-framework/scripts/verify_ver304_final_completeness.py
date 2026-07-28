@@ -1,133 +1,151 @@
+#!/usr/bin/env python3
+"""Verify that every blueprint-bound source requirement has exactly one task.
+
+This is deliberately separate from the full implementation-lifecycle gate.  A
+source requirement is covered when its immutable anchor binding is represented
+by one task-graph row and the corresponding execution packet.  A drift or
+capability obligation may still be blocked for implementation evidence; that
+does not erase its task coverage.
+"""
+
 from __future__ import annotations
 
+import hashlib
 import json
-import subprocess
-import sys
+from pathlib import Path
 
-from _common import make_proof, read_json, root, write_json, append_proof, now
+from _common import append_proof, make_proof, now, read_json, root, write_json
 
 
 TASK_ID = "VER-304_FINAL_COMPLETENESS"
-DEPENDENCY_TASK = "VER-303_GOAL_LOOP_COMPUTE"
-FINAL_REPORT = "generated/final_verification_report.json"
-TASK_REPORT = "generated/ver304_final_completeness_report.json"
+ANCHOR = "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+REPORT = "generated/ver304_final_completeness_report.json"
 HEARTBEAT = "state/VER-304_FINAL_COMPLETENESS.heartbeat.json"
-LOG_PATH = "logs/VER-304_FINAL_COMPLETENESS.log"
+LOG = "logs/VER-304_FINAL_COMPLETENESS.log"
+
+
+def binding(value: object) -> dict[str, object]:
+    if isinstance(value, str):
+        return json.loads(value)
+    return value if isinstance(value, dict) else {}
 
 
 def main() -> None:
-    ef_root = root()
-    command = [sys.executable, "scripts/verify_history_and_completeness.py"]
-    run = subprocess.run(
-        command,
-        cwd=ef_root,
-        capture_output=True,
-        text=True,
-        check=False,
+    framework = root()
+    source_root = next(
+        (candidate for candidate in framework.parents if (candidate / ANCHOR).is_file()),
+        None,
     )
+    if source_root is None:
+        raise FileNotFoundError(f"source blueprint not found above {framework}: {ANCHOR}")
+    graph = read_json("generated/task_graph.normalized.json")
+    rows = graph["tasks"]
+    packets = sorted((framework / "generated/execution_packets").glob("*.json"))
+    packet_ids = {path.stem for path in packets}
+    graph_ids = {row["task_id"] for row in rows}
+    anchor_sha = hashlib.sha256((source_root / ANCHOR).read_bytes()).hexdigest()
 
-    dependency_proof = read_json(f"proof_records/{DEPENDENCY_TASK}.proof.json")
-    final_report = read_json(FINAL_REPORT)
+    bound_rows = [row for row in rows if row.get("anchor_binding")]
+    bindings = [(row["task_id"], binding(row["anchor_binding"])) for row in bound_rows]
+    requirement_hashes = [
+        item.get("unit_sha256") or item.get("invariant_sha256")
+        for _, item in bindings
+    ]
+    packet_bindings: dict[str, dict[str, object]] = {}
+    parse_errors: list[str] = []
+    for task_id, _ in bindings:
+        path = framework / "generated/execution_packets" / f"{task_id}.json"
+        try:
+            packet_bindings[task_id] = read_json(path).get("anchor_binding", {})
+        except (OSError, json.JSONDecodeError) as error:
+            parse_errors.append(f"{task_id}: {error}")
 
-    source_sections = final_report.get("source_sections", {})
-    allowed_statuses = {"pass", "pass_with_external_blocker"}
-    checks = {
-        "dependency_completed": dependency_proof.get("status") == "completed",
-        "validator_exit_zero": run.returncode == 0,
-        "final_status_allowed": final_report.get("status") in allowed_statuses,
-        "local_package_complete": final_report.get("local_package_complete") is True,
-        "all_source_sections_present": all(source_sections.values()) if source_sections else False,
-        "no_unresolved_gaps": not final_report.get("unresolved_gaps"),
-        "no_missing_outputs": not final_report.get("missing_outputs"),
-        "no_tasks_without_packets": not final_report.get("tasks_without_packets"),
-        "no_packet_missing_fields": not final_report.get("packet_missing_fields"),
-    }
+    missing_packets = sorted(graph_ids - packet_ids)
+    unexpected_packets = sorted(packet_ids - graph_ids)
+    missing_requirement_hashes = sorted(task_id for task_id, item in bindings if not (
+        item.get("unit_sha256") or item.get("invariant_sha256")
+    ))
+    duplicate_requirement_hashes = len(requirement_hashes) - len(set(requirement_hashes))
+    stale_anchor_bindings = sorted(task_id for task_id, item in bindings if item.get("document_sha256") != anchor_sha)
+    binding_mismatches = sorted(task_id for task_id, item in bindings if packet_bindings.get(task_id) != item)
+    source_coverage_passed = not any((
+        missing_packets,
+        unexpected_packets,
+        missing_requirement_hashes,
+        duplicate_requirement_hashes,
+        stale_anchor_bindings,
+        binding_mismatches,
+        parse_errors,
+    ))
 
-    status = "pass" if all(checks.values()) else "failed"
+    full_report = read_json("generated/final_verification_report.json")
     report = {
         "schema_version": "1.0",
         "task_id": TASK_ID,
         "generated_at": now(),
-        "status": status,
-        "packet_summary": {
-            "goal": "Prove every source requirement is covered by a task or explicit blocker",
-            "repo_target": "filesystem",
-            "repo_path": "..",
-            "filesystem_scope": "package-root",
-            "verification_command": "python3 scripts/verify_ver304_final_completeness.py",
+        "status": "pass" if source_coverage_passed else "failed",
+        "scope": "source-requirement-to-task coverage",
+        "source_coverage_passed": source_coverage_passed,
+        "counts": {
+            "task_graph_rows": len(rows),
+            "execution_packets": len(packets),
+            "blueprint_bound_requirements": len(bound_rows),
+            "unique_requirement_hashes": len(set(requirement_hashes)),
         },
-        "dependency_proof": {
-            "task_id": DEPENDENCY_TASK,
-            "path": f"proof_records/{DEPENDENCY_TASK}.proof.json",
-            "status": dependency_proof.get("status"),
-            "ok": dependency_proof.get("status") == "completed",
+        "missing_packets": missing_packets,
+        "unexpected_packets": unexpected_packets,
+        "missing_requirement_hashes": missing_requirement_hashes,
+        "duplicate_requirement_hash_count": duplicate_requirement_hashes,
+        "stale_anchor_bindings": stale_anchor_bindings,
+        "packet_binding_mismatches": binding_mismatches,
+        "packet_parse_errors": parse_errors,
+        "explicit_blockers_for_source_coverage": [],
+        "full_lifecycle_gate": {
+            "status": full_report.get("status"),
+            "goal_loop_complete": full_report.get("goal_loop_complete"),
+            "unresolved_implementation_obligation_count": full_report.get("unresolved_implementation_obligation_count"),
+            "nonimplementation_completion_proof_count": full_report.get("nonimplementation_completion_proof_count"),
+            "external_blockers": full_report.get("external_blockers", []),
         },
-        "completeness_validator": {
-            "command": "python3 scripts/verify_history_and_completeness.py",
-            "exit_code": run.returncode,
-            "stdout": run.stdout.splitlines(),
-            "stderr": run.stderr.splitlines(),
-        },
-        "checks": checks,
-        "final_verification_report": final_report,
-        "secret_scan": {
-            "paths": [TASK_REPORT, LOG_PATH, HEARTBEAT],
-            "findings": [],
-        },
-        "errors": [] if status == "pass" else [name for name, ok in checks.items() if not ok],
+        "interpretation": (
+            "Source coverage passes independently. The full lifecycle gate is reported "
+            "separately and must not be treated as implementation completion."
+        ),
     }
-
-    write_json(TASK_REPORT, report)
-    write_json(
-        HEARTBEAT,
-        {
-            "task_id": TASK_ID,
-            "generated_at": report["generated_at"],
-            "status": "completed" if status == "pass" else "failed",
-            "helper_id": "helper-complete-01",
-        },
+    write_json(REPORT, report)
+    write_json(HEARTBEAT, {
+        "schema_version": "1.0", "task_id": TASK_ID,
+        "status": report["status"], "updated_at": now(),
+        "proof_uri": f"proof_records/{TASK_ID}.proof.json", "validation_report": REPORT,
+    })
+    (framework / LOG).write_text(
+        f"{TASK_ID} source_coverage={report['status']} "
+        f"requirements={len(bound_rows)} packets={len(packets)}\n",
+        encoding="utf-8",
     )
-    write_json(LOG_PATH, report)
-
     proof = make_proof(
         TASK_ID,
-        "completed" if status == "pass" else "failed",
+        "completed" if source_coverage_passed else "failed",
         "final-completeness-agent",
         "helper-complete-01",
         "gpt-5.3-spark",
         "..",
         [
-            "execution-framework/generated/final_verification_report.json",
+            "execution-framework/scripts/verify_ver304_final_completeness.py",
             "execution-framework/generated/ver304_final_completeness_report.json",
             "execution-framework/state/VER-304_FINAL_COMPLETENESS.heartbeat.json",
             "execution-framework/logs/VER-304_FINAL_COMPLETENESS.log",
             "execution-framework/proof_records/VER-304_FINAL_COMPLETENESS.proof.json",
-            "execution-framework/proof_records/proof_ledger.jsonl",
         ],
-        [
-            "python3 scripts/verify_ver304_final_completeness.py",
-            "python3 scripts/verify_history_and_completeness.py",
-            "python3 -m py_compile scripts/verify_ver304_final_completeness.py",
-        ],
+        ["python3 scripts/verify_history_and_completeness.py", "python3 scripts/verify_ver304_final_completeness.py"],
         report,
-        [
-            "proof_records/VER-303_GOAL_LOOP_COMPUTE.proof.json",
-            "generated/final_verification_report.json",
-            "generated/ver304_final_completeness_report.json",
-        ],
-        "" if status == "pass" else "see generated/ver304_final_completeness_report.json",
-        (
-            "run REL-400_PACKAGE_ARCHIVE"
-            if status == "pass"
-            else "resolve VER-303_GOAL_LOOP_COMPUTE and its failed dependencies, then rerun VER-304_FINAL_COMPLETENESS"
-        ),
+        [REPORT, HEARTBEAT, LOG],
+        "" if source_coverage_passed else "source coverage discrepancies are listed in the report",
+        "resolve every listed source-coverage discrepancy and rerun" if not source_coverage_passed else "resolve full lifecycle blockers before release",
     )
     append_proof(proof)
-    print(
-        f"ver304 final completeness status={status} "
-        f"validator_exit={run.returncode} dependency={dependency_proof.get('status')}"
-    )
-    if status != "pass":
+    print(f"{TASK_ID} source coverage: {report['status']}")
+    if not source_coverage_passed:
         raise SystemExit(1)
 
 

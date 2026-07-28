@@ -1,10 +1,10 @@
 # Migration Wave Plan
 
 - Task: `ART-120_WAVE_PLAN`
-- Generated at: `2026-07-27T05:01:16+00:00`
+- Generated at: `2026-07-28T09:51:11+00:00`
 - Target: `flexnetos-vs-lifeos`
 - Primary root: `/home/flexnetos/FlexNetOS`
-- Compare root present: `False`
+- Compare root present: `True`
 - Safety mode: `approval-gated`
 
 ## Sequence
@@ -48,7 +48,7 @@
 | ART-100_SYSTEM_INVENTORY | Build System inventory | completed | proof_records/ART-100_SYSTEM_INVENTORY.proof.json |
 | ART-101_DIRECTORY_TREE | Build Directory and subdirectory hierarchy tree | completed | proof_records/ART-101_DIRECTORY_TREE.proof.json |
 | ART-102_REPOSITORY_MAP | Build Repository map | completed | proof_records/ART-102_REPOSITORY_MAP.proof.json |
-| ART-103_SERVICE_DEP_GRAPH | Build Application/service dependency graph | passed | proof_records/ART-103_SERVICE_DEP_GRAPH.proof.json |
+| ART-103_SERVICE_DEP_GRAPH | Build Application/service dependency graph | completed | proof_records/ART-103_SERVICE_DEP_GRAPH.proof.json |
 | ART-104_TOOLCHAIN_TREE | Build Toolchain dependency tree | completed | proof_records/ART-104_TOOLCHAIN_TREE.proof.json |
 | ART-105_PACKAGE_LIB_GRAPH | Build Package/library dependency graph | completed | proof_records/ART-105_PACKAGE_LIB_GRAPH.proof.json |
 | ART-112_CODE_OWNERSHIP | Build Code ownership map | completed | proof_records/ART-112_CODE_OWNERSHIP.proof.json |

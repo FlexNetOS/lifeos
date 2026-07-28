@@ -1,0 +1,63 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/20260727T234858625513Z-e02abb26ae71.json": "f3b9a9845e69902814fc6780b2a43afe6c388f8a6dde2be3edaeb159655ff681",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/ruvector-shake256-sql.json": "84d199539aaacd6ad372b4fd5714611b5efd6f18367f16af5adea888a47d3d4a"
+  },
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.6-sol -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T234858483758Z-8997b4a16b78/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/20260727T234858625513Z-e02abb26ae71 -",
+    "/bin/bash -lc '/home/flexnetos/.nix-profile/bin/rtk proxy bash crates/ruvector-postgres/scripts/verify-ruvector-shake256-sql.sh'"
+  ],
+  "completed_at": "2026-07-28T00:14:31.356128Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/ruvector-shake256-sql.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/20260727T234858625513Z-e02abb26ae71.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/ruvector-shake256-sql.json"
+  ],
+  "helper_id": "helper-inv011-shake256-sql",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/logs/20260727T234858625513Z-e02abb26ae71",
+  "model_tag": "gpt-5.6-sol",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": "/home/flexnetos/meta/src/meta-ruvector",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T23:48:58.672035Z",
+  "status": "completed",
+  "task_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/ruvector-shake256-sql.json",
+        "kind": "file",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/ruvector-shake256-sql.json",
+        "sha256": "84d199539aaacd6ad372b4fd5714611b5efd6f18367f16af5adea888a47d3d4a",
+        "status": "existing_file"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T234858625513Z-e02abb26ae71",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/20260727T234858625513Z-e02abb26ae71.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "f3b9a9845e69902814fc6780b2a43afe6c388f8a6dde2be3edaeb159655ff681"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757",
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

@@ -79,14 +79,37 @@ impl Storage {
     /// Run embedded PostgreSQL migrations. Idempotent: sqlx records applied
     /// versions in `_sqlx_migrations` inside the canonical database.
     pub async fn migrate(&self) -> Result<MigrateReport, StorageError> {
+        let mut connection = self.pool.acquire().await?;
+        let (public_ledger, runtime_ledger): (bool, bool) = sqlx::query_as(
+            "SELECT
+               to_regclass('public._sqlx_migrations') IS NOT NULL,
+               to_regclass('lifeos_runtime._sqlx_migrations') IS NOT NULL",
+        )
+        .fetch_one(&mut *connection)
+        .await?;
+        if public_ledger && runtime_ledger {
+            return Err(StorageError::Sqlx(sqlx::Error::Protocol(
+                "ambiguous SQLx migration ledgers in public and lifeos_runtime".into(),
+            )));
+        }
+        if public_ledger {
+            sqlx::query("ALTER TABLE public._sqlx_migrations SET SCHEMA lifeos_runtime")
+                .execute(&mut *connection)
+                .await?;
+        }
+        sqlx::query("SET search_path TO lifeos_runtime, extensions, pg_catalog")
+            .execute(&mut *connection)
+            .await?;
+
         sqlx::migrate!("./migrations")
-            .run(&self.pool)
+            .run(&mut *connection)
             .await
             .map_err(|e| StorageError::Sqlx(sqlx::Error::Protocol(e.to_string())))?;
 
-        let (applied,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM _sqlx_migrations")
-            .fetch_one(&self.pool)
-            .await?;
+        let (applied,): (i64,) =
+            sqlx::query_as("SELECT COUNT(*) FROM lifeos_runtime._sqlx_migrations")
+                .fetch_one(&mut *connection)
+                .await?;
         let total = sqlx::migrate!("./migrations").migrations.len() as u32;
 
         Ok(MigrateReport {
@@ -116,7 +139,7 @@ impl Storage {
     /// Liveness + migration + extension placement check.
     pub async fn health(&self) -> Result<DbHealth, StorageError> {
         let rows: Vec<(i64,)> =
-            sqlx::query_as("SELECT version FROM _sqlx_migrations ORDER BY version")
+            sqlx::query_as("SELECT version FROM lifeos_runtime._sqlx_migrations ORDER BY version")
                 .fetch_all(&self.pool)
                 .await?;
         let applied = rows.len() as u32;

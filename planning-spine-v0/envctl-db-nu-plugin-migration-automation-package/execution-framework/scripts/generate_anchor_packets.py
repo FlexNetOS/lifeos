@@ -37,6 +37,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+import _common
 
 ANCHOR = "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 

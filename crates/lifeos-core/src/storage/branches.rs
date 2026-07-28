@@ -26,10 +26,7 @@ pub async fn require_accepted_semantics(pool: &PgPool) -> Result<Value, StorageE
             .and_then(Value::as_bool)
             == Some(true)
         && report.get("rvf_roundtrip").and_then(Value::as_bool) == Some(true)
-        && report
-            .get("native_evidence_valid")
-            .and_then(Value::as_bool)
-            == Some(true)
+        && report.get("native_evidence_valid").and_then(Value::as_bool) == Some(true)
         && report
             .get("runtime_digest_binding")
             .and_then(Value::as_bool)

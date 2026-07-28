@@ -1,0 +1,71 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "REQ-032_PLUGIN_LIVE_VISUALS",
+  "status": "completed",
+  "started_at": "2026-07-27T04:35:36+00:00",
+  "completed_at": "2026-07-27T04:39:23+00:00",
+  "actor": "codex-cli-local",
+  "helper_id": "helper-nu-visuals-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "/home/flexnetos/meta/src/nu_plugin",
+  "files_changed": [
+    "crates/nu_plugin_codedb/src/main.rs",
+    "execution-framework/proof_records/REQ-032_PLUGIN_LIVE_VISUALS.proof.json"
+  ],
+  "commands_run": [
+    "cargo test -p nu_plugin_codedb visual",
+    "cargo test -p nu_plugin_codedb",
+    "git diff --check",
+    "envctl --json migration <read-route> run-missing (nine protocol probes)",
+    "node .gitnexus/run.cjs impact --target envctl_migration_argv --direction upstream",
+    "node .gitnexus/run.cjs detect-changes"
+  ],
+  "verification_output": {
+    "status": "passed",
+    "task_specific_tests": "3 passed",
+    "plugin_crate_tests": "29 passed",
+    "diff_check": "passed",
+    "envctl_protocol_probe": {
+      "status": "passed",
+      "route_count": 9,
+      "result": "all routes passed clap parsing and reached the migration database",
+      "routes": [
+        "run status",
+        "run events",
+        "run ops --queue",
+        "approval list --run",
+        "run artifacts",
+        "run validations",
+        "run readiness",
+        "rollback list",
+        "run export"
+      ]
+    },
+    "visual_commands": [
+      "envctl migration status",
+      "envctl migration timeline",
+      "envctl migration ops",
+      "envctl migration approvals",
+      "envctl migration artifacts",
+      "envctl migration graph",
+      "envctl migration validations",
+      "envctl migration replay",
+      "envctl migration rollback plan",
+      "envctl migration proof",
+      "envctl migration visuals"
+    ],
+    "source_of_truth": "Every command invokes an envctl read route with global --json and converts the returned database record into typed Nushell values; graph and proof select graph_edges and evidence from envctl run export.",
+    "gitnexus_note": "Impact and detect-changes were attempted as required, but the repository runner could not launch because npx is not installed."
+  },
+  "checksums": {
+    "crates/nu_plugin_codedb/src/main.rs": "7a5e6bbd95bb2ed081bf6275eb5b847c787be029da70d971eb33f38e1569c038"
+  },
+  "logs_uri": "logs/REQ-032_PLUGIN_LIVE_VISUALS.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "crates/nu_plugin_codedb/src/main.rs",
+    "proof_records/REQ-032_PLUGIN_LIVE_VISUALS.proof.json"
+  ],
+  "failure_reason": "",
+  "next_action": "REQ-041_TWO_REPO_INTEGRATION can exercise these read routes against a populated envctl migration database."
+}

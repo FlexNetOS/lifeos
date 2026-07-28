@@ -17,7 +17,7 @@ source_records: 428
 work_orders: 106
 mandatory_capabilities: 28
 mandatory_language_sources: 87
-mandatory_language_occurrences: 295
+mandatory_language_occurrences: 1008
 unclassified_normative_occurrences: 0
 reference_superset: planning-spine-v0/envctl-db-nu-plugin-migration-automation-package
 local_status: review
@@ -73,7 +73,7 @@ control-plane companion for the separate `nu-plugin-cdb-handoff` namespace.
 | Verify source identity and counts | [Source manifest](./source_manifest.json) | `source_manifest.json` |
 | Read canonical task intent | [WorkOrders](./canonical/work_orders.json) | `handoff.task.v1.collection` |
 | Traverse normalized dependencies | [Normalized graph](./canonical/task_graph.normalized.json) | 106 nodes and typed edges |
-| Resolve packet identity/digests | [Execution manifest](./manifests/execution_manifest.json) | 106 packet receipts |
+| Resolve packet identity/digests | [Execution manifest](./manifests/execution_manifest.json) | 111 classified packet receipts: 106 CDB WorkOrders + 5 mandatory local companions |
 | Inspect a bounded task packet | [`TASK-CDB000`](./packets/TASK-CDB000.json) | `lifeos.execution-packet.v1` |
 | Scan tasks in a spreadsheet | [WorkOrder projection](./projections/work_orders.csv) | CSV, 106 records |
 | Inspect read/write/validation scope | [Companion gates](./normalized/companion_gates.json) | one gate per WorkOrder |
@@ -230,10 +230,13 @@ mandatory without promoting reference status; and `CAP-MIG-028` makes the
 the unmatched `REQ-061-ARCH11` TUI requirement as mandatory provenance.
 
 The [reference namespace registry](./workflow/reference_namespaces.json) keeps
-three graphs distinct: `reference-framework` (80 tasks),
+three graphs distinct: `reference-framework-expanded` (763 tasks),
 `reference-issue-414` (12 tasks), and `nu-plugin-cdb-handoff` (106 WorkOrders).
 Reference task IDs, statuses, packets, and proofs are never collapsed into the
-CDB handoff namespace.
+CDB handoff namespace. The prior 80-task package under
+`src/envctl/envctl-db-nu-plugin-migration-automation-package` remains a separate
+canonical authority loaded by the unified JSON runner; it is not inferred to be
+part of, or completed by, the expanded 763-task copy.
 
 The hard [reference package audit](./workflow/reference_package_audit.json)
 recomputes every file listed by the package's self-excluding
@@ -243,16 +246,17 @@ validator now enforces the same manifest closure, while this independent
 LifeOS receipt additionally enforces namespace and completion-claim isolation;
 neither check substitutes for the other.
 
-The same audit also records the package's contradictory semantic layers
-without repairing or trusting them: the 80-row graph contains 76 `pending` and
-4 `complete` source rows, while proof-derived state contains 78 `completed`
-and 2 `passed` tasks. It separately receipts 80 packets, 88 proof files, 88
-distinct merged proofs, 92 proof-ledger rows, eight human-required tasks, and
-eight agent approvals. All reference statuses, proofs, and agent approvals are
-classified `review_evidence_only`; `pass_no_gaps` and
-`local_package_complete` claims are explicitly rejected. The audit therefore
-sets `admissible_as_lifeos_completion: false` and verifies that zero reference
-statuses or proofs enter the LifeOS completion boundary.
+The same audit records the package's contradictory semantic layers without
+repairing or trusting them: the 763-row expanded graph contains 759 `pending`
+and 4 `complete` source rows, while its legacy proof-derived projection claims
+all 763 completed. It separately receipts 763 packets, 787 current proof
+files, 88 distinct legacy merged proofs, 879 proof-ledger rows, eight
+human-required tasks, and eight agent approvals. These counts are provenance,
+not completion. All reference statuses, proofs, and agent approvals are
+classified `review_evidence_only`; any `pass_no_gaps` or
+`local_package_complete` claim present is explicitly rejected. The audit
+therefore sets `admissible_as_lifeos_completion: false` and verifies that zero
+reference statuses or proofs enter the LifeOS completion boundary.
 
 ## Blueprint cross-reference
 

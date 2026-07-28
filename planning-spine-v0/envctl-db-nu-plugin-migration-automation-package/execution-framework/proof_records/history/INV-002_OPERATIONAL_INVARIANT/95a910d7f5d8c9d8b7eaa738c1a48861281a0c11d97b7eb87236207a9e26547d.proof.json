@@ -1,0 +1,36 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "INV-002_OPERATIONAL_INVARIANT",
+  "status": "completed",
+  "started_at": "2026-07-27T21:24:33Z",
+  "completed_at": "2026-07-27T21:24:33Z",
+  "actor": "codex-cli-background-shell",
+  "helper_id": "helper-invariant-02",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": ".",
+  "files_changed": [
+    "migration-artifacts/inv-002/result.json",
+    "execution-framework/proof_records/INV-002_OPERATIONAL_INVARIANT.proof.json"
+  ],
+  "commands_run": [
+    "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \'$PSQL\' 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select pg_database_size(current_database())' | grep -qE '\''^[0-9]+$'\''"
+  ],
+  "verification_output": {
+    "status": "passed",
+    "generated_at": "2026-07-27T21:24:33Z",
+    "summary": {
+      "database_size_bytes": 23278515891
+    },
+    "errors": []
+  },
+  "checksums": {
+    "migration-artifacts/inv-002/result.json": "a958db9a16e4d35475891ce5614c54f062cd020a763e394045da0caaeaac25fb",
+    "execution-framework/proof_records/INV-002_OPERATIONAL_INVARIANT.proof.json": "4bd7c45ed4cdf1a703a681e61f446f398918096a4beb140ad101462468db926d"
+  },
+  "evidence": [
+    "migration-artifacts/inv-002/result.json",
+    "execution-framework/proof_records/INV-002_OPERATIONAL_INVARIANT.proof.json"
+  ],
+  "failure_reason": "",
+  "next_action": "Continue with remaining invariant verifications."
+}

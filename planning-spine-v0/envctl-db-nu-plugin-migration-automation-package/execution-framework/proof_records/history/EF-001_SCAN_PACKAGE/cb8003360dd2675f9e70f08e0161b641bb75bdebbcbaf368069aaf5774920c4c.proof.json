@@ -1,0 +1,43 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "EF-001_SCAN_PACKAGE",
+  "status": "completed",
+  "started_at": "2026-07-28T01:37:42+00:00",
+  "completed_at": "2026-07-28T01:37:42+00:00",
+  "actor": "local-execution-framework",
+  "helper_id": "helper-scan-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/generated/package_scan.json"
+  ],
+  "commands_run": [
+    "python3 scripts/scan_package.py --gaps"
+  ],
+  "verification_output": {
+    "scanned_folders": [
+      "specs",
+      "prompts",
+      "codex",
+      "schemas",
+      "examples",
+      "helpers",
+      "sql",
+      "source",
+      "expected-output",
+      "history",
+      "execution-framework",
+      "execution-templates"
+    ]
+  },
+  "checksums": {
+    "execution-framework/generated/package_scan.json": "3694a6122897f3e11f11a60dbebe8514aa2a6e5e508a6d352324f45da9cc7159"
+  },
+  "logs_uri": "logs/EF-001_SCAN_PACKAGE.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "generated/package_scan.json"
+  ],
+  "failure_reason": "",
+  "next_action": "generate/validate task graph"
+}

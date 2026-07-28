@@ -1,7 +1,7 @@
 # FlexNetOS vs lifeos comparison evidence
 
 - Task: `REQ-201_FLEXNETOS_LIFEOS_COMPARISON`
-- Generated: `2026-07-27T05:15:42+00:00`
+- Generated: `2026-07-28T12:04:04+00:00`
 - Primary root exists: `True`
 - Declared compare root: `/home/flexnetos/lifeos` exists=`True`
 - lifeos peer root: `/home/flexnetos/FlexNetOS/src/lifeos` exists=`False`

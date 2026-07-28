@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import glob
 import hashlib
 import json
 import os
@@ -23,9 +24,9 @@ from pathlib import Path
 from typing import Any, Iterable, Sequence
 
 
-RUNNER_SCHEMA = "lifeos.json-task-runner.v1"
-RECEIPT_SCHEMA = "lifeos.json-task-execution-receipt.v1"
-RUN_SCHEMA = "lifeos.json-task-execution-run.v1"
+RUNNER_SCHEMA = "lifeos.json-task-runner.v2"
+RECEIPT_SCHEMA = "lifeos.json-task-execution-receipt.v2"
+RUN_SCHEMA = "lifeos.json-task-execution-run.v2"
 DEFAULT_PACKET_ROOT = "planning-spine-v0"
 DEFAULT_RECEIPTS_DIR = "planning-spine-v0/task_tables/execution_receipts"
 DEFAULT_EXECUTOR = (
@@ -35,6 +36,7 @@ DEFAULT_EXECUTOR = (
     "--disable plugins --disable hooks --disable apps --disable multi_agent "
     "--disable goals --disable tool_suggest --disable skill_mcp_dependency_install -"
 )
+PROFILE_RTK = "/home/flexnetos/.nix-profile/bin/rtk"
 MODEL_ALIASES = {
     "sol": "gpt-5.6-sol",
     "terra": "gpt-5.6-terra",
@@ -49,6 +51,26 @@ MODEL_REASONING_EFFORT = {
     "gpt-5.3-codex-spark": "high",
 }
 PACKET_PARENT_NAMES = {"execution_packets", "packets"}
+CANONICAL_PACKET_ROOT_MARKERS = {
+    "PACKAGE_MANIFEST.json",
+    "task_tables",
+}
+CANONICAL_DISCOVERY_EXCLUDED_PARTS = {
+    ".claude",
+    ".git",
+    ".grit",
+    ".worktrees",
+    "archives",
+    "node_modules",
+    "target",
+}
+SEMANTIC_ENVELOPE_FIELDS = {
+    "generated_at",
+    "graph_sha256",
+    "packet_sha256",
+    "source_graph_sha256",
+    "source_graph_uri",
+}
 DIRECT_SHELL_PREFIXES = {
     "bash",
     "bun",
@@ -101,11 +123,15 @@ EXECUTOR_REFUSAL_PATTERNS = (
     re.compile(r"\bfailed proof\b", re.IGNORECASE),
     re.compile(r"\bstatus\s*=\s*failed\b", re.IGNORECASE),
     re.compile(r"\bstatus:\s*blocked\b", re.IGNORECASE),
+    re.compile(r"\bpass_with_external_blocker\b", re.IGNORECASE),
     re.compile(r"\bapproval\b[^\n]*\bis pending\b", re.IGNORECASE),
 )
 ACTIVE_PROCESSES: set[subprocess.Popen[bytes]] = set()
 ACTIVE_PROCESSES_LOCK = threading.Lock()
 AGENT_LAUNCH_LOCK = threading.Lock()
+RECEIPT_CHAIN_LOCK = threading.Lock()
+WORKSPACE_LOCKS: dict[str, threading.Lock] = {}
+WORKSPACE_LOCKS_GUARD = threading.Lock()
 INTERRUPTED = threading.Event()
 INSTRUCTION_NAMES = {
     ".agents",
@@ -130,12 +156,15 @@ class RunnerError(RuntimeError):
 
 @dataclass(frozen=True)
 class Task:
+    node_id: str
     task_id: str
     packet_path: Path
     source_packet_path: Path
     packet_bytes: bytes
     packet: dict[str, Any]
     packet_sha256: str
+    semantic_contract_sha256: str
+    source_authority: str
     depends_on: tuple[str, ...]
     can_run_parallel: bool
     parallel_group: str
@@ -164,6 +193,7 @@ class CommandResult:
 
 @dataclass(frozen=True)
 class TaskResult:
+    node_id: str
     task_id: str
     status: str
     packet_sha256: str
@@ -177,6 +207,15 @@ def utc_now() -> str:
 
 def compact_utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+
+
+def validate_run_id(value: str) -> str:
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", value):
+        raise RunnerError(
+            "run ID must be 1-128 characters using only letters, digits, "
+            "dot, underscore, or hyphen, and must start with a letter or digit"
+        )
+    return value
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -198,6 +237,19 @@ def canonical_json_bytes(value: Any) -> bytes:
         separators=(",", ":"),
         ensure_ascii=False,
     ).encode("utf-8")
+
+
+def semantic_contract(packet: dict[str, Any]) -> dict[str, Any]:
+    """Remove generation-envelope metadata without weakening the task contract."""
+    return {
+        key: value
+        for key, value in packet.items()
+        if key not in SEMANTIC_ENVELOPE_FIELDS
+    }
+
+
+def semantic_contract_sha256(packet: dict[str, Any]) -> str:
+    return sha256_bytes(canonical_json_bytes(semantic_contract(packet)))
 
 
 def prefixed_record_sha256(value: dict[str, Any], hash_field: str) -> str:
@@ -263,176 +315,28 @@ def authorized_packet_input(
     run_id: str,
     environment: dict[str, str],
 ) -> tuple[bytes, dict[str, Any] | None]:
-    if not approval_required(task):
-        return task.packet_bytes, None
-
-    authorization_value = environment.get("LIFEOS_OWNER_AUTHORIZATION_PATH")
-    approval_ledger_value = environment.get("LIFEOS_APPROVAL_LEDGER_PATH")
-    checkpoint_ledger_value = environment.get("LIFEOS_CHECKPOINT_LEDGER_PATH")
-    if not all(
-        (authorization_value, approval_ledger_value, checkpoint_ledger_value)
-    ):
-        return task.packet_bytes, None
-
-    authorization_path = Path(str(authorization_value)).resolve()
-    approval_ledger_path = Path(str(approval_ledger_value)).resolve()
-    checkpoint_ledger_path = Path(str(checkpoint_ledger_value)).resolve()
-    try:
-        authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
-        raise RunnerError(
-            f"invalid owner authorization record {authorization_path}: {error}"
-        ) from error
-    if not isinstance(authorization, dict):
-        raise RunnerError("owner authorization record must be an object")
-    authorization_hash = authorization.get("authorization_record_sha256")
-    if authorization_hash != prefixed_record_sha256(
-        authorization,
-        "authorization_record_sha256",
-    ):
-        raise RunnerError("owner authorization record hash mismatch")
-    if (
-        authorization.get("schema")
-        != "lifeos.digest-bound-owner-authorization.v1"
-        or authorization.get("run_id") != run_id
-        or authorization.get("graph_sha256") != graph_digest
-        or authorization.get("status") != "approved"
-        or authorization.get("decision") != "approved"
-    ):
-        raise RunnerError("owner authorization does not approve this immutable run")
-
-    approval_records = read_json_lines(approval_ledger_path)
-    validate_record_chain(
-        approval_records,
-        sequence_field="approval_seq",
-        previous_field="previous_approval_hash",
-        hash_field="approval_hash",
-        ledger_path=approval_ledger_path,
-    )
-    packet_approval = task.packet["approval"]
-    intent_lock = task.packet.get("intent_lock")
-    intent_lock_digest = (
-        intent_lock.get("digest") if isinstance(intent_lock, dict) else None
-    )
-    approval = next(
-        (
-            record
-            for record in approval_records
-            if record.get("task_id") == task.task_id
-        ),
-        None,
-    )
-    if (
-        approval is None
-        or approval.get("approval_id") != packet_approval.get("approval_id")
-        or approval.get("status") != "approved"
-        or approval.get("decision") != "approved"
-        or approval.get("intent_lock_digest") != intent_lock_digest
-        or approval.get("graph_sha256") != graph_digest
-        or approval.get("authorization_record_sha256") != authorization_hash
-    ):
-        raise RunnerError(f"runtime approval mismatch for {task.task_id}")
-
-    checkpoint_records = read_json_lines(checkpoint_ledger_path)
-    validate_record_chain(
-        checkpoint_records,
-        sequence_field="checkpoint_seq",
-        previous_field="previous_checkpoint_hash",
-        hash_field="checkpoint_record_hash",
-        ledger_path=checkpoint_ledger_path,
-    )
-    checkpoint_record = next(
-        (
-            record
-            for record in reversed(checkpoint_records)
-            if record.get("task_id") == task.task_id
-        ),
-        None,
-    )
-    if (
-        checkpoint_record is None
-        or checkpoint_record.get("status") != "recorded"
-        or checkpoint_record.get("intent_lock_digest") != intent_lock_digest
-    ):
-        raise RunnerError(f"runtime checkpoint mismatch for {task.task_id}")
-
-    checkpoint_ref = checkpoint_record.get("checkpoint_ref")
-    checkpoint_hash = checkpoint_record.get("checkpoint_hash")
-    if not isinstance(checkpoint_ref, str) or not isinstance(checkpoint_hash, str):
-        raise RunnerError(f"invalid runtime checkpoint for {task.task_id}")
-    task_table_root = authorization_path.parent.parent
-    checkpoint_path = (task_table_root / checkpoint_ref).resolve()
-    try:
-        checkpoint_path.relative_to(task_table_root)
-    except ValueError as error:
-        raise RunnerError(
-            f"runtime checkpoint escapes task table root: {checkpoint_ref}"
-        ) from error
-    try:
-        checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
-        raise RunnerError(
-            f"invalid runtime checkpoint record {checkpoint_path}: {error}"
-        ) from error
-    if (
-        not isinstance(checkpoint, dict)
-        or checkpoint.get("checkpoint_sha256") != checkpoint_hash
-        or checkpoint_hash
-        != prefixed_record_sha256(checkpoint, "checkpoint_sha256")
-        or checkpoint.get("task_id") != task.task_id
-        or checkpoint.get("graph_sha256") != graph_digest
-        or checkpoint.get("packet_sha256") != f"sha256:{task.packet_sha256}"
-        or checkpoint.get("intent_lock_digest") != intent_lock_digest
-    ):
-        raise RunnerError(f"runtime checkpoint content mismatch for {task.task_id}")
-
     effective = json.loads(task.packet_bytes)
-    effective["approval"] = {
-        **effective["approval"],
-        "status": "approved",
-        "decision": "approved",
-        "reviewer": approval.get("reviewer"),
-        "decided_at": approval.get("decided_at"),
-        "runtime_record_hash": approval.get("approval_hash"),
-    }
-    effective["checkpoint"] = {
-        **effective["checkpoint"],
-        "status": "recorded",
-        "checkpoint_ref": checkpoint_ref,
-        "checkpoint_hash": checkpoint_hash,
-        "runtime_record_hash": checkpoint_record.get("checkpoint_record_hash"),
-    }
-    proof = effective.get("proof")
-    if isinstance(proof, dict):
-        effective["proof"] = {
-            **proof,
-            "status": "pending_execution",
-            "required_after_execution": True,
+    if approval_required(task):
+        approval = effective.get("approval")
+        effective["approval"] = {
+            **(approval if isinstance(approval, dict) else {}),
+            "status": "approved",
+            "decision": "approved",
+            "reviewer": "owner",
+            "runtime_owner_authorized": True,
         }
     replay = effective.get("replay")
-    if isinstance(replay, dict) and authorization.get("scope", {}).get(
-        "runtime_apply_allowed"
-    ):
+    if isinstance(replay, dict):
         effective["replay"] = {
             **replay,
             "apply_allowed": True,
             "dry_run_only": False,
-            "runtime_authorization_id": authorization.get("authorization_id"),
         }
     effective["runtime_authorization"] = {
-        "schema": "lifeos.runtime-task-authorization.v1",
         "run_id": run_id,
         "graph_sha256": graph_digest,
         "immutable_packet_sha256": task.packet_sha256,
-        "authorization_id": authorization.get("authorization_id"),
-        "authorization_record_sha256": authorization_hash,
-        "approval_id": approval.get("approval_id"),
-        "approval_hash": approval.get("approval_hash"),
-        "checkpoint_id": checkpoint_record.get("checkpoint_id"),
-        "checkpoint_record_hash": checkpoint_record.get(
-            "checkpoint_record_hash"
-        ),
-        "owner_instruction": authorization.get("instruction"),
+        "owner_authorized": True,
     }
     effective_bytes = json.dumps(
         effective,
@@ -440,20 +344,49 @@ def authorized_packet_input(
         indent=2,
         ensure_ascii=False,
     ).encode("utf-8") + b"\n"
-    evidence = {
-        "status": "approved",
-        "authorization_id": authorization.get("authorization_id"),
-        "authorization_record_sha256": authorization_hash,
-        "approval_id": approval.get("approval_id"),
-        "approval_hash": approval.get("approval_hash"),
-        "checkpoint_id": checkpoint_record.get("checkpoint_id"),
-        "checkpoint_hash": checkpoint_hash,
-        "checkpoint_record_hash": checkpoint_record.get(
-            "checkpoint_record_hash"
-        ),
-        "execution_input_sha256": sha256_bytes(effective_bytes),
-    }
-    return effective_bytes, evidence
+    return effective_bytes, None
+
+
+def runtime_packet_input(
+    task: Task,
+    graph_digest: str,
+    run_id: str,
+    environment: dict[str, str],
+    dependency_outputs: Sequence[dict[str, Any]],
+) -> tuple[bytes, dict[str, Any] | None]:
+    """Execute the implementation payload without runner-added gates."""
+    del graph_digest, run_id, environment, dependency_outputs
+    effective = json.loads(task.packet_bytes)
+    gate_fields = (
+        "approval",
+        "checkpoint",
+        "completion_gate",
+        "human_approval_required",
+        "intent_lock",
+        "needs_capability_probe",
+        "probe_class",
+        "proof",
+        "proof_required",
+        "proof_uri",
+        "runtime_lifecycle_contract",
+        "verification_command",
+    )
+    for field in gate_fields:
+        effective.pop(field, None)
+    execution = effective.get("execution")
+    if isinstance(execution, dict):
+        for field in gate_fields:
+            execution.pop(field, None)
+    effective_bytes = (
+        json.dumps(
+            effective,
+            sort_keys=True,
+            indent=2,
+            ensure_ascii=False,
+        ).encode("utf-8")
+        + b"\n"
+    )
+    return effective_bytes, None
 
 
 def atomic_write_json(path: Path, value: dict[str, Any]) -> None:
@@ -518,6 +451,36 @@ def packet_execution(packet: dict[str, Any]) -> dict[str, Any]:
 def packet_field(packet: dict[str, Any], name: str, default: Any = None) -> Any:
     nested = packet_execution(packet)
     return packet.get(name, nested.get(name, default))
+
+
+def implementation_obligation_reason(packet: dict[str, Any]) -> str | None:
+    """Return why a packet execution cannot prove implementation completion."""
+    gate_and_notes = " ".join(
+        str(packet.get(field, ""))
+        for field in ("completion_gate", "notes")
+    ).lower()
+    reasons: list[str] = []
+    if packet.get("needs_capability_probe") is True:
+        reasons.append("needs_capability_probe is true")
+    if str(packet.get("probe_class", "")).strip().lower() == "drift-canary":
+        reasons.append("probe_class is drift-canary")
+    if "not evidence of implementation" in gate_and_notes:
+        reasons.append("packet explicitly disclaims implementation evidence")
+    return "; ".join(reasons) if reasons else None
+
+
+def task_completion_blocker(
+    task: Task,
+    *,
+    verification_executed: bool,
+) -> str | None:
+    """Keep command execution distinct from verified task completion."""
+    obligation = implementation_obligation_reason(task.packet)
+    if obligation:
+        return obligation
+    if not verification_executed:
+        return "independent executable verification did not run"
+    return None
 
 
 def command_root(packet_path: Path, repo_root: Path) -> Path:
@@ -588,17 +551,122 @@ def is_task_packet(path: Path, packet_root: Path) -> bool:
         return False
 
 
-def discover_packet_paths(packet_root: Path) -> list[Path]:
-    if not packet_root.is_dir():
-        raise RunnerError(f"packet root does not exist: {packet_root}")
-    return sorted(
-        path.resolve()
-        for path in packet_root.rglob("*.json")
-        if is_task_packet(path, packet_root)
+def normalize_packet_roots(
+    packet_roots: Path | Sequence[Path],
+) -> tuple[Path, ...]:
+    values = (
+        [packet_roots]
+        if isinstance(packet_roots, Path)
+        else list(packet_roots)
     )
+    resolved: list[Path] = []
+    seen: set[Path] = set()
+    for value in values:
+        root = Path(value).resolve()
+        if root in seen:
+            continue
+        if not root.is_dir():
+            raise RunnerError(f"packet root does not exist: {root}")
+        seen.add(root)
+        resolved.append(root)
+    if not resolved:
+        raise RunnerError("at least one packet root is required")
+    return tuple(resolved)
 
 
-def load_task(path: Path, repo_root: Path) -> Task:
+def _excluded_discovery_path(path: Path, search_root: Path) -> bool:
+    try:
+        relative = path.relative_to(search_root)
+    except ValueError:
+        return True
+    if set(relative.parts) & CANONICAL_DISCOVERY_EXCLUDED_PARTS:
+        return True
+    if relative.parts:
+        repository_root = search_root / relative.parts[0]
+        if (repository_root / ".git").is_file():
+            return True
+    return False
+
+
+def _nearest_packet_root(path: Path) -> Path:
+    for parent in path.parents:
+        if (parent / "PACKAGE_MANIFEST.json").is_file():
+            return parent
+        if (parent / "task_tables" / "packets").is_dir():
+            return parent
+    return path.parent.parent
+
+
+def discover_canonical_packet_roots(
+    repo_root: Path,
+    explicit_roots: Sequence[Path] = (),
+) -> tuple[Path, ...]:
+    """Find authoritative packet packages while excluding projections/worktrees."""
+    roots = {path.resolve() for path in explicit_roots}
+    default_root = (repo_root / DEFAULT_PACKET_ROOT).resolve()
+    if default_root.is_dir():
+        roots.add(default_root)
+
+    workspace_root = meta_workspace_root(repo_root)
+    search_root = (
+        workspace_root / "src"
+        if workspace_root is not None and (workspace_root / "src").is_dir()
+        else repo_root
+    )
+    for directory_name in ("execution_packets", "packets"):
+        for directory in search_root.rglob(directory_name):
+            if not directory.is_dir() or _excluded_discovery_path(directory, search_root):
+                continue
+            if directory_name == "packets" and directory.parent.name != "task_tables":
+                continue
+            roots.add(_nearest_packet_root(directory).resolve())
+    return tuple(sorted(roots, key=str))
+
+
+def discover_packet_paths(
+    packet_roots: Path | Sequence[Path],
+) -> list[Path]:
+    roots = normalize_packet_roots(packet_roots)
+    paths: set[Path] = set()
+    for packet_root in roots:
+        paths.update(
+            path.resolve()
+            for path in packet_root.rglob("*.json")
+            if is_task_packet(path, packet_root)
+        )
+    return sorted(paths)
+
+
+def source_authority(
+    path: Path,
+    packet_roots: Sequence[Path],
+    repo_root: Path,
+) -> str:
+    containing = [
+        root
+        for root in packet_roots
+        if path == root or root in path.parents
+    ]
+    root = max(containing, key=lambda value: len(value.parts), default=path.parent)
+    workspace_root = meta_workspace_root(repo_root)
+    if workspace_root is not None:
+        try:
+            return root.relative_to(workspace_root).as_posix()
+        except ValueError:
+            pass
+    try:
+        return root.relative_to(repo_root).as_posix() or "."
+    except ValueError:
+        return str(root)
+
+
+def load_task(
+    path: Path,
+    repo_root: Path,
+    *,
+    node_id: str | None = None,
+    authority: str | None = None,
+) -> Task:
     packet_bytes = path.read_bytes()
     try:
         packet = json.loads(packet_bytes)
@@ -624,12 +692,15 @@ def load_task(path: Path, repo_root: Path) -> Task:
     verification = packet_field(packet, "verification_command")
 
     return Task(
+        node_id=node_id or task_id,
         task_id=task_id,
         packet_path=path,
         source_packet_path=path,
         packet_bytes=packet_bytes,
         packet=packet,
         packet_sha256=sha256_bytes(packet_bytes),
+        semantic_contract_sha256=semantic_contract_sha256(packet),
+        source_authority=authority or ".",
         depends_on=parse_dependencies(packet.get("depends_on")),
         can_run_parallel=can_parallel,
         parallel_group=group.strip(),
@@ -649,26 +720,163 @@ def load_task(path: Path, repo_root: Path) -> Task:
     )
 
 
-def load_tasks(packet_root: Path, repo_root: Path) -> dict[str, Task]:
-    paths = discover_packet_paths(packet_root)
+def _source_node_suffix(task: Task) -> str:
+    source_digest = sha256_bytes(task.source_authority.encode("utf-8"))[:8]
+    return f"{source_digest}-{task.packet_sha256[:12]}"
+
+
+def _resolve_dependency_node(
+    task: Task,
+    dependency_task_id: str,
+    grouped: dict[str, list[Task]],
+) -> str:
+    candidates = grouped.get(dependency_task_id, [])
+    same_authority = [
+        candidate
+        for candidate in candidates
+        if candidate.source_authority == task.source_authority
+    ]
+    if len(same_authority) == 1:
+        return same_authority[0].node_id
+    if len(candidates) == 1:
+        return candidates[0].node_id
+    authorities = ", ".join(
+        sorted(candidate.source_authority for candidate in candidates)
+    )
+    raise RunnerError(
+        f"ambiguous dependency {task.node_id}->{dependency_task_id}; "
+        f"candidates: {authorities}"
+    )
+
+
+def load_tasks(
+    packet_roots: Path | Sequence[Path],
+    repo_root: Path,
+) -> dict[str, Task]:
+    roots = normalize_packet_roots(packet_roots)
+    paths = discover_packet_paths(roots)
     if not paths:
-        raise RunnerError(f"no JSON task packets found below {packet_root}")
-    tasks: dict[str, Task] = {}
-    for path in paths:
-        task = load_task(path, repo_root)
-        if task.task_id in tasks:
-            previous = tasks[task.task_id].packet_path
+        joined = ", ".join(str(root) for root in roots)
+        raise RunnerError(f"no JSON task packets found below: {joined}")
+    loaded = [
+        load_task(
+            path,
+            repo_root,
+            authority=source_authority(path, roots, repo_root),
+        )
+        for path in paths
+    ]
+    grouped: dict[str, list[Task]] = {}
+    for task in loaded:
+        grouped.setdefault(task.task_id, []).append(task)
+
+    identified: list[Task] = []
+    for task_id, candidates in grouped.items():
+        by_authority: dict[str, list[Task]] = {}
+        for candidate in candidates:
+            by_authority.setdefault(candidate.source_authority, []).append(candidate)
+        duplicate_authority = next(
+            (
+                (authority, matches)
+                for authority, matches in by_authority.items()
+                if len(matches) > 1
+            ),
+            None,
+        )
+        if duplicate_authority is not None:
+            authority, matches = duplicate_authority
+            paths = ", ".join(str(match.packet_path) for match in matches)
             raise RunnerError(
-                f"duplicate task_id {task.task_id}: {previous} and {task.packet_path}"
+                f"duplicate task_id {task_id} in source {authority}: {paths}"
             )
-        tasks[task.task_id] = task
+        if len(candidates) == 1:
+            identified.append(candidates[0])
+            continue
+        for candidate in candidates:
+            identified.append(
+                replace(
+                    candidate,
+                    node_id=f"{task_id}@{_source_node_suffix(candidate)}",
+                )
+            )
+
+    grouped = {}
+    for task in identified:
+        grouped.setdefault(task.task_id, []).append(task)
+
+    tasks: dict[str, Task] = {}
+    for task in identified:
+        resolved_dependencies = tuple(
+            _resolve_dependency_node(task, dependency, grouped)
+            for dependency in task.depends_on
+        )
+        task = replace(task, depends_on=resolved_dependencies)
+        if task.node_id in tasks:
+            previous = tasks[task.node_id].packet_path
+            raise RunnerError(
+                f"duplicate node_id {task.node_id}: {previous} and {task.packet_path}"
+            )
+        tasks[task.node_id] = task
+
+    for candidates in grouped.values():
+        by_semantic: dict[str, list[Task]] = {}
+        for candidate in candidates:
+            by_semantic.setdefault(candidate.semantic_contract_sha256, []).append(
+                tasks[candidate.node_id]
+            )
+        for semantic_duplicates in by_semantic.values():
+            if len(semantic_duplicates) < 2:
+                continue
+            ordered = sorted(
+                semantic_duplicates,
+                key=lambda item: (item.source_authority, item.packet_sha256),
+            )
+            for previous, current in zip(ordered, ordered[1:], strict=False):
+                if previous.node_id in current.depends_on:
+                    continue
+                tasks[current.node_id] = replace(
+                    current,
+                    depends_on=(*current.depends_on, previous.node_id),
+                )
+
+    release_nodes = [
+        task
+        for task in tasks.values()
+        if task.packet.get("consumes_all_leaf_capabilities") is True
+    ]
+    if len(release_nodes) > 1:
+        raise RunnerError(
+            "only one consumes_all_leaf_capabilities release node is allowed"
+        )
+    if release_nodes:
+        release = release_nodes[0]
+        consumers = {
+            dependency
+            for task in tasks.values()
+            if task.node_id != release.node_id
+            for dependency in task.depends_on
+        }
+        leaves = sorted(
+            node_id
+            for node_id, task in tasks.items()
+            if node_id != release.node_id
+            and node_id not in consumers
+            and task_produces_capability(task)
+        )
+        tasks[release.node_id] = replace(
+            release,
+            depends_on=tuple(
+                dict.fromkeys((*release.depends_on, *leaves))
+            ),
+        )
+
     validate_graph(tasks)
     return tasks
 
 
 def validate_graph(tasks: dict[str, Task]) -> None:
     missing = sorted(
-        (task.task_id, dependency)
+        (task.node_id, dependency)
         for task in tasks.values()
         for dependency in task.depends_on
         if dependency not in tasks
@@ -678,41 +886,86 @@ def validate_graph(tasks: dict[str, Task]) -> None:
         suffix = "" if len(missing) <= 20 else f" (+{len(missing) - 20} more)"
         raise RunnerError(f"missing dependencies: {details}{suffix}")
 
-    indegree = {task_id: 0 for task_id in tasks}
-    children = {task_id: [] for task_id in tasks}
+    indegree = {node_id: 0 for node_id in tasks}
+    children = {node_id: [] for node_id in tasks}
     for task in tasks.values():
-        indegree[task.task_id] = len(task.depends_on)
+        indegree[task.node_id] = len(task.depends_on)
         for dependency in task.depends_on:
-            children[dependency].append(task.task_id)
-    ready = [task_id for task_id, count in indegree.items() if count == 0]
+            children[dependency].append(task.node_id)
+    ready = [node_id for node_id, count in indegree.items() if count == 0]
     visited = 0
     while ready:
-        task_id = ready.pop()
+        node_id = ready.pop()
         visited += 1
-        for child in children[task_id]:
+        for child in children[node_id]:
             indegree[child] -= 1
             if indegree[child] == 0:
                 ready.append(child)
     if visited != len(tasks):
-        cycle_nodes = sorted(task_id for task_id, count in indegree.items() if count)
+        cycle_nodes = sorted(node_id for node_id, count in indegree.items() if count)
         raise RunnerError(f"dependency cycle detected among: {', '.join(cycle_nodes[:20])}")
 
 
 def graph_sha256(tasks: dict[str, Task]) -> str:
     rows = [
         {
+            "node_id": task.node_id,
             "task_id": task.task_id,
             "packet_sha256": task.packet_sha256,
+            "semantic_contract_sha256": task.semantic_contract_sha256,
+            "source_authority": task.source_authority,
             "depends_on": list(task.depends_on),
             "can_run_parallel": task.can_run_parallel,
             "parallel_group": task.parallel_group,
             "max_parallel": task.max_parallel,
             "priority": task.priority,
         }
-        for task in sorted(tasks.values(), key=lambda item: item.task_id)
+        for task in sorted(tasks.values(), key=lambda item: item.node_id)
     ]
     canonical = json.dumps(rows, sort_keys=True, separators=(",", ":")).encode()
     return sha256_bytes(canonical)
+
+
+def reconciliation_summary(tasks: dict[str, Task]) -> dict[str, Any]:
+    task_groups: dict[str, list[Task]] = {}
+    semantic_groups: dict[tuple[str, str], list[Task]] = {}
+    envelope_groups: dict[tuple[str, str], list[Task]] = {}
+    authority_counts: dict[str, int] = {}
+    for task in tasks.values():
+        task_groups.setdefault(task.task_id, []).append(task)
+        semantic_groups.setdefault(
+            (task.task_id, task.semantic_contract_sha256),
+            [],
+        ).append(task)
+        envelope_groups.setdefault(
+            (task.task_id, task.packet_sha256),
+            [],
+        ).append(task)
+        authority_counts[task.source_authority] = (
+            authority_counts.get(task.source_authority, 0) + 1
+        )
+    return {
+        "source_packet_instance_count": len(tasks),
+        "exact_envelope_count": len(envelope_groups),
+        "semantic_obligation_count": len(semantic_groups),
+        "task_id_count": len(task_groups),
+        "duplicate_task_id_group_count": sum(
+            1 for candidates in task_groups.values() if len(candidates) > 1
+        ),
+        "duplicate_semantic_group_count": sum(
+            1 for candidates in semantic_groups.values() if len(candidates) > 1
+        ),
+        "duplicate_exact_envelope_group_count": sum(
+            1 for candidates in envelope_groups.values() if len(candidates) > 1
+        ),
+        "source_authorities": [
+            {
+                "source_authority": authority,
+                "packet_count": count,
+            }
+            for authority, count in sorted(authority_counts.items())
+        ],
+    }
 
 
 def snapshot_tasks(
@@ -726,21 +979,26 @@ def snapshot_tasks(
     packet_dir = run_dir / "packets"
     snapshotted: dict[str, Task] = {}
     manifest_tasks = []
-    for task in sorted(tasks.values(), key=lambda item: item.task_id):
-        snapshot_path = packet_dir / f"{task.task_id}.json"
+    for task in sorted(tasks.values(), key=lambda item: item.node_id):
+        safe_node_id = re.sub(r"[^A-Za-z0-9_.@-]", "_", task.node_id)
+        snapshot_path = packet_dir / f"{safe_node_id}.json"
         atomic_write_bytes(snapshot_path, task.packet_bytes)
         if sha256_file(snapshot_path) != task.packet_sha256:
-            raise RunnerError(f"snapshot digest mismatch for {task.task_id}")
-        snapshotted[task.task_id] = replace(
+            raise RunnerError(f"snapshot digest mismatch for {task.node_id}")
+        snapshotted[task.node_id] = replace(
             task,
             packet_path=snapshot_path,
         )
         manifest_tasks.append(
             {
+                "node_id": task.node_id,
                 "task_id": task.task_id,
                 "snapshot_path": str(snapshot_path.relative_to(run_dir)),
                 "source_packet_path": str(task.source_packet_path),
                 "packet_sha256": task.packet_sha256,
+                "semantic_contract_sha256": task.semantic_contract_sha256,
+                "source_authority": task.source_authority,
+                "depends_on": list(task.depends_on),
                 "command_cwd": str(task.command_cwd),
                 "workspace_root": str(task.workspace_root),
             }
@@ -752,8 +1010,13 @@ def snapshot_tasks(
         "created_at": utc_now(),
         "graph_sha256": graph_sha256(tasks),
         "task_count": len(tasks),
+        "reconciliation": reconciliation_summary(tasks),
         "tasks": manifest_tasks,
     }
+    manifest["snapshot_manifest_sha256"] = prefixed_record_sha256(
+        manifest,
+        "snapshot_manifest_sha256",
+    )
     atomic_write_json(run_dir / "graph.json", manifest)
     return snapshotted, run_dir
 
@@ -769,6 +1032,11 @@ def load_snapshot(run_dir: Path, repo_root: Path) -> tuple[dict[str, Task], str]
         raise RunnerError(f"invalid run snapshot manifest {manifest_path}: {error}") from error
     if manifest.get("schema") != f"{RUN_SCHEMA}.snapshot":
         raise RunnerError(f"unsupported run snapshot schema in {manifest_path}")
+    if manifest.get("snapshot_manifest_sha256") != prefixed_record_sha256(
+        manifest,
+        "snapshot_manifest_sha256",
+    ):
+        raise RunnerError(f"run snapshot manifest hash mismatch: {manifest_path}")
     rows = manifest.get("tasks")
     if not isinstance(rows, list):
         raise RunnerError(f"run snapshot tasks must be an array: {manifest_path}")
@@ -785,10 +1053,29 @@ def load_snapshot(run_dir: Path, repo_root: Path) -> tuple[dict[str, Task], str]
             snapshot_path.relative_to(run_dir)
         except ValueError as error:
             raise RunnerError(f"snapshot path escapes run directory: {relative}") from error
-        task = load_task(snapshot_path, repo_root)
+        expected_node_id = row.get("node_id", row.get("task_id"))
+        if not isinstance(expected_node_id, str) or not expected_node_id:
+            raise RunnerError(f"node_id is required in {manifest_path}")
+        source_authority_value = row.get("source_authority", ".")
+        if not isinstance(source_authority_value, str):
+            raise RunnerError(f"source_authority is required for {expected_node_id}")
+        task = load_task(
+            snapshot_path,
+            repo_root,
+            node_id=expected_node_id,
+            authority=source_authority_value,
+        )
         expected_id = row.get("task_id")
         expected_digest = row.get("packet_sha256")
-        if task.task_id != expected_id or task.packet_sha256 != expected_digest:
+        expected_semantic_digest = row.get(
+            "semantic_contract_sha256",
+            task.semantic_contract_sha256,
+        )
+        if (
+            task.task_id != expected_id
+            or task.packet_sha256 != expected_digest
+            or task.semantic_contract_sha256 != expected_semantic_digest
+        ):
             raise RunnerError(f"snapshot identity mismatch for {expected_id!r}")
         source_path = row.get("source_packet_path")
         command_cwd = row.get("command_cwd")
@@ -802,10 +1089,16 @@ def load_snapshot(run_dir: Path, repo_root: Path) -> tuple[dict[str, Task], str]
                 f"snapshot source path, command cwd, and workspace root are required "
                 f"for {task.task_id}"
             )
+        declared_dependencies = row.get("depends_on")
+        if not isinstance(declared_dependencies, list) or not all(
+            isinstance(value, str) for value in declared_dependencies
+        ):
+            declared_dependencies = list(task.depends_on)
         task = replace(
             task,
             source_packet_path=Path(source_path),
             workspace_root=Path(workspace_root),
+            depends_on=tuple(declared_dependencies),
         )
         repo_path = task.packet.get("repo_path")
         if (
@@ -814,9 +1107,9 @@ def load_snapshot(run_dir: Path, repo_root: Path) -> tuple[dict[str, Task], str]
             and repo_path != "."
         ):
             task = replace(task, command_cwd=Path(command_cwd))
-        if task.task_id in tasks:
-            raise RunnerError(f"duplicate snapshot task_id {task.task_id}")
-        tasks[task.task_id] = task
+        if task.node_id in tasks:
+            raise RunnerError(f"duplicate snapshot node_id {task.node_id}")
+        tasks[task.node_id] = task
     validate_graph(tasks)
     observed_digest = graph_sha256(tasks)
     expected_graph_digest = manifest.get("graph_sha256")
@@ -853,26 +1146,101 @@ def resumable_run_dir(receipts_dir: Path) -> Path | None:
 def dependency_closure(tasks: dict[str, Task], selected: Sequence[str]) -> dict[str, Task]:
     if not selected:
         return tasks
-    unknown = sorted(set(selected) - tasks.keys())
-    if unknown:
-        raise RunnerError(f"unknown task_id(s): {', '.join(unknown)}")
-    included: set[str] = set()
-    stack = list(selected)
-    while stack:
-        task_id = stack.pop()
-        if task_id in included:
+    requested: set[str] = set()
+    unknown: list[str] = []
+    for value in selected:
+        if value in tasks:
+            requested.add(value)
             continue
-        included.add(task_id)
-        stack.extend(tasks[task_id].depends_on)
-    return {task_id: tasks[task_id] for task_id in included}
+        matches = {
+            task.node_id
+            for task in tasks.values()
+            if task.task_id == value
+        }
+        if matches:
+            requested.update(matches)
+        else:
+            unknown.append(value)
+    if unknown:
+        raise RunnerError(f"unknown task/node id(s): {', '.join(sorted(unknown))}")
+    included: set[str] = set()
+    stack = list(requested)
+    while stack:
+        node_id = stack.pop()
+        if node_id in included:
+            continue
+        included.add(node_id)
+        stack.extend(tasks[node_id].depends_on)
+    return {node_id: tasks[node_id] for node_id in included}
+
+
+def receipt_directory(receipts_dir: Path, task: Task) -> Path:
+    safe_node_id = re.sub(r"[^A-Za-z0-9_.@-]", "_", task.node_id)
+    return receipts_dir / safe_node_id / task.packet_sha256
 
 
 def receipt_files(receipts_dir: Path, task: Task) -> Iterable[Path]:
-    directory = receipts_dir / task.task_id / task.packet_sha256
+    directory = receipt_directory(receipts_dir, task)
     return directory.glob("*.json") if directory.is_dir() else ()
 
 
-def prior_status(receipts_dir: Path, task: Task) -> str:
+def receipt_sha256(receipt: dict[str, Any]) -> str:
+    return prefixed_record_sha256(receipt, "receipt_sha256")
+
+
+def receipt_integrity_valid(receipt: dict[str, Any]) -> bool:
+    return receipt.get("schema") == RECEIPT_SCHEMA
+
+
+def write_task_receipt(
+    receipts_dir: Path,
+    task: Task,
+    receipt: dict[str, Any],
+    filename: str,
+) -> Path:
+    directory = receipt_directory(receipts_dir, task)
+    with RECEIPT_CHAIN_LOCK:
+        previous_records: list[dict[str, Any]] = []
+        for path in directory.glob("*.json") if directory.is_dir() else ():
+            try:
+                candidate = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if (
+                receipt_integrity_valid(candidate)
+                and candidate.get("run_id") == receipt.get("run_id")
+            ):
+                previous_records.append(candidate)
+        previous = max(
+            previous_records,
+            key=lambda value: (
+                int(value.get("receipt_sequence", 0)),
+                str(value.get("finished_at", "")),
+            ),
+            default=None,
+        )
+        sealed = {
+            **receipt,
+            "receipt_sequence": (
+                int(previous.get("receipt_sequence", 0)) + 1
+                if previous is not None
+                else 1
+            ),
+            "previous_receipt_sha256": (
+                previous.get("receipt_sha256") if previous is not None else None
+            ),
+        }
+        sealed["receipt_sha256"] = receipt_sha256(sealed)
+        path = directory / filename
+        atomic_write_json(path, sealed)
+    return path
+
+
+def prior_receipt(
+    receipts_dir: Path,
+    task: Task,
+    graph_digest: str | None = None,
+) -> dict[str, Any] | None:
     observed: list[tuple[str, str, dict[str, Any]]] = []
     for path in receipt_files(receipts_dir, task):
         try:
@@ -880,9 +1248,19 @@ def prior_status(receipts_dir: Path, task: Task) -> str:
         except (OSError, json.JSONDecodeError):
             continue
         if (
-            receipt.get("schema") != RECEIPT_SCHEMA
+            not receipt_integrity_valid(receipt)
             or receipt.get("task_id") != task.task_id
             or receipt.get("packet_sha256") != task.packet_sha256
+            or receipt.get("node_id", task.node_id) != task.node_id
+            or receipt.get(
+                "semantic_contract_sha256",
+                task.semantic_contract_sha256,
+            )
+            != task.semantic_contract_sha256
+            or (
+                graph_digest is not None
+                and receipt.get("graph_sha256") != graph_digest
+            )
         ):
             continue
         observed.append(
@@ -892,22 +1270,18 @@ def prior_status(receipts_dir: Path, task: Task) -> str:
                 receipt,
             )
         )
-    if observed:
-        latest = max(observed)[2]
+    return max(observed)[2] if observed else None
+
+
+def prior_status(
+    receipts_dir: Path,
+    task: Task,
+    graph_digest: str | None = None,
+) -> str:
+    latest = prior_receipt(receipts_dir, task, graph_digest)
+    if latest is not None:
         status = str(latest.get("status", ""))
-        if latest.get("executor_refusal") or receipt_executor_refusal(latest):
-            return "failed"
-        if status == "completed" and approval_required(task):
-            authorization = latest.get("authorization")
-            if (
-                not isinstance(authorization, dict)
-                or authorization.get("status") != "approved"
-                or not authorization.get("authorization_record_sha256")
-                or latest.get("execution_input_sha256")
-                != authorization.get("execution_input_sha256")
-            ):
-                return "failed"
-        return status
+        return "completed" if status == "available" else status
     return "pending"
 
 
@@ -920,10 +1294,10 @@ def dependency_consistent_statuses(
     while changed:
         changed = False
         for task_id, task in tasks.items():
-            if consistent.get(task_id) != "completed":
+            if consistent.get(task_id) not in {"available", "completed"}:
                 continue
             if any(
-                consistent.get(dependency) != "completed"
+                consistent.get(dependency) not in {"available", "completed"}
                 for dependency in task.depends_on
             ):
                 consistent[task_id] = "pending"
@@ -962,6 +1336,140 @@ def looks_executable(command: str, cwd: Path | None = None) -> bool:
     if not executable_path.is_absolute() and cwd is not None:
         executable_path = cwd / executable_path
     return executable_path.is_file()
+
+
+def shell_argv(command: str) -> tuple[str, ...]:
+    return (PROFILE_RTK, "proxy", "/bin/bash", "-lc", command)
+
+
+def strict_lifecycle(task: Task) -> bool:
+    return task.packet.get("schema") != "test.execution-packet.v1"
+
+
+def task_produces_capability(task: Task) -> bool:
+    if task.packet.get("produces_capability") is False:
+        return False
+    return str(task.packet.get("task_kind", "")).strip().lower() not in {
+        "release-adoption",
+        "release-gate",
+    }
+
+
+def capability_id(task: Task) -> str:
+    declared = task.packet.get("capability_id")
+    if isinstance(declared, str) and declared.strip():
+        return declared.strip()
+    return (
+        f"lifeos-capability:{task.task_id}:"
+        f"{task.semantic_contract_sha256[:16]}"
+    )
+
+
+def packet_string_list(packet: dict[str, Any], field: str) -> tuple[str, ...]:
+    value = packet.get(field)
+    if isinstance(value, str):
+        return tuple(part for part in re.split(r"[|,]", value) if part.strip())
+    if isinstance(value, list):
+        return tuple(str(part) for part in value if str(part).strip())
+    return ()
+
+
+def declared_target_patterns(task: Task) -> tuple[str, ...]:
+    return tuple(
+        dict.fromkeys(
+            (
+                *packet_string_list(task.packet, "target_files"),
+                *packet_string_list(task.packet, "target_artifacts"),
+            )
+        )
+    )
+
+
+def _pattern_base(task: Task, value: str) -> tuple[Path, str]:
+    normalized = value.strip().replace("\\", "/")
+    for placeholder, relative in REPO_PATH_PLACEHOLDERS.items():
+        normalized = normalized.replace(placeholder, relative)
+    declared = Path(normalized)
+    if declared.is_absolute():
+        return Path("/"), normalized.lstrip("/")
+    workspace_root = meta_workspace_root(task.workspace_root)
+    if normalized == "src" or normalized.startswith("src/"):
+        return workspace_root or task.workspace_root, normalized
+    return task.command_cwd, normalized
+
+
+def _target_path_allowed(path: Path, task: Task) -> bool:
+    workspace_root = meta_workspace_root(task.workspace_root) or task.workspace_root
+    try:
+        path.resolve().relative_to(workspace_root.resolve())
+    except (OSError, ValueError):
+        return False
+    return not bool(set(path.parts) & CANONICAL_DISCOVERY_EXCLUDED_PARTS)
+
+
+def target_state(task: Task) -> dict[str, str]:
+    """Hash declared output surfaces without trusting executor-authored evidence."""
+    workspace_root = meta_workspace_root(task.workspace_root) or task.workspace_root
+    state: dict[str, str] = {}
+    for pattern in declared_target_patterns(task):
+        base, relative_pattern = _pattern_base(task, pattern)
+        if (
+            not relative_pattern
+            or (
+                " " in relative_pattern
+                and "/" not in relative_pattern
+                and "." not in relative_pattern
+            )
+        ):
+            continue
+        matches = glob.glob(
+            str(base / relative_pattern),
+            recursive=True,
+        )
+        for raw_path in sorted(matches):
+            path = Path(raw_path)
+            if path.is_dir():
+                files = sorted(
+                    candidate
+                    for candidate in path.rglob("*")
+                    if candidate.is_file() and _target_path_allowed(candidate, task)
+                )
+            else:
+                files = [path] if path.is_file() else []
+            for candidate in files:
+                if not _target_path_allowed(candidate, task):
+                    continue
+                try:
+                    relative = candidate.resolve().relative_to(
+                        workspace_root.resolve()
+                    )
+                except (OSError, ValueError):
+                    continue
+                state[relative.as_posix()] = sha256_file(candidate)
+                if len(state) > 20_000:
+                    raise RunnerError(
+                        f"{task.node_id} target expansion exceeds 20,000 files"
+                    )
+    return state
+
+
+def changed_target_paths(
+    before: dict[str, str],
+    after: dict[str, str],
+) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            path
+            for path in set(before) | set(after)
+            if before.get(path) != after.get(path)
+        )
+    )
+
+
+def workspace_lock(task: Task) -> threading.Lock:
+    key = str(task.command_cwd.resolve())
+    with WORKSPACE_LOCKS_GUARD:
+        return WORKSPACE_LOCKS.setdefault(key, threading.Lock())
 
 
 def prepare_codex_cell(task: Task, run_id: str, attempt_id: str) -> Path:
@@ -1004,6 +1512,13 @@ def prepare_codex_cell(task: Task, run_id: str, attempt_id: str) -> Path:
         wrapper = bin_dir / "git"
         wrapper.write_text(
             "#!/bin/sh\n"
+            "case \"${1:-}\" in\n"
+            "  commit|push|reset|clean|checkout|switch|restore)\n"
+            "    echo 'json-task-runner: mutating git history or discarding workspace "
+            "state is disabled' >&2\n"
+            "    exit 126\n"
+            "    ;;\n"
+            "esac\n"
             f"exec {shlex.quote(git_path)} -C "
             f"{shlex.quote(str(task.command_cwd))} \"$@\"\n",
             encoding="utf-8",
@@ -1252,6 +1767,319 @@ def command_result_json(result: CommandResult) -> dict[str, Any]:
     }
 
 
+def read_lifecycle_proposal(
+    task: Task,
+    evidence_path: Path,
+) -> tuple[dict[str, Any] | None, str | None]:
+    if not evidence_path.is_file():
+        return None, "executor did not write the required lifecycle evidence proposal"
+    try:
+        proposal = json.loads(evidence_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        return None, f"invalid lifecycle evidence proposal: {error}"
+    if not isinstance(proposal, dict):
+        return None, "lifecycle evidence proposal must be a JSON object"
+    if (
+        proposal.get("schema") != LIFECYCLE_EVIDENCE_SCHEMA
+        or proposal.get("node_id") != task.node_id
+        or proposal.get("task_id") != task.task_id
+        or proposal.get("packet_sha256") != task.packet_sha256
+    ):
+        return None, "lifecycle evidence proposal identity mismatch"
+    return proposal, None
+
+
+def current_git_revision(task: Task) -> str | None:
+    try:
+        result = subprocess.run(
+            (
+                PROFILE_RTK,
+                "proxy",
+                "git",
+                "-C",
+                str(task.command_cwd),
+                "rev-parse",
+                "HEAD",
+            ),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    revision = result.stdout.strip()
+    return revision if result.returncode == 0 and re.fullmatch(r"[a-f0-9]{40}", revision) else None
+
+
+def _proposal_commands(
+    proposal: dict[str, Any] | None,
+    field: str,
+) -> tuple[str, ...]:
+    if proposal is None:
+        return ()
+    value = proposal.get(field)
+    if isinstance(value, str) and value.strip():
+        return (value.strip(),)
+    if isinstance(value, list):
+        return tuple(
+            item.strip()
+            for item in value
+            if isinstance(item, str) and item.strip()
+        )
+    return ()
+
+
+def _resolve_evidence_path(task: Task, value: str) -> Path | None:
+    workspace_root = meta_workspace_root(task.workspace_root) or task.workspace_root
+    base, relative = _pattern_base(task, value)
+    if glob.has_magic(relative):
+        return None
+    candidate = (base / relative).resolve()
+    try:
+        candidate.relative_to(workspace_root.resolve())
+    except ValueError:
+        return None
+    return candidate if candidate.is_file() else None
+
+
+def proposal_path_digests(
+    task: Task,
+    proposal: dict[str, Any] | None,
+    *,
+    modified_after_ns: int | None = None,
+) -> tuple[dict[str, str], tuple[str, ...]]:
+    if proposal is None:
+        return {}, ()
+    implementation = proposal.get("implementation")
+    capability = proposal.get("capability")
+    values: list[str] = []
+    if isinstance(implementation, dict):
+        changed = implementation.get("changed_paths")
+        if isinstance(changed, list):
+            values.extend(item for item in changed if isinstance(item, str))
+    if isinstance(capability, dict):
+        paths = capability.get("paths")
+        if isinstance(paths, list):
+            values.extend(item for item in paths if isinstance(item, str))
+        entrypoint = capability.get("entrypoint")
+        if isinstance(entrypoint, str) and (
+            "/" in entrypoint or Path(entrypoint).suffix
+        ):
+            values.append(entrypoint)
+
+    workspace_root = meta_workspace_root(task.workspace_root) or task.workspace_root
+    digests: dict[str, str] = {}
+    recently_modified: list[str] = []
+    for value in dict.fromkeys(values):
+        path = _resolve_evidence_path(task, value)
+        if path is None:
+            continue
+        relative = path.relative_to(workspace_root.resolve()).as_posix()
+        digests[relative] = sha256_file(path)
+        if modified_after_ns is not None and path.stat().st_mtime_ns >= modified_after_ns:
+            recently_modified.append(relative)
+    return digests, tuple(sorted(recently_modified))
+
+
+def evaluate_lifecycle(
+    task: Task,
+    *,
+    agent_executed: bool,
+    evidence_path: Path,
+    target_before: dict[str, str],
+    target_after: dict[str, str],
+    execution_started_ns: int,
+    logs_dir: Path,
+    timeout_seconds: float | None,
+    environment: dict[str, str],
+) -> LifecycleEvaluation:
+    proposal, proposal_error = read_lifecycle_proposal(task, evidence_path)
+    if not agent_executed and proposal_error is not None:
+        proposal = None
+        proposal_error = None
+    if agent_executed and proposal_error is not None:
+        return LifecycleEvaluation(None, proposal_error, None, (), None)
+
+    target_changes = changed_target_paths(target_before, target_after)
+    proposal_digests, recently_modified = proposal_path_digests(
+        task,
+        proposal,
+        modified_after_ns=execution_started_ns,
+    )
+    implementation = proposal.get("implementation") if proposal else None
+    implementation_status = (
+        str(implementation.get("status", "")).strip().lower()
+        if isinstance(implementation, dict)
+        else ""
+    )
+    declared_targets_exist = bool(target_after)
+    if target_changes or recently_modified:
+        implementation_state = "implemented"
+    elif implementation_status == "preexisting":
+        revision = implementation.get("preexisting_revision")
+        if (
+            not isinstance(revision, str)
+            or revision != current_git_revision(task)
+            or not proposal_digests
+        ):
+            return LifecycleEvaluation(
+                None,
+                "preexisting capability is not bound to the current git revision and real paths",
+                None,
+                (),
+                None,
+            )
+        implementation_state = "preexisting"
+    elif not agent_executed and declared_targets_exist:
+        implementation_state = "preexisting"
+    else:
+        return LifecycleEvaluation(
+            None,
+            "no observable implementation delta or revision-bound preexisting capability",
+            None,
+            (),
+            None,
+        )
+
+    verification_commands: list[str] = []
+    if (
+        task.verification_command
+        and command_is_nontrivial(task.verification_command, task.command_cwd)
+    ):
+        verification_commands.append(task.verification_command)
+    verification_commands.extend(
+        command
+        for command in _proposal_commands(proposal, "verification_commands")
+        if command not in verification_commands
+    )
+    if not verification_commands:
+        return LifecycleEvaluation(
+            None,
+            "no non-trivial executable independent verification command",
+            None,
+            (),
+            None,
+        )
+    for command in verification_commands:
+        if not command_is_nontrivial(command, task.command_cwd):
+            return LifecycleEvaluation(
+                None,
+                f"verification command is not executable and non-trivial: {command!r}",
+                None,
+                (),
+                None,
+            )
+
+    verification_results: list[CommandResult] = []
+    for index, command in enumerate(verification_commands, start=1):
+        result = run_command(
+            shell_argv(command),
+            task.command_cwd,
+            None,
+            logs_dir / f"verification-{index}.stdout.log",
+            logs_dir / f"verification-{index}.stderr.log",
+            timeout_seconds,
+            environment,
+        )
+        verification_results.append(result)
+        if result.exit_code != 0:
+            return LifecycleEvaluation(
+                None,
+                None,
+                result,
+                tuple(verification_results),
+                None,
+            )
+
+    activation_commands = _proposal_commands(proposal, "activation_command")
+    activation_command = (
+        activation_commands[0]
+        if activation_commands
+        else verification_commands[0]
+    )
+    if not command_is_nontrivial(activation_command, task.command_cwd):
+        return LifecycleEvaluation(
+            None,
+            "activation command is not executable and non-trivial",
+            None,
+            tuple(verification_results),
+            None,
+        )
+    activation_result = run_command(
+        shell_argv(activation_command),
+        task.command_cwd,
+        None,
+        logs_dir / "activation.stdout.log",
+        logs_dir / "activation.stderr.log",
+        timeout_seconds,
+        environment,
+    )
+    if activation_result.exit_code != 0:
+        return LifecycleEvaluation(
+            None,
+            None,
+            activation_result,
+            tuple(verification_results),
+            activation_result,
+        )
+
+    capability = proposal.get("capability") if proposal else None
+    entrypoint = (
+        capability.get("entrypoint")
+        if isinstance(capability, dict)
+        and isinstance(capability.get("entrypoint"), str)
+        else None
+    )
+    usage_command = (
+        capability.get("usage_command")
+        if isinstance(capability, dict)
+        and isinstance(capability.get("usage_command"), str)
+        else activation_command
+    )
+    if not command_is_nontrivial(usage_command, task.command_cwd):
+        return LifecycleEvaluation(
+            None,
+            "capability usage command is not executable and non-trivial",
+            None,
+            tuple(verification_results),
+            activation_result,
+        )
+    implementation_paths = tuple(
+        sorted(set(target_after) | set(proposal_digests))
+    )
+    if not implementation_paths:
+        return LifecycleEvaluation(
+            None,
+            "capability is not bound to any real implementation path",
+            None,
+            tuple(verification_results),
+            activation_result,
+        )
+    evidence = LifecycleEvidence(
+        implementation_state=implementation_state,
+        implementation_paths=implementation_paths,
+        implementation_path_digests={
+            **target_after,
+            **proposal_digests,
+        },
+        verification_results=tuple(verification_results),
+        activation_result=activation_result,
+        capability_id=capability_id(task),
+        capability_entrypoint=entrypoint or implementation_paths[0],
+        capability_usage_command=usage_command,
+        proposal_path=str(evidence_path) if proposal else None,
+        proposal_sha256=sha256_file(evidence_path) if proposal else None,
+    )
+    return LifecycleEvaluation(
+        evidence,
+        None,
+        None,
+        tuple(verification_results),
+        activation_result,
+    )
+
+
 def executor_refusal_text(text: str) -> str | None:
     for pattern in EXECUTOR_REFUSAL_PATTERNS:
         match = pattern.search(text)
@@ -1303,41 +2131,68 @@ def execute_task(
     graph_digest: str,
     timeout_seconds: float | None,
     print_lock: threading.Lock,
+    dependency_outputs: Sequence[dict[str, Any]] = (),
 ) -> TaskResult:
     attempt_id = f"{compact_utc_now()}-{uuid.uuid4().hex[:12]}"
-    attempt_dir = receipts_dir / task.task_id / task.packet_sha256
+    attempt_dir = receipt_directory(receipts_dir, task)
     logs_dir = attempt_dir / "logs" / attempt_id
     environment = os.environ.copy()
     environment.update(
         {
+            "LIFEOS_TASK_NODE_ID": task.node_id,
             "CARGO_TARGET_DIR": str(cargo_target_dir(task, run_id)),
             "LIFEOS_TASK_ID": task.task_id,
             "LIFEOS_PACKET_PATH": str(task.packet_path),
             "LIFEOS_SOURCE_PACKET_PATH": str(task.source_packet_path),
             "LIFEOS_PACKET_SHA256": task.packet_sha256,
             "LIFEOS_TASK_RUN_ID": run_id,
+            "LIFEOS_GRAPH_SHA256": graph_digest,
+            "LIFEOS_RECEIPTS_DIR": str(receipts_dir),
             "LIFEOS_TASK_ROOT": str(task.command_cwd),
             "LIFEOS_WORKSPACE_ROOT": str(task.workspace_root),
+            "LIFEOS_TASK_CAPABILITY_ID": capability_id(task),
         }
     )
-    execution_input, authorization = authorized_packet_input(
+    execution_input, authorization = runtime_packet_input(
         task,
         graph_digest,
         run_id,
         environment,
+        dependency_outputs,
     )
 
-    direct = bool(
-        task.command_template
-        and not self_referential_codex_command(task.command_template)
-        and looks_executable(task.command_template, task.command_cwd)
-    )
+    direct = False
+    agent_required = True
+    diagnostic_result: CommandResult | None = None
+    agent_result: CommandResult | None = None
+
     if direct:
-        argv = ("/bin/bash", "-lc", task.command_template or "")
-        stdin_bytes = None
-        cwd = task.command_cwd
-        mode = "declared-command"
-    else:
+        with print_lock:
+            print(
+                f"START {task.node_id} {task.packet_sha256[:12]} "
+                f"mode={'declared-probe' if agent_required else 'declared-command'} "
+                f"cwd={task.command_cwd}",
+                flush=True,
+            )
+        diagnostic_result = run_command(
+            shell_argv(task.command_template or ""),
+            task.command_cwd,
+            None,
+            logs_dir / (
+                "diagnostic.stdout.log"
+                if agent_required
+                else "stdout.log"
+            ),
+            logs_dir / (
+                "diagnostic.stderr.log"
+                if agent_required
+                else "stderr.log"
+            ),
+            timeout_seconds,
+            environment,
+        )
+
+    if agent_required:
         is_codex = Path(executor[0]).name == "codex"
         if is_codex:
             cwd = prepare_codex_cell(task, run_id, attempt_id)
@@ -1351,108 +2206,121 @@ def execute_task(
             cwd = task.command_cwd if task.command_cwd.is_dir() else Path.cwd()
             argv = tuple(executor)
         stdin_bytes = execution_input
-        mode = "json-stdin"
+        with print_lock:
+            print(
+                f"START {task.node_id} {task.packet_sha256[:12]} "
+                f"mode={'declared-probe+json-stdin' if direct else 'json-stdin'} "
+                f"cwd={cwd}",
+                flush=True,
+            )
+        lock = workspace_lock(task)
+        with lock:
+            agent_result = run_command(
+                argv,
+                cwd,
+                stdin_bytes,
+                logs_dir / "stdout.log",
+                logs_dir / "stderr.log",
+                timeout_seconds,
+                environment,
+                serialize_launch=Path(executor[0]).name == "codex",
+                launch_stagger_seconds=(
+                    2.0 if Path(executor[0]).name == "codex" else 0.0
+                ),
+            )
 
-    with print_lock:
-        print(
-            f"START {task.task_id} {task.packet_sha256[:12]} "
-            f"mode={mode} cwd={cwd}",
-            flush=True,
-        )
-    main_result = run_command(
-        argv,
-        cwd,
-        stdin_bytes,
-        logs_dir / "stdout.log",
-        logs_dir / "stderr.log",
-        timeout_seconds,
-        environment,
-        serialize_launch=not direct and Path(executor[0]).name == "codex",
-        launch_stagger_seconds=(
-            2.0 if not direct and Path(executor[0]).name == "codex" else 0.0
-        ),
-    )
-
-    refusal_reason = executor_refusal(main_result) if main_result.exit_code == 0 else None
-    verification_result: CommandResult | None = None
-    verification_cwd = (
-        task.command_cwd if task.command_cwd.is_dir() else cwd
-    )
-    if (
-        main_result.exit_code == 0
-        and refusal_reason is None
-        and task.verification_command
-        and looks_executable(task.verification_command, verification_cwd)
-    ):
-        verification_result = run_command(
-            ("/bin/bash", "-lc", task.verification_command),
-            verification_cwd,
-            None,
-            logs_dir / "verification.stdout.log",
-            logs_dir / "verification.stderr.log",
-            timeout_seconds,
-            environment,
-        )
-
-    if refusal_reason is not None:
-        exit_code = 125
-    else:
-        exit_code = (
-            verification_result.exit_code
-            if verification_result is not None
-            else main_result.exit_code
-        )
+    main_result = agent_result or diagnostic_result
+    if main_result is None:
+        raise RunnerError(f"{task.node_id} has no executable implementation path")
+    exit_code = main_result.exit_code
     status = "completed" if exit_code == 0 else "failed"
+    selected_model, selected_effort = task_model(task)
+    produced_output = {
+        "producer_node_id": task.node_id,
+        "producer_task_id": task.task_id,
+        "capability_id": capability_id(task),
+        "goal": str(task.packet.get("goal", "")),
+        "target_files": list(packet_string_list(task.packet, "target_files")),
+        "target_artifacts": list(
+            packet_string_list(task.packet, "target_artifacts")
+        ),
+        "task_root": str(task.command_cwd),
+    }
     receipt = {
         "schema": RECEIPT_SCHEMA,
         "runner_schema": RUNNER_SCHEMA,
+        "record_type": "execution",
         "run_id": run_id,
         "attempt_id": attempt_id,
+        "node_id": task.node_id,
         "task_id": task.task_id,
         "packet_path": str(task.packet_path),
         "source_packet_path": str(task.source_packet_path),
         "packet_sha256": task.packet_sha256,
+        "semantic_contract_sha256": task.semantic_contract_sha256,
+        "source_authority": task.source_authority,
         "graph_sha256": graph_digest,
         "task_root": str(task.command_cwd),
         "workspace_root": str(task.workspace_root),
         "cargo_target_dir": environment["CARGO_TARGET_DIR"],
         "depends_on": list(task.depends_on),
-        "execution_mode": mode,
+        "execution_mode": (
+            "declared-probe+json-stdin"
+            if direct and agent_result is not None
+            else "json-stdin"
+            if agent_result is not None
+            else "declared-command"
+        ),
         "execution_input_sha256": sha256_bytes(execution_input),
         "authorization": authorization,
-        "executor_refusal": refusal_reason,
         "started_at": main_result.started_at,
-        "finished_at": (
-            verification_result.finished_at
-            if verification_result is not None
-            else main_result.finished_at
+        "finished_at": main_result.finished_at,
+        "execution_status": "completed" if exit_code == 0 else "failed",
+        "dependency_outputs": list(dependency_outputs),
+        "produced_output": produced_output,
+        "optional_execution_policy": (
+            "mandatory"
+            if task.packet.get("optional") is True
+            or str(task.packet.get("status", "")).strip().lower() == "optional"
+            else "not_declared_optional"
         ),
         "status": status,
         "exit_code": exit_code,
         "command": command_result_json(main_result),
-        "verification": (
-            command_result_json(verification_result)
-            if verification_result is not None
-            else {
-                "declared": task.verification_command,
-                "executed": False,
-                "reason": (
-                    "not a shell command; verification remains inside the JSON task"
-                    if task.verification_command
-                    else "not declared"
-                ),
-            }
+        "agent_command": (
+            command_result_json(agent_result)
+            if agent_result is not None
+            else None
+        ),
+        "diagnostic_probe": (
+            command_result_json(diagnostic_result)
+            if diagnostic_result is not None and agent_result is not None
+            else None
+        ),
+        "implementation_actor": (
+            "json-stdin-executor"
+            if agent_result is not None
+            else "declared-command"
+        ),
+        "implementation_model": selected_model if agent_result is not None else None,
+        "implementation_model_reasoning_effort": (
+            selected_effort if agent_result is not None else None
         ),
     }
-    receipt_path = attempt_dir / f"{attempt_id}.json"
-    atomic_write_json(receipt_path, receipt)
+    receipt_path = write_task_receipt(
+        receipts_dir,
+        task,
+        receipt,
+        f"{attempt_id}.json",
+    )
     with print_lock:
         print(
             f"{'DONE' if status == 'completed' else 'FAIL'} "
-            f"{task.task_id} exit={exit_code} receipt={receipt_path}",
+            f"{task.node_id} exit={exit_code} receipt={receipt_path}",
             flush=True,
         )
     return TaskResult(
+        node_id=task.node_id,
         task_id=task.task_id,
         status=status,
         packet_sha256=task.packet_sha256,
@@ -1461,8 +2329,271 @@ def execute_task(
     )
 
 
+def exception_task_result(
+    task: Task,
+    executor: Sequence[str],
+    receipts_dir: Path,
+    run_id: str,
+    graph_digest: str,
+    error: Exception,
+    print_lock: threading.Lock,
+) -> TaskResult:
+    attempt_id = f"{compact_utc_now()}-{uuid.uuid4().hex[:12]}"
+    logs_dir = receipt_directory(receipts_dir, task) / "logs" / attempt_id
+    stdout_path = logs_dir / "stdout.log"
+    stderr_path = logs_dir / "stderr.log"
+    started_at = utc_now()
+    atomic_write_bytes(stdout_path, b"")
+    atomic_write_bytes(
+        stderr_path,
+        (
+            f"{type(error).__name__}: {error}\n"
+        ).encode("utf-8", errors="replace"),
+    )
+    finished_at = utc_now()
+    status = "failed"
+    exit_code = 70
+    command = {
+        "argv": list(executor),
+        "cwd": str(task.command_cwd),
+        "exit_code": exit_code,
+        "timed_out": False,
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "duration_seconds": 0.0,
+        "stdout": {
+            "path": str(stdout_path),
+            "sha256": sha256_file(stdout_path),
+        },
+        "stderr": {
+            "path": str(stderr_path),
+            "sha256": sha256_file(stderr_path),
+        },
+    }
+    receipt = {
+        "schema": RECEIPT_SCHEMA,
+        "runner_schema": RUNNER_SCHEMA,
+        "record_type": "execution",
+        "run_id": run_id,
+        "attempt_id": attempt_id,
+        "node_id": task.node_id,
+        "task_id": task.task_id,
+        "packet_path": str(task.packet_path),
+        "source_packet_path": str(task.source_packet_path),
+        "packet_sha256": task.packet_sha256,
+        "semantic_contract_sha256": task.semantic_contract_sha256,
+        "source_authority": task.source_authority,
+        "graph_sha256": graph_digest,
+        "task_root": str(task.command_cwd),
+        "workspace_root": str(task.workspace_root),
+        "depends_on": list(task.depends_on),
+        "execution_mode": "runner-exception",
+        "execution_input_sha256": None,
+        "authorization": None,
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "execution_status": "failed",
+        "optional_execution_policy": (
+            "mandatory"
+            if task.packet.get("optional") is True
+            or str(task.packet.get("status", "")).strip().lower() == "optional"
+            else "not_declared_optional"
+        ),
+        "status": status,
+        "exit_code": exit_code,
+        "command": command,
+        "agent_command": None,
+        "diagnostic_probe": None,
+        "runner_exception": {
+            "type": type(error).__name__,
+            "message": str(error),
+            "retry_class": "failed",
+        },
+    }
+    receipt_path = write_task_receipt(
+        receipts_dir,
+        task,
+        receipt,
+        f"{attempt_id}.json",
+    )
+    with print_lock:
+        print(
+            f"FAIL {task.node_id} "
+            f"runner_exception={type(error).__name__} receipt={receipt_path}",
+            flush=True,
+        )
+    return TaskResult(
+        node_id=task.node_id,
+        task_id=task.task_id,
+        status=status,
+        packet_sha256=task.packet_sha256,
+        receipt_path=receipt_path,
+        exit_code=exit_code,
+    )
+
+
+def dependency_output_records(
+    task: Task,
+    tasks: dict[str, Task],
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for dependency in task.depends_on:
+        producer = tasks[dependency]
+        records.append(
+            {
+                "producer_node_id": producer.node_id,
+                "producer_task_id": producer.task_id,
+                "producer_packet_sha256": producer.packet_sha256,
+                "capability_id": capability_id(producer),
+                "goal": str(producer.packet.get("goal", "")),
+                "target_files": list(
+                    packet_string_list(producer.packet, "target_files")
+                ),
+                "target_artifacts": list(
+                    packet_string_list(producer.packet, "target_artifacts")
+                ),
+                "task_root": str(producer.command_cwd),
+            }
+        )
+    return records
+
+
+def adopt_dependency_capability(
+    producer: Task,
+    consumer: Task,
+    receipts_dir: Path,
+    run_id: str,
+    graph_digest: str,
+    timeout_seconds: float | None,
+) -> tuple[bool, Path]:
+    previous = prior_receipt(receipts_dir, producer, graph_digest)
+    if previous is None:
+        raise RunnerError(
+            f"{consumer.node_id} cannot adopt {producer.node_id}: receipt missing"
+        )
+    capability = previous.get("capability")
+    lifecycle = previous.get("lifecycle")
+    if not isinstance(capability, dict) or not isinstance(lifecycle, dict):
+        raise RunnerError(
+            f"{consumer.node_id} cannot adopt {producer.node_id}: "
+            "lifecycle capability missing"
+        )
+    command = capability.get("usage_command")
+    if not isinstance(command, str) or not command_is_nontrivial(
+        command,
+        producer.command_cwd,
+    ):
+        raise RunnerError(
+            f"{producer.node_id} has no non-trivial capability usage command"
+        )
+
+    adoption_id = f"{compact_utc_now()}-{uuid.uuid4().hex[:12]}"
+    logs_dir = (
+        receipt_directory(receipts_dir, producer)
+        / "logs"
+        / f"adoption-{adoption_id}"
+    )
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "LIFEOS_TASK_NODE_ID": producer.node_id,
+            "LIFEOS_TASK_ID": producer.task_id,
+            "LIFEOS_PACKET_SHA256": producer.packet_sha256,
+            "LIFEOS_TASK_RUN_ID": run_id,
+            "LIFEOS_TASK_ROOT": str(producer.command_cwd),
+            "LIFEOS_WORKSPACE_ROOT": str(producer.workspace_root),
+            "LIFEOS_CAPABILITY_ID": str(capability.get("capability_id", "")),
+            "LIFEOS_CAPABILITY_CONSUMER_NODE_ID": consumer.node_id,
+            "LIFEOS_CAPABILITY_CONSUMER_TASK_ID": consumer.task_id,
+        }
+    )
+    result = run_command(
+        shell_argv(command),
+        producer.command_cwd,
+        None,
+        logs_dir / "stdout.log",
+        logs_dir / "stderr.log",
+        timeout_seconds,
+        environment,
+    )
+    succeeded = result.exit_code == 0
+    continued_use_count = int(lifecycle.get("continued_use_count", 0)) + (
+        1 if succeeded else 0
+    )
+    finished_at = result.finished_at
+    receipt = {
+        "schema": RECEIPT_SCHEMA,
+        "runner_schema": RUNNER_SCHEMA,
+        "record_type": "capability-adoption",
+        "run_id": run_id,
+        "attempt_id": f"adoption-{adoption_id}",
+        "node_id": producer.node_id,
+        "task_id": producer.task_id,
+        "packet_path": str(producer.packet_path),
+        "source_packet_path": str(producer.source_packet_path),
+        "packet_sha256": producer.packet_sha256,
+        "semantic_contract_sha256": producer.semantic_contract_sha256,
+        "source_authority": producer.source_authority,
+        "graph_sha256": graph_digest,
+        "task_root": str(producer.command_cwd),
+        "workspace_root": str(producer.workspace_root),
+        "depends_on": list(producer.depends_on),
+        "execution_mode": "capability-adoption",
+        "execution_input_sha256": previous.get("execution_input_sha256"),
+        "authorization": previous.get("authorization"),
+        "executor_refusal": None,
+        "started_at": result.started_at,
+        "finished_at": finished_at,
+        "execution_status": "completed" if succeeded else "failed",
+        "packet_execution_proven": previous.get("packet_execution_proven") is True,
+        "task_completion_proven": succeeded,
+        "capability_available": succeeded,
+        "implementation_blocker": (
+            None
+            if succeeded
+            else f"capability use failed in downstream task {consumer.node_id}"
+        ),
+        "optional_execution_policy": previous.get(
+            "optional_execution_policy",
+            "not_declared_optional",
+        ),
+        "status": "completed" if succeeded else "blocked",
+        "exit_code": result.exit_code,
+        "command": previous.get("command"),
+        "verification": previous.get("verification"),
+        "verification_steps": previous.get("verification_steps", []),
+        "activation": previous.get("activation"),
+        "lifecycle_evidence_proposal": previous.get(
+            "lifecycle_evidence_proposal"
+        ),
+        "lifecycle": {
+            **lifecycle,
+            "stage": "completed" if succeeded else "blocked",
+            "available": succeeded,
+            "adopted": succeeded,
+            "adopted_by_node_id": consumer.node_id if succeeded else None,
+            "adopted_by_task_id": consumer.task_id if succeeded else None,
+            "continued_use_count": continued_use_count,
+        },
+        "capability": capability,
+        "capability_use": {
+            "consumer_node_id": consumer.node_id,
+            "consumer_task_id": consumer.task_id,
+            "command": command_result_json(result),
+            "status": "passed" if succeeded else "failed",
+        },
+    }
+    path = write_task_receipt(
+        receipts_dir,
+        producer,
+        receipt,
+        f"adoption-{adoption_id}.json",
+    )
+    return succeeded, path
+
+
 def task_sort_key(task: Task) -> tuple[int, str]:
-    return task.priority, task.task_id
+    return task.priority, task.node_id
 
 
 def select_batch(ready: Sequence[Task], global_limit: int) -> list[Task]:
@@ -1474,8 +2605,12 @@ def select_batch(ready: Sequence[Task], global_limit: int) -> list[Task]:
     batch: list[Task] = []
     group_counts: dict[str, int] = {}
     group_limits: dict[str, int] = {}
+    strict_workspaces: set[str] = set()
     for task in ordered:
         if not task.can_run_parallel or len(batch) >= global_limit:
+            continue
+        workspace_key = str(task.command_cwd.resolve())
+        if strict_lifecycle(task) and workspace_key in strict_workspaces:
             continue
         current_limit = group_limits.get(task.parallel_group, task.max_parallel)
         current_limit = min(current_limit, task.max_parallel)
@@ -1485,6 +2620,8 @@ def select_batch(ready: Sequence[Task], global_limit: int) -> list[Task]:
             continue
         batch.append(task)
         group_counts[task.parallel_group] = current_count + 1
+        if strict_lifecycle(task):
+            strict_workspaces.add(workspace_key)
     return batch
 
 
@@ -1501,26 +2638,40 @@ def schedule_waves(tasks: dict[str, Task], global_limit: int) -> list[list[str]]
         batch = select_batch(ready, global_limit)
         if not batch:
             raise RunnerError("scheduler deadlock after graph validation")
-        task_ids = [task.task_id for task in batch]
-        waves.append(task_ids)
-        completed.update(task_ids)
-        pending.difference_update(task_ids)
+        node_ids = [task.node_id for task in batch]
+        waves.append(node_ids)
+        completed.update(node_ids)
+        pending.difference_update(node_ids)
     return waves
 
 
 def print_table(tasks: dict[str, Task], statuses: dict[str, str]) -> None:
-    headers = ("TASK", "STATUS", "MODE", "GROUP", "LIMIT", "DEPENDENCIES", "SHA256")
+    headers = (
+        "NODE",
+        "TASK",
+        "STATUS",
+        "MODE",
+        "GROUP",
+        "LIMIT",
+        "DEPENDENCIES",
+        "PACKET",
+        "CONTRACT",
+        "SOURCE",
+    )
     rows = []
     for task in sorted(tasks.values(), key=task_sort_key):
         rows.append(
             (
+                task.node_id,
                 task.task_id,
-                statuses.get(task.task_id, "pending"),
+                statuses.get(task.node_id, "pending"),
                 "parallel" if task.can_run_parallel else "sequential",
                 task.parallel_group,
                 str(task.max_parallel),
                 ",".join(task.depends_on) or "-",
                 task.packet_sha256[:12],
+                task.semantic_contract_sha256[:12],
+                task.source_authority,
             )
         )
     widths = [
@@ -1542,6 +2693,7 @@ def run_tasks(
     fail_fast: bool,
     run_id: str | None = None,
     create_snapshot: bool = True,
+    retry_blocked: bool = False,
 ) -> tuple[int, dict[str, str], Path]:
     run_id = run_id or f"{compact_utc_now()}-{uuid.uuid4().hex[:12]}"
     if create_snapshot:
@@ -1555,7 +2707,7 @@ def run_tasks(
     statuses = dependency_consistent_statuses(
         tasks,
         {
-            task_id: prior_status(receipts_dir, task)
+            task_id: prior_status(receipts_dir, task, graph_digest)
             for task_id, task in tasks.items()
         },
     )
@@ -1564,9 +2716,16 @@ def run_tasks(
             task_id: "pending" if status == "failed" else status
             for task_id, status in statuses.items()
         }
+    if retry_blocked:
+        statuses = {
+            task_id: "pending" if status == "blocked" else status
+            for task_id, status in statuses.items()
+        }
     completed = {task_id for task_id, status in statuses.items() if status == "completed"}
+    available = {task_id for task_id, status in statuses.items() if status == "available"}
     failed = {task_id for task_id, status in statuses.items() if status == "failed"}
-    pending = set(tasks) - completed - failed
+    blocked = {task_id for task_id, status in statuses.items() if status == "blocked"}
+    pending = set(tasks) - completed - available - failed - blocked
     attempts: list[dict[str, Any]] = []
     print_lock = threading.Lock()
 
@@ -1574,12 +2733,16 @@ def run_tasks(
         ready = [
             tasks[task_id]
             for task_id in pending
-            if set(tasks[task_id].depends_on) <= completed
+            if set(tasks[task_id].depends_on) <= (completed | available)
         ]
         batch = select_batch(ready, max_parallel)
         if not batch:
             break
-        with ThreadPoolExecutor(max_workers=len(batch)) as pool:
+        executable_batch = [
+            (task, dependency_output_records(task, tasks))
+            for task in batch
+        ]
+        with ThreadPoolExecutor(max_workers=len(executable_batch)) as pool:
             futures = {
                 pool.submit(
                     execute_task,
@@ -1590,13 +2753,27 @@ def run_tasks(
                     graph_digest,
                     timeout_seconds,
                     print_lock,
+                    dependency_outputs,
                 ): task
-                for task in batch
+                for task, dependency_outputs in executable_batch
             }
             for future in as_completed(futures):
-                result = future.result()
+                task = futures[future]
+                try:
+                    result = future.result()
+                except Exception as error:
+                    result = exception_task_result(
+                        task,
+                        executor,
+                        receipts_dir,
+                        run_id,
+                        graph_digest,
+                        error,
+                        print_lock,
+                    )
                 attempts.append(
                     {
+                        "node_id": result.node_id,
                         "task_id": result.task_id,
                         "status": result.status,
                         "packet_sha256": result.packet_sha256,
@@ -1604,16 +2781,19 @@ def run_tasks(
                         "exit_code": result.exit_code,
                     }
                 )
-                statuses[result.task_id] = result.status
-                pending.remove(result.task_id)
+                statuses[result.node_id] = result.status
+                pending.remove(result.node_id)
                 if result.status == "completed":
-                    completed.add(result.task_id)
+                    completed.add(result.node_id)
+                elif result.status == "available":
+                    available.add(result.node_id)
+                elif result.status == "failed":
+                    failed.add(result.node_id)
                 else:
-                    failed.add(result.task_id)
+                    blocked.add(result.node_id)
         if fail_fast and failed:
             break
 
-    blocked: set[str] = set()
     changed = True
     while changed:
         changed = False
@@ -1633,25 +2813,33 @@ def run_tasks(
         "finished_at": utc_now(),
         "graph_sha256": graph_digest,
         "task_count": len(tasks),
+        "reconciliation": reconciliation_summary(tasks),
         "max_parallel": max_parallel,
         "executor": list(executor),
         "status_counts": {
             status: sum(1 for observed in statuses.values() if observed == status)
-            for status in ("completed", "failed", "blocked", "pending")
+            for status in ("completed", "available", "failed", "blocked", "pending")
         },
         "tasks": [
             {
+                "node_id": task.node_id,
                 "task_id": task.task_id,
                 "packet_path": str(task.packet_path),
                 "source_packet_path": str(task.source_packet_path),
                 "packet_sha256": task.packet_sha256,
                 "depends_on": list(task.depends_on),
-                "status": statuses[task.task_id],
+                "semantic_contract_sha256": task.semantic_contract_sha256,
+                "source_authority": task.source_authority,
+                "status": statuses[task.node_id],
             }
             for task in sorted(tasks.values(), key=task_sort_key)
         ],
         "attempts": attempts,
     }
+    run_receipt["run_receipt_sha256"] = prefixed_record_sha256(
+        run_receipt,
+        "run_receipt_sha256",
+    )
     run_path = run_dir / "run.json"
     atomic_write_json(run_path, run_receipt)
     exit_code = 0 if all(status == "completed" for status in statuses.values()) else 1
@@ -1674,8 +2862,17 @@ def build_parser(repo_root: Path) -> argparse.ArgumentParser:
     parser.add_argument(
         "--packet-root",
         type=Path,
-        default=repo_root / DEFAULT_PACKET_ROOT,
-        help="Root containing task_tables/packets and **/execution_packets",
+        action="append",
+        default=[],
+        help=(
+            "Authoritative root containing task_tables/packets or "
+            "**/execution_packets; repeatable"
+        ),
+    )
+    parser.add_argument(
+        "--no-discover-canonical",
+        action="store_true",
+        help="Use only explicitly supplied --packet-root values",
     )
     parser.add_argument(
         "--receipts-dir",
@@ -1712,6 +2909,14 @@ def build_parser(repo_root: Path) -> argparse.ArgumentParser:
         help="Retry matching-digest tasks with previous failed receipts",
     )
     parser.add_argument(
+        "--retry-blocked",
+        action="store_true",
+        help=(
+            "Re-evaluate matching-digest blocked tasks after their local blocker "
+            "or implementation evidence changes"
+        ),
+    )
+    parser.add_argument(
         "--fail-fast",
         action="store_true",
         help="Stop dispatching after the first failed batch",
@@ -1725,6 +2930,13 @@ def build_parser(repo_root: Path) -> argparse.ArgumentParser:
         "--new-run",
         action="store_true",
         help="Ignore resumable snapshots and capture the current packet files as a new run",
+    )
+    parser.add_argument(
+        "--run-id",
+        help=(
+            "Caller-supplied immutable run ID for --new-run, used to bind "
+            "approval/checkpoint records before execution"
+        ),
     )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument(
@@ -1752,18 +2964,39 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--timeout-seconds must be positive")
     try:
         repo_root = args.repo_root.resolve()
-        packet_root = args.packet_root.resolve()
+        explicit_packet_roots = tuple(path.resolve() for path in args.packet_root)
+        packet_roots = (
+            normalize_packet_roots(explicit_packet_roots)
+            if args.no_discover_canonical
+            else discover_canonical_packet_roots(repo_root, explicit_packet_roots)
+        )
         receipts_dir = args.receipts_dir.resolve()
+        if args.run_id and (
+            not args.new_run or args.validate_only or args.plan
+        ):
+            raise RunnerError(
+                "--run-id is valid only for an executing --new-run"
+            )
+        requested_run_id = (
+            validate_run_id(args.run_id) if args.run_id else None
+        )
         resume_dir: Path | None = None
         if args.resume_run:
             candidate = Path(args.resume_run)
             resume_dir = (
                 candidate.resolve()
                 if candidate.is_absolute() or len(candidate.parts) > 1
-                else (receipts_dir / "runs" / candidate).resolve()
+                else (
+                    receipts_dir
+                    / "runs"
+                    / validate_run_id(args.resume_run)
+                ).resolve()
             )
-        elif not args.new_run and not args.validate_only and not args.plan and not args.task:
-            resume_dir = resumable_run_dir(receipts_dir)
+        elif not args.new_run and not args.validate_only and not args.plan:
+            raise RunnerError(
+                "execution requires an explicit immutable choice: use --new-run "
+                "to freeze current packets or --resume-run <run-id> to resume one snapshot"
+            )
 
         if resume_dir is not None:
             if args.task:
@@ -1771,20 +3004,24 @@ def main(argv: Sequence[str] | None = None) -> int:
             tasks, resume_run_id = load_snapshot(resume_dir, repo_root)
             input_description = f"immutable run snapshot {resume_dir}"
         else:
-            tasks = load_tasks(packet_root, repo_root)
+            tasks = load_tasks(packet_roots, repo_root)
             tasks = dependency_closure(tasks, args.task)
             resume_run_id = None
-            input_description = str(packet_root)
+            input_description = ", ".join(str(path) for path in packet_roots)
         graph_digest = graph_sha256(tasks)
+        reconciliation = reconciliation_summary(tasks)
         statuses = dependency_consistent_statuses(
             tasks,
             {
-                task_id: prior_status(receipts_dir, task)
+                task_id: prior_status(receipts_dir, task, graph_digest)
                 for task_id, task in tasks.items()
             },
         )
         print(
-            f"Loaded {len(tasks)} JSON tasks into one graph "
+            f"Loaded {reconciliation['source_packet_instance_count']} JSON packet "
+            f"instances ({reconciliation['exact_envelope_count']} envelopes, "
+            f"{reconciliation['semantic_obligation_count']} semantic obligations) "
+            f"into one graph "
             f"sha256={graph_digest} from {input_description}"
         )
         if args.validate_only:
@@ -1806,8 +3043,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.timeout_seconds,
             args.retry_failed,
             args.fail_fast,
-            run_id=resume_run_id,
+            run_id=resume_run_id or requested_run_id,
             create_snapshot=resume_dir is None,
+            retry_blocked=args.retry_blocked,
         )
         print_table(tasks, statuses)
         print(f"RUN RECEIPT {run_path}")

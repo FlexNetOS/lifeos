@@ -1,0 +1,62 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ONNX_EMBEDDINGS_WASM/ba02294681bf623d898e93dddae4c1c831d15c80301a9c9fbe84383b19790647/20260728T020500188250Z-e69ba628e43f.json": "2f922f61fa1242cd828ad50f6c214f2dbf4970041f723325aac2ab8908f37828",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_onnx_embeddings_wasm/result.json": "d146660d59c4c05346f26ba63b29fde5bd6d40c0e2ddcf3c9468a7852ef823a7"
+  },
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'ruvector-onnx-embeddings-wasm'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'ruvector-onnx-embeddings-wasm'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'ruvector\\-onnx\\-embeddings\\-wasm@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'ruvector-onnx-embeddings-wasm'\"'\"' version'"
+  ],
+  "completed_at": "2026-07-28T02:05:00.672156Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_onnx_embeddings_wasm/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ONNX_EMBEDDINGS_WASM/ba02294681bf623d898e93dddae4c1c831d15c80301a9c9fbe84383b19790647/20260728T020500188250Z-e69ba628e43f.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_onnx_embeddings_wasm/result.json"
+  ],
+  "helper_id": "helper-currency-ruvector_onnx_embeddings_wasm",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ONNX_EMBEDDINGS_WASM/ba02294681bf623d898e93dddae4c1c831d15c80301a9c9fbe84383b19790647/logs/20260728T020500188250Z-e69ba628e43f",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T02:05:00.189288Z",
+  "status": "completed",
+  "task_id": "CURRENCY-RUVECTOR_ONNX_EMBEDDINGS_WASM",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/currency-ruvector_onnx_embeddings_wasm/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_onnx_embeddings_wasm/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T020500188250Z-e69ba628e43f",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_ONNX_EMBEDDINGS_WASM/ba02294681bf623d898e93dddae4c1c831d15c80301a9c9fbe84383b19790647/20260728T020500188250Z-e69ba628e43f.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "2f922f61fa1242cd828ad50f6c214f2dbf4970041f723325aac2ab8908f37828"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "ba02294681bf623d898e93dddae4c1c831d15c80301a9c9fbe84383b19790647",
+    "probe_class": "currency",
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

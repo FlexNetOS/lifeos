@@ -1,37 +1,62 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "EF-004_GENERATE_TASK_GRAPH",
-  "status": "completed",
-  "started_at": "2026-07-27T23:47:50+00:00",
-  "completed_at": "2026-07-27T23:47:50+00:00",
-  "actor": "local-execution-framework",
-  "helper_id": "helper-graph-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "execution-framework",
-  "files_changed": [
-    "execution-framework/generated/task_graph.csv",
-    "execution-framework/generated/task_graph.normalized.json",
-    "execution-framework/generated/task_graph.index.json"
-  ],
-  "commands_run": [
-    "python3 scripts/goal_to_task_graph.py"
-  ],
-  "verification_output": {
-    "missing": [],
-    "task_graph_exists": true
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/generated/task_graph.csv": "28a74f19bfb416b704727f0cbec303b96d05a02671537089ce93dc8f5653a1e4",
-    "execution-framework/generated/task_graph.normalized.json": "eaeef81be2a6d564c616e22fe1a8d5883a2ee95598d92ac5b2ad5a3a3c815909",
-    "execution-framework/generated/task_graph.index.json": "221f5d416ad92eff8ea065f16534ddcc4a3da79360e5f9a7003c321fa71d8571"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH/1d431ee2b7f3c42b65c1bb48d2c087a90ea1102a5fbd2ab1c1f98178396e607f/20260728T013743248201Z-1dd1a88d2fee.json": "0eab832deab0431152689c4f01eefaa8524f031156d0f995fb5985e6fb637bd9"
   },
-  "logs_uri": "logs/EF-004_GENERATE_TASK_GRAPH.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/bin/bash -lc 'python3 scripts/goal_to_task_graph.py'",
+    "/bin/bash -lc 'test -f generated/task_graph.csv && test -f generated/task_graph.normalized.json && test -f generated/task_graph.index.json'"
+  ],
+  "completed_at": "2026-07-28T01:37:43.577121Z",
   "evidence": [
-    "generated/task_graph.csv",
-    "generated/task_graph.normalized.json",
-    "generated/task_graph.index.json"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH/1d431ee2b7f3c42b65c1bb48d2c087a90ea1102a5fbd2ab1c1f98178396e607f/20260728T013743248201Z-1dd1a88d2fee.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/EF-004_GENERATE_TASK_GRAPH/4f8c0f1f845a74dba9cc126675cc1e186caccc6ee7f1a47af7a848555b73e2d4.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "validate task graph"
+  "files_changed": [],
+  "helper_id": "helper-graph-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH/1d431ee2b7f3c42b65c1bb48d2c087a90ea1102a5fbd2ab1c1f98178396e607f/logs/20260728T013743248201Z-1dd1a88d2fee",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": "..",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T01:37:43.248756Z",
+  "status": "completed",
+  "task_id": "EF-004_GENERATE_TASK_GRAPH",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "task graph",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T013743248201Z-1dd1a88d2fee",
+      "graph_sha256": "4ed1e04c5aa1edbe85e110aed00b47a015836d38df264af8e4cae12ee8f3087a",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH/1d431ee2b7f3c42b65c1bb48d2c087a90ea1102a5fbd2ab1c1f98178396e607f/20260728T013743248201Z-1dd1a88d2fee.json",
+      "run_id": "20260728T013741633139Z-616a4a3991f0",
+      "sha256": "0eab832deab0431152689c4f01eefaa8524f031156d0f995fb5985e6fb637bd9"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "1d431ee2b7f3c42b65c1bb48d2c087a90ea1102a5fbd2ab1c1f98178396e607f",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/EF-004_GENERATE_TASK_GRAPH/4f8c0f1f845a74dba9cc126675cc1e186caccc6ee7f1a47af7a848555b73e2d4.proof.json",
+      "sha256": "4f8c0f1f845a74dba9cc126675cc1e186caccc6ee7f1a47af7a848555b73e2d4"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
 }

@@ -2,8 +2,8 @@
   "proof_schema_version": "1.0",
   "task_id": "VER-302_PACKET_SCHEMA_VALIDATION",
   "status": "completed",
-  "started_at": "2026-07-27T22:28:09+00:00",
-  "completed_at": "2026-07-27T22:28:09+00:00",
+  "started_at": "2026-07-28T12:37:56+00:00",
+  "completed_at": "2026-07-28T12:37:56+00:00",
   "actor": "schema-validation-agent",
   "helper_id": "helper-schema-01",
   "model_tag": "gpt-5.3-spark",
@@ -24,7 +24,7 @@
     "schema_version": "1.0",
     "task_id": "VER-302_PACKET_SCHEMA_VALIDATION",
     "status": "pass",
-    "generated_at": "2026-07-27T22:28:08+00:00",
+    "generated_at": "2026-07-28T12:36:07+00:00",
     "packet_summary": {
       "goal": "Validate every execution packet and JSON schema contract",
       "repo_target": "filesystem",
@@ -57,8 +57,8 @@
     "counts": {
       "execution_packets": 763,
       "task_graph_rows": 763,
-      "schemas": 8,
-      "proof_records": 92
+      "schemas": 15,
+      "proof_records": 787
     },
     "packet_set_parity": {
       "missing_packets": [],
@@ -8478,6 +8478,22 @@
         "validator": "Draft7Validator"
       },
       {
+        "schema_path": "schemas/approval_request.schema.json",
+        "draft": "http://json-schema.org/draft-07/schema#",
+        "self_valid": true,
+        "schema_title": "envctl Migration Approval Request",
+        "fixture_checks": [],
+        "validator": "Draft7Validator"
+      },
+      {
+        "schema_path": "schemas/artifact_record.schema.json",
+        "draft": "http://json-schema.org/draft-07/schema#",
+        "self_valid": true,
+        "schema_title": "envctl Migration Artifact Record",
+        "fixture_checks": [],
+        "validator": "Draft7Validator"
+      },
+      {
         "schema_path": "schemas/execution_packet.schema.json",
         "draft": "http://json-schema.org/draft-07/schema#",
         "self_valid": true,
@@ -8516,6 +8532,22 @@
         "validator": "Draft7Validator"
       },
       {
+        "schema_path": "schemas/migration_recipe.schema.json",
+        "draft": "http://json-schema.org/draft-07/schema#",
+        "self_valid": true,
+        "schema_title": "envctl Migration Recipe",
+        "fixture_checks": [],
+        "validator": "Draft7Validator"
+      },
+      {
+        "schema_path": "schemas/operation.schema.json",
+        "draft": "http://json-schema.org/draft-07/schema#",
+        "self_valid": true,
+        "schema_title": "envctl Migration Operation",
+        "fixture_checks": [],
+        "validator": "Draft7Validator"
+      },
+      {
         "schema_path": "schemas/proof_record.schema.json",
         "draft": "http://json-schema.org/draft-07/schema#",
         "self_valid": true,
@@ -8534,6 +8566,14 @@
             "errors": []
           }
         ],
+        "validator": "Draft7Validator"
+      },
+      {
+        "schema_path": "schemas/run_event.schema.json",
+        "draft": "http://json-schema.org/draft-07/schema#",
+        "self_valid": true,
+        "schema_title": "envctl Migration Run Event",
+        "fixture_checks": [],
         "validator": "Draft7Validator"
       },
       {
@@ -8558,6 +8598,14 @@
           }
         ],
         "validator": "Draft202012Validator"
+      },
+      {
+        "schema_path": "schemas/target_descriptor.schema.json",
+        "draft": "http://json-schema.org/draft-07/schema#",
+        "self_valid": true,
+        "schema_title": "envctl Migration Target Descriptor",
+        "fixture_checks": [],
+        "validator": "Draft7Validator"
       },
       {
         "schema_path": "schemas/task_graph.schema.json",
@@ -8588,6 +8636,14 @@
           }
         ],
         "validator": "Draft7Validator"
+      },
+      {
+        "schema_path": "schemas/validation_result.schema.json",
+        "draft": "http://json-schema.org/draft-07/schema#",
+        "self_valid": true,
+        "schema_title": "envctl Migration Validation Result",
+        "fixture_checks": [],
+        "validator": "Draft7Validator"
       }
     ],
     "warnings": [],
@@ -8616,11 +8672,11 @@
     "sha256": {
       "execution-framework/generated/task_graph.csv": "28a74f19bfb416b704727f0cbec303b96d05a02671537089ce93dc8f5653a1e4",
       "execution-framework/generated/task_graph.normalized.json": "eaeef81be2a6d564c616e22fe1a8d5883a2ee95598d92ac5b2ad5a3a3c815909",
-      "execution-framework/generated/filesystem_boundaries.json": "6ddf037b51ce1118d20fb12ef55a1020a32f3c91702fc889a9b8ea0c892b5843",
+      "execution-framework/generated/filesystem_boundaries.json": "d3c2b7d9a7e5109faf5a364dad4177d287d79f4d2b9c2cf6ad1a0ab2a7c87d8f",
       "execution-framework/generated/gap_report.json": "3c5bf7490846f4eae56b1d1c1c97dbf44ebc00368393b9e176687f07ee9d1677",
       "execution-framework/generated/upgrade_report.json": "5703caa3d0f99c38bfae6219f6cc4c11ad8089767f90f2dbb4f95670576f966e",
-      "execution-framework/generated/shared_protocol_manifest.json": "fbfde6228f25b83a71a9fd0b9e6b507b06c2ff48666f825ae08b3674ad4a3165",
-      "execution-framework/generated/shared_protocol_validation_report.json": "117062e337a85610d1122309984e8c763a14ce88d4e6ee51de345b9f121122f2",
+      "execution-framework/generated/shared_protocol_manifest.json": "093354f258ff7f7923ad1af82038bfdf7eaf05e1319ba73ef72317cdacea0b1c",
+      "execution-framework/generated/shared_protocol_validation_report.json": "ff165dd56cd3919fa52e3cc059db120f9ad42756d1a02b8177021b95271228f5",
       "execution-framework/templates/AGENT_LANE_TEMPLATE.json": "fbac2f99486fe699114ab11b61da98e21c9be8a1e1ec4c3759f0f33b51d9164a",
       "execution-framework/proof_templates/PROOF_RECORD_TEMPLATE.json": "aec4889373e824e1ed9b4bce48744129747aebe8e7147782d6f2c5e98a0de426",
       "execution-framework/schemas/execution_packet.schema.json": "a4305a40557ebea88f5699b6000000750563df9228916c21116b498e2e74a7e0",
@@ -8630,7 +8686,7 @@
       "execution-framework/schemas/gap_report.schema.json": "8889b598049ddf02f8f9fcd38a5504d3d20949d6975de1b7bc45fa1d16c6e647",
       "execution-framework/schemas/upgrade_report.schema.json": "fc5d58a6c441abf2e2fbfd86cb37859350d300924cfe6daeb07a512485e696d9",
       "execution-framework/schemas/filesystem_boundaries.schema.json": "75901030b7fee3fba0aed8447dc8d78520be803627c13959efe1532c96b0a555",
-      "execution-framework/schemas/shared_protocol.schema.json": "a897b67a1ec37804d74cbc60eb1360667d823b4661016a76a29906f016275007"
+      "execution-framework/schemas/shared_protocol.schema.json": "617ec6b74534b430003657033eba965d632b726116f68021209ffbd2859d4a91"
     },
     "secret_scan": {
       "paths": [
@@ -8642,12 +8698,12 @@
     }
   },
   "checksums": {
-    "execution-framework/scripts/verify_ver302_packet_schema_validation.py": "89ae6b32e9cf9da2a7f881e9691a25ed9efa0fb0e34f46a2f221f3325802aee2",
-    "execution-framework/generated/ver302_packet_schema_validation_report.json": "24cdd2f95cc82558a5faae7958d31a129ac1d663fdf183e7e99b6ae587911940",
-    "execution-framework/state/VER-302_PACKET_SCHEMA_VALIDATION.heartbeat.json": "eccbef4779b47b4de44437374dbe15b00a94aa8b70fb83ea7f83cb062e7b5c03",
-    "execution-framework/logs/VER-302_PACKET_SCHEMA_VALIDATION.log": "24cdd2f95cc82558a5faae7958d31a129ac1d663fdf183e7e99b6ae587911940",
-    "execution-framework/proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json": "f8884e539de916b3bcd5a1a728bc75cbdeab801949f0596ea0631c1afeb96240",
-    "execution-framework/proof_records/proof_ledger.jsonl": "4debcde2ec835fe82ed503886501fdac8c013450d2fe1963484c51f4acb04b11"
+    "execution-framework/scripts/verify_ver302_packet_schema_validation.py": "3d0788dd14b94361d49ee31f3a9801690b3c3f6379eb9456baf7ca654851ead9",
+    "execution-framework/generated/ver302_packet_schema_validation_report.json": "3bad6f2dee3d4bb215d0b9b82faa2e126f241044e21bf01d0b16527bf74e5508",
+    "execution-framework/state/VER-302_PACKET_SCHEMA_VALIDATION.heartbeat.json": "53ad281c7be4e5678eaa255c3d5c233b5e455d400724881785115eab61790b40",
+    "execution-framework/logs/VER-302_PACKET_SCHEMA_VALIDATION.log": "3bad6f2dee3d4bb215d0b9b82faa2e126f241044e21bf01d0b16527bf74e5508",
+    "execution-framework/proof_records/VER-302_PACKET_SCHEMA_VALIDATION.proof.json": "40f2d8184d501cceaa3ad049c080075ffc24d7a24c9c564f24c42549be5bcb2c",
+    "execution-framework/proof_records/proof_ledger.jsonl": "d0a8aede623dc9ac9523dd4bf72d6387c63accf86ac3c42ec5996052eb2592d8"
   },
   "logs_uri": "logs/VER-302_PACKET_SCHEMA_VALIDATION.log",
   "rollback_point": "history/pre_execution_framework_manifest.json",

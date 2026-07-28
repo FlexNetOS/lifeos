@@ -2,7 +2,7 @@
 
 - Task: `REQ-041_TWO_REPO_INTEGRATION`
 - Goal: Wire envctl database commands and nu_plugin commands through shared protocol and executable task packets
-- Generated at: 2026-07-05T05:18:43+00:00
+- Generated at: 2026-07-28T11:14:57+00:00
 - Verification status: passed
 
 ## Verified flow
@@ -14,21 +14,13 @@
 
 ## Repo-native verification
 
-The fixture verifier is not sufficient to certify the repository boundary. Run the
-executable gate against the real checkouts:
+Run the executable gate against real checkouts:
 
 ```bash
-ENVCTL_REPO=/path/to/envctl \
-NU_PLUGIN_REPO=/path/to/nu_plugin \
-python3 scripts/verify_two_repo_runtime.py
+ENVCTL_REPO=/path/to/envctl NU_PLUGIN_REPO=/path/to/nu_plugin python3 scripts/verify_two_repo_runtime.py
 ```
 
-This invokes the active `envctl migration` CLI (override it with `ENVCTL_BIN`),
-runs the nu_plugin envctl tests, and verifies every plugin visual command's argv
-against the corresponding envctl command group. It fails when either checkout
-or any expected route is missing. The JSON output records both Git revisions and
-whether the plugin checkout contains dependency work that has not yet been
-committed.
+It invokes `envctl migration`, runs the nu_plugin envctl tests, and checks every plugin visual-command argv.
 
 ## Contract inputs
 

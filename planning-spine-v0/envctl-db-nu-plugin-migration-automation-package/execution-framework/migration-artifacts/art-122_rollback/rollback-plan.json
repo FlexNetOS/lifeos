@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "task_id": "ART-122_ROLLBACK",
   "title": "Rollback Plan",
-  "generated_at": "2026-07-27T05:01:32+00:00",
+  "generated_at": "2026-07-28T11:43:56+00:00",
   "target": {
     "target_id": "flexnetos-vs-lifeos",
     "primary_root": "/home/flexnetos/FlexNetOS",
@@ -113,8 +113,8 @@
     }
   ],
   "blocked_gate_tasks": [],
-  "readiness_band": "conditional",
-  "overall_readiness_score": 75.3,
+  "readiness_band": "ready",
+  "overall_readiness_score": 100.0,
   "wave_reference": {
     "wave_id": "W6",
     "name": "Cutover, rollback, and decommission controls",
@@ -262,32 +262,7 @@
   ],
   "risk_summary": {
     "risk_count": 7,
-    "rollback_relevant_risks": [
-      {
-        "risk_id": "RISK-ART125-002",
-        "severity": "high",
-        "status": "open",
-        "owner": "envctl-db-agent"
-      },
-      {
-        "risk_id": "RISK-ART125-005",
-        "severity": "high",
-        "status": "mitigating",
-        "owner": "security-reproducibility-agent"
-      },
-      {
-        "risk_id": "RISK-ART125-006",
-        "severity": "medium",
-        "status": "monitoring",
-        "owner": "shared-protocol-agent"
-      },
-      {
-        "risk_id": "RISK-ART125-007",
-        "severity": "medium",
-        "status": "open",
-        "owner": "artifact-agent"
-      }
-    ]
+    "rollback_relevant_risks": []
   },
   "task_cleanup_set": [
     "execution-framework/scripts/generate_art122_rollback.py",
@@ -348,7 +323,7 @@
       ],
       "notes": [
         "Safe checkpoint ref: execution-framework/generated/rollback_checkpoints/safe-artifact.json.",
-        "Cutover execution-ready flag is currently False."
+        "Cutover execution-ready flag is currently True."
       ]
     },
     {
@@ -455,7 +430,7 @@
       ],
       "notes": [
         "Current statuses: REQ-041=completed, REQ-045=completed, VER-300=completed.",
-        "Readiness band remains conditional."
+        "Readiness band remains ready."
       ]
     },
     {

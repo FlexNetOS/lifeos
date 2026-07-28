@@ -1,6 +1,6 @@
 # envctl artifact registry
 
-Generated at: `2026-07-27T05:20:03+00:00`
+Generated at: `2026-07-28T12:29:33+00:00`
 Status: `passed`
 
 ## Persisted fields

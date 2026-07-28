@@ -1,0 +1,94 @@
+{
+  "agent_command": {
+    "argv": [
+      "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/run_codex_executor.sh",
+      "--ignore-user-config",
+      "--ignore-rules"
+    ],
+    "cwd": "/home/flexnetos/meta/src/meta-ruvector",
+    "duration_seconds": 29.297208,
+    "exit_code": 0,
+    "finished_at": "2026-07-28T07:47:24.122793Z",
+    "started_at": "2026-07-28T07:46:54.825603Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/logs/20260728T074654824005Z-d481b4eb7b51/stderr.log",
+      "sha256": "9ebfb423f65796d494118a19377b806577b88dad4e33c5756dd223a548d57247"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/logs/20260728T074654824005Z-d481b4eb7b51/stdout.log",
+      "sha256": "0c53a39e6e0dd42454d7d2e4d863d16d5d041e895111e85e1cf58b9697902929"
+    },
+    "timed_out": false
+  },
+  "attempt_id": "20260728T074654824005Z-d481b4eb7b51",
+  "authorization": null,
+  "cargo_target_dir": "/home/flexnetos/meta/var/cargo-target/lifeos-json-task-cargo/lifeos-canonical-full-run1/meta-ruvector-cb8f056c60c92573",
+  "command": {
+    "argv": [
+      "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/run_codex_executor.sh",
+      "--ignore-user-config",
+      "--ignore-rules"
+    ],
+    "cwd": "/home/flexnetos/meta/src/meta-ruvector",
+    "duration_seconds": 29.297208,
+    "exit_code": 0,
+    "finished_at": "2026-07-28T07:47:24.122793Z",
+    "started_at": "2026-07-28T07:46:54.825603Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/logs/20260728T074654824005Z-d481b4eb7b51/stderr.log",
+      "sha256": "9ebfb423f65796d494118a19377b806577b88dad4e33c5756dd223a548d57247"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CAP-INV011-001_RUVECTOR_SHAKE256_SQL/fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757/logs/20260728T074654824005Z-d481b4eb7b51/stdout.log",
+      "sha256": "0c53a39e6e0dd42454d7d2e4d863d16d5d041e895111e85e1cf58b9697902929"
+    },
+    "timed_out": false
+  },
+  "dependency_outputs": [],
+  "depends_on": [],
+  "diagnostic_probe": null,
+  "execution_input_sha256": "0ad1646dfab4929c43458150bf4959df07a7f62493dce897c42fdf7530ddb1dc",
+  "execution_mode": "json-stdin",
+  "execution_status": "completed",
+  "exit_code": 0,
+  "finished_at": "2026-07-28T07:47:24.122793Z",
+  "graph_sha256": "14814aa0715cb9793e92fafdb473d12422896b4f3fcaf11d18f2de76a0373bf1",
+  "implementation_actor": "json-stdin-executor",
+  "implementation_model": "gpt-5.6-sol",
+  "implementation_model_reasoning_effort": "high",
+  "node_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+  "optional_execution_policy": "not_declared_optional",
+  "packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/runs/lifeos-canonical-full-run1/packets/CAP-INV011-001_RUVECTOR_SHAKE256_SQL.json",
+  "packet_sha256": "fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757",
+  "previous_receipt_sha256": "sha256:5a4722f0c0a465a8c455732f214fc53a274fd09863033270e6e4c4f8ec1f4049",
+  "produced_output": {
+    "capability_id": "lifeos-capability:CAP-INV011-001_RUVECTOR_SHAKE256_SQL:dad4c519d9c2c1cb",
+    "goal": "Implement a trusted PostgreSQL bytea-to-bytea SHAKE256-256 function in ruvector-postgres using the existing rvf_crypto::shake256_256 implementation. Prove NIST vectors in Rust and against the live PostgreSQL 17/RuVector database. Install through the Meta/Nix-owned extension path without writing into the immutable Nix store. Revoke PUBLIC execution and grant only the intended migrator/envctl/runtime roles. Do not use pgcrypto SHAKE256 because the live provider fails with EVP_MD_CTX_size().",
+    "producer_node_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+    "producer_task_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+    "target_artifacts": [
+      "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/ruvector-shake256-sql.json"
+    ],
+    "target_files": [
+      "crates/ruvector-postgres/Cargo.toml",
+      "crates/ruvector-postgres/Cargo.lock",
+      "crates/ruvector-postgres/src/**",
+      "crates/ruvector-postgres/scripts/verify-ruvector-shake256-sql.sh"
+    ],
+    "task_root": "/home/flexnetos/meta/src/meta-ruvector"
+  },
+  "receipt_sequence": 6,
+  "receipt_sha256": "sha256:7f8882443fd9cb8b0f4dd3c0434f1c2cfb55e7184d74858d6c41a901075540b0",
+  "record_type": "execution",
+  "run_id": "lifeos-canonical-full-run1",
+  "runner_schema": "lifeos.json-task-runner.v2",
+  "schema": "lifeos.json-task-execution-receipt.v2",
+  "semantic_contract_sha256": "dad4c519d9c2c1cbb08f7bbfeedd536e6dacbca6ea1d3e2b5596805809d232cc",
+  "source_authority": "src/lifeos/planning-spine-v0",
+  "source_packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/packets/CAP-INV011-001_RUVECTOR_SHAKE256_SQL.json",
+  "started_at": "2026-07-28T07:46:54.825603Z",
+  "status": "completed",
+  "task_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+  "task_root": "/home/flexnetos/meta/src/meta-ruvector",
+  "workspace_root": "/home/flexnetos/meta/src/lifeos"
+}

@@ -3,8 +3,84 @@ from __future__ import annotations
 import copy
 import json
 from pathlib import Path
+import subprocess
 
-from jsonschema import Draft202012Validator
+try:
+    from jsonschema import Draft7Validator, Draft202012Validator
+except ModuleNotFoundError:
+    # The workspace already provides Ajv for its JavaScript tooling, while
+    # some execution cells intentionally omit optional Python packages.  Keep
+    # this verifier runnable in both environments without weakening the
+    # Draft 2020-12 validation performed for the protocol boundary.
+    _AJV_PROGRAM = r"""
+const input = JSON.parse(require('fs').readFileSync(0, 'utf8'));
+try {
+  const imported = require(input.draft === 'draft7' ? 'ajv' : 'ajv/dist/2020');
+  const Ajv = imported.default || imported;
+  const ajv = new Ajv({ allErrors: true, strict: false });
+  const validate = ajv.compile(input.schema);
+  const valid = validate(input.instance);
+  process.stdout.write(JSON.stringify({ errors: valid ? [] : validate.errors }));
+} catch (error) {
+  process.stdout.write(JSON.stringify({ schema_error: error.message }));
+}
+"""
+
+    class _AjvValidationError:
+        def __init__(self, error: dict) -> None:
+            self.message = error.get("message", "Ajv validation error")
+            self.path = tuple(
+                part for part in error.get("instancePath", "").split("/") if part
+            )
+
+    def _ajv_validate(
+        schema: dict,
+        instance: object,
+        draft: str,
+    ) -> list[_AjvValidationError]:
+        completed = subprocess.run(
+            ["node", "-e", _AJV_PROGRAM],
+            input=json.dumps(
+                {
+                    "draft": draft,
+                    "schema": schema,
+                    "instance": instance,
+                }
+            ),
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        result = json.loads(completed.stdout)
+        if "schema_error" in result:
+            raise ValueError(result["schema_error"])
+        return [_AjvValidationError(error) for error in result["errors"]]
+
+    class _AjvValidator:
+        draft = ""
+
+        def __init__(self, schema: dict) -> None:
+            self.schema = schema
+
+        @classmethod
+        def check_schema(cls, schema: dict) -> None:
+            _ajv_validate(schema, None, cls.draft)
+
+        def iter_errors(self, instance: object) -> list[_AjvValidationError]:
+            return _ajv_validate(self.schema, instance, self.draft)
+
+    class Draft7Validator(_AjvValidator):
+        draft = "draft7"
+
+    class Draft202012Validator(_AjvValidator):
+        draft = "2020-12"
+
+
+def validator_for(schema: dict) -> type:
+    declared_draft = str(schema.get("$schema", "")).lower()
+    if "draft-07" in declared_draft:
+        return Draft7Validator
+    return Draft202012Validator
 
 from _common import append_proof, file_checksums, now, package_root, root, write_json
 
@@ -17,7 +93,7 @@ PROTOCOL_VERSION = "1.0.0"
 SOURCE_SCHEMAS = {
     "Operation": "schemas/operation.schema.json",
     "RunEvent": "schemas/run_event.schema.json",
-    "ProofRecord": "execution-framework/schemas/proof_record.schema.json",
+    "ProofRecord": "schemas/proof_record.schema.json",
     "ArtifactRecord": "schemas/artifact_record.schema.json",
     "ApprovalRequest": "schemas/approval_request.schema.json",
     "TargetDescriptor": "schemas/target_descriptor.schema.json",
@@ -282,9 +358,9 @@ def build_manifest(schema: dict) -> dict:
         "required_records": REQUIRED_RECORDS,
         "records": records,
         "generated_files": [
-            "execution-framework/schemas/shared_protocol.schema.json",
-            "execution-framework/generated/shared_protocol_manifest.json",
-            "execution-framework/docs/SHARED_PROTOCOL_SCHEMAS.md",
+            "schemas/shared_protocol.schema.json",
+            "generated/shared_protocol_manifest.json",
+            "docs/SHARED_PROTOCOL_SCHEMAS.md",
         ],
     }
 
@@ -530,7 +606,9 @@ def write_text(relpath: str, text: str) -> None:
 
 
 def main() -> int:
-    base = package_root()
+    # The source schemas are owned by the execution-framework root alongside
+    # this verifier; package_root() is its parent and does not contain them.
+    base = root()
     started_at = now()
     schema = build_shared_schema(base)
     manifest = build_manifest(schema)
@@ -552,15 +630,15 @@ def main() -> int:
     write_json(f"logs/{TASK_ID}.log", validation)
 
     files_changed = [
-        "execution-framework/scripts/verify_shared_protocol_schemas.py",
-        "execution-framework/schemas/shared_protocol.schema.json",
-        "execution-framework/generated/shared_protocol_manifest.json",
-        "execution-framework/generated/shared_protocol_validation_report.json",
-        "execution-framework/docs/SHARED_PROTOCOL_SCHEMAS.md",
-        f"execution-framework/state/{TASK_ID}.heartbeat.json",
-        f"execution-framework/logs/{TASK_ID}.log",
-        f"execution-framework/proof_records/{TASK_ID}.proof.json",
-        "execution-framework/proof_records/proof_ledger.jsonl",
+        "scripts/verify_shared_protocol_schemas.py",
+        "schemas/shared_protocol.schema.json",
+        "generated/shared_protocol_manifest.json",
+        "generated/shared_protocol_validation_report.json",
+        "docs/SHARED_PROTOCOL_SCHEMAS.md",
+        f"state/{TASK_ID}.heartbeat.json",
+        f"logs/{TASK_ID}.log",
+        f"proof_records/{TASK_ID}.proof.json",
+        "proof_records/proof_ledger.jsonl",
     ]
     proof = {
         "proof_schema_version": "1.0",

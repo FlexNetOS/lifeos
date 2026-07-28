@@ -555,11 +555,23 @@ def main() -> int:
     inventory = walk_inventory(target_root)
     outputs = write_outputs(inventory, contract_row)
 
-    conn = sqlite3.connect(":memory:")
-    apply_migrations(conn, package_root())
-    seed_art115_fixture(conn, target_root)
-    registry_payload = register_artifact(conn, outputs, inventory)
-    verification = verify_outputs(outputs, registry_payload, inventory)
+    # ART-115's completion gate requires the content hash to be registered in
+    # the envctl database, not merely validated in an ephemeral test database.
+    db_path = root() / "generated" / "envctl.db"
+    conn = sqlite3.connect(db_path)
+    try:
+        has_registry_table = bool(
+            conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'envctl_migration_artifacts'"
+            ).fetchone()
+        )
+        if not has_registry_table:
+            apply_migrations(conn, package_root())
+        seed_art115_fixture(conn, target_root)
+        registry_payload = register_artifact(conn, outputs, inventory)
+        verification = verify_outputs(outputs, registry_payload, inventory)
+    finally:
+        conn.close()
 
     report_path = root() / "generated" / "art115_config_inventory_report.json"
     report_path.write_text(json.dumps(verification, indent=2, sort_keys=False) + "\n", encoding="utf-8")
@@ -582,6 +594,7 @@ def main() -> int:
         outputs["task_md"],
         outputs["task_json"],
         "execution-framework/generated/art115_config_inventory_report.json",
+        "execution-framework/generated/envctl.db",
         f"execution-framework/state/{TASK_ID}.heartbeat.json",
         f"execution-framework/logs/{TASK_ID}.log",
         f"execution-framework/proof_records/{TASK_ID}.proof.json",
@@ -602,6 +615,7 @@ def main() -> int:
             outputs["task_md"],
             outputs["task_json"],
             "execution-framework/generated/art115_config_inventory_report.json",
+            "execution-framework/generated/envctl.db",
             f"logs/{TASK_ID}.log",
         ],
         "" if verification["status"] == "passed" else "ART-115 verification failed",

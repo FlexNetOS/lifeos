@@ -1,0 +1,118 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/execution/TASK_GRAPH.md",
+    "src/nu_plugin/execution/TASK_FILE_MAP.csv",
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/NAVIGATION.json",
+    "src/nu_plugin/CHECKLIST_COMPLETION.md",
+    "src/nu_plugin/manifests/CHECKLIST_COMPLETION.json",
+    "src/nu_plugin/manifests/PACK_MANIFEST.json",
+    "src/nu_plugin/manifests/CHECKSUMS.sha256",
+    "src/nu_plugin/manifests/LINK_CHECK_REPORT.md",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json",
+    "src/nu_plugin/manifests/CSV_SOURCE_OF_TRUTH_REPAIR.json",
+    "src/nu_plugin/manifests/CSV_DOC_LINK_AUDIT_INPUT.md",
+    "src/nu_plugin/logs/CDB000-package-init.log",
+    "src/nu_plugin/logs/CDB001-navigation.log",
+    "src/nu_plugin/logs/CDB002-gates.log",
+    "src/nu_plugin/logs/CDB003-task-graph.log",
+    "src/nu_plugin/logs/CDB004-ledger.log",
+    "src/nu_plugin/logs/CDB005-manifest.log",
+    "src/nu_plugin/logs/CDB068-csv-source-of-truth-repair.log",
+    "src/nu_plugin/execution/COMMAND_LEDGER.csv",
+    "src/nu_plugin/execution/WORKLOG.md",
+    "src/nu_plugin/scripts/validate_task_graph.py",
+    "src/nu_plugin/tests/test_task_graph_validator.py",
+    "src/nu_plugin/scripts/repair_cdb068_execution_truth.py"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB068",
+    "decision": null,
+    "intent_lock_digest": "blake3:cae48df9eb0cab96f4165d7e7e2e755d2703a3b76c0569304b2a17b0ca56459b",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB013"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB068",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB068",
+  "depends_on": [
+    "TASK-CDB067"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "CSV has exact current package links, evidence logs exist, and validation passes",
+    "deterministic": true,
+    "verification_command": "TASK_GRAPH parses; all current artifact references are exact package-relative paths; completed task evidence logs exist; dependency graph remains acyclic; checksums resealed"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/manifests/CSV_DOC_LINK_AUDIT_INPUT.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/execution/TASK_FILE_MAP.csv",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:cae48df9eb0cab96f4165d7e7e2e755d2703a3b76c0569304b2a17b0ca56459b"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:d89d9cf44518d14e85756a10a314eaa9eb8b8292a1eba44f764abe9eee9556a9",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB068",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB068"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB068 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/execution/TASK_GRAPH.csv",
+    "src/nu_plugin/execution/TASK_GRAPH.md",
+    "src/nu_plugin/execution/TASK_FILE_MAP.csv",
+    "src/nu_plugin/manifests/CSV_SOURCE_OF_TRUTH_REPAIR.json",
+    "src/nu_plugin/manifests/PACK_MANIFEST.json",
+    "src/nu_plugin/manifests/CHECKSUMS.sha256",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json",
+    "src/nu_plugin/logs/CDB000-package-init.log",
+    "src/nu_plugin/logs/CDB001-navigation.log",
+    "src/nu_plugin/logs/CDB002-gates.log",
+    "src/nu_plugin/logs/CDB003-task-graph.log",
+    "src/nu_plugin/logs/CDB004-ledger.log",
+    "src/nu_plugin/logs/CDB005-manifest.log",
+    "src/nu_plugin/logs/CDB068-csv-source-of-truth-repair.log"
+  ],
+  "task_id": "TASK-CDB068",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB068"
+}

@@ -108,8 +108,17 @@ class FailureStateReconciliationTest(unittest.TestCase):
         blocked_status, _, blocked_summary, _, _ = self.module.gate_lps_007()
         self.assertEqual(blocked_status, "blocked")
         self.assertIn("blocked", blocked_summary.lower())
-        # New evidence: the shipped authority report passes again.
-        self.corrupt_authority({"result": "pass"})
+        # New evidence must restore both the result and the distinct identities;
+        # changing only the result string is not completion evidence.
+        self.corrupt_authority(
+            {
+                "result": "pass",
+                "verifier_authority": {
+                    "executor_agent_id": "fixture-executor",
+                    "verifier_agent_id": "fixture-verifier",
+                },
+            }
+        )
         recovered_status, _, recovered_summary, _, _ = self.module.gate_lps_007()
         self.assertEqual(recovered_status, "pass")
         self.assertNotIn("blocked", recovered_summary.lower())

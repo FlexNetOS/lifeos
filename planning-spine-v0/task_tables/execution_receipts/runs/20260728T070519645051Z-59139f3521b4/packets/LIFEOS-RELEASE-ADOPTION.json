@@ -1,0 +1,40 @@
+{
+  "schema": "lifeos.release-adoption-packet.v1",
+  "task_id": "LIFEOS-RELEASE-ADOPTION",
+  "title": "Adopt every remaining LifeOS task capability",
+  "goal": "Exercise every remaining leaf capability and fail closed unless every packet implementation is independently verified, activated, available, adopted, and completed in this exact immutable graph.",
+  "task_kind": "release-adoption",
+  "produces_capability": false,
+  "consumes_all_leaf_capabilities": true,
+  "depends_on": [],
+  "can_run_parallel": false,
+  "parallel_group": "release-adoption",
+  "max_parallel": 1,
+  "priority": 10000000,
+  "model_tag": "gpt-5.3-codex-spark",
+  "repo_path": ".",
+  "filesystem_scope": "planning-spine-v0/task_tables/execution_receipts/runs/**",
+  "input_files": [
+    "planning-spine-v0/task_tables/execution_receipts/runs/*/graph.json"
+  ],
+  "target_files": [
+    "planning-spine-v0/task_tables/execution_receipts/runs/*/capability-adoption-report.json"
+  ],
+  "allowed_paths": [
+    "planning-spine-v0/task_tables/execution_receipts/runs/**"
+  ],
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "command_template": "/home/flexnetos/.nix-profile/bin/rtk proxy python3 planning-spine-v0/scripts/verify_unified_capability_adoption.py",
+  "verification_command": "/home/flexnetos/.nix-profile/bin/rtk proxy python3 planning-spine-v0/scripts/verify_unified_capability_adoption.py --check",
+  "completion_gate": "Every predecessor has a sealed completed receipt with positive implementation, independent verification, activation, and downstream adoption evidence; the exact graph-bound adoption report is current.",
+  "proof_required": true,
+  "human_approval_required": false,
+  "risk_level": "high",
+  "optional": false,
+  "rollback_plan": "Remove only the graph-scoped capability-adoption-report.json; never alter predecessor receipts."
+}

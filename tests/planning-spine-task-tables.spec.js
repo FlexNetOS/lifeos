@@ -281,8 +281,23 @@ describe("nu_plugin execution task-table handoff", () => {
 
     expect(graph.nodes).toHaveLength(106);
     expect(graph.edges.length).toBeGreaterThan(0);
-    expect(manifest.packet_count).toBe(106);
-    expect(manifest.packets).toHaveLength(106);
+    expect(manifest).toMatchObject({
+      schema: "lifeos.execution-manifest.v2",
+      task_count: 111,
+      work_order_count: 106,
+      generated_packet_count: 106,
+      companion_packet_count: 5,
+      packet_count: 111,
+    });
+    expect(manifest.packets).toHaveLength(111);
+    expect(manifest.packet_reconciliation).toMatchObject({
+      physical_packet_count: 111,
+      classified_packet_count: 111,
+      generated_cdb_packet_count: 106,
+      mandatory_local_companion_count: 5,
+      unclassified_packet_count: 0,
+      errors: [],
+    });
     expect(dispatch.dispatch_packets).toEqual([]);
     expect(dispatch.runnable_tasks).toEqual([]);
     expect(dispatch.approval_blocker_count + dispatch.blocked_count).toBe(106);
@@ -291,7 +306,12 @@ describe("nu_plugin execution task-table handoff", () => {
     expect(leases.slots).toHaveLength(106);
     expect(leases.slots.every(({ state, generation }) => state === "available" && generation === 0)).toBe(true);
 
-    for (const entry of manifest.packets) {
+    const generatedPackets = manifest.packets.filter(({ classification }) => classification === "generated-cdb-work-order");
+    const companionPackets = manifest.packets.filter(({ classification }) => classification === "mandatory-local-companion");
+    expect(generatedPackets).toHaveLength(106);
+    expect(companionPackets).toHaveLength(5);
+
+    for (const entry of generatedPackets) {
       const bytes = await readFile(path.join(taskTables, entry.packet_uri));
       expect(createHash("sha256").update(bytes).digest("hex")).toBe(entry.sha256);
       const packet = JSON.parse(bytes);
@@ -299,6 +319,14 @@ describe("nu_plugin execution task-table handoff", () => {
       expect(packet.approval.status).toBe("pending");
       expect(packet.proof.uri).toBeNull();
       expect(packet.execution.command_template).toBeNull();
+    }
+    for (const entry of companionPackets) {
+      const bytes = await readFile(path.join(taskTables, entry.packet_uri));
+      expect(createHash("sha256").update(bytes).digest("hex")).toBe(entry.sha256);
+      const packet = JSON.parse(bytes);
+      expect(packet.optional).not.toBe(true);
+      expect(entry.proof_required).toBe(true);
+      expect(entry.status).toBe("pending");
     }
   });
 
@@ -379,7 +407,7 @@ describe("nu_plugin execution task-table handoff", () => {
     expect(gapMatrix.surfaces.every(({ implementation_status }) => implementation_status === "implemented")).toBe(true);
   });
 
-  it("hard-gates the complete reference package manifest and preserves three task namespaces", async () => {
+  it("hard-gates the expanded reference package without promoting its evidence and preserves three task namespaces", async () => {
     const audit = await auditReferencePackageManifest(referencePackageRoot);
     const committedAudit = await json("workflow/reference_package_audit.json");
     const namespaces = await json("workflow/reference_namespaces.json");
@@ -390,21 +418,27 @@ describe("nu_plugin execution task-table handoff", () => {
     expect(audit.missing_from_disk).toEqual([]);
     expect(audit.hash_or_size_drift).toEqual([]);
     expect(audit.semantic_facts).toMatchObject({
-      framework_graph_task_count: 80,
-      framework_graph_source_status_counts: { complete: 4, pending: 76 },
-      execution_packet_count: 80,
-      proof_file_count: 88,
-      merged_proof_count: 88,
-      merged_proof_distinct_task_count: 88,
-      proof_ledger_row_count: 92,
-      derived_terminal_task_count: 80,
-      derived_terminal_status_counts: { completed: 78, passed: 2 },
+      framework_graph_task_count: 763,
+      framework_graph_source_status_counts: { complete: 4, pending: 759 },
+      execution_packet_count: 763,
+      execution_manifest_task_count: 763,
+      execution_manifest_packet_count: 763,
+      derived_terminal_task_count: 763,
       human_required_task_count: 8,
       agent_approval_record_count: 8,
       agent_approval_classification: "review_evidence_only",
     });
+    expect(audit.semantic_facts).toMatchObject({
+      merged_proof_count: 88,
+      merged_proof_distinct_task_count: 88,
+      derived_terminal_status_counts: { completed: 763 },
+    });
+    expect(typeof audit.semantic_facts.proof_file_count).toBe("number");
+    expect(typeof audit.semantic_facts.proof_ledger_row_count).toBe("number");
+    expect(audit.semantic_facts.proof_file_count).toBeGreaterThan(0);
+    expect(audit.semantic_facts.proof_ledger_row_count).toBeGreaterThan(0);
     expect(audit.agent_approvals.every(({ classification }) => classification === "review_evidence_only")).toBe(true);
-    expect(audit.unsafe_completion_claims.map(({ claim_type }) => claim_type).sort()).toEqual(["local_package_complete", "pass_no_gaps"]);
+    expect(audit.unsafe_completion_claims.map(({ claim_type }) => claim_type).sort()).toEqual(["pass_no_gaps"]);
     expect(audit.unsafe_completion_claims.every(({ disposition }) => disposition === "rejected_as_lifeos_completion")).toBe(true);
     expect(audit.admissible_as_lifeos_completion).toBe(false);
     expect(audit.completion_claim_isolation_passed).toBe(true);
@@ -417,7 +451,7 @@ describe("nu_plugin execution task-table handoff", () => {
     });
     expect(committedAudit.completion_claim_isolation_passed).toBe(true);
     expect(namespaces.namespaces.map(({ namespace, task_count }) => [namespace, task_count])).toEqual([
-      ["reference-framework", 80],
+      ["reference-framework-expanded", 763],
       ["reference-issue-414", 12],
       ["nu-plugin-cdb-handoff", 106],
     ]);
@@ -447,6 +481,7 @@ describe("nu_plugin execution task-table handoff", () => {
     expect(receipts.files.map(({ path: artifactPath }) => artifactPath)).toContain("workflow/mandatory_capabilities.json");
     expect(receipts.files.map(({ path: artifactPath }) => artifactPath)).toContain("workflow/mandatory_capabilities.csv");
     expect(receipts.files.map(({ path: artifactPath }) => artifactPath)).toContain("../generated/task_table_reconciliation.csv");
+    expect(receipts.files.filter(({ kind }) => kind === "mandatory-local-companion-execution-packet")).toHaveLength(5);
   });
 
   it("implements dependency + approval dispatch and real atomic runtime primitives", async () => {
@@ -501,7 +536,7 @@ describe("nu_plugin execution task-table handoff", () => {
     expect(readme).toContain("exactly 28 mandatory, review-only capabilities");
     expect(readme).toContain("workflow/mandatory_language_inventory.json");
     expect(readme).toContain("mandatory_language_sources: 87");
-    expect(readme).toContain("mandatory_language_occurrences: 295");
+    expect(readme).toContain("mandatory_language_occurrences: 1008");
     expect(readme).toContain("unclassified_normative_occurrences: 0");
     expect(readme).toContain("admissible_as_lifeos_completion: false");
     expect(readme).toContain("bun planning-spine-v0/scripts/import-nu-plugin-task-tables.mjs --check");

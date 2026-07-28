@@ -1,7 +1,7 @@
 # Business process map
 
 Task: `ART-119_BUSINESS_PROCESS`
-Generated at: `2026-07-27T04:58:44+00:00`
+Generated at: `2026-07-28T11:38:09+00:00`
 
 ## Scope
 

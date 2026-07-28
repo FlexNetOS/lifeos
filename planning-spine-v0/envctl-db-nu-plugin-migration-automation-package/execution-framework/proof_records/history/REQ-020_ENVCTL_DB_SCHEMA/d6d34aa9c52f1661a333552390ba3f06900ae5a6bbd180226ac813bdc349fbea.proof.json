@@ -1,0 +1,62 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "REQ-020_ENVCTL_DB_SCHEMA",
+  "status": "completed",
+  "started_at": "2026-07-28T09:59:12+00:00",
+  "completed_at": "2026-07-28T09:59:12+00:00",
+  "actor": "codex-cli-local",
+  "helper_id": "helper-envctl-db-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
+  "files_changed": [
+    "execution-framework/scripts/verify_envctl_db_schema.py",
+    "execution-framework/generated/envctl_migration_db_model.json",
+    "execution-framework/generated/envctl_migration_db_validation_report.json",
+    "execution-framework/docs/ENVCTL_DB_SCHEMA.md",
+    "execution-framework/logs/REQ-020_ENVCTL_DB_SCHEMA.log",
+    "execution-framework/proof_records/REQ-020_ENVCTL_DB_SCHEMA.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl"
+  ],
+  "commands_run": [
+    "python3 scripts/verify_envctl_db_schema.py"
+  ],
+  "verification_output": {
+    "schema_version": "1.0",
+    "task_id": "REQ-020_ENVCTL_DB_SCHEMA",
+    "status": "passed",
+    "generated_at": "2026-07-28T09:59:12+00:00",
+    "summary": {
+      "required_table_count": 16,
+      "actual_table_count": 16,
+      "required_view_count": 6,
+      "actual_view_count": 6,
+      "capability_count": 19,
+      "index_count": 31,
+      "foreign_key_count": 24
+    },
+    "errors": [],
+    "evidence": [
+      "generated/envctl_migration_db_model.json",
+      "generated/envctl_migration_db_validation_report.json",
+      "docs/ENVCTL_DB_SCHEMA.md"
+    ]
+  },
+  "checksums": {
+    "execution-framework/scripts/verify_envctl_db_schema.py": "68828eca9d152b4033e0fb5969c0c011886b73d688616a9f30b7de351a14fe00",
+    "execution-framework/generated/envctl_migration_db_model.json": "229c620f010631accc83df3157e2e0186aad4ac6baf4304acd7ac6ac722c6644",
+    "execution-framework/generated/envctl_migration_db_validation_report.json": "4fce47637c2ffed0307b4a60826fcc4b40ee8382e3850adaffacd62cee84a59a",
+    "execution-framework/docs/ENVCTL_DB_SCHEMA.md": "b8bb6d1c92d05038a658b2b7e81ead6d854147739c001961313718867fd3ede1",
+    "execution-framework/logs/REQ-020_ENVCTL_DB_SCHEMA.log": "4fce47637c2ffed0307b4a60826fcc4b40ee8382e3850adaffacd62cee84a59a",
+    "execution-framework/proof_records/REQ-020_ENVCTL_DB_SCHEMA.proof.json": "bc84177f6a6850dc3237780f65becd28de45cda14f430296868c0417f476d52e",
+    "execution-framework/proof_records/proof_ledger.jsonl": "586b978b05d303e52ea937fdce51793c5ffe1c16af7bb04c99aee33af463e6a0"
+  },
+  "logs_uri": "logs/REQ-020_ENVCTL_DB_SCHEMA.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "generated/envctl_migration_db_model.json",
+    "generated/envctl_migration_db_validation_report.json",
+    "docs/ENVCTL_DB_SCHEMA.md"
+  ],
+  "failure_reason": "",
+  "next_action": "run REQ-021 through REQ-028 envctl database API tasks"
+}

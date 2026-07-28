@@ -1,7 +1,7 @@
 # Parity dashboard
 
 Task: `ART-132_PARITY_DASHBOARD`
-Generated at: `2026-07-27T21:40:37+00:00`
+Generated at: `2026-07-28T02:06:12+00:00`
 Status: `complete_with_live_capture_gap`
 
 ## Scope

@@ -1,6 +1,6 @@
 # ART-108 Database Schema Map
 
-Generated: `2026-07-27T04:53:45+00:00`
+Generated: `2026-07-28T11:26:44+00:00`
 Backend: `sqlite`
 Runtime: `python sqlite3 in-memory`
 
@@ -19,7 +19,7 @@ Runtime: `python sqlite3 in-memory`
 
 - `sql/001_migration_automation_schema.sql` (`f0a8ad6ce7fba6023d8bfb765843fef07710387f9e720f7fe01305ce2d52bb0e`)
 - `sql/002_views_and_indexes.sql` (`b9c4fee76504746742695119c84bfbb46dedb1e29da480103f2e6b6c5a83106e`)
-- `execution-framework/generated/contract_manifest.seed.sql` (`b19c813b7b1205cc5fa7df2a135cab807c9a0c45af379c117056889b299c6435`)
+- `execution-framework/generated/contract_manifest.seed.sql` (`a0fddfabc0013cf9b6f5f6a61db3a96ce8f59f496de564bdffbb6e846c1974a9`)
 
 ## Tables
 

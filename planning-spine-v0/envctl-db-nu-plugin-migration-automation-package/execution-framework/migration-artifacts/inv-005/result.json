@@ -1,0 +1,61 @@
+{
+  "artifact_declarations": [
+    {
+      "declaration": "migration-artifacts/inv-005/result.json",
+      "kind": "receipt_result",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-005/result.json",
+      "status": "receipt_result_materialized"
+    }
+  ],
+  "artifact_path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-005/result.json",
+  "command": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "codedb ingest-envelope --help >/dev/null 2>&1 || nu -c 'codedb ingest-envelope --help' >/dev/null 2>&1"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "exit_code": 2,
+    "stderr": {
+      "path": null,
+      "snippet": "codedb: unsupported command: ingest-envelope; supported commands: mcp serve, scan, capture, capture build, capture compiler, materialize, reproduce, merge-plan, store-report, export, schema, tables, gaps, validation-errors, doctor, generate-yazelix-bridge, --version"
+    },
+    "stdout": {
+      "path": null,
+      "snippet": ""
+    }
+  },
+  "completed_at": "2026-07-28T08:41:15Z",
+  "failure_reason": "Required probe command is unsupported: `codedb ingest-envelope --help` exits non-zero and `codedb ingest-envelope` is not registered by the loaded nu_plugin_codedb command set.",
+  "honesty_note": "The live probe failed; design text and prior evidence are not sufficient for invariant proof.",
+  "implementation_scope": "declared_live_probe_failed",
+  "needs_capability_probe": false,
+  "orchestration": {
+    "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+    "run_id": "manual-check-2026-07-28T08:41:15Z"
+  },
+  "packet_execution_proven": false,
+  "packet_sha256": null,
+  "status": "failed",
+  "task_completion_proven": false,
+  "task_id": "INV-005_OPERATIONAL_INVARIANT",
+  "verification": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "command -v codedb || nu -c 'help commands' 2>/dev/null | grep -q 'codedb ingest-envelope'"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "exit_code": 0,
+    "stderr": {
+      "path": null,
+      "snippet": ""
+    },
+    "stdout": {
+      "path": null,
+      "snippet": "/home/flexnetos/.nix-profile/bin/codedb\n"
+    }
+  },
+  "verification_note": "`command -v codedb` succeeds, but plugin-discovered command surface does not include `codedb ingest-envelope` when `nu_plugin_codedb` is loaded.",
+  "schema": "lifeos.receipt-bound-task-result.v1"
+}

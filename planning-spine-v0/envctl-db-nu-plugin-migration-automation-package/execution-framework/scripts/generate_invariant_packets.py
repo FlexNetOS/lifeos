@@ -31,7 +31,9 @@ import argparse
 import hashlib
 import json
 import re
+import shlex
 from pathlib import Path
+import _common
 
 ANCHOR = "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 INVARIANT_HEADING = "## Operational invariants and acceptance"
@@ -206,6 +208,15 @@ PROBES: dict[int, dict[str, object]] = {
     },
 }
 
+# Variable assignments are not executable command prefixes from the runner's
+# perspective. Wrap every PostgreSQL probe explicitly so it is executed by the
+# shell instead of being delegated as an agent prompt.
+for _probe in PROBES.values():
+    for _field in ("probe", "verify"):
+        _command = str(_probe[_field])
+        if "PSQL=" in _command:
+            _probe[_field] = f"bash -lc {shlex.quote(_command)}"
+
 LANE = "lane_e_invariants"
 
 
@@ -283,8 +294,15 @@ def build_packet(inv: dict[str, object], anchor_sha: str, generated_at: str) -> 
         "command_template": probe["probe"],
         "verification_command": probe["verify"],
         "completion_gate": (
-            "probe exits 0 against the live system; a non-zero exit is a real "
-            "invariant violation and must not be recorded as pending or proposed"
+            "probe exits 0 against the live system, but this partial check is NOT "
+            "evidence of implementation completion for the full invariant; a full "
+            "end-to-end capability proof remains mandatory"
+        ),
+        "needs_capability_probe": True,
+        "probe_class": (
+            "drift-canary"
+            if number == 19
+            else "partial-capability-probe"
         ),
         "proof_required": True,
         "proof_uri": f"proof_records/{task_id}.proof.json",
@@ -342,7 +360,9 @@ def main() -> int:
         target = out_dir / f"{packet['task_id']}.json"
         if not args.dry_run:
             out_dir.mkdir(parents=True, exist_ok=True)
-            target.write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            target.write_text(
+                json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+            )
         written.append(str(target))
 
     print(

@@ -1,0 +1,67 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 972539,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "invariant_number": 19,
+    "invariant_sha256": "780331fa86f8eaebcfcd0ebbb1b483f6cc2a97e19355cc6aa39b892022606fce"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "python3 -c \"import re;t=open('Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md',encoding='utf-8').read();a=len(re.findall(r'^\\\\| A\\\\d{2} \\\\|',t,re.M));d=len(re.findall(r'^#### D\\\\d{2}',t,re.M));raise SystemExit(0 if (a==15 and d==24) else 1)\"",
+  "completion_gate": "probe exits 0 against the live system, but this partial check is NOT evidence of implementation completion for the full invariant; a full end-to-end capability proof remains mandatory",
+  "depends_on": [],
+  "execution_cell": "anchor-conformance",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Prove operational invariant 19 holds against the live system. Shipped evidence only: a design document, a proposed ADR, or an intent to build never satisfies this probe.",
+  "heartbeat_file": "state/INV-019_OPERATIONAL_INVARIANT.heartbeat.json",
+  "helper_id": "helper-invariant-19",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/INV-019_OPERATIONAL_INVARIANT.log",
+  "max_parallel": 6,
+  "model_tag": "gpt-5.3-spark",
+  "needs_capability_probe": true,
+  "notes": "Extracted structurally from the anchor's acceptance-invariant list. Anchor invariant sha256=780331fa86f8eaebcfcd0ebbb1b483f6cc2a97e19355cc6aa39b892022606fce; anchor document sha256=78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee.",
+  "owner_agent": "invariant-agent",
+  "owner_lane": "lane_e_invariants",
+  "packet_schema_version": "1.0",
+  "parallel_group": "invariant_anchor-conformance",
+  "parent_id": "INVARIANTS",
+  "phase": "00-invariants",
+  "priority": 119,
+  "probe_class": "drift-canary",
+  "proof_required": true,
+  "proof_uri": "proof_records/INV-019_OPERATIONAL_INVARIANT.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "python3"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/inv-019/result.json"
+  ],
+  "target_files": [],
+  "task_id": "INV-019_OPERATIONAL_INVARIANT",
+  "title": "Invariant 19: All fifteen anchor sections, fourteen source diagrams, and ten operational invariants are represented in th...",
+  "verification_command": "test -f Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+}

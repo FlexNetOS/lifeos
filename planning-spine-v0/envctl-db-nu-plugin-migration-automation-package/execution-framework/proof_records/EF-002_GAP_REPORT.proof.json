@@ -1,34 +1,62 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "EF-002_GAP_REPORT",
-  "status": "completed",
-  "started_at": "2026-07-04T00:00:00-05:00",
-  "completed_at": "2026-07-04T00:00:00-05:00",
-  "actor": "local-package-builder",
-  "helper_id": "helper-gap-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "execution-framework",
-  "files_changed": [
-    "execution-framework/generated/gap_report.json",
-    "execution-framework/docs/GAP_ANALYSIS.md"
-  ],
-  "commands_run": [
-    "generate gap report and docs/GAP_ANALYSIS.md"
-  ],
-  "verification_output": {
-    "status": "completed",
-    "gap_count": 9
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "execution-framework/generated/gap_report.json": "3c5bf7490846f4eae56b1d1c1c97dbf44ebc00368393b9e176687f07ee9d1677",
-    "execution-framework/docs/GAP_ANALYSIS.md": "a92e49ab23b14e3991707132676549b1de583f84294576a83ce14b1369eae829"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-002_GAP_REPORT/a922c76dfada0062a2cf398335ecd2d16f30accf689bfda4e08f78583740f80d/20260728T013742383043Z-135c4fa4252f.json": "5480c931348ae77f8a9925ecdadccb025ce1c795caf1dfb5d19a1143c73078ce"
   },
-  "logs_uri": "logs/EF-002_GAP_REPORT.log",
-  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "commands_run": [
+    "/bin/bash -lc 'python3 scripts/scan_package.py --gaps'",
+    "/bin/bash -lc 'test -f generated/gap_report.json && test -f docs/GAP_ANALYSIS.md'"
+  ],
+  "completed_at": "2026-07-28T01:37:42.917364Z",
   "evidence": [
-    "generated/gap_report.json",
-    "docs/GAP_ANALYSIS.md"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-002_GAP_REPORT/a922c76dfada0062a2cf398335ecd2d16f30accf689bfda4e08f78583740f80d/20260728T013742383043Z-135c4fa4252f.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/EF-002_GAP_REPORT/543834b6d54f3f45c5c4887e6fd9c6d90ac0f86fd8c0c3446d45f3791e55fae9.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "continue required execution command sequence"
+  "files_changed": [],
+  "helper_id": "helper-gap-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-002_GAP_REPORT/a922c76dfada0062a2cf398335ecd2d16f30accf689bfda4e08f78583740f80d/logs/20260728T013742383043Z-135c4fa4252f",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": "..",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T01:37:42.383471Z",
+  "status": "completed",
+  "task_id": "EF-002_GAP_REPORT",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "gap report",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T013742383043Z-135c4fa4252f",
+      "graph_sha256": "4ed1e04c5aa1edbe85e110aed00b47a015836d38df264af8e4cae12ee8f3087a",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-002_GAP_REPORT/a922c76dfada0062a2cf398335ecd2d16f30accf689bfda4e08f78583740f80d/20260728T013742383043Z-135c4fa4252f.json",
+      "run_id": "20260728T013741633139Z-616a4a3991f0",
+      "sha256": "5480c931348ae77f8a9925ecdadccb025ce1c795caf1dfb5d19a1143c73078ce"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "a922c76dfada0062a2cf398335ecd2d16f30accf689bfda4e08f78583740f80d",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/EF-002_GAP_REPORT/543834b6d54f3f45c5c4887e6fd9c6d90ac0f86fd8c0c3446d45f3791e55fae9.proof.json",
+      "sha256": "543834b6d54f3f45c5c4887e6fd9c6d90ac0f86fd8c0c3446d45f3791e55fae9"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
 }

@@ -1,0 +1,62 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_GRAPH_TRANSFORMER_WASM/5a616eb4788af073519349de580b4e5628b38421ff8b4d9c681a3e1377f8c7cb/20260728T020500186496Z-c3abbad7b56d.json": "d54ce2149274cc1d6edea1d8ddc4ca70eb81d7c6c52e0872d2c57983aeb3e07f",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_graph_transformer_wasm/result.json": "97bb62e2878fe9974a7e69ec159ef9a9a66eb67fd5c22898b99fd287715a76c1"
+  },
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'ruvector-graph-transformer-wasm'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'ruvector-graph-transformer-wasm'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'ruvector\\-graph\\-transformer\\-wasm@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'ruvector-graph-transformer-wasm'\"'\"' version'"
+  ],
+  "completed_at": "2026-07-28T02:05:00.772073Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_graph_transformer_wasm/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_GRAPH_TRANSFORMER_WASM/5a616eb4788af073519349de580b4e5628b38421ff8b4d9c681a3e1377f8c7cb/20260728T020500186496Z-c3abbad7b56d.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_graph_transformer_wasm/result.json"
+  ],
+  "helper_id": "helper-currency-ruvector_graph_transformer_wasm",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_GRAPH_TRANSFORMER_WASM/5a616eb4788af073519349de580b4e5628b38421ff8b4d9c681a3e1377f8c7cb/logs/20260728T020500186496Z-c3abbad7b56d",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T02:05:00.187975Z",
+  "status": "completed",
+  "task_id": "CURRENCY-RUVECTOR_GRAPH_TRANSFORMER_WASM",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/currency-ruvector_graph_transformer_wasm/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_graph_transformer_wasm/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T020500186496Z-c3abbad7b56d",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_GRAPH_TRANSFORMER_WASM/5a616eb4788af073519349de580b4e5628b38421ff8b4d9c681a3e1377f8c7cb/20260728T020500186496Z-c3abbad7b56d.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "d54ce2149274cc1d6edea1d8ddc4ca70eb81d7c6c52e0872d2c57983aeb3e07f"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "5a616eb4788af073519349de580b4e5628b38421ff8b4d9c681a3e1377f8c7cb",
+    "probe_class": "currency",
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

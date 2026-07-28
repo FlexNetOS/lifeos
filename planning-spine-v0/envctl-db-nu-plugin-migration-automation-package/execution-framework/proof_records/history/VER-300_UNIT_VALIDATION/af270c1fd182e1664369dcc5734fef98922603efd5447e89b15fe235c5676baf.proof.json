@@ -1,0 +1,238 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "VER-300_UNIT_VALIDATION",
+  "status": "completed",
+  "started_at": "2026-07-28T02:15:55+00:00",
+  "completed_at": "2026-07-28T02:15:55+00:00",
+  "actor": "validation-agent",
+  "helper_id": "helper-validate-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "${ENVCTL_REPO}|${NU_PLUGIN_REPO}",
+  "files_changed": [
+    "execution-framework/scripts/verify_ver300_unit_validation.py",
+    "execution-framework/generated/ver300_runtime_test_results.json",
+    "execution-framework/generated/ver300_unit_validation_report.json",
+    "execution-framework/state/VER-300_UNIT_VALIDATION.heartbeat.json",
+    "execution-framework/logs/VER-300_UNIT_VALIDATION.log",
+    "execution-framework/proof_records/VER-300_UNIT_VALIDATION.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl"
+  ],
+  "commands_run": [
+    "python3 scripts/verify_ver300_unit_validation.py",
+    "python3 -m py_compile scripts/verify_ver300_unit_validation.py"
+  ],
+  "verification_output": {
+    "schema_version": "1.0",
+    "task_id": "VER-300_UNIT_VALIDATION",
+    "status": "pass",
+    "generated_at": "2026-07-28T02:15:55+00:00",
+    "packet_summary": {
+      "goal": "Validate envctl DB, nu_plugin, shared protocol, artifacts, and FlexNetOS adapter",
+      "repo_target": "multi_repo",
+      "repo_path": "${ENVCTL_REPO}|${NU_PLUGIN_REPO}",
+      "filesystem_scope": "repo-pair",
+      "verification_command": "python3 scripts/verify_ver300_unit_validation.py"
+    },
+    "approval": {
+      "path": "approvals/VER-300_UNIT_VALIDATION.agent_approval.json",
+      "decision": "approved",
+      "reviewed_at": "2026-07-05T05:44:32+00:00",
+      "reviewer": "gpt-5.5-fallback",
+      "model": "gpt-5.5"
+    },
+    "checks": {
+      "approval_decision_approved": true,
+      "packet_proof_required": true,
+      "packet_single_threaded": true,
+      "status_report_dispatchable_or_recorded": true,
+      "status_report_state_known": true,
+      "final_verification_local_package_complete": true,
+      "final_verification_no_failed_tasks": true,
+      "coverage_classes_complete": true,
+      "coverage_dependencies_completed": true,
+      "dependency_proofs_completed": true,
+      "validation_inputs_passed": true
+    },
+    "dependency_proofs": {
+      "REQ-041_TWO_REPO_INTEGRATION": {
+        "proof_path": "proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json",
+        "status": "completed",
+        "ok": true
+      },
+      "REQ-202_FLEXNETOS_ADAPTER_RECIPE": {
+        "proof_path": "proof_records/REQ-202_FLEXNETOS_ADAPTER_RECIPE.proof.json",
+        "status": "completed",
+        "ok": true
+      },
+      "ART-123_VALIDATION_RECONCILIATION": {
+        "proof_path": "proof_records/ART-123_VALIDATION_RECONCILIATION.proof.json",
+        "status": "completed",
+        "ok": true
+      }
+    },
+    "validation_inputs": {
+      "runtime_test_suites": {
+        "path": "generated/ver300_runtime_test_results.json",
+        "status": "pass",
+        "ok": true
+      },
+      "envctl_db": {
+        "path": "generated/envctl_migration_db_validation_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "artifact_registry": {
+        "path": "generated/envctl_artifact_registry_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "validation_evidence": {
+        "path": "generated/envctl_validation_evidence_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "shared_protocol": {
+        "path": "generated/shared_protocol_validation_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "two_repo_integration": {
+        "path": "generated/req041_two_repo_integration_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "filesystem_boundaries": {
+        "path": "generated/filesystem_boundary_validation_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "security_redaction": {
+        "path": "generated/security_redaction_validation_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "adapter_recipe": {
+        "path": "generated/flexnetos_adapter_recipe_validation_report.json",
+        "status": "pass",
+        "ok": true
+      },
+      "validation_reconciliation": {
+        "path": "generated/art123_validation_reconciliation_report.json",
+        "status": "passed",
+        "ok": true
+      },
+      "test_coverage": {
+        "path": "generated/art124_test_coverage_report.json",
+        "status": "passed",
+        "ok": true
+      }
+    },
+    "coverage_summary": {
+      "required_classes": [
+        "unit",
+        "integration",
+        "regression",
+        "performance",
+        "security",
+        "UAT"
+      ],
+      "covered_class_count": 6,
+      "automation_status_counts": {
+        "ready": 2,
+        "partial": 2,
+        "planned": 2
+      },
+      "ver300_entry_status": "ready_with_open_runtime_gates"
+    },
+    "coverage_dependency_status": {
+      "REQ-024_ENVCTL_ARTIFACT_REGISTRY": "completed",
+      "REQ-040_SHARED_PROTOCOL_SCHEMAS": "completed",
+      "REQ-025_ENVCTL_VALIDATION_EVIDENCE": "completed",
+      "REQ-033_PLUGIN_HUMAN_APPROVAL": "completed",
+      "REQ-041_TWO_REPO_INTEGRATION": "completed",
+      "REQ-045_RUN_REPLAY": "completed"
+    },
+    "status_surfaces": {
+      "status_report_generated_at": "2026-07-28T01:37:44+00:00",
+      "status_report_task_status": "complete",
+      "final_verification_status": "pass_with_external_blocker",
+      "final_verification_failed_count": 0,
+      "retry_chain_failed_tasks": [],
+      "unrelated_failed_tasks": []
+    },
+    "warnings": [],
+    "errors": [],
+    "allowed_paths": [
+      "${ENVCTL_REPO}/**",
+      "${NU_PLUGIN_REPO}/**",
+      "${MIGRATION_TARGET_ROOT}/**",
+      "execution-framework/**",
+      "migration-artifacts/**"
+    ],
+    "output_paths": [
+      "execution-framework/scripts/verify_ver300_unit_validation.py",
+      "execution-framework/generated/ver300_unit_validation_report.json",
+      "execution-framework/state/VER-300_UNIT_VALIDATION.heartbeat.json",
+      "execution-framework/logs/VER-300_UNIT_VALIDATION.log",
+      "execution-framework/proof_records/VER-300_UNIT_VALIDATION.proof.json"
+    ],
+    "sha256": {
+      "approvals/VER-300_UNIT_VALIDATION.agent_approval.json": "sha256:05fcb6d281c73019c014b134ad664f9d9ff473ce867b06d5a6c8d20d23ffa267",
+      "proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json": "sha256:01c7d17dd75b558dc7e07a87a7e3f69c404b5de0e18b6ad584a600a0f595bca2",
+      "proof_records/REQ-202_FLEXNETOS_ADAPTER_RECIPE.proof.json": "sha256:9ead9702ca800e200ec4110422b50e9d2021a1dba4fb9acdc516e3ea2abdbd6f",
+      "proof_records/ART-123_VALIDATION_RECONCILIATION.proof.json": "sha256:097cf535cce29bb3212d6cd63ef504a07367c022fae466c6be8cfe2851f22503",
+      "generated/ver300_runtime_test_results.json": "sha256:4f20f3a948f6c9108efbdda67c68ca4016bafbc366b575b71c95cba2c5c5c448",
+      "generated/envctl_migration_db_validation_report.json": "sha256:2b5b6ae62ea24928cedf262293341f390ff2f10b887b6500017d8d4ce0d2af8c",
+      "generated/envctl_artifact_registry_report.json": "sha256:4aa753397664e63ba9c2e8ea248ff9ce4eb9ca18a9905a8f6e32b17ea88adb5c",
+      "generated/envctl_validation_evidence_report.json": "sha256:4685b4383f85bad8a5a9e4319615dbb4f55beba13b7dccbab94f590f4e2991e5",
+      "generated/shared_protocol_validation_report.json": "sha256:8f65e05015b453294355899fa0ab1446b83594d9b452858fd18f72a80f95ccac",
+      "generated/req041_two_repo_integration_report.json": "sha256:2cd4ff8fc4ab5539d84afaf9adf9cf89c51137fcc7fddd415e230412b51c8b94",
+      "generated/filesystem_boundary_validation_report.json": "sha256:dc524219809032b2ab7cca3c016181be0166fd12423d8b896eddbd6c122bcabe",
+      "generated/security_redaction_validation_report.json": "sha256:9b1e83155dcee5fb5a6b4998b40f49889800dc57d002fbf2c7639d531b641127",
+      "generated/flexnetos_adapter_recipe_validation_report.json": "sha256:b589f70aeb5c412c8450390dcd37d29341ab4b53609ad82929b425b8e046be9a",
+      "generated/art123_validation_reconciliation_report.json": "sha256:20b01d878ed3721703e8040d4a2a735ccdfaaa6a774df39862651328ee51cbb8",
+      "generated/art124_test_coverage_report.json": "sha256:a15b697990863c9ad7a2223f97a383db94270e492ad94e0bccb61b50ada461ee"
+    },
+    "secret_scan": {
+      "paths": [
+        "generated/ver300_unit_validation_report.json",
+        "logs/VER-300_UNIT_VALIDATION.log",
+        "scripts/verify_ver300_unit_validation.py"
+      ],
+      "findings": []
+    }
+  },
+  "checksums": {
+    "execution-framework/scripts/verify_ver300_unit_validation.py": "bbc8cff1b43f18dcbe373efcb5493e8f6aeee333af429e530ad8c41ddea41092",
+    "execution-framework/generated/ver300_runtime_test_results.json": "4f20f3a948f6c9108efbdda67c68ca4016bafbc366b575b71c95cba2c5c5c448",
+    "execution-framework/generated/ver300_unit_validation_report.json": "f4dc06d2764198fc6efa2c6a6fef7c073a8a1266d0a364b91633bcf81e02abd1",
+    "execution-framework/state/VER-300_UNIT_VALIDATION.heartbeat.json": "e46cce70fabd57941d6847eeef7be6e1f81f0a263ffe15d2bf84455b64a1fb09",
+    "execution-framework/logs/VER-300_UNIT_VALIDATION.log": "f4dc06d2764198fc6efa2c6a6fef7c073a8a1266d0a364b91633bcf81e02abd1",
+    "execution-framework/proof_records/VER-300_UNIT_VALIDATION.proof.json": "6cc8aa0d42c29be0556af4a937f3cb35d2d9c8ddb6b36a7dc680972fc56de7b8",
+    "execution-framework/proof_records/proof_ledger.jsonl": "caca1cf2de9de194dbcce7a01f6b7ee788bcc96823e846d44e5446452b598269"
+  },
+  "logs_uri": "logs/VER-300_UNIT_VALIDATION.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "approvals/VER-300_UNIT_VALIDATION.agent_approval.json",
+    "proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json",
+    "proof_records/REQ-202_FLEXNETOS_ADAPTER_RECIPE.proof.json",
+    "proof_records/ART-123_VALIDATION_RECONCILIATION.proof.json",
+    "generated/ver300_runtime_test_results.json",
+    "generated/envctl_migration_db_validation_report.json",
+    "generated/envctl_artifact_registry_report.json",
+    "generated/envctl_validation_evidence_report.json",
+    "generated/shared_protocol_validation_report.json",
+    "generated/req041_two_repo_integration_report.json",
+    "generated/filesystem_boundary_validation_report.json",
+    "generated/security_redaction_validation_report.json",
+    "generated/flexnetos_adapter_recipe_validation_report.json",
+    "generated/art123_validation_reconciliation_report.json",
+    "generated/art124_test_coverage_report.json",
+    "generated/status_report.json",
+    "generated/status_from_proofs.json",
+    "generated/final_verification_report.json"
+  ],
+  "failure_reason": "",
+  "next_action": "unblock VER-301_SQL_SCHEMA_TEST"
+}

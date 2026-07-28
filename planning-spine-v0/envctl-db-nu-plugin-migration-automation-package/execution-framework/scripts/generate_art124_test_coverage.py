@@ -60,6 +60,18 @@ def status_for(statuses: dict[str, str], task_id: str) -> str:
     return statuses.get(task_id, "unknown")
 
 
+def pending_dependencies(statuses: dict[str, str], task_ids: list[str]) -> list[str]:
+    """Return only dependencies that still need work in the status snapshot."""
+    return [task_id for task_id in task_ids if status_for(statuses, task_id) != "completed"]
+
+
+def dependency_gap(statuses: dict[str, str], task_ids: list[str], resolved_message: str) -> list[str]:
+    pending = pending_dependencies(statuses, task_ids)
+    if not pending:
+        return [resolved_message]
+    return [f"Pending dependencies: {', '.join(pending)}."]
+
+
 def evidence_hashes(paths: list[str]) -> dict[str, str | None]:
     base = package_root()
     out: dict[str, str | None] = {}
@@ -92,9 +104,11 @@ def coverage_rows(statuses: dict[str, str]) -> list[dict[str, Any]]:
             "readiness": "covered_for_ver300_entry",
             "owner": "validation-agent",
             "blocks": ["VER-300_UNIT_VALIDATION", "VER-301_SQL_SCHEMA_TEST", "VER-302_PACKET_SCHEMA_VALIDATION"],
-            "open_gaps": [
-                "Replay and rollback unit checks remain pending until REQ-026, REQ-027, and REQ-045 complete."
-            ],
+            "open_gaps": dependency_gap(
+                statuses,
+                ["REQ-026_ENVCTL_ROLLBACK_CHECKPOINTS", "REQ-027_ENVCTL_REPLAY_ENGINE", "REQ-045_RUN_REPLAY"],
+                "Replay and rollback dependencies are complete; runtime execution remains tracked by VER-300.",
+            ),
         },
         {
             "coverage_id": "TCOV-INTEGRATION-001",
@@ -117,9 +131,11 @@ def coverage_rows(statuses: dict[str, str]) -> list[dict[str, Any]]:
             "readiness": "protocol_ready_runtime_pairing_required",
             "owner": "validation-agent",
             "blocks": ["VER-300_UNIT_VALIDATION"],
-            "open_gaps": [
-                "REQ-041_TWO_REPO_INTEGRATION is pending, so this matrix does not certify a live envctl-to-nu_plugin run."
-            ],
+            "open_gaps": dependency_gap(
+                statuses,
+                ["REQ-041_TWO_REPO_INTEGRATION"],
+                "Two-repository integration dependency is complete; the live runtime pair remains a VER-300 execution gate.",
+            ),
         },
         {
             "coverage_id": "TCOV-REGRESSION-001",
@@ -142,9 +158,11 @@ def coverage_rows(statuses: dict[str, str]) -> list[dict[str, Any]]:
             "readiness": "covered_for_artifact_replay_checks",
             "owner": "validation-agent",
             "blocks": ["VER-300_UNIT_VALIDATION", "VER-303_GOAL_LOOP_COMPUTE", "VER-304_FINAL_COMPLETENESS"],
-            "open_gaps": [
-                "Full replay identity remains pending until REQ-045_RUN_REPLAY is complete."
-            ],
+            "open_gaps": dependency_gap(
+                statuses,
+                ["REQ-045_RUN_REPLAY"],
+                "Replay dependency is complete; regression replay execution remains tracked by VER-300 and later release checks.",
+            ),
         },
         {
             "coverage_id": "TCOV-PERF-001",
@@ -191,9 +209,11 @@ def coverage_rows(statuses: dict[str, str]) -> list[dict[str, Any]]:
             "readiness": "controls_ready_approval_and_replay_pending",
             "owner": "security-reproducibility-agent",
             "blocks": ["VER-300_UNIT_VALIDATION", "VER-302_PACKET_SCHEMA_VALIDATION"],
-            "open_gaps": [
-                "REQ-033_PLUGIN_HUMAN_APPROVAL and REQ-045_RUN_REPLAY are pending, so end-to-end approval/replay security is not certified here."
-            ],
+            "open_gaps": dependency_gap(
+                statuses,
+                ["REQ-033_PLUGIN_HUMAN_APPROVAL", "REQ-045_RUN_REPLAY"],
+                "Approval and replay dependencies are complete; end-to-end runtime security execution remains tracked by VER-300.",
+            ),
         },
         {
             "coverage_id": "TCOV-UAT-001",

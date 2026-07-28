@@ -1,0 +1,81 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/CODEX_BRIDGE.md",
+    "src/nu_plugin/docs/NUSHELL_PLUGIN_COMPAT.md",
+    "src/nu_plugin/docs/YAZELIX_PLACEMENT.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB011",
+    "decision": null,
+    "intent_lock_digest": "blake3:90efe9ef7ea6faa6000274762fa9af99e9608d02eb67d376cea61217f8c8058a",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB011",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB011",
+  "depends_on": [
+    "TASK-CDB009"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "bridge accepted",
+    "deterministic": true,
+    "verification_command": "Codex/Nu/Yazelix conflicts bridged"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:90efe9ef7ea6faa6000274762fa9af99e9608d02eb67d376cea61217f8c8058a"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:2db719fbba408a086a71317c1add0a4abfff2ebc9e9cc579e38ac7097c54cf9b",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB011",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB011"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB011 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/CODEX_BRIDGE.md"
+  ],
+  "task_id": "TASK-CDB011",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB011"
+}

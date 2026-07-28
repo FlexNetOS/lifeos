@@ -32,6 +32,28 @@ class GenerateInvariantPacketsTests(unittest.TestCase):
 
         self.assertEqual(checked, 11)
 
+    def test_partial_invariant_checks_never_claim_full_implementation(self) -> None:
+        for number in range(1, 20):
+            packet = generate_invariant_packets.build_packet(
+                {
+                    "number": number,
+                    "text": f"Invariant {number}",
+                    "anchor_offset": number,
+                    "anchor_sha256": f"sha-{number}",
+                },
+                "anchor-sha",
+                "2026-07-27T00:00:00+00:00",
+            )
+            self.assertTrue(packet["needs_capability_probe"])
+            self.assertIn(
+                packet["probe_class"],
+                {"partial-capability-probe", "drift-canary"},
+            )
+            self.assertIn(
+                "NOT evidence of implementation",
+                packet["completion_gate"],
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

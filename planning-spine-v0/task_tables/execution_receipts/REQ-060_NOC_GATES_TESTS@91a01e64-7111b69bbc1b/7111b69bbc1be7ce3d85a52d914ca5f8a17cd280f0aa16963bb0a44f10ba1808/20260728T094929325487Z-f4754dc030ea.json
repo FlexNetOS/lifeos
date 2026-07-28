@@ -1,0 +1,182 @@
+{
+  "agent_command": {
+    "argv": [
+      "/home/flexnetos/.nix-profile/bin/codex",
+      "exec",
+      "--sandbox",
+      "danger-full-access",
+      "--ignore-user-config",
+      "--ignore-rules",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "--model",
+      "gpt-5.6-terra",
+      "-c",
+      "model_reasoning_effort=medium",
+      "--cd",
+      "/run/user/1001/lifeos-json-task-runner/lifeos-json-full-end2end-20260728T081500Z/REQ-060_NOC_GATES_TESTS/20260728T094929325487Z-f4754dc030ea",
+      "-"
+    ],
+    "cwd": "/run/user/1001/lifeos-json-task-runner/lifeos-json-full-end2end-20260728T081500Z/REQ-060_NOC_GATES_TESTS/20260728T094929325487Z-f4754dc030ea",
+    "duration_seconds": 105.5206,
+    "exit_code": 0,
+    "finished_at": "2026-07-28T09:51:14.867659Z",
+    "started_at": "2026-07-28T09:49:29.347073Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-060_NOC_GATES_TESTS@91a01e64-7111b69bbc1b/7111b69bbc1be7ce3d85a52d914ca5f8a17cd280f0aa16963bb0a44f10ba1808/logs/20260728T094929325487Z-f4754dc030ea/stderr.log",
+      "sha256": "dbc2a616e0ac36be74da3c8b2a1a4df4a576b1944559f985399d01042056020c"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-060_NOC_GATES_TESTS@91a01e64-7111b69bbc1b/7111b69bbc1be7ce3d85a52d914ca5f8a17cd280f0aa16963bb0a44f10ba1808/logs/20260728T094929325487Z-f4754dc030ea/stdout.log",
+      "sha256": "26c86127b01023621ee50bdcba67dea520122c8a05fbe3489ab2fdce4fc8dee7"
+    },
+    "timed_out": false
+  },
+  "attempt_id": "20260728T094929325487Z-f4754dc030ea",
+  "authorization": null,
+  "cargo_target_dir": "/home/flexnetos/meta/var/cargo-target/lifeos-json-task-cargo/lifeos-json-full-end2end-20260728T081500Z/envctl-3d54311c23889bab",
+  "command": {
+    "argv": [
+      "/home/flexnetos/.nix-profile/bin/codex",
+      "exec",
+      "--sandbox",
+      "danger-full-access",
+      "--ignore-user-config",
+      "--ignore-rules",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "--model",
+      "gpt-5.6-terra",
+      "-c",
+      "model_reasoning_effort=medium",
+      "--cd",
+      "/run/user/1001/lifeos-json-task-runner/lifeos-json-full-end2end-20260728T081500Z/REQ-060_NOC_GATES_TESTS/20260728T094929325487Z-f4754dc030ea",
+      "-"
+    ],
+    "cwd": "/run/user/1001/lifeos-json-task-runner/lifeos-json-full-end2end-20260728T081500Z/REQ-060_NOC_GATES_TESTS/20260728T094929325487Z-f4754dc030ea",
+    "duration_seconds": 105.5206,
+    "exit_code": 0,
+    "finished_at": "2026-07-28T09:51:14.867659Z",
+    "started_at": "2026-07-28T09:49:29.347073Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-060_NOC_GATES_TESTS@91a01e64-7111b69bbc1b/7111b69bbc1be7ce3d85a52d914ca5f8a17cd280f0aa16963bb0a44f10ba1808/logs/20260728T094929325487Z-f4754dc030ea/stderr.log",
+      "sha256": "dbc2a616e0ac36be74da3c8b2a1a4df4a576b1944559f985399d01042056020c"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-060_NOC_GATES_TESTS@91a01e64-7111b69bbc1b/7111b69bbc1be7ce3d85a52d914ca5f8a17cd280f0aa16963bb0a44f10ba1808/logs/20260728T094929325487Z-f4754dc030ea/stdout.log",
+      "sha256": "26c86127b01023621ee50bdcba67dea520122c8a05fbe3489ab2fdce4fc8dee7"
+    },
+    "timed_out": false
+  },
+  "dependency_outputs": [
+    {
+      "capability_id": "lifeos-capability:REQ-055_ROOT_ALIAS_REFACTOR:86be1c393f8e62f5",
+      "goal": "envctl db map-root/refactor root-alias --from META_ROOT --to LIFE_OS_ROOT: build indexed snapshot, resolve token forms, emit similar-diff preview, --render-out new tree (never in place), --apply requires --confirm + approval",
+      "producer_node_id": "REQ-055_ROOT_ALIAS_REFACTOR@91a01e64-e585581fe51d",
+      "producer_packet_sha256": "e585581fe51db30fdf4a5499917ec33e04083d42778898987a0f87305cc28321",
+      "producer_task_id": "REQ-055_ROOT_ALIAS_REFACTOR",
+      "target_artifacts": [
+        "envctl db refactor root-alias command"
+      ],
+      "target_files": [
+        "crates/engine/src/db_refactor.rs",
+        "crates/cli/src/main.rs"
+      ],
+      "task_root": "/home/flexnetos/meta/src/envctl"
+    },
+    {
+      "capability_id": "lifeos-capability:REQ-056_DEPLOY_AUTOMATION:0ecb306d820a8611",
+      "goal": "envctl db deploy hooks --target $LIFE_OS_ROOT --plan/--apply: install through envctl managed component system, detect running wrappers/hooks and queue/refuse unsafe overwrites, atomic promotion + rollback",
+      "producer_node_id": "REQ-056_DEPLOY_AUTOMATION@91a01e64-7895bf1df8de",
+      "producer_packet_sha256": "7895bf1df8ded68a0d219b3fe9aec0a7961bbf55f9481044e9ce1126caa8e144",
+      "producer_task_id": "REQ-056_DEPLOY_AUTOMATION",
+      "target_artifacts": [
+        "envctl db deploy command"
+      ],
+      "target_files": [
+        "crates/engine/src/db_deploy.rs",
+        "crates/cli/src/main.rs"
+      ],
+      "task_root": "/home/flexnetos/meta/src/envctl"
+    },
+    {
+      "capability_id": "lifeos-capability:REQ-057_WATCH_INCREMENTAL:b1e84bf4bfdb473a",
+      "goal": "envctl db watch --repo-root: notify-based incremental index invalidation with poll fallback and inotify-limit awareness",
+      "producer_node_id": "REQ-057_WATCH_INCREMENTAL@91a01e64-09ca08e01d19",
+      "producer_packet_sha256": "09ca08e01d19088d98756bb5a395ee7ab77e341ae249458919cab7b3aca7a793",
+      "producer_task_id": "REQ-057_WATCH_INCREMENTAL",
+      "target_artifacts": [
+        "envctl db watch command"
+      ],
+      "target_files": [
+        "crates/engine/src/db_index.rs",
+        "crates/cli/src/main.rs"
+      ],
+      "task_root": "/home/flexnetos/meta/src/envctl"
+    },
+    {
+      "capability_id": "lifeos-capability:REQ-060_NOC_GATES_TESTS:3849acac254c3c0d",
+      "goal": "Run cargo fmt, cargo test, and repo no-C/audit gates (ci/gates/no-c.sh); componentize or feature-gate any C-introducing crate (ast-grep/tree-sitter/libsql-local)",
+      "producer_node_id": "REQ-060_NOC_GATES_TESTS@364b0aeb-7111b69bbc1b",
+      "producer_packet_sha256": "7111b69bbc1be7ce3d85a52d914ca5f8a17cd280f0aa16963bb0a44f10ba1808",
+      "producer_task_id": "REQ-060_NOC_GATES_TESTS",
+      "target_artifacts": [
+        "green fmt/test/no-c gates"
+      ],
+      "target_files": [
+        "ci/**",
+        "Cargo.toml"
+      ],
+      "task_root": "/home/flexnetos/meta/src/envctl"
+    }
+  ],
+  "depends_on": [
+    "REQ-055_ROOT_ALIAS_REFACTOR@91a01e64-e585581fe51d",
+    "REQ-056_DEPLOY_AUTOMATION@91a01e64-7895bf1df8de",
+    "REQ-057_WATCH_INCREMENTAL@91a01e64-09ca08e01d19",
+    "REQ-060_NOC_GATES_TESTS@364b0aeb-7111b69bbc1b"
+  ],
+  "diagnostic_probe": null,
+  "execution_input_sha256": "98a7a676badc21b90c087ed8a81bcbe8e246554431bc7ef7c9138ad05ba3914d",
+  "execution_mode": "json-stdin",
+  "execution_status": "completed",
+  "exit_code": 0,
+  "finished_at": "2026-07-28T09:51:14.867659Z",
+  "graph_sha256": "14814aa0715cb9793e92fafdb473d12422896b4f3fcaf11d18f2de76a0373bf1",
+  "implementation_actor": "json-stdin-executor",
+  "implementation_model": "gpt-5.3-codex-spark",
+  "implementation_model_reasoning_effort": "high",
+  "node_id": "REQ-060_NOC_GATES_TESTS@91a01e64-7111b69bbc1b",
+  "optional_execution_policy": "not_declared_optional",
+  "packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/runs/lifeos-json-full-end2end-20260728T081500Z/packets/REQ-060_NOC_GATES_TESTS@91a01e64-7111b69bbc1b.json",
+  "packet_sha256": "7111b69bbc1be7ce3d85a52d914ca5f8a17cd280f0aa16963bb0a44f10ba1808",
+  "previous_receipt_sha256": null,
+  "produced_output": {
+    "capability_id": "lifeos-capability:REQ-060_NOC_GATES_TESTS:3849acac254c3c0d",
+    "goal": "Run cargo fmt, cargo test, and repo no-C/audit gates (ci/gates/no-c.sh); componentize or feature-gate any C-introducing crate (ast-grep/tree-sitter/libsql-local)",
+    "producer_node_id": "REQ-060_NOC_GATES_TESTS@91a01e64-7111b69bbc1b",
+    "producer_task_id": "REQ-060_NOC_GATES_TESTS",
+    "target_artifacts": [
+      "green fmt/test/no-c gates"
+    ],
+    "target_files": [
+      "ci/**",
+      "Cargo.toml"
+    ],
+    "task_root": "/home/flexnetos/meta/src/envctl"
+  },
+  "receipt_sequence": 1,
+  "receipt_sha256": "sha256:2dab1ffddea768302ec4152b6ed998a16346fd1bffba81a1014e5520aec3ad1f",
+  "record_type": "execution",
+  "run_id": "lifeos-json-full-end2end-20260728T081500Z",
+  "runner_schema": "lifeos.json-task-runner.v2",
+  "schema": "lifeos.json-task-execution-receipt.v2",
+  "semantic_contract_sha256": "3849acac254c3c0d3db848890cc2236eec08d61a780934d14c0b6cd9f37e97ee",
+  "source_authority": "src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
+  "source_packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/generated/issue-414/execution_packets/REQ-060_NOC_GATES_TESTS.json",
+  "started_at": "2026-07-28T09:49:29.347073Z",
+  "status": "completed",
+  "task_id": "REQ-060_NOC_GATES_TESTS",
+  "task_root": "/home/flexnetos/meta/src/envctl",
+  "workspace_root": "/home/flexnetos/meta/src/lifeos"
+}

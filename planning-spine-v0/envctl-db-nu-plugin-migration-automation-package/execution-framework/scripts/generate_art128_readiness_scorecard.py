@@ -192,7 +192,10 @@ def build_scorecard() -> dict[str, Any]:
             "status": readiness_status(envctl_future_score),
             "weight": 0.14,
             "evidence": ["generated/status_from_proofs.json"],
-            "notes": "Validation evidence, rollback checkpoints, replay engine, and agent control API remain pending.",
+            "notes": (
+                f"{complete_count(statuses, envctl_future_tasks)}/{len(envctl_future_tasks)} validation, "
+                "rollback, replay, and agent-control prerequisite proofs are completed."
+            ),
         },
         {
             "domain": "plugin_operator_surface",
@@ -205,7 +208,10 @@ def build_scorecard() -> dict[str, Any]:
                 "proof_records/REQ-032_PLUGIN_LIVE_VISUALS.proof.json",
                 "proof_records/REQ-034_PLUGIN_STATUS_STREAMS.proof.json",
             ],
-            "notes": "Human approval remains pending while protocol, command surface, live visuals, and status streams are complete.",
+            "notes": (
+                f"{complete_count(statuses, plugin_tasks)}/{len(plugin_tasks)} plugin protocol, command, "
+                "live-visual, human-approval, and status-stream prerequisite proofs are completed."
+            ),
         },
         {
             "domain": "filesystem_security_hardening",
@@ -213,7 +219,10 @@ def build_scorecard() -> dict[str, Any]:
             "status": readiness_status(hardening_score),
             "weight": 0.1,
             "evidence": ["generated/status_from_proofs.json", "scripts/artifact_registry.py"],
-            "notes": "Blocked path checks exist in the registry, but filesystem bounds, redaction, and replay hardening are not yet proven.",
+            "notes": (
+                f"{complete_count(statuses, shared_hardening_tasks)}/{len(shared_hardening_tasks)} two-repo, "
+                "filesystem-bounds, redaction, bootstrap, and replay-hardening prerequisite proofs are completed."
+            ),
         },
         {
             "domain": "governance_artifact_readiness",
@@ -221,7 +230,10 @@ def build_scorecard() -> dict[str, Any]:
             "status": readiness_status(governance_score),
             "weight": 0.12,
             "evidence": ["generated/task_graph.csv", "generated/contract_manifest.json"],
-            "notes": "Governance artifacts are mostly pending; this task creates the readiness scorecard itself.",
+            "notes": (
+                f"{complete_count(statuses, governance_artifact_tasks)}/{len(governance_artifact_tasks)} "
+                "governance artifact tasks are completed in the proof status report."
+            ),
         },
         {
             "domain": "package_scan_and_contract_lock",

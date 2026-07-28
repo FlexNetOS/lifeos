@@ -1,0 +1,62 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW/300c8d5506002570362f064a3a78ab3c95422b53ae89cfc8dc040a681c777cf8/20260728T015651132938Z-0fffbb566227.json": "df4b2c495da0ada462a2e85d086de0d5236bf673cc941c373e16e34af26089ef",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-claude_flow/result.json": "899bc338182ffc8d2834a1ee410a08b7fb61b6338fba6da9c4dfb924dde0841b"
+  },
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'claude-flow'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'claude-flow'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'claude\\-flow@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'claude-flow'\"'\"' version'"
+  ],
+  "completed_at": "2026-07-28T01:56:52.019426Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-claude_flow/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW/300c8d5506002570362f064a3a78ab3c95422b53ae89cfc8dc040a681c777cf8/20260728T015651132938Z-0fffbb566227.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-claude_flow/result.json"
+  ],
+  "helper_id": "helper-currency-claude_flow",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW/300c8d5506002570362f064a3a78ab3c95422b53ae89cfc8dc040a681c777cf8/logs/20260728T015651132938Z-0fffbb566227",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T01:56:51.133892Z",
+  "status": "completed",
+  "task_id": "CURRENCY-CLAUDE_FLOW",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/currency-claude_flow/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-claude_flow/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T015651132938Z-0fffbb566227",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-CLAUDE_FLOW/300c8d5506002570362f064a3a78ab3c95422b53ae89cfc8dc040a681c777cf8/20260728T015651132938Z-0fffbb566227.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "df4b2c495da0ada462a2e85d086de0d5236bf673cc941c373e16e34af26089ef"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "300c8d5506002570362f064a3a78ab3c95422b53ae89cfc8dc040a681c777cf8",
+    "probe_class": "currency",
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

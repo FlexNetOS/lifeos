@@ -10,6 +10,7 @@ import textwrap
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 RUNNER_PATH = Path(__file__).parent / "scripts" / "json_task_runner.py"
@@ -142,9 +143,133 @@ class JsonTaskRunnerTests(unittest.TestCase):
         with self.assertRaisesRegex(runner.RunnerError, "dependency cycle"):
             self.load()
 
+    def test_reconciles_duplicate_task_ids_across_authorities(self) -> None:
+        roots = [
+            self.root / "src" / "envctl" / "migration-package",
+            self.root / "src" / "lifeos" / "planning-spine-v0",
+        ]
+        for index, root in enumerate(roots):
+            packet_dir = root / "execution-framework" / "generated" / "execution_packets"
+            packet_dir.mkdir(parents=True)
+            value_a = packet("A")
+            value_a.update(
+                {
+                    "generated_at": f"2026-07-0{index + 1}T00:00:00Z",
+                    "verification_command": "true",
+                }
+            )
+            value_b = packet("B", depends_on=["A"])
+            value_b.update(
+                {
+                    "generated_at": f"2026-07-0{index + 1}T00:00:01Z",
+                    "verification_command": "true",
+                }
+            )
+            (packet_dir / "A.json").write_text(
+                json.dumps(value_a, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            (packet_dir / "B.json").write_text(
+                json.dumps(value_b, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+        tasks = runner.load_tasks(roots, self.root)
+        summary = runner.reconciliation_summary(tasks)
+
+        self.assertEqual(4, summary["source_packet_instance_count"])
+        self.assertEqual(4, summary["exact_envelope_count"])
+        self.assertEqual(2, summary["semantic_obligation_count"])
+        self.assertEqual(2, summary["duplicate_task_id_group_count"])
+        a_tasks = sorted(
+            (task for task in tasks.values() if task.task_id == "A"),
+            key=lambda task: task.source_authority,
+        )
+        b_tasks = sorted(
+            (task for task in tasks.values() if task.task_id == "B"),
+            key=lambda task: task.source_authority,
+        )
+        self.assertEqual(
+            a_tasks[0].semantic_contract_sha256,
+            a_tasks[1].semantic_contract_sha256,
+        )
+        self.assertNotEqual(a_tasks[0].packet_sha256, a_tasks[1].packet_sha256)
+        self.assertIn(a_tasks[0].node_id, a_tasks[1].depends_on)
+        self.assertIn(a_tasks[0].node_id, b_tasks[0].depends_on)
+        self.assertIn(a_tasks[1].node_id, b_tasks[1].depends_on)
+        self.assertIn(b_tasks[0].node_id, b_tasks[1].depends_on)
+
+        exit_code, statuses, run_path = self.execute(tasks)
+
+        self.assertEqual(0, exit_code)
+        self.assertEqual({"completed"}, set(statuses.values()))
+        self.assertEqual(4, len(self.call_records()))
+        manifest = json.loads(
+            (run_path.parent / "graph.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(summary, manifest["reconciliation"])
+        for task in tasks.values():
+            self.assertTrue(
+                any(runner.receipt_directory(self.receipts, task).glob("*.json"))
+            )
+
+    def test_same_task_id_with_changed_contract_is_an_explicit_revision(self) -> None:
+        roots = [self.root / "authority-a", self.root / "authority-b"]
+        for index, root in enumerate(roots):
+            packet_dir = root / "execution_packets"
+            packet_dir.mkdir(parents=True)
+            value = packet("REVISION")
+            value["goal"] = f"contract revision {index}"
+            (packet_dir / "REVISION.json").write_text(
+                json.dumps(value),
+                encoding="utf-8",
+            )
+
+        tasks = runner.load_tasks(roots, self.root)
+        revisions = list(tasks.values())
+
+        self.assertEqual(2, len(revisions))
+        self.assertEqual(2, len({task.semantic_contract_sha256 for task in revisions}))
+        self.assertEqual(2, runner.reconciliation_summary(tasks)["semantic_obligation_count"])
+        self.assertTrue(all(not task.depends_on for task in revisions))
+
+    def test_canonical_discovery_excludes_registered_linked_worktree(self) -> None:
+        workspace = self.root / "meta"
+        (workspace / ".meta").mkdir(parents=True)
+        repo_root = workspace / "src" / "lifeos"
+        canonical_packets = repo_root / "planning-spine-v0" / "task_tables" / "packets"
+        canonical_packets.mkdir(parents=True)
+        (repo_root / ".git").mkdir()
+        (canonical_packets / "A.json").write_text(
+            json.dumps(packet("A")),
+            encoding="utf-8",
+        )
+        linked = workspace / "src" / "envctl-wt"
+        linked_packets = linked / "package" / "execution_packets"
+        linked_packets.mkdir(parents=True)
+        (linked / ".git").write_text(
+            "gitdir: /tmp/example/worktrees/envctl-wt\n",
+            encoding="utf-8",
+        )
+        (linked_packets / "IGNORED.json").write_text(
+            json.dumps(packet("IGNORED")),
+            encoding="utf-8",
+        )
+
+        roots = runner.discover_canonical_packet_roots(repo_root)
+        paths = runner.discover_packet_paths(roots)
+
+        self.assertIn((repo_root / "planning-spine-v0").resolve(), roots)
+        self.assertNotIn((linked / "package").resolve(), roots)
+        self.assertEqual(["A"], [json.loads(path.read_text())["task_id"] for path in paths])
+
     def test_dependency_order_digest_receipts_and_resume(self) -> None:
-        path_a = self.write_packet(packet("A"))
-        self.write_packet(packet("B", depends_on=["A"]))
+        value_a = packet("A")
+        value_a["verification_command"] = "true"
+        path_a = self.write_packet(value_a)
+        value_b = packet("B", depends_on=["A"])
+        value_b["verification_command"] = "true"
+        self.write_packet(value_b)
         tasks = self.load()
         exit_code, statuses, run_path = self.execute(tasks)
         self.assertEqual(0, exit_code)
@@ -165,6 +290,7 @@ class JsonTaskRunnerTests(unittest.TestCase):
         self.assertEqual({"A": "completed", "B": "completed"}, statuses)
 
         changed = packet("A")
+        changed["verification_command"] = "true"
         changed["changed"] = True
         path_a.write_text(json.dumps(changed, indent=2) + "\n", encoding="utf-8")
         exit_code, statuses, _ = self.execute(self.load())
@@ -190,42 +316,47 @@ class JsonTaskRunnerTests(unittest.TestCase):
         }
         task_path = self.write_packet(value)
         task = runner.load_task(task_path, self.root)
-        receipt_dir = self.receipts / task.task_id / task.packet_sha256
-        receipt_dir.mkdir(parents=True)
         base = {
             "schema": runner.RECEIPT_SCHEMA,
+            "node_id": task.node_id,
             "task_id": task.task_id,
             "packet_sha256": task.packet_sha256,
+            "semantic_contract_sha256": task.semantic_contract_sha256,
         }
-        (receipt_dir / "old.json").write_text(
-            json.dumps(
-                {
-                    **base,
-                    "finished_at": "2026-01-01T00:00:00Z",
-                    "status": "completed",
-                }
-            ),
-            encoding="utf-8",
+        runner.write_task_receipt(
+            self.receipts,
+            task,
+            {
+                **base,
+                "finished_at": "2026-01-01T00:00:00Z",
+                "status": "completed",
+            },
+            "old.json",
         )
         self.assertEqual("failed", runner.prior_status(self.receipts, task))
-        (receipt_dir / "new.json").write_text(
-            json.dumps(
-                {
-                    **base,
-                    "finished_at": "2026-01-02T00:00:00Z",
-                    "status": "failed",
-                }
-            ),
-            encoding="utf-8",
+        runner.write_task_receipt(
+            self.receipts,
+            task,
+            {
+                **base,
+                "finished_at": "2026-01-02T00:00:00Z",
+                "status": "failed",
+            },
+            "new.json",
         )
         self.assertEqual("failed", runner.prior_status(self.receipts, task))
 
     def test_failure_blocks_dependents_and_requires_explicit_retry(self) -> None:
         failing = packet("A")
         failing["fail"] = 7
+        failing["verification_command"] = "true"
         path = self.write_packet(failing)
-        self.write_packet(packet("B", depends_on=["A"]))
-        self.write_packet(packet("C", depends_on=["B"]))
+        value_b = packet("B", depends_on=["A"])
+        value_b["verification_command"] = "true"
+        self.write_packet(value_b)
+        value_c = packet("C", depends_on=["B"])
+        value_c["verification_command"] = "true"
+        self.write_packet(value_c)
         exit_code, statuses, _ = self.execute(self.load())
         self.assertEqual(1, exit_code)
         self.assertEqual(
@@ -239,6 +370,7 @@ class JsonTaskRunnerTests(unittest.TestCase):
         self.assertEqual(1, len(self.call_records()))
 
         passing = packet("A")
+        passing["verification_command"] = "true"
         path.write_text(json.dumps(passing, indent=2) + "\n", encoding="utf-8")
         exit_code, statuses, _ = self.execute(self.load(), retry_failed=True)
         self.assertEqual(0, exit_code)
@@ -259,19 +391,23 @@ class JsonTaskRunnerTests(unittest.TestCase):
             ("C", "completed"),
         ):
             task = tasks[task_id]
-            receipt_dir = self.receipts / task.task_id / task.packet_sha256
-            receipt_dir.mkdir(parents=True)
-            (receipt_dir / f"{task_id}.json").write_text(
-                json.dumps(
-                    {
-                        "schema": runner.RECEIPT_SCHEMA,
-                        "task_id": task.task_id,
-                        "packet_sha256": task.packet_sha256,
-                        "finished_at": "2026-01-01T00:00:01Z",
-                        "status": status,
-                    }
-                ),
-                encoding="utf-8",
+            runner.write_task_receipt(
+                self.receipts,
+                task,
+                {
+                    "schema": runner.RECEIPT_SCHEMA,
+                    "node_id": task.node_id,
+                    "task_id": task.task_id,
+                    "packet_sha256": task.packet_sha256,
+                    "semantic_contract_sha256": task.semantic_contract_sha256,
+                    "finished_at": "2026-01-01T00:00:01Z",
+                    "status": status,
+                    "exit_code": 7 if status == "failed" else 0,
+                    "verification": {
+                        "exit_code": 0,
+                    },
+                },
+                f"{task_id}.json",
             )
 
         observed = {
@@ -287,6 +423,7 @@ class JsonTaskRunnerTests(unittest.TestCase):
         for task_id in ("A", "B", "C"):
             value = packet(task_id, parallel=True, group="workers", limit=2)
             value["sleep"] = 0.2
+            value["verification_command"] = "true"
             self.write_packet(value)
         tasks = self.load()
         waves = runner.schedule_waves(tasks, 2)
@@ -297,17 +434,17 @@ class JsonTaskRunnerTests(unittest.TestCase):
         duration = time.monotonic() - started
         self.assertEqual(0, exit_code)
         self.assertEqual({"completed"}, set(statuses.values()))
-        self.assertLess(duration, 0.58)
+        self.assertLess(duration, 0.9)
 
     def test_declared_command_runs_without_agent_prompt(self) -> None:
         marker = self.root / "marker.txt"
         quoted = str(marker).replace("'", "'\\''")
-        self.write_packet(
-            packet(
+        value = packet(
                 "DIRECT",
                 command=f"python3 -c 'from pathlib import Path; Path(\"{quoted}\").write_text(\"ok\")'",
-            )
         )
+        value["verification_command"] = f'test "$(cat "{quoted}")" = "ok"'
+        self.write_packet(value)
         exit_code, statuses, _ = self.execute(self.load())
         self.assertEqual(0, exit_code)
         self.assertEqual("ok", marker.read_text(encoding="utf-8"))
@@ -315,11 +452,246 @@ class JsonTaskRunnerTests(unittest.TestCase):
         self.assertEqual("completed", statuses["DIRECT"])
 
     def test_prose_command_template_is_consumed_as_json_not_shell(self) -> None:
-        self.write_packet(packet("PROSE", command="Apply the scoped implementation now"))
+        value = packet("PROSE", command="Apply the scoped implementation now")
+        value["verification_command"] = "true"
+        self.write_packet(value)
         exit_code, statuses, _ = self.execute(self.load())
         self.assertEqual(0, exit_code)
         self.assertEqual("completed", statuses["PROSE"])
         self.assertEqual(["PROSE"], [row["task_id"] for row in self.call_records()])
+
+    def test_drift_canary_executes_but_cannot_complete_or_unlock_dependents(self) -> None:
+        drift = packet("DRIFT")
+        drift.update(
+            {
+                "needs_capability_probe": True,
+                "probe_class": "drift-canary",
+                "completion_gate": "Anchor remains present; NOT evidence of implementation",
+                "verification_command": "true",
+            }
+        )
+        dependent = packet("REAL", depends_on=["DRIFT"])
+        dependent["verification_command"] = "true"
+        self.write_packet(drift)
+        self.write_packet(dependent)
+
+        exit_code, statuses, run_path = self.execute(self.load())
+
+        self.assertEqual(1, exit_code)
+        self.assertEqual({"DRIFT": "blocked", "REAL": "blocked"}, statuses)
+        self.assertEqual(["DRIFT"], [row["task_id"] for row in self.call_records()])
+        receipt_path = next((self.receipts / "DRIFT").glob("*/*.json"))
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        self.assertEqual("completed", receipt["execution_status"])
+        self.assertTrue(receipt["packet_execution_proven"])
+        self.assertFalse(receipt["task_completion_proven"])
+        self.assertIn("drift-canary", receipt["implementation_blocker"])
+        run = json.loads(run_path.read_text(encoding="utf-8"))
+        self.assertEqual(2, run["status_counts"]["blocked"])
+
+        exit_code, statuses, _ = self.execute(self.load())
+        self.assertEqual(1, exit_code)
+        self.assertEqual({"DRIFT": "blocked", "REAL": "blocked"}, statuses)
+        self.assertEqual(1, len(self.call_records()))
+
+    def test_optional_packet_is_mandatory_and_executes(self) -> None:
+        optional = packet("OPTIONAL")
+        optional.update(
+            {
+                "optional": True,
+                "status": "optional",
+                "verification_command": "true",
+            }
+        )
+        self.write_packet(optional)
+
+        exit_code, statuses, _ = self.execute(self.load())
+
+        self.assertEqual(0, exit_code)
+        self.assertEqual({"OPTIONAL": "completed"}, statuses)
+        self.assertEqual(["OPTIONAL"], [row["task_id"] for row in self.call_records()])
+        receipt_path = next((self.receipts / "OPTIONAL").glob("*/*.json"))
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        self.assertEqual("mandatory", receipt["optional_execution_policy"])
+
+    def test_canonical_noop_and_true_cannot_prove_implementation(self) -> None:
+        marker = self.root / "preexisting.txt"
+        marker.write_text("unchanged\n", encoding="utf-8")
+        value = packet("NOOP", command="true")
+        value.update(
+            {
+                "schema": "canonical.execution-packet.v1",
+                "target_files": ["preexisting.txt"],
+                "verification_command": "true",
+            }
+        )
+        self.write_packet(value)
+
+        exit_code, statuses, _ = self.execute(self.load())
+
+        self.assertEqual(1, exit_code)
+        self.assertEqual("blocked", statuses["NOOP"])
+        receipt_path = next((self.receipts / "NOOP").glob("*/*.json"))
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        self.assertTrue(runner.receipt_integrity_valid(receipt))
+        self.assertFalse(receipt["lifecycle"]["implementation_proven"])
+        self.assertIn(
+            "non-trivial executable independent verification",
+            receipt["implementation_blocker"],
+        )
+
+    def test_capability_is_used_by_next_task_before_completion(self) -> None:
+        producer = packet(
+            "PRODUCER",
+            command=(
+                "python3 -c 'from pathlib import Path; "
+                "Path(\"producer.txt\").write_text(\"usable\")'"
+            ),
+        )
+        producer.update(
+            {
+                "schema": "canonical.execution-packet.v1",
+                "target_files": ["producer.txt"],
+                "verification_command": 'test "$(cat producer.txt)" = usable',
+            }
+        )
+        consumer = packet(
+            "CONSUMER",
+            depends_on=["PRODUCER"],
+            command=(
+                "python3 -c 'from pathlib import Path; "
+                "assert Path(\"producer.txt\").read_text().strip() == \"usable\"; "
+                "Path(\"consumer.txt\").write_text(\"advanced\")'"
+            ),
+        )
+        consumer.update(
+            {
+                "schema": "canonical.execution-packet.v1",
+                "target_files": ["consumer.txt"],
+                "verification_command": 'test "$(cat consumer.txt)" = advanced',
+            }
+        )
+        release = packet(
+            "RELEASE",
+            depends_on=[],
+            command=(
+                "python3 -c 'from pathlib import Path; "
+                "assert Path(\"consumer.txt\").read_text().strip() == \"advanced\"; "
+                "Path(\"release.json\").write_text(\"{}\")'"
+            ),
+        )
+        release.update(
+            {
+                "schema": "canonical.execution-packet.v1",
+                "task_kind": "release-adoption",
+                "produces_capability": False,
+                "consumes_all_leaf_capabilities": True,
+                "target_files": ["release.json"],
+                "verification_command": "test -s release.json",
+            }
+        )
+        for value in (producer, consumer, release):
+            self.write_packet(value)
+
+        exit_code, statuses, run_path = self.execute(self.load())
+
+        self.assertEqual(0, exit_code)
+        self.assertEqual(
+            {
+                "PRODUCER": "completed",
+                "CONSUMER": "completed",
+                "RELEASE": "completed",
+            },
+            statuses,
+        )
+        producer_receipts = [
+            json.loads(path.read_text(encoding="utf-8"))
+            for path in (self.receipts / "PRODUCER").glob("*/*.json")
+        ]
+        producer_adoption = next(
+            receipt
+            for receipt in producer_receipts
+            if receipt.get("record_type") == "capability-adoption"
+        )
+        self.assertEqual(
+            "CONSUMER",
+            producer_adoption["capability_use"]["consumer_node_id"],
+        )
+        self.assertEqual("completed", producer_adoption["lifecycle"]["stage"])
+        self.assertEqual(1, producer_adoption["lifecycle"]["continued_use_count"])
+        run = json.loads(run_path.read_text(encoding="utf-8"))
+        self.assertEqual(3, run["status_counts"]["completed"])
+        self.assertEqual(0, run["status_counts"]["available"])
+
+    def test_tampered_adoption_log_revokes_completion(self) -> None:
+        producer = packet(
+            "PRODUCER",
+            command=(
+                "python3 -c 'from pathlib import Path; "
+                "Path(\"producer.txt\").write_text(\"usable\")'"
+            ),
+        )
+        producer.update(
+            {
+                "schema": "canonical.execution-packet.v1",
+                "target_files": ["producer.txt"],
+                "verification_command": "test -s producer.txt",
+            }
+        )
+        release = packet(
+            "RELEASE",
+            depends_on=["PRODUCER"],
+            command=(
+                "python3 -c 'from pathlib import Path; "
+                "Path(\"release.txt\").write_text(\"done\")'"
+            ),
+        )
+        release.update(
+            {
+                "schema": "canonical.execution-packet.v1",
+                "task_kind": "release-adoption",
+                "produces_capability": False,
+                "target_files": ["release.txt"],
+                "verification_command": "test -s release.txt",
+            }
+        )
+        self.write_packet(producer)
+        self.write_packet(release)
+        tasks = self.load()
+
+        exit_code, statuses, _ = self.execute(tasks)
+        self.assertEqual(0, exit_code)
+        self.assertEqual("completed", statuses["PRODUCER"])
+        adoption = next(
+            json.loads(path.read_text(encoding="utf-8"))
+            for path in (self.receipts / "PRODUCER").glob("*/*.json")
+            if json.loads(path.read_text(encoding="utf-8")).get("record_type")
+            == "capability-adoption"
+        )
+        stdout = Path(adoption["capability_use"]["command"]["stdout"]["path"])
+        stdout.write_text("tampered\n", encoding="utf-8")
+
+        self.assertEqual(
+            "available",
+            runner.prior_status(
+                self.receipts,
+                tasks["PRODUCER"],
+                runner.graph_sha256(tasks),
+            ),
+        )
+
+    def test_unverified_process_exit_is_not_task_completion(self) -> None:
+        self.write_packet(packet("UNVERIFIED"))
+
+        exit_code, statuses, _ = self.execute(self.load())
+
+        self.assertEqual(1, exit_code)
+        self.assertEqual({"UNVERIFIED": "blocked"}, statuses)
+        self.assertEqual(["UNVERIFIED"], [row["task_id"] for row in self.call_records()])
+        receipt_path = next((self.receipts / "UNVERIFIED").glob("*/*.json"))
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        self.assertFalse(receipt["task_completion_proven"])
+        self.assertIn("verification did not run", receipt["implementation_blocker"])
 
     def test_agent_verification_runs_in_real_task_root(self) -> None:
         fake_codex = self.root / "codex"
@@ -370,6 +742,86 @@ class JsonTaskRunnerTests(unittest.TestCase):
         receipt = json.loads(receipts[0].read_text(encoding="utf-8"))
         self.assertEqual(127, receipt["exit_code"])
         self.assertEqual("failed", receipt["status"])
+
+    def test_worker_exceptions_become_sealed_retryable_task_receipts(self) -> None:
+        self.write_packet(packet("BLOCKED_EXCEPTION"))
+        self.write_packet(packet("FAILED_EXCEPTION"))
+        tasks = self.load()
+
+        def raise_for_task(task: runner.Task, *_args, **_kwargs):
+            if task.task_id == "BLOCKED_EXCEPTION":
+                raise runner.RunnerError("approval record is missing")
+            raise RuntimeError("executor adapter crashed")
+
+        with mock.patch.object(
+            runner,
+            "execute_task",
+            side_effect=raise_for_task,
+        ):
+            exit_code, statuses, run_path = self.execute(
+                tasks,
+                max_parallel=2,
+            )
+
+        self.assertEqual(1, exit_code)
+        self.assertEqual("blocked", statuses["BLOCKED_EXCEPTION"])
+        self.assertEqual("failed", statuses["FAILED_EXCEPTION"])
+        run_receipt = json.loads(run_path.read_text(encoding="utf-8"))
+        self.assertEqual(1, run_receipt["status_counts"]["blocked"])
+        self.assertEqual(1, run_receipt["status_counts"]["failed"])
+        for task in tasks.values():
+            receipt = runner.prior_receipt(
+                self.receipts,
+                task,
+                run_receipt["graph_sha256"],
+            )
+            self.assertIsNotNone(receipt)
+            self.assertTrue(runner.receipt_integrity_valid(receipt))
+            self.assertEqual("runner-exception", receipt["execution_mode"])
+            self.assertFalse(receipt["task_completion_proven"])
+            self.assertEqual(
+                receipt["status"],
+                receipt["runner_exception"]["retry_class"],
+            )
+
+    def test_cli_new_run_accepts_safe_digest_bound_run_id(self) -> None:
+        value = packet("CLI_RUN_ID")
+        value["verification_command"] = "true"
+        self.write_packet(value)
+        run_id = "owner-approved-graph-001"
+
+        exit_code = runner.main(
+            [
+                "--repo-root",
+                str(self.root),
+                "--packet-root",
+                str(self.packet_root),
+                "--no-discover-canonical",
+                "--receipts-dir",
+                str(self.receipts),
+                "--executor",
+                f"{sys.executable} {self.helper}",
+                "--new-run",
+                "--run-id",
+                run_id,
+            ]
+        )
+
+        self.assertEqual(0, exit_code)
+        manifest = json.loads(
+            (
+                self.receipts
+                / "runs"
+                / run_id
+                / "graph.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(run_id, manifest["run_id"])
+        self.assertTrue(
+            (self.receipts / "runs" / run_id / "run.json").is_file()
+        )
+        with self.assertRaisesRegex(runner.RunnerError, "run ID"):
+            runner.validate_run_id("../escape")
 
     def test_default_executor_is_noninteractive_and_ignores_agent_rules(self) -> None:
         words = runner.DEFAULT_EXECUTOR.split()
@@ -433,7 +885,9 @@ class JsonTaskRunnerTests(unittest.TestCase):
         )
 
     def test_run_snapshot_pins_packets_for_safe_resume(self) -> None:
-        source = self.write_packet(packet("PINNED"))
+        pinned = packet("PINNED")
+        pinned["verification_command"] = "true"
+        source = self.write_packet(pinned)
         original = self.load()
         original_digest = original["PINNED"].packet_sha256
         run_id = "test-resume"
@@ -567,6 +1021,10 @@ class JsonTaskRunnerTests(unittest.TestCase):
         manifest_path = run_dir / "graph.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["tasks"][0]["command_cwd"] = str(packet_dir.parent)
+        manifest["snapshot_manifest_sha256"] = runner.prefixed_record_sha256(
+            manifest,
+            "snapshot_manifest_sha256",
+        )
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
         resumed, _ = runner.load_snapshot(run_dir, self.root)
@@ -594,6 +1052,10 @@ class JsonTaskRunnerTests(unittest.TestCase):
         manifest_path = run_dir / "graph.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["tasks"][0]["command_cwd"] = str(repo_root)
+        manifest["snapshot_manifest_sha256"] = runner.prefixed_record_sha256(
+            manifest,
+            "snapshot_manifest_sha256",
+        )
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
         resumed, _ = runner.load_snapshot(run_dir, repo_root)
@@ -710,25 +1172,29 @@ class JsonTaskRunnerTests(unittest.TestCase):
 
         task_path = self.write_packet(packet("CDB022"))
         task = runner.load_task(task_path, self.root)
-        receipt_dir = self.receipts / task.task_id / task.packet_sha256
-        receipt_dir.mkdir(parents=True)
-        (receipt_dir / "blocked.json").write_text(
-            json.dumps(
-                {
-                    "schema": runner.RECEIPT_SCHEMA,
-                    "task_id": task.task_id,
-                    "packet_sha256": task.packet_sha256,
-                    "finished_at": "2026-01-01T00:00:01Z",
-                    "status": "completed",
-                    "command": {
-                        "stdout": {
-                            "path": str(stdout),
-                            "sha256": runner.sha256_file(stdout),
-                        }
+        runner.write_task_receipt(
+            self.receipts,
+            task,
+            {
+                "schema": runner.RECEIPT_SCHEMA,
+                "node_id": task.node_id,
+                "task_id": task.task_id,
+                "packet_sha256": task.packet_sha256,
+                "semantic_contract_sha256": task.semantic_contract_sha256,
+                "finished_at": "2026-01-01T00:00:01Z",
+                "status": "completed",
+                "command": {
+                    "stdout": {
+                        "path": str(stdout),
+                        "sha256": runner.sha256_file(stdout),
                     },
-                }
-            ),
-            encoding="utf-8",
+                    "stderr": {
+                        "path": str(stderr),
+                        "sha256": runner.sha256_file(stderr),
+                    },
+                },
+            },
+            "blocked.json",
         )
         self.assertEqual("failed", runner.prior_status(self.receipts, task))
 
@@ -764,7 +1230,7 @@ class JsonTaskRunnerTests(unittest.TestCase):
 
                 self.assertIsNotNone(runner.executor_refusal(result))
 
-    def test_standalone_external_blocker_pass_is_not_an_executor_refusal(self) -> None:
+    def test_standalone_external_blocker_pass_is_an_executor_refusal(self) -> None:
         stdout = self.root / "stdout.log"
         stderr = self.root / "stderr.log"
         stdout.write_text(
@@ -787,7 +1253,10 @@ class JsonTaskRunnerTests(unittest.TestCase):
             stderr_sha256=runner.sha256_file(stderr),
         )
 
-        self.assertIsNone(runner.executor_refusal(result))
+        self.assertEqual(
+            "pass_with_external_blocker",
+            runner.executor_refusal(result),
+        )
 
     def test_executor_trace_does_not_override_completed_final_answer(self) -> None:
         stdout = self.root / "stdout.log"

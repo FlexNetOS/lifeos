@@ -55,7 +55,7 @@ Validation status: `passed`
 
 ## Verification
 
-- Files scanned: `416`
+- Files scanned: `2035`
 - Pre-redaction findings: `0`
 - Sanitized files: `0`
 - Redaction fixtures passed: `5`

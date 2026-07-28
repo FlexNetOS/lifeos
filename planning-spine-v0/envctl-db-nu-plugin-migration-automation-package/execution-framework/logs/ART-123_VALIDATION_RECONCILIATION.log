@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "task_id": "ART-123_VALIDATION_RECONCILIATION",
-  "generated_at": "2026-07-27T05:01:17+00:00",
+  "generated_at": "2026-07-28T12:30:27+00:00",
   "status": "passed",
   "reconciliation": {
     "schema_version": "1.0",
     "task_id": "ART-123_VALIDATION_RECONCILIATION",
     "title": "Validation reconciliation reports",
-    "generated_at": "2026-07-27T05:01:17+00:00",
+    "generated_at": "2026-07-28T12:30:27+00:00",
     "source_inputs": {
       "target_descriptor": "generated/envctl_target_registry.json",
       "repo_scan": "generated/package_scan.json",
@@ -20,11 +20,11 @@
       "contract_manifest": "generated/contract_manifest.json"
     },
     "parity": {
-      "task_graph_rows": 80,
-      "execution_packet_count": 80,
-      "proof_record_count": 89,
-      "status_report_tasks": 80,
-      "successful_tasks": 80,
+      "task_graph_rows": 763,
+      "execution_packet_count": 763,
+      "proof_record_count": 787,
+      "status_report_tasks": 763,
+      "successful_tasks": 760,
       "missing_execution_packets": [],
       "packets_without_task_graph_rows": [],
       "successful_tasks_without_proof": [],
@@ -37,16 +37,87 @@
         "APPROVAL-REQ-045_RUN_REPLAY",
         "APPROVAL-REQ-202_FLEXNETOS_ADAPTER_RECIPE",
         "APPROVAL-VER-300_UNIT_VALIDATION",
-        "REQ-050_DB_MODULE_SCAFFOLD"
+        "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+        "CAP-INV011-002_RVF_CANONICAL_COW_FORMAT",
+        "CAP-INV011-003_COW_DB_SEMANTICS",
+        "CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP",
+        "REQ-050_DB_MODULE_SCAFFOLD",
+        "REQ-051_MULTI_ROOT_MODEL",
+        "REQ-052_FILE_INDEX",
+        "REQ-053_SYMBOL_INDEX",
+        "REQ-054_QUERY_SURFACE",
+        "REQ-055_ROOT_ALIAS_REFACTOR",
+        "REQ-056_DEPLOY_AUTOMATION",
+        "REQ-057_WATCH_INCREMENTAL",
+        "REQ-058_AGENT_JSON_CONTRACT",
+        "REQ-059_CLI_GUI_SHARED_ENGINE",
+        "REQ-060_NOC_GATES_TESTS",
+        "REQ-061_NU_PLUGIN_DB_SURFACE"
       ],
       "passed": true
     },
     "counts": {
       "by_phase": [
         {
+          "phase": "00-anchor",
+          "task_count": 15,
+          "complete_or_passed": 15,
+          "pending": 0,
+          "other": 0
+        },
+        {
+          "phase": "00-atlas",
+          "task_count": 24,
+          "complete_or_passed": 24,
+          "pending": 0,
+          "other": 0
+        },
+        {
+          "phase": "00-components",
+          "task_count": 548,
+          "complete_or_passed": 548,
+          "pending": 0,
+          "other": 0
+        },
+        {
+          "phase": "00-currency",
+          "task_count": 29,
+          "complete_or_passed": 29,
+          "pending": 0,
+          "other": 0
+        },
+        {
           "phase": "00-framework",
           "task_count": 8,
+          "complete_or_passed": 7,
+          "pending": 0,
+          "other": 1
+        },
+        {
+          "phase": "00-invariants",
+          "task_count": 19,
+          "complete_or_passed": 19,
+          "pending": 0,
+          "other": 0
+        },
+        {
+          "phase": "00-pipelines",
+          "task_count": 8,
           "complete_or_passed": 8,
+          "pending": 0,
+          "other": 0
+        },
+        {
+          "phase": "00-review",
+          "task_count": 19,
+          "complete_or_passed": 19,
+          "pending": 0,
+          "other": 0
+        },
+        {
+          "phase": "00-rules",
+          "task_count": 21,
+          "complete_or_passed": 21,
           "pending": 0,
           "other": 0
         },
@@ -95,9 +166,9 @@
         {
           "phase": "07-verification",
           "task_count": 5,
-          "complete_or_passed": 5,
+          "complete_or_passed": 3,
           "pending": 0,
-          "other": 0
+          "other": 2
         },
         {
           "phase": "08-release",
@@ -131,30 +202,30 @@
         "passed": 14
       },
       "final_verification": {
-        "task_count": 80,
-        "packet_count": 80,
-        "proof_count": 88,
+        "task_count": 763,
+        "packet_count": 763,
+        "proof_count": 787,
         "missing_outputs": 0,
         "unresolved_gaps": 0
       }
     },
     "checksums": {
       "inputs": {
-        "execution-framework/generated/envctl_target_registry.json": "f7280403b786bdb64f1db7e5b6e1cdbe2423b49c663e4272fe2d6fadf2d6d240",
-        "execution-framework/generated/package_scan.json": "44ca32f3ea0723be1e8d0cef98c43b150815d546eb19a95be58b6ba7609e1a40",
-        "execution-framework/generated/envctl_migration_db_model.json": "443308663dadb2c59daac71c4410b7adb39dda47ed4c2070d42b4b39fb7eef50",
-        "execution-framework/generated/envctl_artifact_registry_report.json": "df6874e82bf27e006f0def5d6a7877e8a4ee7e0bc575fd651385fcb0ad2c4796",
-        "execution-framework/generated/envctl_validation_evidence_report.json": "eb9d30a10073e5a6aa4f8379d9de2df1547da118fcb24149c1c7823dc5d136b3",
-        "execution-framework/generated/shared_protocol_validation_report.json": "0863b9b28e702c704c96f50a50954181f42b35aaa16e4ecb6643497093c4c4d0",
-        "execution-framework/generated/status_from_proofs.json": "f5877a781757bcacc922d41ee4aceffeb19eaa54bdbd4733f182efa12254a022",
-        "execution-framework/generated/final_verification_report.json": "290e3ef1c634f7cb6192d2023b1b39ce190a89b78b6c68ecdafcfe17e0e8e50b",
-        "execution-framework/generated/contract_manifest.json": "2f6efd26d5dc2dda57d6bedf923ead6c5ed1dec55d72214455878d657e60e0f0",
-        "execution-framework/generated/task_graph.csv": "b752be4c4cf53cb3db3daf5daaef180ec291269ce67a7bb7f0dbb2e835168009"
+        "execution-framework/generated/envctl_target_registry.json": "6a4248bfc27acf25bb6a3b0bcc2128712263d53befa316449aa0f5efd00669c8",
+        "execution-framework/generated/package_scan.json": "3694a6122897f3e11f11a60dbebe8514aa2a6e5e508a6d352324f45da9cc7159",
+        "execution-framework/generated/envctl_migration_db_model.json": "a0513aa468e1ab973cffa4834fe896094a4f9cb39fbe7976bddbe64ff70b0160",
+        "execution-framework/generated/envctl_artifact_registry_report.json": "2a4f2bc105569ff1d56fa08e6336ef518290a12ccf80622cb649cc57c6b81f90",
+        "execution-framework/generated/envctl_validation_evidence_report.json": "2e6cc1a9d25688a7234f56ad821020e88ac61efa8eb14cfed425fa02c31df71e",
+        "execution-framework/generated/shared_protocol_validation_report.json": "ff165dd56cd3919fa52e3cc059db120f9ad42756d1a02b8177021b95271228f5",
+        "execution-framework/generated/status_from_proofs.json": "9c98d93c9c6e980c0c3fe8676bcd53ee6625ef930c57fe6697b5e4b5e8fdea52",
+        "execution-framework/generated/final_verification_report.json": "8c00eac88efea4a7883beb97835f03e25ac162da327d8988bc1f31a86a1802e8",
+        "execution-framework/generated/contract_manifest.json": "ae87ddcf893f85a5376704192428173e168fa5c0d30238994d97ddc1c6a1bed5",
+        "execution-framework/generated/task_graph.csv": "28a74f19bfb416b704727f0cbec303b96d05a02671537089ce93dc8f5653a1e4"
       },
       "upstream_proofs": {
-        "execution-framework/proof_records/REQ-024_ENVCTL_ARTIFACT_REGISTRY.proof.json": "f030de39c2d15a522be7535982b9946214a2b0014d70debbacaabd53538999e1",
-        "execution-framework/proof_records/REQ-040_SHARED_PROTOCOL_SCHEMAS.proof.json": "88ecbe9517d4b24401ea1c5bbd072e1472aa0b9938c34e2c210173f521f1bea1",
-        "execution-framework/proof_records/REQ-025_ENVCTL_VALIDATION_EVIDENCE.proof.json": "4ed40308321714bfdb7c54f907718f8eaf57a50e3c1f5b06f0d17745f2a052d4"
+        "execution-framework/proof_records/REQ-024_ENVCTL_ARTIFACT_REGISTRY.proof.json": "944480f0423e076a968b56597887f10345e771089dd1cf55b342f72886dcdf42",
+        "execution-framework/proof_records/REQ-040_SHARED_PROTOCOL_SCHEMAS.proof.json": "d6eb5734b17e912db1f97e8268dc54808bcf4b27d44458cf940cff422a2f2cfa",
+        "execution-framework/proof_records/REQ-025_ENVCTL_VALIDATION_EVIDENCE.proof.json": "83a82bd0f9512df180d589e6381f2ac9d2808d2e2ad1dc35fc0c428ba8a9c776"
       }
     },
     "dependency_statuses": {
@@ -207,7 +278,7 @@
       "artifact_registry_status": "passed",
       "validation_evidence_status": "passed",
       "shared_protocol_status": "passed",
-      "final_verification_status": "pass_with_external_blocker",
+      "final_verification_status": "failed",
       "target_registry_status": "passed",
       "db_model_status": "passed",
       "package_scan_status": "available"
@@ -221,7 +292,7 @@
       "artifact_id": "art-123-validation-reconciliation-md",
       "run_id": "run-art123-validation-reconciliation",
       "path": "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.md",
-      "content_hash": "sha256:7516636c8b1e25114c70d08a60507c3902d377f893df9775aa4237c6cfa06334",
+      "content_hash": "sha256:3d4ed52fb23e187868d18a67e69e6d055a3ac4a76091d533d7a29e6d8023d401",
       "producer_operation_id": "produce-06-testing-validation-reconciliation-reports-md",
       "contract_id": "contract-full-migration-artifact-contract-1.0.0",
       "evidence_ids": [
@@ -254,7 +325,7 @@
       "artifact_id": "art-123-validation-reconciliation-json",
       "run_id": "run-art123-validation-reconciliation",
       "path": "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.json",
-      "content_hash": "sha256:ef83e3c37a4bb9fbf902581fd382c2d8fb08b33b3990974cd354229cc7cbaa4b",
+      "content_hash": "sha256:8eb20b943c2f22df06f3384690e1e813ae97937d1d950204f3fd5bbf4d6de483",
       "producer_operation_id": "produce-06-testing-validation-reconciliation-reports-md",
       "contract_id": "contract-full-migration-artifact-contract-1.0.0",
       "evidence_ids": [
@@ -287,7 +358,7 @@
       "artifact_id": "06-testing-validation-validation-reconciliation-reports-md",
       "run_id": "run-art123-validation-reconciliation",
       "path": "execution-framework/migration-artifacts/06-testing-validation/validation-reconciliation-reports.md",
-      "content_hash": "sha256:7516636c8b1e25114c70d08a60507c3902d377f893df9775aa4237c6cfa06334",
+      "content_hash": "sha256:3d4ed52fb23e187868d18a67e69e6d055a3ac4a76091d533d7a29e6d8023d401",
       "producer_operation_id": "produce-06-testing-validation-reconciliation-reports-md",
       "contract_id": "contract-full-migration-artifact-contract-1.0.0",
       "evidence_ids": [
@@ -379,11 +450,11 @@
         "validator": "generate_art123_validation_reconciliation.py:parity",
         "status": "pass",
         "details": {
-          "task_graph_rows": 80,
-          "execution_packet_count": 80,
-          "proof_record_count": 89,
-          "status_report_tasks": 80,
-          "successful_tasks": 80,
+          "task_graph_rows": 763,
+          "execution_packet_count": 763,
+          "proof_record_count": 787,
+          "status_report_tasks": 763,
+          "successful_tasks": 760,
           "missing_execution_packets": [],
           "packets_without_task_graph_rows": [],
           "successful_tasks_without_proof": [],
@@ -396,7 +467,22 @@
             "APPROVAL-REQ-045_RUN_REPLAY",
             "APPROVAL-REQ-202_FLEXNETOS_ADAPTER_RECIPE",
             "APPROVAL-VER-300_UNIT_VALIDATION",
-            "REQ-050_DB_MODULE_SCAFFOLD"
+            "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+            "CAP-INV011-002_RVF_CANONICAL_COW_FORMAT",
+            "CAP-INV011-003_COW_DB_SEMANTICS",
+            "CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP",
+            "REQ-050_DB_MODULE_SCAFFOLD",
+            "REQ-051_MULTI_ROOT_MODEL",
+            "REQ-052_FILE_INDEX",
+            "REQ-053_SYMBOL_INDEX",
+            "REQ-054_QUERY_SURFACE",
+            "REQ-055_ROOT_ALIAS_REFACTOR",
+            "REQ-056_DEPLOY_AUTOMATION",
+            "REQ-057_WATCH_INCREMENTAL",
+            "REQ-058_AGENT_JSON_CONTRACT",
+            "REQ-059_CLI_GUI_SHARED_ENGINE",
+            "REQ-060_NOC_GATES_TESTS",
+            "REQ-061_NU_PLUGIN_DB_SURFACE"
           ],
           "passed": true
         },
@@ -412,19 +498,19 @@
       "artifact_id": "06-testing-validation-validation-reconciliation-reports-md",
       "status": "complete",
       "path": "execution-framework/migration-artifacts/06-testing-validation/validation-reconciliation-reports.md",
-      "content_hash": "sha256:7516636c8b1e25114c70d08a60507c3902d377f893df9775aa4237c6cfa06334"
+      "content_hash": "sha256:3d4ed52fb23e187868d18a67e69e6d055a3ac4a76091d533d7a29e6d8023d401"
     },
     {
       "artifact_id": "art-123-validation-reconciliation-json",
       "status": "complete",
       "path": "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.json",
-      "content_hash": "sha256:ef83e3c37a4bb9fbf902581fd382c2d8fb08b33b3990974cd354229cc7cbaa4b"
+      "content_hash": "sha256:8eb20b943c2f22df06f3384690e1e813ae97937d1d950204f3fd5bbf4d6de483"
     },
     {
       "artifact_id": "art-123-validation-reconciliation-md",
       "status": "complete",
       "path": "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.md",
-      "content_hash": "sha256:7516636c8b1e25114c70d08a60507c3902d377f893df9775aa4237c6cfa06334"
+      "content_hash": "sha256:3d4ed52fb23e187868d18a67e69e6d055a3ac4a76091d533d7a29e6d8023d401"
     }
   ],
   "validation_scorecard_row": [
@@ -447,9 +533,9 @@
     "reconciliation": 1
   },
   "registered_output_hashes": {
-    "execution-framework/migration-artifacts/06-testing-validation/validation-reconciliation-reports.md": "sha256:7516636c8b1e25114c70d08a60507c3902d377f893df9775aa4237c6cfa06334",
-    "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.json": "sha256:ef83e3c37a4bb9fbf902581fd382c2d8fb08b33b3990974cd354229cc7cbaa4b",
-    "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.md": "sha256:7516636c8b1e25114c70d08a60507c3902d377f893df9775aa4237c6cfa06334"
+    "execution-framework/migration-artifacts/06-testing-validation/validation-reconciliation-reports.md": "sha256:3d4ed52fb23e187868d18a67e69e6d055a3ac4a76091d533d7a29e6d8023d401",
+    "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.json": "sha256:8eb20b943c2f22df06f3384690e1e813ae97937d1d950204f3fd5bbf4d6de483",
+    "execution-framework/migration-artifacts/art-123_validation_reconciliation/validation-reconciliation-reports.md": "sha256:3d4ed52fb23e187868d18a67e69e6d055a3ac4a76091d533d7a29e6d8023d401"
   },
   "errors": [],
   "evidence": [

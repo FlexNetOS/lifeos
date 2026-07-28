@@ -25,6 +25,7 @@
     "icm:blueprint:ingest": "bun scripts/ingest-architecture-blueprint-icm.mjs",
     "icm:blueprint:verify": "bun scripts/ingest-architecture-blueprint-icm.mjs --verify-only",
     "figma:sidebar:check": "bun scripts/verify-figma-sidebar-companion.mjs",
+    "blueprint:diagrams": "bun scripts/verify-blueprint-diagrams.mjs",
     "storage:verify": "bun scripts/verify-postgres-ruvector.mjs",
     "verify:nbverify004:claim001": "bun scripts/verify-nbverify004-claim001.mjs",
     "verify:nbverify004:claim002": "bun scripts/verify-nbverify004-claim002.mjs",
@@ -57,7 +58,7 @@
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md > design-system-reference/exports/tailwind.theme.json",
     "design:export": "bun run design:export:dtcg && bun run design:export:tailwind",
     "test:a11y": "vitest run --config vitest.a11y.config.ts",
-    "check": "svelte-check && bun run test && bun run test:a11y && bun run design:lint && bun run tauri:icons:check"
+    "check": "svelte-check && bun run test && bun run test:a11y && bun run design:lint && bun run blueprint:diagrams && bun run tauri:icons:check"
   },
   "dependencies": {
     "@lucide/vue": "^1.16.0",
@@ -69,6 +70,7 @@
   "devDependencies": {
     "@google/design.md": "0.1.1",
     "@noble/hashes": "2.2.0",
+    "@ruvector/postgres-cli": "^0.2.9",
     "@ruvector/ruvllm": "2.6.0",
     "@ruvector/rvf": "0.2.3",
     "@ruvector/sona": "0.1.7",
@@ -83,6 +85,8 @@
     "axe-core": "^4.11.4",
     "esbuild": "^0.28.0",
     "happy-dom": "^20.9.0",
+    "jsdom": "^30.0.0",
+    "mermaid": "^11.16.0",
     "ruflo": "3.32.9",
     "ruvector": "0.2.34",
     "svelte": "^5.56.7",

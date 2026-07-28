@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from _common import append_proof
+
 
 TASK_ID = "REQ-201_FLEXNETOS_LIFEOS_COMPARISON"
 ROOT = Path.cwd()
@@ -30,7 +32,6 @@ DEBUG_MAP_PATH = ROOT / "migration-artifacts" / "art-113_debug_code_map" / "debu
 REQ_200_PROOF = ROOT / "proof_records" / "REQ-200_FLEXNETOS_TARGET_DESCRIPTOR.proof.json"
 ARTIFACT_JSON = OUT_DIR / "flexnetos-lifeos-comparison.json"
 ARTIFACT_MD = OUT_DIR / "flexnetos-lifeos-comparison.md"
-PROOF_LEDGER = ROOT / "proof_records" / "proof_ledger.jsonl"
 SCRIPT_PATH = ROOT / "scripts" / "generate_flexnetos_lifeos_comparison.py"
 
 PRIMARY_ROOT = Path("/home/flexnetos/FlexNetOS")
@@ -569,17 +570,7 @@ def generate() -> None:
         "failure_reason": "" if validation["status"] == "pass" else "validation failed",
         "next_action": "Use this comparison evidence for REQ-202_FLEXNETOS_ADAPTER_RECIPE.",
     }
-    write_json(PROOF_PATH, proof)
-
-    ledger_entry = {
-        "task_id": TASK_ID,
-        "status": proof["status"],
-        "proof_uri": rel_workspace(PROOF_PATH),
-        "artifact_uri": rel_workspace(ARTIFACT_JSON),
-        "completed_at": proof["completed_at"],
-    }
-    with PROOF_LEDGER.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(ledger_entry, sort_keys=True) + "\n")
+    append_proof(proof)
 
     validation = build_validation(comparison)
     write_json(VALIDATION_PATH, validation)
@@ -602,7 +593,7 @@ def verify() -> int:
         proof["status"] = "completed" if validation["status"] == "pass" else "failed"
         proof["completed_at"] = utc_now()
         proof["failure_reason"] = "" if validation["status"] == "pass" else "validation failed"
-        write_json(PROOF_PATH, proof)
+        append_proof(proof)
     print(json.dumps(validation, indent=2, sort_keys=True))
     return 0 if validation["status"] == "pass" else 1
 

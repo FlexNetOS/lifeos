@@ -59,8 +59,10 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
         task_id: str = "COMPONENT-001_TEST",
         proof_uri: str = "proof_records/COMPONENT-001_TEST.proof.json",
         legacy_proof: bytes | None = None,
+        unresolved: bool = True,
     ) -> tuple[materializer.RunContext, runner.Task, Path, Path]:
         packet_value = {
+            "schema": "test.execution-packet.v1",
             "packet_schema_version": "1.0",
             "task_id": task_id,
             "depends_on": [],
@@ -77,9 +79,13 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
                 "migration-artifacts/component-001-test/*.md",
                 "semantic capability label",
             ],
-            "needs_capability_probe": True,
-            "probe_class": "drift-canary",
-            "completion_gate": "NOT evidence of implementation",
+            "needs_capability_probe": unresolved,
+            "probe_class": "drift-canary" if unresolved else "capability-probe",
+            "completion_gate": (
+                "NOT evidence of implementation"
+                if unresolved
+                else "command and independent verification both exit zero"
+            ),
             "helper_id": "helper-test",
             "model_tag": "gpt-5.3-codex-spark",
             "repo_path": ".",
@@ -97,21 +103,24 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
         )
         task = tasks[task_id]
         graph_digest = runner.graph_sha256(tasks)
-        runner.atomic_write_json(
-            run_dir / "run.json",
-            {
-                "schema": runner.RUN_SCHEMA,
-                "run_id": self.run_id,
-                "graph_sha256": graph_digest,
-                "task_count": 1,
-                "status_counts": {
-                    "blocked": 0,
-                    "completed": 1,
-                    "failed": 0,
-                    "pending": 0,
-                },
+        run_receipt = {
+            "schema": runner.RUN_SCHEMA,
+            "run_id": self.run_id,
+            "graph_sha256": graph_digest,
+            "task_count": 1,
+            "status_counts": {
+                "blocked": 0,
+                "completed": 1,
+                "available": 0,
+                "failed": 0,
+                "pending": 0,
             },
+        }
+        run_receipt["run_receipt_sha256"] = runner.prefixed_record_sha256(
+            run_receipt,
+            "run_receipt_sha256",
         )
+        runner.atomic_write_json(run_dir / "run.json", run_receipt)
 
         attempt_id = "20260727T000001000000Z-attempt"
         receipt_dir = (
@@ -144,18 +153,22 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
                 },
             }
 
-        receipt_path = receipt_dir / f"{attempt_id}.json"
-        runner.atomic_write_json(
-            receipt_path,
+        receipt_path = runner.write_task_receipt(
+            self.receipts_dir,
+            task,
             {
                 "schema": runner.RECEIPT_SCHEMA,
                 "runner_schema": runner.RUNNER_SCHEMA,
+                "record_type": "execution",
                 "run_id": self.run_id,
                 "attempt_id": attempt_id,
+                "node_id": task.node_id,
                 "task_id": task_id,
                 "packet_path": str(task.packet_path),
                 "source_packet_path": str(task.source_packet_path),
                 "packet_sha256": task.packet_sha256,
+                "semantic_contract_sha256": task.semantic_contract_sha256,
+                "source_authority": task.source_authority,
                 "graph_sha256": graph_digest,
                 "execution_input_sha256": task.packet_sha256,
                 "authorization": None,
@@ -164,9 +177,12 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
                 "finished_at": "2026-07-27T00:00:03Z",
                 "status": "completed",
                 "exit_code": 0,
+                "packet_execution_proven": True,
+                "task_completion_proven": True,
                 "command": command_result("command"),
                 "verification": command_result("verification"),
             },
+            f"{attempt_id}.json",
         )
 
         proof_path = (
@@ -215,18 +231,21 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
         ledger_path.write_text(legacy_ledger_line, encoding="utf-8")
 
         dry_run = materializer.materialize_run(context, write=False)
-        self.assertEqual("passed", dry_run["status"])
+        self.assertEqual("blocked", dry_run["status"])
+        self.assertEqual(1, dry_run["unresolved_implementation_obligation_count"])
         self.assertFalse(result_path.exists())
         self.assertEqual(legacy, proof_path.read_bytes())
 
         report = materializer.materialize_run(context, write=True)
-        self.assertEqual("passed", report["status"])
+        self.assertEqual("blocked", report["status"])
         self.assertEqual(1, report["validated_receipt_count"])
         self.assertEqual(1, report["receipt_result_artifact_count"])
         self.assertEqual(1, report["descriptive_artifact_declaration_count"])
 
         result = json.loads(result_path.read_text(encoding="utf-8"))
         self.assertEqual(materializer.RESULT_SCHEMA, result["schema"])
+        self.assertEqual("blocked", result["status"])
+        self.assertFalse(result["task_completion_proven"])
         self.assertEqual(context.run_id, result["orchestration"]["run_id"])
         self.assertEqual("not_claimed", result["implementation_scope"])
         self.assertIn(
@@ -239,6 +258,8 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
         self.assertEqual(materializer.MATERIALIZATION_SCHEMA, output["materialization_schema"])
         self.assertEqual(task.packet_sha256, output["packet_sha256"])
         self.assertEqual("not_claimed", output["implementation_scope"])
+        self.assertEqual("blocked", proof["status"])
+        self.assertFalse(output["task_completion_proven"])
         history_path = self.repo_root / output["preserved_task_proof"]["path"]
         self.assertEqual(legacy, history_path.read_bytes())
 
@@ -253,6 +274,42 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
         self.assertEqual(proof_bytes, proof_path.read_bytes())
         self.assertEqual(result_bytes, result_path.read_bytes())
         self.assertEqual(2, len(ledger_path.read_text(encoding="utf-8").splitlines()))
+
+    def test_capability_probe_with_independent_verification_can_complete(self) -> None:
+        context, _, proof_path, result_path = self.create_fixture(unresolved=False)
+
+        report = materializer.materialize_run(context, write=True)
+
+        self.assertEqual("passed", report["status"])
+        self.assertEqual(0, report["unresolved_implementation_obligation_count"])
+        result = json.loads(result_path.read_text(encoding="utf-8"))
+        self.assertEqual("passed", result["status"])
+        self.assertTrue(result["task_completion_proven"])
+        proof = json.loads(proof_path.read_text(encoding="utf-8"))
+        self.assertEqual("completed", proof["status"])
+        self.assertTrue(proof["verification_output"]["task_completion_proven"])
+
+    def test_classifies_artifacts_relative_to_declared_repo_path(self) -> None:
+        context, task, _, result_path = self.create_fixture()
+        declarations = [
+            (
+                self.repo_root,
+                result_path.relative_to(self.repo_root).as_posix(),
+            ),
+            (
+                self.repo_root.parent,
+                result_path.relative_to(self.repo_root.parent).as_posix(),
+            ),
+        ]
+
+        for repo_path, declaration in declarations:
+            with self.subTest(repo_path=repo_path):
+                task.packet["repo_path"] = str(repo_path)
+                task.packet["target_artifacts"] = [declaration]
+                artifacts = materializer.classify_artifacts(context, task)
+                self.assertEqual(1, len(artifacts))
+                self.assertEqual("receipt_result", artifacts[0].kind)
+                self.assertEqual(result_path.resolve(), artifacts[0].path)
 
     def test_rejects_tampered_receipt_log(self) -> None:
         context, task, _, _ = self.create_fixture()
@@ -270,7 +327,7 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(
             materializer.MaterializationError,
-            "command stdout log digest mismatch",
+            "failed integrity",
         ):
             materializer.materialize_run(context, write=False)
 
@@ -300,7 +357,7 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
         ]
         results = [process.communicate(timeout=20) for process in processes]
         for process, (stdout, stderr) in zip(processes, results, strict=True):
-            self.assertEqual(0, process.returncode, (stdout, stderr))
+            self.assertEqual(1, process.returncode, (stdout, stderr))
 
         ledger_path = self.execution_framework / "proof_records" / "proof_ledger.jsonl"
         records = [
@@ -313,6 +370,46 @@ class MaterializeRunnerProofsTests(unittest.TestCase):
             if materializer._ledger_key(record) is not None
         ]
         self.assertEqual(1, len(matching))
+
+    def test_hash_chained_proof_ledger_rejects_tampering(self) -> None:
+        context, _, _, _ = self.create_fixture(unresolved=False)
+        materializer.materialize_run(context, write=True)
+        ledger_path = (
+            self.execution_framework / "proof_records" / "proof_ledger.jsonl"
+        )
+        records = [
+            json.loads(line)
+            for line in ledger_path.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(1, records[-1]["proof_seq"])
+        self.assertTrue(records[-1]["proof_hash"].startswith("sha256:"))
+        records[-1]["status"] = "blocked"
+        ledger_path.write_text(
+            "\n".join(json.dumps(record) for record in records) + "\n",
+            encoding="utf-8",
+        )
+
+        with self.assertRaisesRegex(
+            materializer.MaterializationError,
+            "invalid proof ledger hash chain",
+        ):
+            materializer.materialize_run(context, write=False)
+
+    def test_nested_required_proof_fails_closed(self) -> None:
+        packet_path = self.packet_dir / "NESTED.json"
+        packet_path.write_text(
+            json.dumps(
+                {
+                    "schema": "test.execution-packet.v1",
+                    "task_id": "NESTED",
+                    "proof": {"required": True, "uri": None},
+                }
+            ),
+            encoding="utf-8",
+        )
+        task = runner.load_task(packet_path, self.repo_root)
+
+        self.assertTrue(materializer._proof_required(task))
 
 
 if __name__ == "__main__":

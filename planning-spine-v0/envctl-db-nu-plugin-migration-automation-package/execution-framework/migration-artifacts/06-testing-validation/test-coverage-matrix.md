@@ -2,7 +2,7 @@
 
 - Task: `ART-124_TEST_COVERAGE`
 - Target: `flexnetos-vs-lifeos`
-- Generated: `2026-07-27T21:39:17+00:00`
+- Generated: `2026-07-28T11:48:19+00:00`
 - VER-300 entry status: `ready_with_open_runtime_gates`
 - Covered classes: `6` / `6`
 
@@ -37,7 +37,7 @@
 - exercise validation evidence rows for reconciliation, parity, test results, and proof evidence
 
 Open gaps:
-- Replay and rollback unit checks remain pending until REQ-026, REQ-027, and REQ-045 complete.
+- Replay and rollback dependencies are complete; runtime execution remains tracked by VER-300.
 
 ### integration
 - create a run in envctl and read it through the plugin-shaped shared protocol records
@@ -46,7 +46,7 @@ Open gaps:
 - verify approval and replay status are represented as structured records when backing gates exist
 
 Open gaps:
-- REQ-041_TWO_REPO_INTEGRATION is pending, so this matrix does not certify a live envctl-to-nu_plugin run.
+- Two-repository integration dependency is complete; the live runtime pair remains a VER-300 execution gate.
 
 ### regression
 - re-run generation for completed artifact tasks and verify path/hash stability or intentional proof updates
@@ -55,7 +55,7 @@ Open gaps:
 - detect stale or missing canonical contract paths in migration-artifacts
 
 Open gaps:
-- Full replay identity remains pending until REQ-045_RUN_REPLAY is complete.
+- Replay dependency is complete; regression replay execution remains tracked by VER-300 and later release checks.
 
 ### performance
 - time migration application and registry insertion for representative artifact batches
@@ -73,7 +73,7 @@ Open gaps:
 - ensure generated artifacts and evidence rows carry SHA-256 hashes
 
 Open gaps:
-- REQ-033_PLUGIN_HUMAN_APPROVAL and REQ-045_RUN_REPLAY are pending, so end-to-end approval/replay security is not certified here.
+- Approval and replay dependencies are complete; end-to-end runtime security execution remains tracked by VER-300.
 
 ### UAT
 - walk the operator session template using fixture target and recipe records
@@ -89,13 +89,13 @@ Open gaps:
 | input | sha256 |
 | --- | --- |
 | `examples/target-descriptors/flexnetos-vs-lifeos.yaml` | `71f4aab77e91d0fa9a414350dee50f23fc3c6492b265c607fe9e4de93c3fe190` |
-| `execution-framework/generated/package_scan.json` | `9072d7f7537e6a876321e4efff4b87c3a1f06278689881166cb8d9180b913a73` |
-| `execution-framework/generated/envctl_migration_db_model.json` | `53942087cf05d40c288f9e12701ed30d982d661084731b3e47cf0f8397ec200a` |
-| `execution-framework/generated/envctl_artifact_registry_report.json` | `d008800edcc5eaea83ae79b045ff3fc3a0e61d16556e254631d892aa0f476c62` |
-| `execution-framework/generated/envctl_validation_evidence_report.json` | `6e6b802356a9b7858583e201a4f597264f55ad27735f355d85668340a3afc2fe` |
-| `execution-framework/generated/shared_protocol_validation_report.json` | `117062e337a85610d1122309984e8c763a14ce88d4e6ee51de345b9f121122f2` |
-| `execution-framework/generated/status_from_proofs.json` | `16d5edfea4aa4ee2c138f07cc75ec9c2d4127a409a846d5c0ceb77967319cf5f` |
-| `execution-framework/generated/contract_manifest.json` | `2f6efd26d5dc2dda57d6bedf923ead6c5ed1dec55d72214455878d657e60e0f0` |
+| `execution-framework/generated/package_scan.json` | `3694a6122897f3e11f11a60dbebe8514aa2a6e5e508a6d352324f45da9cc7159` |
+| `execution-framework/generated/envctl_migration_db_model.json` | `229c620f010631accc83df3157e2e0186aad4ac6baf4304acd7ac6ac722c6644` |
+| `execution-framework/generated/envctl_artifact_registry_report.json` | `1a85fa85eb1a4e0e7affb161b693c3f06db8a52bf7b446b031b285138186cacf` |
+| `execution-framework/generated/envctl_validation_evidence_report.json` | `c4694be4cdab69be79be88e5ee92cf8f4be86d53445d096f8562e036673b4bf5` |
+| `execution-framework/generated/shared_protocol_validation_report.json` | `305a43adc1b91d4c1cc96f157e33031a8a01176ede6138692bf0301d90b63fe0` |
+| `execution-framework/generated/status_from_proofs.json` | `28e0f0d09ea6606042ed229e66c634410efedd335f9d2141bf674637d279f595` |
+| `execution-framework/generated/contract_manifest.json` | `ae87ddcf893f85a5376704192428173e168fa5c0d30238994d97ddc1c6a1bed5` |
 
 ## Verification Entrypoints
 

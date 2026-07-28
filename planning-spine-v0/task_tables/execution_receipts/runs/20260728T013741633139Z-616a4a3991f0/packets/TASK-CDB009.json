@@ -1,0 +1,82 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/INTEGRATION_CONTRACTS.md"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB009",
+    "decision": null,
+    "intent_lock_digest": "blake3:f8a5245cd1d99234e756ba1ff5e00ff856d40e9f5d33da92e9b55eca4f5fc3e9",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB011",
+    "TASK-CDB040"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB009",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB009",
+  "depends_on": [
+    "TASK-CDB006"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "integration accepted",
+    "deterministic": true,
+    "verification_command": "Codex/Yazelix/meta/envctl/runner covered"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:f8a5245cd1d99234e756ba1ff5e00ff856d40e9f5d33da92e9b55eca4f5fc3e9"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:b249c330556c36fd22cff62b65d2980a93ee6e12a45edbf91605d8f1c6738f51",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB009",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB009"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB009 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/INTEGRATION_CONTRACTS.md"
+  ],
+  "task_id": "TASK-CDB009",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB009"
+}

@@ -1,6 +1,6 @@
 # ART-116 Infrastructure Topology Map
 
-Generated: `2026-07-27T21:38:36+00:00`
+Generated: `2026-07-28T11:33:30+00:00`
 
 This map is built from the target descriptor, generated repo/package scan, envctl database reports, and a safe filename-only scan of the target filesystem. It records repo evidence and database control-plane topology; it does not claim live cloud/runtime inventory unless that evidence is present.
 

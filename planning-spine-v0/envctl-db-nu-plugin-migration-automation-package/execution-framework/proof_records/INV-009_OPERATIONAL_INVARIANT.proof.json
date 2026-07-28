@@ -1,29 +1,67 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "INV-009_OPERATIONAL_INVARIANT",
-  "status": "passed",
-  "proof_type": "live_system_query",
-  "completed_at": "2026-07-27T21:24:36Z",
-  "actor": "codex-cli-background-shell",
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-009_OPERATIONAL_INVARIANT/bb58be49c681c720883ba3637367ac24472911abb7531ff2afc9738768e50606/20260727T234858630246Z-72b46f7bcd6d.json": "55ba85d21da73c820698a1143f15a441449a88cb0a2f563c099e5ab811d089d5",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-009/result.json": "2e507948b055baece22c9ccb1afc50afd7d1fe3976fde420d50dcfcbdc268366"
+  },
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T234858483758Z-8997b4a16b78/INV-009_OPERATIONAL_INVARIANT/20260727T234858630246Z-72b46f7bcd6d -",
+    "/bin/bash -lc 'test -d /home/flexnetos/meta/var/lib/agentdb || test -d /home/flexnetos/meta/var/lib/ruvector'"
+  ],
+  "completed_at": "2026-07-27T23:49:38.473110Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-009/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-009_OPERATIONAL_INVARIANT/bb58be49c681c720883ba3637367ac24472911abb7531ff2afc9738768e50606/20260727T234858630246Z-72b46f7bcd6d.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/INV-009_OPERATIONAL_INVARIANT/f6e7e8c4c073e0a626a1d5e65a09fbd69db4f266c366b943651c0ed136bb4534.proof.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-009/result.json"
+  ],
   "helper_id": "helper-invariant-09",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-009_OPERATIONAL_INVARIANT/bb58be49c681c720883ba3637367ac24472911abb7531ff2afc9738768e50606/logs/20260727T234858630246Z-72b46f7bcd6d",
   "model_tag": "gpt-5.3-spark",
-  "repo_path": "/run/user/1001/lifeos-json-task-runner/20260727T212315401740Z-f7b145f5f97d/INV-009_OPERATIONAL_INVARIANT/20260727T212404553545Z-b6c0d206055d",
-  "verification_command": "test -d /home/flexnetos/meta/var/lib/agentdb || test -d /home/flexnetos/meta/var/lib/ruvector",
-  "command": "PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc 'select extensions.ruvector_simd_info()'",
-  "evidence": {
-    "agentdb_exists": true,
-    "ruvector_dir_exists": false,
-    "ruvector_simd_info": {
-      "architecture": "x86_64",
-      "active": "avx512",
-      "features": [
-        "avx512f",
-        "avx512vl",
-        "avx2",
-        "fma",
-        "sse4.2"
-      ],
-      "floats_per_op": 16
-    }
+  "next_action": "cross-check the probe against every invariant clause before claiming implementation",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T23:48:58.666053Z",
+  "status": "completed",
+  "task_id": "INV-009_OPERATIONAL_INVARIANT",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/inv-009/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-009/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The declared live invariant command and its verification exited zero; this proves that probe, not every semantic clause of the invariant.",
+    "implementation_scope": "declared_live_probe_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T234858630246Z-72b46f7bcd6d",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-009_OPERATIONAL_INVARIANT/bb58be49c681c720883ba3637367ac24472911abb7531ff2afc9738768e50606/20260727T234858630246Z-72b46f7bcd6d.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "55ba85d21da73c820698a1143f15a441449a88cb0a2f563c099e5ab811d089d5"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "bb58be49c681c720883ba3637367ac24472911abb7531ff2afc9738768e50606",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/INV-009_OPERATIONAL_INVARIANT/f6e7e8c4c073e0a626a1d5e65a09fbd69db4f266c366b943651c0ed136bb4534.proof.json",
+      "sha256": "f6e7e8c4c073e0a626a1d5e65a09fbd69db4f266c366b943651c0ed136bb4534"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
   }
 }

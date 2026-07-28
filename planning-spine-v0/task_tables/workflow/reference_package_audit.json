@@ -1,5 +1,5 @@
 {
-  "actual_self_excluding_file_count": 891,
+  "actual_self_excluding_file_count": 3088,
   "admissible_as_lifeos_completion": false,
   "agent_approvals": [
     {
@@ -77,11 +77,11 @@
     },
     {
       "passed": true,
-      "test": "pass_no_gaps_is_rejected"
+      "test": "pass_no_gaps_is_rejected_when_present"
     },
     {
       "passed": true,
-      "test": "local_package_complete_is_rejected"
+      "test": "local_package_complete_is_rejected_when_present"
     },
     {
       "classification": "review_evidence_only",
@@ -89,8 +89,8 @@
       "test": "no_reference_status_or_proof_promoted_to_lifeos"
     }
   ],
-  "declared_entry_count": 891,
-  "declared_file_count": 891,
+  "declared_entry_count": 3088,
+  "declared_file_count": 3088,
   "duplicate_manifest_paths": [],
   "errors": [],
   "hash_or_size_drift": [],
@@ -115,10 +115,10 @@
   "missing_from_manifest": [],
   "namespaces": [
     {
-      "import_policy": "provenance-only; never merge with CDB WorkOrders",
-      "namespace": "reference-framework",
+      "import_policy": "provenance-only; authority-instance identity is retained and never merged with CDB WorkOrders",
+      "namespace": "reference-framework-expanded",
       "source": "execution-framework/generated/task_graph.csv",
-      "task_count": 80
+      "task_count": 763
     },
     {
       "import_policy": "provenance-only; never merge with CDB WorkOrders",
@@ -139,21 +139,22 @@
     "agent_approval_classification": "review_evidence_only",
     "agent_approval_record_count": 8,
     "derived_terminal_status_counts": {
-      "completed": 78,
-      "passed": 2
+      "completed": 763
     },
-    "derived_terminal_task_count": 80,
-    "execution_packet_count": 80,
+    "derived_terminal_task_count": 763,
+    "execution_manifest_packet_count": 763,
+    "execution_manifest_task_count": 763,
+    "execution_packet_count": 763,
     "framework_graph_source_status_counts": {
       "complete": 4,
-      "pending": 76
+      "pending": 759
     },
-    "framework_graph_task_count": 80,
+    "framework_graph_task_count": 763,
     "human_required_task_count": 8,
     "merged_proof_count": 88,
     "merged_proof_distinct_task_count": 88,
-    "proof_file_count": 88,
-    "proof_ledger_row_count": 92
+    "proof_file_count": 787,
+    "proof_ledger_row_count": 879
   },
   "status": "passed",
   "unsafe_completion_claims": [
@@ -162,12 +163,6 @@
       "disposition": "rejected_as_lifeos_completion",
       "source": "execution-framework/generated/live_drive_gap_closure_report.json#/status",
       "source_value": "pass_no_gaps_drive_live_synchronized"
-    },
-    {
-      "claim_type": "local_package_complete",
-      "disposition": "rejected_as_lifeos_completion",
-      "source": "execution-framework/generated/final_verification_report.json#/local_package_complete",
-      "source_value": true
     }
   ]
 }

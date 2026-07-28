@@ -1,0 +1,59 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "REQ-043_SECURITY_REDACTION",
+  "status": "completed",
+  "started_at": "2026-07-28T09:59:12+00:00",
+  "completed_at": "2026-07-28T09:59:40+00:00",
+  "actor": "security-agent",
+  "helper_id": "helper-security-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "..",
+  "files_changed": [
+    "execution-framework/scripts/redaction_controls.py",
+    "execution-framework/scripts/verify_security_redaction.py",
+    "execution-framework/generated/security_redaction_controls.json",
+    "execution-framework/generated/security_redaction_validation_report.json",
+    "execution-framework/docs/SECURITY_REDACTION.md",
+    "execution-framework/state/REQ-043_SECURITY_REDACTION.heartbeat.json",
+    "execution-framework/logs/REQ-043_SECURITY_REDACTION.log",
+    "execution-framework/logs/REQ-043_SECURITY_REDACTION.codex-exec.stdout.log",
+    "execution-framework/proof_records/REQ-043_SECURITY_REDACTION.proof.json",
+    "execution-framework/proof_records/proof_ledger.jsonl"
+  ],
+  "commands_run": [
+    "python3 scripts/verify_security_redaction.py",
+    "python3 -m json.tool generated/security_redaction_controls.json",
+    "python3 -m json.tool generated/security_redaction_validation_report.json",
+    "test -f proof_records/REQ-043_SECURITY_REDACTION.proof.json"
+  ],
+  "verification_output": {
+    "status": "passed",
+    "pattern_count": 11,
+    "files_scanned": 1935,
+    "pre_redaction_finding_count": 0,
+    "sanitized_file_count": 0,
+    "secret_finding_count": 0,
+    "redaction_fixture_count": 5,
+    "blocked_path_probe_count": 5
+  },
+  "checksums": {
+    "execution-framework/scripts/redaction_controls.py": "e5f5356fec05285341e04c95df56b8da51ca6051b2311094d150789531b52815",
+    "execution-framework/scripts/verify_security_redaction.py": "409f70be35cebdd2304d8efe4c8bd2722d55a2d96b5a9de6b4559f8690164ee2",
+    "execution-framework/generated/security_redaction_controls.json": "039fa5614729fb06334952f937c64a56430472ab72e4bc6ec66bb165188d59a3",
+    "execution-framework/generated/security_redaction_validation_report.json": "22a64a1af75209f3e0310b5be725461de7beb6d7b55641c33fda979b09086851",
+    "execution-framework/docs/SECURITY_REDACTION.md": "08237a98cc9e2b7eca0f232803f869974383eb92a7f8825e6e8d58aaa4d2b5c5",
+    "execution-framework/state/REQ-043_SECURITY_REDACTION.heartbeat.json": "e0da4b0a647aa00f05009a125b74e3315002da05b8f0689a6179ef9df99daa78",
+    "execution-framework/logs/REQ-043_SECURITY_REDACTION.log": "3343cded4878243766e3c1a9079638d58bd7804b5dc42fcb840059c9d683eb22",
+    "execution-framework/logs/REQ-043_SECURITY_REDACTION.codex-exec.stdout.log": "6f3fbf1fd6db55286f99f13d2c07b64b54a59741845c6e21acd872f050434c5d"
+  },
+  "logs_uri": "logs/REQ-043_SECURITY_REDACTION.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "generated/security_redaction_controls.json",
+    "generated/security_redaction_validation_report.json",
+    "docs/SECURITY_REDACTION.md",
+    "logs/REQ-043_SECURITY_REDACTION.log"
+  ],
+  "failure_reason": "",
+  "next_action": ""
+}

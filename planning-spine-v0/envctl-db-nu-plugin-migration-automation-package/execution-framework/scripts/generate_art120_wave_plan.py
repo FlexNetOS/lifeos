@@ -509,7 +509,7 @@ def main() -> None:
         write_text(path, markdown)
     write_json(TASK_JSON, payload)
 
-    conn = sqlite3.connect(":memory:")
+    conn = sqlite3.connect(root() / "generated" / "envctl.db")
     apply_migrations(conn, package_root())
     insert_fixture(conn)
     registry_results, artifact_rows = register_artifacts(conn, payload)

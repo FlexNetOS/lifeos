@@ -1,0 +1,57 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-057_WATCH_INCREMENTAL/09ca08e01d19088d98756bb5a395ee7ab77e341ae249458919cab7b3aca7a793/20260727T122841470602Z-f915b2c5e259.json": "77357e6f0359c2a57da55a168126b787c3750af4b1cb8ee3a902e5bfc71a8e4a"
+  },
+  "commands_run": [
+    "codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --cd /run/user/1001/lifeos-json-task-runner/20260727T033323851132Z-b4e24d277985/REQ-057_WATCH_INCREMENTAL/20260727T122841470602Z-f915b2c5e259 -",
+    "/bin/bash -lc 'cargo test -p envctl-engine db_watch'"
+  ],
+  "completed_at": "2026-07-27T12:35:37.485054Z",
+  "evidence": [
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-057_WATCH_INCREMENTAL/09ca08e01d19088d98756bb5a395ee7ab77e341ae249458919cab7b3aca7a793/20260727T122841470602Z-f915b2c5e259.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [],
+  "helper_id": "helper-req-057_watch_incremental",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-057_WATCH_INCREMENTAL/09ca08e01d19088d98756bb5a395ee7ab77e341ae249458919cab7b3aca7a793/logs/20260727T122841470602Z-f915b2c5e259",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": "${ENVCTL_REPO}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T12:28:41.480842Z",
+  "status": "completed",
+  "task_id": "REQ-057_WATCH_INCREMENTAL",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "envctl db watch command",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T122841470602Z-f915b2c5e259",
+      "graph_sha256": "c1191ba7886c0a1ac8e854b54601dc7772c29d1653645636c107e3472e2efb6c",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-057_WATCH_INCREMENTAL/09ca08e01d19088d98756bb5a395ee7ab77e341ae249458919cab7b3aca7a793/20260727T122841470602Z-f915b2c5e259.json",
+      "run_id": "20260727T033323851132Z-b4e24d277985",
+      "sha256": "77357e6f0359c2a57da55a168126b787c3750af4b1cb8ee3a902e5bfc71a8e4a"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "09ca08e01d19088d98756bb5a395ee7ab77e341ae249458919cab7b3aca7a793",
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

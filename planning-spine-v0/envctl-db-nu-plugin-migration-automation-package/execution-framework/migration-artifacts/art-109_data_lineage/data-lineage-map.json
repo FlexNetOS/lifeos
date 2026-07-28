@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "task_id": "ART-109_DATA_LINEAGE",
   "title": "Data Lineage Map",
-  "generated_at": "2026-07-27T04:55:13+00:00",
+  "generated_at": "2026-07-28T11:29:14+00:00",
   "target": {
     "repo_target": "filesystem",
     "repo_path": "${MIGRATION_TARGET_ROOT}",
@@ -12,7 +12,7 @@
     "field_count": 183,
     "critical_field_count": 27,
     "sql_table_count": 16,
-    "schema_source_count": 37,
+    "schema_source_count": 48,
     "target_files_scanned": 2500,
     "fields_with_target_references": 44,
     "protocol_record_count": 14
@@ -4957,6 +4957,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ArtifactRecord",
             "record": "ArtifactRecord",
             "required": true
@@ -4964,6 +4969,11 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ValidationResult",
             "record": "ValidationResult",
+            "required": false
+          },
+          {
+            "source": "execution-framework/schemas/validation_result.schema.json",
+            "record": "envctl Migration Validation Result",
             "required": false
           }
         ]
@@ -5251,6 +5261,11 @@
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/TargetDescriptor",
             "record": "TargetDescriptor",
             "required": false
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
+            "required": false
           }
         ]
       },
@@ -5392,6 +5407,11 @@
         "schemas": [
           {
             "source": "schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": false
+          },
+          {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
             "record": "envctl Migration Artifact Record",
             "required": false
           },
@@ -5948,6 +5968,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": false
@@ -6097,6 +6122,16 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": false
+          },
+          {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": false
@@ -6109,6 +6144,11 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ValidationResult",
             "record": "ValidationResult",
+            "required": false
+          },
+          {
+            "source": "execution-framework/schemas/validation_result.schema.json",
+            "record": "envctl Migration Validation Result",
             "required": false
           }
         ]
@@ -6516,6 +6556,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ArtifactRecord",
             "record": "ArtifactRecord",
             "required": false
@@ -6714,6 +6759,26 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/migration_recipe.schema.json#/$defs/operation",
+            "record": "operation",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/Operation",
             "record": "Operation",
             "required": true
@@ -6721,16 +6786,6 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
-            "required": false
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ApprovalRequest",
-            "record": "ApprovalRequest",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/EvidenceRecord",
-            "record": "EvidenceRecord",
             "required": false
           }
         ]
@@ -7016,6 +7071,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/filesystem_boundaries.schema.json#/$defs/workspace",
             "record": "workspace",
             "required": true
@@ -7164,6 +7224,11 @@
         "schemas": [
           {
             "source": "schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": false
+          },
+          {
+            "source": "execution-framework/schemas/run_event.schema.json",
             "record": "envctl Migration Run Event",
             "required": false
           },
@@ -7317,6 +7382,11 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/TargetDescriptor",
             "record": "TargetDescriptor",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
             "required": true
           }
         ]
@@ -7743,6 +7813,11 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/migration_recipe.schema.json",
+            "record": "envctl Migration Recipe",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/MigrationRecipe",
             "record": "MigrationRecipe",
             "required": true
@@ -8056,6 +8131,21 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/migration_recipe.schema.json#/$defs/operation",
+            "record": "operation",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/Operation",
             "record": "Operation",
             "required": true
@@ -8297,28 +8387,28 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/Operation",
             "record": "Operation",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
-            "record": "RunEvent",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ArtifactRecord",
-            "record": "ArtifactRecord",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ApprovalRequest",
-            "record": "ApprovalRequest",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ValidationResult",
-            "record": "ValidationResult",
             "required": true
           }
         ]
@@ -8661,6 +8751,21 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/proof_record.schema.json",
             "record": "ProofRecord",
             "required": true
@@ -8668,21 +8773,6 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/Operation",
             "record": "Operation",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ProofRecord",
-            "record": "ProofRecord",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ArtifactRecord",
-            "record": "ArtifactRecord",
-            "required": true
-          },
-          {
-            "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ApprovalRequest",
-            "record": "ApprovalRequest",
             "required": true
           }
         ]
@@ -8855,6 +8945,11 @@
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/MigrationRun",
             "record": "MigrationRun",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
+            "required": true
           }
         ]
       },
@@ -9002,6 +9097,11 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ValidationResult",
             "record": "ValidationResult",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/validation_result.schema.json",
+            "record": "envctl Migration Validation Result",
             "required": true
           }
         ]
@@ -9174,6 +9274,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": false
@@ -9321,6 +9426,11 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": true
@@ -9402,6 +9512,11 @@
             "source": "schemas/target_descriptor.schema.json#/$defs/safety",
             "record": "safety",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json#/$defs/safety",
+            "record": "safety",
+            "required": true
           }
         ]
       },
@@ -9422,6 +9537,11 @@
         "schemas": [
           {
             "source": "schemas/target_descriptor.schema.json#/$defs/safety",
+            "record": "safety",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json#/$defs/safety",
             "record": "safety",
             "required": true
           }
@@ -9481,6 +9601,11 @@
         "schemas": [
           {
             "source": "schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/approval_request.schema.json",
             "record": "envctl Migration Approval Request",
             "required": true
           },
@@ -9657,6 +9782,11 @@
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/TargetDescriptor",
             "record": "TargetDescriptor",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
+            "required": true
           }
         ]
       },
@@ -9685,6 +9815,11 @@
         "schemas": [
           {
             "source": "schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": false
+          },
+          {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
             "record": "envctl Migration Artifact Record",
             "required": false
           },
@@ -10348,6 +10483,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ApprovalRequest",
             "record": "ApprovalRequest",
             "required": false
@@ -10408,6 +10548,11 @@
             "source": "schemas/target_descriptor.schema.json#/$defs/safety",
             "record": "safety",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json#/$defs/safety",
+            "record": "safety",
+            "required": true
           }
         ]
       },
@@ -10435,6 +10580,11 @@
             "source": "execution-framework/schemas/execution_packet.schema.json",
             "record": "ExecutionPacket",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/migration_recipe.schema.json#/$defs/phase",
+            "record": "phase",
+            "required": false
           },
           {
             "source": "execution-framework/schemas/task_graph.schema.json",
@@ -10865,6 +11015,11 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": true
@@ -10896,6 +11051,11 @@
         "schemas": [
           {
             "source": "schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/run_event.schema.json",
             "record": "envctl Migration Run Event",
             "required": true
           },
@@ -11801,6 +11961,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/Operation",
             "record": "Operation",
             "required": false
@@ -12084,6 +12249,11 @@
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/MigrationRun",
             "record": "MigrationRun",
             "required": false
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json#/$defs/safety",
+            "record": "safety",
+            "required": true
           }
         ]
       },
@@ -12279,6 +12449,11 @@
             "source": "schemas/target_descriptor.schema.json#/$defs/namedVersion",
             "record": "namedVersion",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json#/$defs/namedVersion",
+            "record": "namedVersion",
+            "required": true
           }
         ]
       },
@@ -12465,6 +12640,16 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/migration_recipe.schema.json#/$defs/operation",
+            "record": "operation",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/Operation",
             "record": "Operation",
             "required": true
@@ -12488,6 +12673,11 @@
         "schemas": [
           {
             "source": "schemas/migration_recipe.schema.json#/$defs/phase",
+            "record": "phase",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/migration_recipe.schema.json#/$defs/phase",
             "record": "phase",
             "required": true
           }
@@ -12526,6 +12716,11 @@
         "schemas": [
           {
             "source": "schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": false
+          },
+          {
+            "source": "execution-framework/schemas/operation.schema.json",
             "record": "envctl Migration Operation",
             "required": false
           },
@@ -12855,6 +13050,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/operation.schema.json",
+            "record": "envctl Migration Operation",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/Operation",
             "record": "Operation",
             "required": false
@@ -13016,6 +13216,11 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": true
@@ -13087,6 +13292,11 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": false
@@ -13115,6 +13325,11 @@
         "schemas": [
           {
             "source": "schemas/migration_recipe.schema.json#/$defs/phase",
+            "record": "phase",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/migration_recipe.schema.json#/$defs/phase",
             "record": "phase",
             "required": true
           }
@@ -13250,6 +13465,11 @@
         "schemas": [
           {
             "source": "schemas/migration_recipe.schema.json",
+            "record": "envctl Migration Recipe",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/migration_recipe.schema.json",
             "record": "envctl Migration Recipe",
             "required": true
           },
@@ -13470,6 +13690,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ApprovalRequest",
             "record": "ApprovalRequest",
             "required": false
@@ -13509,6 +13734,11 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/TargetDescriptor",
             "record": "TargetDescriptor",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
             "required": true
           }
         ]
@@ -13884,6 +14114,11 @@
             "required": false
           },
           {
+            "source": "execution-framework/schemas/approval_request.schema.json",
+            "record": "envctl Migration Approval Request",
+            "required": false
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ApprovalRequest",
             "record": "ApprovalRequest",
             "required": false
@@ -14119,6 +14354,11 @@
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/TargetDescriptor",
             "record": "TargetDescriptor",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
+            "required": true
           }
         ]
       },
@@ -14206,6 +14446,11 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/migration_recipe.schema.json",
+            "record": "envctl Migration Recipe",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/TargetDescriptor",
             "record": "TargetDescriptor",
             "required": true
@@ -14219,6 +14464,11 @@
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/MigrationRun",
             "record": "MigrationRun",
             "required": false
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
+            "required": true
           },
           {
             "source": "execution-framework/schemas/upgrade_report.schema.json",
@@ -14475,6 +14725,11 @@
             "source": "execution-framework/schemas/execution_packet.schema.json",
             "record": "ExecutionPacket",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/task_graph.schema.json",
+            "record": "TaskGraphRow",
+            "required": false
           }
         ]
       },
@@ -14888,6 +15143,11 @@
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/TargetDescriptor",
             "record": "TargetDescriptor",
             "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json",
+            "record": "envctl Migration Target Descriptor",
+            "required": true
           }
         ]
       },
@@ -15066,6 +15326,11 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/run_event.schema.json",
+            "record": "envctl Migration Run Event",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/RunEvent",
             "record": "RunEvent",
             "required": true
@@ -15097,6 +15362,11 @@
         "schemas": [
           {
             "source": "schemas/artifact_record.schema.json",
+            "record": "envctl Migration Artifact Record",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/artifact_record.schema.json",
             "record": "envctl Migration Artifact Record",
             "required": true
           },
@@ -15283,6 +15553,11 @@
           {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/ValidationResult",
             "record": "ValidationResult",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/validation_result.schema.json",
+            "record": "envctl Migration Validation Result",
             "required": true
           }
         ]
@@ -15480,8 +15755,18 @@
             "required": true
           },
           {
+            "source": "execution-framework/schemas/migration_recipe.schema.json",
+            "record": "envctl Migration Recipe",
+            "required": true
+          },
+          {
             "source": "execution-framework/schemas/shared_protocol.schema.json#/$defs/MigrationRecipe",
             "record": "MigrationRecipe",
+            "required": true
+          },
+          {
+            "source": "execution-framework/schemas/target_descriptor.schema.json#/$defs/namedVersion",
+            "record": "namedVersion",
             "required": true
           }
         ]
@@ -15655,7 +15940,7 @@
         {
           "name": "ProofRecord",
           "schema_ref": "schemas/shared_protocol.schema.json#/$defs/ProofRecord",
-          "source_schema": "execution-framework/schemas/proof_record.schema.json",
+          "source_schema": "schemas/proof_record.schema.json",
           "source_of_truth": "execution_framework_proof_records",
           "producer": "envctl",
           "consumer": "nu_plugin",

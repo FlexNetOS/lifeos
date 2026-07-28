@@ -215,6 +215,7 @@ def create_database(database: str) -> None:
 def apply_migration(database: str, version: int) -> None:
     matches = sorted(MIGRATIONS.glob(f"{version:04d}_*.sql"))
     assert_true(len(matches) == 1, f"expected one migration for version {version}")
+    role_prefix = ["-c", "SET ROLE lifeos_migrator"] if version <= 10 else []
     run_raw(
         [
             "psql",
@@ -225,8 +226,7 @@ def apply_migration(database: str, version: int) -> None:
             "-X",
             "-v",
             "ON_ERROR_STOP=1",
-            "-c",
-            "SET ROLE lifeos_migrator",
+            *role_prefix,
             "-f",
             str(matches[0]),
         ]
@@ -243,6 +243,21 @@ def json_result(value: str) -> dict[str, Any]:
     parsed = json.loads(value)
     assert_true(isinstance(parsed, dict), "expected JSON object result")
     return parsed
+
+
+def cow_relation(database: str, qualified_name: str) -> str:
+    assert_true(
+        re.fullmatch(r"lifeos_(?:blob|runtime|rvf)\.[a-z_]+", qualified_name)
+        is not None,
+        f"unsafe COW relation name: {qualified_name}",
+    )
+    schema, name = qualified_name.split(".", 1)
+    preserved = f"{schema}.{name}_pre_s16"
+    exists = scalar(
+        database,
+        f"SELECT (to_regclass({sql_text(preserved)}) IS NOT NULL)::integer",
+    )
+    return preserved if exists == "1" else qualified_name
 
 
 def relation() -> str:
@@ -294,9 +309,10 @@ def create_child(database: str, tenant: str, parent: str, label: str) -> str:
 
 
 def row_digest(database: str, tenant: str, branch: str, member: str) -> str:
+    branch_table = cow_relation(database, "lifeos_runtime.branch")
     generation = scalar(
         database,
-        f"SELECT head_generation FROM lifeos_runtime.branch "
+        f"SELECT head_generation FROM {branch_table} "
         f"WHERE branch_id={sql_text(branch)}::uuid",
         role="lifeos_migrator",
         tenant=tenant,
@@ -376,9 +392,10 @@ def promote(
 
 
 def verify_witness_chain(database: str, tenant: str) -> None:
+    object_table = cow_relation(database, "lifeos_blob.object")
     invalid = scalar(
         database,
-        """
+        f"""
         WITH ordered AS (
           SELECT witness.branch_id, witness.sequence,
                  witness.previous_shake256,
@@ -388,7 +405,7 @@ def verify_witness_chain(database: str, tenant: str) -> None:
                  witness.entry_shake256,
                  preimage.raw_bytes
           FROM lifeos_agent.branch_witness witness
-          JOIN lifeos_blob.object preimage
+          JOIN {object_table} preimage
             ON preimage.id = witness.preimage_object_id
           WHERE witness.tenant_id = current_setting('lifeos.tenant_id')::uuid
         )
@@ -407,6 +424,11 @@ def verify_witness_chain(database: str, tenant: str) -> None:
 
 def verify_fresh(database: str) -> dict[str, Any]:
     checks: list[str] = []
+    branch_table = cow_relation(database, "lifeos_runtime.branch")
+    conflict_table = cow_relation(database, "lifeos_runtime.merge_conflict")
+    membership_table = cow_relation(database, "lifeos_rvf.membership")
+    object_table = cow_relation(database, "lifeos_blob.object")
+    promotion_table = cow_relation(database, "lifeos_runtime.promotion")
     initial = json_result(
         scalar(database, "SELECT lifeos_runtime.cow_branch_capability()")
     )
@@ -456,7 +478,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     )
     expect_error(
         database,
-        "SELECT count(*) FROM lifeos_runtime.branch",
+        f"SELECT count(*) FROM {branch_table}",
         "permission denied",
         role="lifeos_envctl",
         tenant=TENANT_A,
@@ -657,9 +679,9 @@ def verify_fresh(database: str) -> dict[str, Any]:
         database,
         "BEGIN; SET ROLE lifeos_migrator; "
         f"SET lifeos.tenant_id={sql_text(TENANT_A)}; "
-        "UPDATE lifeos_blob.object object SET raw_bytes = "
+        f"UPDATE {object_table} object SET raw_bytes = "
         "decode(repeat('00', object.byte_length::integer), 'hex') "
-        "FROM lifeos_runtime.promotion promotion "
+        f"FROM {promotion_table} promotion "
         f"WHERE promotion.promotion_id={sql_text(first_promotion)}::uuid "
         "AND object.id=promotion.snapshot_object_id; "
         "SET ROLE lifeos_envctl; "
@@ -699,7 +721,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
         database,
         "SELECT count(*)::text || ':' || "
         "count(*) FILTER (WHERE previous_promotion_id IS NULL)::text "
-        "FROM lifeos_runtime.promotion "
+        f"FROM {promotion_table} "
         "WHERE tenant_id=current_setting('lifeos.tenant_id')::uuid "
         "AND pointer_name='serialized-first'",
         role="lifeos_migrator",
@@ -745,7 +767,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     conflict_rows = scalar(
         database,
         "SELECT string_agg(conflict_kind, ',' ORDER BY conflict_ordinal) "
-        "FROM lifeos_runtime.merge_conflict "
+        f"FROM {conflict_table} "
         f"WHERE request_id={sql_text(conflicted['request_id'])}::uuid",
         role="lifeos_migrator",
         tenant=TENANT_A,
@@ -757,7 +779,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     conflict_ids = scalar(
         database,
         "SELECT string_agg(merge_conflict_id::text, ',' ORDER BY conflict_ordinal) "
-        "FROM lifeos_runtime.merge_conflict "
+        f"FROM {conflict_table} "
         f"WHERE request_id={sql_text(conflicted['request_id'])}::uuid",
         role="lifeos_migrator",
         tenant=TENANT_A,
@@ -790,7 +812,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     assert_true(applied == "7", f"resolution application rows mismatch: {applied}")
     merge_generation = scalar(
         database,
-        "SELECT head_generation FROM lifeos_runtime.branch "
+        f"SELECT head_generation FROM {branch_table} "
         f"WHERE branch_id={sql_text(merge_root)}::uuid",
         role="lifeos_migrator",
         tenant=TENANT_A,
@@ -820,7 +842,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     )
     vector_one = scalar(
         database,
-        "SELECT vector_id FROM lifeos_rvf.membership "
+        f"SELECT vector_id FROM {membership_table} "
         f"WHERE container_id={sql_text(container_one)}::uuid "
         f"AND member_key_digest=extensions.digest(convert_to({key('merge-key')}::text,'UTF8'),'sha256')",
         role="lifeos_migrator",
@@ -848,7 +870,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     )
     vector_two = scalar(
         database,
-        "SELECT vector_id FROM lifeos_rvf.membership "
+        f"SELECT vector_id FROM {membership_table} "
         f"WHERE container_id={sql_text(container_two)}::uuid "
         f"AND member_key_digest=extensions.digest(convert_to({key('merge-key')}::text,'UTF8'),'sha256')",
         role="lifeos_migrator",
@@ -875,7 +897,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     )
     vector_three = scalar(
         database,
-        "SELECT vector_id FROM lifeos_rvf.membership "
+        f"SELECT vector_id FROM {membership_table} "
         f"WHERE container_id={sql_text(container_three)}::uuid "
         f"AND member_key_digest=extensions.digest(convert_to({key('merge-key')}::text,'UTF8'),'sha256') "
         "AND tombstone",
@@ -890,7 +912,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
         database,
         "BEGIN; SET ROLE lifeos_migrator; "
         f"SET lifeos.tenant_id={sql_text(TENANT_A)}; "
-        "UPDATE lifeos_runtime.branch SET head_generation=4294967296 "
+        f"UPDATE {branch_table} SET head_generation=4294967296 "
         f"WHERE branch_id={sql_text(merge_root)}::uuid; "
         "SET ROLE lifeos_envctl; "
         "SELECT lifeos_rvf.mirror_branch_membership_v2("
@@ -929,9 +951,16 @@ def verify_fresh(database: str) -> dict[str, Any]:
     final = json_result(
         scalar(database, "SELECT lifeos_runtime.cow_branch_capability()")
     )
-    assert_true(final["implemented"] is True, "receipt did not open capability gate")
     assert_true(final["database_semantics_receipt"] is True, "receipt is invalid")
     assert_true(final["rvf_roundtrip"] is False, "native RVF was incorrectly accepted")
+    if "native_evidence_valid" in final:
+        assert_true(
+            final["implemented"] is False,
+            "database-only receipt incorrectly opened the native RVF gate",
+        )
+        checks.append("native RVF receipt fail-closed")
+    else:
+        assert_true(final["implemented"] is True, "receipt did not open capability gate")
     expect_error(
         database,
         "UPDATE lifeos_runtime.cow_acceptance_receipt SET accepted=false",
@@ -942,7 +971,7 @@ def verify_fresh(database: str) -> dict[str, Any]:
     return {"checks": checks, "capability": final}
 
 
-def verify_upgrade(database: str) -> dict[str, Any]:
+def verify_upgrade(database: str, through: int) -> dict[str, Any]:
     legacy_tenant = "30000000-0000-4000-8000-000000000003"
     legacy_branch = scalar(
         database,
@@ -959,13 +988,14 @@ def verify_upgrade(database: str) -> dict[str, Any]:
         role="lifeos_migrator",
     )
     assert_true(before == "1", "legacy seed witness missing")
-    apply_migration(database, 7)
-    apply_migration(database, 8)
+    for version in range(7, through + 1):
+        apply_migration(database, version)
+    branch_table = cow_relation(database, "lifeos_runtime.branch")
     preserved = scalar(
         database,
         "SELECT branch.tenant_id::text || ':' || witness.tenant_id::text || ':' "
         "|| witness.preimage_version::text "
-        "FROM lifeos_runtime.branch branch "
+        f"FROM {branch_table} branch "
         "JOIN lifeos_agent.branch_witness witness USING (branch_id) "
         f"WHERE branch.branch_id={sql_text(legacy_branch)}::uuid",
         role="lifeos_migrator",
@@ -984,7 +1014,7 @@ def verify_upgrade(database: str) -> dict[str, Any]:
     forced = scalar(
         database,
         "SELECT relforcerowsecurity FROM pg_class "
-        "WHERE oid='lifeos_runtime.branch'::regclass",
+        f"WHERE oid={sql_text(branch_table)}::regclass",
     )
     assert_true(forced == "t", "upgrade did not FORCE RLS")
     return {
@@ -1030,17 +1060,26 @@ def inspect_live() -> dict[str, Any]:
 
 def main() -> int:
     migration_sha = sha256(MIGRATIONS / "0007_cow_truthful_semantics.sql")
-    suffix = migration_sha[:8]
+    migration_paths = sorted(MIGRATIONS.glob("[0-9][0-9][0-9][0-9]_*.sql"))
+    versions = [int(path.name[:4]) for path in migration_paths]
+    assert_true(
+        versions == list(range(1, max(versions) + 1)),
+        f"migration sequence is not contiguous: {versions}",
+    )
+    latest_version = max(versions)
+    compatibility_sha = sha256(
+        MIGRATIONS / "0027_cow_pre_s16_runtime_compatibility.sql"
+    )
+    suffix = compatibility_sha[:8]
     fresh_db = f"lifeos_inv011_fresh_suite_{suffix}"
     upgrade_db = f"lifeos_inv011_upgrade_suite_{suffix}"
     validate_database_name(fresh_db)
     validate_database_name(upgrade_db)
-    completed = False
     try:
-        setup_database(fresh_db, 8)
+        setup_database(fresh_db, latest_version)
         fresh = verify_fresh(fresh_db)
         setup_database(upgrade_db, 6)
-        upgrade = verify_upgrade(upgrade_db)
+        upgrade = verify_upgrade(upgrade_db, latest_version)
         live = inspect_live()
         artifact = {
             "schema": "lifeos.cow-db-semantic-suite.v1",
@@ -1054,6 +1093,8 @@ def main() -> int:
                 "0008_sha256": sha256(
                     MIGRATIONS / "0008_cow_least_privilege_closure.sql"
                 ),
+                "0027_sha256": compatibility_sha,
+                "latest_version": latest_version,
             },
             "fresh_bootstrap": fresh,
             "upgrade_from_0006": upgrade,
@@ -1062,16 +1103,14 @@ def main() -> int:
         }
         ARTIFACT.parent.mkdir(parents=True, exist_ok=True)
         ARTIFACT.write_text(json.dumps(artifact, indent=2, sort_keys=True) + "\n")
-        completed = True
         print(json.dumps(artifact, sort_keys=True))
         return 0
     except (VerificationFailure, subprocess.TimeoutExpired, json.JSONDecodeError) as error:
         print(f"INV-011 COW verification failed: {error}", file=sys.stderr)
         return 1
     finally:
-        if completed:
-            drop_database(fresh_db)
-            drop_database(upgrade_db)
+        drop_database(fresh_db)
+        drop_database(upgrade_db)
 
 
 if __name__ == "__main__":

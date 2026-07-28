@@ -1,6 +1,6 @@
 # ART-106 Runtime Dependency Map
 
-Generated: `2026-07-27T04:50:28+00:00`
+Generated: `2026-07-28T11:13:57+00:00`
 Status: `complete`
 
 This map records runtime dependency evidence for databases, environment variables, secret references, queues, APIs, and caches. It is built from approved package artifacts, the envctl database model, the target descriptor, and a safe scan that excludes `.env`, secret directories, private keys, PEM files, and key files.

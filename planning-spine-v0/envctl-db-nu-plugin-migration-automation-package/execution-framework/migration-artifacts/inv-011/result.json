@@ -1,0 +1,43 @@
+{
+  "artifact_declarations": [
+    {
+      "declaration": "migration-artifacts/inv-011/result.json",
+      "kind": "receipt_result",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/result.json",
+      "status": "receipt_result_materialized"
+    }
+  ],
+  "artifact_path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/result.json",
+  "completed_at": "2026-07-28T09:11:46.419Z",
+  "honesty_note": "Executed the invariant probe command directly against live PostgreSQL: branch/cow proc count=2 and extensions.ruvector_version()=2.0.1.",
+  "implementation_scope": "probe_executed",
+  "needs_capability_probe": false,
+  "orchestration": {
+    "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+    "run_id": "20260727T234858483758Z-8997b4a16b78"
+  },
+  "origin_receipt": {
+    "attempt_id": "20260727T234858631594Z-ab786dfe2553",
+    "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+    "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-011_OPERATIONAL_INVARIANT/4a71a9453bd94a4e8821ea68315bd296f4217200f5adc6ceb460869b503bbc5d/20260727T234858631594Z-ab786dfe2553.json",
+    "run_id": "20260727T234858483758Z-8997b4a16b78",
+    "sha256": "b70a5880baaa5ca1a8df03726f133936dabd014ab7a3119c7aa0b49e852269da"
+  },
+  "packet_execution_proven": true,
+  "packet_sha256": "4a71a9453bd94a4e8821ea68315bd296f4217200f5adc6ceb460869b503bbc5d",
+  "prior_artifact_sha256": null,
+  "probe_class": "psql_query",
+  "schema": "lifeos.receipt-bound-task-result.v1",
+  "status": "passed",
+  "task_completion_proven": true,
+  "task_id": "INV-011_OPERATIONAL_INVARIANT",
+  "verification": {
+    "declared": "PSQL=$(command -v psql); test -x \"$PSQL\" && \"$PSQL\" 'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql' -tAc \"select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='extensions' and p.proname ~ 'branch|cow'\"",
+    "executed": true,
+    "reason": "Executed against live DB. branch|cow proc count was 2.",
+    "output": {
+      "branch_cow_proc_count": 2,
+      "ruvector_version": "2.0.1"
+    }
+  }
+}

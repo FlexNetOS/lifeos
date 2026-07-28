@@ -1,0 +1,91 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB090",
+    "decision": null,
+    "intent_lock_digest": "blake3:a6aedc0a782af0e0606aa3f14866087bcfb7a7071eb51e21741b378b2e62d0cd",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB090",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB090",
+  "depends_on": [
+    "TASK-CDB070",
+    "TASK-CDB071",
+    "TASK-CDB072",
+    "TASK-CDB073",
+    "TASK-CDB074",
+    "TASK-CDB075",
+    "TASK-CDB076",
+    "TASK-CDB077",
+    "TASK-CDB078",
+    "TASK-CDB079",
+    "TASK-CDB080",
+    "TASK-CDB081",
+    "TASK-CDB082",
+    "TASK-CDB083",
+    "TASK-CDB084",
+    "TASK-CDB085",
+    "TASK-CDB086",
+    "TASK-CDB087",
+    "TASK-CDB088",
+    "TASK-CDB089"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "all mandatory capability tests, reproduction proof, and full validation",
+    "deterministic": true,
+    "verification_command": "all mandatory capability tests, reproduction proof, and full validation"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:a6aedc0a782af0e0606aa3f14866087bcfb7a7071eb51e21741b378b2e62d0cd"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:0db8b5d5e41f8790acfd4e77be8be67d33310ba10381aba8f5dbdab33fbcbb75",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB090",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB090"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB090 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json"
+  ],
+  "task_id": "TASK-CDB090",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB090"
+}

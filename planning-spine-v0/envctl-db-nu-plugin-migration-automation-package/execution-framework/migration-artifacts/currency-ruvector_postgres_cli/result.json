@@ -1,0 +1,68 @@
+{
+  "artifact_declarations": [
+    {
+      "declaration": "migration-artifacts/currency-ruvector_postgres_cli/result.json",
+      "kind": "receipt_result",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_postgres_cli/result.json",
+      "status": "receipt_result_materialized"
+    }
+  ],
+  "artifact_path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-ruvector_postgres_cli/result.json",
+  "command": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "test -n \"$(bun info '@ruvector/postgres-cli' version 2>/dev/null)\" && test \"$(bun info '@ruvector/postgres-cli' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '@ruvector/postgres\\-cli@[0-9][^ ]*' | head -1 | sed 's/.*@//')\""
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "exit_code": 0,
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_POSTGRES_CLI/1785d1b751ffaaf03eb518c0abff879f9655d102a346b7a421fcfbc24a317823/logs/20260728T014730826134Z-0f5b078e9bfb/stderr.log",
+      "sha256": "f6a7a8a00c20c3ad28fda16e3af1c34def398348f9375dadc9d53f0e049df303"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_POSTGRES_CLI/1785d1b751ffaaf03eb518c0abff879f9655d102a346b7a421fcfbc24a317823/logs/20260728T014730826134Z-0f5b078e9bfb/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "completed_at": "2026-07-28T01:47:31.361663Z",
+  "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+  "implementation_scope": "command_and_verification_passed",
+  "needs_capability_probe": false,
+  "orchestration": {
+    "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+    "run_id": "20260727T234858483758Z-8997b4a16b78"
+  },
+  "origin_receipt": {
+    "attempt_id": "20260728T014730826134Z-0f5b078e9bfb",
+    "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+    "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_POSTGRES_CLI/1785d1b751ffaaf03eb518c0abff879f9655d102a346b7a421fcfbc24a317823/20260728T014730826134Z-0f5b078e9bfb.json",
+    "run_id": "20260727T234858483758Z-8997b4a16b78",
+    "sha256": "ac9a59cabea47e8725ad73a9886a5c6771842b856e4826c90f43feff68e9c9fe"
+  },
+  "packet_execution_proven": true,
+  "packet_sha256": "1785d1b751ffaaf03eb518c0abff879f9655d102a346b7a421fcfbc24a317823",
+  "prior_artifact_sha256": null,
+  "probe_class": "currency",
+  "schema": "lifeos.receipt-bound-task-result.v1",
+  "status": "passed",
+  "task_completion_proven": true,
+  "task_id": "CURRENCY-RUVECTOR_POSTGRES_CLI",
+  "verification": {
+    "argv": [
+      "/bin/bash",
+      "-lc",
+      "bun info '@ruvector/postgres-cli' version"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos",
+    "exit_code": 0,
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_POSTGRES_CLI/1785d1b751ffaaf03eb518c0abff879f9655d102a346b7a421fcfbc24a317823/logs/20260728T014730826134Z-0f5b078e9bfb/verification.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-RUVECTOR_POSTGRES_CLI/1785d1b751ffaaf03eb518c0abff879f9655d102a346b7a421fcfbc24a317823/logs/20260728T014730826134Z-0f5b078e9bfb/verification.stdout.log",
+      "sha256": "2f2b333be8858cb384114251b668bb1c9e45a0bb8393600b7ad4093d0e8e72f6"
+    }
+  }
+}

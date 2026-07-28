@@ -1,0 +1,82 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/CODEX_BRIDGE.md",
+    "src/nu_plugin/examples/codex/codedb_bounded_smoke_report.json",
+    "src/nu_plugin/examples/codex/codedb_mcp_config.json",
+    "src/nu_plugin/logs/CDB037-codex-bridge.log"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB037",
+    "decision": null,
+    "intent_lock_digest": "blake3:937fae092723de94e0b29c390ecd5d32c7ac928a09d2215f262320008e2b5aec",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB037",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB037",
+  "depends_on": [
+    "TASK-CDB032"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "Codex bridge ready",
+    "deterministic": true,
+    "verification_command": "manual config lint passes"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:937fae092723de94e0b29c390ecd5d32c7ac928a09d2215f262320008e2b5aec"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:e88f58146c3acc364c7b9648f24da136cd32b64d3a1605d1ceb5da2b99ffe97a",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB037",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB037"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB037 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/Codex bridge docs"
+  ],
+  "task_id": "TASK-CDB037",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB037"
+}

@@ -14,6 +14,71 @@ REQUIRED_APPROVAL_FIELDS = {'task_id', 'reviewer', 'model', 'decision', 'reviewe
 ALLOWED_APPROVAL_DIRS = {'approvals', 'reviews', 'proof_records'}
 
 
+def implementation_obligation_reason(row: dict) -> str | None:
+    reasons = []
+    if str(row.get('needs_capability_probe', '')).strip().lower() == 'true':
+        reasons.append('needs_capability_probe is true')
+    if str(row.get('probe_class', '')).strip().lower() == 'drift-canary':
+        reasons.append('probe_class is drift-canary')
+    gate_and_notes = ' '.join(
+        str(row.get(field, ''))
+        for field in ('completion_gate', 'notes')
+    ).lower()
+    if 'not evidence of implementation' in gate_and_notes:
+        reasons.append('task explicitly disclaims implementation evidence')
+    return '; '.join(reasons) if reasons else None
+
+
+def proof_completion_blocker(row: dict, proof: dict | None) -> str | None:
+    if (
+        not proof
+        or str(proof.get('status', '')).lower() not in TERMINAL_COMPLETE
+    ):
+        return None
+    obligation = implementation_obligation_reason(row)
+    output = proof.get('verification_output')
+    reason = None
+    if not isinstance(output, dict):
+        reason = 'terminal proof lacks structured task completion evidence'
+    elif output.get('packet_execution_proven') is not True:
+        reason = 'terminal proof does not affirm exact packet execution'
+    elif output.get('task_completion_proven') is not True:
+        reason = str(
+            output.get('honesty_note')
+            or 'terminal proof does not affirm task completion'
+        )
+    elif output.get('implementation_scope') != 'full_lifecycle_completed':
+        reason = (
+            'proof implementation scope is '
+            + str(output.get('implementation_scope') or 'missing')
+        )
+    else:
+        lifecycle = output.get('lifecycle')
+        if not isinstance(lifecycle, dict):
+            reason = 'terminal proof lacks structured lifecycle evidence'
+        elif lifecycle.get('stage') != 'completed':
+            reason = 'proof lifecycle stage is not completed'
+        else:
+            missing = [
+                field
+                for field in (
+                    'implementation_proven',
+                    'independent_verification_proven',
+                    'activation_proven',
+                    'adopted',
+                )
+                if lifecycle.get(field) is not True
+            ]
+            if missing:
+                reason = (
+                    'proof lifecycle does not affirm '
+                    + ', '.join(missing)
+                )
+    if reason and obligation:
+        return f'{obligation}; {reason}'
+    return reason
+
+
 def rel_to_root(path: Path) -> str:
     return str(path.relative_to(root()))
 
@@ -155,9 +220,14 @@ def load_agent_approval(task_id: str, proof_by_task: dict):
 def compute(rows, proofs):
     proof_by_task = {p.get('task_id'): p for p in proofs if p.get('task_id')}
     statuses = {}
+    completion_blockers = {}
     for r in rows:
         p = proof_by_task.get(r['task_id'])
-        if p and str(p.get('status','')).lower() in TERMINAL_COMPLETE:
+        blocker = proof_completion_blocker(r, p)
+        if p and blocker:
+            statuses[r['task_id']] = 'blocked'
+            completion_blockers[r['task_id']] = blocker
+        elif p and str(p.get('status','')).lower() in TERMINAL_COMPLETE:
             statuses[r['task_id']] = 'complete'
         elif p and str(p.get('status','')).lower() in TERMINAL_FAILED:
             statuses[r['task_id']] = 'failed'
@@ -168,6 +238,13 @@ def compute(rows, proofs):
     for r in rows:
         tid = r['task_id']
         if statuses[tid] in {'complete','failed'}:
+            continue
+        if tid in completion_blockers:
+            blocked.append({
+                'task_id': tid,
+                'reason': 'implementation completion not proven',
+                'detail': completion_blockers[tid],
+            })
             continue
         deps = [d for d in split_list(r.get('depends_on','')) if not d.endswith('*')]
         unknown = [d for d in deps if d not in idset]

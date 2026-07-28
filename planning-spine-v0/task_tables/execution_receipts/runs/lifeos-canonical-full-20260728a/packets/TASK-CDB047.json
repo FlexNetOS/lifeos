@@ -1,0 +1,86 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/manifests/CHECKSUMS.sha256",
+    "src/nu_plugin/manifests/PACK_MANIFEST.json",
+    "src/nu_plugin/manifests/PACKAGE_VALIDATION.json",
+    "src/nu_plugin/scripts/truth_surface.py",
+    "src/nu_plugin/tests/test_truth_surface.py",
+    "src/nu_plugin/logs/CDB047-manifest.log"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB047",
+    "decision": null,
+    "intent_lock_digest": "blake3:0f6ad374dfdb2947fc8ce7629ce49c8d02f06fb15b2d2761067db42f061e80db",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [
+    "TASK-CDB048"
+  ],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB047",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB047",
+  "depends_on": [
+    "TASK-CDB046"
+  ],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "release evidence captured",
+    "deterministic": true,
+    "verification_command": "manifest checksums match"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [
+    "src/nu_plugin/CODEDB_START_HERE.md",
+    "src/nu_plugin/READINESS_GATE.md",
+    "src/nu_plugin/NAVIGATION.md",
+    "src/nu_plugin/prd/nu_plugin_codedb_v1_1_full_prd.md",
+    "src/nu_plugin/nu_plugin_codedb_execution_package_checklist.md",
+    "src/nu_plugin/execution/TASK_GRAPH.csv"
+  ],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:0f6ad374dfdb2947fc8ce7629ce49c8d02f06fb15b2d2761067db42f061e80db"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:b15da390ebad008865203b92864b862632637d1461431168cb96a31fd8ab51e6",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB047",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB047"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB047 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/manifests/PACK_MANIFEST.json"
+  ],
+  "task_id": "TASK-CDB047",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB047"
+}

@@ -1,0 +1,74 @@
+{
+  "allowed_paths": [
+    "src/nu_plugin/docs/polyglot-import/research-ledger.md",
+    "src/nu_plugin/execution/POLYGLOT_TASK_GRAPH.csv",
+    "src/nu_plugin/execution/POLYGLOT_TASK_FILE_MAP.csv"
+  ],
+  "approval": {
+    "approval_id": "APPROVAL-TASK-CDB091",
+    "decision": null,
+    "intent_lock_digest": "blake3:f56ae2cc682ef01b07758135ee96c03110aa3b77b089872627c4e8be2b09906f",
+    "required": true,
+    "status": "pending"
+  },
+  "blocked_paths": [
+    "src/nu_plugin/**/.env",
+    "src/nu_plugin/**/secrets/**",
+    "src/nu_plugin/**/*.pem",
+    "src/nu_plugin/**/*.key"
+  ],
+  "blocks": [],
+  "checkpoint": {
+    "catalog_ref": "recovery/checkpoint_catalog.json#CHECKPOINT-REQUIRED-TASK-CDB091",
+    "required_before_execution": true,
+    "status": "required"
+  },
+  "companion_gate_ref": "normalized/companion_gates.json#GATE-CDB091",
+  "depends_on": [],
+  "execution": {
+    "allows_dependency_changes": false,
+    "allows_dependency_install": false,
+    "allows_network": false,
+    "command_template": null,
+    "completion_gate": "research ledger complete and CSVs parse",
+    "deterministic": true,
+    "verification_command": "research ledger complete and CSVs parse"
+  },
+  "filesystem_scope": "src/nu_plugin/**",
+  "input_files": [],
+  "intent_lock": {
+    "algorithm": "BLAKE3-256",
+    "digest": "blake3:f56ae2cc682ef01b07758135ee96c03110aa3b77b089872627c4e8be2b09906f"
+  },
+  "lease": {
+    "protocol": "atomic-exclusive-create",
+    "required": true,
+    "scope_id": "sha256:b98e5c92135af14075256c3e59055c4929b139f763a388dbdabd66037933049c",
+    "state": "available"
+  },
+  "packet_id": "PACKET-TASK-CDB091",
+  "proof": {
+    "append_only_ledger": "ledgers/proofs.jsonl",
+    "required": true,
+    "status": "missing",
+    "uri": null
+  },
+  "replay": {
+    "apply_allowed": false,
+    "dry_run_only": true,
+    "plan_ref": "recovery/replay_plan.json#REPLAY-TASK-CDB091"
+  },
+  "repo_path": "src/nu_plugin",
+  "rollback_plan": "Remove only the LifeOS review handoff for TASK-CDB091 and regenerate from the pinned c84740532ded2a27ee283ea7a3a5f303eaeb61a7 snapshot; never mutate src/nu_plugin from this import record.",
+  "schema": "lifeos.execution-packet.v1",
+  "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
+  "source_status": "complete",
+  "status": "review",
+  "target_files": [
+    "src/nu_plugin/docs/polyglot-import/research-ledger.md",
+    "src/nu_plugin/execution/POLYGLOT_TASK_GRAPH.csv",
+    "src/nu_plugin/execution/POLYGLOT_TASK_FILE_MAP.csv"
+  ],
+  "task_id": "TASK-CDB091",
+  "work_order_ref": "canonical/work_orders.json#TASK-CDB091"
+}

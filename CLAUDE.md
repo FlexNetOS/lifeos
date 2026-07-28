@@ -44,7 +44,7 @@ Blueprint content map (open the file for detail — do not re-derive):
 | Capability register · component integration table | supplied capabilities and per-component integration rows |
 | Import, transformation, export, and release contract | zero-undeclared-loss completion; database-gated, envctl-activated release |
 | Anchor conformance ledger (A01–A15) | crosswalk over 15 anchor sections, 14 diagrams, 10 invariants |
-| Review ledger (R01–R16) | 2026-07-19 repository-source reconciliation (e.g. Vue→Svelte migration required; `rtk_nu` and `codedb ingest-envelope` are unbuilt release blockers) |
+| Review ledger (R01–R16) | 2026-07-19 repository-source reconciliation (Vue→Svelte migration — **completed** at the phase-3 cutover, see "What this app is"; `rtk_nu` and `codedb ingest-envelope` remain unbuilt release blockers) |
 | FlexNetOS operating doctrine and release gate | permanent `files → Nushell tables → validated envctl tables → generated files` conversion |
 | Operational invariants and acceptance | 19 invariants; zero silent-downgrade language permitted at release |
 
@@ -83,9 +83,15 @@ This repo already has two long-form documents that are **authoritative** — rea
 
 ## What this app is
 
-LifeOS — a Vue 3 + Vite + Pinia + vue-router web app wrapped in a Tauri 2 native shell. Six workspaces (`ai`, `gaming`, `work`, `personal`, `home`, `media`) plus a separate `/settings/:section?` context. Cross-platform desktop target (Linux/macOS/Windows) with a web build for browsers.
+LifeOS — a **Svelte 5** + Vite + Pinia + vue-router web app wrapped in a Tauri 2 native shell. Six workspaces (`ai`, `gaming`, `work`, `personal`, `home`, `media`) plus a separate `/settings/:section?` context. Cross-platform desktop target (Linux/macOS/Windows) with a web build for browsers.
 
-Shell layout in `src/App.vue`: **Sidebar | Workspace | main | AIAvatar**, where `main` renders Dashboard / SubsectionView / N8nFlowView / OpenPencilEditor depending on `lifeos.activeSub`.
+> **The Vue SFC toolchain retired at the phase-3 cutover.** All 25 components are `.svelte`
+> using Svelte 5 runes. The `vue` package remains a *runtime* dependency for exactly two
+> reasons — it is Pinia's reactivity engine, and `vue-router` runs headless (booted manually
+> in `main.ts`, no `app.use`). There are no Vue components. See
+> `.claude/rules/figma-design-integration.md` §2 for the full framework contract.
+
+Shell layout in `src/App.svelte`: **Sidebar | Workspace | main | AIAvatar**, where `main` renders Dashboard / SubsectionView / N8nFlowView / OpenPencilEditor depending on `lifeos.activeSub`.
 
 ## Common commands
 
@@ -95,14 +101,16 @@ Use **`bun`**, not npm. (Corrected 2026-07-07: the previously documented mise-ma
 bun install                 # install JS deps
 bun run dev                 # Vite dev server on :1420 (strict port — Tauri expects it)
 bun run tauri:dev           # Tauri shell + Vite HMR; opens a 1280×800 dark window
-bun run test                # Vitest, all specs (happy-dom + @vue/test-utils)
+bun run test                # Vitest, all specs (happy-dom + @testing-library/svelte)
 bun run test:watch          # Vitest watch mode
 bun run test:coverage       # Vitest + v8 coverage
-bun run build               # vue-tsc --noEmit, then `vite build` to dist/
+bun run test:a11y           # axe suite (separate config); 0 violations enforced
+bun run build               # svelte-check, then `vite build` to dist/
+bun run check               # svelte-check + test + test:a11y + design:lint + tauri:icons:check
 bun run tauri:build         # Native installer (.deb / .AppImage on Linux); slow — on demand only
 
 # Run one spec file
-bunx vitest run tests/Sidebar.spec.js
+bunx vitest run tests/Sidebar.svelte.spec.js
 # Run a single test by name
 bunx vitest run -t "renders the brand toggle"
 ```
@@ -113,7 +121,7 @@ Verification before claiming done (from `AGENTS.md`): `bun run test` passes, `bu
 
 ### Path alias `@/` → `src/` is declared in three places
 
-`tsconfig.json` + `vite.config.ts` + `vitest.config.ts` all set it. Vitest *also* aliases `lucide-vue-next` → `tests/__mocks__/lucide-vue-next.js` so the 600 KB icon pack doesn't load in unit tests. If you add a new test setup or build tool, you must wire the alias there too or imports break asymmetrically.
+`tsconfig.json` + `vite.config.ts` + `vitest.config.ts` all set it (and again in `vitest.a11y.config.ts`). Both Vitest configs *also* alias `lucide-svelte` → `tests/__mocks__/lucide-svelte.js` so the 600 KB icon pack doesn't load in unit tests, and set `resolve.conditions: ["browser"]` so Svelte's compiled output mounts into happy-dom. If you add a new test setup or build tool, you must wire the alias there too or imports break asymmetrically.
 
 ### Legacy `.js` siblings exist alongside `.ts` for the preview path
 
@@ -136,15 +144,16 @@ Rust side (`src-tauri/src/lib.rs`) exposes `ai_complete`, `ai_provider_get`, `ai
 
 `src/lib/persistence.ts` no-ops outside Tauri. Inside Tauri it persists only `LIFEOS_PERSIST_KEYS`: `activeId`, `wsCollapsed`, `sectionByWs`, `aiAvatarHidden`, `aiChatOpen`, `avatarPos`, `aiProvider`, `teamOrder`, `sectionOrder`, `itemOrder`. Explicitly excluded: `aiMessages` (would replay stale chat), `activeSub` / `pendingExpand` (URL-driven), `cmdkOpen` / `cmdkSeed` / `extraItems` / `extraSections` (ephemeral). Writes debounce at 300ms. If you add a new store key and want it to survive restart, add it to both the `.ts` and `.js` whitelist — nowhere else.
 
-### OpenPencil mounting gate in `App.vue`
+### OpenPencil mounting gate in `App.svelte`
 
-`OpenPencilEditor.vue` only mounts when the active sub has `view: "open-pencil"`. The gate is:
+`OpenPencilEditor.svelte` only mounts when the active sub has `view: "open-pencil"`. The gate is at `src/App.svelte:70`:
 
-```vue
-v-else-if="lifeos.activeSub.item?.view === 'open-pencil'"
+```svelte
+{:else if lifeosState.activeSub.item?.view === "open-pencil"}
+  <OpenPencilEditor sub={lifeosState.activeSub} {router} />
 ```
 
-Lose that condition and OpenPencil-tagged subs fall through to `<SubsectionView>` and the editor never renders. File navigation into the editor must go through `useNav().pickSub(...)` so the `view` field is set.
+Lose that condition and OpenPencil-tagged subs fall through to `<SubsectionView>` and the editor never renders. File navigation into the editor must go through `createNav(router).pickSub(...)` so the `view` field is set.
 
 ### Routing mirrors workspace state to the URL
 
@@ -152,7 +161,7 @@ Lose that condition and OpenPencil-tagged subs fall through to `<SubsectionView>
 
 ### Storage layer (Rust-side only)
 
-Added in `database-storage-foundation`. Owned entirely by `lifeos-core` + the Tauri shell — the Vue layer never touches the DB directly.
+Added in `database-storage-foundation`. Owned entirely by `lifeos-core` + the Tauri shell — the Svelte layer never touches the DB directly.
 
 - **Feature flags**: `storage` in `crates/lifeos-core/Cargo.toml` owns PostgreSQL/RuVector storage; `legacy-sqlite-import` is a one-way read-only importer enabled only by the desktop shell. ESP32/`no_std` consumers turn storage off with `default-features = false`. Guard: `cargo check -p lifeos-core --no-default-features` must always pass.
 - **Canonical store**: `LIFEOS_DATABASE_URL` must name PostgreSQL. The application rejects SQLite URLs and verifies that `ruvector` is installed in schema `extensions`. Administrative bootstrap lives at `crates/lifeos-core/sql/bootstrap-postgres-ruvector.sql`.
@@ -174,30 +183,32 @@ Added in `design-md-format-adoption`. Three files form the design-system contrac
 Drift gates:
 - `bun run design:lint` enforces `broken-ref` (errors on unresolved `{token.path}` references) and `contrast-ratio` (warns on WCAG AA fails).
 - `bun run design:diff` (via `scripts/design-diff.mjs`) compares HEAD~1 against HEAD and fails on token-level regressions in `colors / typography / rounded / spacing` unless allowlisted in `scripts/design-diff.allow`.
-- Component-level a11y suite at `tests/a11y/*.spec.ts` runs via `bun run test:a11y` against the 9 dedicated views + 4 overlays + 6 component variants — 32 axe assertions, 0 violations enforced.
+- Component-level a11y suite at `tests/a11y/*.spec.ts` runs via `bun run test:a11y` against the 9 dedicated views + 4 overlays + 6 component variants — 35 axe assertions, 0 violations enforced.
 
 Exports regenerate from `DESIGN.md`: `bun run design:export` writes `design-system-reference/exports/tokens.json` (DTCG) and `tailwind.theme.json` (Tailwind v3 `theme.extend`). Both byte-deterministic — checked in.
 
 ### Vite build splits vendor chunks deliberately
 
-`vite.config.ts` `manualChunks` separates `lucide`, `vue-router`, `pinia`, `vue`, and a residual `vendor`. Lucide alone is ~600 KB — keep it in its own chunk so the main app chunk stays small and vendor chunks cache across releases. Don't collapse this back into a single chunk.
+`vite.config.ts` uses Rolldown's `rolldownOptions.output.codeSplitting.groups` (not Rollup `manualChunks`) to separate `lucide` (from `lucide-svelte`), `vue-router`, `pinia`, and `svelte`. Lucide alone is ~600 KB — keep it in its own chunk so the main app chunk stays small and vendor chunks cache across releases. Don't collapse this back into a single chunk.
 
 ## Non-negotiable design contracts
 
 From `design-system-reference/README.md` (summarized — read the source for nuance):
 
-- **Tokens, not literals.** All color/spacing/radii/shadow come from `colors_and_type.css` CSS variables. No inline hex, ever.
+- **Tokens, not literals.** All color/spacing/radii/shadow come from `colors_and_type.css` CSS variables. No inline hex, ever. (Measured 2026-07-27: 43 hex literals survive in 6 components — `CalendarView` 16, `HealthView` 15, `OpenPencilEditor` 7, `views/Login` 3, `SettingsView` 1, `NotificationsDrawer` 1. Pre-existing debt, **not** precedent. Do not add more; do not bulk-refactor unasked.)
 - **Dark-first.** `--bg-0` page, `--bg-2` cards, `--fg-1` text. `--gradient-spiral` (cyan→purple→green) is the only chromatic moment — never as a full background wash.
 - **Lexend everywhere** except the Rigelstar wordmark. JetBrains Mono for shortcuts/timestamps/hex.
-- **Lucide icons only** via `lucide-vue-next` (or the `Icon.vue` wrapper). Stroke 1.5; 16px in rows, 14px in buttons, 20px in rails. No emoji, no unicode-as-icon, no PNG iconography.
+- **Lucide icons only** via the `Icon.svelte` wrapper over the 155-entry kebab-name barrel `src/lib/icons-svelte.js` (sourced from `lucide-svelte`). Stroke 1.5; 16px in rows, 14px in buttons, 20px in rails. No emoji, no unicode-as-icon, no PNG iconography.
 - **One brand mark per screen**, **one brand glow per viewport** (status pulses don't count).
 - **Voice**: calm, second-person, present-tense, sentence-case. AI suggestions prefixed with `LifeOS suggests:`.
 
-## Vue / TypeScript conventions
+## Svelte / TypeScript conventions
 
-- `<script setup>` with **explicit `defineProps()` schemas** — inferred props caused the icon-click bug recorded in `AUDIT.md`. Do not repeat.
+- Svelte 5 **runes**: `$props()`, `$state()`, `$derived()`. Always destructure props explicitly with defaults — `let { item, collapsed = false, onclick } = $props()`. Implicit/inferred props caused the icon-click bug recorded in `AUDIT.md`. Do not repeat.
+- **Callback props** (`onclick={fn}`), not `createEventDispatcher`. Children via `{@render children?.()}`.
+- Pinia stores are **bridged**, not consumed directly: `bindStore(useLifeos(), [...keys])` from `@/lib/pinia-bridge.svelte.js`. Navigation uses `createNav(router)` from `@/lib/svelte-nav.js` — **not** `useNav()` from `nav.ts`, which needs Vue component injection that no longer exists.
 - TypeScript for everything new under `src/`. (Watch the `.ts`/`.js` sibling contract above.)
-- Tests live under `tests/` mirroring component layout. Every interactive surface ships with a spec.
+- Tests live under `tests/` mirroring component layout as `<Name>.svelte.spec.js`. Every interactive surface ships with a spec.
 - Tauri-only code must be guarded by `window.__TAURI__` so the spec suite and the browser preview path stay green.
 
 ## Tauri specifics
@@ -220,7 +231,7 @@ From `design-system-reference/README.md` (summarized — read the source for nua
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **lifeos** (13307 symbols, 20441 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **lifeos** (24875 symbols, 32694 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

@@ -1,6 +1,6 @@
 # ART-118 Observability Map
 
-Generated: `2026-07-27T18:21:14+00:00`
+Generated: `2026-07-28T09:41:08+00:00`
 
 This map covers logs, metrics, traces, dashboards, alerts, SLOs, and runbooks from generated envctl reports plus a safe scan of the target filesystem. It records evidence categories and control-plane observability; it does not claim deployed external observability services unless the evidence is present.
 

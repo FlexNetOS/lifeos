@@ -1,45 +1,61 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "MAINT-503_CODEX_FINAL_PROMPT",
-  "status": "completed",
-  "started_at": "2026-07-27T05:38:12Z",
-  "completed_at": "2026-07-27T05:40:10Z",
-  "actor": "codex-local-maintenance",
-  "helper_id": "helper-drive-live-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "~/envctl-db-nu-plugin-migration-automation-package",
-  "files_changed": [
-    "CODEX_FINAL_EXECUTION_PROMPT.md",
-    "prompts/CODEX_FINAL_EXECUTION_PROMPT.md",
-    "execution-framework/proof_records/MAINT-503_CODEX_FINAL_PROMPT.proof.json"
-  ],
-  "commands_run": [
-    "cmp CODEX_FINAL_EXECUTION_PROMPT.md prompts/CODEX_FINAL_EXECUTION_PROMPT.md",
-    "sha256sum CODEX_FINAL_EXECUTION_PROMPT.md prompts/CODEX_FINAL_EXECUTION_PROMPT.md",
-    "python3 -c '<validate graph row, manifest entry, and packet task_id>'",
-    "python3 scripts/merge_proofs.py"
-  ],
-  "verification_output": {
-    "status": "pass",
-    "root_prompt_exists": true,
-    "prompts_copy_exists": true,
-    "copies_identical": true,
-    "task_graph_rows": 1,
-    "execution_manifest_entries": 1,
-    "packet_task_id": "MAINT-503_CODEX_FINAL_PROMPT",
-    "proof_ledger_present": true
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "CODEX_FINAL_EXECUTION_PROMPT.md": "c281e084f8f072d213089451d2c94090960b29b806bc4ab5e995802d53df7287",
-    "prompts/CODEX_FINAL_EXECUTION_PROMPT.md": "c281e084f8f072d213089451d2c94090960b29b806bc4ab5e995802d53df7287"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/MAINT-503_CODEX_FINAL_PROMPT/3d9f28440730f17bf5dc74e5ce2c9e9027db08f70daa641d84a2f1ceb5d40e2c/20260728T023604163060Z-1dead76f2d8b.json": "809e786ca49787d277cf103b0f89a03b03f6fb7d69a61bf49c3be0a1e5fe421c"
   },
-  "logs_uri": "execution-framework/logs/MAINT-503_CODEX_FINAL_PROMPT.log",
-  "rollback_point": "Revert only the MAINT-503 prompt/proof update or restore its prior Drive revision; preserve package history/v0-v5.",
-  "evidence": {
-    "task_graph_row": "execution-framework/generated/task_graph.csv#MAINT-503_CODEX_FINAL_PROMPT",
-    "packet": "execution-framework/generated/execution_packets/MAINT-503_CODEX_FINAL_PROMPT.json",
-    "proof": "execution-framework/proof_records/MAINT-503_CODEX_FINAL_PROMPT.proof.json"
-  },
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.6-terra -c model_reasoning_effort=medium --cd /run/user/1001/lifeos-json-task-runner/20260727T234858483758Z-8997b4a16b78/MAINT-503_CODEX_FINAL_PROMPT/20260728T023604163060Z-1dead76f2d8b -"
+  ],
+  "completed_at": "2026-07-28T02:37:52.937922Z",
+  "evidence": [
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/MAINT-503_CODEX_FINAL_PROMPT/3d9f28440730f17bf5dc74e5ce2c9e9027db08f70daa641d84a2f1ceb5d40e2c/20260728T023604163060Z-1dead76f2d8b.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/MAINT-503_CODEX_FINAL_PROMPT/f7b95309430c16f8827f6ce1c22ec2ce7c5dbfa43e0ef94b7430fe511cad3950.proof.json"
+  ],
   "failure_reason": "",
-  "next_action": "Use CODEX_FINAL_EXECUTION_PROMPT.md from the extracted package root."
+  "files_changed": [],
+  "helper_id": "helper-drive-live-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/MAINT-503_CODEX_FINAL_PROMPT/3d9f28440730f17bf5dc74e5ce2c9e9027db08f70daa641d84a2f1ceb5d40e2c/logs/20260728T023604163060Z-1dead76f2d8b",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "~/envctl-db-nu-plugin-migration-automation-package",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T02:36:04.165875Z",
+  "status": "completed",
+  "task_id": "MAINT-503_CODEX_FINAL_PROMPT",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "drive-live-gap-closure",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T023604163060Z-1dead76f2d8b",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/MAINT-503_CODEX_FINAL_PROMPT/3d9f28440730f17bf5dc74e5ce2c9e9027db08f70daa641d84a2f1ceb5d40e2c/20260728T023604163060Z-1dead76f2d8b.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "809e786ca49787d277cf103b0f89a03b03f6fb7d69a61bf49c3be0a1e5fe421c"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "3d9f28440730f17bf5dc74e5ce2c9e9027db08f70daa641d84a2f1ceb5d40e2c",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/MAINT-503_CODEX_FINAL_PROMPT/f7b95309430c16f8827f6ce1c22ec2ce7c5dbfa43e0ef94b7430fe511cad3950.proof.json",
+      "sha256": "f7b95309430c16f8827f6ce1c22ec2ce7c5dbfa43e0ef94b7430fe511cad3950"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

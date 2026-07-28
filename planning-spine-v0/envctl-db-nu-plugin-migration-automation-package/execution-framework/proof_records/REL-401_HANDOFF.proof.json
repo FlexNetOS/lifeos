@@ -1,67 +1,61 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "REL-401_HANDOFF",
-  "status": "completed",
-  "started_at": "2026-07-27T05:32:46+00:00",
-  "completed_at": "2026-07-27T05:33:58+00:00",
-  "actor": "handoff-agent",
-  "helper_id": "helper-handoff-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "execution-framework",
-  "files_changed": [
-    "execution-framework/proof_records/REL-401_HANDOFF.proof.json",
-    "execution-framework/state/REL-401_HANDOFF.heartbeat.json",
-    "execution-framework/logs/REL-401_HANDOFF.log"
-  ],
-  "commands_run": [
-    "icm recall-context \"REL-401 final handoff verification package archive\" --limit 5",
-    "jq . generated/final_verification_report.json",
-    "sed -n '1,260p' docs/FINAL_VERIFICATION.md",
-    "jq . generated/release_archives/REL-400_PACKAGE_ARCHIVE.summary.json",
-    "sha256sum generated/release_archives/*.tar.gz generated/release_archives/*.zip",
-    "python3 -m json.tool proof_records/REL-401_HANDOFF.proof.json",
-    "python3 -m json.tool state/REL-401_HANDOFF.heartbeat.json"
-  ],
-  "verification_output": {
-    "result": "pass_with_external_blocker",
-    "local_package_complete": true,
-    "task_count": 80,
-    "packet_count": 80,
-    "proof_count_before_handoff": 88,
-    "missing_outputs": [],
-    "tasks_without_packets": [],
-    "packet_missing_fields": [],
-    "dependency_proofs_present": true,
-    "archive_checksums_match_manifest": true,
-    "archive_entry_counts_match": true,
-    "archive_secret_safe": true,
-    "handoff_proof_valid_json": true,
-    "heartbeat_valid_json": true
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REL-401_HANDOFF/e55200720f881a87386516e480e5971798d782eb8febf069b4794704e45e50d2/20260728T023119959524Z-62048440910d.json": "c0d13c34b2fc879286712ae3e4364b6ece3322281f698360f67eb4a357892d42"
   },
-  "blockers": [
-    {
-      "blocker_id": "EXT-DRIVE-WRITE",
-      "status": "documented",
-      "detail": "Authenticated Google Drive file edit/revision API is unavailable in this environment; the upgraded archives are ready for external upload/application."
-    },
-    {
-      "blocker_id": "DECLARED-REPO-PATH-UNAVAILABLE",
-      "status": "mitigated",
-      "detail": "The packet repo_path /mnt/data was not mounted and allowed-root environment variables were unset; required inputs and artifacts were accessed through the execution-framework workspace mapping."
-    }
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.6-terra -c model_reasoning_effort=medium --cd /run/user/1001/lifeos-json-task-runner/20260727T234858483758Z-8997b4a16b78/REL-401_HANDOFF/20260728T023119959524Z-62048440910d -"
   ],
-  "artifacts": [
-    {
-      "path": "execution-framework/generated/release_archives/envctl-db-nu-plugin-migration-automation-package-2026-07-05-upgraded.tar.gz",
-      "sha256": "0bdf372bae59a7d207cdb93a89ecbb89a2f83b779019c965f16ad157224b0b27",
-      "size_bytes": 15745389,
-      "entry_count": 967
+  "completed_at": "2026-07-28T02:32:39.781895Z",
+  "evidence": [
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REL-401_HANDOFF/e55200720f881a87386516e480e5971798d782eb8febf069b4794704e45e50d2/20260728T023119959524Z-62048440910d.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REL-401_HANDOFF/0c2a4cd4a11d9d5c5aaeff294e1dc2b62be93f5c4b7ff8289442951a1a61df06.proof.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [],
+  "helper_id": "helper-handoff-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REL-401_HANDOFF/e55200720f881a87386516e480e5971798d782eb8febf069b4794704e45e50d2/logs/20260728T023119959524Z-62048440910d",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "/mnt/data",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T02:31:19.962439Z",
+  "status": "completed",
+  "task_id": "REL-401_HANDOFF",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "handoff report",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
     },
-    {
-      "path": "execution-framework/generated/release_archives/envctl-db-nu-plugin-migration-automation-package-2026-07-05-upgraded.zip",
-      "sha256": "6ad8a4d040c686bb7079b251b7c6064fd54cd283417f678d47004b88dcc55ad4",
-      "size_bytes": 16385876,
-      "entry_count": 967
-    }
-  ]
+    "origin_receipt": {
+      "attempt_id": "20260728T023119959524Z-62048440910d",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REL-401_HANDOFF/e55200720f881a87386516e480e5971798d782eb8febf069b4794704e45e50d2/20260728T023119959524Z-62048440910d.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "c0d13c34b2fc879286712ae3e4364b6ece3322281f698360f67eb4a357892d42"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "e55200720f881a87386516e480e5971798d782eb8febf069b4794704e45e50d2",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REL-401_HANDOFF/0c2a4cd4a11d9d5c5aaeff294e1dc2b62be93f5c4b7ff8289442951a1a61df06.proof.json",
+      "sha256": "0c2a4cd4a11d9d5c5aaeff294e1dc2b62be93f5c4b7ff8289442951a1a61df06"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

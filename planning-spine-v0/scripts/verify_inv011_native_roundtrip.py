@@ -37,6 +37,10 @@ MIGRATION_0010 = (
     LIFEOS_ROOT
     / "crates/lifeos-core/migrations/0010_native_rvf_catalog_binding.sql"
 )
+MIGRATION_0028 = (
+    LIFEOS_ROOT
+    / "crates/lifeos-core/migrations/0028_cow_native_rvf_post_s16_receipt_binding.sql"
+)
 DB_ARTIFACT = (
     LIFEOS_ROOT
     / "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package"
@@ -423,6 +427,13 @@ def execute_native_tool(seed: dict[str, Any]) -> tuple[dict[str, Any], Path]:
             )
     else:
         output_dir.rename(durable_dir)
+    report["parent_path"] = str(durable_dir / "agentdb-parent.rvf")
+    report["child_path"] = str(durable_dir / "agentdb-child.rvf")
+    report["cow_map"]["payload_path"] = str(durable_dir / "cow-map.payload")
+    report["membership"]["payload_path"] = str(durable_dir / "membership.payload")
+    report["parent_membership"]["payload_path"] = str(
+        durable_dir / "parent-membership.payload"
+    )
     return report, durable_dir
 
 
@@ -554,6 +565,7 @@ def apply_live_migration() -> dict[str, Any]:
     migrations = (
         (9, "native rvf postgres acceptance", MIGRATION_0009),
         (10, "native rvf catalog binding", MIGRATION_0010),
+        (28, "native rvf post s16 receipt binding", MIGRATION_0028),
     )
     for target_version, description, migration in migrations:
         version = int(
@@ -618,6 +630,7 @@ def source_digests() -> dict[str, str]:
     paths = [
         MIGRATION_0009,
         MIGRATION_0010,
+        MIGRATION_0028,
         LIFEOS_ROOT / "crates/lifeos-core/migrations/0007_cow_truthful_semantics.sql",
         LIFEOS_ROOT / "crates/lifeos-core/migrations/0008_cow_least_privilege_closure.sql",
         LIFEOS_ROOT / "crates/lifeos-core/src/storage/branches.rs",
@@ -634,7 +647,7 @@ def source_digests() -> dict[str, str]:
 
 
 def main() -> int:
-    migration_suffix = sha256(MIGRATION_0010)[:8]
+    migration_suffix = sha256(MIGRATION_0028)[:8]
     fresh_db = f"lifeos_inv011_fresh_suite_{migration_suffix}"
     upgrade_db = f"lifeos_inv011_upgrade_suite_{migration_suffix}"
     dbsuite.validate_database_name(fresh_db)
@@ -658,6 +671,10 @@ def main() -> int:
         live_catalog_version = extension_catalog_version()
         db_artifact_sha = sha256(DB_ARTIFACT)
 
+        # The native acceptance suite owns migrations 0001–0010.  Later S16
+        # migrations are exercised against the immutable live probe below;
+        # applying their unrelated bootstrap schema to this disposable COW
+        # fixture would change the fixture's branch storage contract.
         dbsuite.setup_database(fresh_db, 10)
         fresh_catalog_version = extension_catalog_version(fresh_db)
         initial = dbsuite.json_result(

@@ -1,0 +1,37 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "EF-004_GENERATE_TASK_GRAPH",
+  "status": "completed",
+  "started_at": "2026-07-28T01:37:43+00:00",
+  "completed_at": "2026-07-28T01:37:43+00:00",
+  "actor": "local-execution-framework",
+  "helper_id": "helper-graph-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/generated/task_graph.csv",
+    "execution-framework/generated/task_graph.normalized.json",
+    "execution-framework/generated/task_graph.index.json"
+  ],
+  "commands_run": [
+    "python3 scripts/goal_to_task_graph.py"
+  ],
+  "verification_output": {
+    "missing": [],
+    "task_graph_exists": true
+  },
+  "checksums": {
+    "execution-framework/generated/task_graph.csv": "28a74f19bfb416b704727f0cbec303b96d05a02671537089ce93dc8f5653a1e4",
+    "execution-framework/generated/task_graph.normalized.json": "eaeef81be2a6d564c616e22fe1a8d5883a2ee95598d92ac5b2ad5a3a3c815909",
+    "execution-framework/generated/task_graph.index.json": "221f5d416ad92eff8ea065f16534ddcc4a3da79360e5f9a7003c321fa71d8571"
+  },
+  "logs_uri": "logs/EF-004_GENERATE_TASK_GRAPH.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "generated/task_graph.csv",
+    "generated/task_graph.normalized.json",
+    "generated/task_graph.index.json"
+  ],
+  "failure_reason": "",
+  "next_action": "validate task graph"
+}

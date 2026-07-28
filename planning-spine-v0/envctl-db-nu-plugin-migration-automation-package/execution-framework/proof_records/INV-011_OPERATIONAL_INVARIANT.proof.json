@@ -1,0 +1,65 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-011_OPERATIONAL_INVARIANT/4a71a9453bd94a4e8821ea68315bd296f4217200f5adc6ceb460869b503bbc5d/20260727T234858631594Z-ab786dfe2553.json": "b70a5880baaa5ca1a8df03726f133936dabd014ab7a3119c7aa0b49e852269da",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/result.json": "70cfd3e22ec47e26d125c5f4e3dea1aa12dcfa2ee917d462885bfbc6a176f4a8"
+  },
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.3-codex-spark -c model_reasoning_effort=high --cd /run/user/1001/lifeos-json-task-runner/20260727T234858483758Z-8997b4a16b78/INV-011_OPERATIONAL_INVARIANT/20260727T234858631594Z-ab786dfe2553 -"
+  ],
+  "completed_at": "2026-07-27T23:49:42.375887Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-011_OPERATIONAL_INVARIANT/4a71a9453bd94a4e8821ea68315bd296f4217200f5adc6ceb460869b503bbc5d/20260727T234858631594Z-ab786dfe2553.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/result.json"
+  ],
+  "helper_id": "helper-invariant-11",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-011_OPERATIONAL_INVARIANT/4a71a9453bd94a4e8821ea68315bd296f4217200f5adc6ceb460869b503bbc5d/logs/20260727T234858631594Z-ab786dfe2553",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T23:48:58.665750Z",
+  "status": "completed",
+  "task_id": "INV-011_OPERATIONAL_INVARIANT",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/inv-011/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-011/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "Executed live invariant probe: count query returned 2 matching branch|cow proc entries and ruvector version is 2.0.1.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T234858631594Z-ab786dfe2553",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-011_OPERATIONAL_INVARIANT/4a71a9453bd94a4e8821ea68315bd296f4217200f5adc6ceb460869b503bbc5d/20260727T234858631594Z-ab786dfe2553.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "b70a5880baaa5ca1a8df03726f133936dabd014ab7a3119c7aa0b49e852269da"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "4a71a9453bd94a4e8821ea68315bd296f4217200f5adc6ceb460869b503bbc5d",
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0,
+    "verification_output_details": {
+      "branch_cow_proc_count": 2,
+      "ruvector_version": "2.0.1"
+    }
+  }
+}

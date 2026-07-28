@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 import csv, hashlib, os, re, sys, time
+import fcntl
 import json
 from pathlib import Path
 from datetime import datetime, timezone
@@ -176,15 +177,49 @@ def append_proof(record: dict):
     pr.mkdir(parents=True, exist_ok=True)
     sanitized_record = _redact_payload(record) if _should_redact_path(pr / f"{record['task_id']}.proof.json") else record
     proof_path = pr / f"{record['task_id']}.proof.json"
-    proof_path.write_text(json.dumps(sanitized_record, indent=2, sort_keys=False) + '\n', encoding='utf-8')
     ledger = pr / 'proof_ledger.jsonl'
-    # Avoid duplicate task IDs by rebuilding ledger with latest record for task.
-    records = [r for r in load_ledger() if r.get('task_id') != record.get('task_id')]
-    records.append(sanitized_record)
-    ledger.write_text(
-        ''.join(json.dumps(r, sort_keys=False) + '\n' for r in records),
-        encoding='utf-8',
-    )
+    lock_path = pr / 'proof_ledger.jsonl.lock'
+    current_payload = (
+        json.dumps(sanitized_record, indent=2, sort_keys=False) + '\n'
+    ).encode('utf-8')
+    ledger_line = json.dumps(sanitized_record, sort_keys=False)
+
+    with lock_path.open('a+b') as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        if proof_path.is_file():
+            previous_payload = proof_path.read_bytes()
+            if previous_payload != current_payload:
+                previous_digest = hashlib.sha256(previous_payload).hexdigest()
+                history_path = (
+                    pr
+                    / 'history'
+                    / str(record['task_id'])
+                    / f'{previous_digest}.proof.json'
+                )
+                history_path.parent.mkdir(parents=True, exist_ok=True)
+                if history_path.exists():
+                    if history_path.read_bytes() != previous_payload:
+                        raise RuntimeError(
+                            f'proof history collision at {history_path}'
+                        )
+                else:
+                    history_path.write_bytes(previous_payload)
+
+        proof_path.write_bytes(current_payload)
+        existing_records = load_ledger()
+        if sanitized_record not in existing_records:
+            needs_newline = (
+                ledger.is_file()
+                and ledger.stat().st_size > 0
+                and not ledger.read_bytes().endswith(b'\n')
+            )
+            with ledger.open('a', encoding='utf-8') as handle:
+                if needs_newline:
+                    handle.write('\n')
+                handle.write(ledger_line + '\n')
+                handle.flush()
+                os.fsync(handle.fileno())
+        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
     return proof_path
 
 def make_proof(task_id: str, status: str, actor: str, helper_id: str, model_tag: str, repo_path: str, files_changed: list[str], commands_run: list[str], verification_output, evidence: list[str], failure_reason: str = '', next_action: str = ''):

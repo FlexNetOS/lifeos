@@ -1,0 +1,62 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-010_OPERATIONAL_INVARIANT/7ce15e33cfba8768ee96d449f3f050c6e719b0358e192e995b3ba2cd4de38edf/20260727T234858630692Z-bd9cd5a12684.json": "5e438104b12d3891a2e1021e208296df42ef90f84e4969dc182e4b2e68f1f830",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-010/result.json": "f7d74acbe3ef1e5f5e3fd046213ab502eb8e398fcbc4c4b3168e5820ca4e54a6"
+  },
+  "commands_run": [
+    "/bin/bash -lc 'test -d /home/flexnetos/meta/var/lib/codedb && test -n \"$(ls -A /home/flexnetos/meta/var/lib/codedb 2>/dev/null)\"'",
+    "/bin/bash -lc 'du -s /home/flexnetos/meta/var/lib/codedb | awk '\"'\"'{exit ($1>0)?0:1}'\"'\"''"
+  ],
+  "completed_at": "2026-07-27T23:48:58.867925Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-010/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-010_OPERATIONAL_INVARIANT/7ce15e33cfba8768ee96d449f3f050c6e719b0358e192e995b3ba2cd4de38edf/20260727T234858630692Z-bd9cd5a12684.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-010/result.json"
+  ],
+  "helper_id": "helper-invariant-10",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-010_OPERATIONAL_INVARIANT/7ce15e33cfba8768ee96d449f3f050c6e719b0358e192e995b3ba2cd4de38edf/logs/20260727T234858630692Z-bd9cd5a12684",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "cross-check the probe against every invariant clause before claiming implementation",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-27T23:48:58.634245Z",
+  "status": "completed",
+  "task_id": "INV-010_OPERATIONAL_INVARIANT",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/inv-010/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/inv-010/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The declared live invariant command and its verification exited zero; this proves that probe, not every semantic clause of the invariant.",
+    "implementation_scope": "declared_live_probe_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260727T234858630692Z-bd9cd5a12684",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/INV-010_OPERATIONAL_INVARIANT/7ce15e33cfba8768ee96d449f3f050c6e719b0358e192e995b3ba2cd4de38edf/20260727T234858630692Z-bd9cd5a12684.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "5e438104b12d3891a2e1021e208296df42ef90f84e4969dc182e4b2e68f1f830"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "7ce15e33cfba8768ee96d449f3f050c6e719b0358e192e995b3ba2cd4de38edf",
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

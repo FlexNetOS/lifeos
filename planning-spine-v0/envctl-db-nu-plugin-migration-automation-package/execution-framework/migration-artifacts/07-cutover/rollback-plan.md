@@ -3,11 +3,11 @@
 - Task: `ART-122_ROLLBACK`
 - Contract artifact: `artifact:07-cutover-rollback-plan-md`
 - Canonical path: `migration-artifacts/07-cutover/rollback-plan.md`
-- Generated at: `2026-07-27T05:01:32+00:00`
+- Generated at: `2026-07-28T11:43:56+00:00`
 - Target: `flexnetos-vs-lifeos`
 - Safety mode: `approval-gated`
 - Max auto risk: `R2`
-- Readiness band: `conditional`
+- Readiness band: `ready`
 - Execution ready now: `True`
 
 ## Gate Summary
@@ -81,7 +81,7 @@
   - Evidence shows no approval-gated target mutation has started.
 - Notes:
   - Safe checkpoint ref: execution-framework/generated/rollback_checkpoints/safe-artifact.json.
-  - Cutover execution-ready flag is currently False.
+  - Cutover execution-ready flag is currently True.
 - Evidence refs:
   - `generated/envctl_rollback_checkpoints_report.json`
   - `migration-artifacts/art-121_cutover/cutover-checklist.json`
@@ -167,7 +167,7 @@
   - VER-300_UNIT_VALIDATION is completed before declaring rollback recovery releasable.
 - Notes:
   - Current statuses: REQ-041=completed, REQ-045=completed, VER-300=completed.
-  - Readiness band remains conditional.
+  - Readiness band remains ready.
 - Evidence refs:
   - `generated/status_from_proofs.json`
   - `migration-artifacts/art-128_readiness_scorecard/readiness-scorecard.json`

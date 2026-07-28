@@ -12,7 +12,7 @@ Backtrace index (v0-v5):
 
 - `history/pre_execution_framework_manifest.json` — upgrade baseline manifest and history chain origin.
 - `history/README.md` — concise version-chain landing context.
-- `history/v0/README.md`, `history/v1/README.md`, `history/v2/README.md`, `history/v3/README.md`, `history/v4/README.md`, `history/v5/README.md` — version-specific migration backtrace snapshots.
+- `history/v0/Migration_Project_Artifacts.md`, `history/v1/README.md`, `history/v2/README.md`, `history/v3/README.md`, `history/v4/README.md`, `history/v5/README.md` — version-specific migration backtrace snapshots.
 - `history/v0/VERSION_MANIFEST.md` through `history/v5/VERSION_MANIFEST.md` — each release manifest.
 
 Backtrace rule: Before changing execution behavior, review `history/v0` through `history/v5` to compare prior package versions and preserve upgrade-only/no-downgrade intent. Use `history/v0` as the restored baseline/backtrace anchor when validating package evolution.
@@ -25,7 +25,7 @@ Codex execution entry pointers:
 - `execution-framework/generated/execution_manifest.json`
 - `execution-framework/generated/execution_packets/`
 
-Agent quick path: `history/` → `CODEX_FINAL_EXECUTION_PROMPT.md` → `execution-framework/generated/task_graph.csv` → `execution-framework/generated/execution_manifest.json` → `execution-framework/generated/execution_packets/` → `execution-framework/state/goal_loop_state.json` → `execution-framework/state/status_report.json` → `execution-framework/generated/final_verification_report.json` → `execution-framework/proof_records/proof_ledger.jsonl`.
+Agent quick path: `history/` → `CODEX_FINAL_EXECUTION_PROMPT.md` → `execution-framework/generated/task_graph.csv` → `execution-framework/generated/execution_manifest.json` → `execution-framework/generated/execution_packets/` → `execution-framework/state/goal_loop_state.json` → `execution-framework/generated/status_report.json` → `execution-framework/generated/final_verification_report.json` → `execution-framework/proof_records/proof_ledger.jsonl`.
 
 No-gap status: `execution-framework/generated/live_drive_gap_closure_report.json` reports `pass_no_gaps_drive_live_synchronized`.
 

@@ -12,16 +12,102 @@
       "artifact_uri": "workflow/mandatory_language_inventory.json",
       "catalog": "mandatory-language-reverse-coverage",
       "projection_uri": "workflow/mandatory_language_inventory.csv",
-      "record_count": 295,
+      "record_count": 1008,
       "status_authority": "classification only; never execution or completion authority",
       "version": "1.0.0"
     }
   ],
+  "companion_packet_count": 5,
+  "generated_packet_count": 106,
   "namespace": "nu-plugin-cdb-handoff",
-  "packet_count": 106,
+  "packet_count": 111,
+  "packet_reconciliation": {
+    "classified_packet_count": 111,
+    "errors": [],
+    "generated_cdb_packet_count": 106,
+    "mandatory_local_companion_count": 5,
+    "physical_packet_count": 111,
+    "unclassified_packet_count": 0
+  },
   "packets": [
     {
+      "classification": "mandatory-local-companion",
+      "depends_on": [],
+      "human_approval_required": false,
+      "model_tag": "gpt-5.6-sol",
+      "packet_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+      "packet_uri": "packets/CAP-INV011-001_RUVECTOR_SHAKE256_SQL.json",
+      "proof_required": true,
+      "schema": "lifeos.execution-packet.v1",
+      "sha256": "fc1ff3edaf4d538cc0e8eb5de07bdfd6eca00adac9ed0317fe6c14f20ff81757",
+      "status": "pending",
+      "task_id": "CAP-INV011-001_RUVECTOR_SHAKE256_SQL",
+      "task_kind": "implementation"
+    },
+    {
+      "classification": "mandatory-local-companion",
+      "depends_on": [],
+      "human_approval_required": false,
+      "model_tag": "gpt-5.6-sol",
+      "packet_id": "CAP-INV011-002_RVF_CANONICAL_COW_FORMAT",
+      "packet_uri": "packets/CAP-INV011-002_RVF_CANONICAL_COW_FORMAT.json",
+      "proof_required": true,
+      "schema": "lifeos.execution-packet.v1",
+      "sha256": "10808543b78b38b63451de167d3b7cf55f2007391aff3c40b3cb030139bd1508",
+      "status": "pending",
+      "task_id": "CAP-INV011-002_RVF_CANONICAL_COW_FORMAT",
+      "task_kind": "implementation"
+    },
+    {
+      "classification": "mandatory-local-companion",
+      "depends_on": [
+        "CAP-INV011-001_RUVECTOR_SHAKE256_SQL"
+      ],
+      "human_approval_required": false,
+      "model_tag": "gpt-5.6-sol",
+      "packet_id": "CAP-INV011-003_COW_DB_SEMANTICS",
+      "packet_uri": "packets/CAP-INV011-003_COW_DB_SEMANTICS.json",
+      "proof_required": true,
+      "schema": "lifeos.execution-packet.v1",
+      "sha256": "6405913373cfaba58004cf1eeba39a808ffbbc467d0a2b82497654fc1f801876",
+      "status": "pending",
+      "task_id": "CAP-INV011-003_COW_DB_SEMANTICS",
+      "task_kind": "implementation"
+    },
+    {
+      "classification": "mandatory-local-companion",
+      "depends_on": [
+        "CAP-INV011-002_RVF_CANONICAL_COW_FORMAT",
+        "CAP-INV011-003_COW_DB_SEMANTICS"
+      ],
+      "human_approval_required": false,
+      "model_tag": "gpt-5.6-sol",
+      "packet_id": "CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP",
+      "packet_uri": "packets/CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP.json",
+      "proof_required": true,
+      "schema": "lifeos.execution-packet.v1",
+      "sha256": "60a3cfe571c678d8e0e9ea93a34c9d5842a6e516517063cbe4d64353c06892f2",
+      "status": "pending",
+      "task_id": "CAP-INV011-004_RVF_POSTGRES_ROUNDTRIP",
+      "task_kind": "implementation"
+    },
+    {
+      "classification": "mandatory-local-companion",
+      "depends_on": [],
+      "human_approval_required": false,
+      "model_tag": "gpt-5.3-codex-spark",
+      "packet_id": "LIFEOS-RELEASE-ADOPTION",
+      "packet_uri": "packets/LIFEOS-RELEASE-ADOPTION.json",
+      "proof_required": true,
+      "schema": "lifeos.release-adoption-packet.v1",
+      "sha256": "6cd19d4b118a8cc26fa49346e5e58e52967cef979d6b0bc7320eaa7fdb1ed344",
+      "status": "pending",
+      "task_id": "LIFEOS-RELEASE-ADOPTION",
+      "task_kind": "release-adoption"
+    },
+    {
       "approval_id": "APPROVAL-TASK-CDB000",
+      "classification": "generated-cdb-work-order",
       "depends_on": [],
       "intent_lock_digest": "blake3:99d216b3b748d1a8b6ffa2712c4de1d44a6010600f6cff79f4af79661d958452",
       "packet_id": "PACKET-TASK-CDB000",
@@ -32,6 +118,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB001",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB000"
       ],
@@ -44,6 +131,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB002",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB000"
       ],
@@ -56,6 +144,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB003",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB000"
       ],
@@ -68,6 +157,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB004",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB000"
       ],
@@ -80,6 +170,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB005",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB001",
         "TASK-CDB003",
@@ -94,6 +185,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB006",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB005"
       ],
@@ -106,6 +198,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB007",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB006"
       ],
@@ -118,6 +211,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB008",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB006"
       ],
@@ -130,6 +224,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB009",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB006"
       ],
@@ -142,6 +237,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB010",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB006"
       ],
@@ -154,6 +250,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB011",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB009"
       ],
@@ -166,6 +263,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB012",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB007"
       ],
@@ -178,6 +276,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB013",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB006",
         "TASK-CDB068"
@@ -191,6 +290,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB014",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB013",
         "TASK-CDB007"
@@ -204,6 +304,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB015",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB014"
       ],
@@ -216,6 +317,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB016",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB015"
       ],
@@ -228,6 +330,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB017",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB014",
         "TASK-CDB015"
@@ -241,6 +344,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB018",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB017"
       ],
@@ -253,6 +357,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB019",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB014",
         "TASK-CDB015"
@@ -266,6 +371,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB020",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB019"
       ],
@@ -278,6 +384,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB021",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB019"
       ],
@@ -290,6 +397,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB022",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB018",
         "TASK-CDB021"
@@ -303,6 +411,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB023",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB022"
       ],
@@ -315,6 +424,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB024",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB022"
       ],
@@ -327,6 +437,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB025",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB022"
       ],
@@ -339,6 +450,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB026",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB022"
       ],
@@ -351,6 +463,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB027",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB025"
       ],
@@ -363,6 +476,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB028",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB017"
       ],
@@ -375,6 +489,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB029",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB015",
         "TASK-CDB017",
@@ -390,6 +505,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB030",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB029"
       ],
@@ -402,6 +518,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB031",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB029",
         "TASK-CDB030"
@@ -415,6 +532,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB032",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB029"
       ],
@@ -427,6 +545,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB033",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB025",
         "TASK-CDB032"
@@ -440,6 +559,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB034",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB033"
       ],
@@ -452,6 +572,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB035",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB029"
       ],
@@ -464,6 +585,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB036",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB029"
       ],
@@ -476,6 +598,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB037",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB032"
       ],
@@ -488,6 +611,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB038",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB031"
       ],
@@ -500,6 +624,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB039",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB028",
         "TASK-CDB029",
@@ -514,6 +639,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB040",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB009"
       ],
@@ -526,6 +652,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB041",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB012",
         "TASK-CDB013"
@@ -539,6 +666,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB042",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB041",
         "TASK-CDB029"
@@ -552,6 +680,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB043",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB041",
         "TASK-CDB032"
@@ -565,6 +694,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB044",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB028",
         "TASK-CDB041"
@@ -578,6 +708,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB045",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB033",
         "TASK-CDB034",
@@ -592,6 +723,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB046",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB042",
         "TASK-CDB043",
@@ -607,6 +739,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB047",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB046"
       ],
@@ -619,6 +752,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB048",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB047"
       ],
@@ -631,6 +765,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB049",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB038"
       ],
@@ -643,6 +778,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB050",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB049",
         "TASK-CDB030"
@@ -656,6 +792,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB051",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB050"
       ],
@@ -668,6 +805,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB052",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB051"
       ],
@@ -680,6 +818,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB053",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB051"
       ],
@@ -692,6 +831,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB054",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB050",
         "TASK-CDB052"
@@ -705,6 +845,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB055",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB054"
       ],
@@ -717,6 +858,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB056",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB054"
       ],
@@ -729,6 +871,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB057",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB053"
       ],
@@ -741,6 +884,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB058",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB049",
         "TASK-CDB056"
@@ -754,6 +898,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB059",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB058",
         "TASK-CDB054"
@@ -767,6 +912,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB060",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB052",
         "TASK-CDB032"
@@ -780,6 +926,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB061",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB014",
         "TASK-CDB050"
@@ -793,6 +940,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB062",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB032",
         "TASK-CDB060"
@@ -806,6 +954,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB063",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB035",
         "TASK-CDB055"
@@ -819,6 +968,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB064",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB005"
       ],
@@ -831,6 +981,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB065",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB064"
       ],
@@ -843,6 +994,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB066",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB065"
       ],
@@ -855,6 +1007,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB067",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB066"
       ],
@@ -867,6 +1020,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB068",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB067"
       ],
@@ -879,6 +1033,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB069",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB068"
       ],
@@ -891,6 +1046,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB070",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB069"
       ],
@@ -903,6 +1059,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB071",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB070"
       ],
@@ -915,6 +1072,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB072",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB071"
       ],
@@ -927,6 +1085,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB073",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB072"
       ],
@@ -939,6 +1098,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB074",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB073"
       ],
@@ -951,6 +1111,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB075",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB074"
       ],
@@ -963,6 +1124,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB076",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB075"
       ],
@@ -975,6 +1137,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB077",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB071"
       ],
@@ -987,6 +1150,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB078",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB071"
       ],
@@ -999,6 +1163,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB079",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB071"
       ],
@@ -1011,6 +1176,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB080",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB079"
       ],
@@ -1023,6 +1189,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB081",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB072"
       ],
@@ -1035,6 +1202,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB082",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB079"
       ],
@@ -1047,6 +1215,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB083",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB071"
       ],
@@ -1059,6 +1228,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB084",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB072"
       ],
@@ -1071,6 +1241,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB085",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB084"
       ],
@@ -1083,6 +1254,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB086",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB072"
       ],
@@ -1095,6 +1267,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB087",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB073"
       ],
@@ -1107,6 +1280,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB088",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB075"
       ],
@@ -1119,6 +1293,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB089",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB075"
       ],
@@ -1131,6 +1306,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB090",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB070",
         "TASK-CDB071",
@@ -1162,6 +1338,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB091",
+      "classification": "generated-cdb-work-order",
       "depends_on": [],
       "intent_lock_digest": "blake3:f56ae2cc682ef01b07758135ee96c03110aa3b77b089872627c4e8be2b09906f",
       "packet_id": "PACKET-TASK-CDB091",
@@ -1172,6 +1349,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB092",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB091"
       ],
@@ -1184,6 +1362,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB093",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB091"
       ],
@@ -1196,6 +1375,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB094",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB091"
       ],
@@ -1208,6 +1388,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB095",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB091"
       ],
@@ -1220,6 +1401,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB096",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB093"
       ],
@@ -1232,6 +1414,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB097",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB093"
       ],
@@ -1244,6 +1427,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB098",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB093"
       ],
@@ -1256,6 +1440,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB099",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB093"
       ],
@@ -1268,6 +1453,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB100",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB091"
       ],
@@ -1280,6 +1466,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB101",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB100"
       ],
@@ -1292,6 +1479,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB102",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB094",
         "TASK-CDB100",
@@ -1306,6 +1494,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB103",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB095"
       ],
@@ -1318,6 +1507,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB104",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB102",
         "TASK-CDB103"
@@ -1331,6 +1521,7 @@
     },
     {
       "approval_id": "APPROVAL-TASK-CDB105",
+      "classification": "generated-cdb-work-order",
       "depends_on": [
         "TASK-CDB091",
         "TASK-CDB092",
@@ -1355,9 +1546,9 @@
       "task_id": "TASK-CDB105"
     }
   ],
-  "schema": "lifeos.execution-manifest.v1",
+  "schema": "lifeos.execution-manifest.v2",
   "source_commit": "c84740532ded2a27ee283ea7a3a5f303eaeb61a7",
-  "task_count": 106,
+  "task_count": 111,
   "visuals": [
     {
       "artifact_uri": "visuals/task_graph.mmd",
@@ -1395,5 +1586,6 @@
       "sha256": "be9a3006ae59c01cbd33478bce98ddab0d4f7a7776c30bd3984bea9ccd72d602",
       "surface": "static-wiki"
     }
-  ]
+  ],
+  "work_order_count": 106
 }

@@ -1,0 +1,62 @@
+{
+  "actor": "json-task-runner",
+  "checksums": {
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-AGENTDB/51e56f1ac00b0a1192bd7b45a32a206f7b2a36614961d4bcf84be8c4e6236f7d/20260728T014730828995Z-faffa4077437.json": "e4be21bcdb22ed5bcaa701310aab4c4f7ebe318a9e2d871a1ffb345869408081",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-agentdb/result.json": "d4555ef7144a27c526f84e5cbe56d242ea39ba338ff1c9327da2b6f0d88f0c03"
+  },
+  "commands_run": [
+    "/bin/bash -lc 'test -n \"$(bun info '\"'\"'agentdb'\"'\"' version 2>/dev/null)\" && test \"$(bun info '\"'\"'agentdb'\"'\"' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '\"'\"'agentdb@[0-9][^ ]*'\"'\"' | head -1 | sed '\"'\"'s/.*@//'\"'\"')\"'",
+    "/bin/bash -lc 'bun info '\"'\"'agentdb'\"'\"' version'"
+  ],
+  "completed_at": "2026-07-28T01:47:31.363640Z",
+  "evidence": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-agentdb/result.json",
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-AGENTDB/51e56f1ac00b0a1192bd7b45a32a206f7b2a36614961d4bcf84be8c4e6236f7d/20260728T014730828995Z-faffa4077437.json"
+  ],
+  "failure_reason": "",
+  "files_changed": [
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-agentdb/result.json"
+  ],
+  "helper_id": "helper-currency-agentdb",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-AGENTDB/51e56f1ac00b0a1192bd7b45a32a206f7b2a36614961d4bcf84be8c4e6236f7d/logs/20260728T014730828995Z-faffa4077437",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "none",
+  "proof_schema_version": "1.0",
+  "repo_path": ".",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T01:47:30.830348Z",
+  "status": "completed",
+  "task_id": "CURRENCY-AGENTDB",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "migration-artifacts/currency-agentdb/result.json",
+        "kind": "receipt_result",
+        "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/migration-artifacts/currency-agentdb/result.json",
+        "status": "receipt_result_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command and its independently executed verification both exited zero.",
+    "implementation_scope": "command_and_verification_passed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T014730828995Z-faffa4077437",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/CURRENCY-AGENTDB/51e56f1ac00b0a1192bd7b45a32a206f7b2a36614961d4bcf84be8c4e6236f7d/20260728T014730828995Z-faffa4077437.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "e4be21bcdb22ed5bcaa701310aab4c4f7ebe318a9e2d871a1ffb345869408081"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "51e56f1ac00b0a1192bd7b45a32a206f7b2a36614961d4bcf84be8c4e6236f7d",
+    "probe_class": "currency",
+    "task_completion_proven": true,
+    "verification_executed": true,
+    "verification_exit_code": 0
+  }
+}

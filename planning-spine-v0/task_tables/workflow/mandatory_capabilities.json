@@ -714,8 +714,8 @@
       "requirement": "mandatory",
       "source_refs": [
         {
-          "line_end": 40,
-          "line_start": 28,
+          "line_end": 53,
+          "line_start": 41,
           "path": "README.md",
           "source_scope": "reference-package",
           "source_wording": "## Bottom-line strategy\n\nDo **contract-first parallel implementation**.\n\nDo not fully implement the FlexNetOS prompt package first as a one-off, and do not build envctl tooling blindly without proving it can execute the package. Codex should:\n\n1. Extract and lock the migration artifact contract from the existing FlexNetOS package.\n2. Add envctl database tables, event sourcing, target descriptors, migration recipes, artifact contracts, evidence storage, approvals, checkpoints, rollbacks, replay, and validation records.\n3. Build a thin envctl adapter that can import and run the prior package as an external artifact-generation bundle.\n4. In parallel, build the Nushell plugin protocol/commands that read from and append controlled actions into envctl's migration database.\n5. Replace shell-oriented collectors with native envctl collectors incrementally, only after the adapter proves parity.\n\nThis sequencing avoids the two worst outcomes: a one-off migration package that cannot be reproduced, or a polished database tool that cannot execute the real migration contract."

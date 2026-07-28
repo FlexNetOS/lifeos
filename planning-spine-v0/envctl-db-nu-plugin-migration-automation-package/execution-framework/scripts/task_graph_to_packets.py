@@ -11,6 +11,35 @@ JSON_FIELDS = {'anchor_binding'}
 OPTIONAL_PACKET_FIELDS = {'anchor_binding','needs_capability_probe','probe_class','source_graph_uri'}
 
 
+def write_packet(path: Path, packet: dict) -> bool:
+    """Write a packet only when its immutable semantic contract changed."""
+    existing = None
+    try:
+        candidate = json.loads(path.read_text(encoding='utf-8'))
+        if isinstance(candidate, dict):
+            existing = candidate
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        pass
+
+    if existing is not None:
+        existing_contract = {
+            key: value for key, value in existing.items() if key != 'generated_at'
+        }
+        packet_contract = {
+            key: value for key, value in packet.items() if key != 'generated_at'
+        }
+        if existing_contract == packet_contract:
+            if 'generated_at' in existing:
+                packet['generated_at'] = existing['generated_at']
+            return False
+
+    path.write_text(
+        json.dumps(packet, indent=2, sort_keys=False) + '\n',
+        encoding='utf-8',
+    )
+    return True
+
+
 def convert(row):
     packet = {'packet_schema_version':'1.0'}
     for k,v in row.items():
@@ -43,7 +72,7 @@ def main():
     for row in rows:
         packet = convert(row)
         out = packet_dir / f"{row['task_id']}.json"
-        out.write_text(json.dumps(packet, indent=2, sort_keys=False) + '\n', encoding='utf-8')
+        write_packet(out, packet)
         packets.append({'task_id':row['task_id'],'packet_uri':f'generated/execution_packets/{row["task_id"]}.json','phase':row['phase'],'owner_lane':row['owner_lane'],'parallel_group':row['parallel_group'],'depends_on':split_list(row.get('depends_on',''))})
     manifest = {'schema_version':'1.0','generated_at':now(),'task_count':len(rows),'packet_count':len(packets),'packets':packets}
     write_json('generated/execution_manifest.json', manifest)

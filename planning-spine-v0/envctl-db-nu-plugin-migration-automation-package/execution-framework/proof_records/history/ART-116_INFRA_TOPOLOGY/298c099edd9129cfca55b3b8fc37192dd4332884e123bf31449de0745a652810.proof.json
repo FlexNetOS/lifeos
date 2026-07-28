@@ -1,0 +1,48 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "ART-116_INFRA_TOPOLOGY",
+  "status": "passed",
+  "started_at": "2026-07-28T09:34:50+00:00",
+  "completed_at": "2026-07-28T09:34:50+00:00",
+  "actor": "artifact-agent",
+  "helper_id": "helper-artifact-17",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "${MIGRATION_TARGET_ROOT}",
+  "files_changed": [
+    "execution-framework/migration-artifacts/art-116_infra_topology/topology.md",
+    "execution-framework/migration-artifacts/art-116_infra_topology/topology.json",
+    "execution-framework/migration-artifacts/08-operations/infrastructure-topology-map.md",
+    "execution-framework/generated/art116_infra_topology_registry_report.json",
+    "execution-framework/state/ART-116_INFRA_TOPOLOGY.heartbeat.json",
+    "execution-framework/logs/ART-116_INFRA_TOPOLOGY.log"
+  ],
+  "commands_run": [
+    "python3 scripts/generate_art116_infra_topology.py",
+    "python3 -m json.tool migration-artifacts/art-116_infra_topology/topology.json",
+    "python3 -m json.tool generated/art116_infra_topology_registry_report.json"
+  ],
+  "verification_output": {
+    "artifact_files_exist": true,
+    "hashes_recorded": true,
+    "validation_evidence_linked": true
+  },
+  "checksums": {
+    "execution-framework/migration-artifacts/art-116_infra_topology/topology.md": "0b945fbfbf4b12d81a4c38b4013aa27a1d0a578574d844e4d6f96a7a3cb0f08b",
+    "execution-framework/migration-artifacts/art-116_infra_topology/topology.json": "7ca509e7b16e450ada430ed324d35587289d6c8e184f5f3744edbcad526830e5",
+    "execution-framework/migration-artifacts/08-operations/infrastructure-topology-map.md": "0b945fbfbf4b12d81a4c38b4013aa27a1d0a578574d844e4d6f96a7a3cb0f08b",
+    "execution-framework/generated/art116_infra_topology_registry_report.json": "7d3991519cfdeba926c9fe87868382b3d0c9cc9abeb5364f38ef7191430959ac",
+    "execution-framework/state/ART-116_INFRA_TOPOLOGY.heartbeat.json": "4c71d8fd56d4c636dc36ae249f60c4d3d53ed1475c5ba95b2607bfd77d65b893",
+    "execution-framework/logs/ART-116_INFRA_TOPOLOGY.log": "17613c7fa8066bc1280dc3dabbc883ab8fe8be8e1d49dead4832a5771a944d9c"
+  },
+  "logs_uri": "logs/ART-116_INFRA_TOPOLOGY.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "migration-artifacts/art-116_infra_topology/topology.md",
+    "migration-artifacts/art-116_infra_topology/topology.json",
+    "migration-artifacts/08-operations/infrastructure-topology-map.md",
+    "generated/art116_infra_topology_registry_report.json",
+    "logs/ART-116_INFRA_TOPOLOGY.log"
+  ],
+  "failure_reason": "",
+  "next_action": ""
+}

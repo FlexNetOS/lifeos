@@ -403,30 +403,41 @@ def write_artifacts(payload: dict[str, Any]) -> dict[str, str]:
 
 def insert_fixture(conn: sqlite3.Connection) -> dict[str, str]:
     descriptor = source_inputs()["target_descriptor"]
-    conn.execute(
-        """
-        INSERT INTO envctl_migration_targets
-          (id, target_id, target_type, primary_root, compare_root, descriptor_json,
-           descriptor_hash, safety_mode, max_auto_risk)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            "target-art129-flexnetos-vs-lifeos",
-            "flexnetos-vs-lifeos",
-            "mixed",
-            descriptor["primary_root"],
-            descriptor["compare_root"],
-            json.dumps(descriptor, sort_keys=True),
-            "sha256:art129-target-descriptor",
-            "approval-gated",
-            "R2",
-        ),
-    )
+    target_row = conn.execute(
+        "SELECT id FROM envctl_migration_targets WHERE target_id = ?",
+        ("flexnetos-vs-lifeos",),
+    ).fetchone()
+    target_fk = target_row[0] if target_row else "target-art129-flexnetos-vs-lifeos"
+    if target_row is None:
+        conn.execute(
+            """
+            INSERT INTO envctl_migration_targets
+              (id, target_id, target_type, primary_root, compare_root, descriptor_json,
+               descriptor_hash, safety_mode, max_auto_risk)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                target_fk,
+                "flexnetos-vs-lifeos",
+                "mixed",
+                descriptor["primary_root"],
+                descriptor["compare_root"],
+                json.dumps(descriptor, sort_keys=True),
+                "sha256:art129-target-descriptor",
+                "approval-gated",
+                "R2",
+            ),
+        )
     conn.execute(
         """
         INSERT INTO envctl_migration_packages
           (id, package_name, package_path, package_hash, manifest_json)
         VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          package_name = excluded.package_name,
+          package_path = excluded.package_path,
+          package_hash = excluded.package_hash,
+          manifest_json = excluded.manifest_json
         """,
         (
             "pkg-art129",
@@ -441,6 +452,12 @@ def insert_fixture(conn: sqlite3.Connection) -> dict[str, str]:
         INSERT INTO envctl_migration_artifact_contracts
           (id, contract_name, contract_version, source_package_id, contract_hash, contract_json)
         VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          contract_name = excluded.contract_name,
+          contract_version = excluded.contract_version,
+          source_package_id = excluded.source_package_id,
+          contract_hash = excluded.contract_hash,
+          contract_json = excluded.contract_json
         """,
         (
             CONTRACT_ID,
@@ -456,6 +473,12 @@ def insert_fixture(conn: sqlite3.Connection) -> dict[str, str]:
         INSERT INTO envctl_migration_recipes
           (id, recipe_name, recipe_version, artifact_contract_id, recipe_hash, recipe_json)
         VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          recipe_name = excluded.recipe_name,
+          recipe_version = excluded.recipe_version,
+          artifact_contract_id = excluded.artifact_contract_id,
+          recipe_hash = excluded.recipe_hash,
+          recipe_json = excluded.recipe_json
         """,
         (
             "recipe-art129",
@@ -473,10 +496,22 @@ def insert_fixture(conn: sqlite3.Connection) -> dict[str, str]:
            initiated_by, sandbox_policy, approval_policy, tool_versions_json,
            reproducibility_hash, started_at_utc)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          target_id = excluded.target_id,
+          recipe_id = excluded.recipe_id,
+          artifact_contract_id = excluded.artifact_contract_id,
+          status = excluded.status,
+          human_mode = excluded.human_mode,
+          initiated_by = excluded.initiated_by,
+          sandbox_policy = excluded.sandbox_policy,
+          approval_policy = excluded.approval_policy,
+          tool_versions_json = excluded.tool_versions_json,
+          reproducibility_hash = excluded.reproducibility_hash,
+          started_at_utc = excluded.started_at_utc
         """,
         (
             RUN_ID,
-            "target-art129-flexnetos-vs-lifeos",
+            target_fk,
             "recipe-art129",
             CONTRACT_ID,
             "running",
@@ -495,6 +530,16 @@ def insert_fixture(conn: sqlite3.Connection) -> dict[str, str]:
           (id, run_id, operation_type, phase, status, risk, idempotency_key,
            command_hash, command_redacted, input_json)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          run_id = excluded.run_id,
+          operation_type = excluded.operation_type,
+          phase = excluded.phase,
+          status = excluded.status,
+          risk = excluded.risk,
+          idempotency_key = excluded.idempotency_key,
+          command_hash = excluded.command_hash,
+          command_redacted = excluded.command_redacted,
+          input_json = excluded.input_json
         """,
         (
             OPERATION_ID,
@@ -721,7 +766,9 @@ def main() -> None:
     generated_at = now()
     payload = build_artifact_payload(generated_at)
     relpaths = write_artifacts(payload)
-    conn = sqlite3.connect(":memory:")
+    # Persist the registration fixture so the completion gate can be verified
+    # against the envctl artifact registry after this process exits.
+    conn = sqlite3.connect(root() / "generated" / "envctl.db")
     conn.execute("PRAGMA foreign_keys = ON")
     apply_migrations(conn, package_root())
     fixture = insert_fixture(conn)

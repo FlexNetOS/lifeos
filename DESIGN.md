@@ -27,6 +27,13 @@ colors:
   # Status
   error: "#FF4D6A"
   warning: "#FFB020"
+  # Agent-state semantic roles (multi-surface spec roles bound to LifeOS values)
+  agent-local: "#00E676"      # runs on the local private node
+  agent-active: "#00D4FF"     # subagent actively working
+  agent-approval: "#FFB020"   # blocked on human-in-the-loop approval
+  agent-thinking: "#9B7BFF"   # memory / inference
+  agent-idle: "#9BA1A6"       # scheduled, not running (--fg-3; --fg-4 fails AA on card)
+  agent-failed: "#FF4D6A"     # errored
 typography:
   display-hero:
     fontFamily: Rigelstar
@@ -269,6 +276,57 @@ components:
     backgroundColor: rgba(255, 77, 106, 0.14)
     textColor: "{colors.on-surface}"
     rounded: "{rounded.lg}"
+  # Surface density — the four multi-surface viewports.
+  # `size` carries the minimum interactive target for that surface.
+  # focusRing / textScale / backgroundOpacity have no schema sub-token; they live
+  # in colors_and_type.css §9 and are documented under "Surface Density" below.
+  surface-mobile:
+    padding: "{spacing.md-sm}"
+    rounded: "{rounded.xl}"
+    size: 44px
+  surface-workstation:
+    padding: "{spacing.md}"
+    rounded: "{rounded.lg}"
+    size: 32px
+  surface-tv-10ft:
+    padding: "{spacing.xl}"
+    rounded: "{rounded.2xl}"
+    size: 64px
+  surface-ai-glasses:
+    padding: "{spacing.sm}"
+    rounded: "{rounded.md}"
+    size: 32px
+  # Agent-state chips — one per semantic role
+  agent-chip-local:
+    backgroundColor: rgba(0, 230, 118, 0.14)
+    textColor: "{colors.agent-local}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
+  agent-chip-active:
+    backgroundColor: rgba(0, 212, 255, 0.14)
+    textColor: "{colors.agent-active}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
+  agent-chip-approval:
+    backgroundColor: rgba(255, 176, 32, 0.14)
+    textColor: "{colors.agent-approval}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
+  agent-chip-thinking:
+    backgroundColor: rgba(155, 123, 255, 0.14)
+    textColor: "{colors.agent-thinking}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
+  agent-chip-idle:
+    backgroundColor: "{colors.surface-card}"
+    textColor: "{colors.agent-idle}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
+  agent-chip-failed:
+    backgroundColor: rgba(255, 77, 106, 0.14)
+    textColor: "{colors.agent-failed}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
 ---
 
 # LifeOS Design System
@@ -356,6 +414,49 @@ LifeOS uses a fixed-shell three-column layout: **Sidebar | Workspace panel | Mai
 - **Card grid:** 12-column CSS grid with `gap: var(--space-4)` (16px). Stat cards span 3 columns; feature cards span 6; full-width cards span 12.
 - **`z-index` layers:** `surface` (0) → `panel` (10) → `overlay` (100) → `modal` (200) → `toast` (300) → `tooltip` (400).
 - **Safe area:** 16px minimum margin from viewport edges on all surfaces.
+
+## Surface Density
+
+LifeOS renders on four surfaces. Density — not palette — is what changes between them. All four share the same tokens, type ramp, and brand rules; only spacing, radius, target size, focus weight, and type scale shift.
+
+Roles and viewports originate in the LifeOS Multi-Surface UI/UX Specification (Gemini Spark, 2026-07-23). That document proposed its own palette (Electric Violet `#7C3AED`, Slate `#090D16`, Inter). **That palette is rejected** — LifeOS brand tokens are authoritative. The *structure* is adopted; the *values* are LifeOS.
+
+| Surface | Padding | Radius | Min target | Focus ring | Type scale | Opacity |
+|---|---|---|---|---|---|---|
+| `mobile` | 12px (`md-sm`) | 16px (`xl`) | 44px | 2px | 1× | 1 |
+| `workstation` *(default)* | 16px (`md`) | 12px (`lg`) | 32px | 2px | 1× | 1 |
+| `tv-10ft` | 32px (`xl`) | 20px (`2xl`) | 64px | 4px | 1.5× | 1 |
+| `ai-glasses` | 8px (`sm`) | 8px (`md`) | 32px | 2px | 1.15× | 0.4 |
+
+**Spec reconciliation.** Two spec values are off the LifeOS 4pt scale and were snapped, deliberately:
+
+- TV padding `28px` → **32px** (`spacing.xl`) — 28px is not on the scale.
+- TV radius `24px` → **20px** (`rounded.2xl`) — 24px is not on the scale.
+
+Mobile (12/16), workstation (16/12), and glasses (8/8) were already on-scale and are adopted verbatim.
+
+**Runtime.** Density lives in `colors_and_type.css` §9 as `[data-surface]` scopes exposing `--surface-pad`, `--surface-radius`, `--surface-gap`, `--surface-min-target`, `--surface-focus-ring`, `--surface-text-scale`, `--surface-opacity`. `src/lib/surface.svelte.js` resolves the active surface and stamps `data-surface` on `<html>` before mount.
+
+Resolution precedence: explicit pin → `?surface=` query → `VITE_LIFEOS_SURFACE` build target → width auto-detect (`≤767px` = mobile, else workstation).
+
+**`tv-10ft` and `ai-glasses` are never auto-detected.** A TV reports a desktop-sized viewport and glasses report an arbitrary one; both require an explicit selection. Do not add a width heuristic for them.
+
+Opt in with the utility classes `.surface-pad`, `.surface-card`, `.surface-stack`, `.surface-target`, `.surface-focus`. Nothing existing is retrofitted — the workstation defaults match today's rendering exactly, so adopting the scaffold is a no-op until a component opts in.
+
+## Agent State
+
+Six semantic roles for agent status, distinct from generic `status-*` colors. An agent chip communicates *where and how* work is running, not whether an operation succeeded.
+
+| Role | Token | Value | Meaning |
+|---|---|---|---|
+| Local private node | `agent-local` | `#00E676` | Running on the local node — never left the device |
+| Active subagent | `agent-active` | `#00D4FF` | Actively working |
+| Human approval | `agent-approval` | `#FFB020` | Blocked awaiting human-in-the-loop approval |
+| Thinking | `agent-thinking` | `#9B7BFF` | Memory / inference in flight |
+| Idle | `agent-idle` | `#9BA1A6` | Scheduled, not running |
+| Failed | `agent-failed` | `#FF4D6A` | Errored |
+
+`agent-idle` uses `--fg-3`, not `--fg-4`: `#6B6F74` on `--surface-card` measures 3.44:1 and fails WCAG AA. The `design:lint` contrast rule enforces this.
 
 ## Elevation & Depth
 

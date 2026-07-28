@@ -1,24 +1,24 @@
 # System Inventory
 
-Generated at: `2026-07-27T21:34:43+00:00`
+Generated at: `2026-07-28T11:07:02+00:00`
 Task: `ART-100_SYSTEM_INVENTORY`
 Target: `flexnetos-vs-lifeos`
-Target root: `/run/user/1001/lifeos-json-task-runner/20260727T033323851132Z-b4e24d277985/ART-100_SYSTEM_INVENTORY/20260727T180755817261Z-349277b3e266`
+Target root: `/home/flexnetos/FlexNetOS`
 Descriptor hash: `sha256:b3f653f9e9cda7991821687f041cb540ce3e4342bde03ef333aa0e72a6b42384`
 
 ## Coverage
 
-- Files scanned: `43`
+- Files scanned: `0`
 - Blocked paths skipped: `0`
-- Directories skipped by generated/cache policy: `2`
+- Directories skipped by generated/cache policy: `1`
 
 | category | count |
 |---|---:|
 | apis | 0 |
-| applications | 3 |
-| databases | 3 |
+| applications | 0 |
+| databases | 0 |
 | jobs | 0 |
-| queues | 5 |
+| queues | 0 |
 | reports | 0 |
 | schedulers | 0 |
 | scripts | 0 |
@@ -26,11 +26,7 @@ Descriptor hash: `sha256:b3f653f9e9cda7991821687f041cb540ce3e4342bde03ef333aa0e7
 
 ## Applications
 
-| kind | path | detail |
-|---|---|---|
-| rust_workspace | `Cargo.toml` | name=20260727T180755817261Z-349277b3e266; members=src-tauri, crates/lifeos-core, crates/lifeos-daemon |
-| nix_flake | `flake.nix` |  |
-| node_package | `package.json` | name=lifeos-vue; scripts=build, check, design:diff, design:export, design:export:dtcg, design:export:tailwind, design:lint, dev |
+_No filesystem evidence found in the bounded scan._
 
 ## Services
 
@@ -42,21 +38,11 @@ _No filesystem evidence found in the bounded scan._
 
 ## Databases
 
-| kind | path | detail |
-|---|---|---|
-| schema_or_migration | `execution-framework/generated/contract_manifest.seed.sql` |  |
-| schema_or_migration | `sql/001_migration_automation_schema.sql` |  |
-| schema_or_migration | `sql/002_views_and_indexes.sql` |  |
+_No filesystem evidence found in the bounded scan._
 
 ## Queues
 
-| kind | path | detail |
-|---|---|---|
-| queue_signal | `CHANGELOG.md` |  |
-| queue_signal | `SESSIONS.md` |  |
-| queue_signal | `TODO.md` |  |
-| queue_signal | `execution-framework/generated/contract_manifest.seed.sql` |  |
-| queue_signal | `sql/001_migration_automation_schema.sql` |  |
+_No filesystem evidence found in the bounded scan._
 
 ## Apis
 

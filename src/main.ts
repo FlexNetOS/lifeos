@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { router } from "@/router";
 import App from "@/App.svelte";
 import { tauriPersistence, LIFEOS_PERSIST_KEYS } from "@/lib/persistence";
+import { createSurface } from "@/lib/surface.svelte.js";
 
 // Load data.js (sets window.LIFEOS_DATA / AGGREGATORS / FLOWS).
 // In production, port this to a typed module under src/data/.
@@ -12,6 +13,11 @@ import "../data.js";
 import "../colors_and_type.css";
 import "../lifeos_app.css";
 import "../styles.css";
+
+// Stamp [data-surface] on <html> before mount so the density tokens in
+// colors_and_type.css §9 are resolved on the very first paint (no reflow flash).
+// Build-time target wins over width auto-detection: VITE_LIFEOS_SURFACE=tv-10ft.
+export const surface = createSurface({ env: import.meta.env.VITE_LIFEOS_SURFACE });
 
 const pinia = createPinia();
 // Register persistence BEFORE activating the pinia so the plugin attaches

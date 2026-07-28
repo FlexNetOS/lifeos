@@ -1,7 +1,7 @@
 # Data Lineage Map
 
 Task: `ART-109_DATA_LINEAGE`
-Generated at: `2026-07-27T04:55:13+00:00`
+Generated at: `2026-07-28T11:29:14+00:00`
 Target root: `/home/flexnetos/FlexNetOS`
 
 ## Scope
@@ -15,7 +15,7 @@ This map traces critical migration fields from their schema or database origin, 
 | field count | 183 |
 | critical field count | 27 |
 | sql table count | 16 |
-| schema source count | 37 |
+| schema source count | 48 |
 | target files scanned | 2500 |
 | fields with target references | 44 |
 | protocol record count | 14 |
@@ -25,32 +25,32 @@ This map traces critical migration fields from their schema or database origin, 
 | field | origin | transformation | consumption | target evidence |
 |---|---|---|---|---:|
 | `artifact_contract_id` | envctl_migration_recipes, envctl_migration_runs, MigrationRun | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
-| `artifact_id` | envctl_migration_artifacts, envctl_migration_validations, envctl Migration Artifact Record, envctl Migration Validation Result, ArtifactRecord | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; static target scan found producer/update/write references | registry/proof consumers only | 18 |
+| `artifact_id` | envctl_migration_artifacts, envctl_migration_validations, envctl Migration Artifact Record, envctl Migration Validation Result, envctl Migration Artifact Record | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; static target scan found producer/update/write references | registry/proof consumers only | 18 |
 | `command_hash` | envctl_migration_operations | hash derivation and comparison through sha256 file/content digests | registry/proof consumers only | 18 |
-| `compare_root` | envctl_migration_targets, envctl Migration Target Descriptor, TargetDescriptor | static lineage only; no transformation-specific reference found | registry/proof consumers only | 18 |
-| `content_hash` | envctl_migration_artifacts, envctl Migration Artifact Record, ArtifactRecord | hash derivation and comparison through sha256 file/content digests; static target scan found producer/update/write references | registry/proof consumers only | 18 |
+| `compare_root` | envctl_migration_targets, envctl Migration Target Descriptor, TargetDescriptor, envctl Migration Target Descriptor | static lineage only; no transformation-specific reference found | registry/proof consumers only | 18 |
+| `content_hash` | envctl_migration_artifacts, envctl Migration Artifact Record, envctl Migration Artifact Record, ArtifactRecord | hash derivation and comparison through sha256 file/content digests; static target scan found producer/update/write references | registry/proof consumers only | 18 |
 | `contract_hash` | envctl_migration_artifact_contracts | hash derivation and comparison through sha256 file/content digests; static target scan found producer/update/write references | registry/proof consumers only | 18 |
 | `contract_id` | static target evidence | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records | registry/proof consumers only | 18 |
 | `descriptor_hash` | envctl_migration_targets | hash derivation and comparison through sha256 file/content digests; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
-| `event_hash` | envctl_migration_run_events, envctl Migration Run Event, RunEvent | hash derivation and comparison through sha256 file/content digests | registry/proof consumers only | 18 |
+| `event_hash` | envctl_migration_run_events, envctl Migration Run Event, envctl Migration Run Event, RunEvent | hash derivation and comparison through sha256 file/content digests | registry/proof consumers only | 18 |
 | `evidence_refs` | envctl Migration Artifact Record, envctl Migration Run Event, envctl Migration Validation Result | artifact evidence and graph-link materialization in proof and registry payloads | registry/proof consumers only | 18 |
 | `id` | envctl_migration_targets, envctl_migration_packages, envctl_migration_artifact_contracts, pathRule, workspace | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; static target scan found producer/update/write references | EvidenceRecord->nu_plugin, ValidationResult->nu_plugin | 18 |
-| `links` | envctl Migration Artifact Record, ArtifactRecord | artifact evidence and graph-link materialization in proof and registry payloads; static target scan found producer/update/write references | registry/proof consumers only | 18 |
+| `links` | envctl Migration Artifact Record, envctl Migration Artifact Record, ArtifactRecord | artifact evidence and graph-link materialization in proof and registry payloads; static target scan found producer/update/write references | registry/proof consumers only | 18 |
 | `operation_id` | envctl_migration_run_events, envctl_migration_evidence, envctl_migration_approvals, envctl Migration Approval Request, operation, envctl Migration Operation | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
 | `package_hash` | envctl_migration_packages | hash derivation and comparison through sha256 file/content digests; static target scan found producer/update/write references | registry/proof consumers only | 18 |
-| `path` | envctl_migration_artifacts, envctl Migration Artifact Record, workspace, ArtifactRecord | static lineage only; no transformation-specific reference found | registry/proof consumers only | 18 |
-| `previous_event_hash` | envctl_migration_run_events, envctl Migration Run Event, RunEvent | hash derivation and comparison through sha256 file/content digests | registry/proof consumers only | 18 |
-| `primary_root` | envctl_migration_targets, envctl Migration Target Descriptor, TargetDescriptor | database persistence requires the field before record insertion | registry/proof consumers only | 18 |
+| `path` | envctl_migration_artifacts, envctl Migration Artifact Record, envctl Migration Artifact Record, workspace | static lineage only; no transformation-specific reference found | registry/proof consumers only | 18 |
+| `previous_event_hash` | envctl_migration_run_events, envctl Migration Run Event, envctl Migration Run Event, RunEvent | hash derivation and comparison through sha256 file/content digests | registry/proof consumers only | 18 |
+| `primary_root` | envctl_migration_targets, envctl Migration Target Descriptor, TargetDescriptor, envctl Migration Target Descriptor | database persistence requires the field before record insertion | registry/proof consumers only | 18 |
 | `proof_uri` | AgentLane, ExecutionPacket, TaskGraphRow | artifact evidence and graph-link materialization in proof and registry payloads | registry/proof consumers only | 18 |
 | `recipe_hash` | envctl_migration_recipes | hash derivation and comparison through sha256 file/content digests; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
-| `recipe_id` | envctl_migration_runs, envctl Migration Recipe, MigrationRecipe, MigrationRun | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
+| `recipe_id` | envctl_migration_runs, envctl Migration Recipe, envctl Migration Recipe, MigrationRecipe | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
 | `reproducibility_hash` | envctl_migration_runs, MigrationRun | hash derivation and comparison through sha256 file/content digests | registry/proof consumers only | 18 |
 | `risk` | envctl_migration_operations, envctl_migration_approvals, envctl Migration Approval Request, operation, envctl Migration Operation | database persistence requires the field before record insertion | registry/proof consumers only | 18 |
 | `run_id` | envctl_migration_operations, envctl_migration_run_events, envctl_migration_evidence, envctl Migration Approval Request, envctl Migration Artifact Record, envctl Migration Operation | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
 | `sha256` | envctl_migration_evidence, EvidenceRecord | hash derivation and comparison through sha256 file/content digests | registry/proof consumers only | 18 |
 | `status` | envctl_migration_runs, envctl_migration_operations, envctl_migration_artifacts, envctl Migration Approval Request, envctl Migration Artifact Record, envctl Migration Operation | state normalization through enum/check constraints and validation status records; static target scan found producer/update/write references | MigrationRun->nu_plugin | 18 |
 | `target_id` | envctl_migration_targets, envctl_migration_runs, envctl Migration Target Descriptor, TargetDescriptor, MigrationRun | stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion | registry/proof consumers only | 18 |
-| `validator` | envctl_migration_validations, envctl Migration Validation Result, ValidationResult | database persistence requires the field before record insertion | registry/proof consumers only | 18 |
+| `validator` | envctl_migration_validations, envctl Migration Validation Result, ValidationResult, envctl Migration Validation Result | database persistence requires the field before record insertion | registry/proof consumers only | 18 |
 
 ## Origin And Consumption Details
 
@@ -76,7 +76,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_artifacts.artifact_id`, `envctl_migration_validations.artifact_id`
-- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Validation Result`, `ArtifactRecord`, `ValidationResult`
+- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Validation Result`, `envctl Migration Artifact Record`, `ArtifactRecord`, `ValidationResult`, `envctl Migration Validation Result`
 - Transformation: stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; static target scan found producer/update/write references; database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -111,7 +111,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_targets.compare_root`
-- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`
+- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`, `envctl Migration Target Descriptor`
 - Transformation: static lineage only; no transformation-specific reference found
 
 | file | line | role | evidence |
@@ -129,7 +129,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_artifacts.content_hash`
-- Schema origin: `envctl Migration Artifact Record`, `ArtifactRecord`
+- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Artifact Record`, `ArtifactRecord`
 - Transformation: hash derivation and comparison through sha256 file/content digests; static target scan found producer/update/write references
 
 | file | line | role | evidence |
@@ -197,7 +197,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_run_events.event_hash`
-- Schema origin: `envctl Migration Run Event`, `RunEvent`
+- Schema origin: `envctl Migration Run Event`, `envctl Migration Run Event`, `RunEvent`
 - Transformation: hash derivation and comparison through sha256 file/content digests
 
 | file | line | role | evidence |
@@ -214,7 +214,7 @@ This map traces critical migration fields from their schema or database origin, 
 ### `evidence_refs`
 
 - Criticality: `critical`
-- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Run Event`, `envctl Migration Validation Result`, `RunEvent`, `ArtifactRecord`, `ValidationResult`
+- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Run Event`, `envctl Migration Validation Result`, `envctl Migration Artifact Record`, `envctl Migration Run Event`, `RunEvent`
 - Transformation: artifact evidence and graph-link materialization in proof and registry payloads
 
 | file | line | role | evidence |
@@ -250,7 +250,7 @@ This map traces critical migration fields from their schema or database origin, 
 ### `links`
 
 - Criticality: `critical`
-- Schema origin: `envctl Migration Artifact Record`, `ArtifactRecord`
+- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Artifact Record`, `ArtifactRecord`
 - Transformation: artifact evidence and graph-link materialization in proof and registry payloads; static target scan found producer/update/write references
 
 | file | line | role | evidence |
@@ -268,7 +268,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_run_events.operation_id`, `envctl_migration_evidence.operation_id`, `envctl_migration_approvals.operation_id`, `envctl_migration_validations.operation_id`, `envctl_migration_checkpoints.operation_id`, `envctl_migration_rollbacks.operation_id`
-- Schema origin: `envctl Migration Approval Request`, `operation`, `envctl Migration Operation`, `envctl Migration Run Event`, `Operation`, `RunEvent`
+- Schema origin: `envctl Migration Approval Request`, `operation`, `envctl Migration Operation`, `envctl Migration Run Event`, `envctl Migration Approval Request`, `operation`
 - Transformation: stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -303,7 +303,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_artifacts.path`
-- Schema origin: `envctl Migration Artifact Record`, `workspace`, `ArtifactRecord`
+- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Artifact Record`, `workspace`, `ArtifactRecord`
 - Transformation: static lineage only; no transformation-specific reference found
 
 | file | line | role | evidence |
@@ -321,7 +321,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_run_events.previous_event_hash`
-- Schema origin: `envctl Migration Run Event`, `RunEvent`
+- Schema origin: `envctl Migration Run Event`, `envctl Migration Run Event`, `RunEvent`
 - Transformation: hash derivation and comparison through sha256 file/content digests
 
 | file | line | role | evidence |
@@ -339,7 +339,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_targets.primary_root`
-- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`
+- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`, `envctl Migration Target Descriptor`
 - Transformation: database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -391,7 +391,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_runs.recipe_id`
-- Schema origin: `envctl Migration Recipe`, `MigrationRecipe`, `MigrationRun`
+- Schema origin: `envctl Migration Recipe`, `envctl Migration Recipe`, `MigrationRecipe`, `MigrationRun`
 - Transformation: stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -427,7 +427,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_operations.risk`, `envctl_migration_approvals.risk`
-- Schema origin: `envctl Migration Approval Request`, `operation`, `envctl Migration Operation`, `Operation`, `ApprovalRequest`
+- Schema origin: `envctl Migration Approval Request`, `operation`, `envctl Migration Operation`, `envctl Migration Approval Request`, `operation`, `envctl Migration Operation`
 - Transformation: database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -445,7 +445,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_operations.run_id`, `envctl_migration_run_events.run_id`, `envctl_migration_evidence.run_id`, `envctl_migration_artifacts.run_id`, `envctl_migration_graph_edges.run_id`, `envctl_migration_approvals.run_id`
-- Schema origin: `envctl Migration Approval Request`, `envctl Migration Artifact Record`, `envctl Migration Operation`, `envctl Migration Run Event`, `envctl Migration Validation Result`, `Operation`
+- Schema origin: `envctl Migration Approval Request`, `envctl Migration Artifact Record`, `envctl Migration Operation`, `envctl Migration Run Event`, `envctl Migration Validation Result`, `envctl Migration Approval Request`
 - Transformation: stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -481,7 +481,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_runs.status`, `envctl_migration_operations.status`, `envctl_migration_artifacts.status`, `envctl_migration_approvals.status`, `envctl_migration_validations.status`, `envctl_migration_rollbacks.status`
-- Schema origin: `envctl Migration Approval Request`, `envctl Migration Artifact Record`, `envctl Migration Operation`, `envctl Migration Validation Result`, `AgentLane`, `ProofRecord`
+- Schema origin: `envctl Migration Approval Request`, `envctl Migration Artifact Record`, `envctl Migration Operation`, `envctl Migration Validation Result`, `AgentLane`, `envctl Migration Approval Request`
 - Transformation: state normalization through enum/check constraints and validation status records; static target scan found producer/update/write references; database persistence requires the field before record insertion
 - Consumption: `MigrationRun` via `envctl_migration_runs` to `nu_plugin`
 
@@ -500,7 +500,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_targets.target_id`, `envctl_migration_runs.target_id`
-- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`, `MigrationRun`
+- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`, `MigrationRun`, `envctl Migration Target Descriptor`
 - Transformation: stable identifier propagation through run, operation, artifact, evidence, and graph-edge records; database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -518,7 +518,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `critical`
 - SQL origin: `envctl_migration_validations.validator`
-- Schema origin: `envctl Migration Validation Result`, `ValidationResult`
+- Schema origin: `envctl Migration Validation Result`, `ValidationResult`, `envctl Migration Validation Result`
 - Transformation: database persistence requires the field before record insertion
 
 | file | line | role | evidence |
@@ -542,7 +542,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `supporting`
 - SQL origin: `envctl_migration_run_events.actor_id`
-- Schema origin: `envctl Migration Run Event`, `RunEvent`
+- Schema origin: `envctl Migration Run Event`, `envctl Migration Run Event`, `RunEvent`
 - Transformation: stable identifier propagation through run, operation, artifact, evidence, and graph-edge records
 
 | file | line | role | evidence |
@@ -560,7 +560,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `supporting`
 - SQL origin: `envctl_migration_run_events.actor_type`
-- Schema origin: `envctl Migration Run Event`, `RunEvent`
+- Schema origin: `envctl Migration Run Event`, `envctl Migration Run Event`, `RunEvent`
 - Transformation: database persistence requires the field before record insertion
 
 ### `agent_name`
@@ -578,13 +578,13 @@ This map traces critical migration fields from their schema or database origin, 
 ### `allow_destructive`
 
 - Criticality: `supporting`
-- Schema origin: `safety`
+- Schema origin: `safety`, `safety`
 - Transformation: static lineage only; no transformation-specific reference found
 
 ### `allow_network`
 
 - Criticality: `supporting`
-- Schema origin: `safety`
+- Schema origin: `safety`, `safety`
 - Transformation: static lineage only; no transformation-specific reference found
 
 ### `allowed_paths`
@@ -596,7 +596,7 @@ This map traces critical migration fields from their schema or database origin, 
 ### `approval_id`
 
 - Criticality: `supporting`
-- Schema origin: `envctl Migration Approval Request`, `ApprovalRequest`, `ApprovalDecision`
+- Schema origin: `envctl Migration Approval Request`, `envctl Migration Approval Request`, `ApprovalRequest`, `ApprovalDecision`
 - Transformation: stable identifier propagation through run, operation, artifact, evidence, and graph-edge records
 
 | file | line | role | evidence |
@@ -619,14 +619,14 @@ This map traces critical migration fields from their schema or database origin, 
 ### `artifact_contract`
 
 - Criticality: `supporting`
-- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`
+- Schema origin: `envctl Migration Target Descriptor`, `TargetDescriptor`, `envctl Migration Target Descriptor`
 - Transformation: static lineage only; no transformation-specific reference found
 
 ### `artifact_type`
 
 - Criticality: `supporting`
 - SQL origin: `envctl_migration_artifacts.artifact_type`
-- Schema origin: `envctl Migration Artifact Record`, `ArtifactRecord`
+- Schema origin: `envctl Migration Artifact Record`, `envctl Migration Artifact Record`, `ArtifactRecord`
 - Transformation: static lineage only; no transformation-specific reference found
 
 ### `authority_level`
@@ -756,7 +756,7 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `supporting`
 - SQL origin: `envctl_migration_approvals.decided_by`
-- Schema origin: `envctl Migration Approval Request`, `ApprovalRequest`, `ApprovalDecision`
+- Schema origin: `envctl Migration Approval Request`, `envctl Migration Approval Request`, `ApprovalRequest`, `ApprovalDecision`
 - Transformation: static lineage only; no transformation-specific reference found
 
 ### `decision`
@@ -769,13 +769,13 @@ This map traces critical migration fields from their schema or database origin, 
 ### `default_mode`
 
 - Criticality: `supporting`
-- Schema origin: `safety`
+- Schema origin: `safety`, `safety`
 - Transformation: static lineage only; no transformation-specific reference found
 
 ### `depends_on`
 
 - Criticality: `supporting`
-- Schema origin: `phase`, `ExecutionPacket`, `TaskGraphRow`
+- Schema origin: `phase`, `ExecutionPacket`, `phase`, `TaskGraphRow`
 - Transformation: static lineage only; no transformation-specific reference found
 
 ### `description`
@@ -847,14 +847,14 @@ This map traces critical migration fields from their schema or database origin, 
 
 - Criticality: `supporting`
 - SQL origin: `envctl_migration_run_events.event_seq`
-- Schema origin: `envctl Migration Run Event`, `RunEvent`
+- Schema origin: `envctl Migration Run Event`, `envctl Migration Run Event`, `RunEvent`
 - Transformation: database persistence requires the field before record insertion
 
 ### `event_type`
 
 - Criticality: `supporting`
 - SQL origin: `envctl_migration_run_events.event_type`
-- Schema origin: `envctl Migration Run Event`, `RunEvent`
+- Schema origin: `envctl Migration Run Event`, `envctl Migration Run Event`, `RunEvent`
 - Transformation: database persistence requires the field before record insertion
 
 ### `evidence`

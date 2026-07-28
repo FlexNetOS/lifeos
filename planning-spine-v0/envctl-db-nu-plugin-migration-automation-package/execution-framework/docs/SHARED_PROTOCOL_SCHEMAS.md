@@ -2,7 +2,7 @@
 
 Protocol: `envctl_nu_plugin_migration_protocol`
 Version: `1.0.0`
-Generated at: `2026-07-27T05:19:59+00:00`
+Generated at: `2026-07-28T12:29:30+00:00`
 
 ## Source Of Truth
 
@@ -29,7 +29,7 @@ Minor versions may add optional fields; removals, type narrowing, and enum remov
 | `ValidationResult` | `schemas/shared_protocol.schema.json#/$defs/ValidationResult` | `envctl_migration_validations` | `schemas/validation_result.schema.json` | Nushell validation table row |
 | `ReplayRequest` | `schemas/shared_protocol.schema.json#/$defs/ReplayRequest` | `envctl_migration_runs` | `generated` | Nushell replay command input record |
 | `ReplayResult` | `schemas/shared_protocol.schema.json#/$defs/ReplayResult` | `envctl_migration_run_events` | `generated` | Nushell replay result record |
-| `ProofRecord` | `schemas/shared_protocol.schema.json#/$defs/ProofRecord` | `execution_framework_proof_records` | `execution-framework/schemas/proof_record.schema.json` | Execution proof file record |
+| `ProofRecord` | `schemas/shared_protocol.schema.json#/$defs/ProofRecord` | `execution_framework_proof_records` | `schemas/proof_record.schema.json` | Execution proof file record |
 
 ## Verification
 

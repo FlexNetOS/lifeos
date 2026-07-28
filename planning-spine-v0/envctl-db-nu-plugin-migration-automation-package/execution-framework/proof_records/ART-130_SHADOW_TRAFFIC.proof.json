@@ -2,42 +2,45 @@
   "proof_schema_version": "1.0",
   "task_id": "ART-130_SHADOW_TRAFFIC",
   "status": "completed",
-  "started_at": "2026-07-27T03:57:35+00:00",
-  "completed_at": "2026-07-27T03:57:35+00:00",
+  "started_at": "2026-07-28T12:01:36+00:00",
+  "completed_at": "2026-07-28T12:01:36+00:00",
   "actor": "artifact-agent",
   "helper_id": "helper-artifact-31",
   "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/FlexNetOS/src/envctl/envctl-db-nu-plugin-migration-automation-package",
+  "repo_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
   "files_changed": [
+    "execution-framework/scripts/register_art130_shadow_traffic.py",
     "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
     "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
     "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
-    "execution-framework/state/ART-130_SHADOW_TRAFFIC.heartbeat.json",
+    "execution-framework/generated/art130_shadow_traffic_registry_report.json",
     "execution-framework/logs/ART-130_SHADOW_TRAFFIC.log",
+    "execution-framework/state/ART-130_SHADOW_TRAFFIC.heartbeat.json",
     "execution-framework/proof_records/ART-130_SHADOW_TRAFFIC.proof.json",
     "execution-framework/proof_records/proof_ledger.jsonl"
   ],
   "commands_run": [
-    "PYTHONPATH=scripts python3 - <<'PY'  # generate ART-130 artifacts and registry proof",
-    "python3 - <<'PY'  # verify ART-130 files, proof, and registry hashes"
+    "python3 scripts/register_art130_shadow_traffic.py",
+    "python3 -m py_compile scripts/register_art130_shadow_traffic.py"
   ],
   "verification_output": {
     "schema_version": "1.0",
     "task_id": "ART-130_SHADOW_TRAFFIC",
+    "generated_at": "2026-07-28T12:01:36+00:00",
     "status": "passed",
-    "generated_at": "2026-07-27T03:57:35+00:00",
     "registry_results": [
       {
         "artifact_row_id": "artifact-99cc089cf031e672067912fb",
         "artifact_id": "art-130-shadow-traffic-report-md",
         "run_id": "run-art130-shadow-traffic",
-        "path": "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
+        "path": "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
         "content_hash": "sha256:6aab51612a7f20f6491ba00a31e47670519dc13a111d55f19a6bd560d7b8be3e",
         "producer_operation_id": "produce-06-testing-validation-shadow-traffic-comparison-report-md",
         "contract_id": "contract-full-migration-artifact-contract-1.0.0",
         "evidence_ids": [
-          "evidence-d724b673263327841f4839e9",
-          "evidence-ca1ad5f3a47d95cdb12f3202",
+          "evidence-11cd7b5c94c241740f069941",
+          "evidence-7e33439a569a97cd7878a009",
+          "evidence-1354abcf1a8619f1fc447dbc",
           "evidence-d995ea76f0b5a6b0fda3412d",
           "evidence-17a949695fba3fb0f3ce0765",
           "evidence-0d8919f0e7937f9f38d54f3c",
@@ -45,29 +48,31 @@
           "evidence-3040ef18061600363f31a9be"
         ],
         "graph_edge_ids": [
-          "edge-29f1822b55d78ac74972c4c2",
-          "edge-fd4bcb3f4532a612fc225d03",
-          "edge-52ecf8c236f40a29b039c87f",
-          "edge-b279936efd429a2ce5f27dce",
+          "edge-96f16af6c4ce9671cd88d01c",
+          "edge-f1afbc2329125cf71f62c87c",
+          "edge-045738e7de06d4b716baba52",
+          "edge-db75de1be1499b443c4e80b9",
           "edge-9fc9b2cec713e989a9a36ad4"
         ],
         "validation_ids": [
-          "validation-d4312ddbfd12107cd60f3438",
-          "validation-63b1e4f019206b654f18d213",
-          "validation-e49a7947135c84f500f2b409"
+          "validation-66a2f5612cce75c614e735a9",
+          "validation-611e617e31701cf340dcd699",
+          "validation-312bb58f97e8959853ed36d8",
+          "validation-669a86785d5f5e29a7f4e4cb"
         ]
       },
       {
         "artifact_row_id": "artifact-33d97ceebbf374bec47f54cb",
         "artifact_id": "art-130-shadow-traffic-report-json",
         "run_id": "run-art130-shadow-traffic",
-        "path": "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
+        "path": "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
         "content_hash": "sha256:1b720e10472ec7ed53021f9a941499f4afdbcd90b74be8fe5ecc9369b8ccdec4",
         "producer_operation_id": "produce-06-testing-validation-shadow-traffic-comparison-report-md",
         "contract_id": "contract-full-migration-artifact-contract-1.0.0",
         "evidence_ids": [
-          "evidence-665e9d5bd8287d27ed67413c",
-          "evidence-a8b508d2c2e99ece1026ab5b",
+          "evidence-0db146ecdcaaf432dd7ebfc8",
+          "evidence-215086ceb27ded1b5465e2f8",
+          "evidence-9766b55d996e483e63f49187",
           "evidence-f8fb6881f7996181e731f0f8",
           "evidence-00ee493954c4fb476d5a5fa3",
           "evidence-c866c4953127b84fd3d2fd54",
@@ -75,29 +80,31 @@
           "evidence-3a572d8b69ffc918c81279e0"
         ],
         "graph_edge_ids": [
-          "edge-630ae4efc7245c6bf5f61172",
-          "edge-da3a96d7b70e206d750a2171",
-          "edge-8dfc2e740a1b61f611d45405",
-          "edge-3de217a9c6b7a03e4a23bd84",
+          "edge-7f782bb8e0d3ed7596b476a5",
+          "edge-7318cc8c51fb7b27310fa424",
+          "edge-243fed7475dec2c6d7ecb0a5",
+          "edge-a79e37e7c2b4413309742b94",
           "edge-0bf203f6a477f72cc2d77003"
         ],
         "validation_ids": [
-          "validation-9c62f93083792f9e6f0053e0",
-          "validation-7ff75e99ca714ca85b279397",
-          "validation-0f315c34d924173e18199d63"
+          "validation-d350b1afc96d7ba79c8b61bf",
+          "validation-d3a3d7df22a234d477df2b35",
+          "validation-4437f93b6fcf7a3d1d248b86",
+          "validation-e59bd0118a8becd26ac2fe7c"
         ]
       },
       {
         "artifact_row_id": "artifact-58530b97cf4160d7ffb45bdc",
         "artifact_id": "06-testing-validation-shadow-traffic-comparison-report-md",
         "run_id": "run-art130-shadow-traffic",
-        "path": "migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
+        "path": "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
         "content_hash": "sha256:945986e239e6345e72fba608902d45420cbfee53932c0733106715e2583ce2da",
         "producer_operation_id": "produce-06-testing-validation-shadow-traffic-comparison-report-md",
         "contract_id": "contract-full-migration-artifact-contract-1.0.0",
         "evidence_ids": [
-          "evidence-d2bd06b805144e1488dad2b5",
-          "evidence-d5392c0432aa39861d4167d0",
+          "evidence-ff633cb451927ed8c21e1179",
+          "evidence-fa6de4399657cf1ecc08622b",
+          "evidence-ef0ef4467a66dad051827861",
           "evidence-595ff3faef0fa9545194eea1",
           "evidence-3ed749ba476769efad810956",
           "evidence-58495005e8d7e636c513cb8e",
@@ -105,16 +112,17 @@
           "evidence-7b20044bd13e7ad14c029103"
         ],
         "graph_edge_ids": [
-          "edge-129a25944e6641215550b74a",
-          "edge-2dca738f712328ebfc8f4f94",
-          "edge-e5e52b1dec506e98de71d122",
-          "edge-6de46eac6c839f78a03adb2a",
+          "edge-e8c2b04d06fc2eda10bccd40",
+          "edge-21b009c881d83b1fa96bd6d9",
+          "edge-b7a592523a0d0a2541401a10",
+          "edge-b3f794c69c0e0cfaf8c5239b",
           "edge-fac3d584392dc59a21fad6b4"
         ],
         "validation_ids": [
-          "validation-892b21196e4c4f7314b36a64",
-          "validation-3ea5b940d61e91f910edb694",
-          "validation-5343d7804d7fa3e20679c4f4"
+          "validation-8a876b0336ad6c36345ceeff",
+          "validation-b2a75f38cc58350e83254e65",
+          "validation-d785820ca623eb9e8d739a81",
+          "validation-4b68bd3aeb425948b2a7dc12"
         ]
       }
     ],
@@ -126,14 +134,15 @@
         "title": "ART-130 Shadow Traffic Comparison Report",
         "artifact_type": "validation_evidence",
         "status": "complete",
-        "path": "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
+        "path": "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
         "content_hash": "sha256:6aab51612a7f20f6491ba00a31e47670519dc13a111d55f19a6bd560d7b8be3e",
         "generated_by_operation_id": "produce-06-testing-validation-shadow-traffic-comparison-report-md",
         "evidence": {
           "contract_id": "contract-full-migration-artifact-contract-1.0.0",
           "evidence_ids": [
-            "evidence-d724b673263327841f4839e9",
-            "evidence-ca1ad5f3a47d95cdb12f3202",
+            "evidence-11cd7b5c94c241740f069941",
+            "evidence-7e33439a569a97cd7878a009",
+            "evidence-1354abcf1a8619f1fc447dbc",
             "evidence-d995ea76f0b5a6b0fda3412d",
             "evidence-17a949695fba3fb0f3ce0765",
             "evidence-0d8919f0e7937f9f38d54f3c",
@@ -141,8 +150,9 @@
             "evidence-3040ef18061600363f31a9be"
           ],
           "evidence_refs": [
-            "examples/target-descriptors/flexnetos-vs-lifeos.yaml",
-            "execution-framework/generated/package_scan.json",
+            "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
+            "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
+            "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
             "execution-framework/generated/envctl_migration_db_validation_report.json",
             "execution-framework/generated/envctl_artifact_registry_report.json",
             "execution-framework/schemas/shared_protocol.schema.json",
@@ -154,41 +164,41 @@
             "capture_status": "not_present_in_package_inputs",
             "contract_row_id": "artifact:06-testing-validation-shadow-traffic-comparison-report-md",
             "helper_id": "helper-artifact-31",
-            "model_tag": "gpt-5.3-spark",
             "owner_agent": "artifact-agent",
             "task_id": "ART-130_SHADOW_TRAFFIC"
           },
           "validation_ids": [
-            "validation-d4312ddbfd12107cd60f3438",
-            "validation-63b1e4f019206b654f18d213",
-            "validation-e49a7947135c84f500f2b409"
+            "validation-66a2f5612cce75c614e735a9",
+            "validation-611e617e31701cf340dcd699",
+            "validation-312bb58f97e8959853ed36d8",
+            "validation-669a86785d5f5e29a7f4e4cb"
           ]
         },
         "links": {
           "contract_id": "contract-full-migration-artifact-contract-1.0.0",
           "graph_edge_ids": [
-            "edge-29f1822b55d78ac74972c4c2",
-            "edge-fd4bcb3f4532a612fc225d03",
-            "edge-52ecf8c236f40a29b039c87f",
-            "edge-b279936efd429a2ce5f27dce",
+            "edge-96f16af6c4ce9671cd88d01c",
+            "edge-f1afbc2329125cf71f62c87c",
+            "edge-045738e7de06d4b716baba52",
+            "edge-db75de1be1499b443c4e80b9",
             "edge-9fc9b2cec713e989a9a36ad4"
           ],
           "links": [
             {
-              "to": "artifact:06-testing-validation-parity-dashboard-md",
-              "type": "feeds"
+              "to": "artifact:06-testing-validation-shadow-traffic-comparison-report-md",
+              "type": "satisfies_contract_row"
             },
             {
-              "to": "artifact:04-data-migration-golden-dataset-md",
-              "type": "requires_input_from"
+              "to": "REQ-024_ENVCTL_ARTIFACT_REGISTRY",
+              "type": "depends_on"
             },
             {
-              "to": "proof:REQ-024_ENVCTL_ARTIFACT_REGISTRY",
-              "type": "validated_by"
+              "to": "REQ-040_SHARED_PROTOCOL_SCHEMAS",
+              "type": "depends_on"
             },
             {
-              "to": "proof:REQ-040_SHARED_PROTOCOL_SCHEMAS",
-              "type": "validated_by"
+              "to": "VER-300_UNIT_VALIDATION",
+              "type": "blocks"
             }
           ]
         }
@@ -200,14 +210,15 @@
         "title": "ART-130 Shadow Traffic Comparison Machine Report",
         "artifact_type": "validation_evidence",
         "status": "complete",
-        "path": "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
+        "path": "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
         "content_hash": "sha256:1b720e10472ec7ed53021f9a941499f4afdbcd90b74be8fe5ecc9369b8ccdec4",
         "generated_by_operation_id": "produce-06-testing-validation-shadow-traffic-comparison-report-md",
         "evidence": {
           "contract_id": "contract-full-migration-artifact-contract-1.0.0",
           "evidence_ids": [
-            "evidence-665e9d5bd8287d27ed67413c",
-            "evidence-a8b508d2c2e99ece1026ab5b",
+            "evidence-0db146ecdcaaf432dd7ebfc8",
+            "evidence-215086ceb27ded1b5465e2f8",
+            "evidence-9766b55d996e483e63f49187",
             "evidence-f8fb6881f7996181e731f0f8",
             "evidence-00ee493954c4fb476d5a5fa3",
             "evidence-c866c4953127b84fd3d2fd54",
@@ -215,8 +226,9 @@
             "evidence-3a572d8b69ffc918c81279e0"
           ],
           "evidence_refs": [
-            "examples/target-descriptors/flexnetos-vs-lifeos.yaml",
-            "execution-framework/generated/package_scan.json",
+            "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
+            "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
+            "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
             "execution-framework/generated/envctl_migration_db_validation_report.json",
             "execution-framework/generated/envctl_artifact_registry_report.json",
             "execution-framework/schemas/shared_protocol.schema.json",
@@ -228,41 +240,41 @@
             "capture_status": "not_present_in_package_inputs",
             "contract_row_id": "artifact:06-testing-validation-shadow-traffic-comparison-report-md",
             "helper_id": "helper-artifact-31",
-            "model_tag": "gpt-5.3-spark",
             "owner_agent": "artifact-agent",
             "task_id": "ART-130_SHADOW_TRAFFIC"
           },
           "validation_ids": [
-            "validation-9c62f93083792f9e6f0053e0",
-            "validation-7ff75e99ca714ca85b279397",
-            "validation-0f315c34d924173e18199d63"
+            "validation-d350b1afc96d7ba79c8b61bf",
+            "validation-d3a3d7df22a234d477df2b35",
+            "validation-4437f93b6fcf7a3d1d248b86",
+            "validation-e59bd0118a8becd26ac2fe7c"
           ]
         },
         "links": {
           "contract_id": "contract-full-migration-artifact-contract-1.0.0",
           "graph_edge_ids": [
-            "edge-630ae4efc7245c6bf5f61172",
-            "edge-da3a96d7b70e206d750a2171",
-            "edge-8dfc2e740a1b61f611d45405",
-            "edge-3de217a9c6b7a03e4a23bd84",
+            "edge-7f782bb8e0d3ed7596b476a5",
+            "edge-7318cc8c51fb7b27310fa424",
+            "edge-243fed7475dec2c6d7ecb0a5",
+            "edge-a79e37e7c2b4413309742b94",
             "edge-0bf203f6a477f72cc2d77003"
           ],
           "links": [
             {
-              "to": "artifact:06-testing-validation-parity-dashboard-md",
-              "type": "feeds"
+              "to": "artifact:06-testing-validation-shadow-traffic-comparison-report-md",
+              "type": "satisfies_contract_row"
             },
             {
-              "to": "artifact:04-data-migration-golden-dataset-md",
-              "type": "requires_input_from"
+              "to": "REQ-024_ENVCTL_ARTIFACT_REGISTRY",
+              "type": "depends_on"
             },
             {
-              "to": "proof:REQ-024_ENVCTL_ARTIFACT_REGISTRY",
-              "type": "validated_by"
+              "to": "REQ-040_SHARED_PROTOCOL_SCHEMAS",
+              "type": "depends_on"
             },
             {
-              "to": "proof:REQ-040_SHARED_PROTOCOL_SCHEMAS",
-              "type": "validated_by"
+              "to": "VER-300_UNIT_VALIDATION",
+              "type": "blocks"
             }
           ]
         }
@@ -274,14 +286,15 @@
         "title": "Shadow Traffic Comparison Report",
         "artifact_type": "validation_evidence",
         "status": "complete",
-        "path": "migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
+        "path": "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
         "content_hash": "sha256:945986e239e6345e72fba608902d45420cbfee53932c0733106715e2583ce2da",
         "generated_by_operation_id": "produce-06-testing-validation-shadow-traffic-comparison-report-md",
         "evidence": {
           "contract_id": "contract-full-migration-artifact-contract-1.0.0",
           "evidence_ids": [
-            "evidence-d2bd06b805144e1488dad2b5",
-            "evidence-d5392c0432aa39861d4167d0",
+            "evidence-ff633cb451927ed8c21e1179",
+            "evidence-fa6de4399657cf1ecc08622b",
+            "evidence-ef0ef4467a66dad051827861",
             "evidence-595ff3faef0fa9545194eea1",
             "evidence-3ed749ba476769efad810956",
             "evidence-58495005e8d7e636c513cb8e",
@@ -289,8 +302,9 @@
             "evidence-7b20044bd13e7ad14c029103"
           ],
           "evidence_refs": [
-            "examples/target-descriptors/flexnetos-vs-lifeos.yaml",
-            "execution-framework/generated/package_scan.json",
+            "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
+            "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
+            "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
             "execution-framework/generated/envctl_migration_db_validation_report.json",
             "execution-framework/generated/envctl_artifact_registry_report.json",
             "execution-framework/schemas/shared_protocol.schema.json",
@@ -302,87 +316,78 @@
             "capture_status": "not_present_in_package_inputs",
             "contract_row_id": "artifact:06-testing-validation-shadow-traffic-comparison-report-md",
             "helper_id": "helper-artifact-31",
-            "model_tag": "gpt-5.3-spark",
             "owner_agent": "artifact-agent",
             "task_id": "ART-130_SHADOW_TRAFFIC"
           },
           "validation_ids": [
-            "validation-892b21196e4c4f7314b36a64",
-            "validation-3ea5b940d61e91f910edb694",
-            "validation-5343d7804d7fa3e20679c4f4"
+            "validation-8a876b0336ad6c36345ceeff",
+            "validation-b2a75f38cc58350e83254e65",
+            "validation-d785820ca623eb9e8d739a81",
+            "validation-4b68bd3aeb425948b2a7dc12"
           ]
         },
         "links": {
           "contract_id": "contract-full-migration-artifact-contract-1.0.0",
           "graph_edge_ids": [
-            "edge-129a25944e6641215550b74a",
-            "edge-2dca738f712328ebfc8f4f94",
-            "edge-e5e52b1dec506e98de71d122",
-            "edge-6de46eac6c839f78a03adb2a",
+            "edge-e8c2b04d06fc2eda10bccd40",
+            "edge-21b009c881d83b1fa96bd6d9",
+            "edge-b7a592523a0d0a2541401a10",
+            "edge-b3f794c69c0e0cfaf8c5239b",
             "edge-fac3d584392dc59a21fad6b4"
           ],
           "links": [
             {
-              "to": "artifact:06-testing-validation-parity-dashboard-md",
-              "type": "feeds"
+              "to": "artifact:06-testing-validation-shadow-traffic-comparison-report-md",
+              "type": "satisfies_contract_row"
             },
             {
-              "to": "artifact:04-data-migration-golden-dataset-md",
-              "type": "requires_input_from"
+              "to": "REQ-024_ENVCTL_ARTIFACT_REGISTRY",
+              "type": "depends_on"
             },
             {
-              "to": "proof:REQ-024_ENVCTL_ARTIFACT_REGISTRY",
-              "type": "validated_by"
+              "to": "REQ-040_SHARED_PROTOCOL_SCHEMAS",
+              "type": "depends_on"
             },
             {
-              "to": "proof:REQ-040_SHARED_PROTOCOL_SCHEMAS",
-              "type": "validated_by"
+              "to": "VER-300_UNIT_VALIDATION",
+              "type": "blocks"
             }
           ]
         }
       }
     ],
-    "summary": {
-      "artifact_count": 3,
-      "evidence_count": 21,
-      "validation_count": 9,
-      "graph_edge_count": 15,
-      "hash_recorded": true,
-      "validation_evidence_linked": true,
-      "real_traffic_capture_files_found": 0,
-      "runtime_parity_certified": false
+    "completion_gate": {
+      "artifact_exists": true,
+      "registry_contains_hash": true,
+      "validation_evidence_linked": true
     },
     "warnings": [
-      "No mirrored live traffic payload captures were present in package inputs; report records comparison contract and capture gap."
+      "No mirrored live traffic payloads were supplied; runtime parity is not certified."
     ],
     "evidence": [
-      "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
-      "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
-      "migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
-      "execution-framework/generated/envctl_artifact_registry_report.json",
-      "execution-framework/generated/envctl_migration_db_validation_report.json",
-      "execution-framework/schemas/shared_protocol.schema.json"
+      "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
+      "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
+      "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md"
     ]
   },
   "checksums": {
+    "execution-framework/scripts/register_art130_shadow_traffic.py": "25855c75b7823f22e214f9cbf122cc6a7f97c0ad782e7815721d09a80d614e54",
     "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md": "6aab51612a7f20f6491ba00a31e47670519dc13a111d55f19a6bd560d7b8be3e",
     "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json": "1b720e10472ec7ed53021f9a941499f4afdbcd90b74be8fe5ecc9369b8ccdec4",
     "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md": "945986e239e6345e72fba608902d45420cbfee53932c0733106715e2583ce2da",
-    "execution-framework/state/ART-130_SHADOW_TRAFFIC.heartbeat.json": "739d84686d85ee796814021c261ecc9252c9d83623f2aaa2ebc7e28c5525f01c",
-    "execution-framework/logs/ART-130_SHADOW_TRAFFIC.log": "d90342d5cd664a806fee6526cec84acc976e2ce817ec6b01c1c45b50e38d8ac8",
-    "execution-framework/proof_records/proof_ledger.jsonl": "4a8f0c2c9df66622fb78d882d119a289a5c7f95a76e8d45e4a68fc207c66b6c7"
+    "execution-framework/generated/art130_shadow_traffic_registry_report.json": "747b061d80cd7bba98b16cae59a349627bfa097bcbed812fbd73b6b328d7023b",
+    "execution-framework/logs/ART-130_SHADOW_TRAFFIC.log": "747b061d80cd7bba98b16cae59a349627bfa097bcbed812fbd73b6b328d7023b",
+    "execution-framework/state/ART-130_SHADOW_TRAFFIC.heartbeat.json": "526a3be69e880402f9405184f9a14b6e29c4fd018c6e676feae429a452447779",
+    "execution-framework/proof_records/ART-130_SHADOW_TRAFFIC.proof.json": "b2fbe1564399849681f799d9f172a708339efecf621c35c68374e001a5368299",
+    "execution-framework/proof_records/proof_ledger.jsonl": "a1ab35f8211beae14d501e4fa3d2cfd4129c3a3dadb5529cee4b4fed32895f03"
   },
   "logs_uri": "logs/ART-130_SHADOW_TRAFFIC.log",
   "rollback_point": "history/pre_execution_framework_manifest.json",
   "evidence": [
-    "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
-    "migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
-    "migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md",
-    "execution-framework/generated/envctl_artifact_registry_report.json",
-    "execution-framework/generated/envctl_migration_db_validation_report.json",
-    "execution-framework/schemas/shared_protocol.schema.json",
-    "logs/ART-130_SHADOW_TRAFFIC.log"
+    "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.md",
+    "execution-framework/migration-artifacts/art-130_shadow_traffic/shadow-traffic-comparison-report.json",
+    "execution-framework/migration-artifacts/06-testing-validation/shadow-traffic-comparison-report.md"
   ],
   "failure_reason": "",
-  "next_action": "VER-300_UNIT_VALIDATION can consume the registered shadow traffic artifact; runtime parity still requires mirrored traffic captures."
+  "next_action": "capture mirrored redacted production traffic before runtime parity certification"
 }

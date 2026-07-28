@@ -6,15 +6,11 @@ from __future__ import annotations
 import fnmatch
 import json
 import re
-import sys
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft7Validator, Draft202012Validator
-from jsonschema.exceptions import ValidationError
-from jsonschema.validators import validator_for
-
 from _common import append_proof, file_checksums, make_proof, now, read_json, read_task_graph, root, split_list, write_json
+from verify_shared_protocol_schemas import Draft7Validator, Draft202012Validator, validator_for
 
 
 TASK_ID = "VER-302_PACKET_SCHEMA_VALIDATION"
@@ -467,19 +463,19 @@ def main() -> None:
     if secret_hits:
         report["status"] = "fail"
         report["errors"].append("secret-like content detected in generated outputs: " + ", ".join(secret_hits))
-        write_json(REPORT_PATH, report)
-        write_json(LOG_PATH, report)
-        write_json(
-            HEARTBEAT_PATH,
-            {
-                "schema_version": "1.0",
-                "task_id": TASK_ID,
-                "status": report["status"],
-                "updated_at": generated_at,
-                "proof_uri": PROOF_PATH,
-                "validation_report": REPORT_PATH,
-            },
-        )
+    write_json(REPORT_PATH, report)
+    write_json(LOG_PATH, report)
+    write_json(
+        HEARTBEAT_PATH,
+        {
+            "schema_version": "1.0",
+            "task_id": TASK_ID,
+            "status": report["status"],
+            "updated_at": generated_at,
+            "proof_uri": PROOF_PATH,
+            "validation_report": REPORT_PATH,
+        },
+    )
 
     files_changed = [
         "execution-framework/scripts/verify_ver302_packet_schema_validation.py",
@@ -532,8 +528,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except ValidationError as exc:
-        print("validation error", file=sys.stderr)
-        raise SystemExit(1) from exc
+    main()

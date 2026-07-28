@@ -1,0 +1,68 @@
+{
+  "agent_runtime": "codex-cli-background-shell",
+  "allowed_paths": [
+    "execution-framework/**",
+    "migration-artifacts/**"
+  ],
+  "anchor_binding": {
+    "byte_offset": 970968,
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "invariant_number": 9,
+    "invariant_sha256": "acfab7f454f499bbe65826ecb9730cbb5ad070a0da279370b47f959ccdf39ccc"
+  },
+  "blocked_paths": [
+    "**/.env",
+    "**/secrets/**",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "blocks": [],
+  "can_run_parallel": true,
+  "command_template": "bash -lc 'PSQL=\"$(command -v psql || echo \"$(dirname \"$(readlink -f /proc/$(head -1 /home/flexnetos/meta/var/lib/postgresql/17/postmaster.pid 2>/dev/null)/exe 2>/dev/null)\")/psql\")\"; test -x \"$PSQL\" && \"$PSQL\" '\"'\"'postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql'\"'\"' -tAc '\"'\"'select extensions.ruvector_simd_info()'\"'\"''",
+  "completion_gate": "probe exits 0 against the live system, but this partial check is NOT evidence of implementation completion for the full invariant; a full end-to-end capability proof remains mandatory",
+  "depends_on": [],
+  "execution_cell": "ruvnet-ecosystem",
+  "filesystem_scope": "read-only-probe",
+  "generated_at": "2026-07-27T00:00:00+00:00",
+  "goal": "Prove operational invariant 9 holds against the live system. Shipped evidence only: a design document, a proposed ADR, or an intent to build never satisfies this probe.",
+  "heartbeat_file": "state/INV-009_OPERATIONAL_INVARIANT.heartbeat.json",
+  "helper_id": "helper-invariant-09",
+  "human_approval_required": false,
+  "input_files": [
+    "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  ],
+  "logs_uri": "logs/INV-009_OPERATIONAL_INVARIANT.log",
+  "max_parallel": 6,
+  "model_tag": "gpt-5.3-spark",
+  "needs_capability_probe": true,
+  "notes": "Extracted structurally from the anchor's acceptance-invariant list. Anchor invariant sha256=acfab7f454f499bbe65826ecb9730cbb5ad070a0da279370b47f959ccdf39ccc; anchor document sha256=78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee.",
+  "owner_agent": "invariant-agent",
+  "owner_lane": "lane_e_invariants",
+  "packet_schema_version": "1.0",
+  "parallel_group": "invariant_ruvnet-ecosystem",
+  "parent_id": "INVARIANTS",
+  "phase": "00-invariants",
+  "priority": 109,
+  "probe_class": "partial-capability-probe",
+  "proof_required": true,
+  "proof_uri": "proof_records/INV-009_OPERATIONAL_INVARIANT.proof.json",
+  "repo_path": ".",
+  "repo_target": "lifeos",
+  "required_tools": [
+    "psql",
+    "shell"
+  ],
+  "risk_level": "high",
+  "rollback_plan": "Read-only probe; nothing to roll back.",
+  "shell_mode": "read-only",
+  "source_graph_uri": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "start_after": "",
+  "target_artifacts": [
+    "migration-artifacts/inv-009/result.json"
+  ],
+  "target_files": [],
+  "task_id": "INV-009_OPERATIONAL_INVARIANT",
+  "title": "Invariant 9: ruvnet/rUv, RuVector, AgentDB, RVF, ruvllm, RuvLTRA, SONA, MicroLoRA, FastGRNN, Ruflo, ATAS, and every offi...",
+  "verification_command": "test -d /home/flexnetos/meta/var/lib/agentdb || test -d /home/flexnetos/meta/var/lib/ruvector"
+}

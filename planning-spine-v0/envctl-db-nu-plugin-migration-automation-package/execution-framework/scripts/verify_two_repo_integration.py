@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator
+# Reuse the shared-protocol verifier's validator adapter.  It uses jsonschema
+# when available and otherwise runs the workspace's Ajv Draft 2020-12 fallback,
+# so this integration gate stays executable in minimal Python task cells.
+from verify_shared_protocol_schemas import Draft202012Validator
 
 from _common import append_proof, make_proof, now, package_root, read_json, root, write_json
 from agent_control_api import Actor, AgentControlApi
@@ -22,6 +28,8 @@ HEARTBEAT_PATH = "state/REQ-041_TWO_REPO_INTEGRATION.heartbeat.json"
 TRACKED_FILES = [
     "execution-framework/generated/req041_two_repo_integration_report.json",
     "execution-framework/docs/TWO_REPO_INTEGRATION.md",
+    "execution-framework/scripts/verify_two_repo_integration.py",
+    "execution-framework/scripts/verify_two_repo_runtime.py",
     "execution-framework/state/REQ-041_TWO_REPO_INTEGRATION.heartbeat.json",
     "execution-framework/proof_records/REQ-041_TWO_REPO_INTEGRATION.proof.json",
 ]
@@ -552,15 +560,21 @@ def collect_protocol_records(conn: sqlite3.Connection, run_id: str, approval_id:
 def validate_protocol_records(records: dict[str, Any], proof_preview: dict[str, Any]) -> dict[str, int]:
     validator = load_shared_validator()
     counts: dict[str, int] = {}
+
+    def validate(value: Any) -> None:
+        errors = sorted(validator.iter_errors(value), key=lambda error: error.path)
+        if errors:
+            raise ValueError("shared protocol validation failed: " + "; ".join(error.message for error in errors))
+
     for key, value in records.items():
         if isinstance(value, list):
             counts[key] = len(value)
             for item in value:
-                validator.validate(item)
+                validate(item)
         else:
             counts[key] = 1
-            validator.validate(value)
-    validator.validate(proof_preview)
+            validate(value)
+    validate(proof_preview)
     counts["ProofRecord"] = 1
     return counts
 
@@ -674,6 +688,16 @@ def write_doc(report: dict[str, Any], packet: dict[str, Any]) -> None:
         "3. Plugin contracts project those records into `codedb envctl status stream` and `codedb envctl human approvals` table shapes.",
         "4. The task proof, report, and status ledger are written back into the execution framework.",
         "",
+        "## Repo-native verification",
+        "",
+        "Run the executable gate against real checkouts:",
+        "",
+        "```bash",
+        "ENVCTL_REPO=/path/to/envctl NU_PLUGIN_REPO=/path/to/nu_plugin python3 scripts/verify_two_repo_runtime.py",
+        "```",
+        "",
+        "It invokes `envctl migration`, runs the nu_plugin envctl tests, and checks every plugin visual-command argv.",
+        "",
         "## Contract inputs",
         "",
         f"- Human approval surface: `{report['inputs']['approval_contract']}`",
@@ -706,6 +730,12 @@ def main() -> None:
     write_json(HEARTBEAT_PATH, heartbeat)
 
     fixture = build_fixture()
+    runtime_gate = None
+    if os.environ.get("ENVCTL_REPO") and os.environ.get("NU_PLUGIN_REPO"):
+        completed = subprocess.run(
+            [sys.executable, "scripts/verify_two_repo_runtime.py"], text=True, capture_output=True, check=True
+        )
+        runtime_gate = json.loads(completed.stdout)
     records = collect_protocol_records(fixture["conn"], fixture["run_id"], fixture["approval_id"])
     proof_preview = make_proof(
         task_id=TASK_ID,
@@ -780,6 +810,7 @@ def main() -> None:
             ],
             "event_chain_valid": fixture["event_chain_valid"],
             "approval_decision": fixture["approval_decision"],
+            "runtime_gate": runtime_gate,
         },
     }
     write_json(REPORT_PATH, report)
@@ -795,6 +826,7 @@ def main() -> None:
         files_changed=TRACKED_FILES,
         commands_run=[
             "python3 scripts/verify_two_repo_integration.py",
+            "ENVCTL_REPO=... NU_PLUGIN_REPO=... python3 scripts/verify_two_repo_runtime.py" if runtime_gate else "runtime gate skipped (repository roots unset)",
             "python3 scripts/status_from_proofs.py",
         ],
         verification_output={
@@ -802,6 +834,7 @@ def main() -> None:
             "status_rows": len(status_rows),
             "approval_rows": len(approval_rows),
             "required_commands_present": sorted(command_names),
+            "runtime_gate": runtime_gate["status"] if runtime_gate else "not-run",
         },
         evidence=[
             "proof_records/REQ-020_ENVCTL_DB_SCHEMA.proof.json",

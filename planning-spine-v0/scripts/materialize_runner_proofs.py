@@ -132,6 +132,7 @@ def load_run_context(
     expected_counts = {
         "blocked": 0,
         "completed": len(tasks),
+        "available": 0,
         "failed": 0,
         "pending": 0,
     }
@@ -141,9 +142,26 @@ def load_run_context(
         or run_receipt.get("graph_sha256") != graph_digest
         or run_receipt.get("task_count") != len(tasks)
         or run_receipt.get("status_counts") != expected_counts
+        or run_receipt.get("run_receipt_sha256")
+        != runner.prefixed_record_sha256(
+            run_receipt,
+            "run_receipt_sha256",
+        )
     ):
         raise MaterializationError(
             f"run receipt is not a completed exact-graph receipt: {run_dir / 'run.json'}"
+        )
+    incomplete = [
+        task.node_id
+        for task in tasks.values()
+        if runner.prior_status(receipts_dir, task, graph_digest) != "completed"
+    ]
+    if incomplete:
+        preview = ", ".join(sorted(incomplete)[:20])
+        suffix = "" if len(incomplete) <= 20 else f" (+{len(incomplete) - 20} more)"
+        raise MaterializationError(
+            f"run receipt completion is not supported by sealed lifecycle receipts: "
+            f"{preview}{suffix}"
         )
     return RunContext(
         repo_root=repo_root,
@@ -224,19 +242,35 @@ def _validate_origin_graph(
     matching = [
         row
         for row in rows
-        if isinstance(row, dict) and row.get("task_id") == task.task_id
+        if isinstance(row, dict)
+        and row.get("node_id", row.get("task_id")) == task.node_id
     ]
-    if len(matching) != 1 or matching[0].get("packet_sha256") != task.packet_sha256:
+    if (
+        len(matching) != 1
+        or matching[0].get("task_id") != task.task_id
+        or matching[0].get("packet_sha256") != task.packet_sha256
+        or matching[0].get(
+            "semantic_contract_sha256",
+            task.semantic_contract_sha256,
+        )
+        != task.semantic_contract_sha256
+        or matching[0].get("source_authority", task.source_authority)
+        != task.source_authority
+    ):
         raise MaterializationError(
-            f"{task.task_id}: receipt is not bound to the exact packet in its origin graph"
+            f"{task.node_id}: receipt is not bound to the exact node in its origin graph"
         )
 
 
 def _validate_approval(receipt: dict[str, Any], task: runner.Task) -> None:
     if not runner.approval_required(task):
-        if receipt.get("execution_input_sha256") != task.packet_sha256:
+        if (
+            receipt.get("authorization") is not None
+            or not isinstance(receipt.get("execution_input_sha256"), str)
+            or not len(receipt["execution_input_sha256"]) == 64
+        ):
             raise MaterializationError(
-                f"{task.task_id}: unapproved packet execution input digest changed"
+                f"{task.node_id}: unapproved packet has an invalid runtime input binding"
             )
         return
     authorization = receipt.get("authorization")
@@ -253,40 +287,70 @@ def _validate_approval(receipt: dict[str, Any], task: runner.Task) -> None:
 
 
 def latest_receipt(context: RunContext, task: runner.Task) -> ReceiptBinding:
-    directory = context.receipts_dir / task.task_id / task.packet_sha256
+    directory = runner.receipt_directory(context.receipts_dir, task)
     if not directory.is_dir():
         raise MaterializationError(
             f"{task.task_id}: exact-digest receipt directory is missing"
         )
     observed: list[tuple[str, str, Path, dict[str, Any]]] = []
+    invalid_v2: list[Path] = []
     for path in sorted(directory.glob("*.json")):
         receipt = _load_json(path, "execution receipt")
+        if receipt.get("schema") != runner.RECEIPT_SCHEMA:
+            continue
         if (
-            receipt.get("schema") != runner.RECEIPT_SCHEMA
+            receipt.get("node_id") != task.node_id
             or receipt.get("task_id") != task.task_id
             or receipt.get("packet_sha256") != task.packet_sha256
+            or receipt.get("semantic_contract_sha256")
+            != task.semantic_contract_sha256
+            or receipt.get("graph_sha256") != context.graph_sha256
         ):
             raise MaterializationError(
-                f"{task.task_id}: receipt identity mismatch: {path}"
+                f"{task.node_id}: receipt identity mismatch: {path}"
             )
+        if not runner.receipt_integrity_valid(receipt):
+            invalid_v2.append(path)
+            continue
         observed.append(
             (
-                str(receipt.get("finished_at", "")),
+                f"{int(receipt.get('receipt_sequence', 0)):020d}",
                 path.name,
                 path.resolve(),
                 receipt,
             )
         )
     if not observed:
-        raise MaterializationError(f"{task.task_id}: no exact-digest receipt exists")
+        if invalid_v2:
+            raise MaterializationError(
+                f"{task.node_id}: all exact-digest v2 receipts failed integrity: "
+                f"{', '.join(str(path) for path in invalid_v2[:5])}"
+            )
+        raise MaterializationError(f"{task.node_id}: no exact-digest v2 receipt exists")
     _, _, receipt_path, receipt = max(observed)
     if (
         receipt.get("status") != "completed"
         or receipt.get("exit_code") != 0
         or receipt.get("executor_refusal")
+        or receipt.get("task_completion_proven") is not True
     ):
         raise MaterializationError(
-            f"{task.task_id}: latest exact-digest receipt is not completed"
+            f"{task.node_id}: latest exact-digest receipt is not completed"
+        )
+    lifecycle = receipt.get("lifecycle")
+    if (
+        runner.strict_lifecycle(task)
+        and (
+            not isinstance(lifecycle, dict)
+            or lifecycle.get("stage") != "completed"
+            or lifecycle.get("implementation_proven") is not True
+            or lifecycle.get("independent_verification_proven") is not True
+            or lifecycle.get("activation_proven") is not True
+            or lifecycle.get("adopted") is not True
+        )
+    ):
+        raise MaterializationError(
+            f"{task.node_id}: completed receipt lacks full lifecycle evidence"
         )
     _validate_approval(receipt, task)
     _validate_origin_graph(context, receipt, task)
@@ -320,6 +384,41 @@ def latest_receipt(context: RunContext, task: runner.Task) -> ReceiptBinding:
         raise MaterializationError(
             f"{task.task_id}: verification metadata is invalid"
         )
+    verification_steps = receipt.get("verification_steps", [])
+    if not isinstance(verification_steps, list):
+        raise MaterializationError(
+            f"{task.node_id}: verification_steps metadata is invalid"
+        )
+    for index, result in enumerate(verification_steps, start=1):
+        _validate_command_result(
+            result,
+            context,
+            task.node_id,
+            f"verification step {index}",
+        )
+    activation = receipt.get("activation")
+    if runner.strict_lifecycle(task):
+        _validate_command_result(
+            activation,
+            context,
+            task.node_id,
+            "activation",
+        )
+        capability_use = receipt.get("capability_use")
+        if runner.task_produces_capability(task):
+            if (
+                not isinstance(capability_use, dict)
+                or capability_use.get("status") != "passed"
+            ):
+                raise MaterializationError(
+                    f"{task.node_id}: downstream capability-use evidence is missing"
+                )
+            _validate_command_result(
+                capability_use.get("command"),
+                context,
+                task.node_id,
+                "capability use",
+            )
     return ReceiptBinding(
         path=receipt_path,
         sha256=runner.sha256_file(receipt_path),
@@ -333,8 +432,27 @@ def resolve_proof_path(
     task: runner.Task,
 ) -> Path:
     proof_uri = task.packet.get("proof_uri")
+    nested_proof = task.packet.get("proof")
+    if (
+        (not isinstance(proof_uri, str) or not proof_uri.strip())
+        and isinstance(nested_proof, dict)
+    ):
+        proof_uri = nested_proof.get("uri")
     if not isinstance(proof_uri, str) or not proof_uri.strip():
-        raise MaterializationError(f"{task.task_id}: proof_uri is required")
+        safe_node_id = "".join(
+            character
+            if character.isalnum() or character in "_.@-"
+            else "_"
+            for character in task.node_id
+        )
+        return _safe_child(
+            context.execution_framework_root
+            / "proof_records"
+            / "runner"
+            / f"{safe_node_id}.proof.json",
+            context.execution_framework_root / "proof_records",
+            "proof path",
+        )
     proof_uri = proof_uri.strip()
     if proof_uri.startswith("execution-framework/"):
         path = context.execution_framework_root.parent / proof_uri
@@ -380,7 +498,21 @@ def classify_artifacts(
         if declaration.startswith("execution-framework/"):
             path = context.execution_framework_root.parent / declaration
         else:
-            path = context.execution_framework_root / declaration
+            repo_path = task.packet.get("repo_path")
+            repo_relative_path = (
+                Path(repo_path) / declaration
+                if isinstance(repo_path, str) and Path(repo_path).is_absolute()
+                else None
+            )
+            if (
+                repo_relative_path is not None
+                and repo_relative_path.resolve().is_relative_to(
+                    context.execution_framework_root
+                )
+            ):
+                path = repo_relative_path
+            else:
+                path = context.execution_framework_root / declaration
         path = _safe_child(
             path,
             context.execution_framework_root,
@@ -411,32 +543,36 @@ def implementation_scope(
     task: runner.Task,
     binding: ReceiptBinding,
 ) -> tuple[str, str, str]:
-    gate_and_notes = " ".join(
-        str(task.packet.get(field, ""))
-        for field in ("completion_gate", "notes")
-    ).lower()
-    needs_probe = task.packet.get("needs_capability_probe") is True
-    probe_class = str(task.packet.get("probe_class", ""))
-    if (
-        needs_probe
-        or probe_class == "drift-canary"
-        or "not evidence of implementation" in gate_and_notes
-    ):
+    receipt = binding.value
+    lifecycle = receipt.get("lifecycle")
+    if runner.strict_lifecycle(task):
+        if (
+            isinstance(lifecycle, dict)
+            and lifecycle.get("stage") == "completed"
+            and lifecycle.get("implementation_proven") is True
+            and lifecycle.get("independent_verification_proven") is True
+            and lifecycle.get("activation_proven") is True
+            and lifecycle.get("adopted") is True
+            and receipt.get("task_completion_proven") is True
+        ):
+            return (
+                "full_lifecycle_completed",
+                "The exact packet has positive implementation evidence, "
+                "runner-executed independent verification, activation, and "
+                "successful downstream capability use.",
+                "none",
+            )
         return (
             "not_claimed",
-            "This receipt proves only immutable packet execution; it is not "
-            "implementation evidence.",
-            "execute a real capability probe before claiming implementation",
+            "The exact packet does not have a completed positive lifecycle receipt.",
+            "implement, independently verify, activate, and adopt the capability",
         )
-    if (
-        task.task_id.startswith("INV-")
-        and binding.verification_executed
-    ):
+    if runner.task_is_probe(task):
         return (
-            "declared_live_probe_passed",
-            "The declared live invariant command and its verification exited zero; "
-            "this proves that probe, not every semantic clause of the invariant.",
-            "cross-check the probe against every invariant clause before claiming implementation",
+            "not_claimed",
+            "This legacy receipt proves only immutable probe execution; it is not "
+            "implementation evidence.",
+            "execute a real capability implementation and positive lifecycle",
         )
     if binding.verification_executed:
         return (
@@ -451,6 +587,13 @@ def implementation_scope(
         "was narrative or non-executable and was not independently run.",
         "add or run an executable verification before claiming independent verification",
     )
+
+
+def scope_proves_task_completion(scope: str) -> bool:
+    return scope in {
+        "full_lifecycle_completed",
+        "command_and_verification_passed",
+    }
 
 
 def _preserve_bytes(path: Path, content: bytes, write: bool) -> None:
@@ -615,13 +758,15 @@ def build_result(
     preserved_artifact: dict[str, str] | None,
 ) -> dict[str, Any]:
     scope, honesty_note, _ = implementation_scope(task, binding)
+    task_completion_proven = scope_proves_task_completion(scope)
     receipt = binding.value
     result: dict[str, Any] = {
         "schema": RESULT_SCHEMA,
+        "node_id": task.node_id,
         "task_id": task.task_id,
-        "status": "passed",
+        "status": "passed" if task_completion_proven else "blocked",
         "packet_execution_proven": True,
-        "task_completion_proven": True,
+        "task_completion_proven": task_completion_proven,
         "implementation_scope": scope,
         "honesty_note": honesty_note,
         "needs_capability_probe": task.packet.get("needs_capability_probe") is True,
@@ -633,6 +778,7 @@ def build_result(
             "graph_sha256": context.graph_sha256,
         },
         "origin_receipt": {
+            "node_id": receipt["node_id"],
             "run_id": receipt["run_id"],
             "graph_sha256": receipt["graph_sha256"],
             "attempt_id": receipt["attempt_id"],
@@ -640,6 +786,11 @@ def build_result(
             "sha256": binding.sha256,
         },
         "packet_sha256": task.packet_sha256,
+        "semantic_contract_sha256": task.semantic_contract_sha256,
+        "source_authority": task.source_authority,
+        "lifecycle": receipt.get("lifecycle"),
+        "capability": receipt.get("capability"),
+        "capability_use": receipt.get("capability_use"),
         "completed_at": receipt["finished_at"],
         "command": _command_summary(receipt["command"]),
         "verification": (
@@ -667,6 +818,7 @@ def build_proof(
 ) -> dict[str, Any]:
     receipt = binding.value
     scope, honesty_note, next_action = implementation_scope(task, binding)
+    task_completion_proven = scope_proves_task_completion(scope)
     missing = [
         row["declaration"]
         for row in artifact_statuses
@@ -677,6 +829,23 @@ def build_proof(
     commands = [_command_line(receipt["command"])]
     if binding.verification_executed:
         commands.append(_command_line(receipt["verification"]))
+    for result in receipt.get("verification_steps", []):
+        command = _command_line(result)
+        if command not in commands:
+            commands.append(command)
+    activation = receipt.get("activation")
+    if isinstance(activation, dict):
+        command = _command_line(activation)
+        if command not in commands:
+            commands.append(command)
+    capability_use = receipt.get("capability_use")
+    if isinstance(capability_use, dict) and isinstance(
+        capability_use.get("command"),
+        dict,
+    ):
+        command = _command_line(capability_use["command"])
+        if command not in commands:
+            commands.append(command)
     artifact_paths = _artifact_paths(artifact_statuses)
     checksums = {
         _relative_or_absolute(path, context.repo_root): runner.sha256_file(path)
@@ -687,7 +856,7 @@ def build_proof(
     verification_output: dict[str, Any] = {
         "materialization_schema": MATERIALIZATION_SCHEMA,
         "packet_execution_proven": True,
-        "task_completion_proven": True,
+        "task_completion_proven": task_completion_proven,
         "implementation_scope": scope,
         "honesty_note": honesty_note,
         "needs_capability_probe": task.packet.get("needs_capability_probe") is True,
@@ -698,6 +867,7 @@ def build_proof(
             "graph_sha256": context.graph_sha256,
         },
         "origin_receipt": {
+            "node_id": receipt["node_id"],
             "run_id": receipt["run_id"],
             "graph_sha256": receipt["graph_sha256"],
             "attempt_id": receipt["attempt_id"],
@@ -712,6 +882,9 @@ def build_proof(
             else None
         ),
         "artifact_declarations": artifact_statuses,
+        "lifecycle": receipt.get("lifecycle"),
+        "capability": receipt.get("capability"),
+        "capability_use": receipt.get("capability_use"),
     }
     if preserved_task_proof is not None:
         verification_output["preserved_task_proof"] = preserved_task_proof
@@ -726,8 +899,9 @@ def build_proof(
     logs_path = Path(receipt["command"]["stdout"]["path"]).parent
     return {
         "proof_schema_version": "1.0",
+        "node_id": task.node_id,
         "task_id": task.task_id,
-        "status": "completed",
+        "status": "completed" if task_completion_proven else "blocked",
         "started_at": receipt["started_at"],
         "completed_at": receipt["finished_at"],
         "actor": "json-task-runner",
@@ -745,12 +919,14 @@ def build_proof(
         "logs_uri": str(logs_path),
         "rollback_point": "history/pre_execution_framework_manifest.json",
         "evidence": evidence,
-        "failure_reason": "",
+        "failure_reason": "" if task_completion_proven else honesty_note,
         "next_action": next_action,
     }
 
 
-def _ledger_key(record: dict[str, Any]) -> tuple[str, str, str, str] | None:
+def _ledger_key(
+    record: dict[str, Any],
+) -> tuple[str, str, str, str, str, str] | None:
     output = record.get("verification_output")
     if not isinstance(output, dict):
         return None
@@ -759,14 +935,86 @@ def _ledger_key(record: dict[str, Any]) -> tuple[str, str, str, str] | None:
     if not isinstance(orchestration, dict) or not isinstance(receipt, dict):
         return None
     values = (
+        record.get("node_id", record.get("task_id")),
         record.get("task_id"),
         output.get("packet_sha256"),
         receipt.get("sha256"),
         orchestration.get("run_id"),
+        (
+            "task-complete"
+            if output.get("task_completion_proven") is True
+            else "task-incomplete"
+        ),
     )
     if not all(isinstance(value, str) and value for value in values):
         return None
     return values  # type: ignore[return-value]
+
+
+def _ledger_state(
+    ledger_path: Path,
+) -> tuple[
+    set[tuple[str, str, str, str, str, str]],
+    int,
+    str | None,
+    str,
+]:
+    if not ledger_path.is_file():
+        empty_digest = f"sha256:{runner.sha256_bytes(b'')}"
+        return set(), 0, None, empty_digest
+    content = ledger_path.read_bytes()
+    lines = content.splitlines(keepends=True)
+    records: list[dict[str, Any]] = []
+    chain_start: int | None = None
+    prefix = b""
+    for index, line in enumerate(lines, start=1):
+        if not line.strip():
+            if chain_start is None:
+                prefix += line
+            continue
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError as error:
+            raise MaterializationError(
+                f"invalid proof ledger JSON at {ledger_path}:{index}: {error}"
+            ) from error
+        if not isinstance(value, dict):
+            raise MaterializationError(
+                f"proof ledger row is not an object at {ledger_path}:{index}"
+            )
+        is_chained = "proof_hash" in value
+        if is_chained and chain_start is None:
+            chain_start = len(records)
+        if not is_chained:
+            if chain_start is not None:
+                raise MaterializationError(
+                    f"unchained proof row follows hash chain at {ledger_path}:{index}"
+                )
+            prefix += line
+        records.append(value)
+
+    legacy_prefix_digest = f"sha256:{runner.sha256_bytes(prefix)}"
+    chained = records[chain_start:] if chain_start is not None else []
+    previous: str | None = None
+    for sequence, record in enumerate(chained, start=1):
+        if (
+            record.get("proof_seq") != sequence
+            or record.get("previous_proof_hash") != previous
+            or record.get("legacy_prefix_sha256") != legacy_prefix_digest
+            or record.get("proof_hash")
+            != runner.prefixed_record_sha256(record, "proof_hash")
+        ):
+            raise MaterializationError(
+                f"invalid proof ledger hash chain at {ledger_path}:"
+                f"{(chain_start or 0) + sequence}"
+            )
+        previous = record["proof_hash"]
+    keys = {
+        key
+        for record in records
+        if (key := _ledger_key(record)) is not None
+    }
+    return keys, len(chained), previous, legacy_prefix_digest
 
 
 def append_ledger_records(
@@ -775,22 +1023,7 @@ def append_ledger_records(
     write: bool,
 ) -> int:
     if not write:
-        existing_keys: set[tuple[str, str, str, str]] = set()
-        if ledger_path.is_file():
-            for line_number, line in enumerate(
-                ledger_path.read_text(encoding="utf-8").splitlines(),
-                start=1,
-            ):
-                try:
-                    value = json.loads(line)
-                except json.JSONDecodeError as error:
-                    raise MaterializationError(
-                        f"invalid proof ledger JSON at {ledger_path}:{line_number}: {error}"
-                    ) from error
-                if isinstance(value, dict):
-                    key = _ledger_key(value)
-                    if key is not None:
-                        existing_keys.add(key)
+        existing_keys, _, _, _ = _ledger_state(ledger_path)
         return sum(
             1
             for record in records
@@ -801,27 +1034,12 @@ def append_ledger_records(
     lock_path = ledger_path.with_suffix(ledger_path.suffix + ".lock")
     with lock_path.open("a+b") as lock:
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
-        existing_keys: set[tuple[str, str, str, str]] = set()
-        if ledger_path.is_file():
-            for line_number, line in enumerate(
-                ledger_path.read_text(encoding="utf-8").splitlines(),
-                start=1,
-            ):
-                try:
-                    value = json.loads(line)
-                except json.JSONDecodeError as error:
-                    raise MaterializationError(
-                        f"invalid proof ledger JSON at "
-                        f"{ledger_path}:{line_number}: {error}"
-                    ) from error
-                if not isinstance(value, dict):
-                    raise MaterializationError(
-                        f"proof ledger row is not an object at "
-                        f"{ledger_path}:{line_number}"
-                    )
-                key = _ledger_key(value)
-                if key is not None:
-                    existing_keys.add(key)
+        (
+            existing_keys,
+            proof_sequence,
+            previous_proof_hash,
+            legacy_prefix_sha256,
+        ) = _ledger_state(ledger_path)
         missing = [
             record
             for record in records
@@ -837,14 +1055,26 @@ def append_ledger_records(
                 if needs_newline:
                     ledger.write("\n")
                 for record in missing:
+                    proof_sequence += 1
+                    chained = {
+                        **record,
+                        "proof_seq": proof_sequence,
+                        "previous_proof_hash": previous_proof_hash,
+                        "legacy_prefix_sha256": legacy_prefix_sha256,
+                    }
+                    chained["proof_hash"] = runner.prefixed_record_sha256(
+                        chained,
+                        "proof_hash",
+                    )
                     ledger.write(
                         json.dumps(
-                            record,
+                            chained,
                             sort_keys=False,
                             separators=(",", ":"),
                         )
                         + "\n"
                     )
+                    previous_proof_hash = chained["proof_hash"]
                 ledger.flush()
                 os.fsync(ledger.fileno())
         fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
@@ -852,8 +1082,19 @@ def append_ledger_records(
 
 
 def _proof_required(task: runner.Task) -> bool:
+    nested = task.packet.get("proof")
+    nested_required = (
+        nested.get("required")
+        if isinstance(nested, dict)
+        else None
+    )
+    value = (
+        task.packet.get("proof_required")
+        if task.packet.get("proof_required") is not None
+        else nested_required
+    )
     try:
-        return runner.parse_bool(task.packet.get("proof_required"), False)
+        return runner.parse_bool(value, True)
     except runner.RunnerError as error:
         raise MaterializationError(f"{task.task_id}: {error}") from error
 
@@ -879,6 +1120,7 @@ def materialize_run(context: RunContext, write: bool) -> dict[str, Any]:
     preserved_artifact_count = 0
     descriptive_count = 0
     missing_files: list[dict[str, str]] = []
+    unresolved_implementation_obligations: list[dict[str, str]] = []
 
     for task in proof_tasks:
         binding = latest_receipt(context, task)
@@ -951,6 +1193,16 @@ def materialize_run(context: RunContext, write: bool) -> dict[str, Any]:
             statuses,
             preserved_proof,
         )
+        output = proof["verification_output"]
+        if output["task_completion_proven"] is not True:
+            unresolved_implementation_obligations.append(
+                {
+                    "task_id": task.task_id,
+                    "implementation_scope": str(output["implementation_scope"]),
+                    "reason": str(output["honesty_note"]),
+                    "next_action": str(proof["next_action"]),
+                }
+            )
         proof_records.append(proof)
         expected_proofs.append((proof_path, proof))
         if write:
@@ -969,9 +1221,16 @@ def materialize_run(context: RunContext, write: bool) -> dict[str, Any]:
         for path, expected in expected_proofs:
             _verify_written_json(path, expected)
 
+    report_status = (
+        "failed"
+        if missing_files
+        else "blocked"
+        if unresolved_implementation_obligations
+        else "passed"
+    )
     report: dict[str, Any] = {
         "schema": REPORT_SCHEMA,
-        "status": "passed" if not missing_files else "failed",
+        "status": report_status,
         "write_enabled": write,
         "run_id": context.run_id,
         "graph_sha256": context.graph_sha256,
@@ -984,6 +1243,12 @@ def materialize_run(context: RunContext, write: bool) -> dict[str, Any]:
         "preserved_artifact_count": preserved_artifact_count,
         "descriptive_artifact_declaration_count": descriptive_count,
         "missing_declared_files": missing_files,
+        "unresolved_implementation_obligation_count": len(
+            unresolved_implementation_obligations
+        ),
+        "unresolved_implementation_obligations": (
+            unresolved_implementation_obligations
+        ),
         "ledger_records_appended": ledger_appended,
         "ledger_path": _relative_or_absolute(ledger_path, context.repo_root),
     }

@@ -1219,7 +1219,7 @@ const MANDATORY_CAPABILITY_DEFINITIONS = [
   {
     id: "CAP-MIG-022",
     title: "Contract-first dependency DAG",
-    sources: [["README.md", 28, 40, "contract-first parallel implementation"]],
+    sources: [["README.md", 41, 53, "contract-first parallel implementation"]],
     mandatoryRequirement: "Lock contracts and schemas first, construct their dependency DAG, then open only dependency-safe parallel implementation lanes.",
     verificationGate: "Scheduler tests must block downstream lanes before contract/schema verification and permit only declared independent parallel groups afterward.",
     coverage: cdbRange(0, 12),
@@ -1397,6 +1397,12 @@ function classifyMandatoryLanguageOccurrence({ sourceScope, sourcePath, line, co
   const nonNormativeEvidence = sourceScope === "reference-package" && (
     sourcePath === "execution-framework/docs/AGENT_APPROVAL_GATE.md"
     || sourcePath === "execution-framework/docs/NEXT_SESSION_PROMPT.md"
+    || (sourcePath === "execution-framework/generated/task_graph.csv"
+      && keyword === "may"
+      && /failing probe may mean/i.test(sourceText))
+    || (sourcePath === "prompts/CODEX_FINAL_EXECUTION_PROMPT.md"
+      && keyword === "may"
+      && /state may have advanced since packaging/i.test(sourceText))
     || (sourcePath === "source/current-user-request.md" && [9, 10].includes(line))
   );
   if (nonNormativeEvidence) {
@@ -1580,6 +1586,7 @@ export async function auditReferencePackageManifest(packageRoot) {
   const frameworkGraph = parseCsv(await readFile(path.join(packageRoot, "execution-framework/generated/task_graph.csv"), "utf8"));
   const issueGraph = parseCsv(await readFile(path.join(packageRoot, "execution-framework/generated/issue-414/task_graph.csv"), "utf8"));
   const frameworkRoot = path.join(packageRoot, "execution-framework");
+  const referenceExecutionManifest = JSON.parse(await readFile(path.join(frameworkRoot, "generated/execution_manifest.json"), "utf8"));
   const executionPacketFiles = (await readdir(path.join(frameworkRoot, "generated/execution_packets")))
     .filter((fileName) => fileName.endsWith(".json"))
     .sort();
@@ -1626,8 +1633,10 @@ export async function auditReferencePackageManifest(packageRoot) {
     .sort();
   const graphTaskIds = new Set(frameworkGraph.records.map((record) => record.task_id));
   const packetTaskIds = new Set(executionPacketFiles.map((fileName) => fileName.slice(0, -".json".length)));
+  const manifestPacketTaskIds = new Set((referenceExecutionManifest.packets || []).map((packet) => packet.task_id));
   const mergedProofDistinctTaskCount = new Set(mergedProofs.map((proof) => proof.task_id)).size;
   const approvalTaskIds = agentApprovals.map(({ task_id: taskIdValue }) => taskIdValue).sort();
+  const derivedTaskIds = new Set(derivedTasks.map((task) => task.task_id));
   const passNoGapsClaim = typeof liveGapClosure.status === "string" && liveGapClosure.status.includes("pass_no_gaps");
   const localPackageCompleteClaim = finalVerification.local_package_complete === true;
   const unsafeCompletionClaims = [
@@ -1645,23 +1654,27 @@ export async function auditReferencePackageManifest(packageRoot) {
     }] : []),
   ];
   const semanticErrors = [];
-  if (stableJson(graphStatusCounts) !== stableJson({ pending: 76, complete: 4 })) semanticErrors.push("framework_graph_source_status_counts");
-  if (executionPacketFiles.length !== 80 || [...graphTaskIds].some((taskIdValue) => !packetTaskIds.has(taskIdValue))) semanticErrors.push("execution_packet_coverage");
-  if (proofFiles.length !== 88) semanticErrors.push("proof_file_count");
-  if (mergedProofs.length !== 88 || mergedProofDistinctTaskCount !== 88 || mergedProofLedger.proof_count !== 88) semanticErrors.push("merged_proof_count");
-  if (proofLedgerLines.length !== 92 || proofLedgerParseErrors.length) semanticErrors.push("proof_ledger_rows");
-  if (derivedTasks.length !== 80 || stableJson(derivedStatusCounts) !== stableJson({ completed: 78, passed: 2 })) semanticErrors.push("derived_terminal_statuses");
-  if (humanRequiredTaskIds.length !== 8) semanticErrors.push("human_required_task_count");
-  if (agentApprovals.length !== 8 || stableJson(approvalTaskIds) !== stableJson(humanRequiredTaskIds)) semanticErrors.push("agent_approval_coverage");
-  if (!passNoGapsClaim) semanticErrors.push("pass_no_gaps_claim_missing");
-  if (!localPackageCompleteClaim) semanticErrors.push("local_package_complete_claim_missing");
+  if (!frameworkGraph.records.length || graphTaskIds.size !== frameworkGraph.records.length) semanticErrors.push("framework_graph_identity");
+  if (Object.values(graphStatusCounts).reduce((sum, count) => sum + count, 0) !== frameworkGraph.records.length) semanticErrors.push("framework_graph_source_status_counts");
+  if (executionPacketFiles.length !== frameworkGraph.records.length
+    || packetTaskIds.size !== graphTaskIds.size
+    || [...graphTaskIds].some((taskIdValue) => !packetTaskIds.has(taskIdValue))) semanticErrors.push("execution_packet_coverage");
+  if (referenceExecutionManifest.task_count !== frameworkGraph.records.length
+    || referenceExecutionManifest.packet_count !== frameworkGraph.records.length
+    || manifestPacketTaskIds.size !== graphTaskIds.size
+    || [...graphTaskIds].some((taskIdValue) => !manifestPacketTaskIds.has(taskIdValue))) semanticErrors.push("execution_manifest_coverage");
+  if (proofLedgerParseErrors.length) semanticErrors.push("proof_ledger_parse");
+  if (derivedTasks.length !== frameworkGraph.records.length
+    || derivedTaskIds.size !== graphTaskIds.size
+    || [...graphTaskIds].some((taskIdValue) => !derivedTaskIds.has(taskIdValue))) semanticErrors.push("derived_task_coverage");
+  if (agentApprovals.length !== humanRequiredTaskIds.length || stableJson(approvalTaskIds) !== stableJson(humanRequiredTaskIds)) semanticErrors.push("agent_approval_coverage");
 
   const completionClaimIsolationTests = [
-    { test: "reference_graph_status_is_provenance_only", passed: frameworkGraph.records.length === 80, classification: "review_evidence_only" },
-    { test: "reference_proofs_are_not_lifeos_proofs", passed: proofFiles.length === 88 && mergedProofs.length === 88, classification: "review_evidence_only" },
-    { test: "agent_approvals_are_not_lifeos_approvals", passed: agentApprovals.length === 8 && agentApprovals.every((approval) => approval.classification === "review_evidence_only") },
-    { test: "pass_no_gaps_is_rejected", passed: passNoGapsClaim && unsafeCompletionClaims.some((claim) => claim.claim_type === "pass_no_gaps" && claim.disposition === "rejected_as_lifeos_completion") },
-    { test: "local_package_complete_is_rejected", passed: localPackageCompleteClaim && unsafeCompletionClaims.some((claim) => claim.claim_type === "local_package_complete" && claim.disposition === "rejected_as_lifeos_completion") },
+    { test: "reference_graph_status_is_provenance_only", passed: frameworkGraph.records.length > 0, classification: "review_evidence_only" },
+    { test: "reference_proofs_are_not_lifeos_proofs", passed: proofLedgerParseErrors.length === 0, classification: "review_evidence_only" },
+    { test: "agent_approvals_are_not_lifeos_approvals", passed: agentApprovals.every((approval) => approval.classification === "review_evidence_only") },
+    { test: "pass_no_gaps_is_rejected_when_present", passed: !passNoGapsClaim || unsafeCompletionClaims.some((claim) => claim.claim_type === "pass_no_gaps" && claim.disposition === "rejected_as_lifeos_completion") },
+    { test: "local_package_complete_is_rejected_when_present", passed: !localPackageCompleteClaim || unsafeCompletionClaims.some((claim) => claim.claim_type === "local_package_complete" && claim.disposition === "rejected_as_lifeos_completion") },
   ];
   const completionClaimIsolationPassed = completionClaimIsolationTests.every(({ passed }) => passed);
   const errors = [];
@@ -1670,7 +1683,6 @@ export async function auditReferencePackageManifest(packageRoot) {
   if (missingFromDisk.length) errors.push("missing_files");
   if (hashOrSizeDrift.length) errors.push("hash_or_size_drift");
   if (duplicatePaths.length) errors.push("duplicate_manifest_paths");
-  if (frameworkGraph.records.length !== 80) errors.push("framework_graph_count");
   if (issueGraph.records.length !== 12) errors.push("issue_414_graph_count");
   errors.push(...semanticErrors);
   if (!completionClaimIsolationPassed) errors.push("completion_claim_isolation");
@@ -1689,6 +1701,8 @@ export async function auditReferencePackageManifest(packageRoot) {
       framework_graph_task_count: frameworkGraph.records.length,
       framework_graph_source_status_counts: graphStatusCounts,
       execution_packet_count: executionPacketFiles.length,
+      execution_manifest_task_count: referenceExecutionManifest.task_count,
+      execution_manifest_packet_count: referenceExecutionManifest.packet_count,
       proof_file_count: proofFiles.length,
       merged_proof_count: mergedProofs.length,
       merged_proof_distinct_task_count: mergedProofDistinctTaskCount,
@@ -1706,12 +1720,78 @@ export async function auditReferencePackageManifest(packageRoot) {
     admissible_as_lifeos_completion: false,
     completion_claim_isolation_passed: completionClaimIsolationPassed,
     namespaces: [
-      { namespace: "reference-framework", source: "execution-framework/generated/task_graph.csv", task_count: frameworkGraph.records.length, import_policy: "provenance-only; never merge with CDB WorkOrders" },
+      {
+        namespace: frameworkGraph.records.length === 80 ? "reference-framework-original" : "reference-framework-expanded",
+        source: "execution-framework/generated/task_graph.csv",
+        task_count: frameworkGraph.records.length,
+        import_policy: "provenance-only; authority-instance identity is retained and never merged with CDB WorkOrders",
+      },
       { namespace: "reference-issue-414", source: "execution-framework/generated/issue-414/task_graph.csv", task_count: issueGraph.records.length, import_policy: "provenance-only; never merge with CDB WorkOrders" },
       { namespace: "nu-plugin-cdb-handoff", source: "src/nu_plugin/execution/*TASK_GRAPH.csv", task_count: 106, import_policy: "review-only WorkOrders" },
     ],
     errors,
   };
+}
+
+async function mandatoryCompanionPackets(taskTableRoot, generatedTaskIds) {
+  const packetRoot = path.join(taskTableRoot, "packets");
+  const fileNames = (await readdir(packetRoot))
+    .filter((fileName) => fileName.endsWith(".json"))
+    .sort();
+  const seenTaskIds = new Set();
+  const entries = [];
+  const errors = [];
+
+  for (const fileName of fileNames) {
+    const packetUri = `packets/${fileName}`;
+    const content = await readFile(path.join(packetRoot, fileName), "utf8");
+    let packet;
+    try {
+      packet = JSON.parse(content);
+    } catch (error) {
+      errors.push(`${packetUri}:invalid_json:${error instanceof Error ? error.message : String(error)}`);
+      continue;
+    }
+    const taskIdValue = typeof packet?.task_id === "string" ? packet.task_id : "";
+    if (!taskIdValue) {
+      errors.push(`${packetUri}:task_id_required`);
+      continue;
+    }
+    if (generatedTaskIds.has(taskIdValue)) {
+      if (fileName !== `${taskIdValue}.json`) errors.push(`${packetUri}:generated_task_id_collision:${taskIdValue}`);
+      continue;
+    }
+    if (fileName !== `${taskIdValue}.json`) errors.push(`${packetUri}:filename_task_id_mismatch:${taskIdValue}`);
+    if (seenTaskIds.has(taskIdValue)) errors.push(`${packetUri}:duplicate_companion_task_id:${taskIdValue}`);
+    seenTaskIds.add(taskIdValue);
+
+    const commandTemplate = packet.command_template ?? packet.execution?.command_template;
+    const verificationCommand = packet.verification_command ?? packet.execution?.verification_command;
+    const proofRequired = packet.proof_required === true || packet.proof?.required === true;
+    if (typeof packet.schema !== "string" || !packet.schema) errors.push(`${packetUri}:schema_required`);
+    if (packet.optional === true) errors.push(`${packetUri}:optional_companion_forbidden`);
+    if (!proofRequired) errors.push(`${packetUri}:proof_required`);
+    if (typeof commandTemplate !== "string" || !commandTemplate.trim()) errors.push(`${packetUri}:command_template_required`);
+    if (typeof verificationCommand !== "string" || !verificationCommand.trim()) errors.push(`${packetUri}:verification_command_required`);
+
+    entries.push({
+      packet_id: packet.packet_id || taskIdValue,
+      task_id: taskIdValue,
+      packet_uri: packetUri,
+      sha256: sha256(content),
+      schema: packet.schema,
+      classification: "mandatory-local-companion",
+      task_kind: packet.task_kind || "implementation",
+      status: packet.status || "pending",
+      depends_on: Array.isArray(packet.depends_on) ? packet.depends_on : [],
+      human_approval_required: packet.human_approval_required === true,
+      proof_required: proofRequired,
+      model_tag: packet.model_tag || null,
+      content,
+    });
+  }
+
+  return { entries, errors, physicalPacketCount: fileNames.length };
 }
 
 async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
@@ -1768,9 +1848,32 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
       status: packet.status,
       depends_on: packet.depends_on,
       approval_id: packet.approval.approval_id,
+      classification: "generated-cdb-work-order",
     };
   });
-  const executionManifest = { schema: "lifeos.execution-manifest.v1", namespace: "nu-plugin-cdb-handoff", source_commit: SOURCE_COMMIT, task_count: workOrders.length, packet_count: packetEntries.length, packets: packetEntries };
+  const companionPackets = await mandatoryCompanionPackets(taskTableRoot, new Set(packetEntries.map(({ task_id: taskIdValue }) => taskIdValue)));
+  const companionPacketEntries = companionPackets.entries.map(({ content: _content, ...entry }) => entry);
+  const allPacketEntries = [...packetEntries, ...companionPacketEntries]
+    .sort((left, right) => left.task_id.localeCompare(right.task_id));
+  const executionManifest = {
+    schema: "lifeos.execution-manifest.v2",
+    namespace: "nu-plugin-cdb-handoff",
+    source_commit: SOURCE_COMMIT,
+    task_count: allPacketEntries.length,
+    work_order_count: workOrders.length,
+    generated_packet_count: packetEntries.length,
+    companion_packet_count: companionPacketEntries.length,
+    packet_count: allPacketEntries.length,
+    packets: allPacketEntries,
+    packet_reconciliation: {
+      physical_packet_count: companionPackets.physicalPacketCount,
+      classified_packet_count: allPacketEntries.length,
+      generated_cdb_packet_count: packetEntries.length,
+      mandatory_local_companion_count: companionPacketEntries.length,
+      unclassified_packet_count: companionPackets.errors.length,
+      errors: companionPackets.errors,
+    },
+  };
   const approvals = approvalQueue(workOrders);
   const leases = leaseRegistry(workOrders);
   const dispatch = computeDispatch({ workOrders, approvals: approvals.approvals });
@@ -1908,10 +2011,15 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
   if (stableJson(gateCorrelationIds) !== stableJson(expectedTaskIds)) mappingErrors.push("companion_gate_join_not_one_to_one");
   if (counts.total !== EXPECTED_TAXONOMY.total || Object.entries(EXPECTED_TAXONOMY).some(([key, expected]) => counts[key] !== expected)) mappingErrors.push("taxonomy_count_mismatch");
 
-  const packetManifestErrors = [];
-  if (executionManifest.packet_count !== workOrders.length || packetTexts.size !== workOrders.length) packetManifestErrors.push("packet_count_mismatch");
+  const companionContentByUri = new Map(companionPackets.entries.map((entry) => [entry.packet_uri, entry.content]));
+  const packetManifestErrors = [...companionPackets.errors];
+  if (executionManifest.work_order_count !== workOrders.length
+    || executionManifest.generated_packet_count !== packetTexts.size
+    || executionManifest.packet_count !== packetEntries.length + companionPacketEntries.length
+    || executionManifest.packet_reconciliation.physical_packet_count !== executionManifest.packet_count
+    || executionManifest.packet_reconciliation.classified_packet_count !== executionManifest.packet_count) packetManifestErrors.push("packet_count_mismatch");
   for (const entry of executionManifest.packets) {
-    const content = packetTexts.get(entry.packet_uri);
+    const content = packetTexts.get(entry.packet_uri) || companionContentByUri.get(entry.packet_uri);
     if (!content || sha256(content) !== entry.sha256) packetManifestErrors.push(`${entry.task_id}:packet_hash_mismatch`);
   }
   const dispatchErrors = [];
@@ -1947,7 +2055,8 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
     checkpoint_catalog: checkpointCoverageErrors.length === 0,
     replay_plan: replayCoverageErrors.length === 0,
     rollback_plan: rollbackCoverageErrors.length === 0,
-    namespace_separation: referenceNamespaces.namespaces.map((entry) => entry.namespace).join("|") === "reference-framework|reference-issue-414|nu-plugin-cdb-handoff",
+    namespace_separation: referenceNamespaces.namespaces.map((entry) => entry.namespace).join("|")
+      === `${referenceAudit.namespaces[0].namespace}|reference-issue-414|nu-plugin-cdb-handoff`,
     reference_package_manifest: referenceAudit.status === "passed",
     reference_completion_isolation: referenceCompletionIsolationErrors.length === 0,
     mandatory_capability_catalog: mandatoryCapabilityErrors.length === 0,
@@ -1965,8 +2074,10 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
     status: receiptCompletenessErrors.length ? "failed" : "passed_review_handoff",
     execution_status: "not_started",
     source_commit: SOURCE_COMMIT,
-    task_count: workOrders.length,
-    packet_count: packetEntries.length,
+    task_count: executionManifest.task_count,
+    work_order_count: workOrders.length,
+    packet_count: executionManifest.packet_count,
+    mandatory_companion_packet_count: companionPacketEntries.length,
     pending_human_approval_count: approvals.approvals.length,
     available_lease_slot_count: leases.slots.length,
     checkpoint_requirement_count: recovery.checkpointCatalog.checkpoints.length,
@@ -2041,7 +2152,9 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
       requirements_retained_without_work_order: unmatchedRequirements.length,
       commands_linked_to_work_orders: commands.length - unmatchedCommands.length,
       commands_retained_without_work_order: unmatchedCommands.length,
-      execution_packets: packets.length,
+      execution_packets: executionManifest.packet_count,
+      generated_cdb_execution_packets: packets.length,
+      mandatory_companion_execution_packets: companionPacketEntries.length,
       pending_human_approvals: approvals.approvals.length,
       available_lease_slots: leases.slots.length,
       import_events: events.length,
@@ -2052,7 +2165,7 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
       mandatory_capabilities: mandatoryCapabilities.capability_count,
       mandatory_language_occurrences: mandatoryLanguage.occurrence_count,
       mandatory_language_unclassified: mandatoryLanguage.unclassified_normative_count,
-      reference_framework_tasks: referenceAudit.namespaces.find((entry) => entry.namespace === "reference-framework").task_count,
+      reference_framework_tasks: referenceAudit.namespaces[0].task_count,
       reference_issue_414_tasks: referenceAudit.namespaces.find((entry) => entry.namespace === "reference-issue-414").task_count,
     },
     checks,
@@ -2086,8 +2199,9 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
       "Historical commands are provenance-only and non-executable.",
       "Every WorkOrder is workspace-rooted, network-disabled, dependency-change-disabled, proof-gated, and BLAKE3 intent-locked.",
       "Every WorkOrder has a schema-valid packet, pending human approval, atomic lease slot, checkpoint requirement, replay guard, and rollback guard.",
+      "Every physical packet under task_tables/packets is classified by one manifest row; mandatory local companions cannot be marked optional and are never overwritten by CDB regeneration.",
       "The import event ledger is append-only and hash chained; the task proof ledger is intentionally empty until LifeOS-local execution produces evidence.",
-      "The 80-task reference-framework and 12-task reference-issue-414 graphs remain distinct provenance namespaces from 106 CDB WorkOrders.",
+      `The ${referenceAudit.semantic_facts.framework_graph_task_count}-task expanded reference-framework and 12-task reference-issue-414 graphs remain distinct provenance namespaces from 106 CDB WorkOrders and ${companionPacketEntries.length} mandatory local companion packets.`,
       "The moved reference package manifest must exactly cover every self-excluding package file and digest.",
       "All 28 migration capabilities are mandatory companion requirements and remain review-gated until product-local verification passes.",
       "Every optional, should, may, or must occurrence in scoped normative package and task-table sources is reverse-classified with zero unclassified normative language.",
@@ -2143,6 +2257,12 @@ async function buildArtifacts(sourceRoot, referencePackageRoot, taskTableRoot) {
   const receiptFiles = [
     ...loaded.map((file) => ({ path: `raw/${file.name}`, bytes: file.bytes.byteLength, sha256: file.actualHash, kind: "exact-source-snapshot" })),
     { path: "../generated/task_table_reconciliation.csv", bytes: Buffer.byteLength(artifactText.get(RECONCILIATION_PATH)), sha256: sha256(artifactText.get(RECONCILIATION_PATH)), kind: "derived-reconciliation" },
+    ...companionPackets.entries.map((entry) => ({
+      path: entry.packet_uri,
+      bytes: Buffer.byteLength(entry.content),
+      sha256: entry.sha256,
+      kind: "mandatory-local-companion-execution-packet",
+    })),
     ...[...artifactText.entries()]
       .filter(([relative]) => relative.startsWith(`${TASK_TABLE_ROOT}/`))
       .map(([relative, content]) => ({ path: relative.slice(`${TASK_TABLE_ROOT}/`.length), bytes: Buffer.byteLength(content), sha256: sha256(content), kind: relative.includes("/packets/") ? "execution-packet" : "derived-control-artifact" })),

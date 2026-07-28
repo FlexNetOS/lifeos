@@ -1,56 +1,61 @@
 {
-  "proof_schema_version": "1.0",
-  "task_id": "REQ-030_PLUGIN_PROTOCOL_MANIFEST",
-  "status": "completed",
-  "started_at": "2026-07-27T03:35:00Z",
-  "completed_at": "2026-07-27T03:39:03Z",
-  "actor": "codex-cli-local",
-  "helper_id": "helper-nu-manifest-01",
-  "model_tag": "gpt-5.3-spark",
-  "repo_path": "/home/flexnetos/Downloads/nu_plugin",
-  "files_changed": [
-    "manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json",
-    "execution-framework/proof_records/REQ-030_PLUGIN_PROTOCOL_MANIFEST.proof.json",
-    "execution-framework/state/REQ-030_PLUGIN_PROTOCOL_MANIFEST.heartbeat.json",
-    "execution-framework/logs/REQ-030_PLUGIN_PROTOCOL_MANIFEST.log"
-  ],
-  "commands_run": [
-    "git-kb code symbols \"nu plugin command manifest\" --json",
-    "git-kb search \"REQ-030 nu plugin manifest\" --json",
-    "cargo metadata --no-deps --format-version 1 --manifest-path /home/flexnetos/Downloads/nu_plugin/Cargo.toml",
-    "python3 task-specific schema and contract validation",
-    "jq -e . /home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json"
-  ],
-  "verification_output": {
-    "status": "passed",
-    "manifest": "/home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json",
-    "schema": "schemas/nu_plugin_command_manifest.schema.json",
-    "plugin_name": "nu_plugin_codedb",
-    "nu_plugin_version": "0.1.0",
-    "command_count": 23,
-    "read_command_count": 15,
-    "mutating_command_count": 8,
-    "contract_command_count": 23,
-    "missing_contract_commands": [],
-    "mutation_endpoint_violations": [],
-    "notes": [
-      "All required NU_PLUGIN_CONTRACT commands are represented.",
-      "Every mutating command delegates to envctl with --emit-event.",
-      "Every command declares a Nushell-native table or record shape and named columns.",
-      "The initial jsonschema Python import was unavailable; validation was completed with an exact task-specific validator over every constraint in the locked schema."
-    ]
-  },
+  "actor": "json-task-runner",
   "checksums": {
-    "/home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json": "9abdd56be395951c44aa5da6ec6d4750af70af89a7d0bb60fd1ef0262b94a83b"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-030_PLUGIN_PROTOCOL_MANIFEST/c533ee91c5c08ddc94f5337c3a2ccf49d34f08e9c603e738376ff24606b46006/20260728T014454830793Z-f1cd3404223c.json": "c744f081023ceb77b0cbb4d49dc6dbc5fdca5bc1292b3051ab27bbd651605071"
   },
-  "logs_uri": "logs/REQ-030_PLUGIN_PROTOCOL_MANIFEST.log",
-  "rollback_point": "Remove /home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json; no existing plugin source files were modified.",
+  "commands_run": [
+    "/home/flexnetos/.nix-profile/bin/codex exec --sandbox danger-full-access --ignore-user-config --ignore-rules --ephemeral -c approval_policy=never -c project_doc_max_bytes=0 -c 'project_root_markers=[]' --skip-git-repo-check --disable plugins --disable hooks --disable apps --disable multi_agent --disable goals --disable tool_suggest --disable skill_mcp_dependency_install --model gpt-5.6-terra -c model_reasoning_effort=medium --cd /run/user/1001/lifeos-json-task-runner/20260727T234858483758Z-8997b4a16b78/REQ-030_PLUGIN_PROTOCOL_MANIFEST/20260728T014454830793Z-f1cd3404223c -"
+  ],
+  "completed_at": "2026-07-28T01:47:11.826429Z",
   "evidence": [
-    "/home/flexnetos/Downloads/nu_plugin/manifests/ENVCTL_MIGRATION_COMMAND_MANIFEST.json",
-    "schemas/nu_plugin_command_manifest.schema.json",
-    "prompts/NU_PLUGIN_CONTRACT.md",
-    "logs/REQ-030_PLUGIN_PROTOCOL_MANIFEST.log"
+    "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-030_PLUGIN_PROTOCOL_MANIFEST/c533ee91c5c08ddc94f5337c3a2ccf49d34f08e9c603e738376ff24606b46006/20260728T014454830793Z-f1cd3404223c.json",
+    "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-030_PLUGIN_PROTOCOL_MANIFEST/a4afaf76be374773d6f20cf108b3964719b25b759c28ec364a2e8ef845e5da48.proof.json"
   ],
   "failure_reason": "",
-  "next_action": "REQ-041_TWO_REPO_INTEGRATION may consume the manifest."
+  "files_changed": [],
+  "helper_id": "helper-nu-manifest-01",
+  "logs_uri": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-030_PLUGIN_PROTOCOL_MANIFEST/c533ee91c5c08ddc94f5337c3a2ccf49d34f08e9c603e738376ff24606b46006/logs/20260728T014454830793Z-f1cd3404223c",
+  "model_tag": "gpt-5.3-spark",
+  "next_action": "add or run an executable verification before claiming independent verification",
+  "proof_schema_version": "1.0",
+  "repo_path": "${NU_PLUGIN_REPO}",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "started_at": "2026-07-28T01:44:54.858033Z",
+  "status": "completed",
+  "task_id": "REQ-030_PLUGIN_PROTOCOL_MANIFEST",
+  "verification_output": {
+    "artifact_declarations": [
+      {
+        "declaration": "plugin manifest",
+        "kind": "descriptive",
+        "status": "descriptive_not_materialized"
+      }
+    ],
+    "command_exit_code": 0,
+    "honesty_note": "The immutable packet command completed, but the declared verification was narrative or non-executable and was not independently run.",
+    "implementation_scope": "runner_command_completed",
+    "materialization_schema": "lifeos.runner-proof-materialization.v1",
+    "needs_capability_probe": false,
+    "orchestration": {
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "run_id": "20260727T234858483758Z-8997b4a16b78"
+    },
+    "origin_receipt": {
+      "attempt_id": "20260728T014454830793Z-f1cd3404223c",
+      "graph_sha256": "cb497e97f320e52a777f506b3c85ee1c71e2bb20dc610bdbed6f6590dd8c752b",
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/REQ-030_PLUGIN_PROTOCOL_MANIFEST/c533ee91c5c08ddc94f5337c3a2ccf49d34f08e9c603e738376ff24606b46006/20260728T014454830793Z-f1cd3404223c.json",
+      "run_id": "20260727T234858483758Z-8997b4a16b78",
+      "sha256": "c744f081023ceb77b0cbb4d49dc6dbc5fdca5bc1292b3051ab27bbd651605071"
+    },
+    "packet_execution_proven": true,
+    "packet_sha256": "c533ee91c5c08ddc94f5337c3a2ccf49d34f08e9c603e738376ff24606b46006",
+    "preserved_task_proof": {
+      "path": "planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/proof_records/history/REQ-030_PLUGIN_PROTOCOL_MANIFEST/a4afaf76be374773d6f20cf108b3964719b25b759c28ec364a2e8ef845e5da48.proof.json",
+      "sha256": "a4afaf76be374773d6f20cf108b3964719b25b759c28ec364a2e8ef845e5da48"
+    },
+    "probe_class": null,
+    "task_completion_proven": true,
+    "verification_executed": false,
+    "verification_exit_code": null
+  }
 }

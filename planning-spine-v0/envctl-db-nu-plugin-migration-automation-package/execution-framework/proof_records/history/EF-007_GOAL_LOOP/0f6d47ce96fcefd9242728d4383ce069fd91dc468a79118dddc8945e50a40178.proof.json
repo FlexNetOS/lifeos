@@ -1,0 +1,35 @@
+{
+  "proof_schema_version": "1.0",
+  "task_id": "EF-007_GOAL_LOOP",
+  "status": "completed",
+  "started_at": "2026-07-28T01:37:44+00:00",
+  "completed_at": "2026-07-28T01:37:44+00:00",
+  "actor": "local-execution-framework",
+  "helper_id": "helper-goal-01",
+  "model_tag": "gpt-5.3-spark",
+  "repo_path": "execution-framework",
+  "files_changed": [
+    "execution-framework/state/goal_loop_state.json",
+    "execution-framework/generated/status_report.json"
+  ],
+  "commands_run": [
+    "python3 scripts/goal_loop.py generated/task_graph.csv"
+  ],
+  "verification_output": {
+    "dispatch_count": 76,
+    "approval_blocker_count": 0,
+    "blocked_count": 1
+  },
+  "checksums": {
+    "execution-framework/state/goal_loop_state.json": "91332a3424b72cbc75e8349dd05ff49cea8a39a2ce1d432ab55842bb43a64c98",
+    "execution-framework/generated/status_report.json": "91332a3424b72cbc75e8349dd05ff49cea8a39a2ce1d432ab55842bb43a64c98"
+  },
+  "logs_uri": "logs/EF-007_GOAL_LOOP.log",
+  "rollback_point": "history/pre_execution_framework_manifest.json",
+  "evidence": [
+    "state/goal_loop_state.json",
+    "generated/status_report.json"
+  ],
+  "failure_reason": "",
+  "next_action": "run verify_history_and_completeness.py"
+}

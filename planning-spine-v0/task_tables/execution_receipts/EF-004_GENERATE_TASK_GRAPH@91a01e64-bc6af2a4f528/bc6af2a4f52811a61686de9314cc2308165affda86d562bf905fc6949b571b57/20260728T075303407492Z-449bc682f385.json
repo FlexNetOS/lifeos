@@ -1,0 +1,131 @@
+{
+  "agent_command": {
+    "argv": [
+      "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/run_codex_executor.sh",
+      "--ignore-user-config",
+      "--ignore-rules"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework",
+    "duration_seconds": 26.78605,
+    "exit_code": 0,
+    "finished_at": "2026-07-28T07:53:30.194160Z",
+    "started_at": "2026-07-28T07:53:03.408122Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH@91a01e64-bc6af2a4f528/bc6af2a4f52811a61686de9314cc2308165affda86d562bf905fc6949b571b57/logs/20260728T075303407492Z-449bc682f385/stderr.log",
+      "sha256": "5ea359f692ab3dd348dec79a60959a7778d6e0512202d300e58ee880af43f04a"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH@91a01e64-bc6af2a4f528/bc6af2a4f52811a61686de9314cc2308165affda86d562bf905fc6949b571b57/logs/20260728T075303407492Z-449bc682f385/stdout.log",
+      "sha256": "21b10349a984eaf4349525bcb1f306e567e48c219ddce3909f17712f31579dda"
+    },
+    "timed_out": false
+  },
+  "attempt_id": "20260728T075303407492Z-449bc682f385",
+  "authorization": null,
+  "cargo_target_dir": "/home/flexnetos/meta/var/cargo-target/lifeos-json-task-cargo/lifeos-canonical-full-run1/execution-framework-e76e921f2dc1c0a0",
+  "command": {
+    "argv": [
+      "/home/flexnetos/meta/src/lifeos/planning-spine-v0/scripts/run_codex_executor.sh",
+      "--ignore-user-config",
+      "--ignore-rules"
+    ],
+    "cwd": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework",
+    "duration_seconds": 26.78605,
+    "exit_code": 0,
+    "finished_at": "2026-07-28T07:53:30.194160Z",
+    "started_at": "2026-07-28T07:53:03.408122Z",
+    "stderr": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH@91a01e64-bc6af2a4f528/bc6af2a4f52811a61686de9314cc2308165affda86d562bf905fc6949b571b57/logs/20260728T075303407492Z-449bc682f385/stderr.log",
+      "sha256": "5ea359f692ab3dd348dec79a60959a7778d6e0512202d300e58ee880af43f04a"
+    },
+    "stdout": {
+      "path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/EF-004_GENERATE_TASK_GRAPH@91a01e64-bc6af2a4f528/bc6af2a4f52811a61686de9314cc2308165affda86d562bf905fc6949b571b57/logs/20260728T075303407492Z-449bc682f385/stdout.log",
+      "sha256": "21b10349a984eaf4349525bcb1f306e567e48c219ddce3909f17712f31579dda"
+    },
+    "timed_out": false
+  },
+  "dependency_outputs": [
+    {
+      "capability_id": "lifeos-capability:EF-003_APPLY_FRAMEWORK:0df6e5c9fd6821d2",
+      "goal": "Add scripts, schemas, templates, generated folders, proof ledger, and examples",
+      "producer_node_id": "EF-003_APPLY_FRAMEWORK@91a01e64-df85a496d521",
+      "producer_packet_sha256": "df85a496d521fa40eb7a567d8b597f20e742cc357e473c64d52a7d25bf51508f",
+      "producer_task_id": "EF-003_APPLY_FRAMEWORK",
+      "target_artifacts": [
+        "execution framework files"
+      ],
+      "target_files": [
+        "scripts/**",
+        "schemas/**",
+        "templates/**",
+        "examples/**",
+        "execution-templates/**"
+      ],
+      "task_root": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework"
+    },
+    {
+      "capability_id": "lifeos-capability:EF-004_GENERATE_TASK_GRAPH:63715d369da5be57",
+      "goal": "Create task_graph.csv, normalized JSON, and index JSON",
+      "producer_node_id": "EF-004_GENERATE_TASK_GRAPH@364b0aeb-0181d91b0d30",
+      "producer_packet_sha256": "0181d91b0d30ad016377f0774239e965ae9754c626efc84cbb8d40246dd2d7e2",
+      "producer_task_id": "EF-004_GENERATE_TASK_GRAPH",
+      "target_artifacts": [
+        "task graph"
+      ],
+      "target_files": [
+        "generated/task_graph.csv",
+        "generated/task_graph.normalized.json",
+        "generated/task_graph.index.json"
+      ],
+      "task_root": "/home/flexnetos/meta/src/envctl/envctl-db-nu-plugin-migration-automation-package/execution-framework"
+    }
+  ],
+  "depends_on": [
+    "EF-003_APPLY_FRAMEWORK@91a01e64-df85a496d521",
+    "EF-004_GENERATE_TASK_GRAPH@364b0aeb-0181d91b0d30"
+  ],
+  "diagnostic_probe": null,
+  "execution_input_sha256": "1993e11995ae65252e49ef285a2e9f83b8dde307882b8ca27429ab3a6fd4913e",
+  "execution_mode": "json-stdin",
+  "execution_status": "completed",
+  "exit_code": 0,
+  "finished_at": "2026-07-28T07:53:30.194160Z",
+  "graph_sha256": "14814aa0715cb9793e92fafdb473d12422896b4f3fcaf11d18f2de76a0373bf1",
+  "implementation_actor": "json-stdin-executor",
+  "implementation_model": "gpt-5.3-codex-spark",
+  "implementation_model_reasoning_effort": "high",
+  "node_id": "EF-004_GENERATE_TASK_GRAPH@91a01e64-bc6af2a4f528",
+  "optional_execution_policy": "not_declared_optional",
+  "packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/task_tables/execution_receipts/runs/lifeos-canonical-full-run1/packets/EF-004_GENERATE_TASK_GRAPH@91a01e64-bc6af2a4f528.json",
+  "packet_sha256": "bc6af2a4f52811a61686de9314cc2308165affda86d562bf905fc6949b571b57",
+  "previous_receipt_sha256": null,
+  "produced_output": {
+    "capability_id": "lifeos-capability:EF-004_GENERATE_TASK_GRAPH:63715d369da5be57",
+    "goal": "Create task_graph.csv, normalized JSON, and index JSON",
+    "producer_node_id": "EF-004_GENERATE_TASK_GRAPH@91a01e64-bc6af2a4f528",
+    "producer_task_id": "EF-004_GENERATE_TASK_GRAPH",
+    "target_artifacts": [
+      "task graph"
+    ],
+    "target_files": [
+      "generated/task_graph.csv",
+      "generated/task_graph.normalized.json",
+      "generated/task_graph.index.json"
+    ],
+    "task_root": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework"
+  },
+  "receipt_sequence": 1,
+  "receipt_sha256": "sha256:c39b5a42bfc9e3c3ac2840471875495785320122220a421ecf580b9df718842c",
+  "record_type": "execution",
+  "run_id": "lifeos-canonical-full-run1",
+  "runner_schema": "lifeos.json-task-runner.v2",
+  "schema": "lifeos.json-task-execution-receipt.v2",
+  "semantic_contract_sha256": "63715d369da5be570bea5940076f83f87bcd6a6b15e66f6464715e1504cc9cf8",
+  "source_authority": "src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package",
+  "source_packet_path": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework/generated/execution_packets/EF-004_GENERATE_TASK_GRAPH.json",
+  "started_at": "2026-07-28T07:53:03.408122Z",
+  "status": "completed",
+  "task_id": "EF-004_GENERATE_TASK_GRAPH",
+  "task_root": "/home/flexnetos/meta/src/lifeos/planning-spine-v0/envctl-db-nu-plugin-migration-automation-package/execution-framework",
+  "workspace_root": "/home/flexnetos/meta/src/lifeos"
+}

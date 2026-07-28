@@ -1,6 +1,6 @@
 # Migration readiness scorecard
 
-Generated at: `2026-07-27T05:06:24+00:00`
+Generated at: `2026-07-28T11:57:27+00:00`
 Overall score: `100.0`
 Readiness band: `ready`
 

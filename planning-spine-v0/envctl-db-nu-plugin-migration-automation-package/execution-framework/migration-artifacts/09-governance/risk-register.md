@@ -3,7 +3,7 @@
 - Task: `ART-125_RISK_REGISTER`
 - Contract artifact: `artifact:09-governance-risk-register-md`
 - Canonical path: `migration-artifacts/09-governance/risk-register.md`
-- Generated at: `2026-07-04T23:19:47+00:00`
+- Generated at: `2026-07-28T11:51:32+00:00`
 - Scope: envctl database, artifact registry, shared protocol, package execution framework, and target-filesystem artifact generation.
 
 ## Risks

@@ -49,6 +49,38 @@
   const authState = bindStore(auth, ["isSignedIn"]);
   const lifeosState = bindStore(lifeos, ["wsCollapsed", "activeId", "activeSub"]);
 
+  let redbProjection = $state(null);
+
+  const tauriInvoke = () =>
+    typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || null;
+
+  onMount(() => {
+    const invoke = tauriInvoke();
+    if (!invoke) return;
+
+    let afterSeq = 0;
+    let syncing = false;
+    const syncProjection = async () => {
+      if (syncing) return;
+      syncing = true;
+      try {
+        const events = await invoke("redb_events_read", { afterSeq });
+        if (events.length) {
+          afterSeq = Math.max(afterSeq, ...events.map((event) => event.seq));
+          redbProjection = await invoke("redb_projection_read");
+        }
+      } catch {
+        redbProjection = null;
+      } finally {
+        syncing = false;
+      }
+    };
+
+    syncProjection();
+    const timer = window.setInterval(syncProjection, 250);
+    return () => window.clearInterval(timer);
+  });
+
   onMount(() => {
     auth.loadStatus();
   });
@@ -58,7 +90,7 @@
   <Login />
 {:else}
   <div class="shell" class:ws-collapsed={lifeosState.wsCollapsed}>
-    <Sidebar {router} />
+    <Sidebar {router} {redbProjection} />
     <Workspace {router} />
     <main class="main" id="main" tabindex="-1">
       {#if lifeosState.activeId === "settings" && !lifeosState.activeSub}

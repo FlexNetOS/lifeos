@@ -11,7 +11,7 @@
   import { router as appRouter } from "@/router";
   import Icon from "./Icon.svelte";
 
-  let { router = appRouter } = $props();
+  let { router = appRouter, redbProjection = null } = $props();
 
   const lifeos = useLifeos();
   const nav = createNav(router);
@@ -348,11 +348,26 @@
       </button>
     {/each}
   </div>
+  {#if redbProjection}
+    <div class="rail-owner-status" title="Owner-published redb projection">
+      <span class:degraded={redbProjection.degraded}></span>
+      <small>{redbProjection.localSeq}</small>
+    </div>
+  {/if}
 </aside>
 
 <style>
 /* Globe trigger — link dot in corner reflects WAN status */
 .rail-switcher-trigger { position: relative; }
+.rail-owner-status {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 8px 0 2px; color: var(--fg-4); font-size: 9px;
+}
+.rail-owner-status span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--lifeos-green); box-shadow: 0 0 5px var(--tint-green-glow-hi);
+}
+.rail-owner-status span.degraded { background: var(--status-warn); box-shadow: none; }
 .rail-switcher-link {
   position: absolute; right: 3px; bottom: 3px;
   width: 5px; height: 5px; border-radius: 50%;

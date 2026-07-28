@@ -9,7 +9,7 @@ mod auth;
 // directly through `#[tauri::command]` return positions — serde derives ride
 // along with the struct definitions.
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
-use flexnetos_redb_owner::{OwnerClient, OwnerService, ProjectionReader};
+use flexnetos_redb_owner::{read_events, OwnerClient, OwnerService, ProjectionReader};
 use lifeos_core::storage::{state, DbHealth, MigrateReport, Storage};
 use lifeos_core::types::{AiProvider, AppVersion, TelemetrySnapshot, VaultEntry};
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
@@ -89,6 +89,19 @@ fn redb_projection_read() -> Result<serde_json::Value, String> {
         "degraded": projection.degraded,
         "entries": projection.entries,
     }))
+}
+
+#[tauri::command]
+fn redb_events_read(after_seq: u64) -> Result<serde_json::Value, String> {
+    let events = read_events(redb_root(), after_seq).map_err(|error| error.to_string())?;
+    Ok(serde_json::json!(events
+        .into_iter()
+        .map(|event| serde_json::json!({
+            "seq": event.seq,
+            "slot": event.slot,
+            "checksum": event.checksum,
+        }))
+        .collect::<Vec<_>>()))
 }
 
 #[tauri::command]
@@ -1064,6 +1077,7 @@ pub fn run() {
             vault_list,
             open_settings,
             redb_projection_read,
+            redb_events_read,
             redb_state_write,
             envctl_drain,
             envctl_return_projection,

@@ -6295,6 +6295,8 @@ The same activation pass confirms `codedb ingest-envelope` at the clean `nu_plug
 
 The envctl bridge is also live at `e9112b2243f690445a70ed96c8bc237bc6d4497f`: its disposable PostgreSQL 17 integration run passes all four committer tests for ordered idempotent restart, envctl-only write grants, acknowledgement-after-durable-commit, and deterministic owner projection. The test database was dropped after the run; no canonical database was modified.
 
+LifeOS R01 currency is reconciled at current revision `10865e60`: `src/main.ts` mounts `App.svelte`, the production command reports zero Svelte diagnostics and a successful Vite build, the isolated live Vite mount serves the `#app` entrypoint, and the Tauri library tests pass both terminal argv and redb-event validation cases. The Vue/Pinia siblings remain compatibility-only; the mounted Glass is Svelte.
+
 | ID | Blueprint Location | Reviewed Claim | Repository/File Evidence | Finding | Conflict or Gap | Correction Applied | Verification |
 |---|---|---|---|---|---|---|---|
 | R01 | §§3.1, 4.2; LifeOS rows | LifeOS is the Tauri/Svelte Glass. | LifeOS [`package.json`](https://github.com/FlexNetOS/lifeos/blob/3d741436b05c0b3cece764c76aa93450e38266ed/package.json), [`src/main.ts`](https://github.com/FlexNetOS/lifeos/blob/3d741436b05c0b3cece764c76aa93450e38266ed/src/main.ts), revision `3d741436…` | current checkout is Vue 3/Pinia/Vite + Tauri. | Target Svelte architecture was stated as current implementation. | Preserved Tauri/Svelte as authority and made Vue→Svelte a release-blocking migration everywhere. | Build closure rejects Vue entrypoint and proves Svelte target. |

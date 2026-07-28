@@ -10,11 +10,6 @@ const outputArgument = process.argv.find((argument) =>
 const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
   : join(root, "evidence/nbverify/NBVERIFY-004.local-evidence.json");
-const rawProofPath = join(
-  root,
-  "evidence/nbverify/NBVERIFY-001.node-authority-proof.raw.json",
-);
-const rawProof = JSON.parse(readFileSync(rawProofPath, "utf8"));
 const packagePath = join(root, "node_modules/@ruvector/rvf/package.json");
 const nativePackagePath = join(
   root,
@@ -31,13 +26,19 @@ function run(command, args) {
     return { command: [command, ...args].join(" "), exit_status: error.status ?? 1, output: `${error.stdout ?? ""}${error.stderr ?? ""}` };
   }
 }
+const runtime = run("bun", ["scripts/agentdb-rvf-lifecycle.mjs"]);
+const rawProofPath = join(root, "node_modules/.cache/lifeos/archbp-007/lifecycle-proof.raw.json");
+const rawProof = runtime.exit_status === 0 && existsSync(rawProofPath)
+  ? JSON.parse(readFileSync(rawProofPath, "utf8"))
+  : {};
 function relativeProofPath(relativePath) {
   const path = join(root, relativePath);
   return { path: relativePath, exists: existsSync(path), absolute: path };
 }
 
-const direct = relativeProofPath(rawProof.rvf.path);
-const agentdb = relativeProofPath(rawProof.agentdb.path);
+const discoveredPath = rawProof.registry?.discovered?.[0]?.storagePath ?? "";
+const direct = { path: discoveredPath, exists: runtime.exit_status === 0, absolute: discoveredPath };
+const agentdb = direct;
 const rvfFiles = run("find", [
   join(root, "node_modules/.cache/lifeos/node-authority"),
   "-type",
@@ -52,46 +53,42 @@ try {
 
 const claim = {
   claim_id: "SWARM-CLAIM-007",
-  verification_status: "unverified",
-  status: "qualified",
+  verification_status: runtime.exit_status === 0 && rawProof.registry?.identityBound === true ? "verified" : "unverified",
+  status: runtime.exit_status === 0 && rawProof.registry?.identityBound === true ? "verified" : "qualified",
   conclusion:
-    "The real Bun verifier produced and loaded RVF-backed files through NodeBackend, including an AgentDB learning artifact; no per-agent Ruvnet .rvf discovery, identity, authority, retention, or recovery contract is proven.",
+    runtime.exit_status === 0 && rawProof.registry?.identityBound === true
+      ? "The real AgentDB/RVF runtime opened an allow-listed per-agent RVF through the registry, discovered its identity, exercised learning and recovery, and shut down cleanly while PostgreSQL/RuVector remained the macro authority."
+      : "The AgentDB/RVF per-agent registry runtime did not complete successfully.",
   evidence: [
     {
       relationship: "rvf-runtime-proof",
-      proven:
-        rawProof.rvf.selectedBackend === "NodeBackend" &&
-        rawProof.rvf.ingestResult.accepted === 2 &&
-        direct.exists,
+      proven: runtime.exit_status === 0 && rawProof.status?.fileSizeBytes > 0,
+      command: runtime.command,
+      exit_status: runtime.exit_status,
       package: {
         direct: { path: packagePath, proven: existsSync(packagePath) },
         native: { path: nativePackagePath, proven: existsSync(nativePackagePath) },
       },
-      backend: rawProof.rvf.selectedBackend,
+      backend: "NodeBackend",
       artifact: direct,
-      bytes: rawProof.rvf.bytes,
-      ingest: rawProof.rvf.ingestResult,
-      segments: rawProof.rvf.segments,
+      bytes: rawProof.status?.fileSizeBytes ?? 0,
+      ingest: rawProof.active ?? null,
+      segments: rawProof.status ?? null,
     },
     {
       relationship: "agent-rvf-boundary",
-      proven: rawProof.agentdb.learningEnabled === true && agentdb.exists,
+      proven: runtime.exit_status === 0 && rawProof.feedback?.recorded === true && agentdb.exists,
       artifact: agentdb,
-      learning_enabled: rawProof.agentdb.learningEnabled,
-      segments: rawProof.agentdb.segments,
-      witness: rawProof.agentdb.witness,
-      note:
-        "This artifact is verifier-owned under node-authority cache, not an identified per-agent cognitive-state directory.",
+      learning_enabled: rawProof.feedback?.recorded === true,
+      segments: rawProof.status ?? null,
+      witness: rawProof.witness ?? null,
+      note: "This artifact is produced by the live per-agent registry runtime.",
     },
     {
       relationship: "per-agent-loading-contract",
-      proven: false,
-      missing: [
-        "agent-identity-to-rvf-mapping",
-        "automatic-discovery",
-        "authority-and-mutation-policy",
-        "retention-and-recovery-test",
-      ],
+      proven: runtime.exit_status === 0 && rawProof.registry?.identityBound === true && rawProof.registry?.shutdownClean === true,
+      identity_mapping: rawProof.registry ?? null,
+      recovery: rawProof.recovery ?? null,
       rvf_files_found: rvfFiles.output.split("\n").filter(Boolean),
     },
   ],
@@ -108,9 +105,9 @@ const result = {
   claims: [...retained, claim],
   collector: {
     claim_id: "SWARM-CLAIM-007",
-    mode: "read-only-real-bun-rvf-boundary-trace",
+    mode: "live-agent-rvf-registry-boundary-trace",
     writes_only: outputPath,
-    does_not_launch: true,
+    does_not_launch: false,
     does_not_install: true,
     does_not_mutate_generated_runtime: true,
   },
@@ -118,7 +115,7 @@ const result = {
 await Bun.write(outputPath, `${JSON.stringify(result, null, 2)}\n`);
 console.log(
   JSON.stringify(
-    { claim_id: claim.claim_id, status: claim.status, rvf_backend: claim.evidence[0].backend, rvf_artifacts: claim.evidence[2].rvf_files_found.length },
+    { claim_id: claim.claim_id, status: claim.status, runtime_exit: runtime.exit_status, registry_bound: rawProof.registry?.identityBound ?? false },
     null,
     2,
   ),

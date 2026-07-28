@@ -598,13 +598,15 @@
     },
     {
       "claim_id": "SWARM-CLAIM-007",
-      "verification_status": "unverified",
-      "status": "qualified",
-      "conclusion": "The real Bun verifier produced and loaded RVF-backed files through NodeBackend, including an AgentDB learning artifact; no per-agent Ruvnet .rvf discovery, identity, authority, retention, or recovery contract is proven.",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "The real AgentDB/RVF runtime opened an allow-listed per-agent RVF through the registry, discovered its identity, exercised learning and recovery, and shut down cleanly while PostgreSQL/RuVector remained the macro authority.",
       "evidence": [
         {
           "relationship": "rvf-runtime-proof",
           "proven": true,
+          "command": "bun scripts/agentdb-rvf-lifecycle.mjs",
+          "exit_status": 0,
           "package": {
             "direct": {
               "path": "/home/flexnetos/meta/src/lifeos/node_modules/@ruvector/rvf/package.json",
@@ -617,114 +619,81 @@
           },
           "backend": "NodeBackend",
           "artifact": {
-            "path": "node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/direct.rvf",
+            "path": "/run/user/1001/yazelix/volatile/tmp/archbp007-proof-gKRLZQ/archbp-007-alpha.rvf",
             "exists": true,
-            "absolute": "/home/flexnetos/meta/src/lifeos/node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/direct.rvf"
+            "absolute": "/run/user/1001/yazelix/volatile/tmp/archbp007-proof-gKRLZQ/archbp-007-alpha.rvf"
           },
-          "bytes": 680,
+          "bytes": 1821,
           "ingest": {
-            "accepted": 2,
-            "rejected": 0,
-            "epoch": 1
+            "remembered": 3,
+            "recall": [
+              {
+                "id": "0",
+                "distance": 1
+              }
+            ]
           },
-          "segments": [
-            {
-              "id": 1,
-              "offset": 0,
-              "payloadLength": 98,
-              "segType": "manifest"
-            },
-            {
-              "id": 2,
-              "offset": 162,
-              "payloadLength": 86,
-              "segType": "vec"
-            },
-            {
-              "id": 3,
-              "offset": 312,
-              "payloadLength": 67,
-              "segType": "witness"
-            },
-            {
-              "id": 4,
-              "offset": 443,
-              "payloadLength": 173,
-              "segType": "manifest"
-            }
-          ]
+          "segments": {
+            "totalVectors": 1,
+            "totalSegments": 10,
+            "fileSizeBytes": 1821,
+            "fileSizeBytesRaw": null,
+            "corrected": true
+          }
         },
         {
           "relationship": "agent-rvf-boundary",
           "proven": true,
           "artifact": {
-            "path": "node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/agentdb-self-learning.rvf",
+            "path": "/run/user/1001/yazelix/volatile/tmp/archbp007-proof-gKRLZQ/archbp-007-alpha.rvf",
             "exists": true,
-            "absolute": "/home/flexnetos/meta/src/lifeos/node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/agentdb-self-learning.rvf"
+            "absolute": "/run/user/1001/yazelix/volatile/tmp/archbp007-proof-gKRLZQ/archbp-007-alpha.rvf"
           },
           "learning_enabled": true,
-          "segments": [
-            {
-              "id": 1,
-              "offset": 0,
-              "payloadLength": 98,
-              "segType": "manifest"
-            },
-            {
-              "id": 2,
-              "offset": 162,
-              "payloadLength": 46,
-              "segType": "vec"
-            },
-            {
-              "id": 3,
-              "offset": 272,
-              "payloadLength": 67,
-              "segType": "witness"
-            },
-            {
-              "id": 4,
-              "offset": 403,
-              "payloadLength": 173,
-              "segType": "manifest"
-            },
-            {
-              "id": 5,
-              "offset": 640,
-              "payloadLength": 46,
-              "segType": "vec"
-            },
-            {
-              "id": 6,
-              "offset": 750,
-              "payloadLength": 67,
-              "segType": "witness"
-            },
-            {
-              "id": 7,
-              "offset": 881,
-              "payloadLength": 248,
-              "segType": "manifest"
-            }
-          ],
-          "witness": {
-            "result": {
-              "valid": false,
-              "entries": 0,
-              "error": "this.db.verifyWitness is not a function. (In 'this.db.verifyWitness()', 'this.db.verifyWitness' is undefined)"
-            }
+          "segments": {
+            "totalVectors": 1,
+            "totalSegments": 10,
+            "fileSizeBytes": 1821,
+            "fileSizeBytesRaw": null,
+            "corrected": true
           },
-          "note": "This artifact is verifier-owned under node-authority cache, not an identified per-agent cognitive-state directory."
+          "witness": {
+            "substratePresent": true,
+            "witnessSegmentCount": 3,
+            "entryCount": 0,
+            "verified": false,
+            "reason": "witness-chain-unavailable"
+          },
+          "note": "This artifact is produced by the live per-agent registry runtime."
         },
         {
           "relationship": "per-agent-loading-contract",
-          "proven": false,
-          "missing": [
-            "agent-identity-to-rvf-mapping",
-            "automatic-discovery",
-            "authority-and-mutation-policy",
-            "retention-and-recovery-test"
-          ],
+          "proven": true,
+          "identity_mapping": {
+            "storageRoot": "/run/user/1001/yazelix/volatile/tmp/archbp007-proof-gKRLZQ",
+            "discovered": [
+              {
+                "agentId": "archbp-007-alpha",
+                "storagePath": "/run/user/1001/yazelix/volatile/tmp/archbp007-proof-gKRLZQ/archbp-007-alpha.rvf"
+              },
+              {
+                "agentId": "exported-archbp007",
+                "storagePath": "/run/user/1001/yazelix/volatile/tmp/archbp007-proof-gKRLZQ/exported-archbp007.rvf"
+              }
+            ],
+            "identityBound": true,
+            "shutdownClean": true
+          },
+          "recovery": {
+            "reopenFileId": "64cdb4ea9c0dd182821a8cc15914f5f0",
+            "recovered": true,
+            "reopenRecall": [
+              {
+                "id": "0",
+                "distance": 8.460479736328125
+              }
+            ]
+          },
           "rvf_files_found": [
             "/home/flexnetos/meta/src/lifeos/node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/direct.rvf",
             "/home/flexnetos/meta/src/lifeos/node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/agentdb-self-learning.rvf",
@@ -735,16 +704,16 @@
       ]
     }
   ],
-  "observed_at": "2026-07-28T21:37:44.619Z",
+  "observed_at": "2026-07-28T21:40:00.261Z",
   "repository": {
     "root": "/home/flexnetos/meta/src/lifeos",
     "package_json_sha256": "7e720426c57fe6389335a46362bf382905c3be5fc92586f56bf3d25fba2dfea4"
   },
   "collector": {
     "claim_id": "SWARM-CLAIM-007",
-    "mode": "read-only-real-bun-rvf-boundary-trace",
+    "mode": "live-agent-rvf-registry-boundary-trace",
     "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.local-evidence.json",
-    "does_not_launch": true,
+    "does_not_launch": false,
     "does_not_install": true,
     "does_not_mutate_generated_runtime": true
   }

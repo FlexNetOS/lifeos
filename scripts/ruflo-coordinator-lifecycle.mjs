@@ -212,14 +212,19 @@ async function emitProof() {
   }
 
   // Real AgentDB identity (ARCHBP-007).
-  const { AgentRvfMemory } = await import("./agentdb-rvf-lifecycle.mjs");
+  const { AgentRvfRegistry } = await import("./agentdb-rvf-lifecycle.mjs");
   const workDir = mkdtempSync(join(tmpdir(), "archbp014-agent-"));
   let agentFileId;
+  let agentRegistry;
   try {
-    const agent = await AgentRvfMemory.open({ agentId: "coordinator-agent", storagePath: join(workDir, "coord.rvf"), dimension: 8 });
+    agentRegistry = await AgentRvfRegistry.open({ storageRoot: workDir });
+    const agent = await agentRegistry.openAgent({ agentId: "coordinator-agent", dimension: 8 });
     agentFileId = (await agent.identity()).fileId;
-    agent.destroy();
+    if (!agentRegistry.discover().some((entry) => entry.agentId === "coordinator-agent")) {
+      throw new Error("coordinator-agent RVF was not discoverable through the registry");
+    }
   } finally {
+    await agentRegistry?.close();
     rmSync(workDir, { recursive: true, force: true });
   }
 

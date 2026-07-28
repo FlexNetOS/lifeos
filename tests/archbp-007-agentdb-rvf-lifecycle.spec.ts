@@ -17,6 +17,7 @@ import {
   correctStatusBytes,
   evaluateWitness,
   classifyWitnessSegments,
+  AgentRvfRegistry,
 } from "../scripts/agentdb-rvf-lifecycle.mjs";
 
 const repoRoot = resolve(import.meta.dirname, "..");
@@ -138,8 +139,30 @@ describe("ARCHBP-007 RVF lifecycle proof (real @ruvector/rvf + agentdb native su
       expect(r.authority.passive).toBe("postgresql+ruvector");
       expect(r.authority.active).toBe("rvf");
       expect(r.authority.macroAuthorityGuardThrew).toBe(true);
+
+      // production per-agent registry: identity allow-list, discovery, and clean shutdown
+      expect(r.registry.identityBound).toBe(true);
+      expect(r.registry.discovered).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ agentId: "archbp-007-alpha" }),
+        ]),
+      );
+      expect(r.registry.shutdownClean).toBe(true);
     } finally {
       rmSync(outputDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("ARCHBP-007 per-agent registry boundary", () => {
+  test("rejects path traversal identities before opening native RVF", async () => {
+    const root = mkdtempSync(join(tmpdir(), "archbp007-registry-"));
+    try {
+      const registry = await AgentRvfRegistry.open({ storageRoot: root });
+      await expect(registry.openAgent({ agentId: "../escape" })).rejects.toThrow(/invalid agent identity/);
+      await registry.close();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
     }
   });
 });

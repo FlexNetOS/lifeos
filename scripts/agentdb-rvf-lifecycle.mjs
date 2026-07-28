@@ -19,7 +19,8 @@
 //      getBackend().verifyWitness() is not a function) — witness is reported
 //      verified ONLY when a real chain verifies, never optimistically.
 
-import { copyFileSync, statSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, statSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 /** The sole passive durable macro authority. The active .rvf is never this. */
 export const PASSIVE_MACRO_AUTHORITY = "postgresql+ruvector";
@@ -222,6 +223,56 @@ export class AgentRvfMemory {
   }
 }
 
+/**
+ * Production loading boundary for per-agent RVF state. Identity is the
+ * allow-listed filename, while PostgreSQL/RuVector remains the macro owner.
+ * The registry is deliberately small: it owns discovery, open, and shutdown;
+ * AgentRvfMemory owns the native active-plane operations.
+ */
+export class AgentRvfRegistry {
+  constructor(storageRoot) {
+    this.storageRoot = resolve(storageRoot);
+    mkdirSync(this.storageRoot, { recursive: true });
+    this.agents = new Map();
+  }
+
+  static async open({ storageRoot }) {
+    return new AgentRvfRegistry(storageRoot);
+  }
+
+  static validateAgentId(agentId) {
+    if (typeof agentId !== "string" || !/^[a-z][a-z0-9-]{0,63}$/.test(agentId)) {
+      throw new Error(`invalid agent identity: ${agentId}`);
+    }
+    return agentId;
+  }
+
+  async openAgent({ agentId, dimension = 8, metric = "cosine", learning = true }) {
+    const id = AgentRvfRegistry.validateAgentId(agentId);
+    const existing = this.agents.get(id);
+    if (existing) return existing;
+    const storagePath = join(this.storageRoot, `${id}.rvf`);
+    const memory = await AgentRvfMemory.open({ agentId: id, storagePath, dimension, metric, learning });
+    this.agents.set(id, memory);
+    return memory;
+  }
+
+  discover() {
+    return readdirSync(this.storageRoot, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".rvf"))
+      .map((entry) => ({
+        agentId: entry.name.slice(0, -4),
+        storagePath: join(this.storageRoot, entry.name),
+      }))
+      .sort((left, right) => left.agentId.localeCompare(right.agentId));
+  }
+
+  async close() {
+    for (const agent of this.agents.values()) agent.destroy();
+    this.agents.clear();
+  }
+}
+
 // ---------------------------------------------------------------------------
 // CLI proof emitter — exercises the full lifecycle against the real native
 // surface and writes deterministic-shaped evidence for the ARCHBP-007 gate.
@@ -234,11 +285,10 @@ async function emitProof() {
   const D = 8;
   const vec = (s) => Float32Array.from({ length: D }, (_, i) => Math.sin(s * (i + 1)));
   const workDir = mkdtempSync(join(tmpdir(), "archbp007-proof-"));
-  const agentPath = join(workDir, "agent-archbp007.rvf");
 
-  const agent = await AgentRvfMemory.open({
+  const registry = await AgentRvfRegistry.open({ storageRoot: workDir });
+  const agent = await registry.openAgent({
     agentId: "archbp-007-alpha",
-    storagePath: agentPath,
     dimension: D,
     metric: "cosine",
     learning: true,
@@ -266,7 +316,8 @@ async function emitProof() {
   const exportPath = join(workDir, "exported-archbp007.rvf");
   await agent.exportTo(exportPath);
   const exportBytes = stat(exportPath).size;
-  agent.destroy();
+  const discovered = registry.discover();
+  await registry.close();
 
   const reopened = await AgentRvfMemory.importFrom(exportPath, { dimension: D });
   const reopenIdentity = await reopened.identity();
@@ -297,6 +348,12 @@ async function emitProof() {
       passive: PASSIVE_MACRO_AUTHORITY,
       active: ACTIVE_PLANE,
       macroAuthorityGuardThrew,
+    },
+    registry: {
+      storageRoot: workDir,
+      discovered,
+      identityBound: discovered.some((entry) => entry.agentId === "archbp-007-alpha"),
+      shutdownClean: registry.agents.size === 0,
     },
     learningStats,
   };

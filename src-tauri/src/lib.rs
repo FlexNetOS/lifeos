@@ -47,13 +47,8 @@ mod terminal_tests {
             vec![
                 "yzx",
                 "enter",
-                "options",
-                "--session-name",
+                "--session",
                 "lifeos-tenant-session",
-                "--attach-to-session",
-                "true",
-                "--on-force-close",
-                "detach",
             ]
         );
     }
@@ -589,13 +584,8 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     vec![
         "yzx".into(),
         "enter".into(),
-        "options".into(),
-        "--session-name".into(),
+        "--session".into(),
         session_name.into(),
-        "--attach-to-session".into(),
-        "true".into(),
-        "--on-force-close".into(),
-        "detach".into(),
     ]
 }
 

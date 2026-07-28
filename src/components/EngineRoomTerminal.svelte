@@ -7,6 +7,7 @@
   let input = $state("");
   let connected = $state(false);
   let redbSeq = $state(null);
+  let reconcileMessage = $state("");
   let terminalEl = $state(null);
   let stopOutput = null;
   let stopExit = null;
@@ -34,6 +35,19 @@
     const bytes = Array.from(new TextEncoder().encode(`${input}\n`));
     await call("terminal_write", { sessionId, bytes });
     input = "";
+  };
+
+  const reconcile = async () => {
+    const call = invoke();
+    if (!call) return;
+    reconcileMessage = "Reconciling…";
+    const receipt = await call("envctl_drain", { maxBatch: 500 }).catch((error) => ({ error }));
+    if (receipt?.error) {
+      reconcileMessage = "envctl unavailable";
+      return;
+    }
+    await call("envctl_return_projection").catch(() => null);
+    reconcileMessage = `Committed ${receipt.committed?.length || 0} record(s) · generation ${receipt.generation}`;
   };
 
   const onKeydown = (event) => {
@@ -80,6 +94,11 @@
     <span class:online={connected} class="status">{connected ? "connected" : "browser preview"}</span>
   </header>
 
+  <div class="reconcile-bar">
+    <span>{reconcileMessage || "redb owner → envctl → PostgreSQL/RuVector"}</span>
+    <button type="button" onclick={reconcile} disabled={!connected}>Reconcile</button>
+  </div>
+
   <pre class="terminal-output" bind:this={terminalEl} aria-live="polite">{output || "Waiting for the Engine Room…"}</pre>
   <form class="terminal-input" onsubmit={(event) => { event.preventDefault(); send(); }}>
     <Icon name="chevron-right" size={15} />
@@ -102,6 +121,8 @@
   .status { color: var(--fg-3); font-size: 11px; }
   .status.online { color: var(--lifeos-green); }
   .terminal-output { flex: 1; min-height: 260px; overflow: auto; margin: 0; padding: 18px; border: 1px solid var(--bg-3); border-radius: var(--radius-lg); background: #08090d; color: var(--fg-2); font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+  .reconcile-bar { display: flex; justify-content: space-between; align-items: center; color: var(--fg-3); font-size: 11px; }
+  .reconcile-bar button { border: 1px solid var(--bg-3); border-radius: var(--radius-md); padding: 6px 10px; }
   .terminal-input { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--bg-3); border-radius: var(--radius-md); background: var(--bg-1); color: var(--lifeos-cyan); }
   textarea { flex: 1; resize: none; border: 0; outline: 0; background: transparent; color: var(--fg-1); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
   button { border: 0; background: transparent; color: var(--fg-3); cursor: pointer; }

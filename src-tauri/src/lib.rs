@@ -45,6 +45,23 @@ fn redb_state_write(key: String, value: String) -> Result<u64, String> {
     client.put(&key, &value).map_err(|error| error.to_string())
 }
 
+fn envctl_commit_conn() -> Result<String, String> {
+    std::env::var("LIFEOS_ENVCTL_COMMIT_CONN")
+        .map_err(|_| "LIFEOS_ENVCTL_COMMIT_CONN is required for envctl reconciliation".into())
+}
+
+#[tauri::command]
+fn envctl_drain(max_batch: Option<usize>) -> Result<envctl_commit_worker::DrainReceipt, String> {
+    envctl_commit_worker::drain_and_commit(&envctl_commit_conn()?, max_batch.unwrap_or(500), false)
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn envctl_return_projection() -> Result<Vec<(String, String)>, String> {
+    envctl_commit_worker::return_projection(&envctl_commit_conn()?, &redb_root())
+        .map_err(|error| error.to_string())
+}
+
 struct TerminalSession {
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
@@ -554,6 +571,8 @@ pub fn run() {
             open_settings,
             redb_projection_read,
             redb_state_write,
+            envctl_drain,
+            envctl_return_projection,
             terminal_spawn,
             terminal_write,
             terminal_resize,

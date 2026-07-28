@@ -31,12 +31,33 @@ WITH ruvector_extension AS (
     'versions', COALESCE(jsonb_agg(version ORDER BY version), '[]'::jsonb)
   ) AS value
   FROM lifeos_runtime._sqlx_migrations
+), witness_entries AS (
+  SELECT entry.*, lag(entry.entry_shake256) OVER (
+    PARTITION BY entry.chain_id ORDER BY entry.sequence
+  ) AS expected_previous
+  FROM lifeos_agent.witness_entry entry
+), witness AS (
+  SELECT jsonb_build_object(
+    'chain_count', (SELECT count(*) FROM lifeos_agent.witness_chain),
+    'entry_count', (SELECT count(*) FROM lifeos_agent.witness_entry),
+    'append_witness', to_regprocedure('lifeos_agent.append_witness(uuid,jsonb,bytea)') IS NOT NULL,
+    'shake256', to_regprocedure('extensions.ruvector_shake256_256(bytea)') IS NOT NULL,
+    'broken_links', (SELECT count(*) FROM witness_entries
+      WHERE sequence > 1 AND previous_shake256 IS DISTINCT FROM expected_previous),
+    'head_mismatches', (SELECT count(*) FROM lifeos_agent.witness_chain chain
+      WHERE chain.head_sequence <> COALESCE((SELECT max(entry.sequence)
+        FROM lifeos_agent.witness_entry entry WHERE entry.chain_id = chain.chain_id), 0)
+        OR (chain.head_sequence > 0 AND chain.head_shake256 IS DISTINCT FROM (SELECT entry.entry_shake256
+          FROM lifeos_agent.witness_entry entry
+          WHERE entry.chain_id = chain.chain_id ORDER BY entry.sequence DESC LIMIT 1)))
+  ) AS value
 )
 SELECT jsonb_build_object(
   'server_version', current_setting('server_version'),
   'search_path', current_setting('search_path'),
   'ruvector', (SELECT value FROM ruvector_extension),
   'migrations', (SELECT value FROM migrations),
+  'witness', (SELECT value FROM witness),
   'required_schemas', jsonb_build_array(
     to_regnamespace('lifeos_blob') IS NOT NULL,
     to_regnamespace('lifeos_security') IS NOT NULL,
@@ -80,6 +101,12 @@ if (receipt.migrations?.count !== expectedMigrations) {
 if (!Array.isArray(receipt.required_schemas) || receipt.required_schemas.some((present) => !present)) {
   failures.push("one or more required LifeOS schemas are absent");
 }
+if (!receipt.witness?.append_witness || !receipt.witness?.shake256) {
+  failures.push("the canonical witness append or SHAKE-256 function is absent");
+}
+if (receipt.witness?.broken_links !== 0 || receipt.witness?.head_mismatches !== 0) {
+  failures.push("the live witness chain has broken links or head mismatches");
+}
 
 if (failures.length) {
   console.error(JSON.stringify({ status: "failed", failures, receipt }, null, 2));
@@ -94,6 +121,7 @@ console.log(
       search_path: receipt.search_path,
       ruvector: receipt.ruvector,
       migrations: receipt.migrations,
+      witness: receipt.witness,
       required_schemas: receipt.required_schemas,
     },
     null,

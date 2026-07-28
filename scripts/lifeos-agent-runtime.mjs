@@ -64,7 +64,7 @@ export async function startAgentRuntime() {
   await agent.remember(`heartbeat-${Date.now()}`, Float32Array.from(vector), { source: "lifeos-agent-runtime", agentId });
   await agent.learn();
   await publish("ready", agentId, engine);
-  return { agentId, engine, rvfRoot, identity: await agent.identity() };
+  return { agentId, engine, rvfRoot, identity: await agent.identity(), shutdown: () => registry.close() };
 }
 
 if (import.meta.main) {
@@ -73,9 +73,13 @@ if (import.meta.main) {
   try {
     runtime = await startAgentRuntime();
     console.log(JSON.stringify({ schemaVersion: "lifeos.agent-runtime.v1", status: "ready", ...runtime }));
-    if (once) process.exit(0);
+    if (once) {
+      await runtime.shutdown();
+      process.exit(0);
+    }
     const stop = async () => {
       await publish("stopped", agentId, runtime.engine).catch(() => {});
+      await runtime.shutdown().catch(() => {});
       process.exit(0);
     };
     process.on("SIGTERM", stop);

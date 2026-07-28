@@ -1,5 +1,6 @@
-// LifeOS — Pinia → Svelte reactivity bridge (Svelte-only; see AGENTS.md/CLAUDE.md
-// Svelte-migration notes for the full "approach_notes" writeup).
+// LifeOS — legacy Pinia → Svelte bridge with support for native Svelte stores.
+// Pinia remains only for the not-yet-migrated lifeos store; native stores expose
+// subscribe() and bypass Vue entirely.
 //
 // Why this exists: Pinia stores are plain Vue-reactive singletons keyed by store id.
 // useLifeos()/useAuth() work with ZERO Vue component tree — defineStore()'s returned
@@ -42,7 +43,7 @@ function mirror(value) {
 }
 
 /**
- * Mirror a set of Pinia store state fields / getters into a Svelte $state object
+ * Mirror a set of store state fields / getters into a Svelte $state object
  * that stays in sync with the live store, and clean up the Vue watcher on
  * component destroy.
  *
@@ -52,6 +53,13 @@ function mirror(value) {
  */
 export function bindStore(store, keys) {
   const snap = $state(Object.fromEntries(keys.map((k) => [k, mirror(store[k])])));
+  if (typeof store.subscribe === "function") {
+    const stop = store.subscribe((value) => {
+      for (const k of keys) snap[k] = mirror(value[k]);
+    });
+    onDestroy(stop);
+    return snap;
+  }
   const stop = watch(
     keys.map((k) => () => store[k]),
     () => {

@@ -23,6 +23,7 @@
   let probeSent = false;
   let probeOutput = "";
   let probeClosed = false;
+  let resizeFrame = null;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
   const invoke = () => tauri()?.core?.invoke || null;
@@ -37,6 +38,18 @@
       cols: terminal.cols,
       rows: terminal.rows,
     }).catch(() => {});
+  };
+
+  const scheduleResize = () => {
+    if (typeof requestAnimationFrame === "undefined") {
+      void resizeTerminal();
+      return;
+    }
+    if (resizeFrame !== null) return;
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = null;
+      void resizeTerminal();
+    });
   };
 
   const start = async () => {
@@ -155,7 +168,7 @@
     terminal.onData((data) => sendBytes(new TextEncoder().encode(data)));
     await resizeTerminal();
     if (typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(() => resizeTerminal());
+      resizeObserver = new ResizeObserver(scheduleResize);
       resizeObserver.observe(terminalEl);
     }
 
@@ -181,6 +194,10 @@
 
   onDestroy(async () => {
     resizeObserver?.disconnect();
+    if (resizeFrame !== null && typeof cancelAnimationFrame !== "undefined") {
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame = null;
+    }
     stopExit?.();
     stopCaptureError?.();
     if (sessionId && invoke()) {

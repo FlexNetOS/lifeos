@@ -996,7 +996,6 @@ fn app_version() -> AppVersion {
 // when the cached system has never seen a CPU refresh. Subsequent calls are
 // near-free (single `refresh_cpu_usage` against the already-warm state).
 
-use std::sync::Mutex;
 use sysinfo::{Networks, System, MINIMUM_CPU_UPDATE_INTERVAL};
 
 pub struct TelemetryState {
@@ -1104,6 +1103,7 @@ async fn db_health(storage: tauri::State<'_, Storage>) -> Result<DbHealth, Strin
 
 #[tauri::command]
 async fn db_migrate(storage: tauri::State<'_, Storage>) -> Result<MigrateReport, String> {
+    let storage = storage.inner().clone();
     storage.migrate().await.map_err(|e| e.to_string())
 }
 

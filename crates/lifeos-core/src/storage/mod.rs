@@ -68,6 +68,7 @@ impl RuntimeContext {
 /// The canonical durable LifeOS storage handle. PostgreSQL/RuVector owns every
 /// product record; redb is intentionally not represented here because it is a
 /// separately supervised transient/projection tier.
+#[derive(Clone)]
 pub struct Storage {
     pool: PgPool,
     database_id: String,
@@ -158,45 +159,51 @@ impl Storage {
     /// Run embedded PostgreSQL migrations. Idempotent: sqlx records applied
     /// versions in `_sqlx_migrations` inside the canonical database.
     pub async fn migrate(&self) -> Result<MigrateReport, StorageError> {
-        let mut connection = self.pool.acquire().await?;
-        let (public_ledger, runtime_ledger): (bool, bool) = sqlx::query_as(
-            "SELECT
+        migrate_pool(self.pool.clone()).await
+    }
+}
+
+async fn migrate_pool(pool: PgPool) -> Result<MigrateReport, StorageError> {
+    let mut connection = pool.acquire().await?;
+    let (public_ledger, runtime_ledger): (bool, bool) = sqlx::query_as(
+        "SELECT
                to_regclass('public._sqlx_migrations') IS NOT NULL,
                to_regclass('lifeos_runtime._sqlx_migrations') IS NOT NULL",
-        )
-        .fetch_one(&mut *connection)
-        .await?;
-        if public_ledger && runtime_ledger {
-            return Err(StorageError::Sqlx(sqlx::Error::Protocol(
-                "ambiguous SQLx migration ledgers in public and lifeos_runtime".into(),
-            )));
-        }
-        if public_ledger {
-            sqlx::query("ALTER TABLE public._sqlx_migrations SET SCHEMA lifeos_runtime")
-                .execute(&mut *connection)
-                .await?;
-        }
-        sqlx::query("SET search_path TO lifeos_runtime, extensions, pg_catalog")
+    )
+    .fetch_one(&mut *connection)
+    .await?;
+    if public_ledger && runtime_ledger {
+        return Err(StorageError::Sqlx(sqlx::Error::Protocol(
+            "ambiguous SQLx migration ledgers in public and lifeos_runtime".into(),
+        )));
+    }
+    if public_ledger {
+        sqlx::query("ALTER TABLE public._sqlx_migrations SET SCHEMA lifeos_runtime")
             .execute(&mut *connection)
             .await?;
-
-        sqlx::migrate!("./migrations")
-            .run(&mut *connection)
-            .await
-            .map_err(|e| StorageError::Sqlx(sqlx::Error::Protocol(e.to_string())))?;
-
-        let (applied,): (i64,) =
-            sqlx::query_as("SELECT COUNT(*) FROM lifeos_runtime._sqlx_migrations")
-                .fetch_one(&mut *connection)
-                .await?;
-        let total = sqlx::migrate!("./migrations").migrations.len() as u32;
-
-        Ok(MigrateReport {
-            applied: applied as u32,
-            total,
-        })
     }
+    sqlx::query("SET search_path TO lifeos_runtime, extensions, pg_catalog")
+        .execute(&mut *connection)
+        .await?;
 
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .map_err(|e| StorageError::Sqlx(sqlx::Error::Protocol(e.to_string())))?;
+
+    let (applied,): (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM lifeos_runtime._sqlx_migrations")
+            .fetch_one(&mut *connection)
+            .await?;
+    let total = sqlx::migrate!("./migrations").migrations.len() as u32;
+
+    Ok(MigrateReport {
+        applied: applied as u32,
+        total,
+    })
+}
+
+impl Storage {
     /// Verify that the database is a valid canonical durable store, rather
     /// than merely a reachable PostgreSQL server.
     pub async fn verify_required_extensions(&self) -> Result<String, StorageError> {

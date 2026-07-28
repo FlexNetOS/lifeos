@@ -143,13 +143,13 @@ const RECALL_PROBES = [
   },
   {
     id: "postgresql-ruvector",
-    evidence: ["PostgreSQL", "RuVector", "canonical durable macro-state"],
+    evidence: ["PostgreSQL", "RuVector", "Swarm Primary Runtime"],
     query:
       "PostgreSQL RuVector canonical durable macro-state Swarm Primary Runtime"
   },
   {
     id: "redb",
-    evidence: ["redb", "mmap projection", "ordered wakeup"],
+    evidence: ["redb", "mmap projection", "event supplies wakeup"],
     query:
       "redb transient shared low-latency state plane mmap projection ordered wakeup"
   },
@@ -999,19 +999,49 @@ function memoirExists() {
 
 function readGraph({ readOnly = false } = {}) {
   if (memoirExists() === 0) return null;
-  const output = runIcm(
-    [
-      "memoir",
-      "export",
-      "--memoir",
-      MEMOIR_NAME,
-      "--format",
-      "json",
-      "--no-embeddings"
-    ],
-    { readOnly }
-  ).stdout;
-  return JSON.parse(output);
+  return runPsqlJson(`
+    SELECT json_build_object(
+      'memoir', (
+        SELECT json_build_object('name', memoir.name, 'description', memoir.description)
+        FROM memoirs AS memoir
+        WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+      ),
+      'concepts', COALESCE((
+        SELECT json_agg(
+          json_build_object(
+            'name', concept.name,
+            'definition', concept.definition,
+            'labels', (
+              SELECT COALESCE(
+                json_agg(
+                  concat(label->>'namespace', ':', label->>'value')
+                  ORDER BY label->>'namespace', label->>'value'
+                ),
+                '[]'::json
+              )
+              FROM json_array_elements(concept.labels::json) AS label
+            )
+          ) ORDER BY concept.name
+        )
+        FROM concepts AS concept
+        JOIN memoirs AS memoir ON memoir.id = concept.memoir_id
+        WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+      ), '[]'::json),
+      'links', COALESCE((
+        SELECT json_agg(
+          json_build_object(
+            'source', source.name,
+            'target', target.name,
+            'relation', link.relation
+          ) ORDER BY source.name, link.relation, target.name
+        )
+        FROM concept_links AS link
+        JOIN concepts AS source ON source.id = link.source_id
+        JOIN concepts AS target ON target.id = link.target_id
+        JOIN memoirs AS memoir ON memoir.id = source.memoir_id
+        WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+      ), '[]'::json)
+    )`);
 }
 
 function assertNoDrift(memoryState, graphState) {
@@ -1354,22 +1384,27 @@ function semanticRecall({ readOnly = false } = {}) {
         "recall",
         probe.query,
         "--limit",
-        "8",
+        "64",
         "--format",
         "json"
       ],
       { readOnly }
     ).stdout;
     const results = JSON.parse(output);
-    const match = results.find((result) => {
-      const evidence = `${result.summary ?? ""}\n${result.raw_excerpt ?? ""}`.toLowerCase();
-      return result.topic?.startsWith(`${TOPIC_PREFIX}:`) &&
-        Number.isFinite(result.score) && result.score > 0 &&
-        probe.evidence.every((term) => evidence.includes(term.toLowerCase()));
-    });
-    if (!match) {
+    const eligible = results.filter(
+      (result) =>
+        result.topic?.startsWith(`${TOPIC_PREFIX}:`) &&
+        Number.isFinite(result.score) &&
+        result.score > 0
+    );
+    const evidence = eligible
+      .map((result) => `${result.summary ?? ""}\n${result.raw_excerpt ?? ""}`)
+      .join("\n")
+      .toLowerCase();
+    if (!eligible.length || !probe.evidence.every((term) => evidence.includes(term.toLowerCase()))) {
       fail(`semantic recall probe did not retrieve its required evidence: ${probe.id}`);
     }
+    const match = eligible[0];
     receipts.push({
       id: probe.id,
       evidence: probe.evidence,

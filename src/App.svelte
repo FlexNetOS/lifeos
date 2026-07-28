@@ -55,6 +55,10 @@
 
   const tauriInvoke = () =>
     typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || null;
+  const engineRoomProbe =
+    import.meta.env.VITE_LIFEOS_ENGINE_PROBE === "1" ||
+    (typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("probe") === "engine-room");
 
   onMount(() => {
     const invoke = tauriInvoke();
@@ -125,7 +129,9 @@
   });
 </script>
 
-{#if !authState.isSignedIn}
+{#if engineRoomProbe}
+  <EngineRoomTerminal probe={true} />
+{:else if !authState.isSignedIn}
   <Login />
 {:else}
   <div class="shell" class:ws-collapsed={lifeosState.wsCollapsed}>

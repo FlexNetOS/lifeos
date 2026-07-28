@@ -7,6 +7,8 @@
   import "@xterm/xterm/css/xterm.css";
   import Icon from "./Icon.svelte";
 
+  let { probe = false } = $props();
+
   let sessionId = $state("");
   let connected = $state(false);
   let redbSeq = $state(null);
@@ -18,6 +20,9 @@
   let stopExit = null;
   let stopCaptureError = null;
   let outputChannel = null;
+  let probeSent = false;
+  let probeOutput = "";
+  let probeClosed = false;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
   const invoke = () => tauri()?.core?.invoke || null;
@@ -40,7 +45,41 @@
     try {
       outputChannel = new Channel();
       outputChannel.onmessage = (bytes) => {
+        const text = new TextDecoder().decode(new Uint8Array(bytes));
         terminal?.write(new Uint8Array(bytes));
+        if (probe && !probeClosed) {
+          probeOutput = `${probeOutput}${text}`.slice(-16_384);
+          if (probeOutput.includes("LIFEOS_ENGINE_PROBE_DONE")) {
+            probeClosed = true;
+            const owner = invoke();
+            void owner?.("redb_state_write", {
+              key: "lifeos.engine-room.ready",
+              value: JSON.stringify({
+                schemaVersion: "lifeos.engine-room-ready.v1",
+                state: "ready",
+                observedAt: Date.now(),
+                sessionId,
+                argv: [
+                  "yzx",
+                  "enter",
+                  "options",
+                  "--session-name",
+                  "<database-derived>",
+                  "--attach-to-session",
+                  "true",
+                  "--on-force-close",
+                  "detach",
+                ],
+                nushellMarker: probeOutput.includes("LIFEOS_NUSHELL_PROBE"),
+                outputTail: probeOutput.slice(-2_048),
+              }),
+            }).finally(() => {
+              window.setTimeout(() => {
+                void owner?.("terminal_close", { sessionId });
+              }, 500);
+            });
+          }
+        }
       };
       sessionId = await call("terminal_spawn", {
         cols: terminal?.cols || 100,
@@ -49,6 +88,16 @@
       });
       connected = true;
       await resizeTerminal();
+      if (probe && !probeSent) {
+        probeSent = true;
+        window.setTimeout(() => {
+          void sendBytes(
+            new TextEncoder().encode(
+              "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\n",
+            ),
+          );
+        }, 1_000);
+      }
     } catch {
       reconcileMessage = "Engine Room unavailable";
     }

@@ -8,6 +8,7 @@ const root = process.cwd();
 const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/var/lib/redb");
 const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root, "evidence/glass/live-launch-receipt.json"));
 const port = process.env.LIFEOS_GLASS_PORT ?? "1421";
+const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
 const runtime = {
   LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql",
   LIFEOS_RUNTIME_TENANT_ID: process.env.LIFEOS_RUNTIME_TENANT_ID ?? "00000000-0000-4000-8000-000000000001",
@@ -20,6 +21,8 @@ const runtime = {
     purpose: "envctl-session-binding",
   }),
   LIFEOS_REDB_ROOT: redbRoot,
+  LIFEOS_ENGINE_SESSION_NAME: engineSession,
+  VITE_LIFEOS_ENGINE_PROBE: "1",
 };
 
 function projection() {
@@ -89,14 +92,19 @@ child.once("error", (error) => { launchError = error; });
 let childExited = false;
 child.once("exit", () => { childExited = true; });
 let readiness = null;
+let engineRoom = null;
 const deadline = Date.now() + 45_000;
 while (Date.now() < deadline && !launchError && !childExited) {
   try {
     const current = projection();
     const candidate = JSON.parse(current.entries["glass.ui.ready"] ?? "null");
+    const engineCandidate = JSON.parse(current.entries["lifeos.engine-room.ready"] ?? "null");
     if (candidate?.schemaVersion === "lifeos.glass-ui-ready.v1" && Number(candidate.mountedAt) >= startedAt) {
       readiness = { ...candidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
-      break;
+      if (engineCandidate?.schemaVersion === "lifeos.engine-room-ready.v1" && engineCandidate.state === "ready") {
+        engineRoom = { ...engineCandidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
+        break;
+      }
     }
   } catch {}
   await new Promise((resolvePromise) => setTimeout(resolvePromise, 500));
@@ -123,9 +131,10 @@ const result = {
     process_tree: tree,
     launch_error: launchError?.message ?? null,
   },
-  readiness,
+    readiness,
+    engine_room: engineRoom,
   shutdown,
-  ok: !launchError && Boolean(readiness) && shutdown.signal === "SIGTERM",
+  ok: !launchError && Boolean(readiness) && Boolean(engineRoom) && shutdown.signal === "SIGTERM",
 };
 if (!result.ok) throw new Error(JSON.stringify(result));
 mkdirSync(join(root, "evidence/glass"), { recursive: true });

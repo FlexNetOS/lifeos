@@ -312,12 +312,23 @@ impl RuvectorMcpClient {
             "tools/call",
             serde_json::json!({"name": name, "arguments": arguments}),
         )?;
+        if result
+            .get("isError")
+            .and_then(Value::as_bool)
+            .unwrap_or(false)
+        {
+            return Err(McpError::Protocol(format!(
+                "RuVector MCP tool reported an error: {result}"
+            )));
+        }
         let text = result
             .get("content")
             .and_then(Value::as_array)
-            .and_then(|content| content.first())
-            .and_then(|item| item.get("text"))
-            .and_then(Value::as_str)
+            .and_then(|content| {
+                content
+                    .iter()
+                    .find_map(|item| item.get("text").and_then(Value::as_str))
+            })
             .ok_or_else(|| McpError::Protocol("RuVector tool result lacks text content".into()))?;
         serde_json::from_str(text).map_err(|error| {
             McpError::Protocol(format!("RuVector tool result is not JSON: {error}"))
@@ -420,6 +431,33 @@ mod tests {
             Err(McpError::Protocol(msg)) => assert!(msg.contains("vector_db_stats")),
             other => panic!("expected Protocol error, got {other:?}"),
         }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn stdio_client_runs_initialize_and_tool_calls_against_a_supervised_child() {
+        let server = r#"
+IFS= read -r line || exit 1
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05"}}'
+IFS= read -r line || exit 1
+IFS= read -r line || exit 1
+printf '%s\n' '{"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"image","data":"ignored"},{"type":"text","text":"{\"count\":42}"}]}}'
+IFS= read -r line || exit 1
+printf '%s\n' '{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"hit_rate\":0.75}"}]}}'
+"#;
+        let client = RuvectorMcpClient::spawn(
+            "sh",
+            &["-c".to_string(), server.to_string()],
+        )
+        .unwrap();
+        assert_eq!(
+            client.vector_db_stats("/var/lib/lifeos/vectors").unwrap()["count"],
+            42
+        );
+        assert_eq!(
+            client.gnn_cache_stats(true).unwrap()["hit_rate"],
+            0.75
+        );
     }
 
     #[test]

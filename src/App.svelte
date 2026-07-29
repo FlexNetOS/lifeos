@@ -56,12 +56,14 @@
 
   const tauriInvoke = () =>
     typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || tauriCoreInvoke;
-  let engineRoomProbe = $state(import.meta.env.VITE_LIFEOS_ENGINE_PROBE === "1");
+  const engineRoomProbeRequested =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("probe") === "engine-room";
+  let engineRoomProbe = $state(
+    import.meta.env.VITE_LIFEOS_ENGINE_PROBE === "1" || engineRoomProbeRequested,
+  );
 
   onMount(() => {
-    if (new URLSearchParams(window.location.search).get("probe") === "engine-room") {
-      engineRoomProbe = true;
-    }
     const invoke = tauriInvoke();
     if (!invoke) return;
 

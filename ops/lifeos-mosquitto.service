@@ -1,0 +1,11 @@
+[Unit]
+Description=LifeOS local MQTT broker
+After=network.target
+
+[Service]
+ExecStart=/nix/store/jffqd9af68i7wxnlzy6lbyqqkj5z2123-mosquitto-2.1.2/bin/mosquitto -p 1883 -v
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=default.target

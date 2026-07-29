@@ -2,7 +2,7 @@
   // LifeOS — CalendarView SFC (Svelte port of CalendarView.vue)
   // 7-day agenda strip filtered by workspace context (Work → Work tag; Personal → Personal + Family tags).
   // Static-first: no interactions beyond hover. Dark surface, tokens-only, one accent per row.
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";
@@ -11,7 +11,7 @@
   let { router = appRouter } = $props();
 
   const lifeos = useLifeos();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, ["activeSub"]);
 
   let sub = $derived(lifeosState.activeSub);
@@ -143,8 +143,7 @@
 }
 
 .cal-day--today {
-  border-color: var(--lifeos-cyan, #00d4ff);
-  border-opacity: 0.4;
+  border-color: color-mix(in srgb, var(--lifeos-cyan, #00d4ff) 40%, transparent);
 }
 
 .cal-day-label {

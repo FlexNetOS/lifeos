@@ -1,10 +1,7 @@
 # lifeos-daemon — headless LifeOS node for Pi Zero 2 W / Pi 3 (64-bit Linux).
 #
-# Wave-3 scaffold. The daemon's eventual job is to bridge the Cognitum-Seed
-# sensor surface (via `lifeos_core::mcp::cognitum::CognitumClient`) to MQTT
-# so a Raspberry Pi without a GUI can stand in as a sensor publisher. For
-# this stage the bin is a placeholder that prints a banner — see `src/main.rs`
-# and `README.md` for the Wave 4+ roadmap.
+# The daemon bridges Cognitum-Seed sensor frames to MQTT. It stays pure Rust:
+# reqwest uses rustls and rumqttc is built without native TLS or OpenSSL.
 #
 # Dependency posture: pure-Rust only. No `openssl-sys`. We pull `lifeos-core`
 # with `default-features = false` so the daemon scaffold doesn't drag
@@ -31,4 +28,6 @@ path = "src/main.rs"
 # without the HTTP transport. A future wave that wires real sensor reads will
 # either flip `default-features` back on or add a `mcp-http` feature here that
 # forwards to `lifeos-core/mcp-http`.
-lifeos-core = { path = "../lifeos-core", default-features = false }
+lifeos-core = { path = "../lifeos-core", default-features = false, features = ["mcp-http"] }
+rumqttc = { version = "0.25.1", default-features = false, features = ["use-rustls"] }
+serde_json = "1"

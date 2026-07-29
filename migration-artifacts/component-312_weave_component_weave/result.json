@@ -1,0 +1,45 @@
+{
+  "task_id": "COMPONENT-312_WEAVE_COMPONENT_WEAVE",
+  "title": "Component: weave component: weave",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "hard_rule": 15,
+  "requirement": "ruvnet/rUv components are installed and used, not replaced.",
+  "component": {
+    "name": "weave",
+    "owner": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/weave",
+    "revision": "b0ccd2278b2df689390023e590cc3c1eb60f9a80",
+    "version": "0.2.0",
+    "declared_role": "Session mesh, injection, durable messages, fenced jobs, MCP, receipts, and runner dispatch.",
+    "declared_contract": "Projects database-owned mesh, job, and attempt state; returns complete result, state, log, artifact, error, and witness streams through PostgreSQL via envctl/CodeDB/redb."
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "supplied_anchor_document_sha256_matches": true,
+    "hard_rule_line": 25,
+    "repository_manifest_line": 690,
+    "package_inventory_line": 1016,
+    "component_row_line": 6020,
+    "installation_gate_line": 5582,
+    "command_template_passed": true,
+    "supplied_unit_sha256": "b17c6de2bf908b202ec520ae5d49f2c14eca3ddef753e20f93b5cdd5e234be3b",
+    "unit_sha256_validation": "unavailable: the packet does not define the source-unit byte range needed to recompute this digest"
+  },
+  "runtime_evidence": {
+    "permitted_implementation_path": "execution-framework",
+    "path_present": false,
+    "installation_verified": false,
+    "usage_verified": false,
+    "reason": "No execution-framework directory is available within the permitted probe scope; this packet authorizes a read-only probe only."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "This was a read-only probe, and hard rule 15 prohibits replacement."
+  },
+  "changes": [
+    "Recorded read-only verification evidence only."
+  ],
+  "rollback": "Read-only probe; no implementation changes were made."
+}

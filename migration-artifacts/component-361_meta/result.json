@@ -1,0 +1,35 @@
+{
+  "task_id": "COMPONENT-361_META",
+  "component": "meta",
+  "probe_type": "read-only structural verification",
+  "status": "verified-declaration-installation-and-runtime-use-not-verifiable-in-scope",
+  "hard_rule_15": {
+    "requirement": "Component 'meta' must be installed and used, not replaced.",
+    "replacement_detected": false,
+    "installation_verified": false,
+    "runtime_use_verified": false,
+    "scope_note": "The assigned read-only probe exposes only the blueprint input and result-artifact paths; it authorizes neither installation nor inspection of the component's runtime installation/use state."
+  },
+  "source_binding": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_actual": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256_expected": "fa6c31dfece7b3e1c24f1c4b706defe13b067c2f4125e56d5bea72f90fb4eacd",
+    "unit_sha256_actual": "fa6c31dfece7b3e1c24f1c4b706defe13b067c2f4125e56d5bea72f90fb4eacd",
+    "source_line": 6069,
+    "supplied_byte_offset": 335153
+  },
+  "canonical_component": {
+    "upstream": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/meta",
+    "revision": "afc146fb5c5410f9df0b751c926b5d5254d11664",
+    "role": "Repository/workspace/release/task/drift graph",
+    "required_verification": "Pinned revision/closure; component test; byte/effect/provenance/witness query"
+  },
+  "probe": {
+    "command": "grep -Fq 'meta' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "exit_code": 0,
+    "result": "marker found"
+  },
+  "mutation_performed": false
+}

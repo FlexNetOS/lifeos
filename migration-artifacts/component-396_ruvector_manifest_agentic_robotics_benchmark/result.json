@@ -1,0 +1,31 @@
+{
+  "task_id": "COMPONENT-396_RUVECTOR_MANIFEST_AGENTIC_ROBOTICS_BENCHMARK",
+  "title": "Component: RuVector manifest: agentic-robotics-benchmarks",
+  "status": "noncompliant_unverified",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector manifest: agentic-robotics-benchmarks' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "anchor_binding": {
+    "declared_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "verified_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "declared_unit_sha256": "88b983ad59abffac08b04778abb20b156512ef20013be774cd56a5e878be0d48",
+    "verified_row_line": 6104,
+    "verified_row_byte_offset": 728951,
+    "verified_row_sha256_newline_free": "88b983ad59abffac08b04778abb20b156512ef20013be774cd56a5e878be0d48"
+  },
+  "required_component": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "crates/agentic-robotics-benchmarks",
+    "package": "agentic-robotics-benchmarks",
+    "version": "2.3.0 workspace",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "hard_rule_15": "The native RuVector agentic-robotics-benchmarks component must be installed and used; it must not be replaced.",
+  "probe_finding": "The canonical blueprint entry and both anchor hashes are valid, but crates/agentic-robotics-benchmarks/Cargo.toml is absent, no robotics Cargo manifests were found, and the root workspace has no agentic-robotics-benchmarks member. Installation and use of the required native component cannot be verified.",
+  "changes_made": [
+    "Created this evidence receipt only."
+  ],
+  "result": "fail",
+  "next_required_action": "Materialize the pinned ruvnet/RuVector revision 6a6c39e662a4c3184dcb913db91a09401c84b2ae with crates/agentic-robotics-benchmarks in the workspace, then verify a locked build/test or fixture run plus byte, provenance, effect, and witness round trip."
+}

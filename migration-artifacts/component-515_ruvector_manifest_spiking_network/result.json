@@ -1,0 +1,31 @@
+{
+  "task_id": "COMPONENT-515_RUVECTOR_MANIFEST_SPIKING_NETWORK",
+  "title": "Component: RuVector manifest: spiking-network",
+  "probe_mode": "read-only",
+  "status": "passed_with_anchor_offset_discrepancy",
+  "verified": {
+    "blueprint": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit": "RuVector manifest: spiking-network table row (without trailing newline)",
+    "unit_sha256": "53d1e8216cf7e19b57963e9134ddcb4fa3d3ab545702905c715bd428199fc01f",
+    "line": 6223,
+    "manifest": {
+      "repository": "https://github.com/ruvnet/RuVector",
+      "path": "examples/spiking-network",
+      "package": "spiking-network",
+      "version": "0.1.0",
+      "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+    }
+  },
+  "anchor_binding": {
+    "supplied_byte_offset": 335153,
+    "actual_marker_byte_offset": 901475,
+    "result": "The supplied offset does not identify the verified component row; document and row hashes do match."
+  },
+  "hard_rule_15": {
+    "requirement": "RuVector manifest spiking-network must be installed and used, not replaced.",
+    "probe_result": "The blueprint explicitly requires the exact pinned manifest component. This read-only structural probe did not perform or attest an installation/runtime use."
+  },
+  "command": "grep -Fq 'RuVector manifest: spiking-network' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "rollback": "None; no implementation files were changed."
+}

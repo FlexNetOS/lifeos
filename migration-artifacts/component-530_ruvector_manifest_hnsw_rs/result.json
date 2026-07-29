@@ -1,0 +1,41 @@
+{
+  "task_id": "COMPONENT-530_RUVECTOR_MANIFEST_HNSW_RS",
+  "title": "Component: RuVector manifest: hnsw_rs",
+  "status": "noncompliant_unverified",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector manifest: hnsw_rs' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "598b513de5e9260ef90bf06e6a1d323abcd3b2ddc7dacebb68770828752bbd56",
+    "verified_row_line": 6238,
+    "verified_row_byte_offset": 923405,
+    "verified_row_sha256_newline_free": "598b513de5e9260ef90bf06e6a1d323abcd3b2ddc7dacebb68770828752bbd56",
+    "finding": "The declared byte offset points to unrelated prose in the hash-matching document. The canonical manifest row begins at byte offset 923405 and matches the declared unit SHA-256 when hashed without its trailing newline. A second hnsw_rs manifest row also exists at line 6239 for scripts/patches/hnsw_rs."
+  },
+  "required_manifests": [
+    {
+      "repository": "https://github.com/ruvnet/RuVector",
+      "path": "patches/hnsw_rs",
+      "package": "hnsw_rs",
+      "version": "0.3.3",
+      "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+    },
+    {
+      "repository": "https://github.com/ruvnet/RuVector",
+      "path": "scripts/patches/hnsw_rs",
+      "package": "hnsw_rs",
+      "version": "0.3.3",
+      "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+    }
+  ],
+  "hard_rule_15": "The native RuVector hnsw_rs manifest is required to be installed and used; it must not be replaced.",
+  "probe_finding": "No hnsw_rs manifest, lockfile entry, source reference, or runtime-use evidence was found under the permitted execution-framework/ and migration-artifacts/ paths. This read-only probe therefore cannot verify installation or use of the required native component.",
+  "changes_made": [
+    "Created this evidence receipt only."
+  ],
+  "rollback": "No rollback required; no implementation or dependency state was changed.",
+  "result": "fail"
+}

@@ -9,14 +9,11 @@ const outputArgument = process.argv.find((argument) =>
 );
 const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
-  : join(
-      root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
-    );
+  : join(root, "evidence/nbverify/NBVERIFY-004.local-evidence.json");
 const packagePath = join(root, "package.json");
 const rawProofPath = join(
   root,
-  "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-RUNTIME-001.node-authority-proof.raw.json",
+  "evidence/nbverify/NBVERIFY-001.node-authority-proof.raw.json",
 );
 const rawProof = JSON.parse(readFileSync(rawProofPath, "utf8"));
 const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
@@ -36,6 +33,12 @@ function run(command, args) {
     return { command: [command, ...args].join(" "), exit_status: error.status ?? 1, output: `${error.stdout ?? ""}${error.stderr ?? ""}` };
   }
 }
+
+const rufloRuntime = run("bun", ["scripts/ruflo-coordinator-lifecycle.mjs"]);
+const rufloProofPath = join(root, "node_modules/.cache/lifeos/archbp-014/coordinator-proof.raw.json");
+const rufloProof = rufloRuntime.exit_status === 0 && existsSync(rufloProofPath)
+  ? JSON.parse(readFileSync(rufloProofPath, "utf8"))
+  : {};
 
 const processSnapshot = run("ps", ["-eo", "pid=,ppid=,comm=,args="]);
 const agentProcesses = processSnapshot.output
@@ -58,10 +61,12 @@ try {
 
 const claim = {
   claim_id: "SWARM-CLAIM-006",
-  verification_status: "unverified",
-  status: "qualified",
+  verification_status: ruvllmPackage.proven && nativePackage.proven && rufloProof.routingRuntime?.nativeLoaded === true && rufloProof.binding?.agentMemoryBound === true ? "verified" : "unverified",
+  status: ruvllmPackage.proven && nativePackage.proven && rufloProof.routingRuntime?.nativeLoaded === true && rufloProof.binding?.agentMemoryBound === true ? "verified" : "qualified",
   conclusion:
-    "A real Bun-installed RuvLLM package and native Linux optional binary load, and the native verifier exercised 51 in-memory adapters; static engine selection by automatically started Ruvnet agents remains unproven.",
+    rufloProof.binding?.agentMemoryBound === true
+      ? "The installed native RuvLLM engine is exercised by the live Ruflo coordinator and its native embedding is persisted into the bound per-agent RVF memory; the coordinator remains policy-gated and fail-closed."
+      : "Native RuvLLM capability is present, but live coordinator usage is not proven.",
   evidence: [
     {
       relationship: "ruvllm-package",
@@ -92,16 +97,18 @@ const claim = {
     },
     {
       relationship: "static-engine-boundary",
-      proven: false,
-      missing: [
-        "static-link-or-packaging-definition",
-        "fixed-agent-engine-selection",
-        "running-agent-process",
-      ],
+      proven: rufloRuntime.exit_status === 0 && rufloProof.routingRuntime?.nativeLoaded === true,
+      command: rufloRuntime.command,
+      exit_status: rufloRuntime.exit_status,
+      model: rufloProof.routingRuntime?.model ?? null,
+      native_loaded: rufloProof.routingRuntime?.nativeLoaded ?? false,
     },
     {
       relationship: "automatic-agent-usage",
-      proven: false,
+      proven: rufloRuntime.exit_status === 0 && rufloProof.binding?.agentMemoryBound === true,
+      command: rufloRuntime.command,
+      exit_status: rufloRuntime.exit_status,
+      binding: rufloProof.binding ?? null,
       process_snapshot: processSnapshot.command,
       agent_processes: agentProcesses,
       note:
@@ -121,12 +128,12 @@ const result = {
   claims: [...retained, claim],
   collector: {
     claim_id: "SWARM-CLAIM-006",
-    mode: "read-only-real-bun-native-package-boundary-trace",
+    mode: "live-ruflo-native-ruvllm-boundary-trace",
     writes_only: outputPath,
-    does_not_launch: true,
+    does_not_launch: false,
     does_not_install: true,
     does_not_mutate_generated_runtime: true,
   },
 };
 await Bun.write(outputPath, `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ claim_id: claim.claim_id, status: claim.status, native: claim.evidence[1].proven, automatic_agent_usage: false }, null, 2));
+console.log(JSON.stringify({ claim_id: claim.claim_id, status: claim.status, native: claim.evidence[1].proven, automatic_agent_usage: claim.evidence[4].proven }, null, 2));

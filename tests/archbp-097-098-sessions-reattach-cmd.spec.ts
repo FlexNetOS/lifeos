@@ -49,7 +49,7 @@ describe("ARCHBP-098 one-command full re-attach", () => {
   }, 200000);
 
   test("the command is documented (unit file, engine usage, subcommands)", () => {
-    expect(existsSync(resolve(repoRoot, "planning-spine-v0/docs/lifeos-reattach.service"))).toBe(true);
+    expect(existsSync(resolve(repoRoot, "evidence/isolation/lifeos-reattach.service"))).toBe(true);
     const src = readFileSync(engine, "utf8");
     expect(src).toContain("Subcommands:");
     expect(src).toContain("single\n// deliberate command");

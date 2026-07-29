@@ -1,0 +1,27 @@
+{
+  "task_id": "COMPONENT-374_CLAUDE_FLOW_SHARED",
+  "component": "@claude-flow/shared",
+  "probe_mode": "read-only",
+  "status": "not_demonstrated",
+  "verified": {
+    "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_binding": {
+      "byte_offset": 335153,
+      "unit_sha256": "992a83000de3d523c162b85103035772cb180d577afe1c436d6a84985b10cc86"
+    },
+    "hard_rule_15": "@claude-flow/shared must be installed and used, not replaced.",
+    "canonical_component": {
+      "blueprint_line": 6082,
+      "source": "https://github.com/ruvnet/ruflo",
+      "package": "shared",
+      "version": "3.0.0-alpha.8",
+      "revision": "12ede21767a6dd669df1b79392a5d27d9154f237",
+      "role": "Shared Ruflo types/protocol/runtime"
+    },
+    "command_template": "grep -Fq '@claude-flow/shared' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0,
+    "global_installation": "bun pm ls -g reports @claude-flow/shared@3.0.0-alpha.8"
+  },
+  "finding": "The required package is explicitly recorded in the SHA-256-bound blueprint and is installed globally at the canonical version. This read-only packet has no execution-framework files or other in-scope configuration, invocation, or integration evidence, so active use and the absence of replacement cannot be demonstrated.",
+  "mutation": "None to the component or runtime; result artifact only."
+}

@@ -5,17 +5,17 @@
   // Canvas pattern: 1fr 320px on desktop, 1fr below 960 px.
   // Static-first, token-only, no new deps.
 
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { router as appRouter } from "@/router";
   import Icon from "./Icon.svelte";
 
   let { router = appRouter } = $props();
 
   const lifeos  = useLifeos();
-  const nav     = createNav(router);
+  let nav     = $derived(createNav(router));
   const toasts  = useToasts();
   const lifeosState = bindStore(lifeos, ["activeId"]);
 

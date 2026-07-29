@@ -7,9 +7,9 @@
   // a "Web preview" placeholder outside the desktop host.
 
   import { onMount } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { useAuth } from "@/stores/auth";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import Icon from "./Icon.svelte";
 

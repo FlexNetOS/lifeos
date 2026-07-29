@@ -3,7 +3,7 @@
   // Lightweight popup chat panel anchored to the AI avatar. Prototype-grade:
   // keeps a local message log + canned reply. Wire to real LifeOS via store later.
   import { onMount, onDestroy, tick } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import Icon from "./Icon.svelte";
 

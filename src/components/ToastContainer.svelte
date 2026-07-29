@@ -3,7 +3,7 @@
   // Global toast notification layer. Teleports to <body> and stacks at bottom-right,
   // above the AI avatar bubble. Auto-dismisses after 3.5 s; hover pauses the timer.
 
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import Icon from "./Icon.svelte";
 

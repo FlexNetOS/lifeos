@@ -15,7 +15,7 @@ export interface Item {
   badge?: { count?: number; tone?: "info" | "warn" | "err" | "ok" };
   active?: boolean;
   shortcut?: string;
-  view?: "n8n-flow";
+  view?: "n8n-flow" | "open-pencil" | "terminal";
   flowId?: string;
   _origin?: OriginTag;
   children?: Item[];

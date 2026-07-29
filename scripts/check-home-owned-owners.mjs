@@ -14,7 +14,7 @@ const bArg = args.indexOf("--baseline");
 const baselinePath =
   bArg >= 0
     ? resolve(process.cwd(), args[bArg + 1])
-    : resolve(repoRoot, "planning-spine-v0/docs/home_residual_baseline.json");
+    : resolve(repoRoot, "evidence/isolation/home_residual_baseline.json");
 
 const HOME = "/home/flexnetos";
 // The residual surface under path law: home-owned dirs that may act as

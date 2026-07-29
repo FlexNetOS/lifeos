@@ -12,6 +12,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, cleanup } from "@testing-library/svelte";
 import { tick } from "svelte";
 import { createPinia, setActivePinia } from "pinia";
+import { useToasts } from "@/stores/toasts-native";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { axe } from "vitest-axe";
 
@@ -19,7 +20,7 @@ import CommandPalette from "@/components/CommandPalette.svelte";
 import KeyboardHelp from "@/components/KeyboardHelp.svelte";
 import NotificationsDrawer from "@/components/NotificationsDrawer.svelte";
 import ToastContainer from "@/components/ToastContainer.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -28,6 +29,8 @@ const makeRouter = () => createRouter({
 
 beforeEach(() => {
   setActivePinia(createPinia());
+  useLifeos().resetUiState();
+  useToasts().clear();
 });
 
 afterEach(() => cleanup());
@@ -103,7 +106,6 @@ describe("ToastContainer", () => {
   it("has no a11y violations with all toast variants visible", async () => {
     const { container } = render(ToastContainer);
     // ToastContainer reads from the useToasts store; seed one of each variant.
-    const { useToasts } = await import("@/stores/toasts.js");
     const toasts = useToasts();
     toasts.push({ message: "Info toast", variant: "info" });
     toasts.push({ message: "Success toast", variant: "success" });

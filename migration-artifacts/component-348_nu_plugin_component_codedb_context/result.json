@@ -1,0 +1,40 @@
+{
+  "task_id": "COMPONENT-348_NU_PLUGIN_COMPONENT_CODEDB_CONTEXT",
+  "title": "Component: nu_plugin component: codedb-context",
+  "status": "verified",
+  "probe_mode": "read-only",
+  "command_template": "grep -Fq 'nu_plugin component: codedb-context' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_line": 6056,
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "45be61fdb8b3324c840398ed6fdead6dfe353c507349c707a07bf8f32a9167f4"
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/nu_plugin",
+    "path": "codedb-context",
+    "revision": "63d6874314031471213fe9f51d9706820bc254e1",
+    "hard_rule": "Must be installed and used, not replaced.",
+    "verification": "Pinned revision; locked package tests; interruption/replay and byte round trip"
+  },
+  "evidence": {
+    "nu_version": "0.113.1",
+    "plugin_binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb",
+    "plugin_registry": {
+      "name": "codedb",
+      "version": "0.1.0",
+      "status": "loaded",
+      "registered_command_count": 24
+    },
+    "compiled_component_identity": "The installed nu_plugin_codedb binary contains the codedb-context-v1 marker and codedb_context Rust symbols, including CapturedCargoContext, ContextError, and CargoContextRequest.",
+    "runtime_use_probe": "nu -c 'codedb cargo packages | to json'",
+    "runtime_use_probe_reached_component": true,
+    "runtime_use_probe_result": "The command invoked locked Cargo context capture, then stopped because this task checkout references a missing envctl/crates/commit-worker/Cargo.toml workspace member.",
+    "runtime_handshake": "package targets nu-plugin/nu-protocol handshake 0.113.1",
+    "replacement_introduced": false
+  },
+  "conclusion": "The canonical requirement, document hash, and anchor unit are verified. codedb-context is installed as a compiled component of the loaded nu_plugin_codedb runtime and is used by the read-only codedb cargo packages path. The workspace closure is incomplete, so locked Cargo-context extraction cannot complete; that environmental failure does not replace or bypass codedb-context.",
+  "next_action": "For full closure verification, supply the pinned nu_plugin checkout at 63d6874314031471213fe9f51d9706820bc254e1 and a complete workspace containing envctl/crates/commit-worker, then run locked package tests and a successful codedb cargo packages probe."
+}

@@ -1,0 +1,25 @@
+{
+  "task_id": "COMPONENT-387_CARGO_PGRX",
+  "component": "cargo-pgrx",
+  "probe_mode": "read-only",
+  "status": "not_satisfied",
+  "checked_at": "2026-07-28T17:55:55Z",
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "command_template_passed": true,
+    "requirements": {
+      "version": "cargo-pgrx 0.12.9",
+      "source": "pgcentralfoundation/pgrx revision a21888973a18b787fa2c09f86936ea9c4a20de4b",
+      "provisioning": "Built inside the pinned Nix closure; host-installed cargo-pgrx must not participate.",
+      "use": "cargo pgrx init --pg17=\"$PG_CONFIG\" with PostgreSQL 17.10 from that same closure."
+    }
+  },
+  "probe": {
+    "command": "cargo pgrx --version",
+    "result": "failed",
+    "evidence": "cargo reported: no such command: pgrx"
+  },
+  "conclusion": "cargo-pgrx is not available in the current execution environment, so installation and required use cannot be verified. No substitute was used and no installation was attempted because this task is a read-only probe.",
+  "next_required_action": "Enter or materialize the blueprint-pinned Nix closure, verify exactly cargo-pgrx 0.12.9 and PostgreSQL 17.10, then run cargo pgrx init with the closure's PG_CONFIG."
+}

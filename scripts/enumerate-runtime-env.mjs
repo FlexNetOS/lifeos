@@ -1,16 +1,16 @@
 // ARCHBP-072 — Enumerate the agent runtime env vars currently on /run tmpfs
 // (CLAUDE_CONFIG_DIR, CODEX_HOME, YAZELIX_STATE_DIR and peers), tag each
 // durable vs volatile, and cross-check against the T1.2 tier map
-// (planning-spine-v0/docs/isolation_tier_map.json). Runs under Bun/Node.
+// (evidence/isolation/isolation_tier_map.json). Runs under Bun/Node.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 
 const repoRoot = resolve(new URL(".", import.meta.url).pathname, "..");
-const tierMapPath = resolve(repoRoot, "planning-spine-v0/docs/isolation_tier_map.json");
+const tierMapPath = resolve(repoRoot, "evidence/isolation/isolation_tier_map.json");
 const outputArg = process.argv.find((a) => a.startsWith("--output="));
 const outPath = outputArg
   ? resolve(process.cwd(), outputArg.slice("--output=".length))
-  : resolve(repoRoot, "planning-spine-v0/docs/runtime_env_enumeration.json");
+  : resolve(repoRoot, "evidence/isolation/runtime_env_enumeration.json");
 
 const tierMap = JSON.parse(readFileSync(tierMapPath, "utf8"));
 const byName = new Map(tierMap.entries.map((e) => [e.name, e]));
@@ -46,9 +46,9 @@ const entries = VARS.map((name) => {
 });
 
 const result = {
-  schema_version: "lifeos-planning-spine.runtime-env-enumeration.v0",
+  schema_version: "lifeos.evidence.runtime-env-enumeration.v1",
   generated_by: "scripts/enumerate-runtime-env.mjs",
-  cross_checked_against: "planning-spine-v0/docs/isolation_tier_map.json",
+  cross_checked_against: "evidence/isolation/isolation_tier_map.json",
   var_count: entries.length,
   on_run_tmpfs_count: entries.filter((e) => e.on_run_tmpfs).length,
   durable_on_run_count: entries.filter((e) => e.on_run_tmpfs && e.tier === "durable").length,

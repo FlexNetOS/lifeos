@@ -1,0 +1,22 @@
+{
+  "task_id": "COMPONENT-292_RUVECTOR_SONA",
+  "component": "@ruvector/sona",
+  "status": "passed_with_version_drift",
+  "hard_rule_15": {
+    "installed": true,
+    "used": true,
+    "replaced": false
+  },
+  "evidence": {
+    "manifest": "package.json: @ruvector/sona 0.1.7",
+    "lockfile": "bun.lock: @ruvector/sona@0.1.7",
+    "installed_module": "node_modules/@ruvector/sona",
+    "runtime_use": [
+      "scripts/learning-boundary-lifecycle.mjs dynamically imports @ruvector/sona and constructs SonaEngine baseline and sandbox instances",
+      "scripts/verify-node-authority.mjs statically imports SonaEngine and records live trajectory, MicroLoRA, learning, and pattern operations"
+    ],
+    "test": "bun test tests/archbp-009-learning-boundary-lifecycle.spec.ts passed its real @ruvector/sona lifecycle proof"
+  },
+  "warning": "The blueprint inventory names @ruvector/sona 0.1.8, while the repository manifest and Bun lock pin 0.1.7. This probe did not modify dependencies because it is read-only.",
+  "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee"
+}

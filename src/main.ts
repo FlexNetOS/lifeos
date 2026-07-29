@@ -1,8 +1,9 @@
 import { mount } from "svelte";
-import { createPinia, setActivePinia } from "pinia";
+import { invoke as tauriInvoke } from "@tauri-apps/api/core";
 import { router } from "@/router";
 import App from "@/App.svelte";
-import { tauriPersistence, LIFEOS_PERSIST_KEYS } from "@/lib/persistence";
+import { createSurface } from "@/lib/surface.svelte.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 // Load data.js (sets window.LIFEOS_DATA / AGGREGATORS / FLOWS).
 // In production, port this to a typed module under src/data/.
@@ -13,21 +14,53 @@ import "../colors_and_type.css";
 import "../lifeos_app.css";
 import "../styles.css";
 
-const pinia = createPinia();
-// Register persistence BEFORE activating the pinia so the plugin attaches
-// before any store is created. No-op in plain browser / Vitest where Tauri
-// invoke is absent.
-pinia.use(tauriPersistence({ storeId: "lifeos", keys: LIFEOS_PERSIST_KEYS }));
-// No Vue app.use(pinia) anymore — the globally active pinia is how useLifeos()
-// et al. resolve from the Svelte tree (and from the router guard).
-setActivePinia(pinia);
+// Record the earliest production bootstrap boundary. This distinguishes a
+// WebKit page load from a page that actually has the Tauri IPC bridge and can
+// reach the authenticated redb owner.
+const mainBootstrapInvoke =
+  typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || tauriInvoke;
+const recordMainFailure = (error: unknown) => {
+  if (!mainBootstrapInvoke) return;
+  void mainBootstrapInvoke("redb_state_write", {
+    key: "lifeos.main.error",
+    value: JSON.stringify({
+      schemaVersion: "lifeos.main-error.v1",
+      observedAt: Date.now(),
+      message: error instanceof Error ? error.message : String(error),
+      href: window.location.href,
+    }),
+  }).catch(() => {});
+};
+if (typeof window !== "undefined") {
+  window.addEventListener("error", (event) => recordMainFailure(event.error ?? event.message));
+  window.addEventListener("unhandledrejection", (event) => recordMainFailure(event.reason));
+}
+if (mainBootstrapInvoke) {
+  void mainBootstrapInvoke("redb_state_write", {
+    key: "lifeos.main.loaded",
+    value: JSON.stringify({
+      schemaVersion: "lifeos.main-loaded.v1",
+      loadedAt: Date.now(),
+      tauriBridge: true,
+      href: window.location.href,
+    }),
+  }).catch(() => {});
+}
 
-// Headless router boot: with no Vue app to install into, perform the initial
-// navigation ourselves (what install() used to trigger) — this runs the
-// URL → store guard for the launch URL, marks the router ready, and attaches
-// the popstate listeners for back/forward.
-router.push(router.options.history.location).catch(() => {
-  /* initial redirect / duplicate navigation — safe to ignore */
+// Stamp [data-surface] on <html> before mount so the density tokens in
+// colors_and_type.css §9 are resolved on the very first paint (no reflow flash).
+// Build-time target wins over width auto-detection: VITE_LIFEOS_SURFACE=tv-10ft.
+export const surface = createSurface({ env: import.meta.env.VITE_LIFEOS_SURFACE });
+
+// Hydrate the native projection before the first URL → store sync so persisted
+// UI state cannot race the launch route. The shell mounts immediately and
+// renders defaults until the projection resolves.
+useLifeos().hydrate().then(() => {
+  // Headless router boot: with no Vue app to install into, perform the initial
+  // navigation ourselves (what install() used to trigger).
+  return router.push(router.options.history.location);
+}).catch(() => {
+  /* initial redirect / projection failure — safe to ignore */
 });
 
 mount(App, { target: document.getElementById("app")! });

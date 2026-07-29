@@ -1,20 +1,19 @@
 <script>
   // LifeOS — Sidebar SFC (Svelte port of Sidebar.vue)
   // Primary rail: logo toggle + workspace switcher dropdown + rail icons + footer cluster.
-  // Navigation goes through the Pinia store via svelte-nav's createNav() — see that file's
-  // header comment for why this doesn't use nav.js's useNav() directly (vue-router's
-  // useRouter() needs Vue component injection, which doesn't exist in a Svelte tree).
+  // Navigation goes through the native LifeOS store via svelte-nav's createNav().
+  // The legacy nav.js composable remains only for the preview compatibility path.
   import { onMount, onDestroy } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";
   import Icon from "./Icon.svelte";
 
-  let { router = appRouter } = $props();
+  let { router = appRouter, redbProjection = null, swarmStatus = null } = $props();
 
   const lifeos = useLifeos();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, [
     "activeId",
     "wsCollapsed",
@@ -112,6 +111,7 @@
 
 <aside class="rail" data-figma-component="Sidebar Companion/Icon rail">
   <button class="rail-brand" class:collapsed={lifeosState.wsCollapsed}
+          data-figma-component="LifeOS Brand/App mark"
           title={lifeosState.wsCollapsed ? "Open LifeOS workspace panel" : "Close LifeOS workspace panel"}
           aria-label="Toggle LifeOS workspace panel"
           onclick={() => lifeos.toggleWs()}>
@@ -302,7 +302,8 @@
     {/if}
   </div>
 
-  <nav class="rail-list" aria-label="Workspaces">
+  <nav class="rail-list" aria-label="Workspaces"
+       data-figma-component="LifeOS Product Identity/Navigation triad">
     {#each rail as item (item.id)}
       <button class="rail-btn" class:active={isActive(item.id)}
               title={item.tooltip || item.label}
@@ -346,11 +347,24 @@
       </button>
     {/each}
   </div>
+  <div class="rail-owner-status" data-owner-status={swarmStatus?.state ?? "unavailable"} class:degraded={swarmStatus?.state === "degraded" || swarmStatus?.state === "stale"} title="Owner-published swarm status">
+    <span></span>
+    <small>{swarmStatus ? `${swarmStatus.state} · ${swarmStatus.localSeq}` : "unavailable"}</small>
+  </div>
 </aside>
 
 <style>
 /* Globe trigger — link dot in corner reflects WAN status */
 .rail-switcher-trigger { position: relative; }
+.rail-owner-status {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 8px 0 2px; color: var(--fg-4); font-size: 9px;
+}
+.rail-owner-status span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--lifeos-green); box-shadow: 0 0 5px var(--tint-green-glow-hi);
+}
+.rail-owner-status.degraded span { background: var(--status-warn); box-shadow: none; }
 .rail-switcher-link {
   position: absolute; right: 3px; bottom: 3px;
   width: 5px; height: 5px; border-radius: 50%;

@@ -1,7 +1,7 @@
 <script>
   // LifeOS — N8nFlowView SFC (Svelte port of N8nFlowView.vue)
   // Agent-team workflow visualization: SVG nodes + animated dashed edges.
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { resolveWorkspace, flow } from "@/lib/resolve.js";
   import Icon from "./Icon.svelte";

@@ -9,6 +9,8 @@ pub enum StorageError {
     ForeignKeyViolation,
     /// `decode_vector` received a byte slice whose length is not divisible by 4.
     InvalidVectorBytes,
+    /// The vector contains NaN or infinity and cannot be projected into RuVector.
+    NonFiniteVector,
     /// Rust-side guard: `vector_bytes.len() != dim * 4`.
     VectorLengthMismatch,
     /// Migration source JSON could not be parsed as a valid `AccountRecord`.
@@ -19,12 +21,27 @@ pub enum StorageError {
     MissingDatabaseUrl,
     /// Storage tests require an explicitly provisioned disposable PostgreSQL URL.
     MissingTestDatabaseUrl,
+    /// The envctl-issued PostgreSQL runtime context was not supplied.
+    MissingRuntimeContext,
+    /// The envctl-issued PostgreSQL runtime context was malformed.
+    InvalidRuntimeContext(String),
+    /// A ciphertext-backed secret registration failed its Rust-side input guard.
+    InvalidSecretRegistration,
+    /// A task claim or execution completion failed its Rust-side input guard.
+    InvalidTaskExecution,
+    /// A canonical execution log frame failed its Rust-side input guard.
+    InvalidLogFrame,
     /// RuVector must be installed in the dedicated `extensions` schema.
     RequiredExtension,
     /// The durable schema has fewer applied migrations than the embedded set.
     IncompleteMigrations { applied: u32, expected: u32 },
+    /// Migration 0007 is present but its versioned semantic acceptance receipt
+    /// is missing, invalid, or no longer agrees with the database self-check.
+    CowSemanticReceipt,
     /// A frontend projection write did not contain valid JSON.
     InvalidProjectionJson,
+    /// A live route decision had invalid route context.
+    InvalidRouteDecision,
     /// Underlying sqlx error.
     Sqlx(sqlx::Error),
     /// Filesystem I/O error (archive rename, etc.).
@@ -39,6 +56,9 @@ impl fmt::Display for StorageError {
             Self::InvalidVectorBytes => {
                 write!(f, "vector byte slice length is not a multiple of 4")
             }
+            Self::NonFiniteVector => {
+                write!(f, "vector contains non-finite coordinates")
+            }
             Self::VectorLengthMismatch => {
                 write!(f, "vector bytes length does not match declared dim")
             }
@@ -52,6 +72,25 @@ impl fmt::Display for StorageError {
             Self::MissingTestDatabaseUrl => {
                 write!(f, "LIFEOS_TEST_DATABASE_URL is required for storage tests")
             }
+            Self::MissingRuntimeContext => write!(
+                f,
+                "an envctl-issued runtime context is required for canonical PostgreSQL access"
+            ),
+            Self::InvalidRuntimeContext(reason) => {
+                write!(f, "invalid envctl-issued runtime context: {reason}")
+            }
+            Self::InvalidSecretRegistration => write!(
+                f,
+                "secret registration requires a non-empty key, purpose scope, and ciphertext"
+            ),
+            Self::InvalidTaskExecution => write!(
+                f,
+                "task execution requires valid worker, capability, lease, result, effect, and witness data"
+            ),
+            Self::InvalidLogFrame => write!(
+                f,
+                "execution log frames require a valid execution, stream, non-negative sequence, offset, and context"
+            ),
             Self::RequiredExtension => {
                 write!(f, "ruvector must be installed in the extensions schema")
             }
@@ -59,7 +98,12 @@ impl fmt::Display for StorageError {
                 f,
                 "database has {applied} applied migrations but {expected} are required"
             ),
+            Self::CowSemanticReceipt => write!(
+                f,
+                "COW database semantics are not accepted by a valid v2 receipt"
+            ),
             Self::InvalidProjectionJson => write!(f, "projection payload must be valid JSON"),
+            Self::InvalidRouteDecision => write!(f, "route decisions require non-empty route context objects"),
             Self::Sqlx(e) => write!(f, "database error: {e}"),
             Self::Io(e) => write!(f, "I/O error: {e}"),
         }

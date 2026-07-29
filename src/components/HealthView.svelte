@@ -8,7 +8,7 @@
 
   let { router = appRouter } = $props();
 
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
 
   let health = $derived(globalThis.LIFEOS_DATA?.health || { metrics: [], sleep: [], activity: [], heart: [] });
 

@@ -1,0 +1,25 @@
+{
+  "task_id": "COMPONENT-370_CLAUDE_FLOW",
+  "component": "claude-flow",
+  "probe_mode": "read-only",
+  "status": "not_demonstrated",
+  "verified": {
+    "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_binding": {
+      "byte_offset": 335153,
+      "unit_sha256": "4cb86e9b135de91dcc5424d4baca182f5ef02aabcf56cd199edec4af4462944d"
+    },
+    "hard_rule_15": "ruvnet/rUv components are installed and used, not replaced.",
+    "canonical_component": {
+      "blueprint_line": 6078,
+      "source": "https://github.com/ruvnet/ruflo",
+      "package": "Ruflo root/CLI",
+      "version": "3.32.8",
+      "revision": "12ede21767a6dd669df1b79392a5d27d9154f237"
+    },
+    "command_template": "grep -Fq 'claude-flow' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0
+  },
+  "finding": "The required component and hard rule are present in the bound blueprint, but this read-only packet contains no execution-framework directory or other in-scope installation/use evidence. Compliance with hard rule 15 therefore cannot be demonstrated from this packet.",
+  "mutation": "None; result artifact only."
+}

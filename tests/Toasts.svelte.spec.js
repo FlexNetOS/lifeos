@@ -18,7 +18,7 @@ import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { tick } from "svelte";
 import { createPinia, setActivePinia } from "pinia";
 import ToastContainer from "@/components/ToastContainer.svelte";
-import { useToasts } from "@/stores/toasts.js";
+import { useToasts } from "@/stores/toasts-native";
 
 describe("ToastContainer.svelte", () => {
   let pinia;
@@ -26,6 +26,7 @@ describe("ToastContainer.svelte", () => {
   beforeEach(() => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useToasts().clear();
     vi.useFakeTimers();
   });
 

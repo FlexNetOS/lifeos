@@ -56,7 +56,7 @@
 ### Working In This Directory
 - **Always declare explicit `defineProps()` schemas.** Inferred props broke icon-click handling once already (see root `AUDIT.md`).
 - Adding a new view pane requires three steps: (1) add the SFC here, (2) wire a new `v-else-if` branch in `../App.vue` keyed on `lifeos.activeSub.item?.view === '<id>'`, (3) extend `DataItem["view"]` in `../data/types.ts` so the discriminator is typed.
-- Use `useNav()` from `@/lib/nav` instead of mutating store state + calling `useRouter()` directly — otherwise the URL drifts from Pinia.
+- Use `createNav(router)` from `@/lib/svelte-nav` instead of mutating store state + calling `useRouter()` directly — otherwise the URL drifts from the native store.
 - Tauri-only flows must check `window.__TAURI__?.core?.invoke` first; the canned-reply / no-op paths keep Vitest green.
 - No emoji in templates. No unicode-as-icon. Lucide names (kebab) only via `Icon.vue` or `lucide-vue-next` directly.
 
@@ -72,14 +72,14 @@ Every interactive component has a spec under `../../tests/<Name>.spec.js`. Addin
 ## Dependencies
 
 ### Internal
-- `@/stores/lifeos` — every shell + view pane reads/writes the Pinia store.
-- `@/stores/toasts` — `ToastContainer.vue` consumes the toast queue.
-- `@/lib/nav` — `useNav()` for routed navigation.
+- `@/stores/lifeos-native` — every Svelte shell + view pane reads/writes the native store.
+- `@/stores/toasts-native` — Svelte overlays consume the native toast queue.
+- `@/lib/svelte-nav` — `createNav(router)` for routed navigation.
 - `@/lib/resolve` — `resolveWorkspace`, `flow` data accessors.
 - `@/lib/icons` — kebab → Lucide map used by `Icon.vue`.
 
 ### External
 - `lucide-vue-next@^0.475.0` (Vitest aliases this to `../../tests/__mocks__/lucide-vue-next.js`).
-- `vue-router@^4` (`useRouter` in nav-aware components).
+- `vue-router` is legacy preview/test infrastructure; mounted Svelte components use the native hash router.
 
 <!-- MANUAL: Add notes below; this section is preserved on regeneration. -->

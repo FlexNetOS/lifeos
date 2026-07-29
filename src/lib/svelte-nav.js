@@ -10,8 +10,15 @@
 // fetching it via injection — the router object itself (push/currentRoute) is
 // plain, framework-agnostic JS, so this is a genuine integration, not a stub.
 // buildPath() is reused as-is from nav.js so the URL scheme never drifts.
-import { buildPath } from "@/lib/nav.js";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
+
+function buildPath(workspaceId, sectionTitle, subLabel) {
+  const base = workspaceId === "settings" ? "/settings" : `/workspace/${encodeURIComponent(workspaceId)}`;
+  const parts = [base];
+  if (sectionTitle) parts.push(encodeURIComponent(sectionTitle));
+  if (subLabel) parts.push(encodeURIComponent(subLabel));
+  return parts.join("/");
+}
 
 function pushIfChanged(router, path) {
   if (!router) return;

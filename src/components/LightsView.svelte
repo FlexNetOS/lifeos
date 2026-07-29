@@ -5,8 +5,8 @@
   // roving tabindex on the scene radiogroup, schedule edit/delete affordance,
   // and a Tauri-backed persistence layer that no-ops outside the desktop shell.
   import { onMount, onDestroy, tick } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useLifeos } from "@/stores/lifeos-native";
+  import { useToasts } from "@/stores/toasts-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { router as appRouter } from "@/router";
   import Icon from "./Icon.svelte";
@@ -15,7 +15,7 @@
 
   const lifeos = useLifeos();
   const toasts = useToasts();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
 
   let lighting = $derived(globalThis.LIFEOS_DATA?.lighting || { scenes: [], rooms: [], schedules: [] });
 
@@ -48,7 +48,7 @@
   let totalCount = $derived(lighting.rooms.reduce((n, r) => n + (r.devices?.length || 0), 0));
   let activeCount = $derived(lighting.rooms.reduce((n, r) => n + activeInRoom(r), 0));
 
-  let activeSceneId = $state(lighting.scenes.find((s) => s.active)?.id || lighting.scenes[0]?.id || "");
+  let activeSceneId = $state(globalThis.LIFEOS_DATA?.lighting?.scenes?.find((s) => s.active)?.id || globalThis.LIFEOS_DATA?.lighting?.scenes?.[0]?.id || "");
   let announcement = $state("");
 
   const pickScene = (id) => {

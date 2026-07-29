@@ -1,0 +1,39 @@
+{
+  "task_id": "COMPONENT-366_RTK_NU",
+  "component": "rtk_nu",
+  "status": "verified",
+  "probe_mode": "read-only",
+  "verified_at": "2026-07-28T17:31:40-05:00",
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_byte_offset": 335153,
+    "unit_sha256": "f09695f0166fdf0870c2d4210a1a9c99375845757f9e23c490276137fc91e1ab"
+  },
+  "installation": {
+    "binary": "/home/flexnetos/.nix-profile/bin/rtk_nu",
+    "version": "0.43.0"
+  },
+  "usage_evidence": {
+    "command": "rtk_nu --format jsonl -- printf 'rtk_nu-probe'",
+    "result": "success",
+    "schema_version": "flexnetos.rtk_nu.envelope.v1",
+    "stdout_frame": {
+      "sequence": 1,
+      "byte_length": 12,
+      "payload_base64": "cnRrX251LXByb2Jl",
+      "sha256": "539ea4067c4b7f838c85a3514998ecbe1b4b2941280afc8fbb675658b8ca4fd2"
+    },
+    "execution": {
+      "exit_code": 0,
+      "success": true
+    }
+  },
+  "contract": {
+    "rtk_nu_role": "Separately packaged FlexNetOS byte-first legacy-output adapter producing lossless JSONL/JSON/Nuon envelopes for Nushell parsing.",
+    "not_replaced_by_rtk": true,
+    "native_nushell_bypasses_rtk_nu": true,
+    "release_gate": "Exact revision, schema, package closure, and witness must be pinned before release activation."
+  },
+  "conclusion": "rtk_nu is installed and was directly exercised; it remains a separate required adapter and was not substituted with rtk."
+}

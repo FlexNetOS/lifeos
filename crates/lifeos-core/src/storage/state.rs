@@ -1,4 +1,3 @@
-use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use std::path::Path;
 
@@ -8,7 +7,10 @@ use super::StorageError;
 /// empty object so first-run frontend behavior stays stable.
 pub async fn read(pool: &PgPool, key: &str) -> Result<String, StorageError> {
     let payload = sqlx::query_scalar::<_, serde_json::Value>(
-        "SELECT payload_json FROM lifeos_runtime.projection WHERE projection_key = $1",
+        "SELECT payload_json
+         FROM lifeos_runtime.ui_projection
+         WHERE tenant_id = lifeos_security.current_tenant()
+           AND projection_key = $1",
     )
     .bind(key)
     .fetch_optional(pool)
@@ -20,18 +22,11 @@ pub async fn read(pool: &PgPool, key: &str) -> Result<String, StorageError> {
 pub async fn write(pool: &PgPool, key: &str, payload: &str) -> Result<(), StorageError> {
     let value: serde_json::Value =
         serde_json::from_str(payload).map_err(|_| StorageError::InvalidProjectionJson)?;
-    sqlx::query(
-        "INSERT INTO lifeos_runtime.projection (projection_key, payload_json, generation, updated_at)
-         VALUES ($1, $2, 1, CURRENT_TIMESTAMP)
-         ON CONFLICT (projection_key) DO UPDATE SET
-           payload_json = EXCLUDED.payload_json,
-           generation = lifeos_runtime.projection.generation + 1,
-           updated_at = CURRENT_TIMESTAMP",
-    )
-    .bind(key)
-    .bind(value)
-    .execute(pool)
-    .await?;
+    sqlx::query("SELECT lifeos_runtime.put_projection($1, $2)")
+        .bind(key)
+        .bind(value)
+        .execute(pool)
+        .await?;
     Ok(())
 }
 
@@ -67,35 +62,46 @@ pub async fn migrate_from_json_file(
     let payload = std::str::from_utf8(&bytes).map_err(|_| StorageError::InvalidProjectionJson)?;
     let value: serde_json::Value =
         serde_json::from_str(payload).map_err(|_| StorageError::InvalidProjectionJson)?;
-    let sha256 = format!("{:x}", Sha256::digest(&bytes));
     let source_kind = format!("legacy-projection-json:{file_name}");
 
     let mut tx = pool.begin().await?;
-    sqlx::query(
-        "INSERT INTO lifeos_blob.object (sha256, byte_length, raw_bytes, source_kind)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (sha256) DO NOTHING",
+    let tenant: uuid::Uuid = sqlx::query_scalar("SELECT lifeos_security.current_tenant()")
+        .fetch_one(&mut *tx)
+        .await?;
+    sqlx::query_scalar::<_, uuid::Uuid>(
+        "SELECT lifeos_blob.store_bytes(
+           $1, $2, 'application/json', $3, 'legacy-projection-json', NULL)",
     )
-    .bind(sha256)
-    .bind(bytes.len() as i64)
+    .bind(tenant)
     .bind(&bytes)
-    .bind(source_kind)
-    .execute(&mut *tx)
+    .bind(serde_json::json!({
+        "producer": "lifeos-legacy-projection-import",
+        "source": source_kind,
+        "file_name": file_name,
+    }))
+    .fetch_one(&mut *tx)
     .await?;
-    let result = sqlx::query(
-        "INSERT INTO lifeos_runtime.projection
-           (projection_key, payload_json, generation, updated_at)
-         VALUES ($1, $2, 1, CURRENT_TIMESTAMP)
-         ON CONFLICT (projection_key) DO NOTHING",
+    let existed: bool = sqlx::query_scalar(
+        "SELECT EXISTS(
+           SELECT 1 FROM lifeos_runtime.ui_projection
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND projection_key = $1
+         )",
     )
     .bind(projection_key)
-    .bind(value)
-    .execute(&mut *tx)
+    .fetch_one(&mut *tx)
     .await?;
+    if !existed {
+        sqlx::query("SELECT lifeos_runtime.put_projection($1, $2)")
+            .bind(projection_key)
+            .bind(value)
+            .execute(&mut *tx)
+            .await?;
+    }
     tx.commit().await?;
     std::fs::remove_file(path)?;
 
-    if result.rows_affected() == 1 {
+    if !existed {
         Ok(LegacyProjectionOutcome::Migrated)
     } else {
         Ok(LegacyProjectionOutcome::CanonicalValueRetained)
@@ -163,7 +169,7 @@ mod tests {
         );
         let archived: i64 = sqlx::query_scalar(
             "SELECT COUNT(*) FROM lifeos_blob.object
-             WHERE source_kind = 'legacy-projection-json:ui-state.json'",
+             WHERE provenance->>'source' = 'legacy-projection-json:ui-state.json'",
         )
         .fetch_one(storage.pool())
         .await

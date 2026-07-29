@@ -1,0 +1,40 @@
+{
+  "task_id": "COMPONENT-310_WEAVE_COMPONENT_WEAVE_INJECT",
+  "status": "passed",
+  "probe_type": "read-only",
+  "component": "weave component: weave-inject",
+  "hard_rule": "Component must be installed and used, not replaced (hard rule 15).",
+  "evidence": {
+    "blueprint": {
+      "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+      "unit_sha256": "afdd7e5fcbcd36d10ed7b8c7bcf154c1fcb214899f547e6c7e4a398815d3a1fa",
+      "matched_line": 6018,
+      "matched_text": "weave component: weave-inject",
+      "pinned_revision": "b0ccd2278b2df689390023e590cc3c1eb60f9a80"
+    },
+    "installation": {
+      "executable": "/home/flexnetos/.nix-profile/bin/weave",
+      "version": "weave 0.2.0",
+      "backend": "sqlite"
+    },
+    "use": {
+      "native_command": "weave inject",
+      "help_verified": true,
+      "required_arguments": ["--to", "--text"],
+      "doctor_session_injectable": true,
+      "registered_peers": 0,
+      "injection_executed": false,
+      "reason": "Read-only probe with no peer target; no state-changing injection was attempted."
+    }
+  },
+  "commands": [
+    "grep -Fq 'weave component: weave-inject' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "weave --version",
+    "weave inject --help",
+    "weave doctor"
+  ],
+  "mutations": [
+    "migration-artifacts/component-310_weave_component_weave_inject/result.json"
+  ]
+}

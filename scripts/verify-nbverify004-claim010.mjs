@@ -9,10 +9,7 @@ const outputArgument = process.argv.find((argument) =>
 );
 const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
-  : join(
-      root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
-    );
+  : join(root, "evidence/nbverify/NBVERIFY-004.local-evidence.json");
 function run(command, args) {
   try {
     return { command: [command, ...args].join(" "), exit_status: 0, output: execFileSync(command, args, { encoding: "utf8" }) };
@@ -20,49 +17,38 @@ function run(command, args) {
     return { command: [command, ...args].join(" "), exit_status: error.status ?? 1, output: `${error.stdout ?? ""}${error.stderr ?? ""}` };
   }
 }
-const uiSearch = run("rg", [
-  "-n",
-  "-i",
-  "swarm|agent team|agent status",
-  "src",
-  "tests",
-  "--glob",
-  "!**/AGENTS.md",
-]);
+const uiRuntime = run("bun", ["run", "test", "--", "tests/swarm-status.spec.ts"]);
+const ownerRuntime = run("/home/flexnetos/.nix-profile/bin/rtk", ["proxy", "cargo", "test", "--manifest-path", "src-tauri/Cargo.toml", "--test", "redb_owner_live"]);
+const verified = uiRuntime.exit_status === 0 && ownerRuntime.exit_status === 0;
 let previous = {};
 try {
   previous = JSON.parse(readFileSync(outputPath, "utf8"));
 } catch {}
 const claim = {
   claim_id: "SWARM-CLAIM-010",
-  verification_status: "unverified",
-  status: "qualified",
-  conclusion:
-    "LifeOS contains agent-team and workflow UI surfaces, but no canonical active-swarm status schema, selected transport projection, agent identity flow, or stale/unavailable state behavior is proven.",
+  verification_status: verified ? "verified" : "unverified",
+  status: verified ? "verified" : "qualified",
+  conclusion: verified
+    ? "The Glass reads an owner-published swarm status projection with identity, sequence, freshness, stale, degraded, and unavailable states; the authenticated owner boundary and status derivation tests pass."
+    : "The owner-published swarm status boundary is not fully proven because one or more live boundary checks failed.",
   evidence: [
     {
-      relationship: "ui-status-search",
-      proven: uiSearch.output.trim().length > 0,
-      command: uiSearch.command,
-      exit_status: uiSearch.exit_status,
-      matches: uiSearch.output.split("\n").filter(Boolean).slice(0, 120),
-      note: "UI labels and fixtures are not live workspace status evidence.",
+      relationship: "ui-status-runtime",
+      proven: uiRuntime.exit_status === 0,
+      command: uiRuntime.command,
+      exit_status: uiRuntime.exit_status,
     },
     {
       relationship: "canonical-status-flow",
-      proven: false,
-      missing: [
-        "canonical-agent-status-schema",
-        "selected-transport",
-        "agent-identity-projection",
-        "event-source",
-        "LifeOS-runtime-bridge",
-      ],
+      proven: verified,
+      command: ownerRuntime.command,
+      exit_status: ownerRuntime.exit_status,
+      details: ["OwnerClient", "redb projection", "swarm.status", "swarm.identity", "swarm.updatedAt"],
     },
     {
       relationship: "stale-unavailable-states",
-      proven: false,
-      missing: ["unavailable-state", "stale-state", "disconnect-recovery", "freshness-marker"],
+      proven: uiRuntime.exit_status === 0,
+      details: ["unavailable", "stale", "degraded", "freshness marker"],
     },
   ],
 };
@@ -79,12 +65,12 @@ const result = {
   claims: [...retained, claim],
   collector: {
     claim_id: "SWARM-CLAIM-010",
-    mode: "read-only-ui-status-boundary-trace",
+    mode: "live-ui-swarm-status-boundary-trace",
     writes_only: outputPath,
-    does_not_launch: true,
+    does_not_launch: false,
     does_not_install: true,
     does_not_mutate_generated_runtime: true,
   },
 };
 await Bun.write(outputPath, `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ claim_id: claim.claim_id, status: claim.status, ui_matches: claim.evidence[0].matches.length }, null, 2));
+console.log(JSON.stringify({ claim_id: claim.claim_id, status: claim.status, ui_runtime_exit: uiRuntime.exit_status, owner_runtime_exit: ownerRuntime.exit_status }, null, 2));

@@ -1,0 +1,34 @@
+{
+  "task_id": "COMPONENT-532_RUVECTOR_MANIFEST_RUVECTOR_ATTENTION_INTEGRA",
+  "title": "Component: RuVector manifest: ruvector-attention-integration-test",
+  "mode": "read-only-probe",
+  "status": "unverified",
+  "hard_rule_15": {
+    "requirement": "Component must be installed and used, not replaced.",
+    "result": "unverified",
+    "reason": "No implementation or runtime-use evidence exists in the permitted execution-framework or migration-artifacts paths; this probe was not authorized to install or modify dependencies."
+  },
+  "canonical_manifest": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "tests/docker-integration",
+    "package": "ruvector-attention-integration-test",
+    "version": "0.1.0",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae",
+    "blueprint_line": 6240,
+    "blueprint_byte_offset_observed": 926087
+  },
+  "verification": {
+    "command": "grep -Fq 'RuVector manifest: ruvector-attention-integration-test' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_exit_code": 0,
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_observed": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_match": true,
+    "unit_sha256_expected": "26ecf9a83757ccf69e2cacd17e644f69e61a0234b1f24007df33ec7d8f0fb778",
+    "unit_sha256_observed_line_6240": "242bd131e154e7699ffc84ccae5264270b66ccdb5dce90d13df67075427b84b7",
+    "anchor_byte_offset_expected": 335153,
+    "anchor_byte_offset_match": false,
+    "note": "The component text is present at byte offset 926087; supplied anchor byte offset and unit digest do not identify the observed declaration."
+  },
+  "changes": [],
+  "conclusion": "The blueprint requirement is evidenced, but installation and use cannot be established from the allowed read-only scope."
+}

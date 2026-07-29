@@ -17,7 +17,7 @@ const mapArg = args.indexOf("--tier-map");
 const tierMapPath =
   mapArg >= 0
     ? resolve(process.cwd(), args[mapArg + 1])
-    : resolve(repoRoot, "planning-spine-v0/docs/isolation_tier_map.json");
+    : resolve(repoRoot, "evidence/isolation/isolation_tier_map.json");
 
 const tierMap = JSON.parse(readFileSync(tierMapPath, "utf8"));
 const durable = tierMap.entries.filter((e) => e.tier === "durable");

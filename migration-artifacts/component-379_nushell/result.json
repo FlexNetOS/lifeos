@@ -1,0 +1,30 @@
+{
+  "task_id": "COMPONENT-379_NUSHELL",
+  "title": "Component: Nushell",
+  "status": "passed",
+  "probe_mode": "read-only",
+  "source": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "bound_unit_sha256": "cc473c404a5f26c30bd4880a8f6cb1a9b0f9d61c70947a3a516b67b6abc5d62f",
+    "anchor_byte_offset": 335153
+  },
+  "requirement": "Nushell must be installed and used, not replaced.",
+  "evidence": {
+    "executable": "/home/flexnetos/.nix-profile/bin/nu",
+    "version_command": "nu --version",
+    "version_output": "0.113.1",
+    "native_typed_pipeline_command": "nu --no-config-file --commands \"[[component version mode]; [Nushell (version) native_typed_pipeline]] | where component == Nushell | select component version mode | to json --raw\"",
+    "native_typed_pipeline_result": {
+      "component": "Nushell",
+      "version": "0.113.1",
+      "mode": "native_typed_pipeline"
+    },
+    "blueprint_contracts": [
+      "Nushell alone converts adapter text to typed Nu values.",
+      "Nix pins Nushell 0.113.1.",
+      "Native Nushell values flow through a typed Nu pipeline without rtk or rtk_nu."
+    ]
+  },
+  "conclusion": "Nushell 0.113.1 is installed and was directly used to execute a native typed table pipeline. No substitute component was used."
+}

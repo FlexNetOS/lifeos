@@ -5,11 +5,11 @@ import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import SubsectionView from "@/components/SubsectionView.svelte";
 import N8nFlowView from "@/components/N8nFlowView.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 describe("SubsectionView.svelte", () => {
   let pinia;
-  beforeEach(() => { pinia = createPinia(); setActivePinia(pinia); });
+  beforeEach(() => { pinia = createPinia(); setActivePinia(pinia); useLifeos().resetUiState(); });
   afterEach(() => cleanup());
 
   it("renders breadcrumb + hero + back button when activeSub is set", () => {
@@ -32,7 +32,7 @@ describe("SubsectionView.svelte", () => {
 
 describe("N8nFlowView.svelte", () => {
   let pinia;
-  beforeEach(() => { pinia = createPinia(); setActivePinia(pinia); });
+  beforeEach(() => { pinia = createPinia(); setActivePinia(pinia); useLifeos().resetUiState(); });
   afterEach(() => cleanup());
 
   it("renders an SVG with nodes + edges for a known flow", () => {

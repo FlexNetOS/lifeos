@@ -1,0 +1,11 @@
+{
+  "task_id": "CURRENCY-RUVECTOR_ATTENTION_WASM",
+  "status": "passed",
+  "registry_latest": "2.1.0",
+  "installed_global": "2.1.0",
+  "versions_match": true,
+  "global_root": "/run/user/1001/yazelix/volatile/cache/.bun/install/global node_modules",
+  "probe": "test -n \"$(bun info 'ruvector-attention-wasm' version 2>/dev/null)\" && test \"$(bun info 'ruvector-attention-wasm' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE 'ruvector\\-attention\\-wasm@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+  "input_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "note": "Bun global packages are located in a volatile runtime cache; rerun this probe after a reboot if currency must be re-established."
+}

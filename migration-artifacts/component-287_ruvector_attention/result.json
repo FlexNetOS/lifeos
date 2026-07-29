@@ -1,0 +1,36 @@
+{
+  "task_id": "COMPONENT-287_RUVECTOR_ATTENTION",
+  "component": "@ruvector/attention",
+  "probe_mode": "read-only",
+  "status": "unverified",
+  "goal": "Component '@ruvector/attention' must be installed and used, not replaced (hard rule 15).",
+  "canonical_requirement": {
+    "package": "@ruvector/attention",
+    "version": "0.1.4",
+    "repository": "https://github.com/ruvnet/RuVector",
+    "revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae",
+    "blueprint_line": 5995
+  },
+  "verification": {
+    "command": "grep -Fq '@ruvector/attention' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_exit_code": 0,
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "expected_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor": {
+      "byte_offset": 335153,
+      "expected_unit_sha256": "f997c87e02978482a8d25a03d871dd8708933e54c383f5e00a64924f917a5dc9"
+    }
+  },
+  "evidence_scope": {
+    "allowed_paths": [
+      "execution-framework/**",
+      "migration-artifacts/**"
+    ],
+    "execution_framework_present": false,
+    "installation_evidence_found": false,
+    "runtime_use_evidence_found": false,
+    "replacement_evidence_found": false
+  },
+  "conclusion": "The blueprint canonically requires @ruvector/attention 0.1.4, and the mandated presence probe passed. The read-only packet exposes no implementation or runtime evidence path, so installation and use cannot be verified; hard rule 15 is not established by this probe. No package was installed, changed, or replaced.",
+  "rollback": "No rollback required; this receipt is the only task artifact."
+}

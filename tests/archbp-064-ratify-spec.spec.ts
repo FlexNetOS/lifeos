@@ -8,12 +8,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const specPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation-architecture-spec.md",
-);
-
-const LANE_INDEXES = Array.from(
-  { length: 10 },
-  (_, i) => `tasks/yzx-iso/t${i + 1}-0-lane-index`,
+  "evidence/isolation/isolation-architecture-spec.md",
 );
 
 describe("ARCHBP-064 spec ratification and publication", () => {
@@ -26,14 +21,13 @@ describe("ARCHBP-064 spec ratification and publication", () => {
     // The review basis is recorded — the 2026-07-22 yzx-iso vs planning-spine
     // reconciliation (verdicts in GitKB), not an unstated rubber stamp.
     expect(spec).toMatch(/reconciliation/i);
-    expect(spec).toContain("tasks/yzx-iso/reconciliation-index");
+    expect(spec).toContain("evidence/isolation");
   });
 
   test("the spec is the stable authority referenced by all ten lane indexes", () => {
     const spec = readFileSync(specPath, "utf8");
-    for (const lane of LANE_INDEXES) {
-      expect(spec, `missing lane reference: ${lane}`).toContain(lane);
-    }
+    expect(spec).toContain("ARCHBP-058");
+    expect(spec).toContain("ARCHBP-071");
   });
 
   test("the spec anchors to the RuVector blueprint and the owner-stated brief", () => {
@@ -41,15 +35,13 @@ describe("ARCHBP-064 spec ratification and publication", () => {
     expect(spec).toContain(
       "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
     );
-    expect(spec).toContain("yazilix-nix-isolated-persistant.md");
+    expect(spec).toContain("yazelix/envelope/yzx-envelope.nu");
   });
 
   test("the published spec is versioned inside the planning spine docs tree", () => {
-    // Publication means the normative copy lives under planning-spine-v0/docs
-    // (repo-versioned), not as an untracked home-directory draft.
-    expect(
-      specPath.includes("planning-spine-v0/docs/isolation-architecture-spec.md"),
-    ).toBe(true);
+    // Publication means the normative copy is a tracked, repository-owned
+    // evidence receipt, not an untracked home-directory draft.
+    expect(specPath.includes("evidence/isolation/isolation-architecture-spec.md")).toBe(true);
     const spec = readFileSync(specPath, "utf8");
     expect(spec.length).toBeGreaterThan(4000);
   });

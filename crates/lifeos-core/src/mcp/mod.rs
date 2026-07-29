@@ -1,16 +1,16 @@
 //! MCP client surface for LifeOS.
 //!
-//! Stage 1d of the TODO: module scaffolds for the two MCP servers the foundation
-//! plan calls out as priority integrations — Cognitum-Seed (custody / sensor
-//! appliance) and RuVector (vector DB + GNN inference). Wave 3 fills in the
-//! read-only client bodies on top of a shared `Transport` trait.
+//! Read-only clients for the two MCP-backed servers the foundation plan calls
+//! out as priority integrations — Cognitum-Seed (custody / sensor appliance)
+//! and RuVector (vector DB + GNN inference). Both use the shared `Transport`
+//! trait so production HTTP and deterministic tests share the same contracts.
 //!
 //! The shared `McpError` is intentionally minimal so cognitum.rs and
 //! ruvector.rs converge on a single error vocabulary as they grow. The
 //! `Transport` abstraction lets us swap real `reqwest::blocking` for an
 //! in-memory fake under `#[cfg(test)]` without dragging HTTP into unit specs.
 //!
-//! Wave-2 → Wave-3 evidence (recorded in `.omc/handoffs/team-exec-wave2.md`):
+//! Source-grounded endpoint evidence:
 //! the live Cognitum endpoint is HTTP (`http://169.254.42.1/mcp`), and every
 //! one of the 40 live MCP tools mirrors a REST endpoint. So the cross-platform
 //! client speaks REST through `reqwest::blocking`; MCP-over-HTTP stays
@@ -53,6 +53,8 @@ impl std::error::Error for McpError {}
 /// tests use an in-memory fake keyed by path.
 pub trait Transport {
     fn get(&self, path: &str) -> Result<String, McpError>;
+    fn post(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError>;
+    fn put(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError>;
 }
 
 #[cfg(feature = "mcp-http")]
@@ -111,6 +113,40 @@ mod reqwest_transport {
             }
             resp.text().map_err(|e| McpError::Protocol(e.to_string()))
         }
+
+        fn post(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError> {
+            let url = format!("{}{}", self.base_url, path);
+            let resp = self
+                .client
+                .post(&url)
+                .json(body)
+                .send()
+                .map_err(|e| McpError::NotConnected(e.to_string()))?;
+            if !resp.status().is_success() {
+                return Err(McpError::Protocol(format!(
+                    "POST {url} returned {}",
+                    resp.status()
+                )));
+            }
+            resp.text().map_err(|e| McpError::Protocol(e.to_string()))
+        }
+
+        fn put(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError> {
+            let url = format!("{}{}", self.base_url, path);
+            let resp = self
+                .client
+                .put(&url)
+                .json(body)
+                .send()
+                .map_err(|e| McpError::NotConnected(e.to_string()))?;
+            if !resp.status().is_success() {
+                return Err(McpError::Protocol(format!(
+                    "PUT {url} returned {}",
+                    resp.status()
+                )));
+            }
+            resp.text().map_err(|e| McpError::Protocol(e.to_string()))
+        }
     }
 }
 
@@ -154,6 +190,14 @@ pub(crate) mod test_fake {
                 McpError::NotConnected(format!("no canned response registered for {path}"))
             })
         }
+
+        fn post(&self, path: &str, _body: &serde_json::Value) -> Result<String, McpError> {
+            self.get(path)
+        }
+
+        fn put(&self, path: &str, _body: &serde_json::Value) -> Result<String, McpError> {
+            self.get(path)
+        }
     }
 }
 
@@ -178,5 +222,13 @@ mod tests {
             Err(McpError::NotConnected(msg)) => assert!(msg.contains("/missing")),
             other => panic!("expected NotConnected, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn in_memory_transport_supports_write_verbs() {
+        let t = InMemoryTransport::new().with("/write", r#"{"ok":true}"#);
+        let body = serde_json::json!({"points": []});
+        assert_eq!(t.put("/write", &body).unwrap(), r#"{"ok":true}"#);
+        assert_eq!(t.post("/write", &body).unwrap(), r#"{"ok":true}"#);
     }
 }

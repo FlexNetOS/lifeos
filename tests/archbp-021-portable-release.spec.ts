@@ -14,7 +14,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const receiptPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/portable_release_root_coverage.json",
+  "evidence/packaging/portable_release_root_coverage.json",
 );
 const receipt = () => JSON.parse(readFileSync(receiptPath, "utf8"));
 const BUNDLE = "/home/flexnetos/meta/var/cache/archbp021/bundle-moved";
@@ -26,7 +26,7 @@ describe("ARCHBP-021 portable release (musl + relocatable closure)", () => {
   test("eligible binaries are reproducible musl artifacts — re-verified from disk", () => {
     expect(existsSync(receiptPath)).toBe(true);
     const r = receipt();
-    expect(r.schema_version).toBe("lifeos-planning-spine.portable-release-root-coverage.v0");
+    expect(r.schema_version).toBe("lifeos.evidence.portable-release-root-coverage.v1");
     expect(r.implements).toContain("YZXCONV-021");
     expect(r.musl_artifacts.length).toBe(3);
     for (const a of r.musl_artifacts) {
@@ -63,7 +63,8 @@ describe("ARCHBP-021 portable release (musl + relocatable closure)", () => {
     // Test A live: bundle bash from the moved prefix, host store hidden.
     const out = execFileSync(`${BUNDLE}/launcher`, [
       "enter", "--id", "archbp021-spec-reloc", "--store", `${BUNDLE}/nixroot`, "--",
-      r.relocation.store_workload, "-c", "echo relocation-ok; ls /nix/store | wc -l",
+      r.relocation.store_workload, "-c",
+      `echo relocation-ok; /nix/store/9ypz3flqsrl5xl495mm8h645gadjsxi1-coreutils-9.11/bin/ls /nix/store | /nix/store/9ypz3flqsrl5xl495mm8h645gadjsxi1-coreutils-9.11/bin/wc -l`,
     ], { encoding: "utf8", timeout: 60000 });
     expect(out).toContain("relocation-ok");
     const visible = Number(out.trim().split("\n").pop());

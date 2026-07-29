@@ -1,0 +1,33 @@
+{
+  "task_id": "COMPONENT-288_RUVECTOR_ATTENTION_WASM",
+  "component": "@ruvector/attention-wasm",
+  "probe_mode": "read-only",
+  "verdict": "noncompliant-unverified",
+  "hard_rule": "15: component must be installed and used, not replaced",
+  "evidence": {
+    "command_template": "grep -Fq '@ruvector/attention-wasm' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0,
+    "blueprint_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "blueprint_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "declared_at_line": 5996,
+    "literal_byte_offset": 625775,
+    "declared_source": "https://github.com/ruvnet/RuVector",
+    "declared_version": "0.1.32",
+    "declared_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "scope_observation": {
+    "permitted_paths": [
+      "execution-framework/**",
+      "migration-artifacts/**"
+    ],
+    "implementation_evidence_found": false,
+    "reason": "The supplied workspace contains only the blueprint and .lifeos-bin; no package manifest, lockfile, node_modules installation, or application source is available for verification."
+  },
+  "anchor_binding": {
+    "supplied_byte_offset": 335153,
+    "supplied_unit_sha256": "34ef4af42d3300704ece7d35aad5689c29bb9e08dab42b3b5cca75ff523d0471",
+    "note": "The supplied byte offset does not locate this literal; the literal begins at zero-based byte offset 625774. No unit extent was supplied, so the unit hash cannot be independently recomputed."
+  },
+  "changes_made": [],
+  "next_action": "Verify a direct dependency/locked package and a runtime import or invocation in the implementation workspace; do not substitute another attention implementation."
+}

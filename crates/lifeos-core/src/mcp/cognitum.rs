@@ -1,19 +1,20 @@
 //! Cognitum-Seed MCP client.
 //!
-//! Wave 3 evidence (recorded in `.omc/handoffs/team-exec-wave2.md`): the live
-//! Cognitum endpoint is HTTP at `http://169.254.42.1/mcp`, and every MCP tool
-//! mirrors a REST endpoint under `/api/v1/...`. So this client speaks REST
-//! through a `Transport` (production: `ReqwestTransport`; tests: in-memory
-//! fake) instead of marshalling JSON-RPC over stdio.
+//! Current Cognitum SDK documentation identifies the Seed appliance as HTTPS
+//! at port `8443`, with REST resources under `/api/v1/...` and MCP available
+//! through both HTTP and stdio transports.
+//! This client speaks those REST routes through a `Transport` (production:
+//! `ReqwestTransport`; tests: in-memory fake) instead of marshalling JSON-RPC
+//! over stdio.
 //!
 //! **Tool-name reconciliation**: the foundation doc named tools
 //! `seed_device_status`, `seed_sensor_list`, `seed_thermal_state`,
 //! `seed_cognitive_status`, `seed_memory_query`. None of those appear in the
 //! live 40-tool list. The closest live equivalents — and the surface this
-//! client wraps for Wave 3 — are:
+//! client wraps are:
 //! - `seed.cogs.list` → `GET /api/v1/apps` → `cogs_list()`
 //! - `seed.sensor.snapshot` → `GET /api/v1/sensor/stream` → `sensor_snapshot()`
-//! - `seed.coherence.profile` → REST mirror path *unverified* → `coherence_profile()`
+//! - `seed.coherence.profile` → `GET /api/v1/coherence/profile` → `coherence_profile()`
 //!
 //! Response types are deliberately permissive: each wrapper holds a
 //! `serde_json::Value` and exposes 1-2 typed accessors plus `raw()` so callers
@@ -30,7 +31,7 @@ use serde_json::Value;
 /// advertises. Includes the `/mcp` suffix because that's the MCP-over-HTTP
 /// path; the REST mirror lives at the bare host (no `/mcp`). See
 /// `rest_base_from_mcp_url` for how the helper strips the suffix.
-pub const DEFAULT_COGNITUM_URL: &str = "http://169.254.42.1/mcp";
+pub const DEFAULT_COGNITUM_URL: &str = "https://169.254.42.1:8443/mcp";
 
 /// Translate an MCP-over-HTTP URL into the REST-mirror base URL. The live
 /// Cognitum exposes both: `http://169.254.42.1/mcp` for MCP tooling and
@@ -86,10 +87,9 @@ impl CogsListResponse {
     }
 }
 
-/// Sensor snapshot — wraps `GET /api/v1/sensor/stream`. The foundation doc
-/// notes 10 sensor channels; the on-wire layout is **inferred**, so the typed
-/// accessor pulls just the timestamp and lets callers reach for `raw()` for
-/// per-channel values until Wave 4 locks the schema.
+/// Sensor snapshot — decodes the latest JSON event from the SSE
+/// `GET /api/v1/sensor/stream` resource. The on-wire channel layout remains
+/// open-ended, so callers can inspect the complete event through `raw()`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SensorSnapshot {
     raw: Value,
@@ -116,11 +116,29 @@ impl SensorSnapshot {
     }
 }
 
+fn parse_sensor_event(body: &str) -> Result<Value, McpError> {
+    let trimmed = body.trim();
+    if trimmed.starts_with('{') || trimmed.starts_with('[') {
+        return serde_json::from_str(trimmed)
+            .map_err(|e| McpError::Protocol(format!("sensor_snapshot: invalid JSON: {e}")));
+    }
+    let data = trimmed
+        .lines()
+        .filter_map(|line| line.strip_prefix("data:"))
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .last()
+        .ok_or_else(|| {
+            McpError::Protocol("sensor_snapshot: SSE stream had no data event".into())
+        })?;
+    serde_json::from_str(data)
+        .map_err(|e| McpError::Protocol(format!("sensor_snapshot: invalid SSE JSON: {e}")))
+}
+
 /// Coherence profile — wraps the REST mirror of `seed.coherence.profile`.
 ///
-/// Path unverified — confirm against live Cognitum once endpoint is reachable.
-/// Best guess `/api/v1/coherence/profile`; the typed accessor pulls a single
-/// `score` field (also best-guess) and the rest stays in `raw()`.
+/// The `/api/v1/coherence/profile` response. The typed accessor pulls a
+/// `score` field when present and the rest stays in `raw()`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CoherenceProfile {
     raw: Value,
@@ -141,19 +159,26 @@ impl CoherenceProfile {
     }
 }
 
-/// Read-only Cognitum-Seed client over an arbitrary `Transport`. Production
-/// callers construct via `from_env()` (which wires a `ReqwestTransport`);
-/// tests construct via `connect()` with an `InMemoryTransport`.
+/// Read-only Cognitum-Seed client over an arbitrary `Transport`. Construction
+/// performs the device status handshake, so a returned client represents a
+/// reachable Seed rather than an unprobed URL.
 pub struct CognitumClient<T: Transport> {
     transport: T,
+    status: Value,
 }
 
 impl<T: Transport> CognitumClient<T> {
-    /// Wrap an existing `Transport`. No handshake — Wave 3 reads only. Wave
-    /// 4+ may grow a real `connect()` step that probes `/api/v1/health` or
-    /// similar.
+    /// Probe the device status endpoint before returning a usable client.
     pub fn connect(transport: T) -> Result<Self, McpError> {
-        Ok(Self { transport })
+        let body = transport.get("/api/v1/status")?;
+        let status: Value = serde_json::from_str(&body)
+            .map_err(|e| McpError::Protocol(format!("status: invalid JSON: {e}")))?;
+        Ok(Self { transport, status })
+    }
+
+    /// Handshake response from `GET /api/v1/status`.
+    pub fn status(&self) -> &Value {
+        &self.status
     }
 
     /// `GET /api/v1/apps` — installed cogs with running state. Mirrors the
@@ -169,13 +194,11 @@ impl<T: Transport> CognitumClient<T> {
     /// `seed.sensor.snapshot` MCP tool.
     pub fn sensor_snapshot(&self) -> Result<SensorSnapshot, McpError> {
         let body = self.transport.get("/api/v1/sensor/stream")?;
-        let raw: Value = serde_json::from_str(&body)
-            .map_err(|e| McpError::Protocol(format!("sensor_snapshot: invalid JSON: {e}")))?;
+        let raw = parse_sensor_event(&body)?;
         Ok(SensorSnapshot { raw })
     }
 
-    /// Coherence profile. **Path unverified — confirm against live Cognitum
-    /// once endpoint is reachable.** Best guess `/api/v1/coherence/profile`.
+    /// Coherence profile from `/api/v1/coherence/profile`.
     pub fn coherence_profile(&self) -> Result<CoherenceProfile, McpError> {
         let body = self.transport.get("/api/v1/coherence/profile")?;
         let raw: Value = serde_json::from_str(&body)
@@ -205,17 +228,22 @@ mod tests {
 
     #[test]
     fn connect_returns_a_client() {
-        let t = InMemoryTransport::new();
-        // `connect()` is a placeholder until Wave 4 grows a handshake.
-        assert!(CognitumClient::connect(t).is_ok());
+        let t = InMemoryTransport::new().with("/api/v1/status", r#"{"ok":true}"#);
+        let client = CognitumClient::connect(t).unwrap();
+        assert_eq!(
+            client.status().get("ok").and_then(Value::as_bool),
+            Some(true)
+        );
     }
 
     #[test]
     fn cogs_list_parses_object_shape() {
-        let t = InMemoryTransport::new().with(
-            "/api/v1/apps",
-            r#"{"apps":[{"id":"cog-a","running":true},{"id":"cog-b","running":false}]}"#,
-        );
+        let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
+            .with(
+                "/api/v1/apps",
+                r#"{"apps":[{"id":"cog-a","running":true},{"id":"cog-b","running":false}]}"#,
+            );
         let client = CognitumClient::connect(t).unwrap();
         let resp = client.cogs_list().unwrap();
         assert_eq!(resp.ids(), vec!["cog-a", "cog-b"]);
@@ -225,26 +253,46 @@ mod tests {
 
     #[test]
     fn cogs_list_parses_array_shape() {
-        let t =
-            InMemoryTransport::new().with("/api/v1/apps", r#"[{"id":"x"},{"id":"y"},{"id":"z"}]"#);
+        let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
+            .with("/api/v1/apps", r#"[{"id":"x"},{"id":"y"},{"id":"z"}]"#);
         let client = CognitumClient::connect(t).unwrap();
         assert_eq!(client.cogs_list().unwrap().ids(), vec!["x", "y", "z"]);
     }
 
     #[test]
     fn sensor_snapshot_extracts_timestamp_string() {
-        let t = InMemoryTransport::new().with(
-            "/api/v1/sensor/stream",
-            r#"{"timestamp":"2026-05-25T12:00:00Z","temp":21.4}"#,
-        );
+        let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
+            .with(
+                "/api/v1/sensor/stream",
+                r#"{"timestamp":"2026-05-25T12:00:00Z","temp":21.4}"#,
+            );
         let client = CognitumClient::connect(t).unwrap();
         let snap = client.sensor_snapshot().unwrap();
         assert_eq!(snap.timestamp().as_deref(), Some("2026-05-25T12:00:00Z"));
     }
 
     #[test]
+    fn sensor_snapshot_extracts_latest_sse_event() {
+        let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
+            .with(
+                "/api/v1/sensor/stream",
+                "event: sensor\ndata: {\"ts\":1748131200000}\n\nevent: sensor\ndata: {\"timestamp\":\"2026-05-25T12:00:00Z\"}\n",
+            );
+        let client = CognitumClient::connect(t).unwrap();
+        assert_eq!(
+            client.sensor_snapshot().unwrap().timestamp().as_deref(),
+            Some("2026-05-25T12:00:00Z")
+        );
+    }
+
+    #[test]
     fn sensor_snapshot_extracts_timestamp_epoch() {
-        let t = InMemoryTransport::new().with("/api/v1/sensor/stream", r#"{"ts":1748131200000}"#);
+        let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
+            .with("/api/v1/sensor/stream", r#"{"ts":1748131200000}"#);
         let client = CognitumClient::connect(t).unwrap();
         assert_eq!(
             client.sensor_snapshot().unwrap().timestamp().as_deref(),
@@ -255,6 +303,7 @@ mod tests {
     #[test]
     fn coherence_profile_parses_score() {
         let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
             .with("/api/v1/coherence/profile", r#"{"score":0.87,"notes":""}"#);
         let client = CognitumClient::connect(t).unwrap();
         assert_eq!(client.coherence_profile().unwrap().score(), Some(0.87));
@@ -262,7 +311,9 @@ mod tests {
 
     #[test]
     fn invalid_json_surfaces_as_protocol_error() {
-        let t = InMemoryTransport::new().with("/api/v1/apps", "not json");
+        let t = InMemoryTransport::new()
+            .with("/api/v1/status", r#"{"ok":true}"#)
+            .with("/api/v1/apps", "not json");
         let client = CognitumClient::connect(t).unwrap();
         match client.cogs_list() {
             Err(McpError::Protocol(msg)) => assert!(msg.contains("cogs_list")),

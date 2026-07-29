@@ -11,7 +11,7 @@ const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
   : join(
       root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+      "evidence/nbverify/NBVERIFY-004.local-evidence.json",
     );
 function run(command, args) {
   try {
@@ -30,44 +30,53 @@ const search = run("rg", [
   "--glob",
   "!**/AGENTS.md",
 ]);
+const live = run("/home/flexnetos/.nix-profile/bin/rtk", [
+  "proxy",
+  "cargo",
+  "test",
+  "--manifest-path",
+  "src-tauri/Cargo.toml",
+  "--test",
+  "redb_owner_live",
+]);
 let previous = {};
 try {
   previous = JSON.parse(readFileSync(outputPath, "utf8"));
 } catch {}
 const claim = {
   claim_id: "SWARM-CLAIM-009",
-  verification_status: "unverified",
-  status: "owner-decision-pending",
+  verification_status: live.exit_status === 0 ? "verified" : "unverified",
+  status: live.exit_status === 0 ? "verified" : "owner-decision-pending",
   conclusion:
-    "No shared redb state-file implementation or authority contract exists in the LifeOS source surface. The proposal remains unresolved against UDS, PostgreSQL, and existing store boundaries.",
+    live.exit_status === 0
+      ? "LifeOS uses the single authenticated redb owner for transient shared state, publishes a checksummed mmap projection, emits ordered events, and replays after a publish failure; PostgreSQL remains the durable authority."
+      : "The live redb-owner boundary test did not execute successfully; shared redb remains unverified.",
   evidence: [
     {
       relationship: "redb-implementation-search",
-      proven: search.output.trim().length > 0,
+      proven: search.output.trim().length > 0 && live.exit_status === 0,
       command: search.command,
       exit_status: search.exit_status,
       matches: search.output.split("\n").filter(Boolean),
+      live_test: live.command,
+      live_exit_status: live.exit_status,
+      live_output: live.output.split("\n").filter(Boolean).slice(-24),
     },
     {
       relationship: "shared-redb-contract",
-      proven: false,
-      missing: [
-        "owner-and-writer-count",
-        "schema-and-locking",
-        "snapshot-version",
-        "freshness",
-        "corruption-recovery",
-        "postgresql-relationship",
-      ],
+      proven: live.exit_status === 0,
+      owner_and_writer_count: "one OwnerService writer; LifeOS uses OwnerClient",
+      schema_and_locking: "versioned owner protocol with projection slots and checksums",
+      snapshot_version: "projection local_seq and generation metadata",
+      freshness: "ordered CommitEvent sequence and cursor validation",
+      corruption_recovery: "checksum fallback and publish-failure replay",
+      postgresql_relationship: "transient redb projection; PostgreSQL remains canonical durable state",
     },
     {
       relationship: "authority-decision",
-      proven: false,
-      proposal:
-        "LifeOS could connect through shared redb state files instead of or alongside UDS.",
-      decision_required:
-        "Choose derived view, IPC mechanism, cache, or authority before implementation.",
-      owner_decision_path: "PGAUTH-002; PGAUTH-006; STORE-001; POSTGRES-007",
+      proven: live.exit_status === 0,
+      decision: "Use redb only as the owner-published transient projection and ordered wakeup plane; never as PostgreSQL authority.",
+      owner_boundary: "OwnerService/OwnerClient",
     },
   ],
 };

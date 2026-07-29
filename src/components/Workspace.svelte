@@ -4,7 +4,7 @@
   // Sections + items are reorderable via native HTML5 drag-and-drop.
   // Each section gets an "Add item" button; the workspace gets an "Add section" button.
   import { onMount, onDestroy, tick } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { resolveWorkspace } from "@/lib/resolve.js";
@@ -15,7 +15,7 @@
   let { router = appRouter } = $props();
 
   const lifeos = useLifeos();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, [
     "activeId",
     "wsCollapsed",

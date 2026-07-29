@@ -1,9 +1,9 @@
 <script>
   // LifeOS — Dashboard SFC (Svelte port of Dashboard.vue)
   // Main canvas: greeting + 4 stat cards + agent-team grid (drag+click) + activity + agenda + AI suggest.
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { useAuth } from "@/stores/auth";
-  import { useToasts } from "@/stores/toasts.js";
+  import { useToasts } from "@/stores/toasts-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";
@@ -15,7 +15,7 @@
   const lifeos = useLifeos();
   const auth = useAuth();
   const toasts = useToasts();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   const lifeosState = bindStore(lifeos, ["teams"]);
   const authState = bindStore(auth, ["account"]);
   const d = globalThis.LIFEOS_DATA?.dashboardCanvas;

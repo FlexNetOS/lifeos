@@ -8,8 +8,8 @@ import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import ContactsView from "@/components/ContactsView.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
-import { useToasts } from "@/stores/toasts.js";
+import { useLifeos } from "@/stores/lifeos-native";
+import { useToasts } from "@/stores/toasts-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -26,6 +26,8 @@ describe("ContactsView.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
+    useToasts().clear();
     router = makeRouter();
     await router.push("/");
     await router.isReady();

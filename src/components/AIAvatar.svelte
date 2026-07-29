@@ -3,7 +3,7 @@
   // Floating, draggable robot avatar that toggles the AI chat. Hidden if
   // lifeos.aiAvatarHidden is true. Position persists in the store.
   import { onMount, onDestroy } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import Icon from "./Icon.svelte";
   import AIChat from "./AIChat.svelte";

@@ -1,0 +1,42 @@
+{
+  "task_id": "COMPONENT-356_NU_PLUGIN_COMPONENT_NU_PLUGIN_CODEDB",
+  "title": "Component: nu_plugin component: nu_plugin_codedb",
+  "status": "verified",
+  "probe_mode": "read-only",
+  "hard_rule_15": "satisfied: the required nu_plugin_codedb component is installed, loaded, and used; no replacement was introduced",
+  "command_template": "grep -Fq 'nu_plugin component: nu_plugin_codedb' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "06675b47547e7c020c29715ab05d1afd882026b0a7e5483be3b28b5dc07ead7e",
+    "component": "nu_plugin component: nu_plugin_codedb",
+    "repository": "https://github.com/FlexNetOS/nu_plugin",
+    "revision": "63d6874314031471213fe9f51d9706820bc254e1"
+  },
+  "runtime_evidence": {
+    "nu_version": "0.113.1",
+    "plugin_name": "codedb",
+    "plugin_version": "0.1.0",
+    "plugin_status": "loaded",
+    "plugin_binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb",
+    "registered_command_count": 24,
+    "use_probe": "nu -c 'codedb doctor | to json -r'",
+    "use_probe_passed": true,
+    "use_probe_result": [
+      {
+        "table": "host_nu",
+        "status": "observed",
+        "note": "package targets nu-plugin/nu-protocol handshake 0.113.1"
+      },
+      {
+        "table": "codedb_store",
+        "status": "degraded",
+        "note": "redb store is not implemented until CDB015"
+      }
+    ],
+    "replacement_introduced": false
+  },
+  "conclusion": "The blueprint declaration and supplied anchor binding are present against the verified document hash. The native nu_plugin_codedb binary is installed in the Nix runtime, registered and loaded by Nushell as codedb, and was directly used through the read-only codedb doctor command. The reported deferred redb store does not replace the plugin and does not prevent verification of installation and use."
+}

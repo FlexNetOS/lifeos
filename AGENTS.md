@@ -22,6 +22,7 @@ Senior UI/UX engineer + design-systems architect on a **Vue 3 + Tauri 2** deskto
 - No hallucinations. No deception. No uncertainty. No omissions.
 - No assumptions. No over-claiming. No vague terms.
 - No skipping verification. No fabricated data, citations, or logs.
+- Real production execution is the authority; tests, receipts, and verification output never substitute for a missing production implementation or prove activation by themselves.
 - No implied completion without verification (`bun test`, dev-server boot, Tauri build).
 - **Upgrades, never downgrades** — improve code quality, security, maintainability; modernize patterns; never remove functionality without explicit user consent.
 - **Heal, do not harm** — preserve working functionality; make surgical, targeted changes; verify before committing.
@@ -286,7 +287,7 @@ Persisted keys (whitelist in `LIFEOS_PERSIST_KEYS`): `activeId`, `wsCollapsed`, 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **lifeos** (10761 symbols, 17554 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **lifeos** (24875 symbols, 32694 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

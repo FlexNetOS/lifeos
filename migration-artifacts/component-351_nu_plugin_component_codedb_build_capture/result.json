@@ -1,0 +1,48 @@
+{
+  "task_id": "COMPONENT-351_NU_PLUGIN_COMPONENT_CODEDB_BUILD_CAPTURE",
+  "title": "Component: nu_plugin component: codedb-build-capture",
+  "status": "failed",
+  "probe_mode": "read-only",
+  "timestamp_utc": "2026-07-28T17:47:04Z",
+  "command_template": "grep -Fq 'nu_plugin component: codedb-build-capture' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "153621a6fa16fbddf1b4815849809ad39f28f4057870f7e7be7ae3dcbef05810",
+    "verified_row_line": 6059,
+    "verified_row_byte_offset": 686826,
+    "verified_row_sha256_newline_free": "153621a6fa16fbddf1b4815849809ad39f28f4057870f7e7be7ae3dcbef05810",
+    "finding": "The document and canonical component-row hashes match. The declared byte offset points to unrelated prose; the matching component row begins at byte offset 686826."
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/nu_plugin",
+    "package": "codedb-build-capture",
+    "pinned_revision": "63d6874314031471213fe9f51d9706820bc254e1",
+    "purpose": "Optional, explicitly gated unsafe execution capture for build-script and procedural-macro evidence."
+  },
+  "installed_runtime": {
+    "plugin_registry": {
+      "name": "codedb",
+      "version": "0.1.0",
+      "status": "loaded",
+      "binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb"
+    },
+    "available_build_related_command": "codedb build scripts",
+    "available_build_related_command_behavior": "Static build.rs rows and safe capture gaps only.",
+    "missing_required_identity": "No codedb-build-capture command, --unsafe-execute-build approval flag, or codedb-build-capture marker is exposed by the loaded plugin.",
+    "invalid_prior_probe": "codedb capture build . is invalid in the current plugin interface: codedb capture accepts only a repository path and has no build-capture mode."
+  },
+  "hard_rule_15": {
+    "result": "not_satisfied",
+    "reason": "The required codedb-build-capture component is not verifiably installed or used. The loaded generic codedb plugin cannot substitute for it.",
+    "replacement_introduced": false
+  },
+  "conclusion": "The blueprint requirement and exact canonical-row hash are verified, but this read-only closure cannot establish installation or use of codedb-build-capture. The previous passed receipt overstated the generic codedb plugin's capabilities and is superseded by this result.",
+  "next_action": "In an installation-authorized execution-framework closure, obtain or build codedb-build-capture from pinned nu_plugin revision 63d6874314031471213fe9f51d9706820bc254e1, expose it through Nushell, and execute its dedicated approval-gated preflight without enabling unsafe build execution.",
+  "changes_made": [
+    "Updated this evidence receipt only."
+  ],
+  "rollback": "No rollback required; no component, dependency, source, build output, plugin registry, or capture evidence state was changed."
+}

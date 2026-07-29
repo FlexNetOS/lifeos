@@ -137,8 +137,12 @@ def main() -> None:
 
     # --- base backup + streaming replica --------------------------------
     replica = ROOT / "replica"
+    # Fetch WAL after the base copy; the started replica below proves the
+    # actual streaming-replication path.  Streaming WAL during this first
+    # disposable copy can wait indefinitely on PostgreSQL 17 when the local
+    # archive is also active, so it is not used as the base-backup transport.
     proc = run([f"{PGBIN}/pg_basebackup", "-h", str(ROOT), "-p", PRIMARY_PORT,
-                "-D", str(replica), "-R", "-X", "stream"])
+                "-D", str(replica), "-R", "-X", "fetch", "--checkpoint=fast"], timeout=120)
     if proc.returncode != 0:
         raise RuntimeError(f"replica basebackup failed: {proc.stderr[-400:]}")
     with open(replica / "postgresql.auto.conf", "a") as conf:
@@ -154,7 +158,7 @@ def main() -> None:
 
     backup = ROOT / "backup"
     proc = run([f"{PGBIN}/pg_basebackup", "-h", str(ROOT), "-p", PRIMARY_PORT,
-                "-D", str(backup), "-X", "stream"])
+                "-D", str(backup), "-X", "fetch", "--checkpoint=fast"], timeout=120)
     check("base_backup_taken", proc.returncode == 0, proc.stderr[-200:])
 
     # --- selected LSN, then post-target writes that must NOT survive ----

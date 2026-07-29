@@ -1,0 +1,46 @@
+{
+  "task_id": "COMPONENT-306_ENVCTL_COMPONENT_SECRETD",
+  "title": "Component: envctl component: secretd",
+  "status": "not_satisfied",
+  "probe_mode": "read-only",
+  "hard_rule": "envctl component: secretd must be installed and used, not replaced",
+  "required_component": {
+    "name": "secretd",
+    "repository": "https://github.com/FlexNetOS/envctl",
+    "pinned_revision": "48368a97f7d1388cea247dd4ebdc32a8193743fb"
+  },
+  "anchor_validation": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_observed": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "required_row_line": 6014,
+    "required_row_found": true,
+    "unit_sha256_expected": "22396a2543f328fafcfdd7d3bb32f6f0e62f8c604881fa99e28b92deceb69676"
+  },
+  "envctl": {
+    "executable": "/home/flexnetos/.nix-profile/bin/envctl",
+    "installed_version": "0.1.0",
+    "component_subcommand_available": false,
+    "secret_subsystem_available": true
+  },
+  "probes": [
+    {
+      "command": "envctl component --help",
+      "result": "unsupported",
+      "detail": "envctl 0.1.0 has no component subcommand"
+    },
+    {
+      "command": "envctl --json install secretd --dry-run",
+      "result": "blocked",
+      "detail": "manifest dir not found or unreadable: manifest"
+    },
+    {
+      "command": "envctl --json secret status",
+      "result": "blocked",
+      "detail": "manifest dir not found or unreadable: manifest"
+    }
+  ],
+  "conclusion": "The required secretd component is not verified installed or used in this task cell. No replacement implementation was used or credited.",
+  "remediation": "Provide the authoritative envctl manifest directory, then install the pinned secretd component with envctl and rerun read-only status verification.",
+  "secrets_mutated": false
+}

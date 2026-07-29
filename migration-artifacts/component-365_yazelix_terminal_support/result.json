@@ -1,0 +1,41 @@
+{
+  "task_id": "COMPONENT-365_YAZELIX_TERMINAL_SUPPORT",
+  "title": "Component: Yazelix terminal support",
+  "probe_mode": "read-only",
+  "status": "pass",
+  "hard_rule": 15,
+  "requirement": "Yazelix terminal support must be installed and used, not replaced.",
+  "component": {
+    "owner": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/yazelix-terminal-support",
+    "name": "terminal-support metadata/agent-environment pin",
+    "pinned_revision": "a7ee555aa4bcd154649b2d53d4fb7eb3c0467413",
+    "role": "Versioned support evidence only; it is explicitly not the terminal launcher, renderer, composer, or repair mechanism."
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "line": 6073,
+    "actual_byte_offset": 696780,
+    "supplied_byte_offset": 335153,
+    "supplied_unit_sha256": "9538e037156b2125531f7eaffbce0fa3da3cfa9ea3ee9caadef9391d72141f54",
+    "literal_present": true,
+    "verification_command": "grep -Fq 'Yazelix terminal support' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  },
+  "runtime_evidence": {
+    "installation_verified": true,
+    "executable": "/home/flexnetos/.nix-profile/bin/yzx",
+    "version": "Yazelix Nova (1.0.0-beta.2)",
+    "usage_verified": true,
+    "commands_executed": [
+      "yzx status",
+      "yzx --version"
+    ],
+    "result": "The native Nix-profile Yazelix executable reported package full, Nushell as its shell, a runtime Zellij configuration, and inside zellij: yes."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "The native yzx Yazelix executable was queried directly. No substitute terminal implementation or metadata repository misuse was introduced."
+  },
+  "scope_note": "This verifies the required support component's documented role and active native Yazelix runtime. The support repository is not asserted to implement the LifeOS PTY bridge; the blueprint assigns that release-blocking bridge to LifeOS."
+}

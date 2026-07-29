@@ -74,41 +74,83 @@ pub async fn upsert_vector(
         return Err(StorageError::VectorLengthMismatch);
     }
     let embedding = ruvector_literal(vector_bytes)?;
-    sqlx::query(
-        "INSERT INTO lifeos_semantic.embedding
-           (id, collection, dim, raw_vector, embedding, metadata_json, last_synced_at)
-         VALUES ($1, $2, $3, $4, $5::extensions.ruvector, $6, to_timestamp($7))
-         ON CONFLICT (id) DO UPDATE SET
-           collection = EXCLUDED.collection,
-           dim = EXCLUDED.dim,
-           raw_vector = EXCLUDED.raw_vector,
-           embedding = EXCLUDED.embedding,
-           metadata_json = EXCLUDED.metadata_json,
-           last_synced_at = EXCLUDED.last_synced_at",
-    )
-    .bind(id)
-    .bind(collection)
-    .bind(dim as i32)
-    .bind(vector_bytes)
-    .bind(embedding)
-    .bind(metadata(metadata_json)?)
-    .bind(last_synced_at as f64)
-    .execute(pool)
-    .await?;
+    let metadata = metadata(metadata_json)?.unwrap_or_else(|| serde_json::json!({}));
+    if let Some(embedding) = embedding {
+        sqlx::query_scalar::<_, uuid::Uuid>(
+            "SELECT lifeos_semantic.append_embedding_projection(
+               $1, $2, $3, $4, $5, $6, $7, false)",
+        )
+        .bind(id)
+        .bind(collection)
+        .bind(dim as i32)
+        .bind(vector_bytes)
+        .bind(embedding)
+        .bind(metadata)
+        .bind(last_synced_at)
+        .fetch_one(pool)
+        .await?;
+    } else {
+        let payload = serde_json::json!({
+            "logical_key": format!("embedding:{id}"),
+            "logical_id": id,
+            "collection": collection,
+            "dimension": dim,
+            "last_synced_at": last_synced_at,
+            "non_finite": true,
+            "tombstone": false,
+            "metadata": metadata,
+        });
+        sqlx::query(
+            "SELECT lifeos_agentdb.append_projection_record(
+               'lifeos_agentdb.exp_nodes'::regclass,
+               'embedding-diagnostic', $1, $2, $3)",
+        )
+        .bind(format!("embedding:{id}"))
+        .bind(payload)
+        .bind(vector_bytes)
+        .execute(pool)
+        .await?;
+    }
     Ok(())
 }
 
 pub async fn get_vector(pool: &PgPool, id: &str) -> Result<Option<VectorRow>, StorageError> {
     let row = sqlx::query_as::<_, VectorRow>(
-        "SELECT id, collection, dim::BIGINT AS dim, raw_vector AS vector,
-           metadata_json::text AS metadata_json,
-           EXTRACT(EPOCH FROM last_synced_at)::BIGINT AS last_synced_at
-         FROM lifeos_semantic.embedding WHERE id = $1",
+        "SELECT metadata->>'logical_id' AS id,
+           metadata->>'collection' AS collection,
+           dimension::BIGINT AS dim,
+           lifeos_blob.load_object_bytes(source_object_id) AS vector,
+           (metadata->'user_metadata')::text AS metadata_json,
+           (metadata->>'last_synced_at')::BIGINT AS last_synced_at
+         FROM lifeos_semantic.embedding
+         WHERE tenant_id = lifeos_security.current_tenant()
+           AND metadata->>'logical_id' = $1
+           AND coalesce((metadata->>'retired')::boolean, false) = false
+         ORDER BY generation DESC LIMIT 1",
     )
     .bind(id)
     .fetch_optional(pool)
     .await?;
-    Ok(row)
+    if row.is_some() {
+        return Ok(row);
+    }
+    Ok(sqlx::query_as::<_, VectorRow>(
+        "SELECT typed_payload->>'logical_id' AS id,
+           typed_payload->>'collection' AS collection,
+           (typed_payload->>'dimension')::BIGINT AS dim,
+           lifeos_blob.load_object_bytes(raw_object_id) AS vector,
+           (typed_payload->'metadata')::text AS metadata_json,
+           (typed_payload->>'last_synced_at')::BIGINT AS last_synced_at
+         FROM lifeos_agentdb.exp_nodes
+         WHERE tenant_id = lifeos_security.current_tenant()
+           AND record_kind = 'embedding-diagnostic'
+           AND typed_payload->>'logical_id' = $1
+           AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
+         ORDER BY sequence DESC LIMIT 1",
+    )
+    .bind(id)
+    .fetch_optional(pool)
+    .await?)
 }
 
 pub async fn list_by_collection(
@@ -116,10 +158,22 @@ pub async fn list_by_collection(
     collection: &str,
 ) -> Result<Vec<VectorRow>, StorageError> {
     let rows = sqlx::query_as::<_, VectorRow>(
-        "SELECT id, collection, dim::BIGINT AS dim, raw_vector AS vector,
-           metadata_json::text AS metadata_json,
-           EXTRACT(EPOCH FROM last_synced_at)::BIGINT AS last_synced_at
-         FROM lifeos_semantic.embedding WHERE collection = $1 ORDER BY id",
+        "SELECT metadata->>'logical_id' AS id,
+           metadata->>'collection' AS collection,
+           dimension::BIGINT AS dim,
+           lifeos_blob.load_object_bytes(source_object_id) AS vector,
+           (metadata->'user_metadata')::text AS metadata_json,
+           (metadata->>'last_synced_at')::BIGINT AS last_synced_at
+         FROM lifeos_semantic.embedding e
+         WHERE tenant_id = lifeos_security.current_tenant()
+           AND metadata->>'collection' = $1
+           AND coalesce((metadata->>'retired')::boolean, false) = false
+           AND generation = (
+             SELECT max(latest.generation)
+             FROM lifeos_semantic.embedding latest
+             WHERE latest.tenant_id = e.tenant_id
+               AND latest.metadata->>'logical_id' = e.metadata->>'logical_id')
+         ORDER BY id",
     )
     .bind(collection)
     .fetch_all(pool)
@@ -134,15 +188,17 @@ pub async fn upsert_gnn(
     computed_at: i64,
 ) -> Result<(), StorageError> {
     sqlx::query(
-        "INSERT INTO lifeos_semantic.gnn_cache (cache_key, payload, computed_at)
-         VALUES ($1, $2, to_timestamp($3))
-         ON CONFLICT (cache_key) DO UPDATE SET
-           payload = EXCLUDED.payload,
-           computed_at = EXCLUDED.computed_at",
+        "SELECT lifeos_agentdb.append_projection_record(
+           'lifeos_agentdb.exp_nodes'::regclass, 'gnn-cache', $1,
+           jsonb_build_object(
+             'logical_key', $1,
+             'payload_base64', encode($2, 'base64'),
+             'computed_at', $3,
+             'tombstone', false), $2)",
     )
     .bind(cache_key)
     .bind(payload)
-    .bind(computed_at as f64)
+    .bind(computed_at)
     .execute(pool)
     .await?;
     Ok(())
@@ -150,9 +206,18 @@ pub async fn upsert_gnn(
 
 pub async fn get_gnn(pool: &PgPool, cache_key: &str) -> Result<Option<GnnCacheRow>, StorageError> {
     let row = sqlx::query_as::<_, GnnCacheRow>(
-        "SELECT cache_key, payload,
-           EXTRACT(EPOCH FROM computed_at)::BIGINT AS computed_at
-         FROM lifeos_semantic.gnn_cache WHERE cache_key = $1",
+        "SELECT latest.typed_payload->>'logical_key' AS cache_key,
+           decode(latest.typed_payload->>'payload_base64', 'base64') AS payload,
+           (latest.typed_payload->>'computed_at')::BIGINT AS computed_at
+         FROM (
+           SELECT DISTINCT ON (typed_payload->>'logical_key') typed_payload
+           FROM lifeos_agentdb.exp_nodes
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND record_kind = 'gnn-cache'
+           ORDER BY typed_payload->>'logical_key', sequence DESC
+         ) latest
+         WHERE latest.typed_payload->>'logical_key' = $1
+           AND coalesce((latest.typed_payload->>'tombstone')::boolean, false) = false",
     )
     .bind(cache_key)
     .fetch_optional(pool)
@@ -161,7 +226,7 @@ pub async fn get_gnn(pool: &PgPool, cache_key: &str) -> Result<Option<GnnCacheRo
 }
 
 pub async fn clear_collection(pool: &PgPool, name: &str) -> Result<(), StorageError> {
-    sqlx::query("DELETE FROM lifeos_semantic.embedding WHERE collection = $1")
+    sqlx::query("SELECT lifeos_semantic.retire_embedding_collection($1)")
         .bind(name)
         .execute(pool)
         .await?;
@@ -169,7 +234,7 @@ pub async fn clear_collection(pool: &PgPool, name: &str) -> Result<(), StorageEr
 }
 
 pub async fn clear_gnn_cache(pool: &PgPool) -> Result<(), StorageError> {
-    sqlx::query("DELETE FROM lifeos_semantic.gnn_cache")
+    sqlx::query("SELECT lifeos_agentdb.clear_projection_kind('gnn-cache')")
         .execute(pool)
         .await?;
     Ok(())
@@ -212,7 +277,8 @@ mod tests {
         }
 
         let projected: Option<String> = sqlx::query_scalar(
-            "SELECT embedding::text FROM lifeos_semantic.embedding WHERE id = $1",
+            "SELECT embedding::text FROM lifeos_semantic.embedding
+             WHERE metadata->>'logical_id' = $1 ORDER BY generation DESC LIMIT 1",
         )
         .bind("v0")
         .fetch_one(pool)
@@ -220,10 +286,11 @@ mod tests {
         .unwrap();
         assert!(projected.is_some());
         let non_finite: Option<String> = sqlx::query_scalar(
-            "SELECT embedding::text FROM lifeos_semantic.embedding WHERE id = $1",
+            "SELECT embedding::text FROM lifeos_semantic.embedding
+             WHERE metadata->>'logical_id' = $1 ORDER BY generation DESC LIMIT 1",
         )
         .bind("v1")
-        .fetch_one(pool)
+        .fetch_optional(pool)
         .await
         .unwrap();
         assert!(non_finite.is_none());
@@ -239,17 +306,6 @@ mod tests {
             upsert_vector(pool, "bad", "test", 4, &three_floats, None, 0).await,
             Err(StorageError::VectorLengthMismatch)
         ));
-        let raw_err = sqlx::query(
-            "INSERT INTO lifeos_semantic.embedding
-               (id, collection, dim, raw_vector, last_synced_at)
-             VALUES ($1, $2, 0, $3, to_timestamp(0))",
-        )
-        .bind("x")
-        .bind("c")
-        .bind(Vec::<u8>::new())
-        .execute(pool)
-        .await;
-        assert!(raw_err.is_err(), "dim=0 should violate CHECK constraint");
         assert!(matches!(
             decode_vector(&[0u8, 1u8, 2u8]),
             Err(StorageError::InvalidVectorBytes)

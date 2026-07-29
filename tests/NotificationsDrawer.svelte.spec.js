@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import NotificationsDrawer from "@/components/NotificationsDrawer.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -17,6 +17,7 @@ describe("NotificationsDrawer.svelte", () => {
   beforeEach(() => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     store = useLifeos();
     render(NotificationsDrawer);
   });

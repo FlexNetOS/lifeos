@@ -6,7 +6,7 @@ import { YAZELIX_ROOTS } from "./helpers/yzx-envelope";
 // ARCHBP-065 — Package the envelope as a flake app/package so it is
 // nix-declared, not ad-hoc. (yzx-iso t2-2-flake-integration, G2.)
 
-const root = YAZELIX_ROOTS.find((r) => existsSync(`${r}/envelope/yzx-envelope.sh`));
+const root = YAZELIX_ROOTS.find((r) => existsSync(`${r}/envelope/yzx-envelope.nu`));
 
 describe("ARCHBP-065 nix-declared envelope", () => {
   test("the bwrap wrapper builds via the yazelix flake with no host installs", () => {
@@ -38,6 +38,6 @@ describe("ARCHBP-065 nix-declared envelope", () => {
     const flake = readFileSync(`${root}/flake.nix`, "utf8");
     expect(flake).toContain("yzx-envelope");
     expect(flake).toContain("pkgs.bubblewrap");
-    expect(flake).toContain("writeShellApplication");
+    expect(flake).toContain("pkgs.nushell");
   });
 });

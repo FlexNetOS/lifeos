@@ -4,7 +4,7 @@
 # lib
 
 ## Purpose
-Shared helpers used across SFCs and the store: data resolver, navigation composable, the Tauri-only Pinia persistence plugin, and the static Lucide icon barrel.
+Shared helpers used across SFCs and the store: data resolver, navigation composables, the native Tauri persistence contract, the legacy Pinia persistence compatibility plugin, and the static Lucide icon barrel.
 
 ## Key Files
 | File | Description |
@@ -13,7 +13,7 @@ Shared helpers used across SFCs and the store: data resolver, navigation composa
 | `resolve.js` | Preview-path sibling — keep API-identical. |
 | `nav.ts` | `useNav()` composable — wraps store actions (`pickWorkspace`, `pickSection`, `pickSub`, `clearSub`, `jumpToTeam`) so they also `router.push` the matching `/workspace/:id/:section?/:sub?` URL. Exports `buildPath(...)` for tests. |
 | `nav.js` | Preview-path sibling for `nav.ts`. |
-| `persistence.ts` | `tauriPersistence({ storeId, keys, debounceMs })` Pinia plugin. Hydrates from `ui_state_read` on activation; debounce-writes whitelisted keys via `ui_state_write`. **No-ops outside Tauri** so Vitest / browser preview stay silent. Exports `LIFEOS_PERSIST_KEYS` (whitelist). |
+| `persistence.ts` | Legacy `tauriPersistence({ storeId, keys, debounceMs })` Pinia compatibility plugin plus the canonical `LIFEOS_PERSIST_KEYS` whitelist consumed by the native LifeOS store. |
 | `persistence.js` | Preview-path sibling for `persistence.ts`. |
 | `icons.ts` | Static kebab-name → Lucide component map. Tree-shaking-safe — only icons actually used in templates + `data.js` are imported. Unknown names fall back to `../components/Icon.vue`'s placeholder. |
 
@@ -23,7 +23,7 @@ Shared helpers used across SFCs and the store: data resolver, navigation composa
 - **All `.ts` files except `icons.ts` have `.js` siblings.** Keep `resolve`, `nav`, `persistence` siblings API-identical. The `store-sync` spec doesn't cover lib helpers, but breaking the preview path is a silent regression — verify the preview HTML still loads.
 - Adding a new icon: import the named PascalCase symbol from `lucide-vue-next` at the top of `icons.ts`, then add the `"kebab-name": Symbol` entry to the `icons` map. Templates use `<Icon name="kebab-name" />`.
 - The persistence whitelist (`LIFEOS_PERSIST_KEYS`) excludes `aiMessages` (would replay stale chat), `activeSub` / `pendingExpand` (URL-driven), `cmdkOpen` / `cmdkSeed` / `extraItems` / `extraSections` (ephemeral). Never add them. Document the reason in the comment block above the array when extending.
-- `tauriInvoke()` here must match the same detection (`window.__TAURI__?.core?.invoke`) used in `../stores/lifeos.ts` — if you change one, change both.
+- `tauriInvoke()` here must match the same detection (`window.__TAURI__?.core?.invoke`) used in `../stores/lifeos-native.ts` — if you change one, change both.
 
 ### Testing Requirements
 - `../../tests/resolve.spec.js` — resolver coverage.
@@ -40,7 +40,7 @@ Shared helpers used across SFCs and the store: data resolver, navigation composa
 - `@/stores/lifeos` — `useNav()` imports `useLifeos()` for state mutation.
 
 ### External
-- `vue-router@^4` — `useRouter` inside `nav.ts`.
+- `vue-router` — legacy `useRouter` inside `nav.ts`; the mounted Glass path uses `src/router/index.ts` natively.
 - `lucide-vue-next@^0.475.0` — icon source for `icons.ts`.
 - `pinia@^2` — `PiniaPluginContext` type only.
 

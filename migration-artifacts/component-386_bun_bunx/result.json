@@ -1,0 +1,49 @@
+{
+  "task_id": "COMPONENT-386_BUN_BUNX",
+  "title": "Component: Bun/Bunx",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_available",
+  "hard_rule": 15,
+  "requirement": "Bun/Bunx must be installed and used, not replaced.",
+  "component": {
+    "name": "Bun/Bunx",
+    "owner": "Oven/FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/lifeos",
+    "declared_version": "1.3.14",
+    "declared_role": "TypeScript install/build/test/package"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "supplied_anchor_byte_offset": 335153,
+    "observed_component_row_line": 6094,
+    "observed_component_row_byte_offset": 716232,
+    "supplied_unit_sha256": "6f9c901bc17fee4d890a278e5c5ae8d77fa67143e40de8a4ee09c0f9caacd2db",
+    "unit_sha256_validation": "unavailable: the packet does not define the source-unit byte range required to recompute this digest",
+    "command_template_passed": true,
+    "component_row": "Bun runtime/package manager; 1.3.14; TypeScript install/build/test/package"
+  },
+  "runtime_evidence": {
+    "bun": {
+      "path": "/home/flexnetos/.nix-profile/bin/bun",
+      "version": "1.3.14"
+    },
+    "bunx": {
+      "path": "/home/flexnetos/.nix-profile/bin/bunx",
+      "version": "1.3.14",
+      "invocation_succeeded": true
+    },
+    "permitted_implementation_path": "execution-framework",
+    "path_present": false,
+    "repository_usage_verified": false,
+    "repository_usage_reason": "No execution-framework directory is available within the permitted probe scope; runtime availability and direct bunx invocation were verified."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "This was a read-only probe; no alternative runtime or package manager was introduced."
+  },
+  "changes": [
+    "Recorded read-only blueprint and runtime verification evidence."
+  ],
+  "rollback": "Read-only probe; no implementation changes were made."
+}

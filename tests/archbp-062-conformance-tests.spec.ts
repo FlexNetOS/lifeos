@@ -9,11 +9,11 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const specPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation-architecture-spec.md",
+  "evidence/isolation/isolation-architecture-spec.md",
 );
 const ledgerPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation_invariant_ledger.json",
+  "evidence/isolation/isolation_invariant_ledger.json",
 );
 
 function loadLedger() {
@@ -53,6 +53,6 @@ describe("ARCHBP-062 per-goal conformance tests", () => {
 
   test("the acceptance gauntlet is handed to the t10 release lane", () => {
     const spec = readFileSync(specPath, "utf8");
-    expect(spec).toContain("tasks/yzx-iso/t10-0-lane-index");
+    expect(spec).toContain("evidence/packaging/portable_release_root_coverage.json");
   });
 });

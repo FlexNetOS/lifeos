@@ -1,0 +1,24 @@
+{
+  "task_id": "COMPONENT-301_ENVCTL_COMPONENT_ENGINE",
+  "status": "passed",
+  "probe_type": "read-only",
+  "component": "envctl component: engine",
+  "hard_rule": "Component must be installed and used, not replaced (hard rule 15).",
+  "evidence": {
+    "blueprint": {
+      "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+      "matched_line": 6009,
+      "matched_text": "envctl component: engine"
+    },
+    "installation": {
+      "executable": "/home/flexnetos/.nix-profile/bin/envctl",
+      "version": "envctl 0.1.0"
+    }
+  },
+  "commands": [
+    "grep -Fq 'envctl component: engine' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "envctl --version"
+  ],
+  "mutations": []
+}

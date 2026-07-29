@@ -1,0 +1,27 @@
+{
+  "task_id": "COMPONENT-342_RUSTY_IDD_COMPONENT_CODEGRAPH_PARSER",
+  "component": "rusty-idd component: codegraph-parser",
+  "status": "blocked",
+  "probe_mode": "read-only",
+  "requirement": "Install and use the upstream rusty-idd codegraph-parser component; do not replace it.",
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "line": 6050,
+    "repository": "https://github.com/FlexNetOS/rusty-idd",
+    "package": "codegraph-parser",
+    "required_revision": "4c47c67fe088e99868d8ccf74d6cbe1aa2af2856",
+    "installation_order": 11,
+    "verification": "Pinned revision; locked package tests; interruption/replay and byte round trip"
+  },
+  "workspace_evidence": {
+    "files_found": [
+      ".lifeos-bin/codex",
+      ".lifeos-bin/git"
+    ],
+    "component_references_found_outside_blueprint": 0,
+    "manifests_found": 0
+  },
+  "conclusion": "The component requirement is present in the blueprint, but this probe workspace provides no source checkout, dependency manifest, lockfile, build output, or runtime wiring that can demonstrate codegraph-parser is installed and used. No replacement implementation was introduced.",
+  "next_action": "Provide the lifeos implementation workspace (or its dependency manifests and runtime configuration) for pinned-revision installation and usage verification."
+}

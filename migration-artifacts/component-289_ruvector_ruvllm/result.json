@@ -1,0 +1,49 @@
+{
+  "task_id": "COMPONENT-289_RUVECTOR_RUVLLM",
+  "component": "@ruvector/ruvllm",
+  "checked_at": "2026-07-28T16:48:02Z",
+  "status": "verified_with_version_divergence",
+  "scope": "read-only-probe",
+  "hard_rule_15": {
+    "requirement": "Component '@ruvector/ruvllm' must be installed and used, not replaced.",
+    "installed": true,
+    "used": true,
+    "replaced": false
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_table_line": 5997,
+    "component_table_row_sha256": "0986a04485f041f97cc428afe45e0336e514747010c134db50e2535af9d74ce9",
+    "canonical_coordinate": "@ruvector/ruvllm 2.6.1; ruvnet/RuVector revision 6a6c39e662a4c3184dcb913db91a09401c84b2ae",
+    "command_template": "grep -Fq '@ruvector/ruvllm' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0
+  },
+  "installation_evidence": {
+    "manifest": "package.json",
+    "manifest_dependency_section": "devDependencies",
+    "manifest_version": "2.6.0",
+    "lockfile": "bun.lock",
+    "lockfile_version": "2.6.0",
+    "installed_package": "node_modules/@ruvector/ruvllm/package.json",
+    "installed_version": "2.6.0",
+    "native_optional_package": "@ruvector/ruvllm-linux-x64-gnu@2.0.1",
+    "native_binary": "node_modules/@ruvector/ruvllm-linux-x64-gnu/ruvllm.linux-x64-gnu.node"
+  },
+  "usage_evidence": {
+    "source_imports": [
+      "scripts/ruvllm-inference-lifecycle.mjs imports RuvLLM and LoraManager",
+      "scripts/verify-node-authority.mjs imports LoraManager"
+    ],
+    "runtime_probe": {
+      "command": "bun -e import('@ruvector/ruvllm') …",
+      "exit_code": 0,
+      "nativeLoaded": true,
+      "model": "B1_2",
+      "adapterCreated": true,
+      "adapterCount": 1
+    }
+  },
+  "verification_note": "The targeted Vitest suite could not initialize because its configured setup file resolves to unavailable /@fs/home/flexnetos/meta/src/lifeos/tests/setup.js. This is a task-workspace mount issue; the independent direct Bun/native NAPI runtime probe passed.",
+  "finding": "The required package is directly installed, lock-pinned, and exercised through its native runtime; no substitute was used. The repository pin (2.6.0) differs from the blueprint table's stated 2.6.1 coordinate, so alignment remains a follow-up outside this read-only probe."
+}

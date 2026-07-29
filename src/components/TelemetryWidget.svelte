@@ -7,12 +7,9 @@
   // no zombie timers. When telemetry is disabled in Settings the widget shows
   // a paused placeholder regardless of host.
   import { onMount, onDestroy } from "svelte";
-  // Vue's standalone watch(), not $effect: the Vue original watches
-  // [telemetryEnabled, refreshMs] WITHOUT an immediate run and without
-  // tracking isTauri — Vue watch semantics reproduce that exactly, where
-  // $effect would fire on mount and track every read.
-  import { watch } from "vue";
-  import { useLifeos } from "@/stores/lifeos.js";
+  // The native store is reactive through bindStore; the effect restarts the
+  // host poll whenever enablement or the configured interval changes.
+  import { useLifeos } from "@/stores/lifeos-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import Icon from "./Icon.svelte";
 
@@ -78,14 +75,14 @@
     }
   };
 
-  const startPolling = () => {
+  const startPolling = (intervalMs = refreshMs) => {
     if (pollTimer) {
       clearInterval(pollTimer);
       pollTimer = null;
     }
     if (!isTauri || !telemetryEnabled) return;
     pollOnce();
-    pollTimer = setInterval(pollOnce, refreshMs);
+    pollTimer = setInterval(pollOnce, intervalMs);
   };
 
   const stopPolling = () => {
@@ -97,29 +94,21 @@
 
   onMount(() => {
     isTauri = !!tauriInvoke();
-    startPolling();
   });
 
-  const stopWatch = watch(
-    [
-      () => lifeos.telemetryEnabled !== false,
-      () => {
-        const n = Number(lifeos.telemetryRefreshMs);
-        return Number.isFinite(n) && n >= 250 ? n : DEFAULT_REFRESH_MS;
-      },
-    ],
-    () => {
-      if (!isTauri) return;
-      if (!telemetryEnabled) {
-        stopPolling();
-        return;
-      }
-      startPolling();
-    },
-  );
+  $effect(() => {
+    const host = isTauri;
+    const enabled = telemetryEnabled;
+    const intervalMs = refreshMs;
+    if (!host || !enabled) {
+      stopPolling();
+      return;
+    }
+    startPolling(intervalMs);
+    return stopPolling;
+  });
 
   onDestroy(() => {
-    stopWatch();
     if (pollTimer) {
       clearInterval(pollTimer);
       pollTimer = null;

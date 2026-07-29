@@ -1,0 +1,42 @@
+{
+  "task_id": "COMPONENT-360_ICM_COMPONENT_ICM_CLI",
+  "title": "Component: icm component: icm-cli",
+  "probe_mode": "read-only",
+  "status": "pass",
+  "hard_rule": 15,
+  "requirement": "ICM CLI must be installed and used, not replaced.",
+  "component": {
+    "owner": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/icm",
+    "name": "icm-cli",
+    "pinned_revision": "03d63a9102ce7f2c17cc7df66ac1aded46def88e"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "line": 6068,
+    "actual_byte_offset": 692001,
+    "supplied_byte_offset": 335153,
+    "unit_sha256": "9e007b8b68d8d8947a159afc9b95a6f0d0f4654fd423d945f025e1616ca15a2b",
+    "literal_present": true,
+    "verification_command": "grep -Fq 'icm component: icm-cli' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  },
+  "runtime_evidence": {
+    "installation_verified": true,
+    "executable": "/home/flexnetos/.nix-profile/bin/icm",
+    "version": "icm 0.10.57",
+    "usage_verified": true,
+    "commands_executed": [
+      "icm recall-context \"icm cli component\" --limit 5",
+      "icm recall \"ICM CLI PostgreSQL RuVector\" -t context-lifeos",
+      "icm health",
+      "icm config"
+    ],
+    "result": "All commands completed successfully against the native ICM CLI."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "The required native icm executable was used directly; no substitute component was introduced."
+  },
+  "scope_note": "This probe verifies CLI installation and active use only; it does not prove checkout revision or full PostgreSQL/RuVector component-closure tests."
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "CURRENCY-CLAUDE_FLOW_CLI",
+  "title": "Toolchain currency: @claude-flow/cli",
+  "probe_mode": "read-only",
+  "status": "outdated",
+  "probe_exit_code": 1,
+  "requirement": "Installed @claude-flow/cli must equal the registry latest.",
+  "registry": {
+    "package": "@claude-flow/cli",
+    "latest_version": "3.32.25"
+  },
+  "global_installation": {
+    "version": "3.32.22",
+    "matches_registry_latest": false
+  },
+  "execution": {
+    "command_template": "test -n \"$(bun info '@claude-flow/cli' version 2>/dev/null)\" && test \"$(bun info '@claude-flow/cli' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE '@claude\\-flow/cli@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+    "observed_at": "2026-07-28T16:29:16Z"
+  },
+  "note": "Bun's global root is in the XDG_RUNTIME_DIR tmpfs on this host; a missing or outdated global package can reflect a prior install that evaporated after reboot. This probe made no changes."
+}

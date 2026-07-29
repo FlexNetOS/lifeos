@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest";
 // overlay, and durable-state mounts the sandbox presents.
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const designPath = resolve(repoRoot, "planning-spine-v0/docs/envelope_mount_design.json");
+const designPath = resolve(repoRoot, "evidence/isolation/envelope_mount_design.json");
 const design = () => JSON.parse(readFileSync(designPath, "utf8"));
 
 describe("ARCHBP-129 envelope mount design", () => {
@@ -39,7 +39,7 @@ describe("ARCHBP-129 envelope mount design", () => {
     const d = design();
     expect(d.tier_map).toContain("isolation_tier_map.json");
     const map = JSON.parse(
-      readFileSync(resolve(repoRoot, "planning-spine-v0/docs/isolation_tier_map.json"), "utf8"),
+      readFileSync(resolve(repoRoot, "evidence/isolation/isolation_tier_map.json"), "utf8"),
     );
     // Every mount-table tier value is a tier the map defines.
     for (const m of d.mount_table) {
@@ -51,16 +51,15 @@ describe("ARCHBP-129 envelope mount design", () => {
     // The design is implemented: the engine constructs exactly these
     // primitives (tmpfs root, ro /nix, tmpfs HOME, explicit binds).
     const engine = [
-      "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.sh",
-      "/home/flexnetos/meta/src/yazelix/.claude/worktrees/archbp-065-envelope/envelope/yzx-envelope.sh",
+      "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.nu",
     ].find((p) => existsSync(p));
     expect(engine).toBeTruthy();
     const src = readFileSync(engine as string, "utf8");
     expect(src).toContain("--tmpfs /");
     // Since ARCHBP-021 the store bind is parameterized (--store mode binds an
     // extracted release closure at /nix); the default remains the host store.
-    expect(src).toContain('--ro-bind "$STORE_SRC" /nix');
-    expect(src).toContain('STORE_SRC="/nix"');
-    expect(src).toContain('--tmpfs "$HOME"');
+    expect(src).toContain("--ro-bind $o.store /nix");
+    expect(src).toContain('store: "/nix"');
+    expect(src).toContain("--tmpfs $env.HOME");
   });
 });

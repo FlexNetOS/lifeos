@@ -1,0 +1,31 @@
+{
+  "task_id": "COMPONENT-524_RUVECTOR_MANIFEST_SEVENSENSE_INTERPRETATION",
+  "title": "Component: RuVector manifest: sevensense-interpretation",
+  "status": "passed_with_anchor_offset_discrepancy",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector manifest: sevensense-interpretation' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "13ad67c7cfde90fcbc601951a6bc42925045c872ee263e636c5c97f29d65b2e3",
+    "verified_row_line": 6232,
+    "verified_row_byte_offset": 914638,
+    "verified_row_sha256_newline_free": "13ad67c7cfde90fcbc601951a6bc42925045c872ee263e636c5c97f29d65b2e3",
+    "finding": "The declared byte offset points to unrelated prose in the hash-matching document. The canonical manifest row begins at byte offset 914638 and matches the declared unit SHA-256 when hashed without its trailing newline."
+  },
+  "manifest": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "examples/vibecast-7sense/crates/sevensense-interpretation",
+    "package": "sevensense-interpretation",
+    "version": "0.1.0 workspace",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "hard_rule_15": "The native RuVector sevensense-interpretation manifest is required to be installed and used; it must not be replaced.",
+  "changes_made": [
+    "Created this evidence receipt only."
+  ],
+  "rollback": "No rollback required; no implementation or dependency state was changed.",
+  "result": "pass"
+}

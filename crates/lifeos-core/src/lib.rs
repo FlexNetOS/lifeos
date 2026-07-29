@@ -1,13 +1,14 @@
 //! LifeOS portable core. See `crates/lifeos-core/Cargo.toml` for the stage roadmap.
 
 pub mod auth;
+#[cfg(feature = "storage")]
+pub mod ingress;
 pub mod mcp;
 pub mod types;
 
-// Wave 3 (TODO 1d / C4): feature-gated Lua/Luau plugin host. Behind
-// `plugin-host` so the default workspace build stays free of mlua's vendored
-// Luau C compile (~30–90s on a cold target/) and the no-mlua surface area is
-// preserved for future no_std / WASM slices of the crate.
+// Feature-gated Lua/Luau plugin host. Keeping it behind `plugin-host` avoids
+// forcing the vendored Luau C compile on no-script consumers and preserves a
+// clean no-mlua surface for future no_std/WASM slices.
 #[cfg(feature = "plugin-host")]
 pub mod plugin;
 

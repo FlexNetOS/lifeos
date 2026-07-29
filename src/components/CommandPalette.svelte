@@ -6,7 +6,7 @@
   // Ported from design-system-reference/lifeos_app_react/CommandPalette.jsx via CommandPalette.vue.
 
   import { onMount, onDestroy, tick } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { router as appRouter } from "@/router";
@@ -15,7 +15,7 @@
   let { router = appRouter } = $props();
 
   const lifeos = useLifeos();
-  const nav = createNav(router);
+  let nav = $derived(createNav(router));
   // Reactive reads: cmdkOpen drives the overlay + the open-watch below. cmdkSeed is
   // deliberately read straight off the store (non-reactively) inside the open effect,
   // mirroring Vue's watch(() => lifeos.cmdkOpen, ...) which does NOT re-fire when only

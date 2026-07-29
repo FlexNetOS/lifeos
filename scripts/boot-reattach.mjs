@@ -1,4 +1,4 @@
-// yzx-iso T7 (spine ARCHBP-093..098) — boot re-attach of the isolation
+// ARCHBP-093..098 — boot re-attach of the isolation
 // envelope, durable services, and resumable sessions, per the ratified
 // isolation spec v1.0.0 (Survival = durable tier + re-attach, I10).
 //
@@ -7,7 +7,7 @@
 //   sessions [--root PATH] [--json]       list resumable sessions (durable only)
 //   unit                                  print the declarative user unit
 // The engine touches NO host system service: it is triggered by a systemd
-// USER unit (docs/lifeos-reattach.service) or invoked directly — the single
+// USER unit (evidence/isolation/lifeos-reattach.service) or invoked directly — the single
 // deliberate command of G7. Runs under Bun/Node.
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync, spawn } from "node:child_process";
@@ -23,7 +23,7 @@ const DURABLE_ROOTS = [
   { name: "xdg-data", path: "/home/flexnetos/meta/var/xdg-data", need: "writable" },
 ];
 
-// Production service order (postgres -> redb -> front door). Health gates are
+// Production service order (postgres -> redb -> front door -> governed agents). Health gates are
 // real; postgres actually STARTS from the intact durable datadir with a
 // user-owned socket dir — the canonical macro-state comes back up at
 // re-attach, exactly what the 2026-07-21 incident lacked.
@@ -49,6 +49,8 @@ function pgBin() {
 
 const PG_DATA = "/home/flexnetos/meta/var/lib/postgresql/17";
 const PG_SOCKET_DIR = "/home/flexnetos/meta/var/run/postgresql";
+const AGENT_STATUS = process.env.LIFEOS_AGENT_STATUS ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/status.json";
+const AGENT_ROOT = process.env.LIFEOS_AGENT_RVF_ROOT ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/rvf";
 
 export function productionServices() {
   const pgCtl = pgBin();
@@ -68,13 +70,20 @@ export function productionServices() {
     // first re-attach initializes it, later runs find it — idempotent.
     { name: "redb-plane", order: 2, health: ["test", "-d", "/home/flexnetos/meta/var/lib/redb"], start: ["mkdir", "-p", "/home/flexnetos/meta/var/lib/redb"], timeoutMs: 5000 },
     { name: "glass-engine-frontdoor", order: 3, health: ["test", "-x", "/home/flexnetos/.nix-profile/bin/yzx"] },
+    {
+      name: "governed-ruvnet-agents",
+      order: 4,
+      health: ["test", "-s", AGENT_STATUS],
+      start: ["/home/flexnetos/.nix-profile/toolbin/bun", `${repoRoot}/scripts/lifeos-agent-runtime.mjs`],
+      timeoutMs: 15000,
+      environment: { LIFEOS_REDB_ROOT: "/home/flexnetos/meta/var/lib/redb", LIFEOS_AGENT_STATUS: AGENT_STATUS, LIFEOS_AGENT_RVF_ROOT: AGENT_ROOT },
+    },
   ];
 }
 
 const ENGINE_CANDIDATES = [
   process.env.YZX_ENVELOPE_BIN,
-  "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.sh",
-  "/home/flexnetos/meta/src/yazelix/.claude/worktrees/archbp-065-envelope/envelope/yzx-envelope.sh",
+  "/home/flexnetos/meta/src/yazelix/envelope/yzx-envelope.nu",
 ].filter(Boolean);
 
 export function envelopeEngine() {
@@ -85,7 +94,8 @@ export function envelopeEngine() {
 export function rematerializeEnvelope() {
   const engine = envelopeEngine();
   if (!engine) return { ok: false, reason: "envelope engine missing" };
-  const out = execFileSync("bash", [engine, "probe", "--id", "reattach-check"], {
+  const command = engine.endsWith(".nu") ? "nu" : "bash";
+  const out = execFileSync(command, [engine, "probe", "--id", "reattach-check"], {
     encoding: "utf8",
     timeout: 60000,
   });
@@ -145,7 +155,11 @@ export async function startServicesOrdered(services) {
       // health never passes.
       while (!started && Date.now() < deadline) {
         try {
-          const child = spawn(svc.start[0], svc.start.slice(1), { detached: true, stdio: "ignore" });
+          const child = spawn(svc.start[0], svc.start.slice(1), {
+            detached: true,
+            stdio: "ignore",
+            env: svc.environment ? { ...process.env, ...svc.environment } : process.env,
+          });
           child.on("error", () => {});
           child.unref();
           started = true;
@@ -190,7 +204,7 @@ export async function reattach({ services, sessionRoot } = {}) {
   const sessions = listSessions(sessionRoot);
   const ok = envelope.ok && durable.ok && svc.ok;
   return {
-    schema_version: "lifeos-planning-spine.boot-reattach-report.v0",
+    schema_version: "lifeos.evidence.boot-reattach-report.v1",
     ok,
     already_attached: ok && svc.report.every((s) => !s.started),
     envelope,

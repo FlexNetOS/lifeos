@@ -5,7 +5,6 @@
 //! bytes into PostgreSQL in one transaction, and only then removes the source
 //! database and any WAL sidecars.
 
-use sha2::{Digest, Sha256};
 use sqlx::{
     sqlite::{SqliteConnectOptions, SqlitePoolOptions},
     PgPool, SqlitePool,
@@ -279,18 +278,23 @@ async fn capture_source_files(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     sources: &[SourceFile],
 ) -> Result<(), sqlx::Error> {
+    let tenant: uuid::Uuid = sqlx::query_scalar("SELECT lifeos_security.current_tenant()")
+        .fetch_one(&mut **tx)
+        .await?;
     for source in sources {
-        let sha256 = format!("{:x}", Sha256::digest(&source.bytes));
-        sqlx::query(
-            "INSERT INTO lifeos_blob.object (sha256, byte_length, raw_bytes, source_kind)
-             VALUES ($1, $2, $3, $4)
-             ON CONFLICT (sha256) DO NOTHING",
+        let provenance = serde_json::json!({
+            "producer": "lifeos-legacy-sqlite-import",
+            "source_kind": source.source_kind,
+            "source_path": source.path,
+        });
+        sqlx::query_scalar::<_, uuid::Uuid>(
+            "SELECT lifeos_blob.store_bytes(
+               $1, $2, 'application/vnd.sqlite3', $3, 'legacy-sqlite-capture', NULL)",
         )
-        .bind(sha256)
-        .bind(source.bytes.len() as i64)
+        .bind(tenant)
         .bind(&source.bytes)
-        .bind(source.source_kind)
-        .execute(&mut **tx)
+        .bind(provenance)
+        .fetch_one(&mut **tx)
         .await?;
     }
     Ok(())
@@ -302,10 +306,14 @@ async fn import_accounts(
 ) -> Result<(), LegacySqliteImportError> {
     for account in accounts {
         let existing: Option<(String, String, i64, i64)> = sqlx::query_as(
-            "SELECT display_name, password_hash,
-                    EXTRACT(EPOCH FROM created_at)::BIGINT,
-                    EXTRACT(EPOCH FROM updated_at)::BIGINT
-             FROM lifeos_security.identity WHERE email = $1",
+            "SELECT attributes->>'display_name', attributes->>'password_hash',
+                    coalesce((attributes->>'created_at')::BIGINT,
+                             EXTRACT(EPOCH FROM active_from)::BIGINT),
+                    coalesce((attributes->>'updated_at')::BIGINT,
+                             EXTRACT(EPOCH FROM active_from)::BIGINT)
+             FROM lifeos_security.identity
+             WHERE subject_kind = 'human' AND subject_key = $1
+               AND active_until IS NULL",
         )
         .bind(&account.email)
         .fetch_optional(&mut **tx)
@@ -323,17 +331,21 @@ async fn import_accounts(
                 });
             }
             None => {
-                sqlx::query(
-                    "INSERT INTO lifeos_security.identity
-                       (email, display_name, password_hash, created_at, updated_at)
-                     VALUES ($1, $2, $3, to_timestamp($4), to_timestamp($5))",
+                let raw = serde_json::json!({
+                    "email": account.email,
+                    "display_name": account.display_name,
+                    "password_hash": account.password_hash,
+                    "created_at": account.created_at,
+                    "updated_at": account.updated_at,
+                    "source": "legacy-sqlite-accounts",
+                });
+                sqlx::query_scalar::<_, uuid::Uuid>(
+                    "SELECT lifeos_security.register_identity(
+                       'human', $1, $2, convert_to($2::text, 'UTF8'))",
                 )
                 .bind(&account.email)
-                .bind(&account.display_name)
-                .bind(&account.password_hash)
-                .bind(account.created_at as f64)
-                .bind(account.updated_at as f64)
-                .execute(&mut **tx)
+                .bind(raw)
+                .fetch_one(&mut **tx)
                 .await?;
             }
         }
@@ -347,21 +359,27 @@ async fn import_nodes(
 ) -> Result<(), LegacySqliteImportError> {
     for node in nodes {
         let payload = parse_json("mempalace_nodes", &node.id, &node.payload_json)?;
-        let existing: Option<(String, Option<String>, bool, i64)> = sqlx::query_as(
-            "SELECT kind, label, payload_json = $2,
-                    EXTRACT(EPOCH FROM last_synced_at)::BIGINT
-             FROM lifeos_agentdb.exp_nodes WHERE id = $1",
+        let typed = serde_json::json!({
+            "logical_key": node.id,
+            "kind": node.kind,
+            "label": node.label,
+            "payload": payload,
+            "last_synced_at": node.last_synced_at,
+            "tombstone": false,
+        });
+        let existing: Option<(serde_json::Value,)> = sqlx::query_as(
+            "SELECT typed_payload FROM lifeos_agentdb.exp_nodes
+             WHERE tenant_id = lifeos_security.current_tenant()
+               AND record_kind = 'exp-node'
+               AND typed_payload->>'logical_key' = $1
+               AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
+             ORDER BY sequence DESC LIMIT 1",
         )
         .bind(&node.id)
-        .bind(&payload)
         .fetch_optional(&mut **tx)
         .await?;
         match existing {
-            Some((kind, label, payload_equal, last_synced_at))
-                if kind == node.kind
-                    && label == node.label
-                    && payload_equal
-                    && last_synced_at == node.last_synced_at => {}
+            Some((existing,)) if existing == typed => {}
             Some(_) => {
                 return Err(LegacySqliteImportError::Conflict {
                     table: "mempalace_nodes",
@@ -369,17 +387,14 @@ async fn import_nodes(
                 });
             }
             None => {
-                sqlx::query(
-                    "INSERT INTO lifeos_agentdb.exp_nodes
-                       (id, kind, label, payload_json, last_synced_at)
-                     VALUES ($1, $2, $3, $4, to_timestamp($5))",
+                sqlx::query_scalar::<_, uuid::Uuid>(
+                    "SELECT lifeos_agentdb.append_projection_record(
+                       'lifeos_agentdb.exp_nodes'::regclass,
+                       'exp-node', $1, $2, convert_to($2::text, 'UTF8'))",
                 )
                 .bind(&node.id)
-                .bind(&node.kind)
-                .bind(&node.label)
-                .bind(payload)
-                .bind(node.last_synced_at as f64)
-                .execute(&mut **tx)
+                .bind(typed)
+                .fetch_one(&mut **tx)
                 .await?;
             }
         }
@@ -394,21 +409,28 @@ async fn import_edges(
     for edge in edges {
         let key = format!("{}:{}:{}", edge.from_id, edge.to_id, edge.kind);
         let payload = parse_json("mempalace_edges", &key, &edge.payload_json)?;
-        let existing: Option<(bool, i64)> = sqlx::query_as(
-            "SELECT payload_json = $4,
-                    EXTRACT(EPOCH FROM last_synced_at)::BIGINT
-             FROM lifeos_agentdb.exp_edges
-             WHERE from_id = $1 AND to_id = $2 AND kind = $3",
+        let typed = serde_json::json!({
+            "logical_key": key,
+            "from_id": edge.from_id,
+            "to_id": edge.to_id,
+            "kind": edge.kind,
+            "payload": payload,
+            "last_synced_at": edge.last_synced_at,
+            "tombstone": false,
+        });
+        let existing: Option<(serde_json::Value,)> = sqlx::query_as(
+            "SELECT typed_payload FROM lifeos_agentdb.exp_edges
+             WHERE tenant_id = lifeos_security.current_tenant()
+               AND record_kind = 'exp-edge'
+               AND typed_payload->>'logical_key' = $1
+               AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
+             ORDER BY sequence DESC LIMIT 1",
         )
-        .bind(&edge.from_id)
-        .bind(&edge.to_id)
-        .bind(&edge.kind)
-        .bind(&payload)
+        .bind(&key)
         .fetch_optional(&mut **tx)
         .await?;
         match existing {
-            Some((payload_equal, last_synced_at))
-                if payload_equal && last_synced_at == edge.last_synced_at => {}
+            Some((existing,)) if existing == typed => {}
             Some(_) => {
                 return Err(LegacySqliteImportError::Conflict {
                     table: "mempalace_edges",
@@ -416,17 +438,14 @@ async fn import_edges(
                 });
             }
             None => {
-                sqlx::query(
-                    "INSERT INTO lifeos_agentdb.exp_edges
-                       (from_id, to_id, kind, payload_json, last_synced_at)
-                     VALUES ($1, $2, $3, $4, to_timestamp($5))",
+                sqlx::query_scalar::<_, uuid::Uuid>(
+                    "SELECT lifeos_agentdb.append_projection_record(
+                       'lifeos_agentdb.exp_edges'::regclass,
+                       'exp-edge', $1, $2, convert_to($2::text, 'UTF8'))",
                 )
-                .bind(&edge.from_id)
-                .bind(&edge.to_id)
-                .bind(&edge.kind)
-                .bind(payload)
-                .bind(edge.last_synced_at as f64)
-                .execute(&mut **tx)
+                .bind(&key)
+                .bind(typed)
+                .fetch_one(&mut **tx)
                 .await?;
             }
         }
@@ -440,20 +459,26 @@ async fn import_drawers(
 ) -> Result<(), LegacySqliteImportError> {
     for drawer in drawers {
         let payload = parse_json("mempalace_drawers", &drawer.id, &drawer.payload_json)?;
-        let existing: Option<(String, bool, i64)> = sqlx::query_as(
-            "SELECT name, payload_json = $2,
-                    EXTRACT(EPOCH FROM last_synced_at)::BIGINT
-             FROM lifeos_agentdb.notes WHERE id = $1",
+        let typed = serde_json::json!({
+            "logical_key": drawer.id,
+            "name": drawer.name,
+            "payload": payload,
+            "last_synced_at": drawer.last_synced_at,
+            "tombstone": false,
+        });
+        let existing: Option<(serde_json::Value,)> = sqlx::query_as(
+            "SELECT typed_payload FROM lifeos_agentdb.exp_nodes
+             WHERE tenant_id = lifeos_security.current_tenant()
+               AND record_kind = 'note'
+               AND typed_payload->>'logical_key' = $1
+               AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
+             ORDER BY sequence DESC LIMIT 1",
         )
         .bind(&drawer.id)
-        .bind(&payload)
         .fetch_optional(&mut **tx)
         .await?;
         match existing {
-            Some((name, payload_equal, last_synced_at))
-                if name == drawer.name
-                    && payload_equal
-                    && last_synced_at == drawer.last_synced_at => {}
+            Some((existing,)) if existing == typed => {}
             Some(_) => {
                 return Err(LegacySqliteImportError::Conflict {
                     table: "mempalace_drawers",
@@ -461,16 +486,14 @@ async fn import_drawers(
                 });
             }
             None => {
-                sqlx::query(
-                    "INSERT INTO lifeos_agentdb.notes
-                       (id, name, payload_json, last_synced_at)
-                     VALUES ($1, $2, $3, to_timestamp($4))",
+                sqlx::query_scalar::<_, uuid::Uuid>(
+                    "SELECT lifeos_agentdb.append_projection_record(
+                       'lifeos_agentdb.exp_nodes'::regclass,
+                       'note', $1, $2, convert_to($2::text, 'UTF8'))",
                 )
                 .bind(&drawer.id)
-                .bind(&drawer.name)
-                .bind(payload)
-                .bind(drawer.last_synced_at as f64)
-                .execute(&mut **tx)
+                .bind(typed)
+                .fetch_one(&mut **tx)
                 .await?;
             }
         }
@@ -495,23 +518,33 @@ async fn import_vectors(
             .metadata_json
             .as_deref()
             .map(|payload| parse_json("ruvector_vectors", &vector.id, payload))
-            .transpose()?;
-        let existing: Option<(String, i64, Vec<u8>, bool, i64)> = sqlx::query_as(
-            "SELECT collection, dim::BIGINT, raw_vector,
-                    metadata_json IS NOT DISTINCT FROM $2,
-                    EXTRACT(EPOCH FROM last_synced_at)::BIGINT
-             FROM lifeos_semantic.embedding WHERE id = $1",
+            .transpose()?
+            .unwrap_or_else(|| serde_json::json!({}));
+        let existing: Option<(String, i64, Vec<u8>, String, i64)> = sqlx::query_as(
+            "SELECT metadata->>'collection', dimension::BIGINT,
+                    lifeos_blob.load_object_bytes(source_object_id),
+                    (metadata->'user_metadata')::text,
+                    (metadata->>'last_synced_at')::BIGINT
+             FROM lifeos_semantic.embedding e
+             WHERE tenant_id = lifeos_security.current_tenant()
+               AND metadata->>'logical_id' = $1
+               AND coalesce((metadata->>'retired')::boolean, false) = false
+               AND generation = (
+                 SELECT max(latest.generation)
+                 FROM lifeos_semantic.embedding latest
+                 WHERE latest.tenant_id = e.tenant_id
+                   AND latest.metadata->>'logical_id' = e.metadata->>'logical_id')",
         )
         .bind(&vector.id)
-        .bind(&metadata)
         .fetch_optional(&mut **tx)
         .await?;
         match existing {
-            Some((collection, dim, bytes, metadata_equal, last_synced_at))
+            Some((collection, dim, bytes, existing_metadata, last_synced_at))
                 if collection == vector.collection
                     && dim == vector.dim
                     && bytes == vector.vector
-                    && metadata_equal
+                    && serde_json::from_str::<serde_json::Value>(&existing_metadata).ok()
+                        == Some(metadata.clone())
                     && last_synced_at == vector.last_synced_at => {}
             Some(_) => {
                 return Err(LegacySqliteImportError::Conflict {
@@ -521,20 +554,42 @@ async fn import_vectors(
             }
             None => {
                 let embedding = ruvector::ruvector_literal(&vector.vector)?;
-                sqlx::query(
-                    "INSERT INTO lifeos_semantic.embedding
-                       (id, collection, dim, raw_vector, embedding, metadata_json, last_synced_at)
-                     VALUES ($1, $2, $3, $4, $5::extensions.ruvector, $6, to_timestamp($7))",
-                )
-                .bind(&vector.id)
-                .bind(&vector.collection)
-                .bind(vector.dim as i32)
-                .bind(&vector.vector)
-                .bind(embedding)
-                .bind(metadata)
-                .bind(vector.last_synced_at as f64)
-                .execute(&mut **tx)
-                .await?;
+                if let Some(embedding) = embedding {
+                    sqlx::query_scalar::<_, uuid::Uuid>(
+                        "SELECT lifeos_semantic.append_embedding_projection(
+                           $1, $2, $3, $4, $5, $6, $7, false)",
+                    )
+                    .bind(&vector.id)
+                    .bind(&vector.collection)
+                    .bind(vector.dim as i32)
+                    .bind(&vector.vector)
+                    .bind(embedding)
+                    .bind(metadata)
+                    .bind(vector.last_synced_at)
+                    .fetch_one(&mut **tx)
+                    .await?;
+                } else {
+                    let payload = serde_json::json!({
+                        "logical_key": format!("embedding:{}", vector.id),
+                        "logical_id": vector.id,
+                        "collection": vector.collection,
+                        "dimension": vector.dim,
+                        "last_synced_at": vector.last_synced_at,
+                        "non_finite": true,
+                        "tombstone": false,
+                        "metadata": metadata,
+                    });
+                    sqlx::query(
+                        "SELECT lifeos_agentdb.append_projection_record(
+                           'lifeos_agentdb.exp_nodes'::regclass,
+                           'embedding-diagnostic', $1, $2, $3)",
+                    )
+                    .bind(format!("embedding:{}", vector.id))
+                    .bind(payload)
+                    .bind(&vector.vector)
+                    .execute(&mut **tx)
+                    .await?;
+                }
             }
         }
     }
@@ -547,8 +602,14 @@ async fn import_gnn_cache(
 ) -> Result<(), LegacySqliteImportError> {
     for entry in entries {
         let existing: Option<(Vec<u8>, i64)> = sqlx::query_as(
-            "SELECT payload, EXTRACT(EPOCH FROM computed_at)::BIGINT
-             FROM lifeos_semantic.gnn_cache WHERE cache_key = $1",
+            "SELECT decode(typed_payload->>'payload_base64', 'base64'),
+                    (typed_payload->>'computed_at')::BIGINT
+             FROM lifeos_agentdb.exp_nodes
+             WHERE tenant_id = lifeos_security.current_tenant()
+               AND record_kind = 'gnn-cache'
+               AND typed_payload->>'logical_key' = $1
+               AND coalesce((typed_payload->>'tombstone')::boolean, false) = false
+             ORDER BY sequence DESC LIMIT 1",
         )
         .bind(&entry.cache_key)
         .fetch_optional(&mut **tx)
@@ -564,12 +625,17 @@ async fn import_gnn_cache(
             }
             None => {
                 sqlx::query(
-                    "INSERT INTO lifeos_semantic.gnn_cache (cache_key, payload, computed_at)
-                     VALUES ($1, $2, to_timestamp($3))",
+                    "SELECT lifeos_agentdb.append_projection_record(
+                       'lifeos_agentdb.exp_nodes'::regclass, 'gnn-cache', $1,
+                       jsonb_build_object(
+                         'logical_key', $1,
+                         'payload_base64', encode($2, 'base64'),
+                         'computed_at', $3,
+                         'tombstone', false), $2)",
                 )
                 .bind(&entry.cache_key)
                 .bind(&entry.payload)
-                .bind(entry.computed_at as f64)
+                .bind(entry.computed_at)
                 .execute(&mut **tx)
                 .await?;
             }
@@ -713,11 +779,9 @@ mod tests {
         assert!(!path.exists());
         for (table, expected) in [
             ("lifeos_security.identity", 1_i64),
-            ("lifeos_agentdb.exp_nodes", 1),
+            ("lifeos_agentdb.exp_nodes", 3),
             ("lifeos_agentdb.exp_edges", 1),
-            ("lifeos_agentdb.notes", 1),
             ("lifeos_semantic.embedding", 1),
-            ("lifeos_semantic.gnn_cache", 1),
         ] {
             let count: i64 = sqlx::query_scalar(&format!("SELECT COUNT(*) FROM {table}"))
                 .fetch_one(storage.pool())
@@ -726,7 +790,8 @@ mod tests {
             assert_eq!(count, expected, "{table}");
         }
         let archived: i64 = sqlx::query_scalar(
-            "SELECT COUNT(*) FROM lifeos_blob.object WHERE source_kind = 'legacy-sqlite-database'",
+            "SELECT COUNT(*) FROM lifeos_blob.object
+             WHERE provenance->>'source_kind' = 'legacy-sqlite-database'",
         )
         .fetch_one(storage.pool())
         .await
@@ -741,14 +806,18 @@ mod tests {
         let dir = tempdir().unwrap();
         let path = dir.path().join("lifeos.db");
         seed_legacy(&path, "Legacy Alex").await;
-        sqlx::query(
-            "INSERT INTO lifeos_security.identity (email, display_name, password_hash)
-             VALUES ($1, $2, $3)",
+        sqlx::query_scalar::<_, uuid::Uuid>(
+            "SELECT lifeos_security.register_identity(
+               'human', $1, $2, convert_to($2::text, 'UTF8'))",
         )
         .bind("alex@lifeos.ai")
-        .bind("Canonical Alex")
-        .bind("different")
-        .execute(storage.pool())
+        .bind(serde_json::json!({
+            "display_name": "Canonical Alex",
+            "password_hash": "different",
+            "created_at": 100,
+            "updated_at": 101,
+        }))
+        .fetch_one(storage.pool())
         .await
         .unwrap();
 

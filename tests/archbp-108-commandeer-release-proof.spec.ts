@@ -17,22 +17,36 @@ function portFree(port: number): Promise<boolean> {
   });
 }
 
+function freePort(): Promise<number> {
+  return new Promise((resolvePort, reject) => {
+    const server = createServer();
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      server.close((error) => error ? reject(error) : resolvePort(port));
+    });
+  });
+}
+
 describe("ARCHBP-108 commandeer + clean release end-to-end", () => {
   test("commandeer demonstrated, clean release verified, OS normal throughout", async () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp108-"));
     try {
+      const port = await freePort();
+      const resource = `loopback-port-${port}`;
       const auditPath = join(dir, "a.jsonl");
-      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port: 23488 }) });
+      const plane = new HostControlPlane({ auditPath, registry: defaultRegistry(dir, { port }) });
 
       // COMMANDEER: LifeOS takes real authoritative control of the port —
       // while held, the little brother genuinely cannot bind it.
-      expect(await portFree(23488)).toBe(true);
-      await plane.acquire("loopback-port-23488", { ttlMs: 30000 });
-      expect(await portFree(23488)).toBe(false); // LifeOS holds it for real
+      expect(await portFree(port)).toBe(true);
+      await plane.acquire(resource, { ttlMs: 30000 });
+      expect(await portFree(port)).toBe(false); // LifeOS holds it for real
       const denied = createServer();
       const bindError = await new Promise<string>((res) => {
         denied.once("error", (e: NodeJS.ErrnoException) => res(e.code ?? "ERR"));
-        denied.listen(23488, "127.0.0.1", () => res("BOUND"));
+        denied.listen(port, "127.0.0.1", () => res("BOUND"));
       });
       expect(bindError).toBe("EADDRINUSE"); // authoritative control is real
 
@@ -43,9 +57,9 @@ describe("ARCHBP-108 commandeer + clean release end-to-end", () => {
 
       // CLEAN RELEASE: prior state restored and verified; the OS can take
       // the port back immediately.
-      const { restored } = await plane.release("loopback-port-23488");
+      const { restored } = await plane.release(resource);
       expect(restored).toBe(true);
-      expect(await portFree(23488)).toBe(true);
+      expect(await portFree(port)).toBe(true);
 
       // The full arc is audited: acquire (with prior) then release (restored).
       const lines = readFileSync(auditPath, "utf8").trim().split("\n").map((l) => JSON.parse(l));

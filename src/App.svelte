@@ -8,19 +8,20 @@
   // App.vue 1:1 (same branch order, same discriminators, including the
   // OpenPencil mounting gate `activeSub.item?.view === 'open-pencil'`).
   //
-  // This component is NOT wired into src/main.ts or src/router/index.ts yet:
-  // the Vue App stays the sole mounted app until the Svelte tree passes parity
-  // review and is explicitly cut over in phase 3 (never remove Vue
-  // functionality before its Svelte replacement is proven — see CLAUDE.md).
+  // This component is the mounted Glass root from src/main.ts. Navigation still
+  // uses the shared router/store contract so the Svelte shell preserves the
+  // existing route and persistence behavior while Vue artifacts are retired.
   //
   // The auth gate is the only top-level branch: Login covers the viewport until
   // the auth store reports `signed_in`. loadStatus() runs once on mount so the
   // gate reflects the backend (no account → signup; account but no session →
   // welcome-back signin).
   import { onMount } from "svelte";
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { invoke as tauriCoreInvoke } from "@tauri-apps/api/core";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { useAuth } from "@/stores/auth";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
+  import { deriveSwarmStatus } from "@/lib/swarm-status";
   import { router as appRouter } from "@/router";
   import Sidebar from "./components/Sidebar.svelte";
   import Workspace from "./components/Workspace.svelte";
@@ -28,6 +29,7 @@
   import SubsectionView from "./components/SubsectionView.svelte";
   import N8nFlowView from "./components/N8nFlowView.svelte";
   import OpenPencilEditor from "./components/OpenPencilEditor.svelte";
+  import EngineRoomTerminal from "./components/EngineRoomTerminal.svelte";
   import LightsView from "./components/LightsView.svelte";
   import CalendarView from "./components/CalendarView.svelte";
   import FilesView from "./components/FilesView.svelte";
@@ -49,16 +51,93 @@
   const authState = bindStore(auth, ["isSignedIn"]);
   const lifeosState = bindStore(lifeos, ["wsCollapsed", "activeId", "activeSub"]);
 
+  let redbProjection = $state(null);
+  let swarmStatus = $derived(deriveSwarmStatus(redbProjection));
+
+  const tauriInvoke = () =>
+    typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || tauriCoreInvoke;
+  let engineRoomProbe = $state(import.meta.env.VITE_LIFEOS_ENGINE_PROBE === "1");
+
+  onMount(() => {
+    if (new URLSearchParams(window.location.search).get("probe") === "engine-room") {
+      engineRoomProbe = true;
+    }
+    const invoke = tauriInvoke();
+    if (!invoke) return;
+
+    // This is the causal Glass readiness receipt: it is emitted only after
+    // Svelte has mounted the root component and is written through the
+    // authenticated owner, so a launcher/process snapshot cannot masquerade
+    // as a mounted LifeOS UI.
+    void invoke("redb_state_write", {
+      key: "glass.ui.ready",
+      value: JSON.stringify({
+        schemaVersion: "lifeos.glass-ui-ready.v1",
+        state: "ready",
+        mountedAt: Date.now(),
+        surface: document.documentElement.dataset.surface ?? "workstation",
+        identity: "lifeos-glass",
+      }),
+    }).catch(() => {});
+
+    let afterSeq = 0;
+    let initialized = false;
+    let syncing = false;
+    let uiReadyPublished = false;
+    const syncProjection = async () => {
+      if (syncing) return;
+      syncing = true;
+      try {
+        // Hydrate from the owner-published mmap on first mount. A reopened
+        // Glass must render the current snapshot even when no new event was
+        // appended while it was offline.
+        if (!initialized) {
+          redbProjection = await invoke("redb_projection_read");
+          afterSeq = redbProjection?.localSeq || 0;
+          initialized = true;
+        }
+        const events = await invoke("redb_events_read", { afterSeq });
+        if (events.length) {
+          afterSeq = Math.max(afterSeq, ...events.map((event) => event.seq));
+          redbProjection = await invoke("redb_projection_read");
+        }
+        const updatedAt = Number(redbProjection?.entries?.["swarm.updatedAt"]);
+        if (!Number.isFinite(updatedAt) || Date.now() - updatedAt > 5_000) {
+          await invoke("redb_swarm_heartbeat");
+        }
+        if (!uiReadyPublished) {
+          await invoke("redb_ui_ready");
+          uiReadyPublished = true;
+        }
+      } catch {
+        // A reconnect, gap, or checksum failure must restart from a fresh
+        // owner-published snapshot instead of advancing a stale cursor.
+        initialized = false;
+        afterSeq = 0;
+        redbProjection = null;
+      } finally {
+        syncing = false;
+      }
+    };
+
+    syncProjection();
+    const timer = window.setInterval(syncProjection, 250);
+    return () => window.clearInterval(timer);
+  });
+
   onMount(() => {
     auth.loadStatus();
   });
 </script>
 
-{#if !authState.isSignedIn}
-  <Login />
-{:else}
-  <div class="shell" class:ws-collapsed={lifeosState.wsCollapsed}>
-    <Sidebar {router} />
+{#key engineRoomProbe}
+  {#if engineRoomProbe}
+    <EngineRoomTerminal probe={true} />
+  {:else if !authState.isSignedIn}
+    <Login />
+  {:else}
+    <div class="shell" class:ws-collapsed={lifeosState.wsCollapsed}>
+    <Sidebar {router} {redbProjection} {swarmStatus} />
     <Workspace {router} />
     <main class="main" id="main" tabindex="-1">
       {#if lifeosState.activeId === "settings" && !lifeosState.activeSub}
@@ -69,6 +148,8 @@
         <Dashboard {router} />
       {:else if lifeosState.activeSub.item?.view === "open-pencil"}
         <OpenPencilEditor sub={lifeosState.activeSub} {router} />
+      {:else if lifeosState.activeSub.item?.view === "terminal"}
+        <EngineRoomTerminal />
       {:else if lifeosState.activeSub.item?.view === "n8n-flow"}
         <N8nFlowView />
       {:else if lifeosState.activeSub.item?.view === "lights"}
@@ -92,5 +173,6 @@
     <KeyboardHelp />
     <NotificationsDrawer />
     <ToastContainer />
-  </div>
-{/if}
+    </div>
+  {/if}
+{/key}

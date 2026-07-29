@@ -8,9 +8,9 @@ import { describe, expect, test } from "vitest";
 
 const repoRoot = resolve(import.meta.dirname, "..");
 const tierMap = () =>
-  JSON.parse(readFileSync(resolve(repoRoot, "planning-spine-v0/docs/isolation_tier_map.json"), "utf8"));
+  JSON.parse(readFileSync(resolve(repoRoot, "evidence/isolation/isolation_tier_map.json"), "utf8"));
 const enumeration = () =>
-  JSON.parse(readFileSync(resolve(repoRoot, "planning-spine-v0/docs/runtime_env_enumeration.json"), "utf8"));
+  JSON.parse(readFileSync(resolve(repoRoot, "evidence/isolation/runtime_env_enumeration.json"), "utf8"));
 
 function mountSourceOf(path: string): string | null {
   // Longest-prefix match over the live host mount table.
@@ -66,7 +66,7 @@ describe("ARCHBP-073 volatile tier stays ephemeral", () => {
 
   test("the volatile contract is documented in the spec and tier map", () => {
     const spec = readFileSync(
-      resolve(repoRoot, "planning-spine-v0/docs/isolation-architecture-spec.md"),
+      resolve(repoRoot, "evidence/isolation/isolation-architecture-spec.md"),
       "utf8",
     );
     expect(spec).toMatch(/volatile.*tmpfs|tmpfs.*volatile/i);

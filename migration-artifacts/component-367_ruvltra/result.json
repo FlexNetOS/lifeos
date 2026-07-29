@@ -1,0 +1,62 @@
+{
+  "task_id": "COMPONENT-367_RUVLTRA",
+  "component": "RuvLTRA",
+  "checked_at": "2026-07-28T17:33:17Z",
+  "status": "verified_with_test_configuration_issue",
+  "scope": "read-only-probe",
+  "hard_rule_15": {
+    "requirement": "RuvLTRA must be installed and used, not replaced.",
+    "installed": true,
+    "used": true,
+    "replaced": false
+  },
+  "anchor_binding": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "byte_offset": 335153,
+    "unit_sha256": "1dbfbb2e00de7dbb2fda47cb6fb8ec0f7951199bc6274611595931dc0781abb7"
+  },
+  "blueprint_evidence": {
+    "hard_rule_line": 6337,
+    "component_table_line": 5718,
+    "profiles": [
+      "RuvLTRA-Small: 494M/32K",
+      "RuvLTRA-Medium: 3B/256K"
+    ],
+    "command_template": "grep -Fq 'RuvLTRA' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0
+  },
+  "installation_evidence": {
+    "package": "@ruvector/tiny-dancer",
+    "package_version": "0.1.22",
+    "manifest": "package.json devDependencies",
+    "lockfile": "bun.lock",
+    "installed_manifest": "node_modules/@ruvector/tiny-dancer/package.json",
+    "installed_manifest_sha256": "f498c19a7c44b34f2758b3639717c96d366528b6c9e3df66920e8566362ddcc3"
+  },
+  "usage_evidence": {
+    "implementation": "scripts/ruvltra-routing-lifecycle.mjs",
+    "implementation_sha256": "fd9aaa25bb96a69dec1aeecce66cc92297ed08cd9ab946557776f1d75a262b16",
+    "native_usage": "RuvltraRouter.train dynamically imports @ruvector/tiny-dancer and invokes trainRouter and score.",
+    "consumer": "scripts/ruflo-coordinator-lifecycle.mjs dynamically imports decideRoute and defaultPolicy from the RuvLTRA adapter.",
+    "offline_runtime_probe": {
+      "command": "bun scripts/ruvltra-routing-lifecycle.mjs --output=/tmp/component-367-ruvltra-proof.json",
+      "exit_code": 0,
+      "trained_fastgrnn": true,
+      "default_route": "local",
+      "live_routing_enabled": false,
+      "all_fail_closed_gates_passed": true,
+      "replay_beats_always_cloud_baseline": true,
+      "live_routes_taken": 0,
+      "audit_digest_present": true
+    }
+  },
+  "test_evidence": {
+    "test_file": "tests/archbp-013-ruvltra-routing-lifecycle.spec.ts",
+    "test_file_sha256": "c20c53caea9f2c47c809a0633abdfa39b6db1652ea992f0722cf031c65cf41aa",
+    "command": "bunx vitest run tests/archbp-013-ruvltra-routing-lifecycle.spec.ts --config vitest.config.ts",
+    "exit_code": 1,
+    "result": "not executed: configured setup file /@fs/home/flexnetos/meta/src/lifeos/tests/setup.js is unavailable in this task workspace mount"
+  },
+  "finding": "RuvLTRA is concretely implemented and used through the installed ruvnet FastGRNN package, rather than being replaced by a prose-only or substitute route. The direct offline native proof passed. The targeted Vitest invocation is blocked before test collection by an unavailable absolute setup-file mount; this is a workspace test-configuration issue, not evidence against component installation or usage."
+}

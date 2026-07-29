@@ -14,7 +14,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import App from "@/App.svelte";
 import { useAuth } from "@/stores/auth";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () =>
   createRouter({
@@ -31,6 +31,7 @@ describe("App.svelte auth gate", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();
@@ -83,6 +84,7 @@ describe("App.svelte shell layout + main-pane gate", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();
@@ -93,6 +95,44 @@ describe("App.svelte shell layout + main-pane gate", () => {
   });
 
   afterEach(() => cleanup());
+
+  it("hydrates the current redb owner projection before waiting for events", async () => {
+    const originalTauri = window.__TAURI__;
+    const calls = [];
+    window.__TAURI__ = {
+      core: {
+        invoke: async (command, args) => {
+          calls.push([command, args]);
+          if (command === "redb_projection_read") {
+            return { localSeq: 7, checksum: "abc", degraded: false, entries: {} };
+          }
+          if (command === "redb_state_write") return 8;
+          if (command === "redb_events_read") return [];
+          if (command === "redb_swarm_heartbeat") return 8;
+          if (command === "redb_ui_ready") return 9;
+          throw new Error(`unexpected command: ${command}`);
+        },
+      },
+    };
+
+    try {
+      render(App, { props: { router } });
+      await tick();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const projectionIndex = calls.findIndex(([command]) => command === "redb_projection_read");
+      const eventIndex = calls.findIndex(([command]) => command === "redb_events_read");
+      expect(projectionIndex).toBeGreaterThanOrEqual(0);
+      expect(eventIndex).toBeGreaterThan(projectionIndex);
+      expect(calls[eventIndex]).toEqual(["redb_events_read", { afterSeq: 7 }]);
+      expect(calls).toContainEqual([
+        "redb_state_write",
+        expect.objectContaining({ key: "glass.ui.ready" }),
+      ]);
+    } finally {
+      window.__TAURI__ = originalTauri;
+    }
+  });
 
   it("mounts Sidebar | Workspace | main | AIAvatar in one shell", async () => {
     const { container } = render(App, { props: { router } });

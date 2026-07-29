@@ -1,0 +1,10 @@
+# Database-authorized local embedding executor used by envctl commit-worker.
+repository = "git@github.com:FlexNetOS/meta-ruvector.git"
+revision = "3bc8f1915743dead22108275a62ccfe919563c80"
+package = "mcp-brain-server"
+binary = "ruvllm-embedder"
+source = "crates/mcp-brain-server/src/bin/embedder.rs"
+endpoint = "http://127.0.0.1:9877/embed"
+health_endpoint = "http://127.0.0.1:9877/health"
+request_field = "embedding_request"
+result_field = "embedding_result"

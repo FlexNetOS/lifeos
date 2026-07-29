@@ -129,8 +129,12 @@ export class KittyUnicodePlaceholderAddon {
     const buffer = terminal?._core?._bufferService?.buffer;
     if (!terminal || !buffer?.lines?.get) return;
 
-    const first = Math.max(0, buffer.ydisp - 1);
-    const last = Math.min(buffer.length - 1, buffer.ydisp + terminal.rows);
+    const first = Math.max(0, Math.trunc(Number(buffer.ydisp) - 1));
+    const last = Math.min(
+      Math.trunc(Number(buffer.length) - 1),
+      Math.trunc(Number(buffer.ydisp) + Number(terminal.rows)),
+    );
+    if (!Number.isInteger(first) || !Number.isInteger(last) || last < first) return;
     for (let y = first; y <= last; y += 1) {
       const line = buffer.lines.get(y);
       if (!line?.getCell || !line?.setCellFromCodepoint) continue;

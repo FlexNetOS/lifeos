@@ -74,6 +74,7 @@
         schemaVersion: "lifeos.engine-room-error.v1",
         observedAt: Date.now(),
         error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
       }),
     });
   };
@@ -206,8 +207,9 @@
           });
       }
       await resizeTerminal();
-    } catch {
+    } catch (error) {
       reconcileMessage = "Engine Room unavailable";
+      recordProbeError(error);
     }
   };
 
@@ -320,8 +322,9 @@
         const projection = await invoke()("redb_projection_read").catch(() => null);
         redbSeq = projection?.localSeq ?? null;
       }
-    } catch {
+    } catch (error) {
       reconcileMessage = "Engine Room unavailable";
+      recordProbeError(error);
     }
   });
 

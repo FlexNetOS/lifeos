@@ -23,6 +23,8 @@
   let probeSent = false;
   let probeOutput = "";
   let probeClosed = false;
+  let probeTimer = null;
+  let probeAttempts = 0;
   let resizeFrame = null;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
@@ -64,6 +66,10 @@
           probeOutput = `${probeOutput}${text}`.slice(-16_384);
           if (probeOutput.includes("LIFEOS_ENGINE_PROBE_DONE")) {
             probeClosed = true;
+            if (probeTimer !== null) {
+              window.clearInterval(probeTimer);
+              probeTimer = null;
+            }
             const owner = invoke();
             void owner?.("redb_state_write", {
               key: "lifeos.engine-room.ready",
@@ -98,13 +104,24 @@
       await resizeTerminal();
       if (probe && !probeSent) {
         probeSent = true;
-        window.setTimeout(() => {
+        const probeCommand = new TextEncoder().encode(
+          "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r",
+        );
+        const sendProbe = () => {
+          if (probeClosed || probeAttempts >= 15) {
+            if (probeTimer !== null) {
+              window.clearInterval(probeTimer);
+              probeTimer = null;
+            }
+            return;
+          }
+          probeAttempts += 1;
           void sendBytes(
-            new TextEncoder().encode(
-              "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r",
-            ),
+            probeCommand,
           );
-        }, 3_000);
+        };
+        sendProbe();
+        probeTimer = window.setInterval(sendProbe, 1_000);
       }
     } catch {
       reconcileMessage = "Engine Room unavailable";
@@ -197,6 +214,10 @@
     if (resizeFrame !== null && typeof cancelAnimationFrame !== "undefined") {
       cancelAnimationFrame(resizeFrame);
       resizeFrame = null;
+    }
+    if (probeTimer !== null) {
+      window.clearInterval(probeTimer);
+      probeTimer = null;
     }
     stopExit?.();
     stopCaptureError?.();

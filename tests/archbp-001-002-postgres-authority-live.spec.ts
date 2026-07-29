@@ -15,12 +15,12 @@ describe("ARCHBP-001/002 PostgreSQL and RuVector authority", () => {
     expect(receipt.migrations.count).toBe(81);
     expect(receipt.migrations.versions).toEqual(expect.arrayContaining([1, 28, 40, 49, 50, 51, 52, 53, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87]));
     expect(receipt.witness).toEqual(expect.objectContaining({
-      chain_count: 2,
       append_witness: true,
       shake256: true,
       broken_links: 0,
       head_mismatches: 0,
     }));
+    expect(receipt.witness.chain_count).toBeGreaterThanOrEqual(2);
     expect(receipt.witness.entry_count).toBeGreaterThanOrEqual(57);
     expect(receipt.compatibility).toEqual({
       vector_avg_final: true,

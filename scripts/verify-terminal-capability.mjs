@@ -80,13 +80,50 @@ if (profile.kittyGraphics && !imageTypings.includes("kittySupport?: boolean")) {
 // Yazi's `Kgp` uses U+10EEEE Unicode placeholders. The pinned addon implements
 // direct placement; LifeOS supplies the renderer-side compatibility adapter.
 const imageBundle = read("node_modules/@xterm/addon-image/lib/addon-image.js");
-const placeholderAdapter = read("src/lib/kitty-unicode-placeholders.js");
-const placeholdersImplemented =
-  imageBundle.includes("10EEEE") ||
-  imageBundle.includes("1114110") ||
-  (placeholderAdapter.includes("0x10eeee") &&
-    placeholderAdapter.includes("KittyUnicodePlaceholderStream") &&
-    placeholderAdapter.includes("KittyUnicodePlaceholderAddon"));
+const addonNative = imageBundle.includes("10EEEE") || imageBundle.includes("1114110");
+
+// Behavioural, not textual. An earlier revision of this gate only grepped the
+// adapter for identifiers, which passed an adapter that handled one of the three
+// sequence shapes Yazi actually emits. Execute it instead: every virtual
+// placement must lose `U=1`, and non-placements must pass through byte-identical.
+const adapter = await import(
+  pathToFileURL(join(root, "src/lib/kitty-unicode-placeholders.js")).href
+);
+const encode = (value) => new TextEncoder().encode(value);
+const decode = (value) => new TextDecoder().decode(value);
+const through = (frames) => {
+  const stream = new adapter.KittyUnicodePlaceholderStream();
+  return frames.map((frame) => decode(stream.feed(encode(frame)))).join("");
+};
+
+const mustNormalize = {
+  "a=T transmit+display virtual placement": ["_Ga=T,f=100,t=d,i=1,q=2,U=1,c=20,r=10;QUJD\\"],
+  "a=p placement with no payload": ["_Ga=p,U=1,i=1,c=20,r=10\\"],
+  "a=p placement with payload": ["_Ga=p,U=1,i=1,c=20,r=10;QUJD\\"],
+  "placement split across PTY frames": ["_Ga=p,U=1,i=1,c=2", "0,r=10\\"],
+};
+for (const [label, frames] of Object.entries(mustNormalize)) {
+  const result = through(frames);
+  if (/U=1/.test(result)) {
+    throw new Error(`kitty placeholder adapter leaves ${label} virtual: ${JSON.stringify(result)}`);
+  }
+  if (!/(?:^|,)C=1(?=,|$|)/.test(result)) {
+    throw new Error(`kitty placeholder adapter did not pin the cursor policy for ${label}`);
+  }
+}
+
+const mustPassThrough = {
+  "plain terminal output": "hello world\r\n",
+  "transmit-only (not a placement)": "_Ga=t,f=100,i=1;QUJD\\",
+  "already-direct placement": "_Ga=T,i=1,c=20,r=10;QUJD\\",
+};
+for (const [label, frame] of Object.entries(mustPassThrough)) {
+  if (through([frame]) !== frame) {
+    throw new Error(`kitty placeholder adapter rewrote ${label}; it must pass through unchanged`);
+  }
+}
+
+const placeholdersImplemented = addonNative || true;
 if (placeholdersImplemented !== profile.kittyUnicodePlaceholders) {
   throw new Error(
     `profile declares kittyUnicodePlaceholders=${profile.kittyUnicodePlaceholders} but the pinned addon ${placeholdersImplemented ? "implements" : "does not implement"} them`,

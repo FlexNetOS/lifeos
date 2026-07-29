@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
+// Local build of the ruvnet solver source. The published 0.1.8 wasm fails its
+// own acceptance (accuracy 0.4667 vs 1.0) - see vendor/rvf-solver/PROVENANCE.md.
 const expectedSourceRevision = "2bb75b2de955c4c1a13cccc2d487ddf4a56d4e9e";
 const expectedWasmSha256 = "27cf1fa341cf8e72bbf5aafd69a81274d2d2506ec3dc4691be527c9007f5c9dd";
 const packageJsonPath = resolve("node_modules/@ruvector/rvf-solver/package.json");

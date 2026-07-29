@@ -21,11 +21,11 @@ const ciPath = resolve(repoRoot, ".github/workflows/ci.yml");
 
 const requiredPackages = {
   "@ruvector/ruvllm": "2.6.0",
-  "@ruvector/rvf": "0.3.0",
+  "@ruvector/rvf": "0.3.4",
   "@ruvector/sona": "0.1.8",
   "@ruvector/tiny-dancer": "0.1.22",
   agentdb: "3.0.0-alpha.18",
-  ruvector: "0.2.34",
+  ruvector: "0.2.39",
 } as const;
 
 const requiredLinuxX64NativeOptionalPackages = [

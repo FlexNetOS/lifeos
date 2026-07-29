@@ -1,0 +1,26 @@
+diff --git a/crates/rvf/rvf-solver-wasm/src/lib.rs b/crates/rvf/rvf-solver-wasm/src/lib.rs
+index f404151e4..1628c998a 100644
+--- a/crates/rvf/rvf-solver-wasm/src/lib.rs
++++ b/crates/rvf/rvf-solver-wasm/src/lib.rs
+@@ -394,7 +394,7 @@ pub extern "C" fn rvf_solver_witness_read(handle: i32, out_ptr: i32) -> i32 {
+ // Panic handler
+ // ═════════════════════════════════════════════════════════════════════
+ 
+-#[cfg(not(test))]
++#[cfg(all(not(test), target_arch = "wasm32"))]
+ #[panic_handler]
+ fn panic(_info: &core::panic::PanicInfo) -> ! {
+     core::arch::wasm32::unreachable()
+diff --git a/crates/rvf/rvf-wasm/src/lib.rs b/crates/rvf/rvf-wasm/src/lib.rs
+index e801942c7..3d935b9d8 100644
+--- a/crates/rvf/rvf-wasm/src/lib.rs
++++ b/crates/rvf/rvf-wasm/src/lib.rs
+@@ -766,7 +766,7 @@ pub extern "C" fn rvf_witness_count(chain_len: i32) -> i32 {
+ // rvf_alloc and rvf_free are exported from alloc_setup module.
+ 
+ /// Panic handler for no_std WASM.
+-#[cfg(not(test))]
++#[cfg(all(not(test), target_arch = "wasm32"))]
+ #[panic_handler]
+ fn panic(_info: &core::panic::PanicInfo) -> ! {
+     core::arch::wasm32::unreachable()

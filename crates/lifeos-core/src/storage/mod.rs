@@ -1,5 +1,6 @@
 pub mod accounts;
 pub mod branches;
+pub mod coordination;
 pub mod error;
 #[cfg(feature = "legacy-sqlite-import")]
 pub mod legacy_sqlite;

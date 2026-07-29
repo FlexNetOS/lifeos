@@ -923,8 +923,7 @@ fn terminal_capture_sender() -> &'static Sender<TerminalCapture> {
         std::thread::Builder::new()
             .name("lifeos-terminal-capture".into())
             .spawn(move || {
-                let owner_capture_enabled = std::env::var_os("VITE_LIFEOS_ENGINE_PROBE")
-                    .as_deref()
+                let owner_capture_enabled = std::env::var_os("VITE_LIFEOS_ENGINE_PROBE").as_deref()
                     != Some(std::ffi::OsStr::new("1"));
                 while let Ok(frame) = receiver.recv() {
                     if !owner_capture_enabled {
@@ -1594,8 +1593,7 @@ fn terminal_probe(
             // well so the probe reaches Nushell across that handoff; the PTY
             // write above remains the captured input authority.
             let zellij = std::env::var_os("YZX_ZELLIJ").unwrap_or_else(|| {
-                "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij"
-                    .into()
+                "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij".into()
             });
             let server_root = std::env::var_os("XDG_RUNTIME_DIR")
                 .map(PathBuf::from)
@@ -2218,6 +2216,123 @@ async fn network_effect_record(
     .map_err(|error| error.to_string())
 }
 
+#[tauri::command]
+async fn weave_job_submit(
+    storage: tauri::State<'_, Storage>,
+    task_id: String,
+    lease_id: String,
+    branch_id: String,
+    request: serde_json::Value,
+    idempotency_key: String,
+) -> Result<String, String> {
+    let task_id = parse_vault_uuid(&task_id, "task_id")?;
+    let lease_id = parse_vault_uuid(&lease_id, "lease_id")?;
+    let branch_id = parse_vault_uuid(&branch_id, "branch_id")?;
+    lifeos_core::storage::coordination::submit_weave_job(
+        storage.pool(),
+        task_id,
+        lease_id,
+        branch_id,
+        request,
+        &idempotency_key,
+    )
+    .await
+    .map(|job_id| job_id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn weave_job_start(
+    storage: tauri::State<'_, Storage>,
+    job_id: String,
+) -> Result<lifeos_core::storage::coordination::WeaveAttempt, String> {
+    let job_id = parse_vault_uuid(&job_id, "job_id")?;
+    lifeos_core::storage::coordination::start_weave_job(storage.pool(), job_id)
+        .await
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn weave_attempt_record(
+    storage: tauri::State<'_, Storage>,
+    job_id: String,
+    attempt_id: String,
+    status: String,
+    result: serde_json::Value,
+    idempotency_key: String,
+) -> Result<String, String> {
+    let job_id = parse_vault_uuid(&job_id, "job_id")?;
+    let attempt_id = parse_vault_uuid(&attempt_id, "attempt_id")?;
+    lifeos_core::storage::coordination::record_weave_attempt(
+        storage.pool(),
+        job_id,
+        attempt_id,
+        &status,
+        result,
+        &idempotency_key,
+    )
+    .await
+    .map(|attempt_id| attempt_id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn runner_job_submit(
+    storage: tauri::State<'_, Storage>,
+    task_id: String,
+    lease_id: String,
+    branch_id: String,
+    request: serde_json::Value,
+    idempotency_key: String,
+) -> Result<String, String> {
+    let task_id = parse_vault_uuid(&task_id, "task_id")?;
+    let lease_id = parse_vault_uuid(&lease_id, "lease_id")?;
+    let branch_id = parse_vault_uuid(&branch_id, "branch_id")?;
+    lifeos_core::storage::coordination::submit_runner_job(
+        storage.pool(),
+        task_id,
+        lease_id,
+        branch_id,
+        request,
+        &idempotency_key,
+    )
+    .await
+    .map(|job_id| job_id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn runner_job_start(
+    storage: tauri::State<'_, Storage>,
+    job_id: String,
+) -> Result<lifeos_core::storage::coordination::RunnerJob, String> {
+    let job_id = parse_vault_uuid(&job_id, "job_id")?;
+    lifeos_core::storage::coordination::start_runner_job(storage.pool(), job_id)
+        .await
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn runner_receipt_record(
+    storage: tauri::State<'_, Storage>,
+    job_id: String,
+    status: String,
+    result: serde_json::Value,
+    idempotency_key: String,
+) -> Result<String, String> {
+    let job_id = parse_vault_uuid(&job_id, "job_id")?;
+    lifeos_core::storage::coordination::record_runner_receipt(
+        storage.pool(),
+        job_id,
+        &status,
+        result,
+        &idempotency_key,
+    )
+    .await
+    .map(|receipt_id| receipt_id.to_string())
+    .map_err(|error| error.to_string())
+}
+
 // ---------- App version ----------
 // Surfaces the LifeOS app version + Tauri runtime version + host target triple
 // to the SettingsView "About" card. Pure metadata — no I/O. `AppVersion` lives
@@ -2392,6 +2507,12 @@ pub fn run() {
             network_plan_submit,
             network_plan_start,
             network_effect_record,
+            weave_job_submit,
+            weave_job_start,
+            weave_attempt_record,
+            runner_job_submit,
+            runner_job_start,
+            runner_receipt_record,
             app_version,
             telemetry_read,
             auth::auth_status,

@@ -66,7 +66,7 @@ Blueprint content map (open the file for detail — do not re-derive):
 | Capability register · component integration table | supplied capabilities and per-component integration rows |
 | Import, transformation, export, and release contract | zero-undeclared-loss completion; database-gated, envctl-activated release |
 | Anchor conformance ledger (A01–A15) | crosswalk over 15 anchor sections, 14 diagrams, 10 invariants |
-| Review ledger (R01–R16) | 2026-07-19 repository-source reconciliation (e.g. Vue→Svelte migration required; `rtk_nu` and `codedb ingest-envelope` are unbuilt release blockers) |
+| Review ledger (R01–R19) | 2026-07-19 repository-source reconciliation plus additive R17–R19 closure records; Vue→Svelte is complete, and `rtk_nu` plus `codedb ingest-envelope` are implemented and profile-pinned; remaining work is exact release-gate evidence, not implementation absence |
 | FlexNetOS operating doctrine and release gate | permanent `files → Nushell tables → validated envctl tables → generated files` conversion |
 | Operational invariants and acceptance | 19 invariants; zero silent-downgrade language permitted at release |
 

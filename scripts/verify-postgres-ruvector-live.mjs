@@ -41,6 +41,7 @@ const receipt = {
   ruvector: verification.ruvector,
   migrations: verification.migrations,
   witness: verification.witness,
+  compatibility: verification.compatibility,
   required_schemas: verification.required_schemas,
   verification_script: "scripts/verify-postgres-ruvector.mjs",
   verification_output_sha256: createHash("sha256").update(output).digest("hex"),

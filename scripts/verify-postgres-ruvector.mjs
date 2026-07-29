@@ -59,6 +59,11 @@ SELECT jsonb_build_object(
   'ruvector', (SELECT value FROM ruvector_extension),
   'migrations', (SELECT value FROM migrations),
   'witness', (SELECT value FROM witness),
+  'compatibility', jsonb_build_object(
+    'vector_avg_final', extensions.vector_avg_final(
+      ARRAY[4.0::real, 6.0::real], 2
+    ) = ARRAY[2.0::real, 3.0::real]
+  ),
   'required_schemas', jsonb_build_array(
     to_regnamespace('lifeos_blob') IS NOT NULL,
     to_regnamespace('lifeos_security') IS NOT NULL,
@@ -108,6 +113,9 @@ if (!receipt.witness?.append_witness || !receipt.witness?.shake256) {
 if (receipt.witness?.broken_links !== 0 || receipt.witness?.head_mismatches !== 0) {
   failures.push("the live witness chain has broken links or head mismatches");
 }
+if (receipt.compatibility?.vector_avg_final !== true) {
+  failures.push("RuVector vector_avg_final compatibility repair is not active");
+}
 
 if (failures.length) {
   console.error(JSON.stringify({ status: "failed", failures, receipt }, null, 2));
@@ -123,6 +131,7 @@ console.log(
       ruvector: receipt.ruvector,
       migrations: receipt.migrations,
       witness: receipt.witness,
+      compatibility: receipt.compatibility,
       required_schemas: receipt.required_schemas,
     },
     null,

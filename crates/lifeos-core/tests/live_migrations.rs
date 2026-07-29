@@ -9,5 +9,5 @@ async fn canonical_migrations_apply_through_the_storage_runner() {
     let storage = Storage::new(&url).await.expect("connect canonical database");
     let report = storage.migrate().await.expect("apply embedded migrations");
     assert_eq!(report.applied, report.total);
-    assert_eq!(report.total, 61);
+    assert_eq!(report.total, 62);
 }

@@ -56,12 +56,12 @@
 
   const tauriInvoke = () =>
     typeof window === "undefined" ? null : window.__TAURI__?.core?.invoke || tauriCoreInvoke;
-  const engineRoomProbe =
-    import.meta.env.VITE_LIFEOS_ENGINE_PROBE === "1" ||
-    (typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("probe") === "engine-room");
+  let engineRoomProbe = $state(import.meta.env.VITE_LIFEOS_ENGINE_PROBE === "1");
 
   onMount(() => {
+    if (new URLSearchParams(window.location.search).get("probe") === "engine-room") {
+      engineRoomProbe = true;
+    }
     const invoke = tauriInvoke();
     if (!invoke) return;
 
@@ -130,12 +130,13 @@
   });
 </script>
 
-{#if engineRoomProbe}
-  <EngineRoomTerminal probe={true} />
-{:else if !authState.isSignedIn}
-  <Login />
-{:else}
-  <div class="shell" class:ws-collapsed={lifeosState.wsCollapsed}>
+{#key engineRoomProbe}
+  {#if engineRoomProbe}
+    <EngineRoomTerminal probe={true} />
+  {:else if !authState.isSignedIn}
+    <Login />
+  {:else}
+    <div class="shell" class:ws-collapsed={lifeosState.wsCollapsed}>
     <Sidebar {router} {redbProjection} {swarmStatus} />
     <Workspace {router} />
     <main class="main" id="main" tabindex="-1">
@@ -172,5 +173,6 @@
     <KeyboardHelp />
     <NotificationsDrawer />
     <ToastContainer />
-  </div>
-{/if}
+    </div>
+  {/if}
+{/key}

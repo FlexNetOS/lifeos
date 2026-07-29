@@ -37,7 +37,9 @@ fn redb_root() -> PathBuf {
 
 #[cfg(test)]
 mod terminal_tests {
-    use super::{engine_room_argv, scoped_prompt, validate_redb_event_stream};
+    use super::{
+        engine_room_argv, engine_room_shell_argv, scoped_prompt, validate_redb_event_stream,
+    };
     use flexnetos_redb_owner::CommitEvent;
 
     #[test]
@@ -46,6 +48,19 @@ mod terminal_tests {
             engine_room_argv("lifeos-tenant-session"),
             vec!["yzx", "enter", "--session", "lifeos-tenant-session"]
         );
+    }
+
+    #[test]
+    fn engine_room_pty_shell_is_nushell_wrapping_yazelix_not_a_host_terminal() {
+        let argv = engine_room_shell_argv("lifeos-tenant-session");
+        assert!(argv[0].ends_with("/nu"));
+        assert_eq!(&argv[1..3], ["-l", "-c"]);
+        assert!(argv[3].starts_with('^'));
+        assert!(argv[3].contains("yzx enter --session lifeos-tenant-session"));
+        assert!(!argv.join(" ").contains("xterm"));
+        assert!(!argv.join(" ").contains("ghostty"));
+        assert!(!argv.join(" ").contains("kitty"));
+        assert!(!argv.join(" ").contains("wezterm"));
     }
 
     #[test]

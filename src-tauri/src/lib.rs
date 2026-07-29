@@ -853,40 +853,11 @@ impl Drop for EnvctlReconciler {
 }
 
 struct TerminalSession {
-    engine_session_name: String,
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send>,
-    output_offset: Arc<AtomicU64>,
     input_offset: Arc<AtomicU64>,
-}
-
-fn engine_room_pane_target(session_name: &str) -> Option<(PathBuf, String)> {
-    let zellij = std::env::var_os("YZX_ZELLIJ")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from("/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij")
-        });
-    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
-    let server = server_root
-        .join("zellij/contract_version_1")
-        .join(session_name);
-    let output = Command::new(&zellij)
-        .args([
-            "--server",
-            server.to_string_lossy().as_ref(),
-            "action",
-            "list-panes",
-        ])
-        .output()
-        .ok()?;
-    String::from_utf8_lossy(&output.stdout)
-        .lines()
-        .find(|line| line.contains("lifeos-engine-shell"))
-        .and_then(|line| line.split_whitespace().next())
-        .map(|pane| (zellij, pane.to_string()))
+    probe_output: Arc<Mutex<Vec<u8>>>,
 }
 
 #[derive(Default)]
@@ -1184,6 +1155,8 @@ fn terminal_spawn(
     let output_offset = Arc::new(AtomicU64::new(0));
     let input_offset = Arc::new(AtomicU64::new(0));
     let reader_output_offset = Arc::clone(&output_offset);
+    let probe_output = Arc::new(Mutex::new(Vec::new()));
+    let reader_probe_output = Arc::clone(&probe_output);
     let event_session = session_id.clone();
     std::thread::spawn(move || {
         let mut buffer = [0_u8; 8192];
@@ -1192,6 +1165,13 @@ fn terminal_spawn(
                 Ok(0) => break,
                 Ok(length) => {
                     let offset = reader_output_offset.fetch_add(length as u64, Ordering::Relaxed);
+                    if let Ok(mut recent) = reader_probe_output.lock() {
+                        recent.extend_from_slice(&buffer[..length]);
+                        if recent.len() > 16_384 {
+                            let keep_from = recent.len() - 16_384;
+                            recent.drain(..keep_from);
+                        }
+                    }
                     if let Err(error) = capture_terminal_frame(
                         &event_session,
                         "output",
@@ -1245,12 +1225,11 @@ fn terminal_spawn(
         .insert(
             session_id.clone(),
             TerminalSession {
-                engine_session_name: session_name.clone(),
                 master: pair.master,
                 writer,
                 child,
-                output_offset,
                 input_offset,
+                probe_output,
             },
         );
     let focus_session_name = session_name.clone();
@@ -1393,10 +1372,22 @@ fn terminal_probe(
         .write_all(probe)
         .and_then(|_| session.writer.flush())
         .map_err(|error| format!("write terminal probe: {error}"))?;
-    // The output channel owns the authoritative completion check. Returning
-    // false avoids claiming readiness merely because the write succeeded;
-    // EngineRoomTerminal records ready only after it receives the marker from
-    // the same PTY byte stream rendered by xterm.js.
+    let recent_output = Arc::clone(&session.probe_output);
+    drop(sessions);
+    for _ in 0..40 {
+        if recent_output
+            .lock()
+            .map(|bytes| {
+                bytes
+                    .windows(b"LIFEOS_ENGINE_PROBE_DONE".len())
+                    .any(|window| window == b"LIFEOS_ENGINE_PROBE_DONE")
+            })
+            .unwrap_or(false)
+        {
+            return Ok(true);
+        }
+        std::thread::sleep(Duration::from_millis(250));
+    }
     Ok(false)
 }
 

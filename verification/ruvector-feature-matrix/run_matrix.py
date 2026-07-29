@@ -320,7 +320,7 @@ CASES = [
      "SELECT abs(ruvector_cosine_distance('[1,0]'::extensions.ruvector,"
      " '[0,1]'::extensions.ruvector) - 1) < 1e-6"),
     ("ip", ["ruvector_inner_product"], "assert",
-     "SELECT ruvector_inner_product('[1,2]'::extensions.ruvector, '[3,4]'::extensions.ruvector) = 11"),
+     "SELECT ruvector_inner_product('[1,2]'::extensions.ruvector, '[3,4]'::extensions.ruvector) = -11"),
     ("l1", ["ruvector_l1_distance"], "assert",
      "SELECT ruvector_l1_distance('[1,2]'::extensions.ruvector, '[4,6]'::extensions.ruvector) = 7"),
 
@@ -330,9 +330,7 @@ CASES = [
     ("op_cosine", ["<=>(ruvector,ruvector)"], "assert",
      "SELECT abs(('[1,0]'::extensions.ruvector <=> '[0,1]'::extensions.ruvector) - 1) < 1e-6"),
     ("op_inner_product", ["<#>(ruvector,ruvector)"], "assert",
-     # Observed: installed <#> returns POSITIVE inner product (anchor §3.1
-     # documents negative inner product) — deviation recorded in annotations.
-     "SELECT ('[1,2]'::extensions.ruvector <#> '[3,4]'::extensions.ruvector) = 11"),
+     "SELECT ('[1,2]'::extensions.ruvector <#> '[3,4]'::extensions.ruvector) = -11"),
     ("op_add", ["+(ruvector,ruvector)"], "assert",
      "SELECT ('[1,2]'::extensions.ruvector + '[3,4]'::extensions.ruvector)::text = '[4,6]'"),
     ("op_sub", ["-(ruvector,ruvector)"], "assert",
@@ -858,10 +856,6 @@ CASES = [
 ]
 
 ANNOTATIONS = [
-    {"id": "RUVMX-NOTE-001", "case": "op_inner_product",
-     "note": "installed <#> returns POSITIVE inner product (11 for [1,2]·[3,4]);"
-             " anchor §3.1 documents it as negative inner product — semantic"
-             " deviation between anchor prose and release artifact."},
     {"id": "RUVMX-REPAIR-001", "case": "vector_avg_final_compatibility",
      "note": "canonical LifeOS activation casts the scalar to real and qualifies"
              " vector_mul_scalar, repairing the released finalizer ABI."},

@@ -24,7 +24,6 @@ on the canonical LifeOS cluster, cross-checked against the blueprint anchor's
 | RUVMX-REPAIR-001 | LifeOS activation casts `vector_avg_final`'s scalar to `real` and qualifies `vector_mul_scalar`, repairing the released finalizer ABI. |
 | RUVMX-REPAIR-002 | LifeOS activation restores the exported `ruvector_record_trajectory` binding and exercises feedback-driven learning. |
 | RUVMX-REPAIR-003 | LifeOS activation bridges the public `real[]` `ruvector_auto_tune` signature to the native JSONB wrapper; NULL and non-NULL calls both pass. |
-| RUVMX-NOTE-001 | Installed `<#>` returns **positive** inner product; anchor §3.1 documents negative inner product. |
 
 The raw release-artifact mismatches remain documented as the inputs to these
 repairs; the matrix executes the activated LifeOS boundary and therefore turns

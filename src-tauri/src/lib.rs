@@ -39,7 +39,7 @@ fn redb_root() -> PathBuf {
 mod terminal_tests {
     use super::{
         apply_glass_vt_profile, engine_room_argv, engine_room_shell_argv, scoped_prompt,
-        validate_redb_event_stream, GLASS_VT_PROFILE,
+        resolve_open_pencil_path, validate_redb_event_stream, GLASS_VT_PROFILE,
     };
     use flexnetos_redb_owner::CommitEvent;
     use portable_pty::CommandBuilder;
@@ -141,6 +141,13 @@ mod terminal_tests {
             scoped_prompt("untrusted-surface", "hello"),
             "[LifeOS surface: chat]\nhello"
         );
+    }
+
+    #[test]
+    fn open_pencil_path_rejects_escape_attempts() {
+        assert!(resolve_open_pencil_path("").is_err());
+        assert!(resolve_open_pencil_path("../outside.txt").is_err());
+        assert!(resolve_open_pencil_path("/etc/passwd").is_err());
     }
 }
 

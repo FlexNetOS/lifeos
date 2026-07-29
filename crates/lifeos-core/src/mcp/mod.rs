@@ -77,6 +77,7 @@ mod reqwest_transport {
     pub struct ReqwestTransport {
         client: reqwest::blocking::Client,
         base_url: String,
+        bearer_token: Option<String>,
     }
 
     impl ReqwestTransport {
@@ -85,16 +86,40 @@ mod reqwest_transport {
         /// concatenates `base_url + path` verbatim so callers control whether
         /// the path leads with `/`.
         pub fn new(base_url: impl Into<String>) -> Result<Self, McpError> {
+            Self::with_bearer(base_url, None)
+        }
+
+        /// Build an authenticated transport for a paired Seed appliance.
+        /// The bearer is supplied by the envctl/secret projection boundary;
+        /// it is never included in diagnostics or receipts.
+        pub fn with_bearer(
+            base_url: impl Into<String>,
+            bearer_token: Option<String>,
+        ) -> Result<Self, McpError> {
+            Self::with_bearer_and_tls(base_url, bearer_token, false)
+        }
+
+        /// Build a transport with an explicit self-signed TLS policy.
+        /// `allow_invalid_certs` is never enabled implicitly; production
+        /// deployments should provide the device CA through their trust
+        /// configuration instead.
+        pub fn with_bearer_and_tls(
+            base_url: impl Into<String>,
+            bearer_token: Option<String>,
+            allow_invalid_certs: bool,
+        ) -> Result<Self, McpError> {
             let client = reqwest::blocking::Client::builder()
                 // 5s feels right for an on-device REST mirror; the Cognitum
                 // appliance is link-local (169.254.42.1). Wave 4+ can wire a
                 // configurable budget if a slower remote provider appears.
                 .timeout(std::time::Duration::from_secs(5))
+                .danger_accept_invalid_certs(allow_invalid_certs)
                 .build()
                 .map_err(|e| McpError::NotConnected(e.to_string()))?;
             Ok(Self {
                 client,
                 base_url: base_url.into(),
+                bearer_token: bearer_token.filter(|token| !token.trim().is_empty()),
             })
         }
 
@@ -103,14 +128,23 @@ mod reqwest_transport {
         pub fn base_url(&self) -> &str {
             &self.base_url
         }
+
+        fn request(
+            &self,
+            request: reqwest::blocking::RequestBuilder,
+        ) -> reqwest::blocking::RequestBuilder {
+            match self.bearer_token.as_deref() {
+                Some(token) => request.bearer_auth(token),
+                None => request,
+            }
+        }
     }
 
     impl Transport for ReqwestTransport {
         fn get(&self, path: &str) -> Result<String, McpError> {
             let url = format!("{}{}", self.base_url, path);
             let resp = self
-                .client
-                .get(&url)
+                .request(self.client.get(&url))
                 .send()
                 .map_err(|e| McpError::NotConnected(e.to_string()))?;
             if !resp.status().is_success() {
@@ -125,8 +159,7 @@ mod reqwest_transport {
         fn get_bytes(&self, path: &str) -> Result<Vec<u8>, McpError> {
             let url = format!("{}{}", self.base_url, path);
             let resp = self
-                .client
-                .get(&url)
+                .request(self.client.get(&url))
                 .send()
                 .map_err(|e| McpError::NotConnected(e.to_string()))?;
             if !resp.status().is_success() {
@@ -143,9 +176,7 @@ mod reqwest_transport {
         fn post(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError> {
             let url = format!("{}{}", self.base_url, path);
             let resp = self
-                .client
-                .post(&url)
-                .json(body)
+                .request(self.client.post(&url).json(body))
                 .send()
                 .map_err(|e| McpError::NotConnected(e.to_string()))?;
             if !resp.status().is_success() {
@@ -160,9 +191,7 @@ mod reqwest_transport {
         fn put(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError> {
             let url = format!("{}{}", self.base_url, path);
             let resp = self
-                .client
-                .put(&url)
-                .json(body)
+                .request(self.client.put(&url).json(body))
                 .send()
                 .map_err(|e| McpError::NotConnected(e.to_string()))?;
             if !resp.status().is_success() {
@@ -178,6 +207,51 @@ mod reqwest_transport {
 
 #[cfg(feature = "mcp-http")]
 pub use reqwest_transport::ReqwestTransport;
+
+#[cfg(all(test, feature = "mcp-http"))]
+mod reqwest_transport_tests {
+    use super::ReqwestTransport;
+    use super::Transport;
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    use std::thread;
+
+    #[test]
+    fn bearer_token_is_sent_without_being_part_of_the_url() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).unwrap();
+        let address = listener.local_addr().unwrap();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut request = Vec::new();
+            let mut chunk = [0_u8; 1024];
+            loop {
+                let count = stream.read(&mut chunk).unwrap();
+                if count == 0 {
+                    break;
+                }
+                request.extend_from_slice(&chunk[..count]);
+                if request.windows(4).any(|window| window == b"\r\n\r\n") {
+                    break;
+                }
+            }
+            let request = String::from_utf8(request).unwrap();
+            assert!(request.contains("GET /status HTTP/1.1"));
+            assert!(request.contains("authorization: Bearer test-token"));
+            assert!(!request.contains("test-token/status"));
+            stream
+                .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\n{}")
+                .unwrap();
+        });
+
+        let transport = ReqwestTransport::with_bearer(
+            format!("http://{address}"),
+            Some("test-token".to_string()),
+        )
+        .unwrap();
+        assert_eq!(transport.get("/status").unwrap(), "{}");
+        server.join().unwrap();
+    }
+}
 
 /// In-memory `Transport` fake for unit tests. Keyed by path; missing keys
 /// surface as `McpError::NotConnected` so a stray request shows up loud in

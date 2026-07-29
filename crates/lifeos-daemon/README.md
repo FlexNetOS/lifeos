@@ -73,6 +73,8 @@ Environment variables are the database/envctl-generated projection boundary:
 | Variable | Default |
 |---|---|
 | `LIFEOS_COGNITUM_URL` | `http://169.254.42.1/mcp` |
+| `LIFEOS_COGNITUM_BEARER_TOKEN` | envctl-projected paired-device bearer (never written to receipts) |
+| `LIFEOS_COGNITUM_ALLOW_INVALID_TLS` | unset/false; explicit development-only opt-in for a device with no trusted CA projection |
 | `LIFEOS_MQTT_URL` | `mqtt://127.0.0.1:1883` |
 | `LIFEOS_MQTT_CLIENT_ID` | `lifeos-daemon-$HOSTNAME` |
 | `LIFEOS_DEVICE_ID` | `$HOSTNAME` or `lifeos-node` |

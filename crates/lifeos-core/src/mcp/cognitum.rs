@@ -227,7 +227,11 @@ impl CognitumClient<ReqwestTransport> {
         let raw = std::env::var("LIFEOS_COGNITUM_URL")
             .unwrap_or_else(|_| DEFAULT_COGNITUM_URL.to_string());
         let base = rest_base_from_mcp_url(&raw);
-        let transport = ReqwestTransport::new(base)?;
+        let bearer = std::env::var("LIFEOS_COGNITUM_BEARER_TOKEN").ok();
+        let allow_invalid_certs = std::env::var("LIFEOS_COGNITUM_ALLOW_INVALID_TLS")
+            .map(|value| value == "1" || value.eq_ignore_ascii_case("true"))
+            .unwrap_or(false);
+        let transport = ReqwestTransport::with_bearer_and_tls(base, bearer, allow_invalid_certs)?;
         Self::connect(transport)
     }
 }

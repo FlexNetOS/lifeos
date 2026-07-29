@@ -1,0 +1,12 @@
+{
+  "schema_version": "lifeos.evidence.update-governance-policy.v1",
+  "recorded_at": "2026-07-28",
+  "holds": [
+    {"pattern":"linux-image*","during":"active-session","apply_mechanism":"ARCHBP-111 host-control hold","evidence":"os_update_lifecycle_map.json"},
+    {"pattern":"snapd","during":"active-session","apply_mechanism":"ARCHBP-111 host-control hold","evidence":"os_update_lifecycle_map.json"},
+    {"pattern":"accountsservice","during":"active-session","apply_mechanism":"ARCHBP-111 host-control hold","evidence":"os_update_lifecycle_map.json"}
+  ],
+  "gate": {"enabled": true,"mechanism":"os-update-hold through scripts/os-update-observer.mjs"},
+  "reboot": {"auto_reboot":"forbidden","requires":"ARCHBP-112 explicit owner handoff"},
+  "authority": "PostgreSQL/RuVector durable state and envctl-controlled host materialization remain authoritative; this policy is a reviewable guard input."
+}

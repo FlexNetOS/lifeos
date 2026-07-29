@@ -1,0 +1,55 @@
+{
+  "task_id": "COMPONENT-389_WASM_BINDGEN_WASM_PACK",
+  "title": "Component: wasm-bindgen/wasm-pack",
+  "probe_mode": "read-only",
+  "status": "partial",
+  "goal": "Component 'wasm-bindgen/wasm-pack' must be installed and used, not replaced (hard rule 15).",
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "sha256_matches_packet": true,
+    "required_component_row": 6097,
+    "named_wasm_surfaces": [
+      "ruvector-sparse-inference-wasm (line 6242)",
+      "ruvector-temporal-tensor-wasm (line 6245)"
+    ],
+    "requirement": "WASM binding/package generation; WASM uses wasm-bindgen/wasm-pack into separate generated trees."
+  },
+  "tooling": {
+    "wasm_pack": {
+      "installed": true,
+      "version": "0.15.0"
+    },
+    "wasm_bindgen_cli": {
+      "installed_on_path": false,
+      "note": "The standalone wasm-bindgen executable was not found on PATH during this probe."
+    },
+    "wasm_bindgen_rust_dependency": {
+      "present_in_cargo_lock": true,
+      "version": "0.2.122",
+      "lockfile": "Cargo.lock"
+    }
+  },
+  "assessment": {
+    "not_replaced": true,
+    "installed_and_usable": "wasm-pack is installed and versioned; wasm-bindgen is pinned as a Rust dependency.",
+    "limitation": "This read-only workspace probe found no local wasm-pack invocation or generated WASM output to prove an executed packaging run, and the standalone wasm-bindgen CLI is unavailable on PATH.",
+    "follow_up": "Run the repository's intended wasm-pack build in its provisioned build environment and retain generated-tree artifacts plus command provenance."
+  },
+  "checks": [
+    {
+      "command": "grep -Fq 'wasm-bindgen/wasm-pack' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+      "passed": true
+    },
+    {
+      "command": "wasm-pack --version",
+      "passed": true,
+      "output": "wasm-pack 0.15.0"
+    },
+    {
+      "command": "wasm-bindgen --version",
+      "passed": false,
+      "output": "executable not found on PATH"
+    }
+  ]
+}

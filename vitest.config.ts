@@ -5,7 +5,7 @@ import { fileURLToPath, URL } from "node:url";
 
 // Vitest config — separated from vite.config.ts so dev server stays clean.
 
-// The archbp-* planning-spine suite validates live FlexNetOS host state
+// The archbp-* suite validates live FlexNetOS host state
 // (postgres cluster, durable mounts, envelope sessions) by design. Off-host
 // (e.g. GitHub-hosted runners) those paths cannot exist, so the suite is
 // excluded there and runs on the self-hosted gha-runner instead

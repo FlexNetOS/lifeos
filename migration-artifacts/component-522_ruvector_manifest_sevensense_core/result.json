@@ -1,0 +1,27 @@
+{
+  "task_id": "COMPONENT-522_RUVECTOR_MANIFEST_SEVENSENSE_CORE",
+  "status": "verified_with_anchor_offset_discrepancy",
+  "goal": "RuVector manifest: sevensense-core is installed and used, not replaced (hard rule 15).",
+  "verification": {
+    "command": "grep -Fq 'RuVector manifest: sevensense-core' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "exit_code": 0,
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "expected_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "entry_line": 6230,
+    "entry_byte_offset": 911677,
+    "entry_sha256_newline_free": "47ef0da2917c6a7176b474dcd2768aa8045741dff1e7c592ca8ca17802c41e44",
+    "expected_entry_sha256": "47ef0da2917c6a7176b474dcd2768aa8045741dff1e7c592ca8ca17802c41e44"
+  },
+  "manifest": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "examples/vibecast-7sense/crates/sevensense-core",
+    "package": "sevensense-core",
+    "version": "0.1.0 workspace",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "finding": "The declared byte offset does not point to the manifest row in the hash-matching document. The verified row begins at byte offset 911677; its line hash matches the bound unit SHA-256."
+  },
+  "result": "pass"
+}

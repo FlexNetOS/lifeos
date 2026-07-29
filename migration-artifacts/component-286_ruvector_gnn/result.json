@@ -1,0 +1,35 @@
+{
+  "task_id": "COMPONENT-286_RUVECTOR_GNN",
+  "title": "Component: @ruvector/gnn",
+  "probe_type": "read-only",
+  "status": "noncompliant",
+  "goal": "Component '@ruvector/gnn' must be installed and used, not replaced (hard rule 15).",
+  "anchor_binding": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_actual": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "byte_offset_supplied": 335153,
+    "unit_sha256_expected": "8b38e9d2dc162e605b5692fff37af065f05fe08deb88984cbfcc327128a29de8",
+    "unit_sha256_verification": "not_verifiable: packet does not define the anchored unit extent"
+  },
+  "blueprint_requirement": {
+    "literal": "@ruvector/gnn",
+    "literal_probe": "passed",
+    "canonical_declaration_line": 5994,
+    "upstream": "https://github.com/ruvnet/RuVector",
+    "version": "0.1.25",
+    "revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae",
+    "hard_rule": 15
+  },
+  "workspace_evidence": {
+    "manifest_direct_dependency": false,
+    "source_usage_in_permitted_paths": false,
+    "lockfile_evidence_in_permitted_paths": false,
+    "runtime_import": "passed: package resolves in the probe environment"
+  },
+  "conclusion": "Hard rule 15 is not satisfied by the permitted workspace evidence: although @ruvector/gnn resolves in the probe environment, no permitted manifest, lockfile, or source usage establishes that the workspace installs and uses it. No replacement was made.",
+  "changes_made": [
+    "Recorded read-only probe result."
+  ],
+  "rollback": "Remove this generated result artifact if the probe record is no longer needed."
+}

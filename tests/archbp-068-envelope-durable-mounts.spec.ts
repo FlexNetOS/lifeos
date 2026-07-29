@@ -45,7 +45,7 @@ describe("ARCHBP-068 durable-state binds", () => {
 
   test("the tier map (t3 dependency) declares the bound durable roots", () => {
     const map = JSON.parse(
-      readFileSync("planning-spine-v0/docs/isolation_tier_map.json", "utf8"),
+      readFileSync("evidence/isolation/isolation_tier_map.json", "utf8"),
     );
     const durablePaths = map.entries
       .filter((e: { tier: string }) => e.tier === "durable")

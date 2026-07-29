@@ -1,0 +1,33 @@
+{
+  "task_id": "COMPONENT-280_RUVECTOR_DETACHED_EXTERNAL_RVDNA",
+  "title": "Component: RuVector detached: external/rvdna",
+  "status": "blocked",
+  "probe": "grep -Fq 'RuVector detached: external/rvdna' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "probe_exit_code": 0,
+  "hard_rule_15": "Component is specified as a detached RuVector external/rvdna runtime and must be installed and used, not replaced.",
+  "evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "row_byte_offset": 617986,
+    "row_sha256_without_trailing_newline": "5d8c4c50d3e30579cfa51cf2a94b7076f2672d48215df6392f1d8db96b770309",
+    "declaration": "ruvnet/RuVector at external/rvdna; parent 6a6c39e…; gitlink 333bc4c40b81adf604452e3b9289f406460b5be1"
+  },
+  "anchor_validation": {
+    "supplied_byte_offset": 335153,
+    "byte_offset_matches": false,
+    "supplied_document_sha256_matches": true,
+    "supplied_unit_sha256_matches": true,
+    "note": "The supplied unit hash identifies the declaration row; its current byte offset is 617986."
+  },
+  "installation_probe": {
+    "external_rvdna_directory_present": false,
+    "rvdna_named_files_present": false,
+    "non_blueprint_rvdna_references_present": false,
+    "result": "The required detached component is not installed or used in this checkout."
+  },
+  "changes": [
+    "Recorded read-only probe evidence only."
+  ],
+  "blocker": "Installing or wiring external/rvdna requires a writable implementation task; this packet explicitly permits only a read-only probe.",
+  "rollback": "Read-only probe; no application changes were made."
+}

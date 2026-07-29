@@ -1,0 +1,30 @@
+{
+  "task_id": "COMPONENT-291_RUVECTOR_RUVLLM_WASM",
+  "title": "Component: @ruvector/ruvllm-wasm",
+  "probe_type": "read-only",
+  "verification_status": "requirement_present_installation_and_use_unverifiable",
+  "component": {
+    "package": "@ruvector/ruvllm-wasm",
+    "required_version": "2.0.2",
+    "source_repository": "https://github.com/ruvnet/RuVector",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "evidence": {
+    "blueprint": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "reference_line": 5999,
+    "command_template": "grep -Fq '@ruvector/ruvllm-wasm' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_exit_code": 0
+  },
+  "assessment": {
+    "canonical_requirement_verified": true,
+    "installation_verified": false,
+    "runtime_use_verified": false,
+    "reason": "The supplied workspace contains the blueprint only; no package manifest, lockfile, source module, or test target was available for an installation/runtime-use probe."
+  },
+  "hard_rule_15": {
+    "requirement": "@ruvector/ruvllm-wasm must be installed and used, not replaced.",
+    "outcome": "not established by this read-only component probe"
+  },
+  "rollback": "No source changes were made; only this probe result artifact was created."
+}

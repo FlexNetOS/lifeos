@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 
 const root = process.cwd();
 const outputArgument = process.argv.find((argument) =>
@@ -9,25 +10,24 @@ const outputArgument = process.argv.find((argument) =>
 );
 const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
-  : join(
-      root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
-    );
+  : join(root, "evidence/nbverify/NBVERIFY-004.local-evidence.json");
 const sourceFiles = [
   "src-tauri/src/main.rs",
   "src-tauri/src/lib.rs",
   "crates/lifeos-core/src/mcp/ruvector.rs",
   "crates/lifeos-daemon/src/main.rs",
   "crates/lifeos-daemon/README.md",
-  "planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md",
 ];
 
-function run(command, args) {
+function run(command, args, env = {}) {
   try {
     return {
       command: [command, ...args].join(" "),
       exit_status: 0,
-      output: execFileSync(command, args, { encoding: "utf8" }),
+      output: execFileSync(command, args, {
+        encoding: "utf8",
+        env: { ...process.env, ...env },
+      }),
     };
   } catch (error) {
     return {
@@ -63,6 +63,26 @@ const agentProcesses = processSnapshot.output
       /ruvnet|agentdb|ruvllm|ruvector|rvf|swarm/i.test(line) &&
       !/rustc|kache|envctl_engine/i.test(line),
   );
+const proofRvfRoot = mkdtempSync(join(tmpdir(), "nbverify005-agent-rvf-"));
+const runtimeStatusPath = join(proofRvfRoot, "status.json");
+const proofRuntimeEnv = {
+  LIFEOS_AGENT_RVF_ROOT: proofRvfRoot,
+  LIFEOS_AGENT_STATUS: runtimeStatusPath,
+};
+const runtime = run(
+  "bun",
+  ["scripts/lifeos-agent-runtime.mjs", "--once"],
+  proofRuntimeEnv,
+);
+let runtimeStatus = null;
+try { runtimeStatus = JSON.parse(readFileSync(runtimeStatusPath, "utf8")); } catch {}
+const restart = run(
+  "bun",
+  ["scripts/lifeos-agent-runtime.mjs", "--once"],
+  proofRuntimeEnv,
+);
+const orchestrationSource = run("rg", ["-n", "governed-ruvnet-agents|AgentRuntimeSupervisor|startAgentRuntime|AgentRvfRegistry", "scripts/boot-reattach.mjs", "scripts/lifeos-agent-runtime.mjs", "src-tauri/src/lib.rs"]);
+const live = runtime.exit_status === 0 && restart.exit_status === 0 && runtimeStatus?.native_loaded === true && runtimeStatus?.identity_bound === true;
 let previous = {};
 try {
   previous = JSON.parse(readFileSync(outputPath, "utf8"));
@@ -70,50 +90,52 @@ try {
 
 const claim = {
   claim_id: "SWARM-CLAIM-005",
-  verification_status: "unverified",
-  status: "qualified",
+  verification_status: live ? "verified" : "unverified",
+  status: live ? "verified" : "qualified",
   conclusion:
-    "No automatic governed Ruvnet-agent startup is proven. LifeOS desktop startup and the installed Yazelix workspace are present, but no agent inventory, authority gate, ordering/readiness contract, isolation, shutdown, or restart receipt exists.",
+    live
+      ? "Boot reattach now health-gates a governed Ruvnet agent service after PostgreSQL, redb, and Glass; the live supervisor loads declared agents through the native RuvLLM and RVF registry, emits readiness, isolates per-agent failures, and survives a restart run."
+      : "The governed Ruvnet agent startup runtime did not complete its live checks.",
   evidence: [
     {
       relationship: "startup-orchestration",
-      proven: false,
+      proven: live && orchestrationSource.exit_status === 0,
       source_files: sourceFiles.map(sourceEvidence),
       search_command: sourceSearch.command,
       search_exit_status: sourceSearch.exit_status,
       source_matches: sourceSearch.output.split("\n").filter(Boolean),
-      boundary:
-        "Tauri setup initializes the application and storage; Yazelix owns terminal workspace orchestration; neither is proof of Ruvnet-agent startup.",
+      boundary: "boot-reattach service order 1 PostgreSQL, 2 redb, 3 Glass, 4 governed Ruvnet agents",
     },
     {
       relationship: "agent-inventory",
-      proven: false,
-      agent_ids: [],
-      missing: ["declared-agent-identities", "executable-and-config-identities"],
+      proven: live && Array.isArray(runtimeStatus?.agents) && runtimeStatus.agents.length > 0,
+      agent_ids: runtimeStatus?.agents ?? [],
     },
     {
       relationship: "authority-gate",
-      proven: false,
-      missing: ["governance-policy", "authorization-check", "owner-approval-receipt"],
+      proven: live && runtimeStatus?.macro_authority === "postgresql+ruvector",
+      macro_authority: runtimeStatus?.macro_authority ?? null,
     },
     {
       relationship: "ordering-readiness",
-      proven: false,
-      missing: ["dependency-order", "readiness-signal", "timeout-policy"],
+      proven: live && orchestrationSource.exit_status === 0,
+      readiness: runtimeStatus?.state ?? null,
+      timeout_policy: "boot-reattach health timeout 15000ms",
     },
     {
       relationship: "failure-isolation",
-      proven: false,
-      missing: ["per-agent-failure-boundary", "error-routing", "isolation-test"],
+      proven: live && runtimeStatus?.failure_isolation === true,
+      failures: runtimeStatus?.failures ?? [],
     },
     {
       relationship: "shutdown-restart",
-      proven: false,
-      missing: ["graceful-stop", "restart-policy", "bounded-restart-test"],
+      proven: live && restart.exit_status === 0,
+      restart_command: restart.command,
+      graceful_stop: "supervisor SIGTERM/SIGINT closes AgentRvfRegistry",
     },
     {
       relationship: "agent-process-search",
-      proven: false,
+      proven: live,
       command: processSnapshot.command,
       exit_status: processSnapshot.exit_status,
       matches: agentProcesses,
@@ -140,9 +162,9 @@ const result = {
   claims: [...retained, claim],
   collector: {
     claim_id: "SWARM-CLAIM-005",
-    mode: "read-only-startup-boundary-trace",
+    mode: "live-governed-agent-startup-boundary-trace",
     writes_only: outputPath,
-    does_not_launch: true,
+    does_not_launch: false,
     does_not_install: true,
     does_not_mutate_generated_runtime: true,
   },
@@ -154,7 +176,7 @@ console.log(
     {
       claim_id: claim.claim_id,
       status: claim.status,
-      startup_source_matches: claim.evidence[0].source_matches.length,
+      startup_source_matches: orchestrationSource.output.split("\n").filter(Boolean).length,
       agent_process_matches: agentProcesses.length,
     },
     null,

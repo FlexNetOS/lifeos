@@ -1,0 +1,27 @@
+{
+  "task_id": "COMPONENT-339_RUSTY_IDD_COMPONENT_CRATES_SPEC",
+  "title": "Component: rusty-idd component: crates/spec",
+  "status": "unverified",
+  "probe_mode": "read-only",
+  "command_template": "grep -Fq 'rusty-idd component: crates/spec' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_line": 6047,
+    "component_byte_offset": 675348,
+    "component_line_sha256": "c036c75841527ac55324c6141df092fb811fdd9525eda2485b627074fedb8631"
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/rusty-idd",
+    "path": "crates/spec",
+    "revision": "4c47c67fe088e99868d8ccf74d6cbe1aa2af2856",
+    "hard_rule": "Must be installed and used, not replaced."
+  },
+  "evidence": {
+    "execution_framework_present": false,
+    "non_blueprint_integration_evidence_found": false,
+    "rusty_idd_on_path": false
+  },
+  "conclusion": "The specification requirement and pinned revision are verified in the canonical blueprint, but installation and actual use of rusty-idd crates/spec cannot be verified from the permitted workspace evidence. No replacement was performed."
+}

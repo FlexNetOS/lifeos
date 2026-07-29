@@ -1,0 +1,46 @@
+{
+  "task_id": "COMPONENT-391_ONNX_RUNTIME_ORT",
+  "component": "ONNX Runtime/ort",
+  "status": "blocked",
+  "conclusion": "The blueprint requires ONNX Runtime/ort to be installed and used, not replaced. This read-only checkout provides the specification evidence but no installed component, lockfile, or runtime manifest that can prove the requirement is satisfied.",
+  "hard_rule_15": {
+    "required": "ONNX Runtime/ort must be installed and used, not replaced.",
+    "satisfied_by_available_evidence": false,
+    "substitution_introduced": false
+  },
+  "source_verification": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_actual": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "command_template": "grep -Fq 'ONNX Runtime/ort' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0,
+    "anchor": {
+      "byte_offset_supplied": 335153,
+      "unit_sha256_supplied": "6def3fd93e8a27a061e2e8efcc3e6db678ab1def79ea7e670e4734904645fbda",
+      "note": "The supplied byte offset is not at the ONNX Runtime/ort inventory row; the canonical literal is at line 6099. No unit boundary was supplied, so the unit hash cannot be recomputed."
+    }
+  },
+  "blueprint_evidence": [
+    {
+      "line": 25,
+      "finding": "Hard rule 15 states that ruvnet/rUv components are installed and used, not replaced."
+    },
+    {
+      "line": 6099,
+      "finding": "ONNX Runtime/ort is sourced from microsoft/onnxruntime, pinned by RuVector lock 6a6c39e662a4c3184dcb913db91a09401c84b2ae, and required for local embedding/model execution; installation order is 9."
+    },
+    {
+      "line": 5745,
+      "finding": "The GPU/ONNX model-driver surface explicitly includes ONNX Runtime/ort for local embedding/inference."
+    }
+  ],
+  "probe_scope": {
+    "mode": "read-only",
+    "paths_examined": [
+      "execution-framework/**",
+      "migration-artifacts/**"
+    ],
+    "repository_observation": "No Cargo.toml, Cargo.lock, package.json, flake.lock, source checkout, runtime invocation, or other dependency/install evidence for ONNX Runtime/ort was present in the allowed paths. The only related artifact is the separate Candle probe, which does not establish ort installation or use.",
+    "required_to_unblock": "Provide the pinned RuVector/runtime checkout and its lockfile or build/runtime evidence showing ONNX Runtime/ort is resolved and exercised under the database-controlled execution path."
+  }
+}

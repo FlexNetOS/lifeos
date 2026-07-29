@@ -13,8 +13,17 @@ describe("ARCHBP-096 ordered health-gated startup", { retry: 2 }, () => {
     // Real fixture: two TCP services started by the engine itself, ordered.
     // Ports are unique per run (pid-derived) and the fixtures live only a few
     // seconds, so back-to-back runs never find a leaked listener already up.
-    const p1 = 23600 + (process.pid % 97);
-    const p2 = p1 + 100;
+    const freePort = () => new Promise<number>((resolvePort, reject) => {
+      const server = createServer();
+      server.once("error", reject);
+      server.listen(0, "127.0.0.1", () => {
+        const address = server.address();
+        const port = typeof address === "object" && address ? address.port : 0;
+        server.close((error) => error ? reject(error) : resolvePort(port));
+      });
+    });
+    const p1 = await freePort();
+    const p2 = await freePort();
     const fixture = (port: number) =>
       ["bun", "-e", `Bun.listen({hostname:'127.0.0.1',port:${port},socket:{data(){}}}); setTimeout(()=>{}, 5000)`];
     const services = [

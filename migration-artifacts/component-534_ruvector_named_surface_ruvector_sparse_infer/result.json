@@ -1,0 +1,33 @@
+{
+  "task_id": "COMPONENT-534_RUVECTOR_NAMED_SURFACE_RUVECTOR_SPARSE_INFER",
+  "title": "Component: RuVector named surface: ruvector-sparse-inference-wasm",
+  "status": "noncompliant_unverified",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector named surface: ruvector-sparse-inference-wasm' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "b6bb7f1f50f96523844356947b28b711a2dc58a50438a5052ea5638d31d3f5c7",
+    "verified_row_line": 6242,
+    "verified_row_byte_offset": 928825,
+    "verified_row_sha256_newline_free": "b6bb7f1f50f96523844356947b28b711a2dc58a50438a5052ea5638d31d3f5c7",
+    "finding": "The declared byte offset points to unrelated prose in the hash-matching document. The canonical named-surface row begins at byte offset 928825 and matches the declared unit SHA-256 when hashed without its trailing newline."
+  },
+  "required_component": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "crates/ruvector-sparse-inference-wasm",
+    "package": "ruvector-sparse-inference-wasm",
+    "version": "2.3.0 workspace",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae",
+    "purpose": "browser sparse inference"
+  },
+  "hard_rule_15": "The native RuVector ruvector-sparse-inference-wasm component is required to be installed and used; it must not be replaced.",
+  "probe_finding": "The permitted execution-framework/ directory is absent. No Cargo manifest, lockfile entry, source reference, or runtime-use evidence for ruvector-sparse-inference-wasm was found in the permitted checkout or under migration-artifacts/. This read-only probe therefore cannot verify installation or use of the required native component.",
+  "changes_made": [
+    "Created this evidence receipt only."
+  ],
+  "rollback": "No rollback required; no implementation or dependency state was changed.",
+  "result": "fail"
+}

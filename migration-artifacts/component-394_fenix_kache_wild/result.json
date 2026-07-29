@@ -1,0 +1,63 @@
+{
+  "task_id": "COMPONENT-394_FENIX_KACHE_WILD",
+  "title": "Component: Fenix/Kache/wild",
+  "probe_mode": "read-only",
+  "status": "partially_verified_runtime_available_fenix_provenance_unverified",
+  "hard_rule": 15,
+  "requirement": "Fenix/Kache/wild must be installed and used, not replaced.",
+  "component": {
+    "name": "Fenix/Kache/wild",
+    "owner": "Nix/Rust",
+    "repository": "https://github.com/FlexNetOS/envctl",
+    "declared_revision": "48368a97f7d1388cea247dd4ebdc32a8193743fb",
+    "declared_role": "Rust toolchain/cache/linker environment"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "supplied_anchor_byte_offset": 335153,
+    "observed_component_row_line": 6102,
+    "observed_component_row_byte_offset": 727071,
+    "supplied_unit_sha256": "9853bb8443cf5450ed40317a856c0b03614f17bca50ef09465b97d063a03bdcd",
+    "unit_sha256_validation": "unavailable: the packet does not define the source-unit byte range required to recompute this digest",
+    "command_template_passed": true,
+    "component_row": "Fenix/Kache/wild; envctl 48368a97f7d1388cea247dd4ebdc32a8193743fb; Rust toolchain/cache/linker environment"
+  },
+  "runtime_evidence": {
+    "nix": {
+      "path": "/home/flexnetos/.nix-profile/bin/nix",
+      "version": "2.34.7"
+    },
+    "rust_toolchain": {
+      "path": "/nix/store/rcaipmaqdjsjj8flb7lr5vcpr3c1clms-rust-mixed/bin/rustc",
+      "version": "rustc 1.98.0-nightly (f8a08b688 2026-05-30)",
+      "fenix_attribution": "unverified: the runtime closure exposes rust-mixed but not the Nix input/source provenance needed to establish Fenix specifically"
+    },
+    "kache": {
+      "path": "/nix/store/lzd2mqfqgid1r1ksg19px85rlx7n8gip-kache-0.10.0/bin/kache",
+      "version": "kache 0.10.0",
+      "invocation_succeeded": true
+    },
+    "wild": {
+      "path": "/nix/store/arlw9v21vr80x3qqhifdqxf1pnrx81f4-wild-unwrapped-wrapper-0.9.0/bin/wild",
+      "version": "Wild 0.9.0 non-git-build (compatible with GNU linkers)",
+      "invocation_succeeded": true
+    },
+    "envctl": {
+      "path": "/home/flexnetos/.nix-profile/bin/envctl",
+      "version": "envctl 0.1.0"
+    },
+    "permitted_implementation_path": "execution-framework",
+    "path_present": false,
+    "repository_usage_verified": false,
+    "repository_usage_reason": "No execution-framework directory is available within the permitted probe scope; direct Kache and wild invocation verifies runtime use, but there is no scoped configuration or lockfile evidence tying the Rust toolchain to Fenix or envctl revision 48368a97f7d1388cea247dd4ebdc32a8193743fb."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "This was a read-only probe; no alternative Rust toolchain, compiler cache, or linker was introduced."
+  },
+  "changes": [
+    "Recorded read-only blueprint and runtime verification evidence."
+  ],
+  "rollback": "Read-only probe; no implementation changes were made."
+}

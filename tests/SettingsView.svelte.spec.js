@@ -9,8 +9,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import SettingsView from "@/components/SettingsView.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
-import { useToasts } from "@/stores/toasts.js";
+import { useLifeos } from "@/stores/lifeos-native";
+import { useToasts } from "@/stores/toasts-native";
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -26,6 +26,8 @@ describe("SettingsView.svelte", () => {
     setTauri(null);
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
+    useToasts().clear();
   });
 
   afterEach(() => {

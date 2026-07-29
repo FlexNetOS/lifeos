@@ -1,0 +1,23 @@
+{
+  "schema_version": "lifeos.evidence.isolation-invariant-ledger.v1",
+  "normative": true,
+  "invariants": [
+    {"id":"I01","statement":"The envelope is native user-namespace isolation with no hypervisor in the hot path.","predicate":"Live probe reports a namespaced process and the selected executor is bwrap.","goals":["G1","G2"],"covers":["isolation"]},
+    {"id":"I02","statement":"The host kernel remains shared and is never presented as a second durable state plane.","predicate":"The architecture spec records shared-kernel limits and state remains on the durable plane.","goals":["G1","G7"],"covers":["isolation","persistence"]},
+    {"id":"I03","statement":"Each envelope has a private root, private process namespace, and private temporary filesystem.","predicate":"The live probe observes a private PID and tmpfs root with no host home residual.","goals":["G1","G2"],"covers":["isolation"]},
+    {"id":"I04","statement":"Envelope setup cost is measured separately from workload runtime latency.","predicate":"The committed latency receipts report setup and runtime medians independently.","goals":["G2","G10"],"covers":["portability"]},
+    {"id":"I05","statement":"The /nix surface is read-only and explicitly selected from the host or portable closure.","predicate":"The engine constructs an explicit ro-bind at /nix and accepts --store.","goals":["G2","G6"],"covers":["isolation","portability"]},
+    {"id":"I06","statement":"No durable path is implicitly mounted from host /run.","predicate":"The engine has no /run bind and the tier guard rejects durable /run targets.","goals":["G2","G4"],"covers":["isolation","persistence"]},
+    {"id":"I07","statement":"Volatile state is disposable and reproducible.","predicate":"Volatile paths are tmpfs or explicitly marked reproducible scratch output.","goals":["G4","G7"],"covers":["persistence"]},
+    {"id":"I08","statement":"Known home-owned residuals are reported and never silently promoted to authority.","predicate":"The home-owner guard distinguishes known residuals from new regressions.","goals":["G5"],"covers":["ownership"]},
+    {"id":"I09","statement":"Portable release bytes remain usable after relocation of the bundle prefix.","predicate":"The moved-prefix launcher executes with the host store hidden.","goals":["G6","G10"],"covers":["portability"]},
+    {"id":"I10","statement":"PostgreSQL/RuVector remains the durable macro-state authority.","predicate":"Durable state paths and release receipts identify PostgreSQL/RuVector as canonical.","goals":["G4","G7"],"covers":["persistence","ownership"]},
+    {"id":"I11","statement":"GPU access is acquired only when explicitly requested.","predicate":"A probe with --gpu sees device nodes and a probe without it does not.","goals":["G8"],"covers":["isolation","ownership"]},
+    {"id":"I12","statement":"Network isolation is explicit and reversible per envelope.","predicate":"Shared networking reports host interfaces while --isolate-net reports loopback only.","goals":["G8"],"covers":["isolation"]},
+    {"id":"I13","statement":"A requested device is passed through without ambient device exposure.","predicate":"The device live test sees the requested node and not unrelated nodes.","goals":["G8"],"covers":["isolation","ownership"]},
+    {"id":"I14","statement":"Multiple envelopes share only caller-declared durable roots.","predicate":"Concurrent envelopes have isolated private tmpfs and exactly one line per shared writer.","goals":["G2","G7"],"covers":["isolation","persistence"]},
+    {"id":"I15","statement":"meta/var is never mounted into container overlay or volume surfaces.","predicate":"The live container mount guard reports zero violations and rejects fixture violations.","goals":["G9"],"covers":["ownership"]},
+    {"id":"I16","statement":"A host reboot can end processes but cannot destroy durable LifeOS state.","predicate":"The architecture separates process loss from durable state and re-attach.","goals":["G7"],"covers":["persistence"]},
+    {"id":"I17","statement":"The portable release does not claim stronger store independence than its evidence proves.","predicate":"The receipt records remaining host dependencies and blocks stronger claims.","goals":["G6","G10"],"covers":["portability","ownership"]}
+  ]
+}

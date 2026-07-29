@@ -1,0 +1,40 @@
+{
+  "task_id": "COMPONENT-349_NU_PLUGIN_COMPONENT_CODEDB_CORE",
+  "title": "Component: nu_plugin component: codedb-core",
+  "status": "verified",
+  "probe_mode": "read-only",
+  "command_template": "grep -Fq 'nu_plugin component: codedb-core' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_line": 6057,
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "7e588d2f75b7f23959b0d269bdb1a39f7d8eb60aa14ed1ffea62508d500a36ac"
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/nu_plugin",
+    "path": "codedb-core",
+    "revision": "63d6874314031471213fe9f51d9706820bc254e1",
+    "hard_rule": "Must be installed and used, not replaced.",
+    "verification": "Pinned revision; locked package tests; interruption/replay and byte round trip"
+  },
+  "evidence": {
+    "nu_version": "0.113.1",
+    "plugin_binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb",
+    "plugin_registry": {
+      "name": "codedb",
+      "version": "0.1.0",
+      "status": "loaded",
+      "registered_command_count": 24
+    },
+    "compiled_component_identity": "The loaded nu_plugin_codedb binary contains codedb_core Rust symbols, including codedb_core::table_inventory, codedb_core::schema_rows, codedb_core::doctor_rows, codedb_core::scan_path, and codedb_core::scan_filesystem.",
+    "runtime_use_probe": "nu -c 'codedb tables | to json'",
+    "runtime_use_probe_passed": true,
+    "runtime_use_probe_result": "The command returned the CodeDB table inventory, reaching the compiled codedb_core table-inventory implementation without mutation.",
+    "runtime_handshake": "package targets nu-plugin/nu-protocol handshake 0.113.1",
+    "replacement_introduced": false
+  },
+  "conclusion": "The canonical requirement, document hash, and exact component-row hash are verified. codedb-core is installed as a compiled component of the loaded nu_plugin_codedb runtime and was used by the read-only codedb tables command. No replacement implementation was introduced.",
+  "next_action": "For full component-closure verification, provide the permitted execution-framework closure and pinned nu_plugin source checkout at 63d6874314031471213fe9f51d9706820bc254e1, then run locked package tests plus interruption/replay and byte-round-trip verification."
+}

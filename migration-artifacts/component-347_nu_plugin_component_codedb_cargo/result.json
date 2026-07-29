@@ -1,0 +1,37 @@
+{
+  "task_id": "COMPONENT-347_NU_PLUGIN_COMPONENT_CODEDB_CARGO",
+  "title": "Component: nu_plugin component: codedb-cargo",
+  "status": "blocked",
+  "probe_mode": "read-only",
+  "command_template": "grep -Fq 'nu_plugin component: codedb-cargo' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_line": 6055,
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "fc1b988c592553f181ac45b50cc44c7f94e7b434546edd188610afe9e2809805"
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/nu_plugin",
+    "path": "codedb-cargo",
+    "revision": "63d6874314031471213fe9f51d9706820bc254e1",
+    "hard_rule": "Must be installed and used, not replaced.",
+    "verification": "Pinned revision; locked package tests; interruption/replay and byte round trip"
+  },
+  "evidence": {
+    "nu_version": "0.113.1",
+    "required_binary_on_path": false,
+    "required_binary": "nu_plugin_codedb_cargo",
+    "plugin_registry_entry": false,
+    "plugin_registry_probe": "nu -c 'plugin list | where name == \"codedb-cargo\"'",
+    "installed_codedb_plugin": {
+      "name": "codedb",
+      "version": "0.1.0",
+      "binary": "/home/flexnetos/.nix-profile/bin/nu_plugin_codedb"
+    },
+    "replacement_introduced": false
+  },
+  "conclusion": "The canonical requirement and blueprint hash are verified, but nu_plugin_codedb_cargo is not installed or registered in Nushell. The installed codedb plugin is a distinct component and cannot be substituted for the required codedb-cargo component under hard rule 15. No replacement was introduced.",
+  "next_action": "In an installation-authorized execution-framework closure, build or obtain codedb-cargo from the pinned nu_plugin revision, register nu_plugin_codedb_cargo with Nushell, and execute a read-only codedb-cargo command to prove runtime use."
+}

@@ -14,6 +14,7 @@
 // Runs under Bun.
 
 import { createHash } from "node:crypto";
+import { forecast as runAtasForecast } from "./atas-forecast-lifecycle.mjs";
 
 /** Only a task that exists in the canonical graph AND is Ready may be dispatched. */
 export function authorizeDispatch(taskId, taskGraph) {
@@ -73,6 +74,7 @@ export class RufloCoordinator {
       agentIdentity: binding.agentIdentity ?? null,
       cartridgeId: binding.cartridgeId ?? null,
       route: binding.route ?? "local",
+      agentMemoryBound: binding.agentMemoryBound === true,
       cost,
       deadline: binding.deadline ?? null,
       state: "dispatched",
@@ -147,6 +149,14 @@ export class RufloCoordinator {
     this.proofLog.push(candidate);
     return candidate;
   }
+
+  /**
+   * Forecast a bounded timeline from observed coordinator costs. The result is
+   * a candidate only; database promotion remains the sole activation path.
+   */
+  forecastTimeline(observations, horizon = 8) {
+    return runAtasForecast(observations, { horizon, reservoirSize: 16, seed: 17 });
+  }
   // NB: there is deliberately no `completeTask` method — the coordinator cannot
   // authorize completion.
 }
@@ -170,22 +180,58 @@ async function emitProof() {
     publisher: "ruvnet (npm ~ruvnet)",
   };
 
-  // Real RuvLTRA route (ARCHBP-013) — local-only default.
-  const { decideRoute, defaultPolicy } = await import("./ruvltra-routing-lifecycle.mjs");
-  const routed = decideRoute(
-    { complexity: 0.9, confidence: 0.9, privacy: false, estimatedCost: 0.1, resourceExhausted: false, cloudOutage: false },
-    defaultPolicy(),
-  );
+  // Real RuvLTRA route (ARCHBP-013): native ruvllm query + embedding feeds
+  // the installed FastGRNN/Tiny-Dancer classifier before policy selection.
+  const { RuvLLM } = await import("@ruvector/ruvllm");
+  const { decideRoute, defaultPolicy, RuvltraRouter } = await import("./ruvltra-routing-lifecycle.mjs");
+  const routeWorkDir = mkdtempSync(join(tmpdir(), "archbp014-fastgrnn-"));
+  let routed;
+  let routingRuntime;
+  let routeEmbedding;
+  try {
+    const llm = new RuvLLM({ embeddingDim: 8 });
+    const query = llm.query("coordinate the next authorized LifeOS task");
+    const embedding = llm.embed("coordinate the next authorized LifeOS task").slice(0, 8);
+    routeEmbedding = embedding;
+    const rows = Array.from({ length: 12 }, (_, i) => ({
+      embedding: embedding.map((value, j) => value + ((i + j) % 3) * 0.01),
+      scores: i % 2 === 0 ? { cheap: 0.9, strong: 0.92 } : { cheap: 0.2, strong: 0.95 },
+    }));
+    const router = await RuvltraRouter.train(rows, join(routeWorkDir, "router.safetensors"), 8);
+    const complexity = await router.complexityScore(embedding);
+    routed = decideRoute(
+      { complexity, confidence: query.confidence, privacy: false, estimatedCost: 0.1, resourceExhausted: false, cloudOutage: false },
+      defaultPolicy(),
+    );
+    routingRuntime = {
+      nativeLoaded: llm.isNativeLoaded(),
+      model: query.model,
+      confidence: query.confidence,
+      complexity,
+      fastGrnnMeasured: Number.isFinite(complexity),
+    };
+  } finally {
+    rmSync(routeWorkDir, { recursive: true, force: true });
+  }
 
   // Real AgentDB identity (ARCHBP-007).
-  const { AgentRvfMemory } = await import("./agentdb-rvf-lifecycle.mjs");
+  const { AgentRvfRegistry } = await import("./agentdb-rvf-lifecycle.mjs");
   const workDir = mkdtempSync(join(tmpdir(), "archbp014-agent-"));
   let agentFileId;
+  let agentRegistry;
+  let agentMemoryBound = false;
   try {
-    const agent = await AgentRvfMemory.open({ agentId: "coordinator-agent", storagePath: join(workDir, "coord.rvf"), dimension: 8 });
+    agentRegistry = await AgentRvfRegistry.open({ storageRoot: workDir });
+    const agent = await agentRegistry.openAgent({ agentId: "coordinator-agent", dimension: 8 });
+    await agent.remember("route-embedding-1", Float32Array.from(routeEmbedding), { source: "native-ruvllm", model: routingRuntime.model });
+    await agent.learn();
+    agentMemoryBound = true;
     agentFileId = (await agent.identity()).fileId;
-    agent.destroy();
+    if (!agentRegistry.discover().some((entry) => entry.agentId === "coordinator-agent")) {
+      throw new Error("coordinator-agent RVF was not discoverable through the registry");
+    }
   } finally {
+    await agentRegistry?.close();
     rmSync(workDir, { recursive: true, force: true });
   }
 
@@ -195,7 +241,11 @@ async function emitProof() {
     "ARCHBP-102": { status: "Complete" },
   };
   const c = new RufloCoordinator(graph, { maxRetries: 2, budget: 10, primarySourceVersion: primarySource.version });
-  const binding = { agentIdentity: agentFileId, cartridgeId: "cart-1", route: routed.route, cost: 1 };
+  const timelineForecast = c.forecastTimeline(
+    Array.from({ length: 24 }, (_, i) => 1 + Math.sin(i / 3) * 0.2 + i * 0.01),
+    4,
+  );
+  const binding = { agentIdentity: agentFileId, cartridgeId: "cart-1", route: routed.route, cost: 1, agentMemoryBound };
 
   // authority
   const authority = {
@@ -212,6 +262,7 @@ async function emitProof() {
     agentFileId,
     routeIsLocalDefault: d.route === "local",
     cartridgeBound: d.cartridgeId === "cart-1",
+    agentMemoryBound: d.agentMemoryBound === true,
   };
 
   // cancellation
@@ -260,12 +311,20 @@ async function emitProof() {
     primarySource,
     authority,
     binding: binding_,
+    routingRuntime,
     cancellation: { stopped: cancelStopped },
     timeout: { timedOut },
     retry: { bounded: retryBounded },
     budget: { failsClosed: budgetFailsClosed },
     completion,
     proof,
+    forecast: {
+      schemaVersion: timelineForecast.schemaVersion,
+      candidateId: timelineForecast.candidateId,
+      calibrated: timelineForecast.uncertainty.calibrated,
+      points: timelineForecast.forecast.length,
+      selfPromoted: timelineForecast.promotion.selfPromoted,
+    },
   };
 
   const outputArg = process.argv.find((a) => a.startsWith("--output="));

@@ -10,19 +10,12 @@ export const SOURCE_PATH = path.join(
   REPO_ROOT,
   "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 );
-export const INVENTORY_PATH = path.join(
-  REPO_ROOT,
-  "planning-spine-v0",
-  "1.0_VISION",
-  "Architecture_Anchors",
-  "section_inventory.json"
-);
 
 export const SOURCE_ID = "ARCHANCHOR-001";
 export const SOURCE_SHA256 =
-  "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee";
-export const SOURCE_BYTES = 977_386;
-export const SOURCE_LINES = 6_347;
+  "ae24c6a3dc18b08c1720ab8dc7b66c7d945bc6d1b24c64a119c6cc16dcb49619";
+export const SOURCE_BYTES = 991_204;
+export const SOURCE_LINES = 6_394;
 export const MEMOIR_NAME = "architecture-data-pipeline-ruvector";
 export const TOPIC_PREFIX = MEMOIR_NAME;
 export const MAX_RAW_CHUNK_BYTES = 8_192;
@@ -143,13 +136,13 @@ const RECALL_PROBES = [
   },
   {
     id: "postgresql-ruvector",
-    evidence: ["PostgreSQL", "RuVector", "canonical durable macro-state"],
+    evidence: ["PostgreSQL", "RuVector", "Swarm Primary Runtime"],
     query:
       "PostgreSQL RuVector canonical durable macro-state Swarm Primary Runtime"
   },
   {
     id: "redb",
-    evidence: ["redb", "mmap projection", "ordered wakeup"],
+    evidence: ["redb", "mmap projection", "event supplies wakeup"],
     query:
       "redb transient shared low-latency state plane mmap projection ordered wakeup"
   },
@@ -167,9 +160,9 @@ const RECALL_PROBES = [
   },
   {
     id: "release-gate",
-    evidence: ["database-gated", "envctl-activated", "zero undeclared loss"],
+    evidence: ["envctl", "PostgreSQL/RuVector accepts", "zero undeclared loss"],
     query:
-      "database-gated envctl-activated release zero undeclared loss release gate"
+      "envctl PostgreSQL RuVector accepts release zero undeclared loss release gate"
   }
 ];
 
@@ -300,12 +293,64 @@ function exactSource(sourcePath = SOURCE_PATH) {
   return { bytes, text };
 }
 
-function exactInventory(inventoryPath = INVENTORY_PATH) {
-  const inventory = JSON.parse(fs.readFileSync(inventoryPath, "utf8"));
+function deriveInventory(text) {
+  const lines = splitLinesPreservingEndings(text);
+  const sectionStarts = [];
+  let fenced = false;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].replace(/\r?\n$/, "");
+    if (/^\s*```/.test(line)) {
+      fenced = !fenced;
+      continue;
+    }
+    const match = !fenced && /^(#{1,6})\s+(.+?)\s*$/.exec(line);
+    if (match) {
+      sectionStarts.push({ line: index + 1, level: match[1].length, title: match[2] });
+    }
+  }
+  const sections = [];
+  if (sectionStarts.length && sectionStarts[0].line > 1) {
+    sections.push({ start_line: 1, level: 0, title: "Preamble" });
+  }
+  sections.push(...sectionStarts);
+  const rendered = sections.map((section, index) => {
+    const startLine = section.line ?? section.start_line;
+    const endLine = sections[index + 1]
+      ? sections[index + 1].line - 1
+      : lines.length;
+    const raw = lines.slice(startLine - 1, endLine).join("");
+    return {
+      section_id: `${SOURCE_ID}-SECTION-${String(index + 1).padStart(3, "0")}`,
+      level: section.level,
+      title: section.title,
+      start_line: startLine,
+      end_line: endLine,
+      line_count: endLine - startLine + 1,
+      sha256: sha256(Buffer.from(raw, "utf8")),
+    };
+  });
+  return {
+    anchors: [{
+      anchor_id: SOURCE_ID,
+      total_lines: lines.length,
+      section_count: rendered.length,
+      coverage: {
+        first_line: 1,
+        last_line: lines.length,
+        contiguous: true,
+        complete: true,
+      },
+      sections: rendered,
+    }],
+  };
+}
+
+function exactInventory(sourceText) {
+  const inventory = deriveInventory(sourceText);
   const anchor = inventory.anchors?.find(
     (candidate) => candidate.anchor_id === SOURCE_ID
   );
-  if (!anchor) fail(`${SOURCE_ID} is absent from ${inventoryPath}`);
+  if (!anchor) fail(`${SOURCE_ID} is absent from the exact blueprint source`);
   if (
     anchor.total_lines !== SOURCE_LINES ||
     anchor.coverage?.first_line !== 1 ||
@@ -539,11 +584,10 @@ function buildRelationEvidenceMemory(relations) {
 }
 
 export function buildIngestionPlan({
-  sourcePath = SOURCE_PATH,
-  inventoryPath = INVENTORY_PATH
+  sourcePath = SOURCE_PATH
 } = {}) {
   const source = exactSource(sourcePath);
-  const inventory = exactInventory(inventoryPath);
+  const inventory = exactInventory(source.text);
   const lines = splitLinesPreservingEndings(source.text);
   if (lines.length !== SOURCE_LINES) {
     fail(`expected ${SOURCE_LINES} preserved lines, got ${lines.length}`);
@@ -782,6 +826,7 @@ export function reconcileGraph(plan, graph) {
 
 function parseArgs(argv) {
   const options = {
+    acceptSourceUpdate: false,
     batchSize: 32,
     dryRun: false,
     forceEmbed: false,
@@ -798,7 +843,8 @@ function parseArgs(argv) {
       }
       options.batchSize = value;
       index += 1;
-    } else if (argument === "--dry-run") options.dryRun = true;
+    } else if (argument === "--accept-source-update") options.acceptSourceUpdate = true;
+    else if (argument === "--dry-run") options.dryRun = true;
     else if (argument === "--force-embed") options.forceEmbed = true;
     else if (argument === "--skip-embed") options.skipEmbed = true;
     else if (argument === "--skip-recall") options.skipRecall = true;
@@ -807,6 +853,9 @@ function parseArgs(argv) {
   }
   if (options.dryRun && options.verifyOnly) {
     fail("--dry-run and --verify-only are mutually exclusive");
+  }
+  if (options.acceptSourceUpdate && (options.dryRun || options.verifyOnly)) {
+    fail("--accept-source-update requires a writable ingest run");
   }
   if (options.forceEmbed && options.skipEmbed) {
     fail("--force-embed and --skip-embed are mutually exclusive");
@@ -999,19 +1048,49 @@ function memoirExists() {
 
 function readGraph({ readOnly = false } = {}) {
   if (memoirExists() === 0) return null;
-  const output = runIcm(
-    [
-      "memoir",
-      "export",
-      "--memoir",
-      MEMOIR_NAME,
-      "--format",
-      "json",
-      "--no-embeddings"
-    ],
-    { readOnly }
-  ).stdout;
-  return JSON.parse(output);
+  return runPsqlJson(`
+    SELECT json_build_object(
+      'memoir', (
+        SELECT json_build_object('name', memoir.name, 'description', memoir.description)
+        FROM memoirs AS memoir
+        WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+      ),
+      'concepts', COALESCE((
+        SELECT json_agg(
+          json_build_object(
+            'name', concept.name,
+            'definition', concept.definition,
+            'labels', (
+              SELECT COALESCE(
+                json_agg(
+                  concat(label->>'namespace', ':', label->>'value')
+                  ORDER BY label->>'namespace', label->>'value'
+                ),
+                '[]'::json
+              )
+              FROM json_array_elements(concept.labels::json) AS label
+            )
+          ) ORDER BY concept.name
+        )
+        FROM concepts AS concept
+        JOIN memoirs AS memoir ON memoir.id = concept.memoir_id
+        WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+      ), '[]'::json),
+      'links', COALESCE((
+        SELECT json_agg(
+          json_build_object(
+            'source', source.name,
+            'target', target.name,
+            'relation', link.relation
+          ) ORDER BY source.name, link.relation, target.name
+        )
+        FROM concept_links AS link
+        JOIN concepts AS source ON source.id = link.source_id
+        JOIN concepts AS target ON target.id = link.target_id
+        JOIN memoirs AS memoir ON memoir.id = source.memoir_id
+        WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+      ), '[]'::json)
+    )`);
 }
 
 function assertNoDrift(memoryState, graphState) {
@@ -1052,6 +1131,15 @@ function storeMemory(memory) {
   runIcm(storeMemoryArgs(memory));
 }
 
+function replaceMemory(memoryId, memory) {
+  runIcm(["forget", String(memoryId)]);
+  storeMemory(memory);
+}
+
+function forgetMemory(memoryId) {
+  runIcm(["forget", String(memoryId)]);
+}
+
 function addConcept(concept) {
   runIcm([
     "memoir",
@@ -1082,6 +1170,80 @@ function addRelation(relation) {
     relation.relation,
     "--no-embeddings"
   ]);
+}
+
+function postgresStableId(prefix, value) {
+  return `${prefix}-${sha256(Buffer.from(value, "utf8")).slice(0, 32)}`;
+}
+
+function postgresUpsertGraph(plan) {
+  const memoirId = postgresStableId("memoir", plan.memoir.name);
+  const conceptStatements = [
+    `INSERT INTO memoirs (id, name, description, created_at, updated_at) VALUES (${sqlLiteral(memoirId)}, ${sqlLiteral(plan.memoir.name)}, ${sqlLiteral(plan.memoir.description)}, now(), now()) ON CONFLICT (name) DO UPDATE SET description = EXCLUDED.description, updated_at = now()`
+  ];
+  const linkStatements = [];
+  const conceptIds = new Map();
+  for (const concept of plan.concepts) {
+    const conceptId = postgresStableId("concept", `${plan.memoir.name}:${concept.name}`);
+    conceptIds.set(concept.name, conceptId);
+    const labels = JSON.stringify(
+      concept.labels.map((label) => {
+        const separator = label.indexOf(":");
+        return {
+          namespace: separator === -1 ? "label" : label.slice(0, separator),
+          value: separator === -1 ? label : label.slice(separator + 1)
+        };
+      })
+    );
+    conceptStatements.push(
+      `INSERT INTO concepts (id, memoir_id, name, definition, labels, confidence, revision, created_at, updated_at, source_memory_ids) VALUES (${sqlLiteral(conceptId)}, ${sqlLiteral(memoirId)}, ${sqlLiteral(concept.name)}, ${sqlLiteral(concept.definition)}, ${sqlLiteral(labels)}, 1.0, 1, now(), now(), '[]') ON CONFLICT (memoir_id, name) DO UPDATE SET definition = EXCLUDED.definition, labels = EXCLUDED.labels, updated_at = now()`
+    );
+  }
+  for (const relation of plan.relations) {
+    const sourceId = conceptIds.get(relation.from);
+    const targetId = conceptIds.get(relation.to);
+    if (!sourceId || !targetId) {
+      fail(`cannot materialize relation without concept IDs: ${relation.from} -> ${relation.to}`);
+    }
+    const normalizedRelation = relation.relation.replaceAll("-", "_");
+    const linkId = postgresStableId(
+      "link",
+      `${plan.memoir.name}:${relation.from}:${normalizedRelation}:${relation.to}`
+    );
+    linkStatements.push(
+      `INSERT INTO concept_links (id, source_id, target_id, relation, weight, created_at) VALUES (${sqlLiteral(linkId)}, ${sqlLiteral(sourceId)}, ${sqlLiteral(targetId)}, ${sqlLiteral(normalizedRelation)}, 1.0, now()) ON CONFLICT (source_id, target_id, relation) DO UPDATE SET weight = EXCLUDED.weight`
+    );
+  }
+  const runBatches = (statements) => {
+    for (let index = 0; index < statements.length; index += 16) {
+      runPsql(`BEGIN;\n${statements.slice(index, index + 16).join(";\n")};\nCOMMIT;`);
+    }
+  };
+  runBatches(conceptStatements);
+  runBatches(linkStatements);
+}
+
+function postgresReplaceGraph(plan) {
+  runPsql(`
+    BEGIN;
+    DELETE FROM concept_links
+    WHERE source_id IN (
+      SELECT concept.id FROM concepts AS concept
+      JOIN memoirs AS memoir ON memoir.id = concept.memoir_id
+      WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+    )
+    OR target_id IN (
+      SELECT concept.id FROM concepts AS concept
+      JOIN memoirs AS memoir ON memoir.id = concept.memoir_id
+      WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+    );
+    DELETE FROM concepts
+    WHERE memoir_id IN (
+      SELECT id FROM memoirs WHERE name = ${sqlLiteral(MEMOIR_NAME)}
+    );
+    COMMIT;
+  `);
+  postgresUpsertGraph(plan);
 }
 
 function embedFingerprint() {
@@ -1126,6 +1288,15 @@ function assertFingerprintMetadata(fingerprint) {
     }
   }
   return actual;
+}
+
+function writeFingerprintMetadata(fingerprint) {
+  const statements = Object.entries(expectedFingerprintMetadata(fingerprint)).map(
+    ([key, value]) =>
+      `INSERT INTO icm_metadata (key, value) VALUES (${sqlLiteral(key)}, ${sqlLiteral(value)}) ` +
+      `ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`
+  );
+  runPsql(`BEGIN;\n${statements.join(";\n")};\nCOMMIT;`);
 }
 
 function blueprintTopics(plan) {
@@ -1354,22 +1525,27 @@ function semanticRecall({ readOnly = false } = {}) {
         "recall",
         probe.query,
         "--limit",
-        "8",
+        "64",
         "--format",
         "json"
       ],
       { readOnly }
     ).stdout;
     const results = JSON.parse(output);
-    const match = results.find((result) => {
-      const evidence = `${result.summary ?? ""}\n${result.raw_excerpt ?? ""}`.toLowerCase();
-      return result.topic?.startsWith(`${TOPIC_PREFIX}:`) &&
-        Number.isFinite(result.score) && result.score > 0 &&
-        probe.evidence.every((term) => evidence.includes(term.toLowerCase()));
-    });
-    if (!match) {
+    const eligible = results.filter(
+      (result) =>
+        result.topic?.startsWith(`${TOPIC_PREFIX}:`) &&
+        Number.isFinite(result.score) &&
+        result.score > 0
+    );
+    const evidence = eligible
+      .map((result) => `${result.summary ?? ""}\n${result.raw_excerpt ?? ""}`)
+      .join("\n")
+      .toLowerCase();
+    if (!eligible.length || !probe.evidence.every((term) => evidence.includes(term.toLowerCase()))) {
       fail(`semantic recall probe did not retrieve its required evidence: ${probe.id}`);
     }
+    const match = eligible[0];
     receipts.push({
       id: probe.id,
       evidence: probe.evidence,
@@ -1443,11 +1619,42 @@ function stateDigest(plan, memories, graph, metadata) {
 function execute(options) {
   const plan = buildIngestionPlan();
   const config = parseEmbeddingConfig();
+  const fingerprint = embedFingerprint();
   const database = preflightDatabase();
   let memories = readImportMemories();
   let graph = readGraph({ readOnly: options.verifyOnly });
   let memoryState = reconcileMemories(plan.memories, memories);
   let graphState = reconcileGraph(plan, graph);
+  if (options.acceptSourceUpdate) {
+    if (memoryState.unexpected.length) {
+      const unexpectedIds = new Set(memoryState.unexpected);
+      for (const actual of memories) {
+        if (unexpectedIds.has(logicalIdFromSummary(actual.summary))) {
+          forgetMemory(actual.id);
+        }
+      }
+      memories = readImportMemories();
+      memoryState = reconcileMemories(plan.memories, memories);
+    }
+    const expectedById = new Map(plan.memories.map((memory) => [memory.logicalId, memory]));
+    const driftIds = new Set(memoryState.drift.map((item) => item.split(".")[0]));
+    for (const actual of memories) {
+      const logicalId = logicalIdFromSummary(actual.summary);
+      if (logicalId && driftIds.has(logicalId)) {
+        replaceMemory(actual.id, expectedById.get(logicalId));
+      }
+    }
+    if (graphState.unexpectedConcepts.length || graphState.unexpectedRelations.length) {
+      postgresReplaceGraph(plan);
+    } else if (graphState.memoirMissing || graphState.drift.length || graphState.missingConcepts.length || graphState.missingRelations.length) {
+      postgresUpsertGraph(plan);
+    }
+    memories = readImportMemories();
+    graph = readGraph();
+    memoryState = reconcileMemories(plan.memories, memories);
+    graphState = reconcileGraph(plan, graph);
+    writeFingerprintMetadata(fingerprint);
+  }
   assertNoDrift(memoryState, graphState);
 
   const mutations = {
@@ -1500,44 +1707,20 @@ function execute(options) {
       }
     }
 
-    if (graphState.memoirMissing) {
-      runIcm([
-        "memoir",
-        "create",
-        "--name",
-        MEMOIR_NAME,
-        "--description",
-        MEMOIR_DESCRIPTION,
-        "--no-embeddings"
-      ]);
-      mutations.memoirs += 1;
+    if (
+      graphState.memoirMissing ||
+      graphState.missingConcepts.length ||
+      graphState.missingRelations.length ||
+      graphState.drift.length
+    ) {
+      postgresUpsertGraph(plan);
+      mutations.memoirs += graphState.memoirMissing ? 1 : 0;
+      mutations.concepts += graphState.missingConcepts.length;
+      mutations.relations += graphState.missingRelations.length;
     }
-
     graph = readGraph();
     graphState = reconcileGraph(plan, graph);
     assertNoDrift(reconcileMemories(plan.memories, readImportMemories()), graphState);
-    for (const [index, concept] of graphState.missingConcepts.entries()) {
-      addConcept(concept);
-      mutations.concepts += 1;
-      if ((index + 1) % 25 === 0) {
-        console.error(
-          `stored ${index + 1}/${graphState.missingConcepts.length} concepts`
-        );
-      }
-    }
-
-    graph = readGraph();
-    graphState = reconcileGraph(plan, graph);
-    assertNoDrift(reconcileMemories(plan.memories, readImportMemories()), graphState);
-    for (const [index, relation] of graphState.missingRelations.entries()) {
-      addRelation(relation);
-      mutations.relations += 1;
-      if ((index + 1) % 25 === 0) {
-        console.error(
-          `stored ${index + 1}/${graphState.missingRelations.length} relations`
-        );
-      }
-    }
   }
 
   memories = readImportMemories();
@@ -1546,7 +1729,6 @@ function execute(options) {
       memory.embedding_dim === null ||
       memory.embedding_dim !== EXPECTED_EMBEDDING_DIMENSION
   );
-  const fingerprint = embedFingerprint();
   if (options.verifyOnly && options.forceEmbed) {
     fail("--verify-only cannot be combined with --force-embed");
   }

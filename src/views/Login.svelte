@@ -91,7 +91,8 @@
   {:else}
     <form class="login-card" novalidate onsubmit={(e) => { e.preventDefault(); onSubmit(); }}>
       <header class="login-head">
-        <div class="login-lockup" aria-label="LifeOS by ElementArk">
+        <div class="login-lockup" aria-label="LifeOS by ElementArk"
+             data-figma-component="LifeOS Brand/Primary lockup">
           <img class="login-mark" src="/lifeos-mark-256.png" alt="" />
           <span class="login-brand-copy">
             <span class="login-wordmark">LIFEOS</span>

@@ -1,0 +1,23 @@
+{
+  "task_id": "CURRENCY-AGENTIC_QE",
+  "title": "Toolchain currency: agentic-qe",
+  "probe_mode": "read-only",
+  "status": "current",
+  "probe_exit_code": 0,
+  "requirement": "Installed agentic-qe must equal the registry latest.",
+  "registry": {
+    "package": "agentic-qe",
+    "latest_version": "3.13.2"
+  },
+  "global_installation": {
+    "version": "3.13.2",
+    "matches_registry_latest": true
+  },
+  "execution": {
+    "command_template": "test -n \"$(bun info 'agentic-qe' version 2>/dev/null)\" && test \"$(bun info 'agentic-qe' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE 'agentic\\-qe@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+    "bun_version": "1.3.14",
+    "bun_install_cache_dir": "/run/user/1001/yazelix/volatile/cache/bun",
+    "observed_at": "2026-07-28T17:18:10Z"
+  },
+  "note": "Bun's global root is in the XDG_RUNTIME_DIR tmpfs on this host; a missing package after reboot can reflect a prior install that evaporated. This probe made no toolchain changes."
+}

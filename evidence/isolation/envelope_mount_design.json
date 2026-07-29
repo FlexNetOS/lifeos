@@ -1,0 +1,12 @@
+{
+  "schema_version": "lifeos.evidence.envelope-mount-design.v1",
+  "tier_map": "evidence/isolation/isolation_tier_map.json",
+  "mount_table": [
+    {"path":"/","tier":"volatile","mechanism":"tmpfs","decision":"tmpfs-not-overlay","rationale":"A private tmpfs root prevents accidental host-root writes and makes teardown automatic."},
+    {"path":"/nix","tier":"portable","mechanism":"ro-bind","decision":"bind-not-copy","rationale":"The selected host store or extracted release closure is exposed read-only without copying bytes into the namespace."},
+    {"path":"$HOME","tier":"volatile","mechanism":"tmpfs","decision":"overlay-as-tmpfs-not-overlayfs","rationale":"A fresh tmpfs home prevents host session files from becoming ambient state and is destroyed on exit."},
+    {"path":"/durable/meta-var","tier":"durable","mechanism":"bind","decision":"explicit-rw-bind-per-durable-root","rationale":"Durable state at meta/var/lib/postgresql and the surrounding meta/var plane is caller-declared and remains across envelope exit."},
+    {"path":"/proc","tier":"volatile","mechanism":"proc","decision":"private-kernel-view","rationale":"A private process namespace receives a proc view scoped to the envelope lifecycle."},
+    {"path":"/dev","tier":"volatile","mechanism":"dev","decision":"minimal-device-surface","rationale":"The device surface is private by default and expanded only by explicit GPU or device acquisition."}
+  ]
+}

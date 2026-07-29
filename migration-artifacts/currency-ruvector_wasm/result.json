@@ -1,0 +1,10 @@
+{
+  "task_id": "CURRENCY-RUVECTOR_WASM",
+  "status": "pass",
+  "checked_at": "2026-07-28T16:51:52Z",
+  "registry_latest_version": "2.1.0",
+  "installed_global_version": "2.1.0",
+  "probe_exit_code": 0,
+  "command": "test -n \"$(bun info 'ruvector-wasm' version 2>/dev/null)\" && test \"$(bun info 'ruvector-wasm' version 2>/dev/null)\" = \"$(bun pm ls -g 2>/dev/null | grep -oE 'ruvector\\-wasm@[0-9][^ ]*' | head -1 | sed 's/.*@//')\"",
+  "note": "Bun global installs resolve under the runtime cache on this host and may disappear after reboot; this probe confirms the package was installed and current at check time."
+}

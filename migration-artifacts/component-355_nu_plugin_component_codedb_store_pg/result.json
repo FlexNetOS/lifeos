@@ -1,0 +1,37 @@
+{
+  "task_id": "COMPONENT-355_NU_PLUGIN_COMPONENT_CODEDB_STORE_PG",
+  "component": "nu_plugin component: codedb-store-pg",
+  "status": "blocked",
+  "mode": "read-only-probe",
+  "hard_rule_15": "not satisfied: the shared CodeDB Nushell plugin is installed and accepted a PostgreSQL store invocation, but no inherited PostgreSQL connection is available and the runtime reports its store backend as degraded; no replacement was introduced",
+  "blueprint": {
+    "marker": "nu_plugin component: codedb-store-pg",
+    "line": 6063,
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "required_revision": "63d6874314031471213fe9f51d9706820bc254e1",
+    "role": "envctl-only codedb-store-pg mapping to the PostgreSQL/RuVector durable authority"
+  },
+  "runtime": {
+    "nushell_version": "0.113.1",
+    "plugin_name": "codedb",
+    "plugin_version": "0.1.0",
+    "plugin_status": "loaded",
+    "plugin_binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb"
+  },
+  "usage": {
+    "commands": [
+      "codedb doctor",
+      "codedb schema",
+      "codedb store-report --store pg"
+    ],
+    "postgres_store_probe": "rejected before database access: PostgreSQL DSN is required through inherited CODEDB_PG_CONN",
+    "doctor_result": {
+      "table": "codedb_store",
+      "status": "degraded",
+      "note": "redb store is not implemented until CDB015"
+    },
+    "binary_evidence": "The loaded plugin includes PostgreSQL store-selection messaging and codedb_store invocation symbols."
+  },
+  "assessment": "The blueprint requirement, exact document hash, and component row are verified. The installed native CodeDB plugin exposes and received the PostgreSQL store selector without using a replacement implementation. However, an authorized inherited PostgreSQL connection is absent, and the runtime's store diagnostic remains degraded; therefore this read-only closure cannot verify codedb-store-pg as installed and used under hard rule 15.",
+  "unblock": "In an installation-authorized envctl closure, provide the pinned nu_plugin revision with its PostgreSQL store implementation and an envctl-owned CODEDB_PG_CONN, then execute codedb-store-pg's read-only report/query path and preserve the PostgreSQL commit/witness evidence."
+}

@@ -7,7 +7,7 @@ import { describe, expect, test } from "vitest";
 // bare-native; assert near-zero overhead (no hypervisor tax).
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const artifactPath = resolve(repoRoot, "planning-spine-v0/docs/envelope_latency_benchmark.json");
+const artifactPath = resolve(repoRoot, "evidence/benchmarks/envelope_latency_benchmark.json");
 const harness = resolve(repoRoot, "scripts/envelope-latency-bench.mjs");
 
 describe("ARCHBP-130 envelope latency benchmark", () => {
@@ -26,6 +26,7 @@ describe("ARCHBP-130 envelope latency benchmark", () => {
 
   test("the result is recorded for the T10.7 release gauntlet", () => {
     const r = JSON.parse(readFileSync(artifactPath, "utf8"));
+    expect(r.schema_version).toBe("lifeos.envelope-latency-bench.v1");
     expect(r.recorded_for).toContain("t10-7-latency-benchmark");
     expect(Array.isArray(r.bare_samples_s)).toBe(true);
     expect(Array.isArray(r.envelope_samples_s)).toBe(true);

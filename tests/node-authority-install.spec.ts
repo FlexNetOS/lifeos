@@ -14,17 +14,17 @@ const packageJsonPath = resolve(repoRoot, "package.json");
 const proofScriptPath = resolve(repoRoot, "scripts/verify-node-authority.mjs");
 const protocolPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
+  "evidence/nbverify/NOTEBOOKLM_SOURCE_EXTRACTION_PROTOCOL.md",
 );
 const agentsPath = resolve(repoRoot, "AGENTS.md");
 const ciPath = resolve(repoRoot, ".github/workflows/ci.yml");
 
 const requiredPackages = {
   "@ruvector/ruvllm": "2.6.0",
-  "@ruvector/rvf": "0.2.3",
-  "@ruvector/sona": "0.1.7",
+  "@ruvector/rvf": "0.3.0",
+  "@ruvector/sona": "0.1.8",
   "@ruvector/tiny-dancer": "0.1.22",
-  agentdb: "3.0.0-alpha.17",
+  agentdb: "3.0.0-alpha.18",
   ruvector: "0.2.34",
 } as const;
 
@@ -152,7 +152,17 @@ describe("repo-owned Node verification runtime", () => {
       expect(result.rvf.ingestResult.accepted).toBe(2);
       expect(result.sona.enabled).toBe(true);
       expect(result.agentdb.learningEnabled).toBe(true);
+      expect(result.agentdb.learningStats.trajectoriesRecorded).toBe(1);
+      expect(result.agentdb.acceptance.witnessEntries).toBeGreaterThan(0);
+      expect(result.agentdb.witness.result.valid).toBe(true);
+      expect(result.agentdb.witness.result.entryCount).toBeGreaterThan(0);
       expect(result.ruvllm.adapterCount).toBe(51);
+      expect(result.ruvllm.persistence.exported).toBe(true);
+      expect(result.ruvllm.persistence.imported).toBe(true);
+      expect(result.ruvllm.persistence.adapterIdsMatch).toBe(true);
+      expect(result.ruvllm.persistence.activeAdapterRestored).toBe(true);
+      expect(result.ruvllm.persistence.weightsMatch).toBe(true);
+      expect(result.ruvllm.persistence.checkpointBytes).toBeGreaterThan(0);
       expect(result.tinyDancer.bytes).toBeGreaterThan(0);
     } finally {
       rmSync(outputDir, { recursive: true, force: true });

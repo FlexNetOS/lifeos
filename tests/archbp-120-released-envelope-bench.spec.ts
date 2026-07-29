@@ -10,10 +10,7 @@ import { describe, expect, test } from "vitest";
 // bundle launcher in --store mode with the host store hidden.)
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const benchPath = resolve(
-  repoRoot,
-  "planning-spine-v0/docs/envelope_released_benchmark.json",
-);
+const benchPath = resolve(repoRoot, "evidence/benchmarks/envelope_released_benchmark.json");
 const BENCH_BUNDLE = "/home/flexnetos/meta/var/cache/archbp021/bench-bundle";
 const load = () => JSON.parse(readFileSync(benchPath, "utf8"));
 
@@ -21,7 +18,7 @@ describe("ARCHBP-120 released-envelope benchmark", () => {
   test("the benchmark ran through the T2.7 harness against the released launcher", () => {
     expect(existsSync(benchPath)).toBe(true);
     const b = load();
-    expect(b.schema_version).toBe("lifeos-planning-spine.envelope-latency-bench.v0");
+    expect(b.schema_version).toBe("lifeos.envelope-latency-bench.v1");
     expect(b.released_engine).toContain("released-engine-shim.sh");
     expect(b.consumes).toContain("envelope-latency-bench.mjs");
     expect(b.runs_per_arm).toBeGreaterThanOrEqual(9);

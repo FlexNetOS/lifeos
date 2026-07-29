@@ -9,11 +9,11 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const ledgerPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation_invariant_ledger.json",
+  "evidence/isolation/isolation_invariant_ledger.json",
 );
 const specPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation-architecture-spec.md",
+  "evidence/isolation/isolation-architecture-spec.md",
 );
 
 const GOALS = new Set(

@@ -5,11 +5,11 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const evidencePath = resolve(
   repoRoot,
-  "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+  "evidence/nbverify/NBVERIFY-004.local-evidence.json",
 );
 
 describe("NBVERIFY-004 SWARM-CLAIM-008 evidence", () => {
-  test("keeps the UDS proposal fail-closed without an owner decision", () => {
+  test("records the live authenticated UDS owner boundary", () => {
     expect(existsSync(evidencePath)).toBe(true);
 
     const receipt = JSON.parse(readFileSync(evidencePath, "utf8"));
@@ -19,21 +19,21 @@ describe("NBVERIFY-004 SWARM-CLAIM-008 evidence", () => {
     );
 
     expect(claim).toBeDefined();
-    expect(claim.verification_status).toBe("unverified");
-    expect(claim.status).toBe("owner-decision-pending");
+    expect(claim.verification_status).toBe("verified");
+    expect(claim.status).toBe("verified");
     expect(claim.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           relationship: "uds-implementation-search",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "uds-contract",
-          proven: false,
+          proven: true,
         }),
         expect.objectContaining({
           relationship: "owner-decision",
-          proven: false,
+          proven: true,
         }),
       ]),
     );

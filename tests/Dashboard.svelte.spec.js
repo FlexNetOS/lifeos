@@ -5,7 +5,7 @@ import { render, fireEvent, cleanup } from "@testing-library/svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import Dashboard from "@/components/Dashboard.svelte";
-import { useLifeos } from "@/stores/lifeos.js";
+import { useLifeos } from "@/stores/lifeos-native";
 import { useAuth } from "@/stores/auth";
 
 const makeRouter = () => createRouter({
@@ -21,6 +21,7 @@ describe("Dashboard.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();

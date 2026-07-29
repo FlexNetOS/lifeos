@@ -22,6 +22,7 @@ Senior UI/UX engineer + design-systems architect on a **Vue 3 + Tauri 2** deskto
 - No hallucinations. No deception. No uncertainty. No omissions.
 - No assumptions. No over-claiming. No vague terms.
 - No skipping verification. No fabricated data, citations, or logs.
+- Real production execution is the authority; tests, receipts, and verification output never substitute for a missing production implementation or prove activation by themselves.
 - No implied completion without verification (`bun test`, dev-server boot, Tauri build).
 - **Upgrades, never downgrades** — improve code quality, security, maintainability; modernize patterns; never remove functionality without explicit user consent.
 - **Heal, do not harm** — preserve working functionality; make surgical, targeted changes; verify before committing.
@@ -183,23 +184,12 @@ Use `bun` for npm-compatible package management and JS execution, and `bunx`
 for npx-compatible package execution. Tauri's `beforeDevCommand` /
 `beforeBuildCommand` already point at `bun run dev` / `bun run build`.
 
-## Planning-spine instant recall
+## Archived planning artifacts
 
-Start planning work at `planning-spine-v0/navigation/README.md`. The committed graph
-is repository-native and remains usable when GitKB or GitNexus is absent,
-stale, or pointed at another checkout.
-
-```bash
-bun run planning-spine:navigation:query -- "STORE-001"
-bun run planning-spine:navigation:query -- "redb PostgreSQL authority"
-bun run planning-spine:navigation:explain -- "claim:REDB-CLAIM-002"
-bun run planning-spine:navigation:check
-```
-
-The generated graph is a navigation projection, not a new authority source.
-Canonical task inputs, exact proof history, maintained contracts, and raw
-architecture inputs retain the authority order documented in
-`planning-spine-v0/navigation/README.md`.
+The former planning-spine tree and `.codex` execution loop are archived and are
+not repository authorities or runnable gates. Work directly from
+`Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md` and
+the live production surfaces.
 
 ## Verification commands
 
@@ -256,6 +246,37 @@ Provider selection lives in `lifeos_runtime.projection` under key `ai-provider` 
 
 API-key lookup per provider, in order: OS keyring (`service: "lifeos"`, account: `"anthropic" | "openai" | "gemini"`) via the `keyring` crate, then env var fallback (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY`). Either path is sufficient; both missing surfaces the calm error to the UI. HTTP uses `reqwest` with `rustls-tls` (no `openssl-sys` C build).
 
+## Engine Room terminal contract (Glass VT capability envelope)
+
+`@xterm/xterm` is **xterm.js**, the renderer embedded in the Svelte pane — not XTerm the
+X11 application, and not a host terminal emulator. Kitty, Ghostty, WezTerm, and Yazelix
+Nova's bundled Mars (Rio-derived) live one layer out at the *native* front door, where
+they host `yzx enter` directly. A GPU host emulator cannot mount inside a webview pane
+and xterm.js cannot replace the native host, so the two are never substitutable. Host
+terminal choice stays open at the native front door.
+
+Because both front doors render the same Engine Room, the embedded renderer's
+capabilities are a **declared contract**, never inherited from the host process.
+`GLASS_VT_PROFILE` in `src-tauri/src/lib.rs` is the single source of truth; the
+renderer reads it through the `terminal_capabilities` command, and
+`src/components/EngineRoomTerminal.svelte` carries only a browser-preview fallback that
+`bun run verify:terminal-capability` proves has not drifted.
+
+| Rule | Why |
+|---|---|
+| The PTY exports `TERM=xterm-256color` | Truthful baseline for the embedded renderer. |
+| `TERM_PROGRAM` / `TERM_PROGRAM_VERSION` are stripped | `CommandBuilder` seeds from `std::env::vars_os()`, so the host identity would otherwise leak. |
+| **Never** set `TERM` to a host terminal type | `xterm-ghostty`/`xterm-kitty` makes Yazi emit graphics the renderer cannot draw; Yazi documents this as breaking adapter detection. |
+| `YAZI_IMAGE_PROTOCOL=Kgp` is set explicitly | The renderer-side compatibility addon adapts Yazi's `U+10EEEE` Unicode placeholders for the pinned image addon; raw PTY capture remains unchanged. |
+| `convertEol` stays `false` | Zellij emits its own CRLF and absolute cursor positioning; rewriting LF corrupts the stream. |
+| `onBinary` must stay wired | It carries 8-bit input; UTF-8 encoding it corrupts any byte ≥ `0x80`. |
+| PTY pixel geometry is reported every resize | SIXEL, IIP, and Kitty graphics size their output from it. |
+
+Changing any renderer pin means re-checking the envelope against what the new packages
+actually implement, then re-running `bun run verify:terminal-capability`. The Kgp
+compatibility adapter is part of the renderer contract and must remain covered by
+protocol tests; do not describe its adaptation as a host-terminal capability.
+
 ## UI state persistence
 
 The Pinia `lifeos` store survives app restarts in the Tauri shell via the persistence plugin at `src/lib/persistence.{ts,js}`. Outside Tauri (plain Vite dev / Vitest) the plugin no-ops — no read, no subscribe — so the test suite, OpenPencil mocks, and browser preview stay byte-identical to before.
@@ -286,7 +307,7 @@ Persisted keys (whitelist in `LIFEOS_PERSIST_KEYS`): `activeId`, `wsCollapsed`, 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **lifeos** (10761 symbols, 17554 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **lifeos** (24875 symbols, 32694 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

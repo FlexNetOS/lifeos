@@ -1,0 +1,33 @@
+{
+  "task_id": "COMPONENT-393_MUSL",
+  "component": "musl",
+  "probe_mode": "read-only",
+  "status": "not_demonstrated",
+  "verified": {
+    "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_binding": {
+      "byte_offset": 335153,
+      "packet_unit_sha256": "d88198e45736cb59d0744af5e9b9f6c80103408bbdd00edc731c5bebfc326847",
+      "current_byte_offset_content": "The supplied offset resolves to packaging prose; the canonical musl row is at line 6101."
+    },
+    "hard_rule_15": "musl must be installed and used, not replaced.",
+    "canonical_component": {
+      "blueprint_line": 6101,
+      "source": "https://musl.libc.org/",
+      "package": "x86_64-unknown-linux-musl",
+      "version_or_closure": "Yazelix Nix closure 01790ae2292a0060acb015d72e3bec8a21b0b0ef",
+      "role": "Self-contained CLI/worker targets",
+      "installation_order": 15
+    },
+    "command_template": "grep -Fq 'musl' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0,
+    "installation": {
+      "compiler": "/home/flexnetos/.nix-profile/bin/x86_64-unknown-linux-musl-gcc",
+      "resolved_compiler": "/nix/store/567rw8wblzwijgnlvlrhlxnx2rsx5rlz-x86_64-unknown-linux-musl-gcc-wrapper-15.2.0/bin/x86_64-unknown-linux-musl-gcc",
+      "target": "x86_64-unknown-linux-musl",
+      "version": "x86_64-unknown-linux-musl-gcc (GCC) 15.2.0"
+    }
+  },
+  "finding": "The SHA-256-bound blueprint explicitly requires the canonical musl target and the Nix-provided x86_64-unknown-linux-musl-gcc wrapper is installed. No files under execution-framework contain musl target, compiler, build, invocation, or replacement-control evidence. Therefore actual use and the hard rule's non-replacement condition cannot be demonstrated by this read-only packet.",
+  "mutation": "None to the component or runtime; result artifact only."
+}

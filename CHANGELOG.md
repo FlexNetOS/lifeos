@@ -2,6 +2,30 @@
 
 All notable changes to LifeOS (ubuntu-lifeos). Dates ISO. Each stage closed with green gates (tests + build + axe).
 
+## [Unreleased] · Glass VT capability envelope
+
+- Declared the Glass renderer's capability envelope as a single backend constant
+  (`GLASS_VT_PROFILE` in `src-tauri/src/lib.rs`), published to the renderer through
+  the `terminal_capabilities` command and gated by
+  `bun run verify:terminal-capability` (receipt:
+  `evidence/glass/terminal-capability-receipt.json`). Blueprint §3.1.1 and review
+  ledger row R20 record the contract.
+- Fixed the Engine Room PTY inheriting the **host** terminal's identity. It exported
+  the host `TERM` (`xterm-ghostty` on a Ghostty host) and leaked `TERM_PROGRAM`,
+  so Yazi selected Kitty Unicode-placeholder graphics and Helix/Zellij negotiated a
+  keyboard protocol the embedded renderer could not answer. The PTY now exports
+  `xterm-256color` and strips `TERM_PROGRAM`/`TERM_PROGRAM_VERSION`.
+- Upgraded the renderer to `@xterm/xterm` 6.1.0-beta.292 with
+  `@xterm/addon-image` 0.10.0-beta.292, enabling the Kitty keyboard protocol,
+  Kitty graphics, SIXEL, and iTerm2 IIP. `YAZI_IMAGE_PROTOCOL` is set to `Kgp`,
+  with the renderer-side compatibility adapter handling `U+10EEEE` Unicode
+  placeholders while raw PTY capture remains byte-complete.
+- Restored byte fidelity on the terminal surface: `convertEol` is off (Zellij emits
+  its own CRLF and absolute cursor positioning), 8-bit `onBinary` input is forwarded
+  instead of dropped, PTY pixel geometry is reported on spawn and every resize so
+  image protocols have a scale reference, and the probe decoder streams UTF-8 across
+  channel frames.
+
 ## [Unreleased] · PostgreSQL/RuVector durable-storage cutover
 
 - Replaced the application’s SQLite durable-store path with mandatory

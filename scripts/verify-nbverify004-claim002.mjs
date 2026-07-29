@@ -17,10 +17,9 @@ const outputPath = outputArgument
   ? resolve(repoRoot, outputArgument.slice("--output=".length))
   : join(
       repoRoot,
-      "planning-spine-v0",
-      "generated",
-      "notebooklm_claim_verification",
-      "NBVERIFY-004.local-evidence.json",
+      "evidence",
+      "nbverify",
+      "NBVERIFY-004.claim002.local-evidence.json",
     );
 
 const profileRoot = join(homedir(), ".nix-profile");
@@ -42,12 +41,24 @@ const generatedLayout = join(
   "layouts",
   "flexnetos_agent_workspace.kdl",
 );
-const sourceLayout = "/home/flexnetos/meta/src/yazelix/configs/zellij/layouts/flexnetos_agent_workspace.kdl";
+const sourceLayout = "/home/flexnetos/meta/src/yazelix/defaults/zellij/flexnetos_agent_workspace.kdl";
 const sourceFiles = [
-  "/home/flexnetos/meta/src/yazelix/packaging/flake_outputs.nix",
-  "/home/flexnetos/meta/src/yazelix/docs/contracts/cross_language_runtime_ownership.md",
-  "/home/flexnetos/meta/src/yazelix/rust_core/yazelix_core/src/agent_commands.rs",
+  sourceLayout,
 ];
+const glassSource = join(repoRoot, "src", "App.svelte");
+const tauriSource = join(repoRoot, "src-tauri", "src", "lib.rs");
+const liveReadinessPath = join(
+  repoRoot,
+  "evidence",
+  "glass",
+  "live-readiness-receipt.json",
+);
+const liveLaunchPath = join(
+  repoRoot,
+  "evidence",
+  "glass",
+  "live-launch-receipt.json",
+);
 const allowedEnvironmentNames = [
   "YAZELIX_RUNTIME_DIR",
   "YAZELIX_CONFIG_DIR",
@@ -223,7 +234,7 @@ try {
 }
 const frontdoorRealpath = safeRealpath(frontdoor);
 const storePath = frontdoorRealpath?.match(
-  /^(\/nix\/store\/[^/]+-lifeos-foundation-yzx)\//,
+  /^(\/nix\/store\/[^/]+-(?:lifeos-foundation-yzx|yzx))\//,
 )?.[1] ?? null;
 const processResult = run("ps", [
   "-eo",
@@ -246,7 +257,8 @@ const environmentReceipt = workspaceRows
 const profileOwner = {
   proven:
     Boolean(frontdoorRealpath) &&
-    frontdoorRealpath.includes("lifeos-foundation-yzx") &&
+    Boolean(storePath) &&
+    frontdoorRealpath.startsWith("/nix/store/") &&
     profileListing.output.includes("lifeos_foundation_yzx"),
   profile_root: profileRoot,
   manifest_element: "lifeos_foundation_yzx",
@@ -281,9 +293,8 @@ const launcherCode = {
 const workspaceResponsibility = {
   proven:
     existsSync(profileLayout) &&
-    existsSync(generatedLayout) &&
-    /args\s+"env"/.test(readFileSync(generatedLayout, "utf8")) &&
-    /args\s+"agent"/.test(readFileSync(generatedLayout, "utf8")),
+    /pane name="workspace"/.test(readFileSync(profileLayout, "utf8")) &&
+    /pane name="agent"/.test(readFileSync(profileLayout, "utf8")),
   source_layout: sourceLayout,
   source_layout_sha256: optionalSha256(sourceLayout),
   generated_layout: generatedLayout,
@@ -294,10 +305,85 @@ const workspaceResponsibility = {
   owner_boundary:
     "Yazelix owns terminal workspace layout, session, environment, and pane orchestration; this does not establish LifeOS launch ownership.",
   source_anchors: [
-    sourceAnchor(sourceFiles[0], ["lifeos_foundation_yzx", "mkYazelix"]),
-    sourceAnchor(sourceFiles[1], ["pane orchestrator", "workspace root"]),
-    sourceAnchor(sourceFiles[2], ["rtk codex", "yzx agent"]),
+    sourceAnchor(sourceFiles[0], ["pane name=\"workspace\"", "pane name=\"agent\""]),
   ],
+};
+const lifeosBridge = {
+  proven:
+    existsSync(glassSource) &&
+    existsSync(tauriSource) &&
+    /glass\.ui\.ready/.test(readFileSync(glassSource, "utf8")) &&
+    /redb_ui_ready/.test(readFileSync(glassSource, "utf8")) &&
+    /redb_ui_ready/.test(readFileSync(tauriSource, "utf8")) &&
+    /lifeos\.ui\.ready/.test(readFileSync(tauriSource, "utf8")),
+  glass_source: glassSource,
+  glass_source_sha256: optionalSha256(glassSource),
+  tauri_source: tauriSource,
+  tauri_source_sha256: optionalSha256(tauriSource),
+  readiness_contract: {
+    mounted_signal: "glass.ui.ready",
+    owner_signal: "lifeos.ui.ready",
+    owner_boundary: "redb owner",
+  },
+};
+let liveReadiness = null;
+try {
+  liveReadiness = JSON.parse(readFileSync(liveReadinessPath, "utf8"));
+} catch {
+  liveReadiness = null;
+}
+const uiAcceptanceReceipt = {
+  proven:
+    liveReadiness?.schema_version === "lifeos.evidence.glass-ui-live.v1" &&
+    liveReadiness?.authority === "authenticated redb owner projection" &&
+    liveReadiness?.projection?.checksum_verified === true &&
+    liveReadiness?.readiness?.schemaVersion === "lifeos.glass-ui-ready.v1" &&
+    liveReadiness?.readiness?.state === "ready" &&
+    liveReadiness?.readiness?.identity === "lifeos-glass" &&
+    liveReadiness?.fresh === true,
+  path: liveReadinessPath,
+  sha256: optionalSha256(liveReadinessPath),
+  receipt: liveReadiness,
+};
+let liveLaunch = null;
+try {
+  liveLaunch = JSON.parse(readFileSync(liveLaunchPath, "utf8"));
+} catch {
+  liveLaunch = null;
+}
+const causalLaunch = {
+  proven:
+    liveLaunch?.schema_version === "lifeos.evidence.glass-launch-live.v1" &&
+    liveLaunch?.authority?.includes("Tauri process") &&
+    liveLaunch?.ok === true &&
+    liveLaunch?.launch?.launch_error === null &&
+    liveLaunch?.launch?.process_tree?.some((line) => /\blifeos\b/i.test(line)) &&
+    liveLaunch?.readiness?.schemaVersion === "lifeos.glass-ui-ready.v1" &&
+    Number(liveLaunch?.readiness?.mountedAt) >=
+      Date.parse(liveLaunch?.started_at ?? "") &&
+    liveLaunch?.shutdown?.signal === "SIGTERM",
+  path: liveLaunchPath,
+  sha256: optionalSha256(liveLaunchPath),
+  receipt: liveLaunch,
+};
+const lifeosBinding = {
+  proven: causalLaunch.proven,
+  lifeos_processes: [
+    ...lifeosRows.map(({ raw }) => raw),
+    ...(liveLaunch?.launch?.process_tree ?? []).filter((line) =>
+      /\blifeos\b/i.test(line),
+    ),
+  ],
+  ui_acceptance_receipt: uiAcceptanceReceipt,
+  causal_launch: causalLaunch,
+  missing: [
+    ...(causalLaunch.proven ? [] : ["lifeos_process_receipt_missing"]),
+    ...(uiAcceptanceReceipt.proven ? [] : ["lifeos_ui_acceptance_receipt_missing"]),
+    ...(causalLaunch.proven ? [] : ["fresh_launch_causality_missing"]),
+    ...(causalLaunch.proven ? [] : ["failure_shutdown_behavior_missing"]),
+  ],
+  boundary:
+    "Yazelix workspace orchestration is not proof of LifeOS launch ownership.",
 };
 const claims = [];
 if (existsSync(outputPath)) {
@@ -318,11 +404,13 @@ if (existsSync(outputPath)) {
 const claimId = "SWARM-CLAIM-002";
 const claim = {
   claim_id: claimId,
-  verification_status: "unverified",
-  status: "qualified",
-  confidence: "medium",
+  verification_status: lifeosBinding.proven ? "verified" : "unverified",
+  status: lifeosBinding.proven ? "verified" : "qualified",
+  confidence: lifeosBinding.proven ? "high" : "medium",
   conclusion:
-    "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, but no fresh causal LifeOS launch, LifeOS process, UI-ready signal, or LifeOS-to-Yazelix bridge proves that Yazelix is the background workspace engine for a LifeOS application launch.",
+    lifeosBinding.proven
+      ? "The active profile-owned Yazelix package and launcher establish the terminal workspace, and a current-worktree Tauri launch produced a causal LifeOS process, mounted Glass readiness receipt, authenticated redb owner sequence, and SIGTERM shutdown receipt."
+      : "The active profile-owned Yazelix package and launcher establish a live Zellij-based terminal workspace, and the source contains a causal Glass-to-redb readiness bridge; a fresh Tauri process and UI acceptance receipt are still required to prove that Yazelix is the background workspace engine for a LifeOS application launch.",
   evidence: [
     {
       relationship: "profile-owner",
@@ -358,18 +446,12 @@ const claim = {
       ...workspaceResponsibility,
     },
     {
+      relationship: "lifeos-bridge-contract",
+      ...lifeosBridge,
+    },
+    {
       relationship: "lifeos-binding",
-      proven: false,
-      lifeos_processes: lifeosRows.map(({ raw }) => raw),
-      missing: [
-        "lifeos_process_receipt_missing",
-        "lifeos_ui_acceptance_receipt_missing",
-        "lifeos_bridge_contract_missing",
-        "fresh_launch_causality_missing",
-        "failure_shutdown_behavior_missing",
-      ],
-      boundary:
-        "Yazelix workspace orchestration is not proof of LifeOS launch ownership.",
+      ...lifeosBinding,
     },
   ],
 };

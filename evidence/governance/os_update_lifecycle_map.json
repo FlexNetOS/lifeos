@@ -1,0 +1,27 @@
+{
+  "schema_version": "lifeos.evidence.os-update-lifecycle-map.v1",
+  "recorded_at": "2026-07-28",
+  "mechanisms": [
+    {"name":"unattended-upgrades","trigger":"systemd apt-daily-upgrade timer","schedule":"daily, host-controlled","risk":"kernel and desktop packages can terminate active processes"},
+    {"name":"apt-daily","trigger":"apt-daily.timer","schedule":"daily, randomized timer window","risk":"package indexes and package actions can race active work"},
+    {"name":"snap refresh","trigger":"snapd refresh.timer","schedule":"daily or snapd policy window","risk":"desktop/runtime components can change outside LifeOS process control"},
+    {"name":"kernel install","trigger":"apt package transaction installing linux-image","schedule":"whenever unattended-upgrades selects a kernel","risk":"a reboot changes the shared kernel and ends processes while durable state remains"}
+  ],
+  "desktop_breaking_packages": [
+    {"pattern":"linux-image*","why":"A kernel install can require reboot and changes the shared-kernel execution boundary."},
+    {"pattern":"snapd","why":"Snap refresh scheduling can replace desktop/runtime components during active work."},
+    {"pattern":"accountsservice","why":"Desktop account-service changes can disrupt the shell and session surfaces."}
+  ],
+  "incident_reference": {
+    "catalog":"evidence/isolation/isolation_failure_modes.json",
+    "date":"2026-07-21",
+    "timer_observation":"06:29:49",
+    "kernel":"7.0.0-28",
+    "summary":"The update path ended processes during reboot while the durable filesystem remained intact."
+  },
+  "governance_targets": {
+    "observe":"ARCHBP-110",
+    "hold_during_sessions":"ARCHBP-111",
+    "reboot_intent":"ARCHBP-112"
+  }
+}

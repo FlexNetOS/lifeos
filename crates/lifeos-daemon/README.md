@@ -1,10 +1,13 @@
 # lifeos-daemon
 
-Headless LifeOS node. Runs on a Raspberry Pi Zero 2 W or Pi 3 (Pi OS 64-bit / Ubuntu 24.04 arm64) with no GUI and no Tauri shell — just a Rust bin that will eventually bridge Cognitum-Seed sensor frames into an MQTT broker so the desktop LifeOS app (and anything else on the network) can consume them without sitting on the same wire as the appliance.
+Headless LifeOS node. Runs on a Raspberry Pi Zero 2 W or Pi 3 (Pi OS 64-bit / Ubuntu 24.04 arm64) with no GUI and no Tauri shell. It bridges Cognitum-Seed sensor frames into MQTT so the desktop LifeOS app and other network consumers can receive them without sitting on the same wire as the appliance.
 
-## Status (Wave 3 scaffold)
+## Status
 
-This is a **scaffold**. `main()` prints a banner and exits cleanly. The sensor → MQTT bridge body is a `TODO` — see `src/main.rs`. The crate exists so the workspace can already cross-compile to `aarch64-unknown-linux-gnu`; that lets later waves grow the bridge without having to relitigate workspace topology, dependency posture, or target setup.
+The daemon is an active Cognitum-Seed → MQTT bridge. On startup it performs a
+status handshake, connects to the configured broker, publishes retained online
+status, and publishes retained sensor snapshots until stopped. MQTT's
+last-will record publishes retained offline status when the process disappears.
 
 ## Purpose
 
@@ -15,9 +18,12 @@ This is a **scaffold**. `main()` prints a banner and exits cleanly. The sensor �
 
 ## Dependency posture
 
-`lifeos-core` is pulled with `default-features = false`. That strips the optional `reqwest`-backed `mcp-http` transport from this crate's resolution graph. The scaffold's `main()` only needs the `VERSION` constant and the `CognitumClient<T>` type signatures, both of which compile without the HTTP transport. A later wave that wires a real read loop will flip `default-features` back on (or add a feature-forwarding pass-through) at the same time the MQTT client lands.
+`lifeos-core` is pulled with `default-features = false` and explicitly enables
+the `mcp-http` feature. The daemon uses `reqwest` with rustls for the Seed REST
+mirror and `rumqttc` with its pure-Rust TLS feature set.
 
-When MQTT lands: prefer [`rumqttc`](https://crates.io/crates/rumqttc) with its `use-rustls` feature. Avoid `paho-mqtt` (C bindings, drags `openssl-sys`).
+The bridge uses [`rumqttc`](https://crates.io/crates/rumqttc) with its
+`use-rustls` feature. Avoid `paho-mqtt` (C bindings, drags `openssl-sys`).
 
 ## Cross-compile setup
 
@@ -45,30 +51,36 @@ cross build -p lifeos-daemon --target aarch64-unknown-linux-gnu --release
 
 `cross` ships its own toolchain image; useful when the host can't install Debian cross packages.
 
-## Acceptance command transcript (Wave 3)
+## Acceptance commands
 
 These are the four commands that proved the scaffold:
 
 ```bash
 cargo check --workspace                                             # native, full workspace
-cargo run -p lifeos-daemon                                          # banner + clean exit
+cargo run -p lifeos-daemon                                          # bridge loop
 rustup target add aarch64-unknown-linux-gnu                         # additive, idempotent
 cargo check -p lifeos-daemon --target aarch64-unknown-linux-gnu     # cross check (no link)
 ```
 
 `cargo build --target aarch64-unknown-linux-gnu` will fail until `gcc-aarch64-linux-gnu` is installed on the host — that's a deliberate trade. `cargo check` is the contract for the scaffold.
 
-## Wave 4+ roadmap
+## Configuration
 
-In rough order of dependency:
+Environment variables are the database/envctl-generated projection boundary:
 
-1. **MQTT client wiring.** `rumqttc` with `use-rustls`, configurable broker URL, last-will, retained sensor topics.
-2. **Re-enable `lifeos-core` HTTP transport.** Either default-features back on, or add a `mcp-http` feature on this crate that forwards to `lifeos-core/mcp-http`.
-3. **Config file.** TOML at `/etc/lifeos/daemon.toml` (system) or `$XDG_CONFIG_HOME/lifeos/daemon.toml` (user). Fields: Cognitum URL, MQTT broker URL, poll interval, device-id, topic prefix.
-4. **Async runtime + signal handling.** `tokio` with rt-multi-thread, `tokio::signal::ctrl_c()` + SIGTERM for graceful shutdown that flushes the MQTT outbound queue.
-5. **Backoff + retry.** Exponential backoff on Cognitum read failures; MQTT auto-reconnect (rumqttc handles its side).
-6. **`systemd` unit.** Drop-in service file in `dist/systemd/` plus install docs.
-7. **Observability.** Structured logs to stdout (journald-friendly), optional metrics endpoint.
+| Variable | Default |
+|---|---|
+| `LIFEOS_COGNITUM_URL` | `http://169.254.42.1/mcp` |
+| `LIFEOS_MQTT_URL` | `mqtt://127.0.0.1:1883` |
+| `LIFEOS_MQTT_CLIENT_ID` | `lifeos-daemon-$HOSTNAME` |
+| `LIFEOS_DEVICE_ID` | `$HOSTNAME` or `lifeos-node` |
+| `LIFEOS_MQTT_TOPIC_PREFIX` | `lifeos/sensor` |
+| `LIFEOS_SENSOR_POLL_SECONDS` | `5` |
+
+The bridge publishes `<prefix>/<device-id>/status` and
+`<prefix>/<device-id>/snapshot` with QoS 1 and retained payloads. `mqtts://`
+is rejected until the deployment supplies an explicit TLS transport policy;
+the HTTP Cognitum path already uses rustls.
 
 ## What this crate explicitly is NOT
 

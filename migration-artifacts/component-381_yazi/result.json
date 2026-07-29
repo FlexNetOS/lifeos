@@ -1,0 +1,32 @@
+{
+  "task_id": "COMPONENT-381_YAZI",
+  "title": "Component: Yazi",
+  "probe_mode": "read-only",
+  "status": "noncompliant",
+  "verdict": "Yazi is required by the blueprint but is not available in the current runtime PATH; no replacement was used.",
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "sha256_matches_packet": true,
+    "required_command": "grep -Fq 'Yazi' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "required_command_exit_code": 0,
+    "evidence_lines": [66, 68, 598, 697, 5736, 6089, 6321]
+  },
+  "requirement": {
+    "component": "Yazi",
+    "source": "https://github.com/sxyazi/yazi",
+    "required_runtime": "Yazi in the Nix-owned Yazelix closure pinned at 01790ae2292a0060acb015d72e3bec8a21b0b0ef",
+    "hard_rule": "Yazi must be installed and used, not replaced."
+  },
+  "runtime_probe": {
+    "yazi_path": null,
+    "yazi_version": null,
+    "yazi_command_result": "command not found",
+    "yzx_path": "/home/flexnetos/.nix-profile/bin/yzx",
+    "yzx_version": "Yazelix Nova (1.0.0-beta.2)"
+  },
+  "remediation": "Install or enter the pinned Yazelix Nix closure that exposes Yazi, then verify `yazi --version` and use Yazi through the Yazelix/Zellij runtime. Do not substitute another file manager.",
+  "changes": [
+    "Created this result artifact only."
+  ]
+}

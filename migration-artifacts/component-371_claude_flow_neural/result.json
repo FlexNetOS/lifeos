@@ -1,0 +1,44 @@
+{
+  "task_id": "COMPONENT-371_CLAUDE_FLOW_NEURAL",
+  "title": "Component: @claude-flow/neural",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "hard_rule": 15,
+  "requirement": "@claude-flow/neural must be installed and used, not replaced.",
+  "component": {
+    "name": "@claude-flow/neural",
+    "owner": "ruvnet",
+    "repository": "https://github.com/ruvnet/ruflo",
+    "declared_version": "3.0.0-alpha.9",
+    "declared_capabilities": [
+      "PPO, A2C, DQN, Q-Learning, SARSA, Decision Transformer, Curiosity, and SONA",
+      "database-controlled execution and canonical state/results",
+      "integration by role with ruvllm, AgentDB, RVF, SONA, FastGRNN, Ruflo, RuvLTRA, and ATAS"
+    ]
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "supplied_anchor_document_sha256_matches": true,
+    "supplied_unit_sha256": "95283b8e5dadc2913575d789162623fb596350382648bb52fe046085f535c462",
+    "unit_sha256_validation": "unavailable: the packet does not define the source-unit byte range needed to recompute this digest",
+    "architecture_section_line": 1188,
+    "component_inventory_line": 6079,
+    "command_template": "grep -Fq '@claude-flow/neural' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "command_template_exit_code": 0
+  },
+  "runtime_evidence": {
+    "permitted_implementation_path": "execution-framework",
+    "installation_verified": false,
+    "usage_verified": false,
+    "reason": "No @claude-flow/neural reference or package manifest was observed under execution-framework during the authorized read-only probe."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "No implementation changes were authorized; hard rule 15 prohibits replacement."
+  },
+  "changes": [
+    "Recorded read-only verification evidence only."
+  ],
+  "rollback": "Read-only probe; no implementation changes were made."
+}

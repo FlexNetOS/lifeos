@@ -1,0 +1,24 @@
+{
+  "task_id": "COMPONENT-368_MICROLORA",
+  "component": "ruvector-sona MicroLoRA / ruvllm LoRA",
+  "status": "passed_with_version_drift",
+  "hard_rule_15": {
+    "installed": true,
+    "used": true,
+    "replaced": false
+  },
+  "evidence": {
+    "blueprint_inventory": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md:6256 identifies MicroLoRA as ruvector-sona MicroLoRA/ruvllm LoRA; rule 15 requires ruvnet/rUv components to be installed and used, not replaced.",
+    "manifest": "package.json: @ruvector/sona 0.1.7 and @ruvector/ruvllm 2.6.0",
+    "lockfile": "bun.lock: @ruvector/sona@0.1.7",
+    "installed_module": "node_modules/@ruvector/sona",
+    "runtime_use": [
+      "scripts/learning-boundary-lifecycle.mjs constructs real @ruvector/sona SonaEngine instances with microLoraRank: 2 and executes the witness-gated learning lifecycle.",
+      "A read-only Bun probe constructed SonaEngine with microLoraRank: 2 and applyMicroLora returned an enabled, finite 8-value output for an 8-value input.",
+      "scripts/verify-node-authority.mjs calls sona.applyMicroLora(sonaInput) and uses @ruvector/ruvllm LoraManager for adapter creation and activation."
+    ],
+    "test": "bun scripts/learning-boundary-lifecycle.mjs --output=/tmp/component-368-microlora-proof.json completed: sandbox isolation, witnessed promotion, deterministic rollback, zero dropped trajectories, and the MicroLoRA-supported component guard all passed."
+  },
+  "warning": "The blueprint inventory specifies SONA 0.2.1, while package.json and bun.lock pin @ruvector/sona 0.1.7. This read-only probe did not modify dependencies. The configured Vitest target could not load its repository-external setup file /home/flexnetos/meta/src/lifeos/tests/setup.js; the lifecycle adapter itself completed successfully under Bun.",
+  "blueprint_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee"
+}

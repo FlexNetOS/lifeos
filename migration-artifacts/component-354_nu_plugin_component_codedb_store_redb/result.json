@@ -1,0 +1,34 @@
+{
+  "task_id": "COMPONENT-354_NU_PLUGIN_COMPONENT_CODEDB_STORE_REDB",
+  "component": "nu_plugin component: codedb-store-redb",
+  "status": "blocked",
+  "mode": "read-only-probe",
+  "hard_rule_15": "not satisfied: the shared CodeDB Nushell plugin is installed and was exercised, but its redb store implementation is explicitly unavailable (deferred until CDB015); no replacement was introduced",
+  "blueprint": {
+    "marker": "nu_plugin component: codedb-store-redb",
+    "line": 6062,
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "required_revision": "63d6874314031471213fe9f51d9706820bc254e1"
+  },
+  "runtime": {
+    "nushell_version": "0.113.1",
+    "plugin_name": "codedb",
+    "plugin_version": "0.1.0",
+    "plugin_status": "loaded",
+    "plugin_binary": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb"
+  },
+  "usage": {
+    "commands": [
+      "codedb doctor",
+      "codedb store-report"
+    ],
+    "doctor_result": {
+      "table": "codedb_store",
+      "status": "degraded",
+      "note": "redb store is not implemented until CDB015"
+    },
+    "store_report_result": "rejected before backend access because a required --store selector was not supplied"
+  },
+  "assessment": "The required component is declared at the pinned blueprint revision and its host Nushell plugin is installed, loaded, and invoked. However, the plugin's own read-only diagnostic states that the redb store is not implemented. Therefore codedb-store-redb cannot be verified as installed and used under hard rule 15. This probe made no substitution and no state changes.",
+  "unblock": "Provide the CDB015 implementation in the pinned nu_plugin closure, then rerun a read-only codedb store-report against an existing redb:// store selector."
+}

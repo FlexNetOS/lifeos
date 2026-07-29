@@ -1,0 +1,53 @@
+{
+  "schema_version": "lifeos.evidence.portable-release-root-coverage.v1",
+  "recorded_at": "2026-07-28",
+  "implements": ["ARCHBP-021", "YZXCONV-021"],
+  "bundle_root": "/home/flexnetos/meta/var/cache/archbp021/bundle-moved",
+  "musl_artifacts": [
+    {
+      "name": "yzx-open",
+      "path": "bin/yzx-open",
+      "reproducible": true,
+      "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked, not stripped",
+      "sha256": "f670a111f767539ba391aa33e1ec44bacfb60e709e1192947e32d97dac7526c0"
+    },
+    {
+      "name": "yzx-tutor",
+      "path": "bin/yzx-tutor",
+      "reproducible": true,
+      "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked, not stripped",
+      "sha256": "07e046f56c573d116906bae84389bfdc0741fc4dc17c3c26f9d2a49e2e32a8d3"
+    },
+    {
+      "name": "yzx-yazi-config",
+      "path": "bin/yzx-yazi-config",
+      "reproducible": true,
+      "file_type": "ELF 64-bit LSB pie executable, x86-64, static-pie linked, not stripped",
+      "sha256": "c445a884b27c41c888f05b83ded6204a33090641d45473b7aa82b6498d48df28"
+    }
+  ],
+  "non_musl_classification": [
+    {"dependency": "WebKitGTK", "owner": "host desktop integration", "fallback": "The desktop host supplies WebKitGTK; the receipt keeps this dependency visible and does not claim headless portability."},
+    {"dependency": "PostgreSQL/RuVector", "owner": "canonical database runtime", "fallback": "Connect to the provisioned PostgreSQL/RuVector service; the portable UI bundle never substitutes local SQLite state."},
+    {"dependency": "bwrap", "owner": "Yazelix Nix closure with profiled host fallback", "fallback": "Use the pinned closure bwrap when permitted, otherwise record and use the AppArmor-profiled /usr/bin/bwrap."},
+    {"dependency": "yzx-config", "owner": "Yazelix runtime closure", "fallback": "The moved closure provides yzx-config and its data; a missing closure entry is a release failure, not a silent host lookup."},
+    {"dependency": "Nushell", "owner": "yzx-envelope closure", "fallback": "The release closure supplies the Nushell interpreter used by the packaged envelope engine."},
+    {"dependency": "glibc support libraries", "owner": "relocatable Nix closure", "fallback": "Dynamic support libraries remain inside the extracted closure and are exposed only through the envelope's /nix bind."}
+  ],
+  "closure": {
+    "paths": 20,
+    "source": "bundle-moved/closure.txt",
+    "host_store_hidden": true
+  },
+  "relocation": {
+    "moved_prefix": "/home/flexnetos/meta/var/cache/archbp021/bundle-moved",
+    "launcher": "launcher",
+    "store_workload": "/nix/store/gik3rh1vz2jlgnifb9dh6vc6sxwwz9jj-bash-5.3p9/bin/bash",
+    "empty_store_root": "/tmp",
+    "tests": ["store-hidden relocation using closure bash and coreutils", "static musl workload with durable binary bind"]
+  },
+  "host_nix_dependence": {
+    "remaining": ["WebKitGTK desktop host", "PostgreSQL/RuVector service", "AppArmor-profiled /usr/bin/bwrap fallback"],
+    "blocks_stronger_claims": true
+  }
+}

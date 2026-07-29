@@ -1,0 +1,31 @@
+{
+  "task_id": "COMPONENT-529_RUVECTOR_MANIFEST_RUVECTOR_IOS_WASM",
+  "title": "Component: RuVector manifest: ruvector-ios-wasm",
+  "status": "passed_with_anchor_offset_discrepancy",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector manifest: ruvector-ios-wasm' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "9e9e25943c2341a1923fdbdb474eaad7033cfc4a932f27f05d8f599815a33125",
+    "verified_row_line": 6237,
+    "verified_row_byte_offset": 922003,
+    "verified_row_sha256_newline_free": "9e9e25943c2341a1923fdbdb474eaad7033cfc4a932f27f05d8f599815a33125",
+    "finding": "The declared byte offset points to unrelated prose in the hash-matching document. The canonical manifest row begins at byte offset 922003 and matches the declared unit SHA-256 when hashed without its trailing newline."
+  },
+  "manifest": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "examples/wasm/ios",
+    "package": "ruvector-ios-wasm",
+    "version": "0.1.0",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "hard_rule_15": "The native RuVector ruvector-ios-wasm manifest is required to be installed and used; it must not be replaced.",
+  "changes_made": [
+    "Created this evidence receipt only."
+  ],
+  "rollback": "No rollback required; no implementation or dependency state was changed.",
+  "result": "pass"
+}

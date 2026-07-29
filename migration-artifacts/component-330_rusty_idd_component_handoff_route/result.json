@@ -1,0 +1,32 @@
+{
+  "task_id": "COMPONENT-330_RUSTY_IDD_COMPONENT_HANDOFF_ROUTE",
+  "status": "passed",
+  "probe": {
+    "command": "grep -Fq 'rusty-idd component: handoff-route' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "exit_code": 0,
+    "match_line": 6038,
+    "match_byte_offset": 666604
+  },
+  "component": {
+    "name": "handoff-route",
+    "repository": "https://github.com/FlexNetOS/rusty-idd",
+    "revision": "4c47c67fe088e99868d8ccf74d6cbe1aa2af2856",
+    "hard_rule_15": "must be installed and used, not replaced"
+  },
+  "document": {
+    "sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "sha256_actual": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee"
+  },
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "50358d0da259dd2edd4661c28f090708ef6ee666dd2f72ee1c8da6eed2cd2205",
+    "actual_byte_offset": 666604,
+    "actual_unit_sha256": "50358d0da259dd2edd4661c28f090708ef6ee666dd2f72ee1c8da6eed2cd2205",
+    "verification": "unit hash verified; declared byte offset does not locate the current component entry"
+  },
+  "installation_and_use": {
+    "status": "not verified",
+    "reason": "This read-only packet exposes no execution-framework files or other permitted integration evidence for the pinned rusty-idd component."
+  },
+  "scope": "read-only probe; no component replacement or source mutation performed"
+}

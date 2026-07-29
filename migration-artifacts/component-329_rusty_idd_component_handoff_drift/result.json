@@ -1,0 +1,36 @@
+{
+  "task_id": "COMPONENT-329_RUSTY_IDD_COMPONENT_HANDOFF_DRIFT",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "probe_mode": "read-only",
+  "hard_rule": 15,
+  "requirement": "rusty-idd component: handoff-drift must be installed and used, not replaced.",
+  "probe": {
+    "command": "grep -Fq 'rusty-idd component: handoff-drift' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "exit_code": 0,
+    "match_line": 6037,
+    "match_byte_offset": 665630
+  },
+  "component": {
+    "name": "handoff-drift",
+    "repository": "https://github.com/FlexNetOS/rusty-idd",
+    "revision": "4c47c67fe088e99868d8ccf74d6cbe1aa2af2856"
+  },
+  "document": {
+    "sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "sha256_actual": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee"
+  },
+  "anchor_binding": {
+    "declared_byte_offset": 335153,
+    "declared_unit_sha256": "9e6f9a1fb05477219e73d1375c29a582bf835f39601b024b4d73783abe7db72c",
+    "verification": "not verified: the declared byte offset does not locate the component entry (observed entry starts at byte 665630); the supplied unit hash cannot be validated against that entry"
+  },
+  "installation_and_use": {
+    "status": "not verified",
+    "reason": "No execution-framework directory or non-blueprint pinned rusty-idd/handoff-drift integration reference was available in the permitted read-only probe scope."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "The task is a read-only probe and hard rule 15 prohibits replacing the component."
+  },
+  "next_action": "Provide the execution-framework component closure or a pinned rusty-idd checkout at 4c47c67fe088e99868d8ccf74d6cbe1aa2af2856, then rerun the read-only installation and usage probe."
+}

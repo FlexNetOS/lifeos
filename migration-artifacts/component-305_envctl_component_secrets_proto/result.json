@@ -1,0 +1,44 @@
+{
+  "task_id": "COMPONENT-305_ENVCTL_COMPONENT_SECRETS_PROTO",
+  "title": "Component: envctl component: secrets-proto",
+  "status": "not_satisfied",
+  "probe_mode": "read-only",
+  "hard_rule": "envctl component: secrets-proto must be installed and used, not replaced",
+  "required_component": {
+    "name": "secrets-proto",
+    "repository": "https://github.com/FlexNetOS/envctl",
+    "pinned_revision": "48368a97f7d1388cea247dd4ebdc32a8193743fb"
+  },
+  "anchor_validation": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_observed": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "required_row_line": 6013,
+    "required_row_found": true
+  },
+  "envctl": {
+    "installed_version": "0.1.0",
+    "component_subcommand_available": false,
+    "secret_subsystem_available": true
+  },
+  "probes": [
+    {
+      "command": "envctl catalog scan --json",
+      "result": "blocked",
+      "detail": "manifest dir not found or unreadable: manifest"
+    },
+    {
+      "command": "envctl install secrets-proto --dry-run --json",
+      "result": "blocked",
+      "detail": "manifest dir not found or unreadable: manifest"
+    },
+    {
+      "command": "envctl --json secret status",
+      "result": "blocked",
+      "detail": "manifest dir not found or unreadable: manifest"
+    }
+  ],
+  "conclusion": "The required component is not verified installed or used in this task cell. No replacement implementation was used or credited.",
+  "remediation": "Provide the authoritative envctl manifest directory, then install the pinned secrets-proto component and rerun the read-only status verification.",
+  "secrets_mutated": false
+}

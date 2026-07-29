@@ -8,6 +8,7 @@ import { tick } from "svelte";
 import { createPinia, setActivePinia } from "pinia";
 import { createRouter, createMemoryHistory } from "vue-router";
 import LightsView from "@/components/LightsView.svelte";
+import { useLifeos } from "@/stores/lifeos-native";
 
 const makeRouter = () => createRouter({
   history: createMemoryHistory(),
@@ -24,6 +25,7 @@ describe("LightsView.svelte", () => {
   beforeEach(async () => {
     pinia = createPinia();
     setActivePinia(pinia);
+    useLifeos().resetUiState();
     router = makeRouter();
     await router.push("/");
     await router.isReady();
@@ -195,7 +197,7 @@ describe("LightsView.svelte", () => {
     });
     // Clicking edit calls lifeos.sendAiMessage — verify by message count + content
     const editBtn = rows[0].querySelectorAll(".schedule-action")[0];
-    const { useLifeos } = await import("@/stores/lifeos.js");
+    const { useLifeos } = await import("@/stores/lifeos-native");
     const store = useLifeos();
     const startLen = store.aiMessages.length;
     await fireEvent.click(editBtn);

@@ -1,0 +1,28 @@
+{
+  "task_id": "COMPONENT-316_FLEXNETOS_RUNNER_COMPONENT_RUNNER_CORE",
+  "component": "flexnetos_runner component: runner-core",
+  "probe_mode": "read-only",
+  "status": "blocked",
+  "requirement": "The component must be installed and used, not replaced (hard rule 15).",
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_present": true,
+    "required_revision": "e6ccf7138b5fb38ad7d6472dc0df144993edc86c"
+  },
+  "observed_installation": {
+    "checkout": "/home/flexnetos/meta/flexnetos_runner",
+    "head": "998c3db9bbf5b0d79045b94f34b850cdc3482091",
+    "pinned_commit_available": true,
+    "pinned_commit_checked_out": false,
+    "runner_core_package_present": true,
+    "runner_core_offline_cargo_check": "passed"
+  },
+  "hard_rule_assessment": {
+    "installed_at_required_revision": false,
+    "used_at_required_revision": false,
+    "replacement_detected": true,
+    "evidence": "The only flexnetos_runner worktree is at 998c3db9 on main; runner-core differs from the blueprint-pinned e6ccf713 revision. No checked-out or referenced pinned component was found."
+  },
+  "next_action": "Provision and reference a clean checkout/worktree at e6ccf7138b5fb38ad7d6472dc0df144993edc86c, then rerun this probe."
+}

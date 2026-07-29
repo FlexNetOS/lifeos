@@ -4,13 +4,14 @@
 # stores
 
 ## Purpose
-Pinia stores for LifeOS. The `lifeos` store holds workspace nav, AI chat, telemetry config, command-palette state, notifications state, and the drag/drop reorder maps. The `toasts` store backs `ToastContainer.vue`. **Strict `.ts` ↔ `.js` parity** with the preview path is enforced by a test — see below.
+Stores for LifeOS. The legacy Pinia `lifeos` and `toasts` siblings remain the browser-preview compatibility surface, with strict `.ts` ↔ `.js` parity enforced by a test. Native Svelte runtime surfaces use `lifeos-native.ts` and `toasts-native.ts` with subscribable contracts.
 
 ## Key Files
 | File | Description |
 |------|-------------|
 | `lifeos.ts` | Canonical typed Pinia store. State, getters, actions for `activeId`, `sectionByWs`, `activeSub`, `teamOrder`, `sectionOrder`, `itemOrder`, `aiMessages`, `aiProvider`, telemetry, cmdk, notifications. `sendAiMessage()` is dual-mode: Tauri → `invoke("ai_complete", …)`; Vite/Vitest → canned-reply. `setAiProvider()` calls `invoke("ai_provider_set", …)` on the Tauri path. |
 | `lifeos.js` | Sibling for the in-browser CDN preview path. Surface MUST match `lifeos.ts` (the `../../tests/store-sync.spec.js` spec asserts state-key + action-name parity). |
+| `lifeos-native.ts` | Native Svelte Glass runtime store. Owns the live state machine, native subscription boundary, Tauri projection hydration, and debounced `ui-state` writes. |
 | `toasts.ts` | Typed toast queue. Push / dismiss API consumed by `../components/ToastContainer.vue`. |
 | `toasts.js` | Preview-path sibling for `toasts.ts`. |
 

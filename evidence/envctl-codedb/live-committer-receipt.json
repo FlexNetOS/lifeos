@@ -1,0 +1,53 @@
+{
+  "schema_version": "lifeos.evidence.envctl-codedb-live.v1",
+  "authority": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "authority_invariants": [
+    5,
+    7,
+    10,
+    12,
+    14,
+    18
+  ],
+  "code_db": {
+    "repository": "../nu_plugin",
+    "revision": "5ec4242c656d019ea9dd583c1c78f1d5d48b4e7f",
+    "worktree": "clean",
+    "path": "rtk_nu → CodeDB → redb",
+    "verification_output_sha256": "9c3d30d6172173c455ea3d1a5125106af16bee3df540a0dc05a360c6b97eefea"
+  },
+  "envctl": {
+    "repository": "../envctl",
+    "revision": "a10db126c98380f3c6425c9cf5516caccf4fa3b8",
+    "worktree": "clean",
+    "committer_role": "lifeos_envctl",
+    "test_database": "envctl_commit_test",
+    "connection_transport": "PostgreSQL Unix socket",
+    "tests": [
+      {
+        "name": "acknowledgement_never_precedes_durable_commit",
+        "status": "passed"
+      },
+      {
+        "name": "committed_state_projects_back_deterministically_through_the_owner_protocol",
+        "status": "passed"
+      },
+      {
+        "name": "drain_is_ordered_idempotent_and_restart_safe_with_exact_identity",
+        "status": "passed"
+      },
+      {
+        "name": "grants_deny_every_non_envctl_write_at_the_database",
+        "status": "passed"
+      }
+    ],
+    "verification_output_sha256": "3a1f55935bb851e71f3cac1fa84839a588ccde900237e2a8631f3b36074420a9"
+  },
+  "boundary": {
+    "durable_committer": "envctl",
+    "staging": "codedb_outbox_export",
+    "redb_role": "transient ordered outbox/projection boundary",
+    "postgres_role": "canonical durable authority",
+    "non_envctl_write_denied": true
+  }
+}

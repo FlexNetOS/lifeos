@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest";
 // and their triggers/timing. (yzx-iso t9, G10.)
 
 const repoRoot = resolve(import.meta.dirname, "..");
-const mapPath = resolve(repoRoot, "planning-spine-v0/docs/os_update_lifecycle_map.json");
+const mapPath = resolve(repoRoot, "evidence/governance/os_update_lifecycle_map.json");
 const load = () => JSON.parse(readFileSync(mapPath, "utf8"));
 
 describe("ARCHBP-109 OS-update lifecycle map", () => {
@@ -43,7 +43,7 @@ describe("ARCHBP-109 OS-update lifecycle map", () => {
 
   test("the 2026-07-21 incident is referenced and tied to the observed timer", () => {
     const m = load();
-    expect(m.incident_reference.catalog).toContain("isolation_failure_modes.json");
+    expect(m.incident_reference.catalog).toContain("evidence/isolation/isolation_failure_modes.json");
     // The causal tie: the timer's last run matches the kernel-swap minute.
     expect(JSON.stringify(m)).toContain("06:29:49");
     expect(JSON.stringify(m)).toContain("7.0.0-28");

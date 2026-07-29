@@ -1,0 +1,32 @@
+{
+  "schema_version": "lifeos.evidence.isolation-tier-map.v1",
+  "rule": "nothing-durable-on-host-run",
+  "feeds": ["scripts/enumerate-runtime-env.mjs", "scripts/check-durable-not-on-run.mjs"],
+  "tiers": {
+    "volatile": "tmpfs or reproducible scratch state; never a source of truth",
+    "durable": "persistent state under /home/flexnetos/meta/var; never host /run",
+    "portable": "release bytes and closure content that can move with the launcher"
+  },
+  "entries": [
+    {"name":"CLAUDE_CONFIG_DIR","kind":"env-var","path":"$CLAUDE_CONFIG_DIR","current_path":"/run/user/1001/yazelix/profile-runtime/claude","target_path":"/home/flexnetos/meta/var/xdg-data/claude","tier":"durable","misplaced":true,"note":"known restart-gated migration resident"},
+    {"name":"CODEX_HOME","kind":"env-var","path":"$CODEX_HOME","current_path":"/run/user/1001/yazelix/profile-runtime/codex","target_path":"/home/flexnetos/meta/var/xdg-data/codex","tier":"durable","misplaced":true},
+    {"name":"YAZELIX_STATE_DIR","kind":"env-var","path":"$YAZELIX_STATE_DIR","current_path":"/run/user/1001/yazelix/profile-runtime/yazelix","target_path":"/home/flexnetos/meta/var/xdg-state/yazelix","tier":"durable","misplaced":true},
+    {"name":"XDG_DATA_HOME","kind":"env-var","path":"$XDG_DATA_HOME","current_path":"/home/flexnetos/meta/var/lib","target_path":"/home/flexnetos/meta/var/xdg-data","tier":"durable","misplaced":false},
+    {"name":"XDG_STATE_HOME","kind":"env-var","path":"$XDG_STATE_HOME","current_path":"/home/flexnetos/meta/var/lib","target_path":"/home/flexnetos/meta/var/xdg-state","tier":"durable","misplaced":false},
+    {"name":"XDG_RUNTIME_DIR","kind":"env-var","path":"$XDG_RUNTIME_DIR","current_path":"/run/user/1001","target_path":"/run/user/1001","tier":"volatile","misplaced":false},
+    {"name":"ICM_DB","kind":"env-var","path":"$ICM_DB","current_path":"/home/flexnetos/meta/var/lib/icm/memories.db","target_path":"/home/flexnetos/meta/var/lib/icm/memories.db","tier":"durable","misplaced":false},
+    {"name":"CARGO_TARGET_DIR","kind":"env-var","path":"$CARGO_TARGET_DIR","current_path":"/home/flexnetos/meta/var/cargo-target","target_path":"/home/flexnetos/meta/var/cargo-target","tier":"volatile","misplaced":false,"note":"reproducible build output"},
+    {"name":"RUSTUP_HOME","kind":"env-var","path":"$RUSTUP_HOME","current_path":"/run/user/1001/yazelix/volatile/rustup-home","target_path":"/run/user/1001/yazelix/volatile/rustup-home","tier":"volatile","misplaced":false},
+    {"name":"TMPDIR","kind":"env-var","path":"$TMPDIR","current_path":"/run/user/1001/yazelix/volatile/tmp","target_path":"/run/user/1001/yazelix/volatile/tmp","tier":"volatile","misplaced":false},
+    {"name":"postgres-datadir","kind":"state-path","path":"meta/var/lib/postgresql","current_path":"/home/flexnetos/meta/var/lib/postgresql","target_path":"/home/flexnetos/meta/var/lib/postgresql","tier":"durable","misplaced":false},
+    {"name":"redb-plane","kind":"state-path","path":"meta/var/lib/redb","current_path":"/home/flexnetos/meta/var/lib/redb","target_path":"/home/flexnetos/meta/var/lib/redb","tier":"durable","misplaced":false},
+    {"name":"claude-session-transcripts","kind":"state-path","path":"meta/var/xdg-data/claude","current_path":"/home/flexnetos/meta/var/xdg-data/claude","target_path":"/home/flexnetos/meta/var/xdg-data/claude","tier":"durable","misplaced":false},
+    {"name":"cargo-target","kind":"state-path","path":"meta/var/cargo-target","current_path":"/home/flexnetos/meta/var/cargo-target","target_path":"/home/flexnetos/meta/var/cargo-target","tier":"volatile","misplaced":false,"note":"reproducible ephemeral build output"},
+    {"name":"rustup-toolchains","kind":"state-path","path":"/run/user/1001/yazelix/volatile/rustup-home/toolchains","current_path":"/run/user/1001/yazelix/volatile/rustup-home/toolchains","target_path":"/run/user/1001/yazelix/volatile/rustup-home/toolchains","tier":"volatile","misplaced":false},
+    {"name":"build-tmp","kind":"state-path","path":"/run/user/1001/yazelix/volatile/tmp","current_path":"/run/user/1001/yazelix/volatile/tmp","target_path":"/run/user/1001/yazelix/volatile/tmp","tier":"volatile","misplaced":false},
+    {"name":"profile-runtime","kind":"state-path","path":"/run/user/1001/yazelix/profile-runtime","current_path":"/run/user/1001/yazelix/profile-runtime","target_path":"/run/user/1001/yazelix/profile-runtime","tier":"volatile","misplaced":false},
+    {"name":"runner-work-root","kind":"state-path","path":"meta/var/lib/runner/work","current_path":"/home/flexnetos/meta/var/lib/runner/work","target_path":"/home/flexnetos/meta/var/lib/runner/work","tier":"durable","misplaced":false},
+    {"name":"portable-release-closure","kind":"release-path","path":"evidence/packaging","current_path":"/home/flexnetos/meta/var/cache/archbp021/bundle-moved","target_path":"/home/flexnetos/meta/var/cache/archbp021/bundle-moved","tier":"portable","misplaced":false},
+    {"name":"envelope-private-tmp","kind":"runtime-path","path":"/tmp inside yzx-envelope","current_path":"tmpfs","target_path":"tmpfs","tier":"volatile","misplaced":false}
+  ]
+}

@@ -29,7 +29,7 @@ PGBIN = os.environ.get(
     "RUVECTOR_PGBIN",
     "/nix/store/5fsfh7z2v4s52rhngsc2gkc5x581p35a-postgresql-and-plugins-17.10/bin",
 )
-PGHOST = os.environ.get("RUVECTOR_PGHOST", "/home/flexnetos/meta/var/lib/postgresql")
+PGHOST = os.environ.get("RUVECTOR_PGHOST", "/home/flexnetos/meta/var/run/postgresql")
 PGPORT = os.environ.get("RUVECTOR_PGPORT", "5432")
 DBNAME = os.environ.get("RUVECTOR_DB", "ruvector_matrix")
 ANCHOR = os.environ.get(

@@ -6,7 +6,7 @@ import * as ruvector from "ruvector";
 import { SelfLearningRvfBackend } from "agentdb/backends/self-learning";
 import { SonaEngine } from "@ruvector/sona";
 import { RvfDatabase, resolveBackend } from "@ruvector/rvf";
-import { LoraManager } from "@ruvector/ruvllm";
+import { LoraAdapter, LoraManager } from "@ruvector/ruvllm";
 import {
   hello as tinyDancerHello,
   score,
@@ -20,9 +20,8 @@ const bunLockPath = join(repoRoot, "bun.lock");
 const outputArgument = process.argv.find((argument) => argument.startsWith("--output="));
 const canonicalEvidencePath = join(
   repoRoot,
-  "planning-spine-v0",
-  "generated",
-  "notebooklm_claim_verification",
+  "evidence",
+  "nbverify",
   "NBVERIFY-001.node-authority-proof.raw.json",
 );
 const evidencePath = outputArgument
@@ -269,13 +268,28 @@ await learning.insertAsync("doc-a", new Float32Array(sonaInput), { kind: "proof"
 await learning.insertAsync("doc-b", new Float32Array([...sonaInput].reverse()), {
   kind: "control",
 });
-const learningSearch = await learning.searchAsync(new Float32Array(sonaInput), 2);
-learning.recordFeedback(learningSearch[0].id, 1.0);
+const learningFeedbackId = "node-authority-query-1";
+const learningSearch = await learning.searchAsync(
+  new Float32Array(sonaInput),
+  2,
+  { feedbackId: learningFeedbackId },
+);
+learning.recordFeedback(learningFeedbackId, 1.0);
 await learning.forceLearn();
 await learning.flush();
+const acceptance = learning.runAcceptance({
+  holdoutSize: 4,
+  trainingPerCycle: 4,
+  cycles: 2,
+  stepBudget: 100,
+  seed: 7,
+});
 let witness;
 try {
-  witness = { result: learning.getBackend().verifyWitness() };
+  // SelfLearningRvfBackend owns the solver witness chain.  The underlying
+  // storage backend has no verifyWitness() API; using it here silently turned
+  // a real valid chain into an unverifiable receipt.
+  witness = { result: learning.verifyWitnessChain() };
 } catch (error) {
   witness = { error: String(error) };
 }
@@ -285,6 +299,7 @@ result.agentdb = {
   search: learningSearch,
   stats: await learning.getStatsAsync(),
   learningStats: learning.getLearningStats(),
+  acceptance,
   learningEnabled: learning.isLearningEnabled,
   backendPath: relative(repoRoot, learning.getBackend().getStoragePath()),
   backendInitialized: learning.getBackend().isInitialized(),
@@ -302,13 +317,50 @@ for (let index = 0; index < 51; index += 1) {
     8,
   );
 }
+lora.activate("personality-51");
+const adapterCheckpoint = {
+  activeAdapter: lora.getActiveId(),
+  adapters: lora.list().map((id) => ({
+    id,
+    json: lora.get(id).toJSON(),
+  })),
+};
+const adapterCheckpointPath = join(runtimeDir, "lora-adapters.json");
+await Bun.write(adapterCheckpointPath, `${JSON.stringify(adapterCheckpoint, null, 2)}\n`);
+const reloadedCheckpoint = JSON.parse(readFileSync(adapterCheckpointPath, "utf8"));
+const reloadedLora = new LoraManager({ rank: 1, alpha: 1 });
+for (const adapter of reloadedCheckpoint.adapters) {
+  reloadedLora.register(adapter.id, LoraAdapter.fromJSON(adapter.json));
+}
+const expectedAdapterIds = lora.list();
+const reloadedAdapterIds = reloadedLora.list();
+const reloadedLastAdapter = reloadedLora.get("personality-51");
+const originalLastAdapter = lora.get("personality-51");
+const adapterIdsMatch =
+  JSON.stringify(reloadedAdapterIds) === JSON.stringify(expectedAdapterIds);
+const adapterWeightsMatch =
+  JSON.stringify(reloadedLastAdapter?.getWeights()) ===
+  JSON.stringify(originalLastAdapter?.getWeights());
+const reloadedActivation = reloadedLora.activate(reloadedCheckpoint.activeAdapter);
+assert(adapterIdsMatch, "LoRA checkpoint adapter IDs changed during reload");
+assert(adapterWeightsMatch, "LoRA checkpoint weights changed during reload");
+assert(reloadedActivation, "LoRA checkpoint active adapter could not be restored");
 result.ruvllm = {
   adapterCount: lora.count(),
   firstActivated: lora.activate("personality-01"),
   lastActivated: lora.activate("personality-51"),
   activeAdapter: lora.getActiveId(),
   stats: lora.stats(),
-  note: "This proves 51 in-memory LoRA adapters and switching, not RVF persistence or complete agent personalities.",
+  persistence: {
+    checkpointPath: relative(repoRoot, adapterCheckpointPath),
+    checkpointBytes: (await stat(adapterCheckpointPath)).size,
+    exported: adapterCheckpoint.adapters.length === lora.count(),
+    imported: reloadedLora.count() === lora.count(),
+    adapterIdsMatch,
+    activeAdapterRestored: reloadedLora.getActiveId() === lora.getActiveId(),
+    weightsMatch: adapterWeightsMatch,
+  },
+  note: "This proves 51 adapters, switching, and a portable checkpoint round-trip; PostgreSQL/RuVector remains the canonical macro-state and this is not complete agent-personality or RVF persistence.",
 };
 
 const rows = Array.from({ length: 40 }, (_, index) => ({

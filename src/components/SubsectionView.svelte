@@ -1,7 +1,7 @@
 <script>
   // LifeOS — SubsectionView SFC (Svelte port of SubsectionView.vue)
   // Renders the per-subsection dashboard on the main canvas.
-  import { useLifeos } from "@/stores/lifeos.js";
+  import { useLifeos } from "@/stores/lifeos-native";
   import { bindStore } from "@/lib/pinia-bridge.svelte.js";
   import { resolveWorkspace } from "@/lib/resolve.js";
   import Icon from "./Icon.svelte";

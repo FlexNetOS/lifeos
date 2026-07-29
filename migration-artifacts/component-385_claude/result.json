@@ -1,0 +1,37 @@
+{
+  "task_id": "COMPONENT-385_CLAUDE",
+  "title": "Component: Claude",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_usage_not_demonstrated",
+  "hard_rule": 15,
+  "requirement": "Claude must be installed and used, not replaced.",
+  "component": {
+    "owner": "Anthropic/FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/yazelix-terminal-support",
+    "name": "Claude managed agent",
+    "revision": "a7ee555aa4bcd154649b2d53d4fb7eb3c0467413"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "line": 6093,
+    "actual_byte_offset": 718732,
+    "supplied_byte_offset": 335153,
+    "supplied_unit_sha256": "676540c7e839f5b7d32991815ff5de7082cf4bb22d566bfc8aaf6f2bdad76304",
+    "literal_present": true,
+    "verification_command": "grep -Fq 'Claude' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  },
+  "runtime_evidence": {
+    "cli_present": true,
+    "cli_path": "/home/flexnetos/.nix-profile/bin/claude",
+    "cli_version": "2.1.220 (Claude Code)",
+    "pinned_installation_verified": false,
+    "usage_verified": false,
+    "reason": "The Claude CLI is available, but no execution-framework directory or other permitted invocation, configuration, provenance, or result evidence links it to the required pinned managed-agent revision."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "This was a read-only probe; no replacement was attempted."
+  },
+  "next_action": "Provide the execution-framework component closure or managed-agent invocation and result records pinned to a7ee555aa4bcd154649b2d53d4fb7eb3c0467413, then rerun this probe."
+}

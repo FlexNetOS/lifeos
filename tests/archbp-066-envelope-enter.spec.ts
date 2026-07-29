@@ -33,11 +33,11 @@ describe("ARCHBP-066 envelope enter lifecycle", () => {
 
   test("nu is the only default in-envelope shell; the host shell is untouched", () => {
     const src = readFileSync(enginePath(), "utf8");
-    expect(src).toMatch(/command -v nu/);
+    expect(src).toMatch(/which nu/);
     expect(src).toContain("only interactive shell inside the envelope is nu");
     // Host login shell record is not modified by envelope runs.
     const before = readFileSync("/etc/passwd", "utf8");
-    engine(["enter", "--id", "t066-shell", "--", BASH, "-c", "true"]);
+    engine(["enter", "--id", "t066-shell", "--", BASH, "-c", "echo true"]);
     expect(readFileSync("/etc/passwd", "utf8")).toBe(before);
   }, 60000);
 });

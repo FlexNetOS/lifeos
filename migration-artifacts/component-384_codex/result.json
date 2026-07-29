@@ -1,0 +1,36 @@
+{
+  "task_id": "COMPONENT-384_CODEX",
+  "title": "Component: Codex",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "hard_rule": 15,
+  "requirement": "Codex must be installed and used, not replaced.",
+  "component": {
+    "owner": "OpenAI/FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/lifeos",
+    "name": "Codex integration",
+    "revision": "3d741436b05c0b3cece764c76aa93450e38266ed"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "line": 6092,
+    "actual_byte_offset": 717808,
+    "supplied_byte_offset": 335153,
+    "supplied_unit_sha256": "3e661729e9864a0b0dbf7a5226dc360d1b1cb62c29906c7fb6a9c673f53f83e4",
+    "actual_unit_sha256": "3e661729e9864a0b0dbf7a5226dc360d1b1cb62c29906c7fb6a9c673f53f83e4",
+    "literal_present": true,
+    "verification_command": "grep -Fq 'Codex' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  },
+  "runtime_evidence": {
+    "execution_framework_available": false,
+    "installation_verified": false,
+    "usage_verified": false,
+    "reason": "No execution-framework directory or non-blueprint pinned LifeOS/Codex integration reference was available in the permitted read-only probe scope."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "The task is a read-only probe and hard rule 15 prohibits replacing Codex."
+  },
+  "next_action": "Provide the execution-framework component closure or a pinned LifeOS checkout at 3d741436b05c0b3cece764c76aa93450e38266ed, then rerun the read-only installation and usage probe."
+}

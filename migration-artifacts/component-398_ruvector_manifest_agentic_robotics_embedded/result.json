@@ -1,0 +1,31 @@
+{
+  "task_id": "COMPONENT-398_RUVECTOR_MANIFEST_AGENTIC_ROBOTICS_EMBEDDED",
+  "title": "Component: RuVector manifest: agentic-robotics-embedded",
+  "status": "noncompliant_unverified",
+  "mode": "read-only-probe",
+  "command_template": "grep -Fq 'RuVector manifest: agentic-robotics-embedded' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_result": "passed",
+  "source_document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "anchor_binding": {
+    "declared_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "verified_document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "declared_unit_sha256": "23f85effbb5c5f0c853bc02ebd975d4d19f448e6e1b149582329b51fc538e7a4",
+    "verified_row_line": 6106,
+    "verified_row_byte_offset": 731777,
+    "verified_row_sha256_newline_free": "23f85effbb5c5f0c853bc02ebd975d4d19f448e6e1b149582329b51fc538e7a4"
+  },
+  "required_component": {
+    "repository": "https://github.com/ruvnet/RuVector",
+    "path": "crates/agentic-robotics-embedded",
+    "package": "agentic-robotics-embedded",
+    "version": "2.3.0 workspace",
+    "source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "hard_rule_15": "The native RuVector agentic-robotics-embedded component must be installed and used; it must not be replaced.",
+  "probe_finding": "The canonical blueprint entry and both anchor hashes are valid, but crates/agentic-robotics-embedded/Cargo.toml is absent and no workspace reference or runtime usage of agentic-robotics-embedded was found. Installation and use of the required native component cannot be verified.",
+  "changes_made": [
+    "Created this evidence receipt only."
+  ],
+  "result": "fail",
+  "next_required_action": "Materialize the pinned ruvnet/RuVector revision 6a6c39e662a4c3184dcb913db91a09401c84b2ae with crates/agentic-robotics-embedded in the workspace, then verify a locked build/test or fixture run plus byte, provenance, effect, and witness round trip."
+}

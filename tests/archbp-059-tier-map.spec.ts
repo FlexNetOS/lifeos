@@ -9,7 +9,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const tierMapPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation_tier_map.json",
+  "evidence/isolation/isolation_tier_map.json",
 );
 
 const TIERS = new Set(["volatile", "durable", "portable"]);
@@ -96,6 +96,6 @@ describe("ARCHBP-059 runtime path tier map", () => {
 
   test("declares its consumer (t3 runtime-relocation lane)", () => {
     const map = loadTierMap();
-    expect(map.feeds).toContain("tasks/yzx-iso/t3-0-lane-index");
+    expect(map.feeds).toContain("scripts/enumerate-runtime-env.mjs");
   });
 });

@@ -1,0 +1,57 @@
+{
+  "task_id": "COMPONENT-362_GITKB",
+  "component": "GitKB",
+  "probe_type": "read-only structural verification",
+  "status": "passed",
+  "hard_rule_15": {
+    "requirement": "Component 'GitKB' must be installed and used, not replaced.",
+    "replacement_detected": false,
+    "installation_verified": true,
+    "runtime_use_verified": true,
+    "scope_note": "GitKB was invoked only with non-mutating version/help commands. A repository-local knowledge-base operation was not attempted because this detached probe workspace has no GitKB knowledge base."
+  },
+  "source_binding": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "document_sha256_actual": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "unit_sha256_expected": "9e695381871eb7e4a3b0f1d7d39b6bfa3efef9f4070535d3c65fd1a15f4570f1",
+    "source_line": 6070,
+    "supplied_byte_offset": 335153
+  },
+  "canonical_component": {
+    "upstream": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/meta",
+    "package": "docs/gitkb plus Codex plugin",
+    "revisions": {
+      "meta": "afc146fb5c5410f9df0b751c926b5d5254d11664",
+      "gitkb": "c073fa5818554454289442ab53bff986574de41f"
+    },
+    "role": "Durable decisions/context/handoffs/repository knowledge/ledger links",
+    "required_verification": "Pinned revision/closure; component test; byte/effect/provenance/witness query"
+  },
+  "usage_contract": {
+    "physical_surface": "GitKB stores linked decisions and repository memory.",
+    "integration": "GitKB and meta bind source revisions, package graph, task map, drift record, release graph, and handoff.",
+    "release_gate": "The runner gate requires a GitKB/handoff update."
+  },
+  "probe": {
+    "command": "grep -Fq 'GitKB' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "exit_code": 0,
+    "result": "marker found"
+  },
+  "installation_and_use_evidence": {
+    "executable": "/home/flexnetos/.nix-profile/bin/git-kb",
+    "version_command": "git-kb --version",
+    "version_output": "git-kb 0.2.13",
+    "use_command": "git-kb --log-format json --no-pager --help",
+    "use_exit_code": 0,
+    "use_result": "GitKB CLI directly executed and enumerated its project, document, workspace, graph, and sync command surfaces without mutating state.",
+    "local_kb_check": {
+      "command": "git-kb info",
+      "exit_code": 1,
+      "result": "No gitkb knowledge base found between cwd and root; no initialization was performed because this is a read-only detached probe."
+    }
+  },
+  "mutation_performed": false,
+  "artifact_written": "migration-artifacts/component-362_gitkb/result.json"
+}

@@ -1,0 +1,41 @@
+{
+  "task_id": "COMPONENT-297_LIFEOS_COMPONENT_LIFEOS_CORE",
+  "title": "Component: lifeos component: lifeos-core",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "hard_rule": 15,
+  "requirement": "ruvnet/rUv components are installed and used, not replaced.",
+  "component": {
+    "name": "lifeos-core",
+    "owner": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/lifeos",
+    "revision": "3d741436b05c0b3cece764c76aa93450e38266ed",
+    "declared_role": "Glass domain model for agents, .rvf pressure, tasks, sessions, Git and RuVector branches",
+    "declared_contract": "Rust domain core; Svelte-facing contracts required"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "supplied_anchor_document_sha256_matches": true,
+    "component_row_line": 6005,
+    "hard_rule_line": 25,
+    "command_template_passed": true,
+    "supplied_unit_sha256": "5cdeec654ca7442be91870738041f551946b01642de459bf81c00911acefa389",
+    "unit_sha256_validation": "unavailable: the packet does not define the source-unit byte range needed to recompute this digest"
+  },
+  "runtime_evidence": {
+    "permitted_implementation_path": "execution-framework",
+    "path_present": false,
+    "installation_verified": false,
+    "usage_verified": false,
+    "reason": "No execution-framework directory is available within the permitted probe scope."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "This was a read-only probe, and hard rule 15 prohibits replacement."
+  },
+  "changes": [
+    "Recorded read-only verification evidence only."
+  ],
+  "rollback": "Read-only probe; no implementation changes were made."
+}

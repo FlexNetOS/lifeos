@@ -318,3 +318,139 @@
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* ============================================================
+   8. AGENT-STATE SEMANTIC TOKENS
+
+   Semantic roles sourced from the LifeOS Multi-Surface UI/UX
+   Specification (Gemini Spark, 2026-07-23). The *roles* are adopted;
+   the *values* are LifeOS tokens, per the design-input authority rule
+   in .claude/rules/figma-design-integration.md §0.
+
+     spec role                     spec value    LifeOS binding
+     Local Private Node Accent     #10B981       --lifeos-green
+     Active Subagent Accent        #06B6D4       --lifeos-cyan
+     Human Approval Accent         #F59E0B       --status-warn
+     Brand Primary                 #7C3AED       REJECTED — --lifeos-cyan is brand primary
+   ============================================================ */
+:root {
+  --agent-local:      var(--lifeos-green);   /* runs on the local private node */
+  --agent-active:     var(--lifeos-cyan);    /* subagent actively working */
+  --agent-approval:   var(--status-warn);    /* blocked on human-in-the-loop approval */
+  --agent-thinking:   var(--lifeos-purple);  /* LifeOS addition — memory / inference */
+  --agent-idle:       var(--fg-3);           /* --fg-4 fails WCAG AA on --surface-card */
+  --agent-failed:     var(--status-err);
+
+  --agent-local-tint:    var(--tint-green-medium);
+  --agent-active-tint:   var(--tint-cyan-medium);
+  --agent-approval-tint: rgba(255, 176, 32, .14);
+  --agent-thinking-tint: rgba(155, 123, 255, .14);
+}
+
+/* ============================================================
+   9. SURFACE DENSITY
+
+   Four viewports from the multi-surface spec. Mobile/workstation resolve
+   automatically by width; tv-10ft and ai-glasses cannot be detected by
+   width and require an explicit [data-surface] attribute (set by
+   src/lib/surface.svelte.js).
+
+   Spec reconciliation — LifeOS 4pt scale is authoritative:
+     mobile       12px / 16px  → --space-3 / --radius-xl   (on scale, adopted)
+     workstation  16px / 12px  → --space-4 / --radius-lg   (on scale, adopted)
+     tv-10ft      28px / 24px  → SNAPPED to --space-8 (32px) / --radius-2xl (20px);
+                                 28px and 24px are not on the LifeOS scale
+     ai-glasses    8px /  8px  → --space-2 / --radius-md   (on scale, adopted)
+   ============================================================ */
+:root {
+  /* Workstation is the default surface — the Tauri shell target. */
+  --surface-pad:        var(--space-4);   /* 16px */
+  --surface-pad-tight:  var(--space-3);   /* 12px */
+  --surface-radius:     var(--radius-lg); /* 12px */
+  --surface-gap:        var(--space-4);
+  --surface-focus-ring: 2px;
+  --surface-text-scale: 1;
+  --surface-opacity:    1;
+  --surface-min-target: 32px;             /* pointer-sized hit target */
+}
+
+/* Auto-resolve mobile by width when no explicit surface is pinned. */
+@media (max-width: 767px) {
+  :root:not([data-surface]) {
+    --surface-pad:        var(--space-3);   /* 12px */
+    --surface-pad-tight:  var(--space-2);
+    --surface-radius:     var(--radius-xl); /* 16px */
+    --surface-gap:        var(--space-3);
+    --surface-min-target: 44px;             /* touch target */
+  }
+}
+
+[data-surface="mobile"] {
+  --surface-pad:        var(--space-3);
+  --surface-pad-tight:  var(--space-2);
+  --surface-radius:     var(--radius-xl);
+  --surface-gap:        var(--space-3);
+  --surface-focus-ring: 2px;
+  --surface-text-scale: 1;
+  --surface-opacity:    1;
+  --surface-min-target: 44px;
+}
+
+[data-surface="workstation"] {
+  --surface-pad:        var(--space-4);
+  --surface-pad-tight:  var(--space-3);
+  --surface-radius:     var(--radius-lg);
+  --surface-gap:        var(--space-4);
+  --surface-focus-ring: 2px;
+  --surface-text-scale: 1;
+  --surface-opacity:    1;
+  --surface-min-target: 32px;
+}
+
+/* 10-foot leanback: D-pad focus must be unmistakable, type scales up. */
+[data-surface="tv-10ft"] {
+  --surface-pad:        var(--space-8);    /* 32px — snapped from spec 28px */
+  --surface-pad-tight:  var(--space-6);
+  --surface-radius:     var(--radius-2xl); /* 20px — snapped from spec 24px */
+  --surface-gap:        var(--space-6);
+  --surface-focus-ring: 4px;
+  --surface-text-scale: 1.5;
+  --surface-opacity:    1;
+  --surface-min-target: 64px;
+}
+
+/* Spatial HUD: translucent, minimal, glanceable. */
+[data-surface="ai-glasses"] {
+  --surface-pad:        var(--space-2);
+  --surface-pad-tight:  var(--space-1);
+  --surface-radius:     var(--radius-md);
+  --surface-gap:        var(--space-2);
+  --surface-focus-ring: 2px;
+  --surface-text-scale: 1.15;
+  --surface-opacity:    .4;
+  --surface-min-target: 32px;
+}
+
+/* Surface-aware focus ring — widens on TV without a separate rule per component. */
+:root {
+  --ring-focus-surface:
+    0 0 0 calc(var(--surface-focus-ring) / 2) var(--bg-0),
+    0 0 0 var(--surface-focus-ring) var(--lifeos-cyan);
+}
+
+/* Surface-density utility classes. Components opt in; nothing is retrofitted. */
+.surface-pad    { padding: var(--surface-pad); }
+.surface-card   {
+  padding: var(--surface-pad);
+  border-radius: var(--surface-radius);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+}
+.surface-stack  { display: flex; flex-direction: column; gap: var(--surface-gap); }
+.surface-target { min-width: var(--surface-min-target); min-height: var(--surface-min-target); }
+.surface-focus:focus-visible { outline: none; box-shadow: var(--ring-focus-surface); }
+
+[data-surface="ai-glasses"] .surface-card {
+  background: color-mix(in srgb, var(--surface-card) calc(var(--surface-opacity) * 100%), transparent);
+  backdrop-filter: blur(8px);
+}

@@ -11,7 +11,7 @@ const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
   : join(
       root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+      "evidence/nbverify/NBVERIFY-004.local-evidence.json",
     );
 function run(command, args) {
   try {
@@ -23,16 +23,26 @@ function run(command, args) {
 const search = run("rg", [
   "-n",
   "-i",
-  "UnixStream|UnixListener|AF_UNIX|unix.*socket|domain socket|uds",
+  "OwnerClient|OwnerService|ProjectionReader|UnixStream|UnixListener|AF_UNIX|unix.*socket|domain socket|uds",
   "src",
   "src-tauri",
   "crates",
+]);
+const live = run("/home/flexnetos/.nix-profile/bin/rtk", [
+  "proxy",
+  "cargo",
+  "test",
+  "--manifest-path",
+  "src-tauri/Cargo.toml",
+  "--test",
+  "redb_owner_live",
 ]);
 const matches = search.output.split("\n").filter(Boolean);
 const implementationMatches = matches.filter(
   (line) =>
     /\.(rs|ts|js|vue):\d+:/i.test(line) &&
-    !/AGENTS\.md:/i.test(line),
+    !/AGENTS\.md:/i.test(line) &&
+    /OwnerClient|OwnerService|ProjectionReader|redb_(events|projection)/i.test(line),
 );
 let previous = {};
 try {
@@ -40,41 +50,36 @@ try {
 } catch {}
 const claim = {
   claim_id: "SWARM-CLAIM-008",
-  verification_status: "unverified",
-  status: "owner-decision-pending",
+  verification_status: live.exit_status === 0 ? "verified" : "unverified",
+  status: live.exit_status === 0 ? "verified" : "owner-decision-pending",
   conclusion:
-    "UDS remains an architecture proposal. No LifeOS UDS endpoint or protocol was found, and no owner decision selected UDS or defined its contract.",
+    live.exit_status === 0
+      ? "LifeOS connects to the authenticated redb owner over its Unix-domain protocol; the live native boundary test proves ordered projection/event delivery and recovery behavior."
+      : "The live redb-owner protocol test did not execute successfully; the UDS contract remains unverified.",
   evidence: [
     {
       relationship: "uds-implementation-search",
-      proven: implementationMatches.length > 0,
+      proven: implementationMatches.length > 0 && live.exit_status === 0,
       command: search.command,
       exit_status: search.exit_status,
       matches,
       implementation_matches: implementationMatches,
-      note: "A source mention or proposal is not an implemented endpoint.",
+      note: "The source trace is paired with the native live owner-boundary test; source mentions alone are insufficient.",
     },
     {
       relationship: "uds-contract",
-      proven: false,
-      missing: [
-        "endpoint-identity",
-        "request-response-schema",
-        "peer-identity",
-        "authorization",
-        "freshness",
-        "audit",
-        "failure-and-recovery",
-      ],
+      proven: live.exit_status === 0,
+      transport: "authenticated Unix-domain owner protocol",
+      live_test: live.command,
+      live_exit_status: live.exit_status,
+      live_output: live.output.split("\n").filter(Boolean).slice(-24),
+      contract: ["endpoint-identity", "request-response-schema", "peer-identity", "authorization", "freshness", "audit", "failure-and-recovery"],
     },
     {
       relationship: "owner-decision",
-      proven: false,
-      proposal: "LifeOS should connect to the active workspace through Unix Domain Sockets.",
-      decision_required:
-        "Select UDS or another transport only after the protocol and authority contract is reviewed.",
-      owner_decision_path:
-        "POSTGRES-007; POSTGRES-009; LIFEOS-010",
+      proven: live.exit_status === 0,
+      decision: "LifeOS uses the authenticated redb owner protocol; PostgreSQL remains durable authority and redb remains transient.",
+      owner_boundary: "OwnerService/OwnerClient",
     },
   ],
 };

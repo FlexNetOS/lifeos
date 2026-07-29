@@ -119,6 +119,18 @@ describe("ARCHBP-014 coordinator state machine", () => {
     expect(typeof c.proofLog.pop).toBe("function"); // it's an array, but the coordinator never calls destructive ops itself
     expect(c.proofLog[0].evidence).toBeDefined();
   });
+
+  test("forecasting produces a calibrated candidate without self-promotion", () => {
+    const c = coordinator();
+    const candidate = c.forecastTimeline(
+      Array.from({ length: 24 }, (_, i) => 1 + Math.sin(i / 3) * 0.2 + i * 0.01),
+      4,
+    );
+    expect(candidate.schemaVersion).toBe("lifeos.atas.forecast.v1");
+    expect(candidate.uncertainty.calibrated).toBe(true);
+    expect(candidate.forecast).toHaveLength(4);
+    expect(candidate.promotion.selfPromoted).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -145,6 +157,10 @@ describe("ARCHBP-014 coordinator proof (real ruflo primary source + real binding
       expect(r.binding.agentIdentityBound).toBe(true);
       expect(typeof r.binding.agentFileId).toBe("string");
       expect(r.binding.routeIsLocalDefault).toBe(true);
+      expect(r.routingRuntime.nativeLoaded).toBe(true);
+      expect(typeof r.routingRuntime.model).toBe("string");
+      expect(Number.isFinite(r.routingRuntime.confidence)).toBe(true);
+      expect(r.routingRuntime.fastGrnnMeasured).toBe(true);
       expect(r.retry.bounded).toBe(true);
       expect(r.cancellation.stopped).toBe(true);
       expect(r.timeout.timedOut).toBe(true);
@@ -152,6 +168,10 @@ describe("ARCHBP-014 coordinator proof (real ruflo primary source + real binding
       expect(r.completion.coordinatorCannotComplete).toBe(true);
       expect(r.proof.appendOnly).toBe(true);
       expect(r.proof.candidatesNotAccepted).toBe(true);
+      expect(r.forecast.schemaVersion).toBe("lifeos.atas.forecast.v1");
+      expect(r.forecast.calibrated).toBe(true);
+      expect(r.forecast.points).toBe(4);
+      expect(r.forecast.selfPromoted).toBe(false);
     } finally {
       rmSync(outputDir, { recursive: true, force: true });
     }

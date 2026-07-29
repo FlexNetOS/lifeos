@@ -18,7 +18,7 @@ import {
 describe("architecture blueprint ICM ingestion plan", () => {
   const plan = buildIngestionPlan();
 
-  it("uses the PostgreSQL ICM backend without an out-of-band metadata writer", () => {
+  it("uses the PostgreSQL ICM backend and records source provenance in PostgreSQL", () => {
     const script = fs.readFileSync(
       path.join(process.cwd(), "scripts/ingest-architecture-blueprint-icm.mjs"),
       "utf8"
@@ -27,10 +27,10 @@ describe("architecture blueprint ICM ingestion plan", () => {
     expect(script).toContain('ICM_DB_BACKEND: "postgres"');
     expect(script).toContain("postgresql://");
     expect(script).toContain("/home/flexnetos/.nix-profile/toolbin/psql");
-    expect(script).not.toContain("INSERT INTO icm_metadata");
+    expect(script).toContain("INSERT INTO icm_metadata");
   });
 
-  it("reconstructs all 6,340 lines and every exact source byte", () => {
+  it("reconstructs all current source lines and every exact source byte", () => {
     const reconstructed = Buffer.from(
       plan.chunks.map((chunk) => chunk.raw).join(""),
       "utf8"
@@ -51,10 +51,10 @@ describe("architecture blueprint ICM ingestion plan", () => {
   });
 
   it("maps all named sections and only explicit heading containment", () => {
-    expect(plan.sectionCount).toBe(105);
-    expect(plan.namedSectionCount).toBe(104);
-    expect(plan.concepts).toHaveLength(104);
-    expect(plan.relations).toHaveLength(103);
+    expect(plan.sectionCount).toBe(106);
+    expect(plan.namedSectionCount).toBe(105);
+    expect(plan.concepts).toHaveLength(105);
+    expect(plan.relations).toHaveLength(104);
     expect(new Set(plan.relations.map((relation) => relation.relation))).toEqual(
       new Set(["part-of"])
     );

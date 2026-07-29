@@ -1,0 +1,34 @@
+{
+  "task_id": "COMPONENT-308_ENVCTL_COMPONENT_SECRETS_STORE_LIBSQL",
+  "title": "Component: envctl component: secrets-store-libsql",
+  "status": "blocked_environment",
+  "probe_mode": "read-only",
+  "timestamp_utc": "2026-07-28T17:09:52Z",
+  "requirement": {
+    "component": "envctl component: secrets-store-libsql",
+    "hard_rule": "installed and used, not replaced",
+    "authoritative_source": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "source_line": 6016,
+    "source_sha256_expected": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "source_sha256_observed": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "source_literal_verified": true,
+    "pinned_revision": "48368a97f7d1388cea247dd4ebdc32a8193743fb"
+  },
+  "envctl": {
+    "binary": "/home/flexnetos/.nix-profile/bin/envctl",
+    "version": "0.1.0",
+    "install_command_available": true,
+    "native_secret_subsystem_available": true
+  },
+  "installation_and_use_probe": {
+    "command": "envctl install secrets-store-libsql --dry-run",
+    "result": "not_proven",
+    "reason": "envctl refused the probe because the task cell has no readable manifest directory: 'manifest dir not found or unreadable: manifest'"
+  },
+  "non_replacement_assertion": {
+    "replacement_performed": false,
+    "alternative_component_introduced": false,
+    "secret_operations_performed": false
+  },
+  "conclusion": "The mandated envctl integration is present as an installed executable and no replacement was made. A manifest-backed environment is required to verify that secrets-store-libsql is installed and used."
+}

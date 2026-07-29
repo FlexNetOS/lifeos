@@ -1,0 +1,31 @@
+{
+  "task_id": "COMPONENT-395_LANE_OBSCURA_IROH",
+  "status": "passed",
+  "mode": "read-only-probe",
+  "source": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "116b8ce9d2c1c5d99ad4f156cd2fd5e035c941b63c9035d92d39a32b55f21235",
+    "component_line": 6103,
+    "component_byte_offset": 728012
+  },
+  "component": {
+    "name": "lane/obscura/iroh",
+    "owner": "FlexNetOS/network",
+    "repository": "https://github.com/FlexNetOS/network-control",
+    "package": "network fabric",
+    "revision": "5341ea0041f833475ff989a6749dafc2194f0967",
+    "role": "On-host/off-host network/peer relay"
+  },
+  "requirements": {
+    "hard_rule_15": "Components are installed and used, not replaced.",
+    "integration": "PostgreSQL ↔ envctl/CodeDB/redb ↔ component ↔ PostgreSQL return",
+    "verification": "Pinned revision/closure; component test; byte/effect/provenance/witness query"
+  },
+  "probe": {
+    "command": "grep -Fq 'lane/obscura/iroh' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "result": "passed",
+    "mutations_performed": false
+  }
+}

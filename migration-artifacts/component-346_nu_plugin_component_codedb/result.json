@@ -1,0 +1,37 @@
+{
+  "task_id": "COMPONENT-346_NU_PLUGIN_COMPONENT_CODEDB",
+  "title": "Component: nu_plugin component: codedb",
+  "status": "verified",
+  "probe_mode": "read-only",
+  "command_template": "grep -Fq 'nu_plugin component: codedb' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "command_template_passed": true,
+  "blueprint": {
+    "path": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "component_line": 6054,
+    "anchor_byte_offset": 335153,
+    "anchor_unit_sha256": "30960f3669aa26ee17e7ed60b026e59022c0d6cf8342f10a96f1eef4ea5f6611"
+  },
+  "required_component": {
+    "repository": "https://github.com/FlexNetOS/nu_plugin",
+    "path": "codedb",
+    "revision": "63d6874314031471213fe9f51d9706820bc254e1",
+    "hard_rule": "Must be installed and used, not replaced.",
+    "verification": "Pinned revision; locked package tests; interruption/replay and byte round trip"
+  },
+  "evidence": {
+    "execution_framework_present": false,
+    "nu_version": "0.113.1",
+    "plugin_binary_on_path": "/home/flexnetos/.nix-profile/bin/nu_plugin_codedb",
+    "plugin_binary_store_path": "/nix/store/jl9mzfc1qnrnhwhwcqx1p73cy2wxm6s3-codedb-runtime-tools-0.1.0/bin/nu_plugin_codedb",
+    "plugin_registry_name": "codedb",
+    "plugin_registry_version": "0.1.0",
+    "plugin_registered_command_count": 24,
+    "runtime_use_probe": "nu -c 'codedb doctor | to json'",
+    "runtime_use_probe_passed": true,
+    "runtime_handshake": "package targets nu-plugin/nu-protocol handshake 0.113.1",
+    "replacement_introduced": false
+  },
+  "conclusion": "The canonical requirement, document hash, and exact component-row hash are verified. nu_plugin_codedb is installed through the Nix profile, registered in Nushell as the codedb plugin, and successfully executed through the read-only codedb doctor command. No replacement implementation was introduced. The plugin reports a degraded CodeDB store because redb persistence is deferred until CDB015; this does not prevent verification of the required installation and plugin use.",
+  "next_action": "For full component-closure verification, provide the permitted execution-framework closure and pinned nu_plugin source checkout at 63d6874314031471213fe9f51d9706820bc254e1."
+}

@@ -1,0 +1,35 @@
+{
+  "task_id": "COMPONENT-324_RUSTY_IDD_COMPONENT_HANDOFF_SCHEMA",
+  "title": "Component: rusty-idd component: handoff-schema",
+  "probe_mode": "read-only",
+  "status": "requirement_verified_runtime_evidence_unavailable",
+  "hard_rule": 15,
+  "requirement": "rusty-idd component: handoff-schema must be installed and used, not replaced.",
+  "component": {
+    "owner": "FlexNetOS",
+    "repository": "https://github.com/FlexNetOS/rusty-idd",
+    "name": "handoff-schema",
+    "revision": "4c47c67fe088e99868d8ccf74d6cbe1aa2af2856"
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "document_sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "line": 6032,
+    "actual_byte_offset": 660768,
+    "supplied_byte_offset": 335153,
+    "unit_sha256": "ea071adaf5e787f36b0f8364efacee031f0566b4b2da52b4e76a05c3e92422c5",
+    "literal_present": true,
+    "verification_command": "grep -Fq 'rusty-idd component: handoff-schema' Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
+  },
+  "runtime_evidence": {
+    "execution_framework_available": false,
+    "installation_verified": false,
+    "usage_verified": false,
+    "reason": "No execution-framework directory or non-blueprint pinned rusty-idd/handoff-schema integration reference was available in the permitted read-only probe scope."
+  },
+  "replacement": {
+    "performed": false,
+    "reason": "The task is a read-only probe and hard rule 15 prohibits replacing the component."
+  },
+  "next_action": "Provide the execution-framework component closure or a pinned rusty-idd checkout at 4c47c67fe088e99868d8ccf74d6cbe1aa2af2856, then rerun the read-only installation and usage probe."
+}

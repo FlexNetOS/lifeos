@@ -1,0 +1,40 @@
+{
+  "task_id": "COMPONENT-363_BEADS_RUST_BR",
+  "status": "verified_installed_and_used",
+  "probe_mode": "read-only",
+  "checked_at": "2026-07-28T17:29:04Z",
+  "hard_rule_15": {
+    "requirement": "Component 'beads_rust/br' must be installed and used, not replaced.",
+    "satisfied": true,
+    "replacement_detected": false
+  },
+  "blueprint_evidence": {
+    "document": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+    "sha256": "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee",
+    "anchor_byte_offset": 335153,
+    "component_row": "beads_rust/br | FlexNetOS | https://github.com/FlexNetOS/beads_rust | beads_rust and br | f5611cb7ded23df0ad5410fab58a64fa49e4dea2 | Executable task atoms and dependencies"
+  },
+  "installation_evidence": {
+    "command": "command -v br && br --version",
+    "binary_path": "/home/flexnetos/.nix-profile/bin/br",
+    "nix_store_target": "/nix/store/jg1lgzi61g4vbkpmrrjqlxirsqdmfdxh-beads_rust-0.2.16/bin/br",
+    "version": "br 0.2.16"
+  },
+  "runtime_use_evidence": {
+    "command": "br status --no-auto-flush --no-auto-import --json",
+    "exit_code": 0,
+    "mutation_controls": [
+      "--no-auto-flush",
+      "--no-auto-import"
+    ],
+    "observed_summary": {
+      "total_issues": 20,
+      "open_issues": 14,
+      "closed_issues": 6,
+      "ready_issues": 14
+    }
+  },
+  "changes": [
+    "Recorded this verification artifact only; no component, task, database, or JSONL state was changed."
+  ]
+}

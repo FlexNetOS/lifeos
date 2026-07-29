@@ -9,7 +9,7 @@ import { describe, expect, test } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const specPath = resolve(
   repoRoot,
-  "planning-spine-v0/docs/isolation-architecture-spec.md",
+  "evidence/isolation/isolation-architecture-spec.md",
 );
 
 describe("ARCHBP-060 shared-kernel boundary", () => {
@@ -34,6 +34,6 @@ describe("ARCHBP-060 shared-kernel boundary", () => {
 
   test("the boundary section declares its consumer (t7 boot re-attach lane)", () => {
     const spec = readFileSync(specPath, "utf8");
-    expect(spec).toContain("tasks/yzx-iso/t7-0-lane-index");
+    expect(spec).toContain("ARCHBP-093");
   });
 });

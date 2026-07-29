@@ -5,6 +5,7 @@ pub mod error;
 pub mod legacy_sqlite;
 pub mod logs;
 pub mod mempalace;
+pub mod network;
 pub mod routing;
 pub mod ruvector;
 pub mod security;

@@ -2155,6 +2155,69 @@ async fn ai_provider_set(
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+async fn network_plan_submit(
+    storage: tauri::State<'_, Storage>,
+    task_id: String,
+    lease_id: String,
+    branch_id: String,
+    request: serde_json::Value,
+    rollback_request: serde_json::Value,
+    idempotency_key: String,
+) -> Result<String, String> {
+    let task_id = parse_vault_uuid(&task_id, "task_id")?;
+    let lease_id = parse_vault_uuid(&lease_id, "lease_id")?;
+    let branch_id = parse_vault_uuid(&branch_id, "branch_id")?;
+    lifeos_core::storage::network::submit_plan(
+        storage.pool(),
+        task_id,
+        lease_id,
+        branch_id,
+        request,
+        rollback_request,
+        &idempotency_key,
+    )
+    .await
+    .map(|plan_id| plan_id.to_string())
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn network_plan_start(
+    storage: tauri::State<'_, Storage>,
+    plan_id: String,
+) -> Result<lifeos_core::storage::network::NetworkPlan, String> {
+    let plan_id = parse_vault_uuid(&plan_id, "plan_id")?;
+    lifeos_core::storage::network::start_plan(storage.pool(), plan_id)
+        .await
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn network_effect_record(
+    storage: tauri::State<'_, Storage>,
+    plan_id: String,
+    status: String,
+    exit_code: Option<i32>,
+    effect: serde_json::Value,
+    rollback_effect: Option<serde_json::Value>,
+    idempotency_key: String,
+) -> Result<String, String> {
+    let plan_id = parse_vault_uuid(&plan_id, "plan_id")?;
+    lifeos_core::storage::network::record_effect(
+        storage.pool(),
+        plan_id,
+        &status,
+        exit_code,
+        effect,
+        rollback_effect,
+        &idempotency_key,
+    )
+    .await
+    .map(|effect_id| effect_id.to_string())
+    .map_err(|error| error.to_string())
+}
+
 // ---------- App version ----------
 // Surfaces the LifeOS app version + Tauri runtime version + host target triple
 // to the SettingsView "About" card. Pure metadata — no I/O. `AppVersion` lives
@@ -2326,6 +2389,9 @@ pub fn run() {
             ai_complete,
             ai_provider_get,
             ai_provider_set,
+            network_plan_submit,
+            network_plan_start,
+            network_effect_record,
             app_version,
             telemetry_read,
             auth::auth_status,

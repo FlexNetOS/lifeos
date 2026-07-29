@@ -42,6 +42,8 @@ pub enum StorageError {
     InvalidProjectionJson,
     /// A live route decision had invalid route context.
     InvalidRouteDecision,
+    /// A network-control plan/effect failed its Rust-side envelope guard.
+    InvalidNetworkPlan,
     /// Underlying sqlx error.
     Sqlx(sqlx::Error),
     /// Filesystem I/O error (archive rename, etc.).
@@ -104,6 +106,7 @@ impl fmt::Display for StorageError {
             ),
             Self::InvalidProjectionJson => write!(f, "projection payload must be valid JSON"),
             Self::InvalidRouteDecision => write!(f, "route decisions require non-empty route context objects"),
+            Self::InvalidNetworkPlan => write!(f, "network-control plans require valid lease-bound netctl envelopes"),
             Self::Sqlx(e) => write!(f, "database error: {e}"),
             Self::Io(e) => write!(f, "I/O error: {e}"),
         }

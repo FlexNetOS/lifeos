@@ -616,9 +616,13 @@ fn terminal_spawn(
     let session_name = engine_room_session_name()?;
     let engine_argv = engine_room_argv(&session_name);
     let runtime_dir = yazelix_runtime_dir()?;
+    let state_dir = std::env::var_os("YAZELIX_STATE_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| runtime_dir.join("yazelix"));
     let mut command = CommandBuilder::new(&engine_argv[0]);
     command.args(&engine_argv[1..]);
-    command.env("YAZELIX_RUNTIME_DIR", runtime_dir);
+    command.env("YAZELIX_RUNTIME_DIR", &runtime_dir);
+    command.env("YAZELIX_STATE_DIR", state_dir);
     command.env(
         "TERM",
         std::env::var("TERM").unwrap_or_else(|_| "xterm-256color".into()),

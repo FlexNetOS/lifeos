@@ -200,12 +200,12 @@
         }
       });
     }
+    await start();
     if (invoke()) {
       await invoke()("terminal_replay_spool").catch(() => 0);
       const projection = await invoke()("redb_projection_read").catch(() => null);
       redbSeq = projection?.localSeq ?? null;
     }
-    await start();
   });
 
   onDestroy(async () => {

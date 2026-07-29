@@ -733,18 +733,23 @@ fn terminal_spawn(
     let focus_capture_session = session_id.clone();
     std::thread::spawn(move || {
         let zellij = std::env::var_os("YZX_ZELLIJ").unwrap_or_else(|| "zellij".into());
+        let server_root = std::env::var_os("XDG_RUNTIME_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+        let server = server_root
+            .join("zellij/contract_version_1")
+            .join(&focus_session_name);
         for _ in 0..20 {
             std::thread::sleep(std::time::Duration::from_millis(250));
             let pane_id = "terminal_1";
             let focused = Command::new(&zellij)
                 .args([
-                    "--session",
-                    &focus_session_name,
+                    "--server",
+                    server.to_string_lossy().as_ref(),
                     "action",
                     "focus-pane-id",
-                    &pane_id,
+                    pane_id,
                 ])
-                .env("ZELLIJ_SESSION_NAME", &focus_session_name)
                 .status()
                 .is_ok_and(|status| status.success());
             if focused {
@@ -788,6 +793,39 @@ fn terminal_write(
         .write_all(&bytes)
         .and_then(|_| session.writer.flush())
         .map_err(|error| format!("write terminal input: {error}"))
+}
+
+#[tauri::command]
+fn terminal_probe(
+    state: tauri::State<'_, TerminalState>,
+    session_id: String,
+) -> Result<(), String> {
+    let probe = b"echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r";
+    for _ in 0..15 {
+        std::thread::sleep(std::time::Duration::from_secs(1));
+        let mut sessions = state
+            .sessions
+            .lock()
+            .map_err(|error| format!("terminal state lock: {error}"))?;
+        let session = sessions
+            .get_mut(&session_id)
+            .ok_or_else(|| "terminal session is not active".to_string())?;
+        let offset = session
+            .input_offset
+            .fetch_add(probe.len() as u64, Ordering::Relaxed);
+        capture_terminal_frame(
+            &session_id,
+            "input",
+            probe,
+            serde_json::json!({"stream": "pty", "offset": offset, "source": "native-probe"}),
+        )?;
+        session
+            .writer
+            .write_all(probe)
+            .and_then(|_| session.writer.flush())
+            .map_err(|error| format!("write terminal probe: {error}"))?;
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -1476,6 +1514,7 @@ pub fn run() {
             envctl_return_projection,
             terminal_spawn,
             terminal_write,
+            terminal_probe,
             terminal_resize,
             terminal_close,
             terminal_replay_spool,

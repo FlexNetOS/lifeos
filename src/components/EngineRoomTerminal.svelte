@@ -23,12 +23,24 @@
   let probeSent = false;
   let probeOutput = "";
   let probeClosed = false;
-  let probeTimer = null;
   let probeAttempts = 0;
   let resizeFrame = null;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
   const invoke = () => tauri()?.core?.invoke || tauriCoreInvoke;
+
+  const recordProbeError = (error) => {
+    if (!probe) return;
+    const call = invoke();
+    void call?.("redb_state_write", {
+      key: "lifeos.engine-room.error",
+      value: JSON.stringify({
+        schemaVersion: "lifeos.engine-room-error.v1",
+        observedAt: Date.now(),
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    });
+  };
 
   const resizeTerminal = async () => {
     if (!terminal || !fitAddon) return;
@@ -58,6 +70,16 @@
     const call = invoke();
     if (!call) return;
     try {
+      if (probe) {
+        void call("redb_state_write", {
+          key: "lifeos.engine-room.component-start",
+          value: JSON.stringify({
+            schemaVersion: "lifeos.engine-room-component-start.v1",
+            observedAt: Date.now(),
+            probe,
+          }),
+        });
+      }
       outputChannel = new Channel();
       outputChannel.onmessage = (bytes) => {
         const text = new TextDecoder().decode(new Uint8Array(bytes));
@@ -66,10 +88,6 @@
           probeOutput = `${probeOutput}${text}`.slice(-16_384);
           if (probeOutput.includes("LIFEOS_ENGINE_PROBE_DONE")) {
             probeClosed = true;
-            if (probeTimer !== null) {
-              window.clearInterval(probeTimer);
-              probeTimer = null;
-            }
             const owner = invoke();
             void owner?.("redb_state_write", {
               key: "lifeos.engine-room.ready",
@@ -102,26 +120,32 @@
       });
       sessionId = spawnedSessionId;
       connected = true;
-      await resizeTerminal();
+      if (probe) {
+        void call("redb_state_write", {
+          key: "lifeos.engine-room.component-spawned",
+          value: JSON.stringify({
+            schemaVersion: "lifeos.engine-room-component-spawned.v1",
+            observedAt: Date.now(),
+            sessionId: spawnedSessionId,
+          }),
+        });
+      }
       if (probe && !probeSent) {
         probeSent = true;
-        const probeCommand = new TextEncoder().encode(
-          "echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r",
-        );
-        const sendProbe = () => {
-          if (probeClosed || probeAttempts >= 15) {
-            if (probeTimer !== null) {
-              window.clearInterval(probeTimer);
-              probeTimer = null;
-            }
-            return;
-          }
-          probeAttempts += 1;
-          void sendBytes(probeCommand, spawnedSessionId);
-        };
-        sendProbe();
-        probeTimer = window.setInterval(sendProbe, 1_000);
+        probeAttempts = 15;
+        void call("redb_state_write", {
+          key: "lifeos.engine-room.probe-scheduled",
+          value: JSON.stringify({
+            schemaVersion: "lifeos.engine-room-probe-scheduled.v1",
+            observedAt: Date.now(),
+            sessionId: spawnedSessionId,
+          }),
+        });
+        void call("terminal_probe", { sessionId: spawnedSessionId }).catch((error) => {
+          recordProbeError(error);
+        });
       }
+      await resizeTerminal();
     } catch {
       reconcileMessage = "Engine Room unavailable";
     }
@@ -130,8 +154,9 @@
   const sendBytes = async (bytes, targetSessionId = sessionId) => {
     const call = invoke();
     if (!call || !targetSessionId || !bytes?.length) return;
-    await call("terminal_write", { sessionId: targetSessionId, bytes: Array.from(bytes) }).catch(() => {
+    await call("terminal_write", { sessionId: targetSessionId, bytes: Array.from(bytes) }).catch((error) => {
       connected = false;
+      recordProbeError(error);
     });
   };
 
@@ -149,7 +174,8 @@
   };
 
   onMount(async () => {
-    terminal = new Terminal({
+    try {
+      terminal = new Terminal({
       cols: 100,
       rows: 30,
       cursorBlink: true,
@@ -201,10 +227,13 @@
       });
     }
     await start();
-    if (invoke()) {
-      await invoke()("terminal_replay_spool").catch(() => 0);
-      const projection = await invoke()("redb_projection_read").catch(() => null);
-      redbSeq = projection?.localSeq ?? null;
+      if (invoke()) {
+        await invoke()("terminal_replay_spool").catch(() => 0);
+        const projection = await invoke()("redb_projection_read").catch(() => null);
+        redbSeq = projection?.localSeq ?? null;
+      }
+    } catch {
+      reconcileMessage = "Engine Room unavailable";
     }
   });
 
@@ -213,10 +242,6 @@
     if (resizeFrame !== null && typeof cancelAnimationFrame !== "undefined") {
       cancelAnimationFrame(resizeFrame);
       resizeFrame = null;
-    }
-    if (probeTimer !== null) {
-      window.clearInterval(probeTimer);
-      probeTimer = null;
     }
     stopExit?.();
     stopCaptureError?.();

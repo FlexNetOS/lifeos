@@ -46,7 +46,7 @@
           pname = "lifeos-gha-agent-layer";
           version = "0.1.0";
           src = ./agent-layer;
-          npmDepsHash = "sha256-dhre1ifoeXL3z5D95YZlRIl5/sTh5N9U/AOjRc8gPV4=";  # captured post lockfile phantom-optional-dep patch
+          npmDepsHash = "sha256-eVnO+WNBGfcGtBd7tvqOm1nhamaTQN6lX94qrs1BDUc=";  # re-captured for @modelcontextprotocol/sdk 1.30.0 lockfile
           dontNpmBuild = true;          # these are prebuilt CLIs; no build step
           makeCacheWritable = true;     # agentic-flow's tree needs a writable npm cache
           # agentic-flow ships native postinstall (node-gyp) scripts that cannot run in

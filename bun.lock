@@ -22,6 +22,7 @@
         "@ruvector/postgres-cli": "^0.2.9",
         "@ruvector/ruvllm": "2.6.0",
         "@ruvector/rvf": "0.3.0",
+        "@ruvector/rvf-solver": "file:vendor/rvf-solver",
         "@ruvector/sona": "0.1.8",
         "@ruvector/tiny-dancer": "0.1.22",
         "@sveltejs/vite-plugin-svelte": "^7.2.0",
@@ -52,6 +53,9 @@
     "agentdb",
     "protobufjs",
   ],
+  "overrides": {
+    "@ruvector/rvf-solver": "file:vendor/rvf-solver",
+  },
   "packages": {
     "@ai-sdk/google": ["@ai-sdk/google@3.0.98", "", { "dependencies": { "@ai-sdk/provider": "3.0.14", "@ai-sdk/provider-utils": "4.0.40" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-TeZdNKvzAq6Rxanu936sJojXSAuap6E5lNvoroXx0uYptVkw7lMgVL+UJkXsIPKJpKqPZdWL85vVXxZANpYE4g=="],
 
@@ -533,7 +537,7 @@
 
     "@ruvector/rvf-node-win32-x64-msvc": ["@ruvector/rvf-node-win32-x64-msvc@0.1.7", "", { "os": "win32", "cpu": "x64" }, "sha512-sgnoNphOnbD4d3+YyQ83MlGO7sX4kbcDwsFNz7p2mlTaDR8coQXoudSaPrMeMpeUojFUqoxeDvVly/un3jADig=="],
 
-    "@ruvector/rvf-solver": ["@ruvector/rvf-solver@0.1.8", "", {}, "sha512-YM7L6TvhVoC5w0kUMl8ASback2ka3MesPvuf+lRYSJEcaf6bncPX7YGzcrsheOe4BBwyiyx39vAijVPx1nZkWA=="],
+    "@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
 
     "@ruvector/rvf-wasm": ["@ruvector/rvf-wasm@0.1.7", "", {}, "sha512-VTGPau9ikQXG9Tvjkjk5ff90ZcCMcwOYv3l6rJ+PL2fH/9EtxM1FWE7H1i7gdhh8dCSqRv4moXOAMSDbJ5oubQ=="],
 
@@ -2219,6 +2223,8 @@
 
     "@ruvector/ruvllm/ora": ["ora@5.4.1", "", { "dependencies": { "bl": "^4.1.0", "chalk": "^4.1.0", "cli-cursor": "^3.1.0", "cli-spinners": "^2.5.0", "is-interactive": "^1.0.0", "is-unicode-supported": "^0.1.0", "log-symbols": "^4.1.0", "strip-ansi": "^6.0.0", "wcwidth": "^1.0.1" } }, "sha512-5b6Y85tPxZZ7QytO+BQzysW31HJku27cRIlkbAXaNx+BdcVi+LlRFmVXzeF6a7JCwJpyw5c4b+YSVImQIrBpuQ=="],
 
+    "@ruvector/rvf/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
+
     "@testing-library/dom/aria-query": ["aria-query@5.3.0", "", { "dependencies": { "dequal": "^2.0.3" } }, "sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A=="],
 
     "@vue/compiler-core/estree-walker": ["estree-walker@2.0.2", "", {}, "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="],
@@ -2226,6 +2232,8 @@
     "@vue/compiler-sfc/estree-walker": ["estree-walker@2.0.2", "", {}, "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="],
 
     "agentdb/@ruvector/rvf": ["@ruvector/rvf@0.2.3", "", { "dependencies": { "@ruvector/rvf-node": "^0.1.7" }, "optionalDependencies": { "@ruvector/rvf-solver": "^0.1.0", "@ruvector/rvf-wasm": "^0.1.7" } }, "sha512-Z3TGxErAa9254UTB8COt44sXU3u5CCZWDewwu4Bj3mDoE8vWsaUiXxUBTJRy4sp60ZFXygghWGB8MsX1bs3zZw=="],
+
+    "agentdb/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
 
     "agentdb/commander": ["commander@12.1.0", "", {}, "sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA=="],
 
@@ -2357,6 +2365,8 @@
 
     "@claude-flow/cli/agentdb/@ruvector/rvf": ["@ruvector/rvf@0.1.9", "", { "dependencies": { "@ruvector/rvf-node": "^0.1.7" }, "optionalDependencies": { "@ruvector/rvf-solver": "^0.1.0", "@ruvector/rvf-wasm": "^0.1.5" } }, "sha512-W40NLeSj/+FwIHT0+v3soFrtk4pnAZL5Ghx93qAsZkuwriNw2y6vGPnsapflQyp34WgMN362syIRiACXx3KW8g=="],
 
+    "@claude-flow/cli/agentdb/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
+
     "@claude-flow/cli/agentdb/@ruvector/sona": ["@ruvector/sona@0.1.7", "", { "optionalDependencies": { "@ruvector/sona-darwin-arm64": "0.1.7", "@ruvector/sona-darwin-x64": "0.1.7", "@ruvector/sona-linux-arm64-gnu": "0.1.7", "@ruvector/sona-linux-x64-gnu": "0.1.7", "@ruvector/sona-linux-x64-musl": "0.1.7", "@ruvector/sona-win32-arm64-msvc": "0.1.7", "@ruvector/sona-win32-x64-msvc": "0.1.7" } }, "sha512-TR112g0QoiwavKGk+bogNm++F7LDZ4ko47pR1L/b0kuWfNi8FiW8CVLI/7GSIAJPS3VEfI86Cm7HYiEedc/dTQ=="],
 
     "@claude-flow/cli/agentdb/better-sqlite3": ["better-sqlite3@11.10.0", "", { "dependencies": { "bindings": "^1.5.0", "prebuild-install": "^7.1.1" } }, "sha512-EwhOpyXiOEL/lKzHz9AW1msWFNzGc/z+LzeB3/jnFJpxu+th2yqvzsSWas1v9jgs9+xiXJcD5A8CJxAG2TaghQ=="],
@@ -2393,6 +2403,8 @@
 
     "@claude-flow/memory/agentdb/@ruvector/rvf": ["@ruvector/rvf@0.1.9", "", { "dependencies": { "@ruvector/rvf-node": "^0.1.7" }, "optionalDependencies": { "@ruvector/rvf-solver": "^0.1.0", "@ruvector/rvf-wasm": "^0.1.5" } }, "sha512-W40NLeSj/+FwIHT0+v3soFrtk4pnAZL5Ghx93qAsZkuwriNw2y6vGPnsapflQyp34WgMN362syIRiACXx3KW8g=="],
 
+    "@claude-flow/memory/agentdb/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
+
     "@claude-flow/memory/agentdb/@ruvector/sona": ["@ruvector/sona@0.1.7", "", { "optionalDependencies": { "@ruvector/sona-darwin-arm64": "0.1.7", "@ruvector/sona-darwin-x64": "0.1.7", "@ruvector/sona-linux-arm64-gnu": "0.1.7", "@ruvector/sona-linux-x64-gnu": "0.1.7", "@ruvector/sona-linux-x64-musl": "0.1.7", "@ruvector/sona-win32-arm64-msvc": "0.1.7", "@ruvector/sona-win32-x64-msvc": "0.1.7" } }, "sha512-TR112g0QoiwavKGk+bogNm++F7LDZ4ko47pR1L/b0kuWfNi8FiW8CVLI/7GSIAJPS3VEfI86Cm7HYiEedc/dTQ=="],
 
     "@claude-flow/memory/agentdb/better-sqlite3": ["better-sqlite3@11.10.0", "", { "dependencies": { "bindings": "^1.5.0", "prebuild-install": "^7.1.1" } }, "sha512-EwhOpyXiOEL/lKzHz9AW1msWFNzGc/z+LzeB3/jnFJpxu+th2yqvzsSWas1v9jgs9+xiXJcD5A8CJxAG2TaghQ=="],
@@ -2416,6 +2428,8 @@
     "@claude-flow/neural/@ruvector/sona/@ruvector/sona-win32-x64-msvc": ["@ruvector/sona-win32-x64-msvc@0.1.5", "", { "os": "win32", "cpu": "x64" }, "sha512-ifB2meo3GeguivC5Dcq50UZEupc+F/yFZ1+cg2mVgUpoqNN9lzJ+k3IdGgdYyMu7YAM8CrgTswfp/krUwx8BLQ=="],
 
     "@claude-flow/neural/agentdb/@ruvector/rvf": ["@ruvector/rvf@0.1.9", "", { "dependencies": { "@ruvector/rvf-node": "^0.1.7" }, "optionalDependencies": { "@ruvector/rvf-solver": "^0.1.0", "@ruvector/rvf-wasm": "^0.1.5" } }, "sha512-W40NLeSj/+FwIHT0+v3soFrtk4pnAZL5Ghx93qAsZkuwriNw2y6vGPnsapflQyp34WgMN362syIRiACXx3KW8g=="],
+
+    "@claude-flow/neural/agentdb/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
 
     "@claude-flow/neural/agentdb/@ruvector/sona": ["@ruvector/sona@0.1.7", "", { "optionalDependencies": { "@ruvector/sona-darwin-arm64": "0.1.7", "@ruvector/sona-darwin-x64": "0.1.7", "@ruvector/sona-linux-arm64-gnu": "0.1.7", "@ruvector/sona-linux-x64-gnu": "0.1.7", "@ruvector/sona-linux-x64-musl": "0.1.7", "@ruvector/sona-win32-arm64-msvc": "0.1.7", "@ruvector/sona-win32-x64-msvc": "0.1.7" } }, "sha512-TR112g0QoiwavKGk+bogNm++F7LDZ4ko47pR1L/b0kuWfNi8FiW8CVLI/7GSIAJPS3VEfI86Cm7HYiEedc/dTQ=="],
 
@@ -2448,6 +2462,8 @@
     "@ruvector/ruvllm/ora/is-unicode-supported": ["is-unicode-supported@0.1.0", "", {}, "sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw=="],
 
     "@ruvector/ruvllm/ora/log-symbols": ["log-symbols@4.1.0", "", { "dependencies": { "chalk": "^4.1.0", "is-unicode-supported": "^0.1.0" } }, "sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg=="],
+
+    "agentdb/@ruvector/rvf/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
 
     "agentdb/ruvector/@ruvector/rvf": ["@ruvector/rvf@0.1.9", "", { "dependencies": { "@ruvector/rvf-node": "^0.1.7" }, "optionalDependencies": { "@ruvector/rvf-solver": "^0.1.0", "@ruvector/rvf-wasm": "^0.1.5" } }, "sha512-W40NLeSj/+FwIHT0+v3soFrtk4pnAZL5Ghx93qAsZkuwriNw2y6vGPnsapflQyp34WgMN362syIRiACXx3KW8g=="],
 
@@ -2509,6 +2525,8 @@
 
     "prebuild-install/tar-fs/tar-stream": ["tar-stream@2.2.0", "", { "dependencies": { "bl": "^4.0.3", "end-of-stream": "^1.4.1", "fs-constants": "^1.0.0", "inherits": "^2.0.3", "readable-stream": "^3.1.1" } }, "sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ=="],
 
+    "ruvector/@ruvector/rvf/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
+
     "ruvector/@ruvector/sona/@ruvector/sona-darwin-arm64": ["@ruvector/sona-darwin-arm64@0.1.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-7J1Mpakghe9iTZc2cTTMK6dtMQLhSQKxG9bN1LAakp0Gn/r6N7qmbJEJWGx4vZcsYoQKPbl9ijIDKLgEu92qAQ=="],
 
     "ruvector/@ruvector/sona/@ruvector/sona-darwin-x64": ["@ruvector/sona-darwin-x64@0.1.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-elFfUL9fYd+6uP7R64KEiq+8adpyrIKv2f8WVUU42OXQ1K0KWMrLYWW5NzPVcS/KHv1t0eUwc06HnqWgA8KXaQ=="],
@@ -2547,6 +2565,8 @@
 
     "yargs/string-width/strip-ansi": ["strip-ansi@7.2.0", "", { "dependencies": { "ansi-regex": "^6.2.2" } }, "sha512-yDPMNjp4WyfYBkHnjIRLfca1i6KMyGCtsVgoKe/z1+6vukgaENdgGBZt+ZmKPc4gavvEZ5OgHfHdrazhgNyG7w=="],
 
+    "@claude-flow/cli/agentdb/@ruvector/rvf/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
+
     "@claude-flow/cli/agentdb/@ruvector/sona/@ruvector/sona-darwin-arm64": ["@ruvector/sona-darwin-arm64@0.1.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-7J1Mpakghe9iTZc2cTTMK6dtMQLhSQKxG9bN1LAakp0Gn/r6N7qmbJEJWGx4vZcsYoQKPbl9ijIDKLgEu92qAQ=="],
 
     "@claude-flow/cli/agentdb/@ruvector/sona/@ruvector/sona-darwin-x64": ["@ruvector/sona-darwin-x64@0.1.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-elFfUL9fYd+6uP7R64KEiq+8adpyrIKv2f8WVUU42OXQ1K0KWMrLYWW5NzPVcS/KHv1t0eUwc06HnqWgA8KXaQ=="],
@@ -2581,6 +2601,8 @@
 
     "@claude-flow/mcp/express/type-is/mime-types": ["mime-types@2.1.35", "", { "dependencies": { "mime-db": "1.52.0" } }, "sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw=="],
 
+    "@claude-flow/memory/agentdb/@ruvector/rvf/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
+
     "@claude-flow/memory/agentdb/@ruvector/sona/@ruvector/sona-darwin-arm64": ["@ruvector/sona-darwin-arm64@0.1.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-7J1Mpakghe9iTZc2cTTMK6dtMQLhSQKxG9bN1LAakp0Gn/r6N7qmbJEJWGx4vZcsYoQKPbl9ijIDKLgEu92qAQ=="],
 
     "@claude-flow/memory/agentdb/@ruvector/sona/@ruvector/sona-darwin-x64": ["@ruvector/sona-darwin-x64@0.1.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-elFfUL9fYd+6uP7R64KEiq+8adpyrIKv2f8WVUU42OXQ1K0KWMrLYWW5NzPVcS/KHv1t0eUwc06HnqWgA8KXaQ=="],
@@ -2600,6 +2622,8 @@
     "@claude-flow/memory/agentdb/ruvector/commander": ["commander@11.1.0", "", {}, "sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ=="],
 
     "@claude-flow/memory/agentdb/ruvector/ora": ["ora@5.4.1", "", { "dependencies": { "bl": "^4.1.0", "chalk": "^4.1.0", "cli-cursor": "^3.1.0", "cli-spinners": "^2.5.0", "is-interactive": "^1.0.0", "is-unicode-supported": "^0.1.0", "log-symbols": "^4.1.0", "strip-ansi": "^6.0.0", "wcwidth": "^1.0.1" } }, "sha512-5b6Y85tPxZZ7QytO+BQzysW31HJku27cRIlkbAXaNx+BdcVi+LlRFmVXzeF6a7JCwJpyw5c4b+YSVImQIrBpuQ=="],
+
+    "@claude-flow/neural/agentdb/@ruvector/rvf/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
 
     "@claude-flow/neural/agentdb/@ruvector/sona/@ruvector/sona-darwin-arm64": ["@ruvector/sona-darwin-arm64@0.1.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-7J1Mpakghe9iTZc2cTTMK6dtMQLhSQKxG9bN1LAakp0Gn/r6N7qmbJEJWGx4vZcsYoQKPbl9ijIDKLgEu92qAQ=="],
 
@@ -2626,6 +2650,8 @@
     "@grpc/proto-loader/yargs/string-width/is-fullwidth-code-point": ["is-fullwidth-code-point@3.0.0", "", {}, "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg=="],
 
     "@ruvector/ruvllm/ora/cli-cursor/restore-cursor": ["restore-cursor@3.1.0", "", { "dependencies": { "onetime": "^5.1.0", "signal-exit": "^3.0.2" } }, "sha512-l+sSefzHpj5qimhFSE5a8nufZYAM3sBSVMAPtYkmC+4EH2anSGaEMXSD0izRQbu9nfyQ9y5JrVmp7E8oZrUjvA=="],
+
+    "agentdb/ruvector/@ruvector/rvf/@ruvector/rvf-solver": ["@ruvector/rvf-solver@file:vendor/rvf-solver", {}],
 
     "agentdb/ruvector/@ruvector/sona/@ruvector/sona-darwin-arm64": ["@ruvector/sona-darwin-arm64@0.1.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-7J1Mpakghe9iTZc2cTTMK6dtMQLhSQKxG9bN1LAakp0Gn/r6N7qmbJEJWGx4vZcsYoQKPbl9ijIDKLgEu92qAQ=="],
 

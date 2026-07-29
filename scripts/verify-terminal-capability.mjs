@@ -125,10 +125,13 @@ for (const [label, frame] of Object.entries(mustPassThrough)) {
   }
 }
 
-const placeholdersImplemented = addonNative || true;
+const compatibilityAdapterImplemented =
+  typeof adapter.KittyUnicodePlaceholderStream === "function" &&
+  typeof adapter.KittyUnicodePlaceholderAddon === "function";
+const placeholdersImplemented = addonNative || compatibilityAdapterImplemented;
 if (placeholdersImplemented !== profile.kittyUnicodePlaceholders) {
   throw new Error(
-    `profile declares kittyUnicodePlaceholders=${profile.kittyUnicodePlaceholders} but the pinned addon ${placeholdersImplemented ? "implements" : "does not implement"} them`,
+    `profile declares kittyUnicodePlaceholders=${profile.kittyUnicodePlaceholders} but the pinned addon/compatibility adapter ${placeholdersImplemented ? "implements" : "does not implement"} them`,
   );
 }
 if (profile.kittyGraphics && profile.kittyUnicodePlaceholders && profile.imageProtocol !== "Kgp") {

@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-28T21:37:39.571Z",
+  "generatedAt": "2026-07-29T00:55:27.670Z",
   "install": {
     "owner": "LifeOS root package.json and bun.lock",
     "cwd": "/home/flexnetos/meta/src/lifeos",
-    "package_json_sha256": "7e720426c57fe6389335a46362bf382905c3be5fc92586f56bf3d25fba2dfea4",
-    "bun_lock_sha256": "ce8054983c7d4da193469552ada0c9dd6a72c668b8321fcf5f5fda62cd554f73",
+    "package_json_sha256": "9d6629bb2ce1601985ded77c081b35cadc1c3e79fc514baba65cbf47bd06e629",
+    "bun_lock_sha256": "b8a5a8bf0cdb834efcf14234f920d367d1959d1d00514da32e686f5a2a51fe03",
     "trusted_dependencies": [
       "agentdb",
       "protobufjs"
@@ -18,13 +18,13 @@
       },
       "@ruvector/rvf": {
         "ownership": "direct-root-devDependency",
-        "version": "0.2.3",
+        "version": "0.3.0",
         "entrypoint": "node_modules/@ruvector/rvf/dist/index.js",
         "package_json": "node_modules/@ruvector/rvf/package.json"
       },
       "@ruvector/sona": {
         "ownership": "direct-root-devDependency",
-        "version": "0.1.7",
+        "version": "0.1.8",
         "entrypoint": "node_modules/@ruvector/sona/index.js",
         "package_json": "node_modules/@ruvector/sona/package.json"
       },
@@ -36,7 +36,7 @@
       },
       "agentdb": {
         "ownership": "direct-root-devDependency",
-        "version": "3.0.0-alpha.17",
+        "version": "3.0.0-alpha.18",
         "entrypoint": "node_modules/agentdb/dist/src/index.js",
         "package_json": "node_modules/agentdb/package.json"
       },
@@ -100,7 +100,7 @@
         },
         "@ruvector/sona-linux-x64-gnu": {
           "ownerOptionalDependency": "@ruvector/sona",
-          "version": "0.1.7",
+          "version": "0.1.8",
           "package_json": "node_modules/@ruvector/sona-linux-x64-gnu/package.json",
           "binary": "node_modules/@ruvector/sona-linux-x64-gnu/sona.linux-x64-gnu.node"
         },
@@ -154,14 +154,14 @@
   },
   "sona": {
     "microLoraOutput": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      0.10000000149011612,
+      0.20000000298023224,
+      0.30000001192092896,
+      0.4000000059604645,
+      0.5,
+      0.6000000238418579,
+      0.699999988079071,
+      0.800000011920929
     ],
     "forceLearnResult": "Forced learning: 1 trajectories -> 1 patterns, status: completed",
     "patterns": [
@@ -180,8 +180,8 @@
         "clusterSize": 1,
         "totalWeight": 0.949999988079071,
         "avgQuality": 0.949999988079071,
-        "createdAt": "1785274659",
-        "lastAccessed": "1785274659",
+        "createdAt": "1785286527",
+        "lastAccessed": "1785286527",
         "accessCount": 0,
         "patternType": "General"
       }
@@ -254,20 +254,25 @@
       "deadSpaceRatio": 0,
       "readOnly": false
     },
-    "fileId": "e09baefa9afd2d47b7b76f2d2b978e41"
+    "fileId": "e09baefa9afd2d180717818383978e41"
   },
   "agentdb": {
     "path": "node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/agentdb-self-learning.rvf",
     "bytes": 1193,
     "search": [
       {
-        "id": "0",
-        "distance": 1,
-        "similarity": 0
+        "id": "doc-a",
+        "distance": 0,
+        "similarity": 1
+      },
+      {
+        "id": "doc-b",
+        "distance": 0.4117646813392639,
+        "similarity": 0.5882353186607361
       }
     ],
     "stats": {
-      "count": 1,
+      "count": 2,
       "dimension": 8,
       "metric": "cosine",
       "backend": "rvf",
@@ -287,6 +292,93 @@
       "violations": 0,
       "patternsDistilled": 0,
       "dimensionsImproved": 0
+    },
+    "acceptance": {
+      "version": 2,
+      "modeA": {
+        "passed": false,
+        "finalAccuracy": 0,
+        "accuracyMaintained": false,
+        "costImproved": false,
+        "robustnessImproved": false,
+        "zeroViolations": true,
+        "dimensionsImproved": 1,
+        "cycles": [
+          {
+            "cycle": 1,
+            "accuracy": 0.25,
+            "costPerSolve": 290,
+            "noiseAccuracy": 0,
+            "violations": 0,
+            "patternsLearned": 1
+          },
+          {
+            "cycle": 2,
+            "accuracy": 0.25,
+            "costPerSolve": 290,
+            "noiseAccuracy": 0,
+            "violations": 0,
+            "patternsLearned": 2
+          }
+        ]
+      },
+      "modeB": {
+        "passed": false,
+        "finalAccuracy": 0,
+        "accuracyMaintained": false,
+        "costImproved": false,
+        "robustnessImproved": false,
+        "zeroViolations": true,
+        "dimensionsImproved": 1,
+        "cycles": [
+          {
+            "cycle": 1,
+            "accuracy": 0.25,
+            "costPerSolve": 290,
+            "noiseAccuracy": 0,
+            "violations": 0,
+            "patternsLearned": 1
+          },
+          {
+            "cycle": 2,
+            "accuracy": 0.25,
+            "costPerSolve": 290,
+            "noiseAccuracy": 0,
+            "violations": 0,
+            "patternsLearned": 2
+          }
+        ]
+      },
+      "modeC": {
+        "passed": false,
+        "finalAccuracy": 0,
+        "accuracyMaintained": false,
+        "costImproved": false,
+        "robustnessImproved": false,
+        "zeroViolations": true,
+        "dimensionsImproved": 1,
+        "cycles": [
+          {
+            "cycle": 1,
+            "accuracy": 0.25,
+            "costPerSolve": 368,
+            "noiseAccuracy": 0,
+            "violations": 0,
+            "patternsLearned": 1
+          },
+          {
+            "cycle": 2,
+            "accuracy": 0.25,
+            "costPerSolve": 368,
+            "noiseAccuracy": 0,
+            "violations": 0,
+            "patternsLearned": 2
+          }
+        ]
+      },
+      "allPassed": false,
+      "witnessEntries": 6,
+      "witnessChainBytes": 438
     },
     "learningEnabled": true,
     "backendPath": "node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/agentdb-self-learning.rvf",
@@ -337,9 +429,8 @@
     ],
     "witness": {
       "result": {
-        "valid": false,
-        "entries": 0,
-        "error": "this.db.verifyWitness is not a function. (In 'this.db.verifyWitness()', 'this.db.verifyWitness' is undefined)"
+        "valid": true,
+        "entryCount": 6
       }
     }
   },
@@ -361,13 +452,13 @@
     "hello": "Hello from Tiny Dancer Node.js bindings!",
     "trainResult": {
       "epochsRun": 10,
-      "trainLoss": 0.4891206920146942,
+      "trainLoss": 0.5035868287086487,
       "trainAccuracy": 1,
       "valAccuracy": 1,
       "modelPath": "/home/flexnetos/meta/src/lifeos/node_modules/.cache/lifeos/node-authority/NBVERIFY-001.node-authority-proof.raw/fastgrnn-router.safetensors",
       "modelBytes": 1268
     },
-    "score": 0.6936265826225281,
+    "score": 0.6428907513618469,
     "bytes": 1268
   }
 }

@@ -95,11 +95,12 @@
           }
         }
       };
-      sessionId = await call("terminal_spawn", {
+      const spawnedSessionId = await call("terminal_spawn", {
         cols: terminal?.cols || 100,
         rows: terminal?.rows || 30,
         onOutput: outputChannel,
       });
+      sessionId = spawnedSessionId;
       connected = true;
       await resizeTerminal();
       if (probe && !probeSent) {
@@ -116,9 +117,7 @@
             return;
           }
           probeAttempts += 1;
-          void sendBytes(
-            probeCommand,
-          );
+          void sendBytes(probeCommand, spawnedSessionId);
         };
         sendProbe();
         probeTimer = window.setInterval(sendProbe, 1_000);
@@ -128,10 +127,10 @@
     }
   };
 
-  const sendBytes = async (bytes) => {
+  const sendBytes = async (bytes, targetSessionId = sessionId) => {
     const call = invoke();
-    if (!call || !sessionId || !bytes?.length) return;
-    await call("terminal_write", { sessionId, bytes: Array.from(bytes) }).catch(() => {
+    if (!call || !targetSessionId || !bytes?.length) return;
+    await call("terminal_write", { sessionId: targetSessionId, bytes: Array.from(bytes) }).catch(() => {
       connected = false;
     });
   };

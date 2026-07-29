@@ -62,7 +62,19 @@ SELECT jsonb_build_object(
   'compatibility', jsonb_build_object(
     'vector_avg_final', extensions.vector_avg_final(
       ARRAY[4.0::real, 6.0::real], 2
-    ) = ARRAY[2.0::real, 3.0::real]
+    ) = ARRAY[2.0::real, 3.0::real],
+    'auto_tune_bridge',
+      to_regprocedure('extensions.ruvector_auto_tune(text,text,real[])') IS NOT NULL
+      AND to_regprocedure('extensions.ruvector_auto_tune_jsonb_native(text,text,jsonb)') IS NOT NULL
+      AND EXISTS (
+        SELECT 1
+        FROM pg_proc function_row
+        JOIN pg_namespace namespace_row ON namespace_row.oid = function_row.pronamespace
+        JOIN pg_language language_row ON language_row.oid = function_row.prolang
+        WHERE namespace_row.nspname = 'extensions'
+          AND function_row.proname = 'ruvector_auto_tune'
+          AND language_row.lanname = 'sql'
+      )
   ),
   'required_schemas', jsonb_build_array(
     to_regnamespace('lifeos_blob') IS NOT NULL,
@@ -115,6 +127,9 @@ if (receipt.witness?.broken_links !== 0 || receipt.witness?.head_mismatches !== 
 }
 if (receipt.compatibility?.vector_avg_final !== true) {
   failures.push("RuVector vector_avg_final compatibility repair is not active");
+}
+if (receipt.compatibility?.auto_tune_bridge !== true) {
+  failures.push("RuVector auto_tune real[] to native JSONB bridge is not active");
 }
 
 if (failures.length) {

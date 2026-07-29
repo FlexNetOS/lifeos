@@ -21,7 +21,7 @@ use std::process::{Child as ProcessChild, Command, Stdio};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
@@ -33,6 +33,68 @@ fn redb_root() -> PathBuf {
     std::env::var_os("LIFEOS_REDB_ROOT")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("/home/flexnetos/meta/var/lib/redb"))
+}
+
+fn redb_owner_binary() -> Option<PathBuf> {
+    if let Some(path) = std::env::var_os("LIFEOS_REDB_OWNER_BIN") {
+        let path = PathBuf::from(path);
+        if path.is_file() {
+            return Some(path);
+        }
+    }
+
+    let profile_path = PathBuf::from("/home/flexnetos/.nix-profile/bin/flexnetos-redb-owner");
+    if profile_path.is_file() {
+        return Some(profile_path);
+    }
+
+    std::env::current_exe()
+        .ok()
+        .and_then(|path| {
+            path.parent()
+                .map(|parent| parent.join("flexnetos-redb-owner"))
+        })
+        .filter(|path| path.is_file())
+}
+
+/// Ensure the lifecycle-independent owner is serving before the Glass writes
+/// its setup receipt. The owner is a separate process and keeps the redb
+/// handle after the Glass exits; the Glass is only a reconnecting client.
+fn ensure_redb_owner() -> Result<(), String> {
+    let root = redb_root();
+    std::fs::create_dir_all(&root).map_err(|error| format!("create redb owner root: {error}"))?;
+
+    if let Ok(mut client) = OwnerClient::connect(&root) {
+        if client.events(0, 0).is_ok() {
+            return Ok(());
+        }
+    }
+
+    let binary = redb_owner_binary().ok_or_else(|| {
+        "redb owner is unavailable and flexnetos-redb-owner could not be located; set LIFEOS_REDB_OWNER_BIN".to_string()
+    })?;
+    Command::new(&binary)
+        .arg("serve")
+        .arg(&root)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .map_err(|error| format!("start redb owner {}: {error}", binary.display()))?;
+
+    for _ in 0..80 {
+        if let Ok(mut client) = OwnerClient::connect(&root) {
+            if client.events(0, 0).is_ok() {
+                return Ok(());
+            }
+        }
+        std::thread::sleep(Duration::from_millis(25));
+    }
+
+    Err(format!(
+        "redb owner did not become ready at {}",
+        root.display()
+    ))
 }
 
 #[cfg(test)]
@@ -791,93 +853,11 @@ impl Drop for EnvctlReconciler {
 }
 
 struct TerminalSession {
-    engine_session_name: String,
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send>,
-    output_offset: Arc<AtomicU64>,
     input_offset: Arc<AtomicU64>,
-}
-
-fn engine_room_pane_target(session_name: &str) -> Option<(PathBuf, String)> {
-    let zellij = std::env::var_os("YZX_ZELLIJ")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from("/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij")
-        });
-    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
-    let server = server_root
-        .join("zellij/contract_version_1")
-        .join(session_name);
-    let output = Command::new(&zellij)
-        .args([
-            "--server",
-            server.to_string_lossy().as_ref(),
-            "action",
-            "list-panes",
-        ])
-        .output()
-        .ok()?;
-    String::from_utf8_lossy(&output.stdout)
-        .lines()
-        .find(|line| line.contains("lifeos-engine-shell"))
-        .and_then(|line| line.split_whitespace().next())
-        .map(|pane| (zellij, pane.to_string()))
-}
-
-fn write_engine_room_pane(session_name: &str, bytes: &[u8]) -> Result<bool, String> {
-    let Some((zellij, pane)) = engine_room_pane_target(session_name) else {
-        return Ok(false);
-    };
-    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
-    let server = server_root
-        .join("zellij/contract_version_1")
-        .join(session_name);
-    let text = String::from_utf8_lossy(bytes);
-    let status = Command::new(zellij)
-        .args([
-            "--server",
-            server.to_string_lossy().as_ref(),
-            "action",
-            "write-chars",
-            &text,
-        ])
-        .status()
-        .map_err(|error| format!("write Engine Room Nushell pane: {error}"))?;
-    if !status.success() {
-        return Err(format!(
-            "write Engine Room Nushell pane exited with {status}"
-        ));
-    }
-    let _ = pane;
-    Ok(true)
-}
-
-fn read_engine_room_pane(session_name: &str) -> Option<String> {
-    let (zellij, pane) = engine_room_pane_target(session_name)?;
-    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
-    let server = server_root
-        .join("zellij/contract_version_1")
-        .join(session_name);
-    Command::new(zellij)
-        .args([
-            "--server",
-            server.to_string_lossy().as_ref(),
-            "action",
-            "dump-screen",
-            "-p",
-            &pane,
-        ])
-        .output()
-        .ok()
-        .filter(|output| output.status.success())
-        .map(|output| String::from_utf8_lossy(&output.stdout).into_owned())
+    probe_output: Arc<Mutex<Vec<u8>>>,
 }
 
 #[derive(Default)]
@@ -1175,6 +1155,8 @@ fn terminal_spawn(
     let output_offset = Arc::new(AtomicU64::new(0));
     let input_offset = Arc::new(AtomicU64::new(0));
     let reader_output_offset = Arc::clone(&output_offset);
+    let probe_output = Arc::new(Mutex::new(Vec::new()));
+    let reader_probe_output = Arc::clone(&probe_output);
     let event_session = session_id.clone();
     std::thread::spawn(move || {
         let mut buffer = [0_u8; 8192];
@@ -1183,6 +1165,13 @@ fn terminal_spawn(
                 Ok(0) => break,
                 Ok(length) => {
                     let offset = reader_output_offset.fetch_add(length as u64, Ordering::Relaxed);
+                    if let Ok(mut recent) = reader_probe_output.lock() {
+                        recent.extend_from_slice(&buffer[..length]);
+                        if recent.len() > 16_384 {
+                            let keep_from = recent.len() - 16_384;
+                            recent.drain(..keep_from);
+                        }
+                    }
                     if let Err(error) = capture_terminal_frame(
                         &event_session,
                         "output",
@@ -1236,12 +1225,11 @@ fn terminal_spawn(
         .insert(
             session_id.clone(),
             TerminalSession {
-                engine_session_name: session_name.clone(),
                 master: pair.master,
                 writer,
                 child,
-                output_offset,
                 input_offset,
+                probe_output,
             },
         );
     let focus_session_name = session_name.clone();
@@ -1349,9 +1337,6 @@ fn terminal_write(
         &bytes,
         serde_json::json!({"stream": "pty", "offset": offset}),
     )?;
-    if write_engine_room_pane(&session.engine_session_name, &bytes)? {
-        return Ok(());
-    }
     session
         .writer
         .write_all(&bytes)
@@ -1365,41 +1350,43 @@ fn terminal_probe(
     session_id: String,
 ) -> Result<bool, String> {
     let probe = b"echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r";
-    for _ in 0..15 {
-        std::thread::sleep(std::time::Duration::from_secs(1));
-        let mut sessions = state
-            .sessions
+    std::thread::sleep(Duration::from_millis(250));
+    let mut sessions = state
+        .sessions
+        .lock()
+        .map_err(|error| format!("terminal state lock: {error}"))?;
+    let session = sessions
+        .get_mut(&session_id)
+        .ok_or_else(|| "terminal session is not active".to_string())?;
+    let offset = session
+        .input_offset
+        .fetch_add(probe.len() as u64, Ordering::Relaxed);
+    capture_terminal_frame(
+        &session_id,
+        "input",
+        probe,
+        serde_json::json!({"stream": "pty", "offset": offset, "source": "native-probe"}),
+    )?;
+    session
+        .writer
+        .write_all(probe)
+        .and_then(|_| session.writer.flush())
+        .map_err(|error| format!("write terminal probe: {error}"))?;
+    let recent_output = Arc::clone(&session.probe_output);
+    drop(sessions);
+    for _ in 0..40 {
+        if recent_output
             .lock()
-            .map_err(|error| format!("terminal state lock: {error}"))?;
-        let session = sessions
-            .get_mut(&session_id)
-            .ok_or_else(|| "terminal session is not active".to_string())?;
-        let offset = session
-            .input_offset
-            .fetch_add(probe.len() as u64, Ordering::Relaxed);
-        capture_terminal_frame(
-            &session_id,
-            "input",
-            probe,
-            serde_json::json!({"stream": "pty", "offset": offset, "source": "native-probe"}),
-        )?;
-        if !write_engine_room_pane(&session.engine_session_name, probe)? {
-            session
-                .writer
-                .write_all(probe)
-                .and_then(|_| session.writer.flush())
-                .map_err(|error| format!("write terminal probe: {error}"))?;
-        }
-        let pane_output = read_engine_room_pane(&session.engine_session_name).unwrap_or_default();
-        capture_terminal_frame(
-            &session_id,
-            "output",
-            pane_output.as_bytes(),
-            serde_json::json!({"stream": "zellij-pane", "source": "nushell", "pane": "lifeos-engine-shell"}),
-        )?;
-        if pane_output.contains("LIFEOS_ENGINE_PROBE_DONE") {
+            .map(|bytes| {
+                bytes
+                    .windows(b"LIFEOS_ENGINE_PROBE_DONE".len())
+                    .any(|window| window == b"LIFEOS_ENGINE_PROBE_DONE")
+            })
+            .unwrap_or(false)
+        {
             return Ok(true);
         }
+        std::thread::sleep(Duration::from_millis(250));
     }
     Ok(false)
 }
@@ -2148,6 +2135,7 @@ pub fn run() {
                 "frontendDist": format!("{:?}", app.config().build.frontend_dist),
                 "tauriConfigEnvPresent": std::env::var_os("TAURI_CONFIG").is_some(),
             });
+            ensure_redb_owner().map_err(std::io::Error::other)?;
             let mut setup_owner = OwnerClient::connect(redb_root()).map_err(|error| {
                 std::io::Error::other(format!("connect setup receipt owner: {error}"))
             })?;

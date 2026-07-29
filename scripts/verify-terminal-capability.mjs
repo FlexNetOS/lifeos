@@ -97,27 +97,35 @@ const through = (frames) => {
   return frames.map((frame) => decode(stream.feed(encode(frame)))).join("");
 };
 
+// Literal ESC bytes in a source file render as `^[` and are trivially corrupted
+// by an editor or a stray copy-paste, so every fixture below is built from
+// explicit escapes instead. `payload` is omitted for a placement referencing an
+// already-transmitted image — its control section ends at the terminator.
+const ESC = "\u001b";
+const apc = (control, payload) =>
+  `${ESC}_G${control}${payload === undefined ? "" : `;${payload}`}${ESC}\\`;
+
 const mustNormalize = {
-  "a=T transmit+display virtual placement": ["_Ga=T,f=100,t=d,i=1,q=2,U=1,c=20,r=10;QUJD\\"],
-  "a=p placement with no payload": ["_Ga=p,U=1,i=1,c=20,r=10\\"],
-  "a=p placement with payload": ["_Ga=p,U=1,i=1,c=20,r=10;QUJD\\"],
-  "placement split across PTY frames": ["_Ga=p,U=1,i=1,c=2", "0,r=10\\"],
+  "a=T transmit+display virtual placement": [apc("a=T,f=100,t=d,i=1,q=2,U=1,c=20,r=10", "QUJD")],
+  "a=p placement with no payload": [apc("a=p,U=1,i=1,c=20,r=10")],
+  "a=p placement with payload": [apc("a=p,U=1,i=1,c=20,r=10", "QUJD")],
+  "placement split across PTY frames": [`${ESC}_Ga=p,U=1,i=1,c=2`, `0,r=10${ESC}\\`],
 };
 for (const [label, frames] of Object.entries(mustNormalize)) {
   const result = through(frames);
   if (/U=1/.test(result)) {
     throw new Error(`kitty placeholder adapter leaves ${label} virtual: ${JSON.stringify(result)}`);
   }
-  if (result.includes(",C=1;") || result.includes(",C=1\u001b")) continue;
-  if (!/(?:^|,)C=1(?=,|$|)/.test(result)) {
+  if (result.includes(",C=1;") || result.includes(`,C=1${ESC}`)) continue;
+  if (!new RegExp(`(?:^|,)C=1(?=,|$|${ESC})`).test(result)) {
     throw new Error(`kitty placeholder adapter did not pin the cursor policy for ${label}`);
   }
 }
 
 const mustPassThrough = {
   "plain terminal output": "hello world\r\n",
-  "transmit-only (not a placement)": "_Ga=t,f=100,i=1;QUJD\\",
-  "already-direct placement": "_Ga=T,i=1,c=20,r=10;QUJD\\",
+  "transmit-only (not a placement)": apc("a=t,f=100,i=1", "QUJD"),
+  "already-direct placement": apc("a=T,i=1,c=20,r=10", "QUJD"),
 };
 for (const [label, frame] of Object.entries(mustPassThrough)) {
   if (through([frame]) !== frame) {

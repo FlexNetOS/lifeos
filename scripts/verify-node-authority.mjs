@@ -278,10 +278,13 @@ learning.recordFeedback(learningFeedbackId, 1.0);
 await learning.forceLearn();
 await learning.flush();
 const acceptance = learning.runAcceptance({
-  holdoutSize: 4,
-  trainingPerCycle: 4,
-  cycles: 2,
-  stepBudget: 100,
+  // The solver's documented acceptance contract needs a meaningful
+  // holdout/training workload; tiny smoke values can fail before the
+  // three-loop policy has enough signal to converge.
+  holdoutSize: 30,
+  trainingPerCycle: 200,
+  cycles: 5,
+  stepBudget: 500,
   seed: 7,
 });
 let witness;

@@ -156,7 +156,7 @@ SETUP_STEPS = [
         " END $$;"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune_jsonb_native("
         " table_name text, optimize_for text, sample_queries jsonb) RETURNS jsonb"
-        " LANGUAGE c PARALLEL SAFE AS '/home/flexnetos/meta/var/lib/ruvector/ext/ruvector', 'ruvector_auto_tune_wrapper';"
+        " LANGUAGE c PARALLEL SAFE AS '$libdir/ruvector', 'ruvector_auto_tune_wrapper';"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune("
         " table_name text, optimize_for text DEFAULT 'balanced', sample_queries real[] DEFAULT NULL)"
         " RETURNS jsonb LANGUAGE sql PARALLEL SAFE AS $$"
@@ -168,7 +168,7 @@ SETUP_STEPS = [
         "CREATE OR REPLACE FUNCTION extensions.ruvector_record_trajectory("
         " table_name text, query_vector real[], result_ids bigint[], latency_us bigint,"
         " ef_search integer, probes integer) RETURNS text LANGUAGE c PARALLEL SAFE"
-        " AS '/home/flexnetos/meta/var/lib/ruvector/ext/ruvector', 'ruvector_record_trajectory_wrapper'"
+        " AS '$libdir/ruvector', 'ruvector_record_trajectory_wrapper'"
     )),
     ("placement", (
         "DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_extension x JOIN pg_namespace n"
@@ -278,7 +278,7 @@ EDGES = "'[[0,1],[1,0]]'::jsonb"
 CASES = [
     # -- runtime / meta ----------------------------------------------------
     ("version", ["ruvector_version"], "assert",
-     "SELECT ruvector_version() = '2.0.1'"),
+     "SELECT ruvector_version() = '0.3.0'"),
     ("simd_info", ["ruvector_simd_info"], "assert",
      "SELECT ruvector_simd_info() LIKE 'architecture:%'"),
     ("memory_stats", ["ruvector_memory_stats"], "assert",

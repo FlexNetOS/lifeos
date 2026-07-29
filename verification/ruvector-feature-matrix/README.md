@@ -7,20 +7,15 @@ on the canonical LifeOS cluster, cross-checked against the blueprint anchor's
 ## What it proves
 
 - **Every installed extension object is exercised** with at least one positive
-  assertion: 190 functions, 1 aggregate, 5 operators, 2 types (`ruvector`,
-  `_ruvector`), 2 access methods (`hnsw`, `ruivfflat`), 6 operator classes —
-  206 objects. A hard coverage gate fails the run if any live object lacks a
+  assertion: 322 functions, 1 aggregate, 5 operators, 2 base types
+  (`ruvector`, `sparsevec`), 2 access methods (`hnsw`, `ruivfflat`), 6
+  operator classes — 338 objects. A hard coverage gate fails the run if any live object lacks a
   matrix case, so the coverage claim is enforced, not asserted.
-- **Every anchor-§3-cataloged name is accounted**: 350 catalog names = 181
-  installed functions + 8 resolved to other object classes (access methods,
-  opclasses, `*_fn` aliases, type, aggregate) + 161 absent from the official
-  release artifact. The anchor itself records the split: the pinned source
-  tree carries 346 `#[pg_extern]` definitions, while the checked release
-  artifact `ruvector--0.3.0.sql` emits 190 — a feature-gated subset. Both
-  official planes (the nix-packaged extension and docker
-  `ruvnet/ruvector-postgres:2.0.5`) expose identical 191-function surfaces,
-  verified live.
-- Total matrix rows: **373** (all tested green or explicitly accounted).
+- **Every anchor-§3-cataloged name is accounted**: 350 catalog names = 298
+  installed objects + 7 resolved to other object classes (access methods,
+  opclasses, aliases, type, aggregate) + 45 explicitly absent from the
+  current all-features-v3 release artifact.
+- Total matrix rows: **388** (all tested green or explicitly accounted).
 
 ## Activated compatibility register
 
@@ -70,8 +65,8 @@ cases AND zero uncovered live objects.
 
 - `results/receipts.jsonl` — one record per case (assertion, outcome, timing).
 - `results/summary.json` — counts, coverage, annotations, defect register.
-- `results/absent_account.json` — per-name accounting for all 168 non-installed
+- `results/absent_account.json` — per-name accounting for all 45 non-installed
   anchor identifiers with classification and absence reason.
 - `results/environment.json` — cluster version, extension versions, SIMD
-  capability, and sha256 of the exact `ruvector.so` and `ruvector--0.3.0.sql`
+  capability, and sha256 of the exact `ruvector.so` and `ruvector--0.3.1.sql`
   artifacts the run executed against.

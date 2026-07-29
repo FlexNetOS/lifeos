@@ -19,7 +19,8 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::{Child as ProcessChild, Command, Stdio};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::mpsc::{self, Sender};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::thread::JoinHandle;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
@@ -910,6 +911,45 @@ struct TerminalState {
 
 static TERMINAL_FRAME_SEQUENCE: AtomicU64 = AtomicU64::new(1);
 
+struct TerminalCapture {
+    key: String,
+    rendered: String,
+}
+
+fn terminal_capture_sender() -> &'static Sender<TerminalCapture> {
+    static SENDER: OnceLock<Sender<TerminalCapture>> = OnceLock::new();
+    SENDER.get_or_init(|| {
+        let (sender, receiver) = mpsc::channel::<TerminalCapture>();
+        std::thread::Builder::new()
+            .name("lifeos-terminal-capture".into())
+            .spawn(move || {
+                let owner_capture_enabled = std::env::var_os("VITE_LIFEOS_ENGINE_PROBE")
+                    .as_deref()
+                    != Some(std::ffi::OsStr::new("1"));
+                while let Ok(frame) = receiver.recv() {
+                    if !owner_capture_enabled {
+                        if let Err(spool_error) = append_terminal_spool(&frame.rendered) {
+                            eprintln!("terminal probe capture spool failed: {spool_error}");
+                        }
+                        continue;
+                    }
+                    let result = OwnerClient::connect(redb_root())
+                        .and_then(|mut owner| owner.put(&frame.key, &frame.rendered))
+                        .map(|_| ());
+                    if let Err(owner_error) = result {
+                        if let Err(spool_error) = append_terminal_spool(&frame.rendered) {
+                            eprintln!(
+                                "terminal capture failed: owner={owner_error}; spool={spool_error}"
+                            );
+                        }
+                    }
+                }
+            })
+            .expect("spawn terminal capture worker");
+        sender
+    })
+}
+
 fn selected_environment_digest() -> String {
     let mut selected: Vec<_> = std::env::vars()
         .filter(|(name, _)| {
@@ -955,9 +995,11 @@ fn append_terminal_spool(envelope: &str) -> Result<(), String> {
         .map_err(|error| format!("sync terminal spool: {error}"))
 }
 
-/// Capture a lossless terminal lifecycle frame through the authenticated owner.
-/// If the owner is temporarily unavailable, the exact envelope is fsynced to
-/// the emergency spool so output is never silently discarded.
+/// Queue a lossless terminal lifecycle frame for the authenticated owner.
+/// A single worker preserves frame order while keeping the PTY byte path
+/// independent of the owner's projection rebuild latency. If the owner is
+/// temporarily unavailable, the worker fsyncs the exact envelope to the
+/// emergency spool so output is never silently discarded.
 fn capture_terminal_frame(
     session_id: &str,
     frame_kind: &str,
@@ -981,12 +1023,9 @@ fn capture_terminal_frame(
     let rendered = serde_json::to_string(&envelope)
         .map_err(|error| format!("encode terminal frame: {error}"))?;
     let key = format!("terminal/frame/{session_id}/{sequence:020}");
-    match OwnerClient::connect(redb_root()).and_then(|mut owner| owner.put(&key, &rendered)) {
-        Ok(_) => Ok(()),
-        Err(owner_error) => append_terminal_spool(&rendered).map_err(|spool_error| {
-            format!("owner capture failed: {owner_error}; spool failed: {spool_error}")
-        }),
-    }
+    terminal_capture_sender()
+        .send(TerminalCapture { key, rendered })
+        .map_err(|error| format!("queue terminal capture: {error}"))
 }
 
 /// Replay every emergency-spooled frame through deterministic owner keys.

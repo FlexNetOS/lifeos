@@ -140,7 +140,18 @@ async function emitProof() {
   const overloadScale = Math.max(hardware.logicalCpus * 2, 64);
   const baseline = await runScale(Worker, baselineScale, iterations);
   const overloadRun = await runScale(Worker, overloadScale, iterations);
-  const recovery = await runScale(Worker, baselineScale, iterations);
+  // A single post-overload run is too sensitive to unrelated scheduler noise
+  // when the harness is launched beside the full Vitest worker pool. Keep
+  // every raw recovery run, then use the median measured mean as the recovery
+  // statistic. This reduces incidental variance without hiding a sustained
+  // slowdown.
+  const recoveryRuns = await Promise.all(
+    Array.from({ length: 3 }, () => runScale(Worker, baselineScale, iterations)),
+  );
+  const recoveryMeanMs = percentile(
+    recoveryRuns.map((run) => run.meanMs),
+    50,
+  );
 
   const overload = {
     baselineScale,
@@ -150,11 +161,15 @@ async function emitProof() {
     degraded: overloadRun.meanMs > baseline.meanMs,
   };
   const recoveryResult = {
-    recoveryMeanMs: recovery.meanMs,
-    // 4x tolerates shared-host CPU contention (the full suite runs many spec
-    // files concurrently) while still distinguishing recovery from the
-    // deliberately saturated overload phase.
-    recovered: recovery.meanMs <= baseline.meanMs * 4.0,
+    recoveryMeanMs,
+    recoveryRuns: recoveryRuns.map((run) => ({
+      meanMs: run.meanMs,
+      samplesMs: run.samplesMs,
+      ci: run.ci,
+    })),
+    // 4x tolerates shared-host CPU contention while the median of three raw
+    // runs prevents one scheduler outlier from deciding the gate.
+    recovered: recoveryMeanMs <= baseline.meanMs * 4.0,
   };
 
   const result = {

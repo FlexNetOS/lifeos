@@ -5,20 +5,27 @@ import { resolve } from "node:path";
 import process from "node:process";
 
 const root = resolve(import.meta.dirname, "..");
-const binary = process.env.LIFEOS_RUVECTOR_MCP_BIN;
-const cwd = process.env.LIFEOS_RUVECTOR_MCP_CWD;
-const db = process.env.LIFEOS_RUVECTOR_MCP_DB;
-const source = process.env.LIFEOS_RUVECTOR_MCP_SOURCE;
-
-if (!binary || !cwd || !db || !source) {
-  throw new Error("LIFEOS_RUVECTOR_MCP_BIN, LIFEOS_RUVECTOR_MCP_CWD, LIFEOS_RUVECTOR_MCP_DB, and LIFEOS_RUVECTOR_MCP_SOURCE are required");
-}
+const binary = process.env.LIFEOS_RUVECTOR_MCP_BIN ?? "/home/flexnetos/meta/var/cargo-target/release/ruvector-mcp";
+const cwd = process.env.LIFEOS_RUVECTOR_MCP_CWD ?? "/home/flexnetos/meta/var/lib/ruvector/runtime";
+const db = process.env.LIFEOS_RUVECTOR_MCP_DB ?? "ruvector.db";
+const source = process.env.LIFEOS_RUVECTOR_MCP_SOURCE ?? "/home/flexnetos/meta/src/meta-ruvector";
 if (!existsSync(binary)) throw new Error(`RuVector MCP binary does not exist: ${binary}`);
 
 const result = spawnSync(
   "cargo",
   ["run", "--quiet", "-p", "lifeos-core", "--example", "ruvector_mcp_live"],
-  { cwd: root, env: { ...process.env }, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] },
+  {
+    cwd: root,
+    env: {
+      ...process.env,
+      LIFEOS_RUVECTOR_MCP_BIN: binary,
+      LIFEOS_RUVECTOR_MCP_CWD: cwd,
+      LIFEOS_RUVECTOR_MCP_DB: db,
+      LIFEOS_RUVECTOR_MCP_SOURCE: source,
+    },
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "inherit"],
+  },
 );
 if (result.error) throw result.error;
 if (result.status !== 0) throw new Error(`RuVector MCP live example exited ${result.status}`);

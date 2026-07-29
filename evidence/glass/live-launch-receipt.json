@@ -1,47 +1,51 @@
 {
   "schema_version": "lifeos.evidence.glass-launch-live.v1",
   "authority": "Tauri process and authenticated redb owner projection",
-  "started_at": "2026-07-29T02:12:55.652Z",
+  "started_at": "2026-07-29T02:29:00.644Z",
   "launch": {
-    "command": "/home/flexnetos/.nix-profile/bin/cargo run,--manifest-path,src-tauri/Cargo.toml,--no-default-features,--color,always,--",
-    "pid": 572926,
+    "command": "/home/flexnetos/.nix-profile/bin/bun run,tauri,--,dev",
+    "pid": 760350,
     "process_tree": [
-      " 572926  572914 lifeos          /home/flexnetos/meta/var/cargo-target/debug/lifeos",
-      " 572975  572926 bwrap           bwrap --unshare-all --die-with-parent --chdir / --ro-bind /usr /usr --dev /dev --ro-bind-try /etc/ld.so.cache /etc/ld.so.cache --ro-bind-try /nix/store /nix/store --tmpfs /tmp-home --tmpfs /tmp-run --clearenv --setenv HOME /tmp-home --setenv XDG_RUNTIME_DIR /tmp-run --setenv XDG_RUNTIME_DIR /run/user/1001 --symlink /usr/lib32 /lib32 --symlink /usr/lib64 /lib64 --symlink /usr/lib /lib --ro-bind-try /etc/fonts/conf.d /etc/fonts/conf.d --ro-bind-try /etc/fonts/fonts.conf /etc/fonts/fonts.conf --ro-bind-try /home/flexnetos/.fontconfig /home/flexnetos/.fontconfig --ro-bind-try /run/user/1001/yazelix/volatile/cache/fontconfig /run/user/1001/yazelix/volatile/cache/fontconfig --ro-bind-try /var/cache/fontconfig /var/cache/fontconfig --bind-try /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --setenv XDG_CACHE_HOME /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --seccomp 21 /usr/libexec/glycin-loaders/2+/glycin-svg --dbus-fd 20",
-      " 572976  572975 bwrap           bwrap --unshare-all --die-with-parent --chdir / --ro-bind /usr /usr --dev /dev --ro-bind-try /etc/ld.so.cache /etc/ld.so.cache --ro-bind-try /nix/store /nix/store --tmpfs /tmp-home --tmpfs /tmp-run --clearenv --setenv HOME /tmp-home --setenv XDG_RUNTIME_DIR /tmp-run --setenv XDG_RUNTIME_DIR /run/user/1001 --symlink /usr/lib32 /lib32 --symlink /usr/lib64 /lib64 --symlink /usr/lib /lib --ro-bind-try /etc/fonts/conf.d /etc/fonts/conf.d --ro-bind-try /etc/fonts/fonts.conf /etc/fonts/fonts.conf --ro-bind-try /home/flexnetos/.fontconfig /home/flexnetos/.fontconfig --ro-bind-try /run/user/1001/yazelix/volatile/cache/fontconfig /run/user/1001/yazelix/volatile/cache/fontconfig --ro-bind-try /var/cache/fontconfig /var/cache/fontconfig --bind-try /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --setenv XDG_CACHE_HOME /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --seccomp 21 /usr/libexec/glycin-loaders/2+/glycin-svg --dbus-fd 20",
-      " 572977  572976 glycin-svg      /usr/libexec/glycin-loaders/2+/glycin-svg --dbus-fd 20",
-      " 573426  572926 WebKitNetworkPr /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitNetworkProcess 1 25",
-      " 573447  572926 WebKitWebProces /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitWebProcess 4 61",
-      " 573481  572926 bun <defunct>   [bun] <defunct>",
-      " 574368  572926 nu              /nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu -l -c ^/home/flexnetos/.nix-profile/bin/yzx enter --session lifeos-probe-1785291175652",
-      " 574371  574368 zellij          /nix/store/ad0a9zk2alys3yci7r85qyx08108wvcr-zellij-0.44.3/bin/zellij --theme-mode dark --config /run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl --new-session-with-layout /nix/store/cb0114425idrdy8pamn0by2calasysiy-flexnetos-zellij-layout/layout.kdl --session lifeos-probe-1785291175652"
+      " 760350  760309 bun             /home/flexnetos/.nix-profile/bin/bun run tauri -- dev",
+      " 760352  760350 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/tauri dev",
+      " 760589  760352 bun             bun run dev",
+      " 760593  760589 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/vite",
+      " 761323  760352 lifeos          /home/flexnetos/meta/var/cargo-target/debug/lifeos",
+      " 763159  761323 bwrap           bwrap --unshare-all --die-with-parent --chdir / --ro-bind /usr /usr --dev /dev --ro-bind-try /etc/ld.so.cache /etc/ld.so.cache --ro-bind-try /nix/store /nix/store --tmpfs /tmp-home --tmpfs /tmp-run --clearenv --setenv HOME /tmp-home --setenv XDG_RUNTIME_DIR /tmp-run --setenv XDG_RUNTIME_DIR /run/user/1001 --symlink /usr/lib32 /lib32 --symlink /usr/lib64 /lib64 --symlink /usr/lib /lib --ro-bind-try /etc/fonts/conf.d /etc/fonts/conf.d --ro-bind-try /etc/fonts/fonts.conf /etc/fonts/fonts.conf --ro-bind-try /home/flexnetos/.fontconfig /home/flexnetos/.fontconfig --ro-bind-try /run/user/1001/yazelix/volatile/cache/fontconfig /run/user/1001/yazelix/volatile/cache/fontconfig --ro-bind-try /var/cache/fontconfig /var/cache/fontconfig --bind-try /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --setenv XDG_CACHE_HOME /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --seccomp 21 /usr/libexec/glycin-loaders/2+/glycin-svg --dbus-fd 20",
+      " 763160  763159 bwrap           bwrap --unshare-all --die-with-parent --chdir / --ro-bind /usr /usr --dev /dev --ro-bind-try /etc/ld.so.cache /etc/ld.so.cache --ro-bind-try /nix/store /nix/store --tmpfs /tmp-home --tmpfs /tmp-run --clearenv --setenv HOME /tmp-home --setenv XDG_RUNTIME_DIR /tmp-run --setenv XDG_RUNTIME_DIR /run/user/1001 --symlink /usr/lib32 /lib32 --symlink /usr/lib64 /lib64 --symlink /usr/lib /lib --ro-bind-try /etc/fonts/conf.d /etc/fonts/conf.d --ro-bind-try /etc/fonts/fonts.conf /etc/fonts/fonts.conf --ro-bind-try /home/flexnetos/.fontconfig /home/flexnetos/.fontconfig --ro-bind-try /run/user/1001/yazelix/volatile/cache/fontconfig /run/user/1001/yazelix/volatile/cache/fontconfig --ro-bind-try /var/cache/fontconfig /var/cache/fontconfig --bind-try /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --setenv XDG_CACHE_HOME /run/user/1001/yazelix/volatile/cache/glycin/usr/libexec/glycin-loaders/2+/glycin-svg --seccomp 21 /usr/libexec/glycin-loaders/2+/glycin-svg --dbus-fd 20",
+      " 763161  763160 glycin-svg      /usr/libexec/glycin-loaders/2+/glycin-svg --dbus-fd 20",
+      " 763624  761323 WebKitNetworkPr /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitNetworkProcess 1 23",
+      " 763666  761323 WebKitWebProces /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitWebProcess 4 61",
+      " 763725  761323 bun <defunct>   [bun] <defunct>",
+      " 764325  761323 nu              /nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu -l -c ^/home/flexnetos/.nix-profile/bin/yzx enter --session lifeos-probe-1785292140644",
+      " 764328  764325 zellij          /nix/store/ad0a9zk2alys3yci7r85qyx08108wvcr-zellij-0.44.3/bin/zellij --theme-mode dark --config /run/user/1001/yazelix/profile-runtime/yazelix/zellij/config.kdl --new-session-with-layout /nix/store/cb0114425idrdy8pamn0by2calasysiy-flexnetos-zellij-layout/layout.kdl --session lifeos-probe-1785292140644"
     ],
     "launch_error": null,
-    "output_head": "\u001b[1m\u001b[33mwarning\u001b[0m\u001b[1m: fields `child` and `output_offset` are never read\u001b[0m\n   \u001b[1m\u001b[94m--> \u001b[0msrc-tauri/src/lib.rs:583:5\n    \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m579\u001b[0m \u001b[1m\u001b[94m|\u001b[0m struct TerminalSession {\n    \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[94m---------------\u001b[0m \u001b[1m\u001b[94mfields in this struct\u001b[0m\n\u001b[1m\u001b[94m...\u001b[0m\n\u001b[1m\u001b[94m583\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     child: Box<dyn Child + Send>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^\u001b[0m\n\u001b[1m\u001b[94m584\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     output_offset: Arc<AtomicU64>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^^^^^^^^^\u001b[0m\n    \u001b[1m\u001b[94m|\u001b[0m\n    \u001b[1m\u001b[94m= \u001b[0m\u001b[1mnote\u001b[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\u001b[1m\u001b[33mwarning\u001b[0m: `lifeos` (lib) generated 1 warning\n\u001b[1m\u001b[92m    Finished\u001b[0m \u001b]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\u001b\\`dev` profile [unoptimized + debuginfo]\u001b]8;;\u001b\\ target(s) in 0.23s\n\u001b[1m\u001b[92m     Running\u001b[0m `/home/flexnetos/meta/var/cargo-target/debug/lifeos`\nlifeos setup: receipt written\n",
-    "output_tail": "\u001b[1m\u001b[33mwarning\u001b[0m\u001b[1m: fields `child` and `output_offset` are never read\u001b[0m\n   \u001b[1m\u001b[94m--> \u001b[0msrc-tauri/src/lib.rs:583:5\n    \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m579\u001b[0m \u001b[1m\u001b[94m|\u001b[0m struct TerminalSession {\n    \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[94m---------------\u001b[0m \u001b[1m\u001b[94mfields in this struct\u001b[0m\n\u001b[1m\u001b[94m...\u001b[0m\n\u001b[1m\u001b[94m583\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     child: Box<dyn Child + Send>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^\u001b[0m\n\u001b[1m\u001b[94m584\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     output_offset: Arc<AtomicU64>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^^^^^^^^^\u001b[0m\n    \u001b[1m\u001b[94m|\u001b[0m\n    \u001b[1m\u001b[94m= \u001b[0m\u001b[1mnote\u001b[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\u001b[1m\u001b[33mwarning\u001b[0m: `lifeos` (lib) generated 1 warning\n\u001b[1m\u001b[92m    Finished\u001b[0m \u001b]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\u001b\\`dev` profile [unoptimized + debuginfo]\u001b]8;;\u001b\\ target(s) in 0.23s\n\u001b[1m\u001b[92m     Running\u001b[0m `/home/flexnetos/meta/var/cargo-target/debug/lifeos`\nlifeos setup: receipt written\n"
+    "output_head": "$ tauri dev\n     Running BeforeDevCommand (`bun run dev`)\n$ vite\n\n  VITE v8.0.14  ready in 236 ms\n\n  ➜  Local:   http://localhost:1420/\n     Running DevCommand (`cargo  run --no-default-features --color always --`)\n        Info Watching /home/flexnetos/meta/src/lifeos/src-tauri for changes...\n        Info Watching /home/flexnetos/meta/src/lifeos/crates/lifeos-core for changes...\n\u001b[1m\u001b[92m    Blocking\u001b[0m waiting for file lock on build directory\n\u001b[1m\u001b[92m   Compiling\u001b[0m lifeos v0.1.0 (/home/flexnetos/meta/src/lifeos/src-tauri)\n\u001b[1m\u001b[96m    Building\u001b[0m [=======================> ] 666/668: lifeos                      \r\u001b[K\u001b[1m\u001b[33mwarning\u001b[0m\u001b[1m: fields `child` and `output_offset` are never read\u001b[0m\n   \u001b[1m\u001b[94m--> \u001b[0msrc-tauri/src/lib.rs:583:5\n    \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m579\u001b[0m \u001b[1m\u001b[94m|\u001b[0m struct TerminalSession {\n    \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[94m---------------\u001b[0m \u001b[1m\u001b[94mfields in this struct\u001b[0m\n\u001b[1m\u001b[94m...\u001b[0m\n\u001b[1m\u001b[94m583\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     child: Box<dyn Child + Send>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^\u001b[0m\n\u001b[1m\u001b[94m584\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     output_offset: Arc<AtomicU64>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^^^^^^^^^\u001b[0m\n    \u001b[1m\u001b[94m|\u001b[0m\n    \u001b[1m\u001b[94m= \u001b[0m\u001b[1mnote\u001b[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\u001b[1m\u001b[96m    Building\u001b[0m [=======================> ] 666/668: lifeos                      \r\u001b[K\u001b[1m\u001b[33mwarning\u001b[0m: `lifeos` (lib) generated 1 warning\n\u001b[1m\u001b[96m    Building\u001b[0m [=======================> ] 667/668: lifeos(bin)                 \r\u001b[K\u001b[1m\u001b[92m    Finished\u001b[0m \u001b]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\u001b\\`dev` profile [unoptimized + debuginfo]\u001b]8;;\u001b\\ target(s) in 12.41s\n\u001b[1m\u001b[92m     Running\u001b[0m `/home/flexnetos/meta/var/cargo-target/debug/lifeos`\nlifeos setup: receipt written\nerror: script \"tauri\" was terminated by signal SIGTERM (Polite quit request)\n",
+    "output_tail": "$ tauri dev\n     Running BeforeDevCommand (`bun run dev`)\n$ vite\n\n  VITE v8.0.14  ready in 236 ms\n\n  ➜  Local:   http://localhost:1420/\n     Running DevCommand (`cargo  run --no-default-features --color always --`)\n        Info Watching /home/flexnetos/meta/src/lifeos/src-tauri for changes...\n        Info Watching /home/flexnetos/meta/src/lifeos/crates/lifeos-core for changes...\n\u001b[1m\u001b[92m    Blocking\u001b[0m waiting for file lock on build directory\n\u001b[1m\u001b[92m   Compiling\u001b[0m lifeos v0.1.0 (/home/flexnetos/meta/src/lifeos/src-tauri)\n\u001b[1m\u001b[96m    Building\u001b[0m [=======================> ] 666/668: lifeos                      \r\u001b[K\u001b[1m\u001b[33mwarning\u001b[0m\u001b[1m: fields `child` and `output_offset` are never read\u001b[0m\n   \u001b[1m\u001b[94m--> \u001b[0msrc-tauri/src/lib.rs:583:5\n    \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m579\u001b[0m \u001b[1m\u001b[94m|\u001b[0m struct TerminalSession {\n    \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[94m---------------\u001b[0m \u001b[1m\u001b[94mfields in this struct\u001b[0m\n\u001b[1m\u001b[94m...\u001b[0m\n\u001b[1m\u001b[94m583\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     child: Box<dyn Child + Send>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^\u001b[0m\n\u001b[1m\u001b[94m584\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     output_offset: Arc<AtomicU64>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^^^^^^^^^\u001b[0m\n    \u001b[1m\u001b[94m|\u001b[0m\n    \u001b[1m\u001b[94m= \u001b[0m\u001b[1mnote\u001b[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\u001b[1m\u001b[96m    Building\u001b[0m [=======================> ] 666/668: lifeos                      \r\u001b[K\u001b[1m\u001b[33mwarning\u001b[0m: `lifeos` (lib) generated 1 warning\n\u001b[1m\u001b[96m    Building\u001b[0m [=======================> ] 667/668: lifeos(bin)                 \r\u001b[K\u001b[1m\u001b[92m    Finished\u001b[0m \u001b]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\u001b\\`dev` profile [unoptimized + debuginfo]\u001b]8;;\u001b\\ target(s) in 12.41s\n\u001b[1m\u001b[92m     Running\u001b[0m `/home/flexnetos/meta/var/cargo-target/debug/lifeos`\nlifeos setup: receipt written\nerror: script \"tauri\" was terminated by signal SIGTERM (Polite quit request)\n"
   },
   "main_loaded": {
     "schemaVersion": "lifeos.main-loaded.v1",
-    "loadedAt": 1785291177541,
+    "loadedAt": 1785292157095,
     "tauriBridge": true,
     "href": "http://localhost:1420/?probe=engine-room",
-    "owner_local_seq": 29340,
-    "owner_checksum": "d46dc5b5f11d76195733f1c490caadc26230623d1102cc13302466836ec7949a"
+    "owner_local_seq": 29412,
+    "owner_checksum": "189fb54b87b8f4592fdd61e7e7451c90a46cb56f4c178e44ccc7e034fc98d664"
   },
   "readiness": {
     "schemaVersion": "lifeos.glass-ui-ready.v1",
     "state": "ready",
-    "mountedAt": 1785291177547,
+    "mountedAt": 1785292157106,
     "surface": "workstation",
     "identity": "lifeos-glass",
-    "owner_local_seq": 29340,
-    "owner_checksum": "d46dc5b5f11d76195733f1c490caadc26230623d1102cc13302466836ec7949a"
+    "owner_local_seq": 29412,
+    "owner_checksum": "189fb54b87b8f4592fdd61e7e7451c90a46cb56f4c178e44ccc7e034fc98d664"
   },
   "engine_room": {
     "schemaVersion": "lifeos.engine-room-ready.v1",
     "state": "ready",
-    "observedAt": 1785291186245,
-    "sessionId": "a1c3b60e-6bbc-400d-97c7-b9937843d52b",
+    "observedAt": 1785292167643,
+    "sessionId": "6b49a3ad-5478-4ca5-9f36-fbfd43992c6b",
     "argv": [
       "yzx",
       "enter",
@@ -50,8 +54,8 @@
     ],
     "nushellMarker": true,
     "source": "zellij-pane",
-    "owner_local_seq": 29340,
-    "owner_checksum": "d46dc5b5f11d76195733f1c490caadc26230623d1102cc13302466836ec7949a"
+    "owner_local_seq": 29412,
+    "owner_checksum": "189fb54b87b8f4592fdd61e7e7451c90a46cb56f4c178e44ccc7e034fc98d664"
   },
   "shutdown": {
     "signal": "SIGTERM",

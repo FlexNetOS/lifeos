@@ -1,20 +1,19 @@
 {
   "schema_version": "lifeos.evidence.glass-launch-live.v1",
   "authority": "Tauri process and authenticated redb owner projection",
-  "started_at": "2026-07-28T22:43:28.440Z",
+  "started_at": "2026-07-29T02:11:55.508Z",
   "launch": {
-    "command": "bun run tauri -- dev --config <isolated-loopback-port-1461-config>",
-    "pid": 1884069,
+    "command": "/home/flexnetos/.nix-profile/bin/cargo run,--manifest-path,src-tauri/Cargo.toml,--no-default-features,--color,always,--",
+    "pid": 562739,
     "process_tree": [
-      "1884069 1884050 bun             /home/flexnetos/.nix-profile/bin/bun run tauri -- dev --config {\"build\":{\"devUrl\":\"http://127.0.0.1:1461/?probe=engine-room\",\"beforeDevCommand\":\"bun run dev -- --host 127.0.0.1 --port 1461\"}}",
-      "1884070 1884069 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/tauri dev --config {\"build\":{\"devUrl\":\"http://127.0.0.1:1461/?probe=engine-room\",\"beforeDevCommand\":\"bun run dev -- --host 127.0.0.1 --port 1461\"}}",
-      "1884120 1884070 bun             bun run dev -- --host 127.0.0.1 --port 1461",
-      "1884124 1884120 MainThread      node /home/flexnetos/meta/src/lifeos/node_modules/.bin/vite --host 127.0.0.1 --port 1461",
-      "1884365 1884070 lifeos          /home/flexnetos/meta/var/cargo-target/debug/lifeos",
-      "1885070 1884365 WebKitNetworkPr /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitNetworkProcess 1 25",
-      "1885099 1884365 WebKitWebProces /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitWebProcess 4 61"
+      " 562739  562727 lifeos          /home/flexnetos/meta/var/cargo-target/debug/lifeos",
+      " 563240  562739 WebKitNetworkPr /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitNetworkProcess 1 25",
+      " 563257  562739 WebKitWebProces /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKitWebProcess 4 61",
+      " 563287  562739 bun <defunct>   [bun] <defunct>"
     ],
-    "launch_error": null
+    "launch_error": null,
+    "output_head": "\u001b[1m\u001b[33mwarning\u001b[0m\u001b[1m: fields `child` and `output_offset` are never read\u001b[0m\n   \u001b[1m\u001b[94m--> \u001b[0msrc-tauri/src/lib.rs:583:5\n    \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m579\u001b[0m \u001b[1m\u001b[94m|\u001b[0m struct TerminalSession {\n    \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[94m---------------\u001b[0m \u001b[1m\u001b[94mfields in this struct\u001b[0m\n\u001b[1m\u001b[94m...\u001b[0m\n\u001b[1m\u001b[94m583\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     child: Box<dyn Child + Send>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^\u001b[0m\n\u001b[1m\u001b[94m584\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     output_offset: Arc<AtomicU64>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^^^^^^^^^\u001b[0m\n    \u001b[1m\u001b[94m|\u001b[0m\n    \u001b[1m\u001b[94m= \u001b[0m\u001b[1mnote\u001b[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\u001b[1m\u001b[33mwarning\u001b[0m: `lifeos` (lib) generated 1 warning\n\u001b[1m\u001b[92m    Finished\u001b[0m \u001b]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\u001b\\`dev` profile [unoptimized + debuginfo]\u001b]8;;\u001b\\ target(s) in 0.23s\n\u001b[1m\u001b[92m     Running\u001b[0m `/home/flexnetos/meta/var/cargo-target/debug/lifeos`\nlifeos setup: receipt written\n",
+    "output_tail": "\u001b[1m\u001b[33mwarning\u001b[0m\u001b[1m: fields `child` and `output_offset` are never read\u001b[0m\n   \u001b[1m\u001b[94m--> \u001b[0msrc-tauri/src/lib.rs:583:5\n    \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m579\u001b[0m \u001b[1m\u001b[94m|\u001b[0m struct TerminalSession {\n    \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[94m---------------\u001b[0m \u001b[1m\u001b[94mfields in this struct\u001b[0m\n\u001b[1m\u001b[94m...\u001b[0m\n\u001b[1m\u001b[94m583\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     child: Box<dyn Child + Send>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^\u001b[0m\n\u001b[1m\u001b[94m584\u001b[0m \u001b[1m\u001b[94m|\u001b[0m     output_offset: Arc<AtomicU64>,\n    \u001b[1m\u001b[94m|\u001b[0m     \u001b[1m\u001b[33m^^^^^^^^^^^^^\u001b[0m\n    \u001b[1m\u001b[94m|\u001b[0m\n    \u001b[1m\u001b[94m= \u001b[0m\u001b[1mnote\u001b[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\u001b[1m\u001b[33mwarning\u001b[0m: `lifeos` (lib) generated 1 warning\n\u001b[1m\u001b[92m    Finished\u001b[0m \u001b]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\u001b\\`dev` profile [unoptimized + debuginfo]\u001b]8;;\u001b\\ target(s) in 0.23s\n\u001b[1m\u001b[92m     Running\u001b[0m `/home/flexnetos/meta/var/cargo-target/debug/lifeos`\nlifeos setup: receipt written\n"
   },
   "main_loaded": null,
   "readiness": null,

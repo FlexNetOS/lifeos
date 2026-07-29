@@ -26,16 +26,14 @@ pub async fn append_frame(
         return Err(StorageError::InvalidLogFrame);
     }
 
-    sqlx::query_scalar(
-        "SELECT lifeos_runtime.append_log_frame($1, $2, $3, $4, $5, $6)",
-    )
-    .bind(execution_id)
-    .bind(stream_name)
-    .bind(frame_no)
-    .bind(byte_offset)
-    .bind(frame)
-    .bind(context)
-    .fetch_one(pool)
-    .await
-    .map_err(StorageError::from)
+    sqlx::query_scalar("SELECT lifeos_runtime.append_log_frame($1, $2, $3, $4, $5, $6)")
+        .bind(execution_id)
+        .bind(stream_name)
+        .bind(frame_no)
+        .bind(byte_offset)
+        .bind(frame)
+        .bind(context)
+        .fetch_one(pool)
+        .await
+        .map_err(StorageError::from)
 }

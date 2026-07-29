@@ -272,9 +272,19 @@ const learningSearch = await learning.searchAsync(new Float32Array(sonaInput), 2
 learning.recordFeedback(learningSearch[0].id, 1.0);
 await learning.forceLearn();
 await learning.flush();
+const acceptance = learning.runAcceptance({
+  holdoutSize: 4,
+  trainingPerCycle: 4,
+  cycles: 2,
+  stepBudget: 100,
+  seed: 7,
+});
 let witness;
 try {
-  witness = { result: learning.getBackend().verifyWitness() };
+  // SelfLearningRvfBackend owns the solver witness chain.  The underlying
+  // storage backend has no verifyWitness() API; using it here silently turned
+  // a real valid chain into an unverifiable receipt.
+  witness = { result: learning.verifyWitnessChain() };
 } catch (error) {
   witness = { error: String(error) };
 }
@@ -284,6 +294,7 @@ result.agentdb = {
   search: learningSearch,
   stats: await learning.getStatsAsync(),
   learningStats: learning.getLearningStats(),
+  acceptance,
   learningEnabled: learning.isLearningEnabled,
   backendPath: relative(repoRoot, learning.getBackend().getStoragePath()),
   backendInitialized: learning.getBackend().isInitialized(),

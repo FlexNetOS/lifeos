@@ -117,7 +117,9 @@ child.once("exit", () => { childExited = true; });
 let readiness = null;
 let engineRoom = null;
 let mainLoaded = null;
-const deadline = Date.now() + 45_000;
+// A cold native launch may compile the Tauri workspace before WebKit mounts;
+// the gate must cover that real startup path and still require fresh receipts.
+const deadline = Date.now() + 120_000;
 while (Date.now() < deadline && !launchError && !childExited) {
   try {
     const current = projection();

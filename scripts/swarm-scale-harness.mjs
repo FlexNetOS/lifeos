@@ -138,7 +138,17 @@ async function emitProof() {
   // Overload: oversubscribe to ~2x logical CPUs; recovery: return to baseline.
   const baselineScale = 16;
   const overloadScale = Math.max(hardware.logicalCpus * 2, 64);
-  const baseline = await runScale(Worker, baselineScale, iterations);
+  // Use the same repeated raw-sample treatment for the baseline as for
+  // recovery. A single baseline run can be inflated by an unrelated host
+  // scheduler event and would make a genuinely recovered process fail its
+  // own comparison.
+  const baselineRuns = await Promise.all(
+    Array.from({ length: 3 }, () => runScale(Worker, baselineScale, iterations)),
+  );
+  const baselineMeanMs = percentile(
+    baselineRuns.map((run) => run.meanMs),
+    50,
+  );
   const overloadRun = await runScale(Worker, overloadScale, iterations);
   // A single post-overload run is too sensitive to unrelated scheduler noise
   // when the harness is launched beside the full Vitest worker pool. Keep
@@ -156,9 +166,9 @@ async function emitProof() {
   const overload = {
     baselineScale,
     overloadScale,
-    baselineMeanMs: baseline.meanMs,
+    baselineMeanMs,
     overloadMeanMs: overloadRun.meanMs,
-    degraded: overloadRun.meanMs > baseline.meanMs,
+    degraded: overloadRun.meanMs > baselineMeanMs,
   };
   const recoveryResult = {
     recoveryMeanMs,
@@ -169,7 +179,12 @@ async function emitProof() {
     })),
     // 4x tolerates shared-host CPU contention while the median of three raw
     // runs prevents one scheduler outlier from deciding the gate.
-    recovered: recoveryMeanMs <= baseline.meanMs * 4.0,
+    baselineRuns: baselineRuns.map((run) => ({
+      meanMs: run.meanMs,
+      samplesMs: run.samplesMs,
+      ci: run.ci,
+    })),
+    recovered: recoveryMeanMs <= baselineMeanMs * 4.0,
   };
 
   const result = {

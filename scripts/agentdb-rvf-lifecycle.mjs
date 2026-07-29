@@ -10,14 +10,13 @@
 // portable export/import, crash recovery — and enforces the authority boundary
 // so the `.rvf` never silently becomes a competing macro authority.
 //
-// Two observed native API defects are handled fail-closed rather than papered
-// over (see ARCHBP-007 proof):
+// Two observed native-surface conditions are handled explicitly rather than
+// papered over (see ARCHBP-007 proof):
 //   1. RvfStatus.fileSizeBytes reports 0 for a non-empty store — corrected from
 //      the real on-disk size via fs.stat.
-//   2. Chain-level witness verification is unavailable on the installed surface
-//      (getWitnessChain()/verifyWitnessChain() return null; the legacy
-//      getBackend().verifyWitness() is not a function) — witness is reported
-//      verified ONLY when a real chain verifies, never optimistically.
+//   2. Chain-level witness bytes are unavailable until the solver acceptance
+//      cycle runs; the live proof runs that bounded cycle before evaluating the
+//      chain, and still reports verified ONLY when a real chain verifies.
 
 import { copyFileSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -169,6 +168,11 @@ export class AgentRvfMemory {
     await this.backend.flush();
   }
 
+  /** Run the bounded solver acceptance cycle that materializes its witness chain. */
+  runAcceptance(options = {}) {
+    return this.backend.runAcceptance(options);
+  }
+
   /** Stable per-agent identity and provenance. */
   async identity() {
     const b = this.backend.getBackend();
@@ -300,6 +304,13 @@ async function emitProof() {
   const recall = await agent.recall(vec(1), 2);
   agent.feedback(recall[0].id, 1.0);
   await agent.learn();
+  const acceptance = agent.runAcceptance({
+    holdoutSize: 4,
+    trainingPerCycle: 4,
+    cycles: 2,
+    stepBudget: 100,
+    seed: 7,
+  });
 
   const identity = await agent.identity();
   const witness = await agent.witness();
@@ -335,6 +346,11 @@ async function emitProof() {
     feedback: {
       recorded: true,
       solverTrainCount: learningStats.solverTrainCount,
+    },
+    acceptance: {
+      allPassed: acceptance?.allPassed === true,
+      witnessEntries: acceptance?.witnessEntries ?? 0,
+      witnessChainBytes: acceptance?.witnessChainBytes ?? 0,
     },
     witness,
     status,

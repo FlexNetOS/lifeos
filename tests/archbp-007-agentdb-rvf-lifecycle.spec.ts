@@ -120,11 +120,14 @@ describe("ARCHBP-007 RVF lifecycle proof (real @ruvector/rvf + agentdb native su
       expect(r.recovery.reopenFileId).toBe(r.identity.fileId);
       expect(r.recovery.recovered).toBe(true);
 
-      // witness-bound feedback: substrate is real, chain verify fails closed
+      // witness-bound feedback: the bounded acceptance cycle materializes and
+      // verifies the native SHAKE-256 chain.
       expect(r.witness.substratePresent).toBe(true);
       expect(r.witness.witnessSegmentCount).toBeGreaterThan(0);
-      expect(r.witness.verified).toBe(false);
-      expect(r.witness.reason).toBe("witness-chain-unavailable");
+      expect(r.witness.verified).toBe(true);
+      expect(r.witness.reason).toBe("verified");
+      expect(r.acceptance.witnessEntries).toBeGreaterThan(0);
+      expect(r.acceptance.witnessChainBytes).toBe(r.acceptance.witnessEntries * 73);
       expect(r.feedback.recorded).toBe(true);
       expect(r.feedback.solverTrainCount).toBeGreaterThan(0);
 

@@ -156,6 +156,12 @@ describe("repo-owned Node verification runtime", () => {
       expect(result.agentdb.witness.result.valid).toBe(true);
       expect(result.agentdb.witness.result.entryCount).toBeGreaterThan(0);
       expect(result.ruvllm.adapterCount).toBe(51);
+      expect(result.ruvllm.persistence.exported).toBe(true);
+      expect(result.ruvllm.persistence.imported).toBe(true);
+      expect(result.ruvllm.persistence.adapterIdsMatch).toBe(true);
+      expect(result.ruvllm.persistence.activeAdapterRestored).toBe(true);
+      expect(result.ruvllm.persistence.weightsMatch).toBe(true);
+      expect(result.ruvllm.persistence.checkpointBytes).toBeGreaterThan(0);
       expect(result.tinyDancer.bytes).toBeGreaterThan(0);
     } finally {
       rmSync(outputDir, { recursive: true, force: true });

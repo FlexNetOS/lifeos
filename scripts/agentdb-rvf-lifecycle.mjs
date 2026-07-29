@@ -152,8 +152,8 @@ export class AgentRvfMemory {
   }
 
   /** Retrieve nearest active memories. */
-  async recall(query, k) {
-    return this.backend.searchAsync(toFloat32(query), k);
+  async recall(query, k, options = {}) {
+    return this.backend.searchAsync(toFloat32(query), k, options);
   }
 
   /** Witness-bound feedback: records reward and appends a mutation witness. */
@@ -301,8 +301,9 @@ async function emitProof() {
   await agent.remember("m1", vec(1), { kind: "note" });
   await agent.remember("m2", vec(2), { kind: "note" });
   await agent.remember("m3", vec(3), { kind: "note" });
-  const recall = await agent.recall(vec(1), 2);
-  agent.feedback(recall[0].id, 1.0);
+  const feedbackId = "archbp007-recall-1";
+  const recall = await agent.recall(vec(1), 2, { feedbackId });
+  agent.feedback(feedbackId, 1.0);
   await agent.learn();
   const acceptance = agent.runAcceptance({
     holdoutSize: 4,

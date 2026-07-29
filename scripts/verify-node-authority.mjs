@@ -268,8 +268,13 @@ await learning.insertAsync("doc-a", new Float32Array(sonaInput), { kind: "proof"
 await learning.insertAsync("doc-b", new Float32Array([...sonaInput].reverse()), {
   kind: "control",
 });
-const learningSearch = await learning.searchAsync(new Float32Array(sonaInput), 2);
-learning.recordFeedback(learningSearch[0].id, 1.0);
+const learningFeedbackId = "node-authority-query-1";
+const learningSearch = await learning.searchAsync(
+  new Float32Array(sonaInput),
+  2,
+  { feedbackId: learningFeedbackId },
+);
+learning.recordFeedback(learningFeedbackId, 1.0);
 await learning.forceLearn();
 await learning.flush();
 const acceptance = learning.runAcceptance({

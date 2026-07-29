@@ -152,6 +152,7 @@ describe("repo-owned Node verification runtime", () => {
       expect(result.rvf.ingestResult.accepted).toBe(2);
       expect(result.sona.enabled).toBe(true);
       expect(result.agentdb.learningEnabled).toBe(true);
+      expect(result.agentdb.learningStats.trajectoriesRecorded).toBe(1);
       expect(result.agentdb.acceptance.witnessEntries).toBeGreaterThan(0);
       expect(result.agentdb.witness.result.valid).toBe(true);
       expect(result.agentdb.witness.result.entryCount).toBeGreaterThan(0);

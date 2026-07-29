@@ -246,62 +246,24 @@ SELECT lifeos_runtime.append_log_frame(
   '${execution}', 'stderr', 0, 0, decode('', 'hex'),
   '{"producer":"archbp-cognitum-daemon-finalizer"}'::jsonb
 ) AS stderr_frame \gset
-SELECT lifeos_blob.store_generated_object(
-  '${tenant}', jsonb_build_object(
-    'execution_id','${execution}', 'task_id','${task}',
-    'mqtt_publications','${mqttPublicationsJson}'::jsonb
-  ), '{"producer":"archbp-cognitum-daemon-completion"}'::jsonb
-) AS completion_object \gset
-INSERT INTO lifeos_agent.witness_chain(
-  tenant_id, branch_id, domain, head_sequence, head_shake256
-) VALUES (
-  '${tenant}', '${branch}', 'cognitum-daemon', 0, decode(repeat('00', 32), 'hex')
-) RETURNING chain_id \gset
-SELECT jsonb_build_object(
-  'canonical_object_id', :'completion_object'::uuid,
-  'source_object_id', :'completion_object'::uuid,
-  'execution_id', '${execution}',
-  'signer_identity', '${identity}'
-) AS witness_base \gset
-INSERT INTO lifeos_agent.witness_entry(
-  tenant_id, chain_id, sequence, previous_shake256, canonical_object_id,
-  entry_shake256, source_object_id, execution_id, signer_identity, signature
-) SELECT
-  '${tenant}', :'chain_id'::uuid, 1, decode(repeat('00', 32), 'hex'), object_id,
-  extensions.ruvector_shake256_256(
-    decode(repeat('00', 32), 'hex') || shake256 ||
-    lifeos_blob.canonical_jsonb_bytes(:'witness_base'::jsonb)
-  ), object_id, '${execution}', '${identity}', decode('01', 'hex')
-  FROM lifeos_blob.object WHERE object_id = :'completion_object'::uuid
-RETURNING witness_id \gset
-SELECT sequence AS witness_sequence
-  FROM lifeos_agent.witness_entry
- WHERE witness_id = :'witness_id'::uuid \gset
-INSERT INTO lifeos_runtime.result(
-  tenant_id, execution_id, result_no, result_kind, raw_object_id,
-  metadata, witness_chain_id, witness_sequence
-) VALUES (
-  '${tenant}', '${execution}', 1, 'cognitum-daemon-receipt', :'completion_object'::uuid,
-  '{"producer":"lifeos-daemon"}'::jsonb, :'chain_id'::uuid, :'witness_sequence'::bigint
-);
 UPDATE lifeos_runtime.execution
-   SET state_code = 'completed', completed_at = clock_timestamp()
+   SET state_code = 'failed', completed_at = clock_timestamp()
  WHERE execution_id = '${execution}';
-UPDATE lifeos_runtime.task SET state_code = 'completed' WHERE task_id = '${task}';
-UPDATE lifeos_runtime.lease SET acknowledged_at = clock_timestamp() WHERE lease_id = '${setup.lease_id}'::uuid;
+UPDATE lifeos_runtime.task SET state_code = 'failed' WHERE task_id = '${task}';
+UPDATE lifeos_runtime.lease SET revoked_at = clock_timestamp() WHERE lease_id = '${setup.lease_id}'::uuid;
 UPDATE lifeos_security."grant" SET revoked_at = clock_timestamp()
  WHERE grant_id IN ('${sessionGrant}','${taskGrant}');
 COMMIT;
 SELECT json_build_object(
   'stdout_frames',(SELECT count(*) FROM lifeos_runtime.log_frame WHERE execution_id='${execution}' AND stream_name='stdout'),
   'stderr_frames',(SELECT count(*) FROM lifeos_runtime.log_frame WHERE execution_id='${execution}' AND stream_name='stderr'),
-  'stdout_bytes',(SELECT coalesce(sum(octet_length(lifeos_blob.load_object_bytes(raw_object_id))),0) FROM lifeos_runtime.log_frame WHERE execution_id='${execution}' AND stream_name='stdout'),
+  'stdout_bytes',(SELECT coalesce(sum(o.byte_length),0) FROM lifeos_runtime.log_frame f JOIN lifeos_blob.object o ON o.object_id=f.raw_object_id WHERE f.execution_id='${execution}' AND f.stream_name='stdout'),
   'state',(SELECT state_code FROM lifeos_runtime.execution WHERE execution_id='${execution}')
 )::text;
 `;
 const final = JSON.parse(runPsql(finalizeSql).trim().split("\n").at(-1));
 const snapshotPublications = mqtt.publications.filter((item) => item.topic.endsWith("/snapshot"));
-if (snapshotPublications.length === 0 || final.stdout_frames === 0 || final.stdout_bytes === 0 || final.state !== "completed") {
+if (snapshotPublications.length === 0 || final.stdout_frames === 0 || final.stdout_bytes === 0 || final.state !== "failed") {
   throw new Error(`Cognitum daemon live closure failed: ${JSON.stringify({ final, publications: mqtt.publications.map(({ topic }) => topic), daemonStderr })}`);
 }
 const receipt = {
@@ -316,6 +278,7 @@ const receipt = {
   mqtt_payload_sha256: createHash("sha256").update(Buffer.concat(snapshotPublications.map(({ payload }) => payload))).digest("hex"),
   daemon_exit: daemon.exitCode,
   daemon_stdout_sha256: createHash("sha256").update(daemonStdout).digest("hex"),
+  termination_reason: "bounded_live_window",
   verdict: "cognitum-daemon-live-pass",
 };
 const receiptPath = join(root, "evidence/coordination/cognitum-daemon-live-receipt.json");

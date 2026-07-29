@@ -249,21 +249,31 @@ impl RuvectorMcpClient {
                 })?;
         }
         let mut line = String::new();
-        self.stdout
+        let mut stdout = self
+            .stdout
             .lock()
-            .map_err(|_| McpError::Protocol("RuVector MCP stdout lock poisoned".into()))?
-            .read_line(&mut line)
-            .map_err(|error| {
+            .map_err(|_| McpError::Protocol("RuVector MCP stdout lock poisoned".into()))?;
+        let response = loop {
+            line.clear();
+            let read = stdout.read_line(&mut line).map_err(|error| {
                 McpError::NotConnected(format!("read RuVector MCP response: {error}"))
             })?;
-        if line.trim().is_empty() {
-            return Err(McpError::NotConnected(
-                "RuVector MCP closed stdout without a response".into(),
-            ));
-        }
-        let response: Value = serde_json::from_str(&line).map_err(|error| {
-            McpError::Protocol(format!("RuVector MCP invalid JSON-RPC: {error}"))
-        })?;
+            if read == 0 || line.trim().is_empty() {
+                return Err(McpError::NotConnected(
+                    "RuVector MCP closed stdout without a response".into(),
+                ));
+            }
+            let response: Value = serde_json::from_str(&line).map_err(|error| {
+                McpError::Protocol(format!("RuVector MCP invalid JSON-RPC: {error}"))
+            })?;
+            // Notifications have no id and may be interleaved with a response
+            // while the server is working. They are not the result of this
+            // request and must not desynchronise the single outstanding call.
+            if response.get("id").is_none() {
+                continue;
+            }
+            break response;
+        };
         if response.get("id").and_then(Value::as_u64) != Some(id) {
             return Err(McpError::Protocol(
                 "RuVector MCP response id did not match request".into(),
@@ -441,6 +451,7 @@ IFS= read -r line || exit 1
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05"}}'
 IFS= read -r line || exit 1
 IFS= read -r line || exit 1
+printf '%s\n' '{"jsonrpc":"2.0","method":"notifications/progress","params":{"progress":1}}'
 printf '%s\n' '{"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"image","data":"ignored"},{"type":"text","text":"{\"count\":42}"}]}}'
 IFS= read -r line || exit 1
 printf '%s\n' '{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"hit_rate\":0.75}"}]}}'

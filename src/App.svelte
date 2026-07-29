@@ -84,45 +84,63 @@
     let initialized = false;
     let syncing = false;
     let uiReadyPublished = false;
-    const syncProjection = async () => {
+    let disposed = false;
+    const waitBeforeRetry = () => new Promise((resolve) => window.setTimeout(resolve, 250));
+    const watchProjection = async () => {
       if (syncing) return;
       syncing = true;
       try {
-        // Hydrate from the owner-published mmap on first mount. A reopened
-        // Glass must render the current snapshot even when no new event was
-        // appended while it was offline.
-        if (!initialized) {
-          redbProjection = await invoke("redb_projection_read");
-          afterSeq = redbProjection?.localSeq || 0;
-          initialized = true;
+        while (!disposed) {
+          try {
+            // Hydrate from the owner-published mmap on first mount. A reopened
+            // Glass must render the current snapshot even when no new event was
+            // appended while it was offline.
+            if (!initialized) {
+              redbProjection = await invoke("redb_projection_read");
+              afterSeq = redbProjection?.localSeq || 0;
+              initialized = true;
+            }
+            const updatedAt = Number(redbProjection?.entries?.["swarm.updatedAt"]);
+            if (!Number.isFinite(updatedAt) || Date.now() - updatedAt > 5_000) {
+              await invoke("redb_swarm_heartbeat");
+            }
+            if (!uiReadyPublished) {
+              await invoke("redb_ui_ready");
+              uiReadyPublished = true;
+            }
+
+            // `redb_events_read` is an authenticated UDS watch: the owner
+            // blocks until a commit arrives. Keep one connection in flight;
+            // starting interval-driven watches would accumulate owner sockets.
+            const events = await invoke("redb_events_read", { afterSeq });
+            if (disposed) return;
+            if (events.length) {
+              afterSeq = Math.max(afterSeq, ...events.map((event) => event.seq));
+              redbProjection = await invoke("redb_projection_read");
+            } else {
+              // Test doubles and an owner restart may return immediately; do
+              // not spin while allowing the next iteration to reconnect.
+              await waitBeforeRetry();
+            }
+          } catch {
+            // A reconnect, gap, or checksum failure must restart from a fresh
+            // owner-published snapshot instead of advancing a stale cursor.
+            initialized = false;
+            afterSeq = 0;
+            redbProjection = null;
+            uiReadyPublished = false;
+            if (!disposed) await waitBeforeRetry();
+          }
         }
-        const events = await invoke("redb_events_read", { afterSeq });
-        if (events.length) {
-          afterSeq = Math.max(afterSeq, ...events.map((event) => event.seq));
-          redbProjection = await invoke("redb_projection_read");
-        }
-        const updatedAt = Number(redbProjection?.entries?.["swarm.updatedAt"]);
-        if (!Number.isFinite(updatedAt) || Date.now() - updatedAt > 5_000) {
-          await invoke("redb_swarm_heartbeat");
-        }
-        if (!uiReadyPublished) {
-          await invoke("redb_ui_ready");
-          uiReadyPublished = true;
-        }
-      } catch {
-        // A reconnect, gap, or checksum failure must restart from a fresh
-        // owner-published snapshot instead of advancing a stale cursor.
-        initialized = false;
-        afterSeq = 0;
-        redbProjection = null;
       } finally {
         syncing = false;
       }
     };
 
-    syncProjection();
-    const timer = window.setInterval(syncProjection, 250);
-    return () => window.clearInterval(timer);
+    void watchProjection();
+    return () => {
+      disposed = true;
+    };
   });
 
   onMount(() => {

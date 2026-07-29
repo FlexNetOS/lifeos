@@ -30,12 +30,11 @@ if (process.platform === "linux") {
     .split(delimiter)
     .filter((directory) => {
       const marker = join(directory, "yazelix-gpu-verify-install.sh");
-      if (!existsSync(marker)) return true;
       try {
         accessSync(marker, constants.R_OK);
         return true;
-      } catch {
-        return false;
+      } catch (error) {
+        return error?.code === "ENOENT";
       }
     })
     .join(delimiter);

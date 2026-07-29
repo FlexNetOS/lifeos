@@ -1015,7 +1015,7 @@ def main():
         "JOIN pg_depend d ON d.objid = p.oid AND d.classid = 'pg_proc'::regclass "
         "AND d.deptype = 'e' JOIN pg_extension e ON e.oid = d.refobjid "
         "WHERE e.extname = 'ruvector' AND n.nspname = 'extensions' "
-        "AND p.probin LIKE '%ruvector' "
+        "AND p.probin LIKE '%ruvector%' "
         "AND p.prokind = 'f'"
     )
     ok, dynamic_out, dynamic_err, _ = psql(dynamic_sql)

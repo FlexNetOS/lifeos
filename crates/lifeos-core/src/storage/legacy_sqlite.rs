@@ -6,15 +6,15 @@
 //! database and any WAL sidecars.
 
 use sqlx::{
-    PgPool, SqlitePool,
     sqlite::{SqliteConnectOptions, SqlitePoolOptions},
+    PgPool, SqlitePool,
 };
 use std::{
     ffi::OsString,
     path::{Path, PathBuf},
 };
 
-use super::{StorageError, ruvector};
+use super::{ruvector, StorageError};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct LegacySqliteImportReport {
@@ -783,17 +783,21 @@ mod tests {
             ("lifeos_agentdb.exp_edges", 1),
             ("lifeos_semantic.embedding", 1),
         ] {
-            let count: i64 = sqlx::query_scalar(&format!(
-                "SELECT COUNT(*) FROM {table}{}",
-                if table == "lifeos_security.identity" {
-                    " WHERE subject_kind = 'human'"
-                } else {
-                    ""
-                }
-            ))
-            .fetch_one(storage.pool())
-            .await
-            .unwrap();
+            let count_sql = if table == "lifeos_security.identity" {
+                format!("SELECT COUNT(*) FROM {table} WHERE subject_kind = 'human'")
+            } else if table == "lifeos_semantic.embedding" {
+                format!(
+                    "SELECT COUNT(DISTINCT metadata->>'logical_id') FROM {table} \
+                     WHERE metadata->>'logical_id' = 'v1' \
+                       AND record_kind = 'embedding'"
+                )
+            } else {
+                format!("SELECT COUNT(*) FROM {table}")
+            };
+            let count: i64 = sqlx::query_scalar(&count_sql)
+                .fetch_one(storage.pool())
+                .await
+                .unwrap();
             assert_eq!(count, expected, "{table}");
         }
         let archived: i64 = sqlx::query_scalar(

@@ -122,7 +122,11 @@ while (Date.now() < deadline && !launchError && !childExited) {
     }
     if (mainLoaded && candidate?.schemaVersion === "lifeos.glass-ui-ready.v1" && Number(candidate.mountedAt) >= startedAt) {
       readiness = { ...candidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
-      if (engineCandidate?.schemaVersion === "lifeos.engine-room-ready.v1" && engineCandidate.state === "ready") {
+      if (
+        engineCandidate?.schemaVersion === "lifeos.engine-room-ready.v1" &&
+        engineCandidate.state === "ready" &&
+        Number(engineCandidate.observedAt) >= startedAt
+      ) {
         engineRoom = { ...engineCandidate, owner_local_seq: current.pointer.local_seq, owner_checksum: current.pointer.checksum };
         break;
       }

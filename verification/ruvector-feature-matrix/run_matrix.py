@@ -243,6 +243,12 @@ SETUP_STEPS = [
     )),
 ]
 
+# A failed first setup can leave extension objects unowned in the disposable
+# matrix database. Reset only that scratch schema; the canonical lifeos run is
+# never destructive and uses the already activated extension surface.
+if DBNAME != "lifeos":
+    SETUP_STEPS.insert(0, ("reset_matrix_schema", "DROP SCHEMA IF EXISTS extensions CASCADE"))
+
 
 def run_setup():
     ok, out, err, _ = psql(

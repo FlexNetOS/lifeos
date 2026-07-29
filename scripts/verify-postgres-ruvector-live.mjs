@@ -50,4 +50,10 @@ const receipt = {
 const receiptPath = join(root, "evidence/postgres-ruvector/live-authority-receipt.json");
 mkdirSync(join(root, "evidence/postgres-ruvector"), { recursive: true });
 writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
-console.log(JSON.stringify({ receipt: receiptPath, status: "ok", server: verification.server_version, migrations: verification.migrations.count }, null, 2));
+console.log(JSON.stringify({
+  receipt: receiptPath,
+  status: "ok",
+  server: verification.server_version,
+  migrations: verification.migrations.count,
+  latest_migration: verification.migrations.latest_version,
+}, null, 2));

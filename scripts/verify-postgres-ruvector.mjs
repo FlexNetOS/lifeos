@@ -15,9 +15,13 @@ if (!psql) {
   process.exit(1);
 }
 
-const expectedMigrations = (await readdir(resolve("crates/lifeos-core/migrations")))
+const migrationFiles = (await readdir(resolve("crates/lifeos-core/migrations")))
   .filter((entry) => /^\d+_.+\.sql$/.test(entry))
-  .length;
+  .sort();
+const expectedMigrations = migrationFiles.length;
+const expectedLatestMigration = Math.max(
+  ...migrationFiles.map((entry) => Number(entry.match(/^\d+/)?.[0] ?? 0)),
+);
 const supportedRuVectorVersions = new Set(["0.3.0", "0.3.1"]);
 const approvedRuVectorLibrary = "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector";
 
@@ -30,6 +34,7 @@ WITH ruvector_extension AS (
 ), migrations AS (
   SELECT jsonb_build_object(
     'count', COUNT(*),
+    'latest_version', MAX(version),
     'versions', COALESCE(jsonb_agg(version ORDER BY version), '[]'::jsonb)
   ) AS value
   FROM lifeos_runtime._sqlx_migrations
@@ -142,6 +147,9 @@ if (!supportedRuVectorVersions.has(receipt.ruvector?.version)) {
 }
 if (receipt.migrations?.count !== expectedMigrations) {
   failures.push(`expected ${expectedMigrations} migrations, found ${receipt.migrations?.count ?? "none"}`);
+}
+if (receipt.migrations?.latest_version !== expectedLatestMigration) {
+  failures.push(`expected latest migration ${expectedLatestMigration}, found ${receipt.migrations?.latest_version ?? "none"}`);
 }
 if (!Array.isArray(receipt.required_schemas) || receipt.required_schemas.some((present) => !present)) {
   failures.push("one or more required LifeOS schemas are absent");

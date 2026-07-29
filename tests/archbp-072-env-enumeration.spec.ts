@@ -52,14 +52,17 @@ describe("ARCHBP-072 runtime env enumeration", () => {
     }
   });
 
-  test("the known /run-tmpfs residents are captured as durable-on-run (the migration surface)", () => {
+  test("profile-owned /run-tmpfs residents are captured as volatile-on-run", () => {
     const e = JSON.parse(readFileSync(artifact, "utf8"));
     const onRunDurable = e.entries
       .filter((x: { on_run_tmpfs: boolean; tier: string }) => x.on_run_tmpfs && x.tier === "durable")
       .map((x: { name: string }) => x.name);
-    // This session runs with the pre-migration env: the misplaced residents
-    // must be enumerated honestly, not hidden.
     expect(e.durable_on_run_count).toBe(onRunDurable.length);
-    expect(onRunDurable).toContain("CODEX_HOME");
+    expect(onRunDurable).toEqual([]);
+    const onRunVolatile = e.entries
+      .filter((x: { on_run_tmpfs: boolean; tier: string }) => x.on_run_tmpfs && x.tier === "volatile")
+      .map((x: { name: string }) => x.name);
+    expect(onRunVolatile).toContain("CODEX_HOME");
+    expect(onRunVolatile).toContain("YAZELIX_STATE_DIR");
   });
 });

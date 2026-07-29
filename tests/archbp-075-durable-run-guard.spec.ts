@@ -18,15 +18,13 @@ describe("ARCHBP-075 durable-not-on-run CI guard", () => {
     const r = run([]);
     expect(r.status, r.stderr).toBe(0);
     expect(r.stdout).toContain("PASS");
-    // Honesty: the known restart-gated live misplacement is REPORTED, not
-    // hidden, while targets stay clean.
-    expect(r.stderr).toContain("misplaced (known, restart-gated)");
+    expect(r.stderr).not.toContain("misplaced (known, restart-gated)");
   });
 
-  test("strict mode fails today — the live misplacement is real until the migration lands", () => {
+  test("strict mode passes after the profile-runtime cutover", () => {
     const r = run(["--strict"]);
-    expect(r.status).toBe(1);
-    expect(r.stdout).toContain("FAIL");
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stdout).toContain("PASS");
   });
 
   test("fails on regression: a durable entry targeting /run is rejected", () => {

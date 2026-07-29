@@ -77,20 +77,18 @@ describe("ARCHBP-059 runtime path tier map", () => {
     expect(offenders).toEqual([]);
   });
 
-  test("entries still parasitized on host /run are flagged as misplaced with a durable target", () => {
+  test("profile-owned /run state is explicitly classified as volatile", () => {
     const map = loadTierMap();
     const onRun = map.entries.filter(
       (e: { current_path?: string; tier: string }) =>
-        (e.current_path ?? "").startsWith("/run/") && e.tier === "durable",
+        (e.current_path ?? "").startsWith("/run/") &&
+        ["CLAUDE_CONFIG_DIR", "CODEX_HOME", "YAZELIX_STATE_DIR"].includes(e.name),
     );
-    // The 2026-07-21 incident proved this set is non-empty today (tmpfs
-    // profile-runtime); the tier map must record it honestly, not hide it.
-    expect(onRun.length).toBeGreaterThan(0);
+    expect(onRun.length).toBe(3);
     for (const entry of onRun) {
-      expect(entry.misplaced, `${entry.name} must be flagged misplaced`).toBe(
-        true,
-      );
-      expect(entry.target_path.startsWith("/run/")).toBe(false);
+      expect(entry.tier, entry.name).toBe("volatile");
+      expect(entry.misplaced, `${entry.name} must not be marked misplaced`).toBe(false);
+      expect(entry.target_path.startsWith("/run/"), entry.name).toBe(true);
     }
   });
 

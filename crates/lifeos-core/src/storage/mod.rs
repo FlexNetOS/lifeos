@@ -80,7 +80,9 @@ fn optional_runtime_uuid(name: &str) -> Result<Option<Uuid>, StorageError> {
             .map(Some)
             .map_err(|error| StorageError::InvalidRuntimeContext(format!("{name}: {error}"))),
         Err(std::env::VarError::NotPresent) => Ok(None),
-        Err(error) => Err(StorageError::InvalidRuntimeContext(format!("{name}: {error}"))),
+        Err(error) => Err(StorageError::InvalidRuntimeContext(format!(
+            "{name}: {error}"
+        ))),
     }
 }
 

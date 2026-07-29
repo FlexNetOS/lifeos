@@ -206,10 +206,7 @@ impl<T: Transport> CognitumClient<T> {
             McpError::Protocol(format!("sensor_snapshot: response is not UTF-8: {error}"))
         })?;
         let raw = parse_sensor_event(&body)?;
-        Ok(SensorSnapshot {
-            raw,
-            wire_bytes,
-        })
+        Ok(SensorSnapshot { raw, wire_bytes })
     }
 
     /// Coherence profile from `/api/v1/coherence/profile`.

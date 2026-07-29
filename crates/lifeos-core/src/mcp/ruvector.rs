@@ -464,19 +464,13 @@ printf '%s\n' '{"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"image","dat
 IFS= read -r line || exit 1
 printf '%s\n' '{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"hit_rate\":0.75}"}]}}'
 "#;
-        let client = RuvectorMcpClient::spawn(
-            "sh",
-            &["-c".to_string(), server.to_string()],
-        )
-        .unwrap();
+        let client =
+            RuvectorMcpClient::spawn("sh", &["-c".to_string(), server.to_string()]).unwrap();
         assert_eq!(
             client.vector_db_stats("/var/lib/lifeos/vectors").unwrap()["count"],
             42
         );
-        assert_eq!(
-            client.gnn_cache_stats(true).unwrap()["hit_rate"],
-            0.75
-        );
+        assert_eq!(client.gnn_cache_stats(true).unwrap()["hit_rate"], 0.75);
     }
 
     #[test]

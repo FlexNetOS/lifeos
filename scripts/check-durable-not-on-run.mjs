@@ -2,10 +2,8 @@
 // on host /run. Two layers, both honest:
 //   default: FAIL if any durable tier-map TARGET path is on /run (a
 //            configuration regression that must never land), and REPORT
-//            current misplaced live state without failing (the restart-gated
-//            migration retires it; hiding it would be a silent downgrade).
-//   --strict: additionally FAIL on current live misplacement — the CI mode
-//            after the T3 migration completes.
+//            current misplaced live state without failing.
+//   --strict: additionally FAIL on current live misplacement.
 // Usage: bun scripts/check-durable-not-on-run.mjs [--strict] [--tier-map PATH]
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";

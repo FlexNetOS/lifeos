@@ -1,14 +1,23 @@
 import { spawnSync } from "node:child_process";
-import { accessSync, constants, existsSync, readdirSync } from "node:fs";
+import { accessSync, constants, existsSync, lstatSync, readdirSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import process from "node:process";
 
 const env = { ...process.env };
 
 if (process.platform === "linux") {
+  const profileToolBin = "/home/flexnetos/meta/var/bin";
+  if (existsSync(join(profileToolBin, "patchelf"))) {
+    env.PATH = [profileToolBin, env.PATH ?? ""].filter(Boolean).join(delimiter);
+  }
+
   const pkgConfigPaths = (env.PKG_CONFIG_PATH ?? "")
     .split(delimiter)
     .filter(Boolean);
+  const profilePkgConfig = "/home/flexnetos/meta/var/lib/lifeos/pkgconfig";
+  if (existsSync(join(profilePkgConfig, "librsvg-2.0.pc"))) {
+    pkgConfigPaths.push(profilePkgConfig);
+  }
 
   if (existsSync("/nix/store")) {
     for (const entry of readdirSync("/nix/store")) {
@@ -22,6 +31,11 @@ if (process.platform === "linux") {
     }
   }
 
+  pkgConfigPaths.push(
+    "/usr/lib/x86_64-linux-gnu/pkgconfig",
+    "/usr/share/pkgconfig",
+    "/usr/lib/pkgconfig",
+  );
   env.PKG_CONFIG_PATH = [...new Set(pkgConfigPaths)].join(delimiter);
 
   // linuxdeploy scans PATH. Remove only a path entry containing an unreadable
@@ -34,16 +48,31 @@ if (process.platform === "linux") {
         accessSync(marker, constants.R_OK);
         return true;
       } catch (error) {
-        return error?.code === "ENOENT";
+        try {
+          lstatSync(marker);
+          return false;
+        } catch {
+          return error?.code === "ENOENT";
+        }
       }
     })
     .join(delimiter);
+
+  // The profile's volatile runtime cache contains the downloaded AppImage
+  // tools. Force their extract-and-run path so FUSE availability cannot turn
+  // an otherwise complete bundle into a false linuxdeploy failure.
+  env.APPIMAGE_EXTRACT_AND_RUN = "1";
 }
 
-const command = process.platform === "linux" ? "/bin/sh" : process.execPath;
-const args = process.platform === "linux"
-  ? ["-c", 'ulimit -n 524288 2>/dev/null || true; exec "$BUN_EXEC" x tauri build']
-  : ["x", "tauri", "build"];
+const localCli = join(
+  env.CARGO_TARGET_DIR ?? "/home/flexnetos/meta/var/cargo-target",
+  "release/cargo-tauri",
+);
+const tauriCli = env.TAURI_CLI_BIN ?? (existsSync(localCli) ? localCli : null);
+const command = tauriCli ?? process.execPath;
+const args = tauriCli
+  ? ["build", "--bundles", "deb", "rpm"]
+  : ["x", "tauri", "build", "--bundles", "deb", "rpm"];
 
 const result = spawnSync(command, args, {
   env: { ...env, BUN_EXEC: process.execPath },

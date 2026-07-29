@@ -1,10 +1,21 @@
 {
-  "schema_version": "lifeos.evidence.tauri-native-build-live.v1",
+  "schema_version": "lifeos.evidence.tauri-native-build-live.v2",
   "authority": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
-  "command": "cargo build --release --manifest-path src-tauri/Cargo.toml --no-default-features",
+  "command": "bun run tauri:build",
   "binary": "/home/flexnetos/meta/var/cargo-target/release/lifeos",
-  "bytes": 40045597,
-  "sha256": "0f9eee81639a1d29fdc11eed5dcc8dfd9cd8800ecd5282b55d5da06cccfae150",
-  "installer_bundle": "not-produced: tauri-cli interface returns EMFILE before Cargo/bundler invocation on this host",
-  "verdict": "tauri-native-build-live-pass-installer-pending"
+  "bytes": 42828804,
+  "sha256": "83837b77b4841c6e4a5d92b88e8e0b8b9b80fab3e4c6d27c3da319d539cd5f1c",
+  "bundles": {
+    "deb": {
+      "path": "/home/flexnetos/meta/var/cargo-target/release/bundle/deb/LifeOS_0.1.0_amd64.deb",
+      "bytes": 15098128,
+      "sha256": "33d7a8103105c5d299d684ac20abd8cf8d6c79f87df8821afd3f89f9587bf3bc"
+    },
+    "rpm": {
+      "path": "/home/flexnetos/meta/var/cargo-target/release/bundle/rpm/LifeOS-0.1.0-1.x86_64.rpm",
+      "bytes": 15101858,
+      "sha256": "2785eb28445168088172a7919a400c77beaf3de3fc960a76102afb3499e4e3bc"
+    }
+  },
+  "verdict": "tauri-native-build-live-pass-deb-rpm-appimage-pending"
 }

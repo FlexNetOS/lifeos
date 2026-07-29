@@ -184,23 +184,12 @@ Use `bun` for npm-compatible package management and JS execution, and `bunx`
 for npx-compatible package execution. Tauri's `beforeDevCommand` /
 `beforeBuildCommand` already point at `bun run dev` / `bun run build`.
 
-## Planning-spine instant recall
+## Archived planning artifacts
 
-Start planning work at `planning-spine-v0/navigation/README.md`. The committed graph
-is repository-native and remains usable when GitKB or GitNexus is absent,
-stale, or pointed at another checkout.
-
-```bash
-bun run planning-spine:navigation:query -- "STORE-001"
-bun run planning-spine:navigation:query -- "redb PostgreSQL authority"
-bun run planning-spine:navigation:explain -- "claim:REDB-CLAIM-002"
-bun run planning-spine:navigation:check
-```
-
-The generated graph is a navigation projection, not a new authority source.
-Canonical task inputs, exact proof history, maintained contracts, and raw
-architecture inputs retain the authority order documented in
-`planning-spine-v0/navigation/README.md`.
+The former planning-spine tree and `.codex` execution loop are archived and are
+not repository authorities or runnable gates. Work directly from
+`Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md` and
+the live production surfaces.
 
 ## Verification commands
 
@@ -256,6 +245,37 @@ The Rust side (`src-tauri/src/lib.rs`) exposes three commands:
 Provider selection lives in `lifeos_runtime.projection` under key `ai-provider` as `{ "provider": "claude" | "openai" | "gemini" }`. A pre-cutover `<app_data_dir>/ai.json` is imported byte-for-byte into PostgreSQL before it is retired. The store mirrors that as `aiProvider` (state) + `availableAiProviders` (getter) + `setAiProvider(name)` (action) — sibling-identical between `lifeos.ts` and `lifeos.js`.
 
 API-key lookup per provider, in order: OS keyring (`service: "lifeos"`, account: `"anthropic" | "openai" | "gemini"`) via the `keyring` crate, then env var fallback (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY`). Either path is sufficient; both missing surfaces the calm error to the UI. HTTP uses `reqwest` with `rustls-tls` (no `openssl-sys` C build).
+
+## Engine Room terminal contract (Glass VT capability envelope)
+
+`@xterm/xterm` is **xterm.js**, the renderer embedded in the Svelte pane — not XTerm the
+X11 application, and not a host terminal emulator. Kitty, Ghostty, WezTerm, and Yazelix
+Nova's bundled Mars (Rio-derived) live one layer out at the *native* front door, where
+they host `yzx enter` directly. A GPU host emulator cannot mount inside a webview pane
+and xterm.js cannot replace the native host, so the two are never substitutable. Host
+terminal choice stays open at the native front door.
+
+Because both front doors render the same Engine Room, the embedded renderer's
+capabilities are a **declared contract**, never inherited from the host process.
+`GLASS_VT_PROFILE` in `src-tauri/src/lib.rs` is the single source of truth; the
+renderer reads it through the `terminal_capabilities` command, and
+`src/components/EngineRoomTerminal.svelte` carries only a browser-preview fallback that
+`bun run verify:terminal-capability` proves has not drifted.
+
+| Rule | Why |
+|---|---|
+| The PTY exports `TERM=xterm-256color` | Truthful baseline for the embedded renderer. |
+| `TERM_PROGRAM` / `TERM_PROGRAM_VERSION` are stripped | `CommandBuilder` seeds from `std::env::vars_os()`, so the host identity would otherwise leak. |
+| **Never** set `TERM` to a host terminal type | `xterm-ghostty`/`xterm-kitty` makes Yazi emit graphics the renderer cannot draw; Yazi documents this as breaking adapter detection. |
+| `YAZI_IMAGE_PROTOCOL=KgpOld` is set explicitly | Yazi's `Kgp` default uses `U+10EEEE` Unicode placeholders, which the pinned image addon does not implement. |
+| `convertEol` stays `false` | Zellij emits its own CRLF and absolute cursor positioning; rewriting LF corrupts the stream. |
+| `onBinary` must stay wired | It carries 8-bit input; UTF-8 encoding it corrupts any byte ≥ `0x80`. |
+| PTY pixel geometry is reported every resize | SIXEL, IIP, and Kitty graphics size their output from it. |
+
+Changing any renderer pin means re-checking the envelope against what the new packages
+actually implement, then re-running `bun run verify:terminal-capability`. The Kitty
+Unicode-placeholder gap is declared and release-gated — do not describe it in
+silent-downgrade language.
 
 ## UI state persistence
 

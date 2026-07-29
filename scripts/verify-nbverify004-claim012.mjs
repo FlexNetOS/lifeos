@@ -27,7 +27,6 @@ const search = run("rg", [
   "src",
   "src-tauri",
   "crates",
-  "planning-spine-v0",
   "--glob",
   "!**/AGENTS.md",
   "--glob",

@@ -367,6 +367,71 @@ struct AgentRuntimeSupervisor {
     child: Arc<Mutex<ProcessChild>>,
 }
 
+/// Supervises the loopback-native RuvLLM embedding executor used by envctl.
+/// The executor has no durable state and binds only to localhost; envctl still
+/// validates and exclusively commits every resulting job into PostgreSQL/RuVector.
+struct RuvllmEmbedderSupervisor {
+    child: Arc<Mutex<ProcessChild>>,
+}
+
+impl RuvllmEmbedderSupervisor {
+    fn start() -> Result<Option<Self>, String> {
+        if std::env::var_os("LIFEOS_ENVCTL_COMMIT_CONN").is_none()
+            || std::env::var_os("ENVCTL_RUVLLM_EMBEDDER_URL").is_some()
+        {
+            return Ok(None);
+        }
+        let script = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("..")
+            .join("scripts/ruvllm-embedder.mjs");
+        if !script.exists() {
+            return Err(format!(
+                "RuvLLM embedder script is missing: {}",
+                script.display()
+            ));
+        }
+        let bun = std::env::var_os("LIFEOS_BUN_BIN")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("/home/flexnetos/.nix-profile/bin/bun"));
+        let port = std::env::var("LIFEOS_RUVLLM_EMBEDDER_PORT").unwrap_or_else(|_| "19764".into());
+        let child = Command::new(&bun)
+            .arg(&script)
+            .current_dir(
+                script
+                    .parent()
+                    .and_then(|path| path.parent())
+                    .unwrap_or_else(|| std::path::Path::new(".")),
+            )
+            .env("LIFEOS_RUVLLM_EMBEDDER_PORT", &port)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .map_err(|error| {
+                format!(
+                    "start native RuvLLM embedder with {}: {error}",
+                    bun.display()
+                )
+            })?;
+        std::env::set_var(
+            "ENVCTL_RUVLLM_EMBEDDER_URL",
+            format!("http://127.0.0.1:{port}"),
+        );
+        Ok(Some(Self {
+            child: Arc::new(Mutex::new(child)),
+        }))
+    }
+}
+
+impl Drop for RuvllmEmbedderSupervisor {
+    fn drop(&mut self) {
+        if let Ok(mut child) = self.child.lock() {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
+    }
+}
+
 impl AgentRuntimeSupervisor {
     fn start() -> Result<Self, String> {
         let script = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -1733,6 +1798,9 @@ pub fn run() {
             publish_swarm_runtime_status().map_err(std::io::Error::other)?;
             let agent_runtime = AgentRuntimeSupervisor::start().map_err(std::io::Error::other)?;
             app.manage(agent_runtime);
+            if let Some(embedder) = RuvllmEmbedderSupervisor::start().map_err(std::io::Error::other)? {
+                app.manage(embedder);
+            }
             if let Some(reconciler) = EnvctlReconciler::start() {
                 app.manage(reconciler);
             }

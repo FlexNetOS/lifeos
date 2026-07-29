@@ -87,7 +87,7 @@ const database = JSON.parse(rtkRun(psql, [
     'procedure_count', (SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = 'lifeos_coord' AND p.proname IN ('submit_network_plan','start_network_plan','record_network_effect','submit_weave_job','start_weave_job','record_weave_attempt','submit_runner_job','start_runner_job','record_runner_receipt'))
   )::text`,
 ]));
-if (Number(database.migration_count) !== 88 || Number(database.latest_migration) !== 99 || Number(database.procedure_count) !== 9) {
+if (Number(database.migration_count) !== 93 || Number(database.latest_migration) !== 104 || Number(database.procedure_count) !== 9) {
   throw new Error(`database coordination authority is incomplete: ${JSON.stringify(database)}`);
 }
 

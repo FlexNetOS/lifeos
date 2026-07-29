@@ -3,9 +3,10 @@
   "observed_at": "2026-07-29T02:58:30-05:00",
   "authority": {
     "envctl_table": "/home/flexnetos/meta/var/lib/envctl/tables/bootstrap_env_vars.csv",
-    "envctl_table_sha256": "59d1ff647315528b4716dd277f03c2a02c00504dd801096728ea278f413667c5",
-    "yazelix_commit": "5c02f473daf24463fc45f13ddedb503495858dbe",
-    "active_profile_yzx": "/nix/store/9cjm6l0f355bflaksa4p3x22nivh5967-yzx/bin/yzx"
+    "envctl_table_sha256": "1beabddafce375193e99c2d73bfc4765b5806cbb03dd152ce5622b6c6447458b",
+    "envctl_commit": "e67b99a5",
+    "yazelix_commit": "b3997613",
+    "active_profile_yzx": "/nix/store/bvq4x6wsb36kci2r84nnj95fc0fmgnzk-yzx/bin/yzx"
   },
   "activation": {
     "profile_package": "lifeos_foundation_yzx",
@@ -16,19 +17,31 @@
       "XDG_DATA_HOME": "/home/flexnetos/meta/var/xdg-data",
       "XDG_STATE_HOME": "/home/flexnetos/meta/var/xdg-state",
       "XDG_CACHE_HOME": "/run/user/1001/yazelix/volatile/cache",
-      "ICM_DB": "/home/flexnetos/meta/var/lib/icm/memories.db"
+      "ICM_DB": "/home/flexnetos/meta/var/xdg-data/icm/memories.db"
     }
   },
   "cutover": {
     "script": "src/envctl/scripts/profile-env-cutover.nu",
     "before_sha256": "9bd871d37af2cee3f76f475a69c2b43441626ae0ff964a47517d5b6885979957",
-    "after_sha256": "59d1ff647315528b4716dd277f03c2a02c00504dd801096728ea278f413667c5",
+    "after_sha256": "1beabddafce375193e99c2d73bfc4765b5806cbb03dd152ce5622b6c6447458b",
     "verified": true,
-    "archive": "/home/flexnetos/meta/var/lib/envctl/archives/profile-env-cutover/20260729T000000Z"
+    "archive": "/home/flexnetos/meta/var/lib/envctl/archives/session-env-anchors-cutover/20260729T080000Z"
   },
   "source_files": [
     "../yazelix/flake.nix",
     "../yazelix/nushell/config/config.nu"
   ],
-  "notes": "The rebuilt profile-owned Nushell process reports the canonical envctl XDG roots; YAZELIX_STATE_DIR remains runtime-owned and ICM_DB remains the durable database-tier path."
+  "icm_corpus": {
+    "source": "/home/flexnetos/meta/var/lib/icm/memories.db",
+    "destination": "/home/flexnetos/meta/var/xdg-data/icm/memories.db",
+    "destination_sha256": "bbf067a071dfad9730e3835fbdd8a5857966c53b8fce5a2d095613adac4b75de",
+    "backup": "/home/flexnetos/meta/var/xdg-data/icm-backups/20260729T080000Z",
+    "copied_without_purging_source": true
+  },
+  "migration_verify": {
+    "exit_status": 0,
+    "fresh_clean_env": true,
+    "icm_reads_destination": true
+  },
+  "notes": "The rebuilt profile-owned Nushell process and clean fresh-env migration probe use the canonical envctl XDG roots and destination ICM database; YAZELIX_STATE_DIR remains runtime-owned."
 }

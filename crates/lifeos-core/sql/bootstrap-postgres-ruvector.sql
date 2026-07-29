@@ -28,11 +28,11 @@ CREATE SCHEMA IF NOT EXISTS lifeos_rvf;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA extensions;
--- 0.3.1 is currently an unrendered packaging template (its SQL contains
--- literal placeholders). Pin the live-verified 0.3.0 catalog surface; the C
--- implementation is rebound below to the accepted CAP-INV011-001 library.
+-- The profile now carries the rendered full-feature 0.3.1 catalog. Its C
+-- implementation is rebound below to the one approved durable library path
+-- so existing databases and fresh installs share one loaded identity.
 CREATE EXTENSION IF NOT EXISTS ruvector
-  WITH SCHEMA extensions VERSION '0.3.0';
+  WITH SCHEMA extensions VERSION '0.3.1';
 
 -- The packaged 0.3 extension SQL still names its profile `$libdir` binary,
 -- while CAP-INV011-001 installs the accepted RuVector build in Meta's durable

@@ -8,10 +8,11 @@ const lifeosRoot = resolve(".");
 const ruvectorRoot = "/home/flexnetos/meta/src/meta-ruvector";
 const envctlRoot = "/home/flexnetos/meta/src/envctl";
 const receiptPath = resolve("evidence/ruvector/full-feature-closure-receipt.json");
-const expectedRuVectorCommit = "4dec9ce6e";
+const expectedRuVectorCommit = "d9e845f39";
 const expectedEnvctlCommit = "6a6159ad";
-const approvedSqlPath = "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector--0.3.1.sql";
-const approvedLibraryPath = "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector.so";
+const profileRoot = "/home/flexnetos/.nix-profile";
+const approvedSqlPath = `${profileRoot}/share/postgresql/extension/ruvector--0.3.1.sql`;
+const approvedLibraryPath = `${profileRoot}/lib/ruvector.so`;
 
 function runGit(root, ...args) {
   return execFileSync(rtk, ["proxy", "git", "-C", root, ...args], {
@@ -27,6 +28,13 @@ function runCargoTree() {
     "--features", "pg17,all-features-v3",
     "--no-default-features", "-e", "features",
   ], { cwd: ruvectorRoot, encoding: "utf8" });
+}
+
+function runPsql(sql) {
+  return execFileSync(rtk, [
+    "proxy", "psql", "-X", "-q", "-h", "/home/flexnetos/meta/var/run/postgresql",
+    "-d", "lifeos", "-At", "-c", sql,
+  ], { cwd: lifeosRoot, encoding: "utf8" }).trim();
 }
 
 async function fileReceipt(path) {
@@ -45,6 +53,8 @@ const treeLines = tree.split("\n").filter(Boolean);
 const approvedSql = await readFile(approvedSqlPath, "utf8");
 const sqlFunctionCount = (approvedSql.match(/CREATE\s+(?:OR REPLACE\s+)?FUNCTION/g) ?? []).length;
 const invalidDefaultTokens = [...approvedSql.matchAll(/DEFAULT\s+(auto|dot|validation|parameter_change|JsonB\(|DEFAULT_CURVATURE)\b/g)].map((match) => match[0]);
+const liveExtVersion = runPsql("SELECT extversion FROM pg_extension WHERE extname='ruvector'");
+const liveOwnedFunctions = Number(runPsql("SELECT count(*) FROM pg_proc p JOIN pg_depend d ON d.objid=p.oid AND d.classid='pg_proc'::regclass AND d.deptype='e' JOIN pg_extension e ON e.oid=d.refobjid WHERE e.extname='ruvector' AND p.prokind='f'"));
 const receipt = {
   schema_version: "lifeos.evidence.ruvector-full-feature-closure.v1",
   authority: "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
@@ -67,10 +77,16 @@ const receipt = {
     rustls_present: treeLines.some((line) => /rustls/.test(line)),
   },
   approved_artifact: {
+    profile_root: profileRoot,
     sql: await fileReceipt(approvedSqlPath),
     library: await fileReceipt(approvedLibraryPath),
     sql_function_count: sqlFunctionCount,
     invalid_default_tokens: invalidDefaultTokens,
+  },
+  live_activation: {
+    database: "lifeos",
+    extension_version: liveExtVersion,
+    extension_owned_functions: liveOwnedFunctions,
   },
   cargo_tree_lines: treeLines.length,
 };
@@ -96,6 +112,12 @@ if (sqlFunctionCount < 314) {
 }
 if (invalidDefaultTokens.length) {
   failures.push(`approved full-feature SQL contains invalid default tokens: ${invalidDefaultTokens.join(", ")}`);
+}
+if (liveExtVersion !== "0.3.1") {
+  failures.push(`live ruvector extension is ${liveExtVersion}; expected 0.3.1`);
+}
+if (liveOwnedFunctions < 314) {
+  failures.push(`live ruvector extension owns ${liveOwnedFunctions} functions; expected at least 314`);
 }
 
 await mkdir(dirname(receiptPath), { recursive: true });

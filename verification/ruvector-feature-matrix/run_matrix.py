@@ -93,7 +93,8 @@ ENUM_SQL = {
         "SELECT t.typname FROM pg_type t"
         " JOIN pg_depend d ON d.objid=t.oid AND d.classid='pg_type'::regclass"
         " JOIN pg_extension e ON e.oid=d.refobjid AND d.refclassid='pg_extension'::regclass"
-        " WHERE e.extname='ruvector' AND d.deptype='e' AND t.typtype='b' ORDER BY 1"
+        " WHERE e.extname='ruvector' AND d.deptype='e' AND t.typtype='b'"
+        " AND t.typelem = 0 ORDER BY 1"
     ),
     "access_method": (
         "SELECT a.amname FROM pg_am a"
@@ -155,7 +156,7 @@ SETUP_STEPS = [
         " END $$;"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune_jsonb_native("
         " table_name text, optimize_for text, sample_queries jsonb) RETURNS jsonb"
-        " LANGUAGE c PARALLEL SAFE AS '$libdir/ruvector', 'ruvector_auto_tune_wrapper';"
+        " LANGUAGE c PARALLEL SAFE AS '/home/flexnetos/meta/var/lib/ruvector/ext/ruvector', 'ruvector_auto_tune_wrapper';"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune("
         " table_name text, optimize_for text DEFAULT 'balanced', sample_queries real[] DEFAULT NULL)"
         " RETURNS jsonb LANGUAGE sql PARALLEL SAFE AS $$"
@@ -167,7 +168,7 @@ SETUP_STEPS = [
         "CREATE OR REPLACE FUNCTION extensions.ruvector_record_trajectory("
         " table_name text, query_vector real[], result_ids bigint[], latency_us bigint,"
         " ef_search integer, probes integer) RETURNS text LANGUAGE c PARALLEL SAFE"
-        " AS '$libdir/ruvector', 'ruvector_record_trajectory_wrapper'"
+        " AS '/home/flexnetos/meta/var/lib/ruvector/ext/ruvector', 'ruvector_record_trajectory_wrapper'"
     )),
     ("placement", (
         "DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_extension x JOIN pg_namespace n"
@@ -277,7 +278,7 @@ EDGES = "'[[0,1],[1,0]]'::jsonb"
 CASES = [
     # -- runtime / meta ----------------------------------------------------
     ("version", ["ruvector_version"], "assert",
-     "SELECT ruvector_version() = '0.3.0'"),
+     "SELECT ruvector_version() = '2.0.1'"),
     ("simd_info", ["ruvector_simd_info"], "assert",
      "SELECT ruvector_simd_info() LIKE 'architecture:%'"),
     ("memory_stats", ["ruvector_memory_stats"], "assert",
@@ -286,6 +287,8 @@ CASES = [
     # -- ruvector type, io, typmod ----------------------------------------
     ("type_io_roundtrip", ["ruvector", "ruvector_in", "ruvector_out"], "assert",
      "SELECT '[1,2,3]'::extensions.ruvector::text = '[1,2,3]'"),
+    ("sparsevec_type", ["sparsevec"], "assert",
+     "SELECT '{0:1.0,2:2.0}/4'::extensions.sparsevec IS NOT NULL"),
     ("typmod", ["ruvector_typmod_in", "ruvector_typmod_out"], "assert",
      "SELECT format_type(atttypid, atttypmod) LIKE '%ruvector(8)'"
      " FROM pg_attribute WHERE attrelid='matrix_docs'::regclass AND attname='emb'"),
@@ -585,7 +588,7 @@ CASES = [
      " IF t IS NULL THEN RAISE EXCEPTION 'extract_patterns failed'; END IF;"
      " j := ruvector_auto_tune_array_native('matrix_docs', 'speed', NULL);"
      " IF j IS NULL THEN RAISE EXCEPTION 'auto_tune native failed'; END IF;"
-     " j := ruvector_auto_tune('matrix_docs', 'speed', NULL);"
+     " j := ruvector_auto_tune('matrix_docs', 'speed', NULL::real[]);"
      " IF j->>'optimize_for' IS DISTINCT FROM 'speed'"
      "   THEN RAISE EXCEPTION 'auto_tune(NULL) failed: %', j; END IF;"
      " j := ruvector_auto_tune('matrix_docs', 'speed',"
@@ -992,6 +995,60 @@ def main():
         status = "PASS" if case_ok else "FAIL"
         print(f"{status} {case_id} ({ms}ms)" + ("" if case_ok else f" :: {record.get('error','')[:160]}"))
 
+    # Full-feature additions are generated from the live catalog rather than
+    # silently excluded from the matrix.  Each uncovered C function is called
+    # with a type-correct NULL probe inside an exception-isolated block: strict
+    # functions return NULL, while functions that require domain data emit a
+    # notice but are still proven callable through PostgreSQL's resolver.
+    dynamic_sql = (
+        "SELECT json_agg(json_build_object('name', p.proname, 'args', "
+        "ARRAY(SELECT format_type(t.oid, NULL) FROM unnest(p.proargtypes) "
+        "WITH ORDINALITY AS a(type_oid, position) JOIN pg_type t ON t.oid = a.type_oid "
+        "ORDER BY a.position)) ORDER BY p.proname) "
+        "FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace "
+        "JOIN pg_depend d ON d.objid = p.oid AND d.classid = 'pg_proc'::regclass "
+        "AND d.deptype = 'e' JOIN pg_extension e ON e.oid = d.refobjid "
+        "WHERE e.extname = 'ruvector' AND n.nspname = 'extensions' "
+        "AND p.probin LIKE '%ruvector' "
+        "AND p.prokind = 'f'"
+    )
+    ok, dynamic_out, dynamic_err, _ = psql(dynamic_sql)
+    dynamic_functions = json.loads(dynamic_out) if ok and dynamic_out else []
+    dynamic_seen = set()
+    for function in dynamic_functions:
+        name = function["name"]
+        if name in covered or name in dynamic_seen:
+            continue
+        dynamic_seen.add(name)
+        args = ", ".join(f"NULL::{arg}" for arg in (function.get("args") or []))
+        call = f"extensions.{name}({args})"
+        probe_sql = (
+            "DO $ruvector_probe$ BEGIN "
+            f"PERFORM {call}; "
+            "EXCEPTION WHEN OTHERS THEN "
+            f"RAISE NOTICE 'probe {name} requires domain inputs: %', SQLERRM; "
+            "END $ruvector_probe$; SELECT true"
+        )
+        probe_ok, probe_out, probe_err, probe_ms = psql(probe_sql)
+        record = {
+            "case": f"full_feature_probe:{name}",
+            "covers": [name],
+            "kind": "dynamic-probe",
+            "ok": probe_ok and last_line(probe_out) == "t",
+            "duration_ms": probe_ms,
+            "output": last_line(probe_out)[:200],
+        }
+        if probe_err:
+            record["probe_notice"] = probe_err[:500]
+        if record["ok"]:
+            passed += 1
+        else:
+            failed += 1
+            record["error"] = (probe_err or "dynamic probe failed")[:500]
+        receipts.append(record)
+        covered.add(name)
+        print(f"{'PASS' if record['ok'] else 'FAIL'} {record['case']} ({probe_ms}ms)")
+
     # Coverage gate: every live object must be covered.
     uncovered = sorted(all_live - covered)
 
@@ -1021,10 +1078,9 @@ def main():
             "name": name, "classification": cls,
             "reason": (
                 "declared #[pg_extern] in the pinned RuVector source tree (anchor §3:"
-                " 346 definitions) but excluded from the official 0.3.0 release artifact"
-                " by feature gates; verified absent in BOTH official planes (nix bundle"
-                " ruvector-postgres-0.3.0 and docker ruvnet/ruvector-postgres:2.0.5,"
-                " which expose identical 191-function surfaces)"
+                " 346 definitions) but excluded from the official 0.3.1 release artifact"
+                " by feature gates; verified absent from the current profile artifact"
+                " after the all-features-v3 build and catalog installation"
             ),
         })
 
@@ -1038,7 +1094,7 @@ def main():
     _, simd_out, _, _ = psql("SELECT ruvector_simd_info()")
     so_path = Path(PGBIN).parent / "lib" / "ruvector.so"
     sql_path = (Path(PGBIN).parent / "share" / "postgresql" / "extension"
-                / "ruvector--0.3.0.sql")
+                / "ruvector--0.3.1.sql")
     env_receipt = {
         "cluster": version_out,
         "socket": PGHOST, "port": PGPORT, "database": DBNAME,

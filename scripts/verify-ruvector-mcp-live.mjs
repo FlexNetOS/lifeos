@@ -10,6 +10,17 @@ const cwd = process.env.LIFEOS_RUVECTOR_MCP_CWD ?? "/home/flexnetos/meta/var/lib
 const db = process.env.LIFEOS_RUVECTOR_MCP_DB ?? "ruvector.db";
 const source = process.env.LIFEOS_RUVECTOR_MCP_SOURCE ?? "/home/flexnetos/meta/src/meta-ruvector";
 if (!existsSync(binary)) throw new Error(`RuVector MCP binary does not exist: ${binary}`);
+const sourceCommit = execFileSync("git", ["-C", source, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+const output = resolve(root, "evidence/ruvector/ruvector-mcp-live-receipt.json");
+const baseReceipt = {
+  schema_version: "lifeos.ruvector-mcp.live.v1",
+  producer: "verify-ruvector-mcp-live",
+  binary,
+  binary_sha256: createHash("sha256").update(readFileSync(binary)).digest("hex"),
+  server_cwd: cwd,
+  database: db,
+  source_commit: sourceCommit,
+};
 
 const result = spawnSync(
   "cargo",
@@ -24,25 +35,27 @@ const result = spawnSync(
       LIFEOS_RUVECTOR_MCP_SOURCE: source,
     },
     encoding: "utf8",
-    stdio: ["ignore", "pipe", "inherit"],
+    stdio: ["ignore", "pipe", "pipe"],
   },
 );
 if (result.error) throw result.error;
-if (result.status !== 0) throw new Error(`RuVector MCP live example exited ${result.status}`);
+if (result.status !== 0) {
+  const receipt = {
+    ...baseReceipt,
+    status: "ruvector-mcp-live-failed",
+    error: (result.stderr || `RuVector MCP live example exited ${result.status}`).trim().slice(-4000),
+  };
+  writeFileSync(output, `${JSON.stringify(receipt, null, 2)}\n`);
+  console.error(JSON.stringify({ status: receipt.status, receipt: output, error: receipt.error }, null, 2));
+  process.exit(result.status || 1);
+}
 
 const payload = JSON.parse(result.stdout.trim());
 const receipt = {
-  schema_version: "lifeos.ruvector-mcp.live.v1",
-  producer: "verify-ruvector-mcp-live",
+  ...baseReceipt,
   status: payload.status,
-  binary,
-  binary_sha256: createHash("sha256").update(readFileSync(binary)).digest("hex"),
-  server_cwd: cwd,
-  database: db,
   vector_db: payload.vector_db,
   gnn_cache: payload.gnn_cache,
-  source_commit: execFileSync("git", ["-C", source, "rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
 };
-const output = resolve(root, "evidence/ruvector/ruvector-mcp-live-receipt.json");
 writeFileSync(output, `${JSON.stringify(receipt, null, 2)}\n`);
 console.log(JSON.stringify({ status: receipt.status, receipt: output }, null, 2));

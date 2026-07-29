@@ -6,15 +6,15 @@
 //! database and any WAL sidecars.
 
 use sqlx::{
-    sqlite::{SqliteConnectOptions, SqlitePoolOptions},
     PgPool, SqlitePool,
+    sqlite::{SqliteConnectOptions, SqlitePoolOptions},
 };
 use std::{
     ffi::OsString,
     path::{Path, PathBuf},
 };
 
-use super::{ruvector, StorageError};
+use super::{StorageError, ruvector};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct LegacySqliteImportReport {
@@ -783,10 +783,17 @@ mod tests {
             ("lifeos_agentdb.exp_edges", 1),
             ("lifeos_semantic.embedding", 1),
         ] {
-            let count: i64 = sqlx::query_scalar(&format!("SELECT COUNT(*) FROM {table}"))
-                .fetch_one(storage.pool())
-                .await
-                .unwrap();
+            let count: i64 = sqlx::query_scalar(&format!(
+                "SELECT COUNT(*) FROM {table}{}",
+                if table == "lifeos_security.identity" {
+                    " WHERE subject_kind = 'human'"
+                } else {
+                    ""
+                }
+            ))
+            .fetch_one(storage.pool())
+            .await
+            .unwrap();
             assert_eq!(count, expected, "{table}");
         }
         let archived: i64 = sqlx::query_scalar(

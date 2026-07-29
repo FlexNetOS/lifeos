@@ -116,17 +116,25 @@ pub async fn upsert_vector(
 
 pub async fn get_vector(pool: &PgPool, id: &str) -> Result<Option<VectorRow>, StorageError> {
     let row = sqlx::query_as::<_, VectorRow>(
-        "SELECT metadata->>'logical_id' AS id,
+        "WITH latest AS (
+           SELECT embedding.*,
+                  row_number() OVER (
+                    PARTITION BY metadata->>'logical_id'
+                    ORDER BY generation DESC
+                  ) AS row_number
+           FROM lifeos_semantic.embedding AS embedding
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND metadata->>'logical_id' = $1
+         )
+         SELECT metadata->>'logical_id' AS id,
            metadata->>'collection' AS collection,
            dimension::BIGINT AS dim,
            lifeos_blob.load_object_bytes(source_object_id) AS vector,
            (metadata->'user_metadata')::text AS metadata_json,
            (metadata->>'last_synced_at')::BIGINT AS last_synced_at
-         FROM lifeos_semantic.embedding
-         WHERE tenant_id = lifeos_security.current_tenant()
-           AND metadata->>'logical_id' = $1
-           AND coalesce((metadata->>'retired')::boolean, false) = false
-         ORDER BY generation DESC LIMIT 1",
+         FROM latest
+         WHERE row_number = 1
+           AND coalesce((metadata->>'retired')::boolean, false) = false",
     )
     .bind(id)
     .fetch_optional(pool)
@@ -158,21 +166,25 @@ pub async fn list_by_collection(
     collection: &str,
 ) -> Result<Vec<VectorRow>, StorageError> {
     let rows = sqlx::query_as::<_, VectorRow>(
-        "SELECT metadata->>'logical_id' AS id,
+        "WITH latest AS (
+           SELECT embedding.*,
+                  row_number() OVER (
+                    PARTITION BY metadata->>'logical_id'
+                    ORDER BY generation DESC
+                  ) AS row_number
+           FROM lifeos_semantic.embedding AS embedding
+           WHERE tenant_id = lifeos_security.current_tenant()
+             AND metadata->>'collection' = $1
+         )
+         SELECT metadata->>'logical_id' AS id,
            metadata->>'collection' AS collection,
            dimension::BIGINT AS dim,
            lifeos_blob.load_object_bytes(source_object_id) AS vector,
            (metadata->'user_metadata')::text AS metadata_json,
            (metadata->>'last_synced_at')::BIGINT AS last_synced_at
-         FROM lifeos_semantic.embedding e
-         WHERE tenant_id = lifeos_security.current_tenant()
-           AND metadata->>'collection' = $1
+         FROM latest
+         WHERE row_number = 1
            AND coalesce((metadata->>'retired')::boolean, false) = false
-           AND generation = (
-             SELECT max(latest.generation)
-             FROM lifeos_semantic.embedding latest
-             WHERE latest.tenant_id = e.tenant_id
-               AND latest.metadata->>'logical_id' = e.metadata->>'logical_id')
          ORDER BY id",
     )
     .bind(collection)
@@ -257,6 +269,7 @@ mod tests {
             &[f32::MIN_POSITIVE, f32::MAX, -0.0_f32, 0.0_f32],
             &[f32::from_bits(0x0000_0001)],
         ];
+        let test_prefix = uuid::Uuid::new_v4();
 
         for (index, &floats) in cases.iter().enumerate() {
             let encoded = encode_vector(floats);
@@ -265,7 +278,7 @@ mod tests {
             for (a, b) in floats.iter().zip(&decoded) {
                 assert_eq!(a.to_bits(), b.to_bits(), "case {index}: bit mismatch");
             }
-            let id = format!("v{index}");
+            let id = format!("lifeos-test-vector-{test_prefix}-{index}");
             upsert_vector(pool, &id, "test", floats.len() as i64, &encoded, None, 0)
                 .await
                 .unwrap();
@@ -280,7 +293,7 @@ mod tests {
             "SELECT embedding::text FROM lifeos_semantic.embedding
              WHERE metadata->>'logical_id' = $1 ORDER BY generation DESC LIMIT 1",
         )
-        .bind("v0")
+        .bind(format!("lifeos-test-vector-{test_prefix}-0"))
         .fetch_one(pool)
         .await
         .unwrap();
@@ -289,7 +302,7 @@ mod tests {
             "SELECT embedding::text FROM lifeos_semantic.embedding
              WHERE metadata->>'logical_id' = $1 ORDER BY generation DESC LIMIT 1",
         )
-        .bind("v1")
+        .bind(format!("lifeos-test-vector-{test_prefix}-1"))
         .fetch_optional(pool)
         .await
         .unwrap();

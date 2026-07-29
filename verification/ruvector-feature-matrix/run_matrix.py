@@ -29,6 +29,10 @@ PGBIN = os.environ.get(
     "RUVECTOR_PGBIN",
     "/nix/store/5fsfh7z2v4s52rhngsc2gkc5x581p35a-postgresql-and-plugins-17.10/bin",
 )
+RUVECTOR_LIBRARY = os.environ.get(
+    "RUVECTOR_LIBRARY",
+    str(Path(PGBIN).parent / "lib" / "ruvector"),
+)
 PGHOST = os.environ.get("RUVECTOR_PGHOST", "/home/flexnetos/meta/var/run/postgresql")
 PGPORT = os.environ.get("RUVECTOR_PGPORT", "5432")
 DBNAME = os.environ.get("RUVECTOR_DB", "ruvector_matrix")
@@ -156,7 +160,7 @@ SETUP_STEPS = [
         " END $$;"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune_jsonb_native("
         " table_name text, optimize_for text, sample_queries jsonb) RETURNS jsonb"
-        " LANGUAGE c PARALLEL SAFE AS '$libdir/ruvector', 'ruvector_auto_tune_wrapper';"
+        f" LANGUAGE c PARALLEL SAFE AS '{RUVECTOR_LIBRARY}', 'ruvector_auto_tune_wrapper';"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune("
         " table_name text, optimize_for text DEFAULT 'balanced', sample_queries real[] DEFAULT NULL)"
         " RETURNS jsonb LANGUAGE sql PARALLEL SAFE AS $$"
@@ -168,7 +172,7 @@ SETUP_STEPS = [
         "CREATE OR REPLACE FUNCTION extensions.ruvector_record_trajectory("
         " table_name text, query_vector real[], result_ids bigint[], latency_us bigint,"
         " ef_search integer, probes integer) RETURNS text LANGUAGE c PARALLEL SAFE"
-        " AS '$libdir/ruvector', 'ruvector_record_trajectory_wrapper'"
+        f" AS '{RUVECTOR_LIBRARY}', 'ruvector_record_trajectory_wrapper'"
     )),
     ("placement", (
         "DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_extension x JOIN pg_namespace n"
@@ -278,7 +282,7 @@ EDGES = "'[[0,1],[1,0]]'::jsonb"
 CASES = [
     # -- runtime / meta ----------------------------------------------------
     ("version", ["ruvector_version"], "assert",
-     "SELECT ruvector_version() = '0.3.0'"),
+     "SELECT extensions.ruvector_version() = '2.0.1'"),
     ("simd_info", ["ruvector_simd_info"], "assert",
      "SELECT ruvector_simd_info() LIKE 'architecture:%'"),
     ("memory_stats", ["ruvector_memory_stats"], "assert",
@@ -368,6 +372,8 @@ CASES = [
      " ROLLBACK"),
     ("hnsw_debug", ["ruvector_hnsw_debug"], "assert",
      "SELECT jsonb_typeof(ruvector_hnsw_debug('matrix_hnsw_l2')) = 'object'"),
+    ("ruivfflat_index_health", ["ruivfflat_index_health"], "assert",
+     "SELECT count(*) = 1 FROM extensions.ruivfflat_index_health('matrix_ivf_l2')"),
 
     # -- aggregate ---------------------------------------------------------
     ("agg_vector_sum", ["vector_sum", "vector_sum_state"], "assert",

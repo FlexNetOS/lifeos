@@ -132,6 +132,43 @@ SETUP_STEPS = [
     ("ext_pgcrypto", "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions"),
     ("ext_btree_gin", "CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA extensions"),
     ("ext_ruvector", "CREATE EXTENSION IF NOT EXISTS ruvector WITH SCHEMA extensions"),
+    # Apply the same canonical activation repairs used by lifeos-core.  The
+    # released extension SQL contains three ABI mismatches: the average
+    # finalizer resolves a double-precision scalar, auto_tune's generated
+    # signature is real[][] while its native wrapper consumes JSONB, and the
+    # trajectory writer is exported by the binary but omitted from the SQL
+    # artifact.  The feature matrix measures the activated LifeOS surface, so
+    # these repairs must be present before any case executes.
+    ("vector_avg_final_compatibility", (
+        "CREATE OR REPLACE FUNCTION extensions.vector_avg_final(state real[], count bigint)"
+        " RETURNS real[] LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$"
+        " SELECT CASE WHEN state IS NULL OR count = 0 THEN NULL"
+        " ELSE extensions.vector_mul_scalar(state, (1.0 / count::real)::real) END"
+        " $$"
+    )),
+    ("auto_tune_jsonb_bridge", (
+        "DO $$ BEGIN"
+        " IF to_regprocedure('extensions.ruvector_auto_tune(text,text,real[][])') IS NOT NULL"
+        " AND to_regprocedure('extensions.ruvector_auto_tune_array_native(text,text,real[][])') IS NULL"
+        " THEN ALTER FUNCTION extensions.ruvector_auto_tune(text,text,real[][])"
+        " RENAME TO ruvector_auto_tune_array_native; END IF;"
+        " END $$;"
+        " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune_jsonb_native("
+        " table_name text, optimize_for text, sample_queries jsonb) RETURNS jsonb"
+        " LANGUAGE c PARALLEL SAFE AS '$libdir/ruvector', 'ruvector_auto_tune_wrapper';"
+        " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune("
+        " table_name text, optimize_for text DEFAULT 'balanced', sample_queries real[] DEFAULT NULL)"
+        " RETURNS jsonb LANGUAGE sql PARALLEL SAFE AS $$"
+        " SELECT extensions.ruvector_auto_tune_jsonb_native($1, $2,"
+        " CASE WHEN $3 IS NULL THEN NULL::jsonb ELSE to_jsonb(ARRAY[$3]::real[][]) END)"
+        " $$"
+    )),
+    ("trajectory_writer_binding", (
+        "CREATE OR REPLACE FUNCTION extensions.ruvector_record_trajectory("
+        " table_name text, query_vector real[], result_ids bigint[], latency_us bigint,"
+        " ef_search integer, probes integer) RETURNS text LANGUAGE c PARALLEL SAFE"
+        " AS '$libdir/ruvector', 'ruvector_record_trajectory_wrapper'"
+    )),
     ("placement", (
         "DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_extension x JOIN pg_namespace n"
         " ON n.oid=x.extnamespace WHERE x.extname IN ('pgcrypto','btree_gin','ruvector')"
@@ -333,17 +370,8 @@ CASES = [
     ("agg_vector_sum", ["vector_sum", "vector_sum_state"], "assert",
      "SELECT (vector_sum(v))[1] = 4 AND (vector_sum(v))[2] = 6"
      " FROM (VALUES (ARRAY[1.0::real,2.0]), (ARRAY[3.0::real,4.0])) t(v)"),
-    ("vector_avg_final_defect", ["vector_avg_final"], "assert",
-     # RUVMX-DEFECT-001: the release-artifact body of vector_avg_final calls
-     # vector_mul_scalar(real[], double precision), which does not exist, so
-     # every invocation fails with undefined_function. This case positively
-     # asserts the exact defect signature; see annotations in summary.json.
-     "DO $$ BEGIN"
-     " PERFORM vector_avg_final(ARRAY[4.0::real,6.0], 2);"
-     " RAISE EXCEPTION 'vector_avg_final unexpectedly succeeded —"
-     " re-verify RUVMX-DEFECT-001';"
-     " EXCEPTION WHEN undefined_function THEN NULL; END $$;"
-     " SELECT true"),
+    ("vector_avg_final_compatibility", ["vector_avg_final"], "assert",
+     "SELECT vector_avg_final(ARRAY[4.0::real,6.0], 2) = ARRAY[2.0::real,3.0]"),
 
     # -- real[] core math --------------------------------------------------
     ("l2_arr", ["l2_distance_arr"], "assert",
@@ -521,14 +549,10 @@ CASES = [
      " END $$; SELECT true"),
 
     # -- learning / SONA (state is session-local: one-session lifecycle).
-    # record_feedback and non-NULL auto_tune sample_queries are asserted
-    # against their proven release-artifact defect contracts (RUVMX-DEFECT-002
-    # and RUVMX-DEFECT-003): the tracker's only writer
-    # (ruvector_record_trajectory) is gated out of the artifact, and the
-    # auto_tune SQL declaration (real[]) mismatches the library (JSONB).
     ("learning_lifecycle",
      ["ruvector_enable_learning", "ruvector_record_feedback", "ruvector_learning_stats",
       "ruvector_get_search_params", "ruvector_extract_patterns", "ruvector_auto_tune",
+      "ruvector_auto_tune_array_native", "ruvector_record_trajectory",
       "ruvector_sona_learn", "ruvector_sona_apply", "ruvector_sona_ewc_status",
       "ruvector_sona_stats", "ruvector_clear_learning"],
      "assert",
@@ -542,6 +566,10 @@ CASES = [
      "   '{\"query\":[1.0,0,0,0,1,0,0,0],\"results\":[1,2],\"feedback\":1.0}'::jsonb);"
      " IF j->>'status' IS DISTINCT FROM 'learned'"
      "   THEN RAISE EXCEPTION 'sona_learn failed: %', j; END IF;"
+     " t := ruvector_record_trajectory('matrix_docs',"
+     "   ARRAY[1.0::real,0,0,0,1,0,0,0], ARRAY[1,2]::bigint[], 1000, 50, 10);"
+     " IF t NOT LIKE 'Trajectory recorded%'"
+     "   THEN RAISE EXCEPTION 'record_trajectory failed: %', t; END IF;"
      " a := ruvector_sona_apply('matrix_docs', ARRAY[1.0::real,0,0,0,1,0,0,0]);"
      " IF array_length(a, 1) IS DISTINCT FROM 8"
      "   THEN RAISE EXCEPTION 'sona_apply failed: %', a; END IF;"
@@ -555,25 +583,15 @@ CASES = [
      " IF j IS NULL THEN RAISE EXCEPTION 'get_search_params failed'; END IF;"
      " t := ruvector_extract_patterns('matrix_docs', 2);"
      " IF t IS NULL THEN RAISE EXCEPTION 'extract_patterns failed'; END IF;"
+     " j := ruvector_auto_tune_array_native('matrix_docs', 'speed', NULL);"
+     " IF j IS NULL THEN RAISE EXCEPTION 'auto_tune native failed'; END IF;"
      " j := ruvector_auto_tune('matrix_docs', 'speed', NULL);"
      " IF j->>'optimize_for' IS DISTINCT FROM 'speed'"
      "   THEN RAISE EXCEPTION 'auto_tune(NULL) failed: %', j; END IF;"
-     " BEGIN"  # RUVMX-DEFECT-002: feeder gated out; assert documented contract
-     "   t := ruvector_record_feedback('matrix_docs', ARRAY[1.0::real,0,0,0,1,0,0,0],"
-     "     ARRAY[1::bigint], ARRAY[2::bigint]);"
-     "   RAISE EXCEPTION 'record_feedback unexpectedly succeeded —"
-     "     re-verify RUVMX-DEFECT-002';"
-     " EXCEPTION WHEN OTHERS THEN"
-     "   IF SQLERRM NOT LIKE '%No recent trajectory found%' THEN RAISE; END IF;"
-     " END;"
-     " BEGIN"  # RUVMX-DEFECT-003: SQL real[] vs library JSONB mismatch
-     "   j := ruvector_auto_tune('matrix_docs', 'speed',"
-     "     ARRAY[1.0::real,0,0,0,1,0,0,0]);"
-     "   RAISE EXCEPTION 'auto_tune(real[]) unexpectedly succeeded —"
-     "     re-verify RUVMX-DEFECT-003';"
-     " EXCEPTION WHEN OTHERS THEN"
-     "   IF SQLERRM NOT LIKE '%unknown type of jsonb container%' THEN RAISE; END IF;"
-     " END;"
+     " j := ruvector_auto_tune('matrix_docs', 'speed',"
+     "   ARRAY[1.0::real,0,0,0,1,0,0,0]);"
+     " IF j->>'optimize_for' IS DISTINCT FROM 'speed'"
+     "   THEN RAISE EXCEPTION 'auto_tune(real[]) failed: %', j; END IF;"
      " t := ruvector_clear_learning('matrix_docs');"
      " IF t IS NULL THEN RAISE EXCEPTION 'clear_learning failed'; END IF;"
      " END $$; SELECT true"),
@@ -835,13 +853,9 @@ ANNOTATIONS = [
      "note": "installed <#> returns POSITIVE inner product (11 for [1,2]·[3,4]);"
              " anchor §3.1 documents it as negative inner product — semantic"
              " deviation between anchor prose and release artifact."},
-    {"id": "RUVMX-DEFECT-001", "case": "vector_avg_final_defect",
-     "note": "release-artifact SQL body of vector_avg_final calls"
-             " vector_mul_scalar(real[], double precision), which does not exist;"
-             " every invocation fails with undefined_function. Upstream artifact"
-             " defect present in BOTH official planes; matrix asserts the exact"
-             " defect signature. Owner-visible blocker for any consumer of"
-             " vector_avg_final; vector_sum aggregate is unaffected and green."},
+    {"id": "RUVMX-REPAIR-001", "case": "vector_avg_final_compatibility",
+     "note": "canonical LifeOS activation casts the scalar to real and qualifies"
+             " vector_mul_scalar, repairing the released finalizer ABI."},
     {"id": "RUVMX-NOTE-002", "case": "am_ruivfflat_scan",
      "note": "ruivfflat with default probe budget can return fewer than LIMIT k"
              " rows (IVF recall semantics); scan-executes assertion uses >= 1."},
@@ -853,21 +867,10 @@ ANNOTATIONS = [
              " session-local (backend memory), unlike the graph/RDF planes which"
              " persist in _ruvector_* tables; lifecycle families are therefore"
              " exercised inside single-session DO blocks."},
-    {"id": "RUVMX-DEFECT-002", "case": "learning_lifecycle",
-     "note": "ruvector_record_feedback is structurally unsatisfiable in the"
-             " release artifact: the learning tracker's only production writer"
-             " (ruvector_record_trajectory, learning/operators.rs) is"
-             " feature-gated out of the 0.3.0 artifact, so get_recent() can"
-             " never contain a matching trajectory and every call fails with"
-             " 'No recent trajectory found matching query vector'. The matrix"
-             " asserts that exact contract. Owner-visible blocker for feedback-"
-             "driven learning until upstream ships the recorder."},
-    {"id": "RUVMX-DEFECT-003", "case": "learning_lifecycle",
-     "note": "ruvector_auto_tune's release-artifact SQL declares sample_queries"
-             " real[] while the library reads it as JSONB array-of-arrays;"
-             " every non-NULL sample_queries call fails with 'unknown type of"
-             " jsonb container'. The NULL path works and is asserted green;"
-             " the non-NULL path is asserted against its defect signature."},
+    {"id": "RUVMX-REPAIR-002", "case": "learning_lifecycle",
+     "note": "canonical LifeOS activation restores the exported trajectory"
+             " writer and bridges the public real[] auto-tune signature to the"
+             " native JSONB wrapper before exercising feedback-driven learning."},
 ]
 
 

@@ -1,8 +1,8 @@
 {
-  "anchor_absent_from_release_artifact": 160,
+  "anchor_absent_from_release_artifact": 161,
   "anchor_accounted_other_object": 8,
   "anchor_catalog_names": 350,
-  "anchor_installed": 182,
+  "anchor_installed": 181,
   "annotations": [
     {
       "case": "op_inner_product",
@@ -10,9 +10,9 @@
       "note": "installed <#> returns POSITIVE inner product (11 for [1,2]\u00b7[3,4]); anchor \u00a73.1 documents it as negative inner product \u2014 semantic deviation between anchor prose and release artifact."
     },
     {
-      "case": "vector_avg_final_defect",
-      "id": "RUVMX-DEFECT-001",
-      "note": "release-artifact SQL body of vector_avg_final calls vector_mul_scalar(real[], double precision), which does not exist; every invocation fails with undefined_function. Upstream artifact defect present in BOTH official planes; matrix asserts the exact defect signature. Owner-visible blocker for any consumer of vector_avg_final; vector_sum aggregate is unaffected and green."
+      "case": "vector_avg_final_compatibility",
+      "id": "RUVMX-REPAIR-001",
+      "note": "canonical LifeOS activation casts the scalar to real and qualifies vector_mul_scalar, repairing the released finalizer ABI."
     },
     {
       "case": "am_ruivfflat_scan",
@@ -31,19 +31,14 @@
     },
     {
       "case": "learning_lifecycle",
-      "id": "RUVMX-DEFECT-002",
-      "note": "ruvector_record_feedback is structurally unsatisfiable in the release artifact: the learning tracker's only production writer (ruvector_record_trajectory, learning/operators.rs) is feature-gated out of the 0.3.0 artifact, so get_recent() can never contain a matching trajectory and every call fails with 'No recent trajectory found matching query vector'. The matrix asserts that exact contract. Owner-visible blocker for feedback-driven learning until upstream ships the recorder."
-    },
-    {
-      "case": "learning_lifecycle",
-      "id": "RUVMX-DEFECT-003",
-      "note": "ruvector_auto_tune's release-artifact SQL declares sample_queries real[] while the library reads it as JSONB array-of-arrays; every non-NULL sample_queries call fails with 'unknown type of jsonb container'. The NULL path works and is asserted green; the non-NULL path is asserted against its defect signature."
+      "id": "RUVMX-REPAIR-002",
+      "note": "canonical LifeOS activation restores the exported trajectory writer and bridges the public real[] auto-tune signature to the native JSONB wrapper before exercising feedback-driven learning."
     }
   ],
   "cases": 158,
   "covered_objects": 206,
   "failed": 0,
-  "matrix_rows_total": 372,
+  "matrix_rows_total": 373,
   "passed": 158,
   "schema_version": "lifeos.ruvector-feature-matrix.v1",
   "surface_counts": {

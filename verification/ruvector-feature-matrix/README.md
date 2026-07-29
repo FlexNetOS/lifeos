@@ -11,29 +11,30 @@ on the canonical LifeOS cluster, cross-checked against the blueprint anchor's
   `_ruvector`), 2 access methods (`hnsw`, `ruivfflat`), 6 operator classes —
   206 objects. A hard coverage gate fails the run if any live object lacks a
   matrix case, so the coverage claim is enforced, not asserted.
-- **Every anchor-§3-cataloged name is accounted**: 350 catalog names = 182
+- **Every anchor-§3-cataloged name is accounted**: 350 catalog names = 181
   installed functions + 8 resolved to other object classes (access methods,
-  opclasses, `*_fn` aliases, type, aggregate) + 160 absent from the official
+  opclasses, `*_fn` aliases, type, aggregate) + 161 absent from the official
   release artifact. The anchor itself records the split: the pinned source
   tree carries 346 `#[pg_extern]` definitions, while the checked release
   artifact `ruvector--0.3.0.sql` emits 190 — a feature-gated subset. Both
   official planes (the nix-packaged extension and docker
   `ruvnet/ruvector-postgres:2.0.5`) expose identical 191-function surfaces,
   verified live.
-- Total matrix rows: **372** (all tested green or explicitly accounted).
+- Total matrix rows: **373** (all tested green or explicitly accounted).
 
-## Defect register (proven, signature-asserted)
+## Activated compatibility register
 
 | ID | Finding |
 |---|---|
-| RUVMX-DEFECT-001 | `vector_avg_final` release-artifact body calls `vector_mul_scalar(real[], double precision)`, which does not exist — every invocation fails with `undefined_function`. |
-| RUVMX-DEFECT-002 | `ruvector_record_feedback` is structurally unsatisfiable: the learning tracker's only writer (`ruvector_record_trajectory`) is feature-gated out of the artifact, so no trajectory can ever match. |
-| RUVMX-DEFECT-003 | `ruvector_auto_tune` SQL declares `sample_queries real[]` while the library reads JSONB — every non-NULL call fails with `unknown type of jsonb container`; the NULL path works. |
+| RUVMX-REPAIR-001 | LifeOS activation casts `vector_avg_final`'s scalar to `real` and qualifies `vector_mul_scalar`, repairing the released finalizer ABI. |
+| RUVMX-REPAIR-002 | LifeOS activation restores the exported `ruvector_record_trajectory` binding and exercises feedback-driven learning. |
+| RUVMX-REPAIR-003 | LifeOS activation bridges the public `real[]` `ruvector_auto_tune` signature to the native JSONB wrapper; NULL and non-NULL calls both pass. |
 | RUVMX-NOTE-001 | Installed `<#>` returns **positive** inner product; anchor §3.1 documents negative inner product. |
 
-Defective paths are asserted against their exact failure signatures, so a
-future artifact that fixes them will turn those cases red and force the matrix
-to be updated — regressions and fixes are both detected.
+The raw release-artifact mismatches remain documented as the inputs to these
+repairs; the matrix executes the activated LifeOS boundary and therefore turns
+each repaired path into a positive behavioral assertion. A future upstream
+artifact change still has to preserve the same public behavior.
 
 ## Behavioral findings
 
@@ -61,7 +62,9 @@ Environment overrides: `RUVECTOR_PGBIN`, `RUVECTOR_PGHOST` (socket dir),
 matrix database so the canonical `lifeos` database stays clean; the §16.2
 bootstrap contract is re-applied there on every run), `RUVECTOR_ANCHOR`.
 
-Exit 0 requires: zero failed cases AND zero uncovered live objects.
+The setup applies the same three compatibility repairs as the canonical
+LifeOS migrations before exercising the matrix. Exit 0 requires: zero failed
+cases AND zero uncovered live objects.
 
 ## Results
 

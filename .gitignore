@@ -9,6 +9,14 @@ dist/
 dist-ssr/
 *.local
 
+# Exception: vendor/rvf-solver is a prebuilt vendored artifact, not a build output.
+# package.json declares "main": "dist/index.js", so bun's file: link resolves through
+# dist/. The blanket dist/ rule above hid it from every fresh checkout, so CI installed
+# a package whose entry point did not exist and node-authority-install.spec.ts failed
+# with "Cannot find module '@ruvector/rvf-solver'". Its sibling pkg/*.wasm is already
+# committed for the same reason.
+!vendor/rvf-solver/dist/
+
 # Vite cache
 .vite/
 

@@ -37,7 +37,7 @@ fn redb_root() -> PathBuf {
 
 #[cfg(test)]
 mod terminal_tests {
-    use super::{engine_room_argv, engine_room_shell_argv, scoped_prompt, validate_redb_event_stream};
+    use super::{engine_room_argv, scoped_prompt, validate_redb_event_stream};
     use flexnetos_redb_owner::CommitEvent;
 
     #[test]
@@ -46,14 +46,6 @@ mod terminal_tests {
             engine_room_argv("lifeos-tenant-session"),
             vec!["yzx", "enter", "--session", "lifeos-tenant-session"]
         );
-    }
-
-    #[test]
-    fn engine_room_shell_uses_profile_nushell_for_the_exact_command() {
-        let shell = engine_room_shell_argv("lifeos-tenant-session");
-        assert_eq!(shell[0], "/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu");
-        assert_eq!(&shell[1..3], ["-l", "-c"]);
-        assert!(shell[3].starts_with("^/home/flexnetos/.nix-profile/bin/yzx enter --session"));
     }
 
     #[test]
@@ -592,22 +584,6 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     ]
 }
 
-fn engine_room_shell_argv(session_name: &str) -> Vec<String> {
-    let yzx = std::env::var("YZX_BIN")
-        .unwrap_or_else(|_| "/home/flexnetos/.nix-profile/bin/yzx".into());
-    let inner = format!(
-        "^{yzx} enter --session {session_name}"
-    );
-    vec![
-        std::env::var("LIFEOS_NUSHELL_PATH").unwrap_or_else(|_| {
-            "/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu".into()
-        }),
-        "-l".into(),
-        "-c".into(),
-        inner,
-    ]
-}
-
 fn yazelix_runtime_dir() -> Result<PathBuf, String> {
     if let Some(value) = std::env::var_os("YAZELIX_RUNTIME_DIR") {
         return Ok(PathBuf::from(value));
@@ -639,11 +615,20 @@ fn terminal_spawn(
         .map_err(|error| format!("open terminal: {error}"))?;
     let session_name = engine_room_session_name()?;
     let engine_argv = engine_room_argv(&session_name);
-    let argv = engine_room_shell_argv(&session_name);
     let runtime_dir = yazelix_runtime_dir()?;
-    let mut command = CommandBuilder::new(&argv[0]);
-    command.args(&argv[1..]);
+    let mut command = CommandBuilder::new(&engine_argv[0]);
+    command.args(&engine_argv[1..]);
     command.env("YAZELIX_RUNTIME_DIR", runtime_dir);
+    command.env(
+        "TERM",
+        std::env::var("TERM").unwrap_or_else(|_| "xterm-256color".into()),
+    );
+    command.env(
+        "YAZELIX_SESSION_TERMINAL",
+        std::env::var("YAZELIX_SESSION_TERMINAL")
+            .unwrap_or_else(|_| format!("lifeos-engine-room-{session_name}")),
+    );
+    command.env("YZX_WELCOME_ENABLED", "false");
     let child = pair
         .slave
         .spawn_command(command)
@@ -667,7 +652,6 @@ fn terminal_spawn(
             "cols": size.cols,
             "rows": size.rows,
             "argv": engine_argv,
-            "shell_argv": argv,
         }),
     )?;
     let output_offset = Arc::new(AtomicU64::new(0));

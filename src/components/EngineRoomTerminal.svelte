@@ -141,9 +141,25 @@
             sessionId: spawnedSessionId,
           }),
         });
-        void call("terminal_probe", { sessionId: spawnedSessionId }).catch((error) => {
-          recordProbeError(error);
-        });
+        void call("terminal_probe", { sessionId: spawnedSessionId })
+          .then((verified) => {
+            if (!verified) return;
+            void call("redb_state_write", {
+              key: "lifeos.engine-room.ready",
+              value: JSON.stringify({
+                schemaVersion: "lifeos.engine-room-ready.v1",
+                state: "ready",
+                observedAt: Date.now(),
+                sessionId: spawnedSessionId,
+                argv: ["yzx", "enter", "--session", "<database-derived>"],
+                nushellMarker: true,
+                source: "zellij-pane",
+              }),
+            });
+          })
+          .catch((error) => {
+            recordProbeError(error);
+          });
       }
       await resizeTerminal();
     } catch {

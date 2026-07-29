@@ -434,11 +434,84 @@ impl Drop for EnvctlReconciler {
 }
 
 struct TerminalSession {
+    engine_session_name: String,
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send>,
     output_offset: Arc<AtomicU64>,
     input_offset: Arc<AtomicU64>,
+}
+
+fn engine_room_pane_target(session_name: &str) -> Option<(PathBuf, String)> {
+    let zellij = std::env::var_os("YZX_ZELLIJ").map(PathBuf::from).unwrap_or_else(|| {
+        PathBuf::from("/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij")
+    });
+    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+    let server = server_root
+        .join("zellij/contract_version_1")
+        .join(session_name);
+    let output = Command::new(&zellij)
+        .args(["--server", server.to_string_lossy().as_ref(), "action", "list-panes"])
+        .output()
+        .ok()?;
+    String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .find(|line| line.contains("lifeos-engine-shell"))
+        .and_then(|line| line.split_whitespace().next())
+        .map(|pane| (zellij, pane.to_string()))
+}
+
+fn write_engine_room_pane(session_name: &str, bytes: &[u8]) -> Result<bool, String> {
+    let Some((zellij, pane)) = engine_room_pane_target(session_name) else {
+        return Ok(false);
+    };
+    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+    let server = server_root
+        .join("zellij/contract_version_1")
+        .join(session_name);
+    let text = String::from_utf8_lossy(bytes);
+    let status = Command::new(zellij)
+        .args([
+            "--server",
+            server.to_string_lossy().as_ref(),
+            "action",
+            "write-chars",
+            &text,
+        ])
+        .status()
+        .map_err(|error| format!("write Engine Room Nushell pane: {error}"))?;
+    if !status.success() {
+        return Err(format!("write Engine Room Nushell pane exited with {status}"));
+    }
+    let _ = pane;
+    Ok(true)
+}
+
+fn read_engine_room_pane(session_name: &str) -> Option<String> {
+    let (zellij, pane) = engine_room_pane_target(session_name)?;
+    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+    let server = server_root
+        .join("zellij/contract_version_1")
+        .join(session_name);
+    Command::new(zellij)
+        .args([
+            "--server",
+            server.to_string_lossy().as_ref(),
+            "action",
+            "dump-screen",
+            "-p",
+            &pane,
+        ])
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+        .map(|output| String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
 #[derive(Default)]
@@ -584,6 +657,20 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
     ]
 }
 
+fn engine_room_shell_argv(session_name: &str) -> Vec<String> {
+    let yzx = std::env::var("YZX_BIN")
+        .unwrap_or_else(|_| "/home/flexnetos/.nix-profile/bin/yzx".into());
+    let inner = format!("^{yzx} enter --session {session_name}");
+    vec![
+        std::env::var("LIFEOS_NUSHELL_PATH").unwrap_or_else(|_| {
+            "/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu".into()
+        }),
+        "-l".into(),
+        "-c".into(),
+        inner,
+    ]
+}
+
 fn yazelix_runtime_dir() -> Result<PathBuf, String> {
     if let Some(value) = std::env::var_os("YAZELIX_RUNTIME_DIR") {
         return Ok(PathBuf::from(value));
@@ -615,12 +702,13 @@ fn terminal_spawn(
         .map_err(|error| format!("open terminal: {error}"))?;
     let session_name = engine_room_session_name()?;
     let engine_argv = engine_room_argv(&session_name);
+    let shell_argv = engine_room_shell_argv(&session_name);
     let runtime_dir = yazelix_runtime_dir()?;
     let state_dir = std::env::var_os("YAZELIX_STATE_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|| runtime_dir.join("yazelix"));
-    let mut command = CommandBuilder::new(&engine_argv[0]);
-    command.args(&engine_argv[1..]);
+    let mut command = CommandBuilder::new(&shell_argv[0]);
+    command.args(&shell_argv[1..]);
     command.env("YAZELIX_RUNTIME_DIR", &runtime_dir);
     command.env("YAZELIX_STATE_DIR", state_dir);
     command.env(
@@ -656,6 +744,7 @@ fn terminal_spawn(
             "cols": size.cols,
             "rows": size.rows,
             "argv": engine_argv,
+            "shell_argv": shell_argv,
         }),
     )?;
     let output_offset = Arc::new(AtomicU64::new(0));
@@ -722,6 +811,7 @@ fn terminal_spawn(
         .insert(
             session_id.clone(),
             TerminalSession {
+                engine_session_name: session_name.clone(),
                 master: pair.master,
                 writer,
                 child,
@@ -732,23 +822,64 @@ fn terminal_spawn(
     let focus_session_name = session_name.clone();
     let focus_capture_session = session_id.clone();
     std::thread::spawn(move || {
-        let zellij = std::env::var_os("YZX_ZELLIJ").unwrap_or_else(|| "zellij".into());
+        let zellij = std::env::var_os("YZX_ZELLIJ").unwrap_or_else(|| {
+            "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij".into()
+        });
+        let shell = std::env::var_os("LIFEOS_NUSHELL_PATH").unwrap_or_else(|| {
+            "/nix/store/6rf5daj415jnir6218pjk6b78phhx6pf-nushell-0.113.1/bin/nu".into()
+        });
         let server_root = std::env::var_os("XDG_RUNTIME_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
         let server = server_root
             .join("zellij/contract_version_1")
             .join(&focus_session_name);
+        let pane_name = "lifeos-engine-shell";
+        let find_pane = || {
+            Command::new(&zellij)
+                .args(["--server", server.to_string_lossy().as_ref(), "action", "list-panes"])
+                .output()
+                .ok()
+                .and_then(|output| {
+                    String::from_utf8_lossy(&output.stdout)
+                        .lines()
+                        .find(|line| line.contains(pane_name))
+                        .and_then(|line| line.split_whitespace().next())
+                        .map(str::to_string)
+                })
+        };
         for _ in 0..20 {
             std::thread::sleep(std::time::Duration::from_millis(250));
-            let pane_id = "terminal_1";
+            let pane_id = find_pane().or_else(|| {
+                let created = Command::new(&zellij)
+                    .args([
+                        "--server",
+                        server.to_string_lossy().as_ref(),
+                        "action",
+                        "new-pane",
+                        "--name",
+                        pane_name,
+                        "--",
+                        shell.to_string_lossy().as_ref(),
+                        "-l",
+                    ])
+                    .status()
+                    .is_ok_and(|status| status.success());
+                if created {
+                    std::thread::sleep(std::time::Duration::from_millis(250));
+                    find_pane()
+                } else {
+                    None
+                }
+            });
+            let Some(pane_id) = pane_id else { continue };
             let focused = Command::new(&zellij)
                 .args([
                     "--server",
                     server.to_string_lossy().as_ref(),
                     "action",
                     "focus-pane-id",
-                    pane_id,
+                    &pane_id,
                 ])
                 .status()
                 .is_ok_and(|status| status.success());
@@ -757,7 +888,7 @@ fn terminal_spawn(
                     &focus_capture_session,
                     "focus",
                     &[],
-                    serde_json::json!({"pane": pane_id, "title": "workspace"}),
+                    serde_json::json!({"pane": pane_id, "title": pane_name}),
                 );
                 break;
             }
@@ -788,6 +919,9 @@ fn terminal_write(
         &bytes,
         serde_json::json!({"stream": "pty", "offset": offset}),
     )?;
+    if write_engine_room_pane(&session.engine_session_name, &bytes)? {
+        return Ok(());
+    }
     session
         .writer
         .write_all(&bytes)
@@ -799,7 +933,7 @@ fn terminal_write(
 fn terminal_probe(
     state: tauri::State<'_, TerminalState>,
     session_id: String,
-) -> Result<(), String> {
+) -> Result<bool, String> {
     let probe = b"echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r";
     for _ in 0..15 {
         std::thread::sleep(std::time::Duration::from_secs(1));
@@ -819,13 +953,25 @@ fn terminal_probe(
             probe,
             serde_json::json!({"stream": "pty", "offset": offset, "source": "native-probe"}),
         )?;
-        session
-            .writer
-            .write_all(probe)
-            .and_then(|_| session.writer.flush())
-            .map_err(|error| format!("write terminal probe: {error}"))?;
+        if !write_engine_room_pane(&session.engine_session_name, probe)? {
+            session
+                .writer
+                .write_all(probe)
+                .and_then(|_| session.writer.flush())
+                .map_err(|error| format!("write terminal probe: {error}"))?;
+        }
+        let pane_output = read_engine_room_pane(&session.engine_session_name).unwrap_or_default();
+        capture_terminal_frame(
+            &session_id,
+            "output",
+            pane_output.as_bytes(),
+            serde_json::json!({"stream": "zellij-pane", "source": "nushell", "pane": "lifeos-engine-shell"}),
+        )?;
+        if pane_output.contains("LIFEOS_ENGINE_PROBE_DONE") {
+            return Ok(true);
+        }
     }
-    Ok(())
+    Ok(false)
 }
 
 #[tauri::command]

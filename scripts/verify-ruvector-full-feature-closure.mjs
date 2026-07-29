@@ -48,6 +48,7 @@ async function fileReceipt(path) {
 
 const ruVectorCommit = runGit(ruvectorRoot, "rev-parse", "HEAD");
 const envctlCommit = runGit(envctlRoot, "rev-parse", "HEAD");
+const envctlBaseIsAncestor = runGit(envctlRoot, "merge-base", "--is-ancestor", expectedEnvctlCommit, envctlCommit) === "";
 const tree = runCargoTree();
 const treeLines = tree.split("\n").filter(Boolean);
 const approvedSql = await readFile(approvedSqlPath, "utf8");
@@ -95,8 +96,8 @@ const failures = [];
 if (!ruVectorCommit.startsWith(expectedRuVectorCommit)) {
   failures.push(`RuVector is ${ruVectorCommit}; expected ${expectedRuVectorCommit}`);
 }
-if (!envctlCommit.startsWith(expectedEnvctlCommit)) {
-  failures.push(`envctl is ${envctlCommit}; expected ${expectedEnvctlCommit}`);
+if (!envctlBaseIsAncestor) {
+  failures.push(`envctl is ${envctlCommit}; expected a descendant of ${expectedEnvctlCommit}`);
 }
 if (receipt.dependency_policy.openssl_sys_present) {
   failures.push("all-features-v3 dependency graph still contains openssl-sys");

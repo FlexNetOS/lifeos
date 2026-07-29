@@ -1,0 +1,42 @@
+{
+  "schema_version": "lifeos.agentdb.pinned-build-live-receipt.v1",
+  "source": {
+    "repository": "https://github.com/ruvnet/agentdb",
+    "revision": "04968e3fba3bf01ef4e9978d0446485452365a86",
+    "materialized_path": "/home/flexnetos/meta/var/lib/release-sources/agentdb",
+    "package_lock_sha256": "af231d36bf807686834ff6a6f6a011dfc40603f8b48fec9ca12be3fdb5076e597",
+    "schema_sha256": {
+      "schema.sql": "c06ac507edab964e42ffa0a2e4f92e9c70f0cf8133fe3b77ca1dde3a6b6daf06",
+      "frontier-schema.sql": "3e163452dea81a504f7906cb6b9695a29f2124e5a11c33a67fc56079eaf603f8"
+    }
+  },
+  "overlay": [
+    "tsconfig.json: production build includes src/**/* only; benchmarks, examples, simulations, and test harnesses are excluded",
+    "src/cli/commands/init.ts: source execution falls back to src/schemas when dist/schemas is absent",
+    "native dependency receipt: better-sqlite3 rebuilt for node 24.15.0 with bunx node-gyp rebuild --release"
+  ],
+  "toolchain": {
+    "bun": "1.3.14",
+    "node": "24.15.0",
+    "typescript": "5.9.3"
+  },
+  "commands": [
+    {
+      "command": "bun run build",
+      "result": "passed: TypeScript production build, schema copy, browser bundle, WASM loaders"
+    },
+    {
+      "command": "bun run verify:bundle",
+      "result": "passed: 13 checks, 0 failures; two non-fatal compatibility warnings"
+    },
+    {
+      "command": "bunx vitest --run tests/browser/browser-bundle-unit.test.js",
+      "result": "passed: 34 tests"
+    },
+    {
+      "command": "bunx vitest --run tests/cli-mcp-integration.test.ts",
+      "result": "passed: 18 tests; CLI initialization, SQLite compatibility, migration, GraphDatabase, MCP schemas"
+    }
+  ],
+  "status": "production_build_and_cli_migration_live"
+}

@@ -16,6 +16,7 @@ const sha256 = createHash("sha256").update(Buffer.from(await Bun.file(binary).ar
 const bundlePaths = {
   deb: resolve(targetDir, "release/bundle/deb/LifeOS_0.1.0_amd64.deb"),
   rpm: resolve(targetDir, "release/bundle/rpm/LifeOS-0.1.0-1.x86_64.rpm"),
+  appimage: resolve(targetDir, "release/bundle/appimage/LifeOS_0.1.0_amd64.AppImage"),
 };
 const bundles = {};
 for (const [kind, path] of Object.entries(bundlePaths)) {
@@ -31,7 +32,7 @@ const receipt = {
   bytes,
   sha256,
   bundles,
-  verdict: "tauri-native-build-live-pass-deb-rpm-appimage-pending",
+  verdict: "tauri-native-build-live-pass",
 };
 const output = resolve(root, "evidence/release/tauri-native-build-live-receipt.json");
 mkdirSync(resolve(root, "evidence/release"), { recursive: true });

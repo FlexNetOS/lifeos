@@ -1,5 +1,13 @@
 import { spawnSync } from "node:child_process";
-import { accessSync, constants, existsSync, lstatSync, readdirSync } from "node:fs";
+import {
+  accessSync,
+  constants,
+  existsSync,
+  lstatSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
 import { delimiter, join } from "node:path";
 import process from "node:process";
 
@@ -62,6 +70,33 @@ if (process.platform === "linux") {
   // tools. Force their extract-and-run path so FUSE availability cannot turn
   // an otherwise complete bundle into a false linuxdeploy failure.
   env.APPIMAGE_EXTRACT_AND_RUN = "1";
+  env.LIFEOS_SKIP_LINUXDEPLOY_RECURSIVE_PASS = "1";
+
+  // linuxdeploy's GTK plugin recursively invokes the extracted AppImage. On
+  // extract-and-run hosts that temporary self-path is deleted before the
+  // recursive pass returns. Patch only that exact upstream line in the
+  // profile-owned cached plugin; the primary deployment already copied the
+  // required libraries, so the recursive pass is unnecessary.
+  const gtkPlugin = join(
+    env.XDG_CACHE_HOME ?? "/run/user/1001/yazelix/volatile/cache",
+    "tauri/linuxdeploy-plugin-gtk.sh",
+  );
+  if (existsSync(gtkPlugin)) {
+    const source = readFileSync(gtkPlugin, "utf8");
+    const recursivePass =
+      'env LINUXDEPLOY_PLUGIN_MODE=1 "$LINUXDEPLOY" --appdir="$APPDIR" "${LIBRARIES[@]}"';
+    if (source.includes(recursivePass) && !source.includes("LIFEOS_SKIP_LINUXDEPLOY_RECURSIVE_PASS")) {
+      writeFileSync(
+        gtkPlugin,
+        source.replace(
+          recursivePass,
+          'if [ "${LIFEOS_SKIP_LINUXDEPLOY_RECURSIVE_PASS:-1}" != "1" ]; then\n    ' +
+            recursivePass +
+            "\nfi",
+        ),
+      );
+    }
+  }
 }
 
 const localCli = join(
@@ -71,8 +106,8 @@ const localCli = join(
 const tauriCli = env.TAURI_CLI_BIN ?? (existsSync(localCli) ? localCli : null);
 const command = tauriCli ?? process.execPath;
 const args = tauriCli
-  ? ["build", "--bundles", "deb", "rpm"]
-  : ["x", "tauri", "build", "--bundles", "deb", "rpm"];
+  ? ["build", "--bundles", "deb", "rpm", "appimage"]
+  : ["x", "tauri", "build", "--bundles", "deb", "rpm", "appimage"];
 
 const result = spawnSync(command, args, {
   env: { ...env, BUN_EXEC: process.execPath },

@@ -74,7 +74,33 @@ SELECT jsonb_build_object(
         WHERE namespace_row.nspname = 'extensions'
           AND function_row.proname = 'ruvector_auto_tune'
           AND language_row.lanname = 'sql'
-      )
+      ),
+    'trajectory_writer',
+      to_regprocedure('extensions.ruvector_record_trajectory(text,real[],bigint[],bigint,integer,integer)') IS NOT NULL
+      AND EXISTS (
+        SELECT 1
+        FROM pg_proc function_row
+        JOIN pg_namespace namespace_row ON namespace_row.oid = function_row.pronamespace
+        JOIN pg_language language_row ON language_row.oid = function_row.prolang
+        WHERE namespace_row.nspname = 'extensions'
+          AND function_row.proname = 'ruvector_record_trajectory'
+          AND language_row.lanname = 'c'
+      ),
+    'learning_library_paths', (
+      SELECT COUNT(*) = 7 AND bool_and(function_row.probin = '$libdir/ruvector')
+      FROM pg_proc function_row
+      JOIN pg_namespace namespace_row ON namespace_row.oid = function_row.pronamespace
+      WHERE namespace_row.nspname = 'extensions'
+        AND function_row.proname = ANY (ARRAY[
+          'ruvector_enable_learning',
+          'ruvector_record_feedback',
+          'ruvector_learning_stats',
+          'ruvector_extract_patterns',
+          'ruvector_get_search_params',
+          'ruvector_clear_learning',
+          'ruvector_record_trajectory'
+        ])
+    )
   ),
   'required_schemas', jsonb_build_array(
     to_regnamespace('lifeos_blob') IS NOT NULL,
@@ -130,6 +156,12 @@ if (receipt.compatibility?.vector_avg_final !== true) {
 }
 if (receipt.compatibility?.auto_tune_bridge !== true) {
   failures.push("RuVector auto_tune real[] to native JSONB bridge is not active");
+}
+if (receipt.compatibility?.trajectory_writer !== true) {
+  failures.push("RuVector trajectory writer binding is not active");
+}
+if (receipt.compatibility?.learning_library_paths !== true) {
+  failures.push("RuVector learning bindings are not normalized to $libdir/ruvector");
 }
 
 if (failures.length) {

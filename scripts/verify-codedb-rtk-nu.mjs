@@ -6,7 +6,10 @@ import { spawnSync } from "node:child_process";
 const repoRoot = resolve(import.meta.dirname, "..");
 const rtkNuRoot = resolve(repoRoot, process.env.LIFEOS_RTK_NU_ROOT ?? "../rtk-tokenkill");
 const codeDbRoot = resolve(repoRoot, process.env.LIFEOS_CODEDB_ROOT ?? "../nu_plugin");
-const expectedCodeDbRevision = "71c631f2b9d28aa9f274b07bd2b791273bb40c4f";
+// The external nu_plugin checkout is the immutable integration target. This
+// pin follows its owner-socket redb landing implementation; LifeOS never
+// mutates that checkout.
+const expectedCodeDbRevision = "5cc8c97b1b05a47949af455c951570fbee9701e4";
 
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });

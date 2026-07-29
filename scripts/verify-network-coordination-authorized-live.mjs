@@ -172,7 +172,11 @@ const receipt = JSON.parse(marker);
 if (receipt.task_id !== task || receipt.execution_id !== execution || receipt.plan_id === undefined || receipt.effect_id === undefined || typeof receipt.apply_exit_code !== "number") {
   throw new Error(`authorized network execution returned an invalid receipt: ${marker}`);
 }
-const outputPath = resolve(root, "evidence/coordination/network-authorized-live-receipt.json");
+// Keep the procedure-only probe separate from the production-executor receipt.
+// Both probes exercise an authorized path, but their schemas and authorities
+// are intentionally different; sharing the path lets a later probe erase the
+// production receipt with the weaker v1 envelope.
+const outputPath = resolve(root, "evidence/coordination/network-authorized-procedure-live-receipt.json");
 const { writeFileSync: writeReceipt } = await import("node:fs");
 writeReceipt(outputPath, `${JSON.stringify({
   schema_version: "lifeos.evidence.network-coordination-authorized-live.v1",

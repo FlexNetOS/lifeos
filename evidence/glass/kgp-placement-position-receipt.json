@@ -1,0 +1,66 @@
+{
+  "schema_version": "lifeos.evidence.kgp-placement-position.v1",
+  "question": "Kgp positions an image by its U+10EEEE placeholder-cell region, but a direct placement paints at the cursor. Does converting the virtual placement land the image in the right cell region?",
+  "answer": "Yes. Yazi parks the cursor at the placeholder region's origin before emitting the placement, so the converted direct placement lands exactly there. Measured, not assumed — no adapter change was required.",
+  "authority": "Live yazi 26.5.6 Kgp stream captured on a real PTY reproducing the Glass VT envelope, then replayed through the shipped src/lib/kitty-unicode-placeholders.js.",
+  "repository_commit": "1f48323a79eca1d3b794215dd50f885140057031",
+  "capture": {
+    "bytes": 712097,
+    "kitty_apc_sequences": 181,
+    "placeholder_cells": 676,
+    "placement_control_observed": "q=2,a=T,C=1,U=1,f=32,s=256,v=256,i=3726565,m=1",
+    "notes": [
+      "Yazi sets C=1 itself; the adapter preserves it rather than appending a second cursor-policy key.",
+      "The payload is chunked with m=1 across 179 continuation APCs that carry no control keys."
+    ]
+  },
+  "position_measurement": {
+    "method": "Replayed the byte stream tracking the cursor as a terminal would (CUP/ED/LF/CR), recorded the cursor at each placement and the origin of the placeholder-cell region that followed it, segmented per redraw.",
+    "placements": [
+      {
+        "cursor_when_parsed": "2;64",
+        "placeholder_region_origin": "2;64",
+        "rows_spanned": "2..14",
+        "cells": 338,
+        "aligned": true
+      },
+      {
+        "cursor_when_parsed": "3;64",
+        "placeholder_region_origin": "3;64",
+        "rows_spanned": "3..15",
+        "cells": 338,
+        "aligned": true
+      }
+    ],
+    "all_aligned": true
+  },
+  "adapter_replay": {
+    "input_bytes": 712097,
+    "output_bytes": 712089,
+    "delta_bytes": -8,
+    "delta_explanation": "exactly two placements x the 4 bytes of \"U=1,\" — nothing else changed",
+    "apc_sequences": {
+      "before": 181,
+      "after": 181
+    },
+    "placements_still_virtual": 0,
+    "placeholder_cells": {
+      "before": 676,
+      "after": 676
+    },
+    "cursor_sequences_identical": true,
+    "chunk_continuations_preserved": true,
+    "trailing_bytes_after_flush": 0
+  },
+  "multiplexer_finding": {
+    "statement": "Yazi disables Kgp when it detects a multiplexer. The Engine Room runs `yzx enter` -> Zellij, and Yazi reads ZELLIJ_SESSION_NAME, so inside the Glass it will not select Kgp regardless of renderer capability — Sixel is the operative path there by Yazi's own policy, not by any choice or downgrade in LifeOS.",
+    "evidence": "With every Kitty signal aligned (KITTY_WINDOW_ID=1, TERM=xterm-kitty, XTVERSION kitty(0.42.0), cell size answered) Adapter.matches stayed Chafa while ZELLIJ_* was present, and became Kgp the moment those variables were hidden.",
+    "consequence": "The Kgp compatibility adapter remains required and correct for any non-multiplexed Kgp producer rendering into Glass; it is not dead code, but it is not the path Yazi takes inside the Engine Room today."
+  },
+  "regression_locks": [
+    "tests/kitty-unicode-placeholders.spec.js — converts the placement yazi actually emits, changing only the virtual flag",
+    "tests/kitty-unicode-placeholders.spec.js — leaves chunked payload continuations untouched",
+    "tests/kitty-unicode-placeholders.spec.js — never rewrites the cursor positioning the image is placed against"
+  ],
+  "ok": true
+}

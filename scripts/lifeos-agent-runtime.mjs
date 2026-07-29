@@ -20,39 +20,58 @@ const rvfRoot = resolve(process.env.LIFEOS_AGENT_RVF_ROOT ?? "/home/flexnetos/me
 const intervalMs = Number(process.env.LIFEOS_AGENT_HEARTBEAT_MS ?? 5_000);
 const statusPath = resolve(process.env.LIFEOS_AGENT_STATUS ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/status.json");
 
-function ownerPut(key, value) {
+function ownerPutMany(entries) {
   return new Promise((resolvePromise, reject) => {
     const socket = createConnection({ path: `${redbRoot}/owner.sock` });
     let response = "";
+    let settled = false;
     socket.setEncoding("utf8");
+    socket.setTimeout(30_000, () => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      reject(new Error("redb owner did not acknowledge the runtime status batch within 30s"));
+    });
     socket.on("connect", () => {
       socket.write(`${JSON.stringify({
         protocol_version: "flexnetos.redb-owner.v0",
         token: readFileSync(`${redbRoot}/owner.token`, "utf8").trim(),
-        op: "put",
-        key,
-        value,
+        op: "put_many",
+        entries,
       })}\n`);
     });
     const finish = () => {
+      if (settled) return;
       try {
         const result = JSON.parse(response.split("\n", 1)[0]);
+        settled = true;
+        socket.destroy();
         if (!result.ok) reject(new Error(result.error ?? "owner rejected runtime status"));
-        else { socket.destroy(); resolvePromise(result.seq); }
-      } catch (error) { reject(error); }
+        else resolvePromise(result.seq);
+      } catch (error) {
+        settled = true;
+        socket.destroy();
+        reject(error);
+      }
     };
     socket.on("data", (chunk) => { response += chunk; if (response.includes("\n")) finish(); });
     socket.on("end", () => { if (response) finish(); });
-    socket.on("error", reject);
+    socket.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    });
   });
 }
 
 async function publish(status, identity, engine) {
   const now = String(Date.now());
-  await ownerPut("agent.runtime.status", status);
-  await ownerPut("agent.runtime.identity", identity);
-  await ownerPut("agent.runtime.engine", engine);
-  await ownerPut("agent.runtime.updatedAt", now);
+  await ownerPutMany([
+    { key: "agent.runtime.status", value: status },
+    { key: "agent.runtime.identity", value: identity },
+    { key: "agent.runtime.engine", value: engine },
+    { key: "agent.runtime.updatedAt", value: now },
+  ]);
   mkdirSync(dirname(statusPath), { recursive: true });
   writeFileSync(statusPath, `${JSON.stringify({ schema_version: "lifeos.agent-runtime-status.v1", state: status, updated_at: Number(now), native_loaded: engine === "ruvllm-native", agents: [identity], identity_bound: true, failure_isolation: true, macro_authority: "postgresql+ruvector" }, null, 2)}\n`);
 }

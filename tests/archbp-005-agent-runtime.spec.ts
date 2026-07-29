@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
@@ -11,12 +11,37 @@ const runtimeScript = resolve(repoRoot, "scripts/lifeos-agent-runtime.mjs");
 function canConnect(root: string) {
   return new Promise<boolean>((resolveConnection) => {
     const socket = createConnection({ path: join(root, "owner.sock") });
+    let response = "";
+    let settled = false;
     const finish = (available: boolean) => {
+      if (settled) return;
+      settled = true;
       socket.destroy();
       resolveConnection(available);
     };
+    socket.setEncoding("utf8");
     socket.setTimeout(1000, () => finish(false));
-    socket.once("connect", () => finish(true));
+    socket.once("connect", () => {
+      try {
+        socket.write(`${JSON.stringify({
+          protocol_version: "flexnetos.redb-owner.v0",
+          token: readFileSync(join(root, "owner.token"), "utf8").trim(),
+          op: "status",
+        })}\n`);
+      } catch {
+        finish(false);
+      }
+    });
+    socket.on("data", (chunk) => {
+      response += chunk;
+      if (!response.includes("\n")) return;
+      try {
+        finish(JSON.parse(response.split("\n", 1)[0]).ok === true);
+      } catch {
+        finish(false);
+      }
+    });
+    socket.once("end", () => finish(false));
     socket.once("error", () => finish(false));
   });
 }

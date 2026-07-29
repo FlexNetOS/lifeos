@@ -10,8 +10,8 @@ describe("ARCHBP-011/012 network and coordination authority receipt", () => {
     const receipt = JSON.parse(readFileSync(receiptPath, "utf8"));
     expect(receipt.schema_version).toBe("lifeos.evidence.network-coordination-authority-live.v1");
     expect(receipt.verdict).toBe("pass-with-authorized-apply-release-gate");
-    expect(receipt.database.migration_count).toBe(94);
-    expect(receipt.database.latest_migration).toBe(105);
+    expect(receipt.database.migration_count).toBe(95);
+    expect(receipt.database.latest_migration).toBe(106);
     expect(receipt.database.procedure_count).toBe(9);
     expect(receipt.network.dry_run.result).toBe("planned");
     expect(receipt.network.unauthorized_submission_rejected).toBe(true);

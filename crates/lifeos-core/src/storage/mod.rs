@@ -34,6 +34,9 @@ pub struct RuntimeContext {
     pub identity_id: Uuid,
     pub grant_id: Uuid,
     pub binding_bytes: Vec<u8>,
+    pub task_grant_id: Option<Uuid>,
+    pub task_lease_id: Option<Uuid>,
+    pub task_binding_object_id: Option<Uuid>,
 }
 
 impl RuntimeContext {
@@ -64,7 +67,20 @@ impl RuntimeContext {
             )?,
             grant_id: parse_uuid("LIFEOS_RUNTIME_GRANT_ID", read("LIFEOS_RUNTIME_GRANT_ID")?)?,
             binding_bytes: binding,
+            task_grant_id: optional_runtime_uuid("LIFEOS_RUNTIME_TASK_GRANT_ID")?,
+            task_lease_id: optional_runtime_uuid("LIFEOS_RUNTIME_TASK_LEASE_ID")?,
+            task_binding_object_id: optional_runtime_uuid("LIFEOS_RUNTIME_TASK_BINDING_OBJECT_ID")?,
         })
+    }
+}
+
+fn optional_runtime_uuid(name: &str) -> Result<Option<Uuid>, StorageError> {
+    match std::env::var(name) {
+        Ok(value) => Uuid::parse_str(&value)
+            .map(Some)
+            .map_err(|error| StorageError::InvalidRuntimeContext(format!("{name}: {error}"))),
+        Err(std::env::VarError::NotPresent) => Ok(None),
+        Err(error) => Err(StorageError::InvalidRuntimeContext(format!("{name}: {error}"))),
     }
 }
 
@@ -138,8 +154,24 @@ impl Storage {
                     .bind(context.identity_id)
                     .bind(context.grant_id)
                     .bind(context.binding_bytes)
-                    .fetch_one(connection)
+                    .fetch_one(&mut *connection)
                     .await?;
+                    if let (Some(task_grant_id), Some(task_lease_id), Some(binding_object_id)) = (
+                        context.task_grant_id,
+                        context.task_lease_id,
+                        context.task_binding_object_id,
+                    ) {
+                        sqlx::query(
+                            "SELECT lifeos_security.bind_runtime_context($1, $2, $3, $4, $5)",
+                        )
+                        .bind(context.tenant_id)
+                        .bind(context.identity_id)
+                        .bind(task_grant_id)
+                        .bind(task_lease_id)
+                        .bind(binding_object_id)
+                        .fetch_one(&mut *connection)
+                        .await?;
+                    }
                     Ok(())
                 })
             });
@@ -327,6 +359,9 @@ impl Storage {
             identity_id: uuid::uuid!("00000000-0000-4000-8000-000000000002"),
             grant_id: uuid::uuid!("00000000-0000-4000-8000-000000000003"),
             binding_bytes: br#"{"tenant_id":"00000000-0000-4000-8000-000000000001","identity_id":"00000000-0000-4000-8000-000000000002","grant_id":"00000000-0000-4000-8000-000000000003","purpose":"envctl-session-binding"}"#.to_vec(),
+            task_grant_id: None,
+            task_lease_id: None,
+            task_binding_object_id: None,
         };
         let storage = Self::new_with_context_and_pool_size(&url, Some(context), 1).await?;
         storage.reset_for_test().await?;
@@ -387,6 +422,9 @@ mod tests {
             identity_id: uuid::uuid!("00000000-0000-4000-8000-000000000002"),
             grant_id: uuid::uuid!("00000000-0000-4000-8000-000000000003"),
             binding_bytes: br#"{"purpose":"envctl-session-binding"}"#.to_vec(),
+            task_grant_id: None,
+            task_lease_id: None,
+            task_binding_object_id: None,
         };
         assert_eq!(
             context.binding_bytes,

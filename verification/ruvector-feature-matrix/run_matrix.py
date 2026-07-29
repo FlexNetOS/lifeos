@@ -36,6 +36,7 @@ RUVECTOR_LIBRARY = os.environ.get(
 PGHOST = os.environ.get("RUVECTOR_PGHOST", "/home/flexnetos/meta/var/run/postgresql")
 PGPORT = os.environ.get("RUVECTOR_PGPORT", "5432")
 DBNAME = os.environ.get("RUVECTOR_DB", "ruvector_matrix")
+SQL_LIBRARY = RUVECTOR_LIBRARY if DBNAME == "lifeos" else "$libdir/ruvector"
 ANCHOR = os.environ.get(
     "RUVECTOR_ANCHOR",
     "/home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
@@ -160,7 +161,15 @@ SETUP_STEPS = [
         " END $$;"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune_jsonb_native("
         " table_name text, optimize_for text, sample_queries jsonb) RETURNS jsonb"
-        f" LANGUAGE c PARALLEL SAFE AS '{RUVECTOR_LIBRARY}', 'ruvector_auto_tune_wrapper';"
+        f" LANGUAGE c PARALLEL SAFE AS '{SQL_LIBRARY}', 'ruvector_auto_tune_wrapper';"
+        " DO $$ BEGIN IF to_regprocedure("
+        "'extensions.ruvector_auto_tune_array_native(text,text,real[][])'"
+        ") IS NULL THEN CREATE FUNCTION extensions.ruvector_auto_tune_array_native("
+        " table_name text, optimize_for text, sample_queries real[][]) RETURNS jsonb"
+        " LANGUAGE sql PARALLEL SAFE AS $fn$"
+        " SELECT extensions.ruvector_auto_tune_jsonb_native($1, $2,"
+        " CASE WHEN $3 IS NULL THEN NULL::jsonb ELSE to_jsonb($3) END)"
+        " $fn$; END IF; END $$;"
         " CREATE OR REPLACE FUNCTION extensions.ruvector_auto_tune("
         " table_name text, optimize_for text DEFAULT 'balanced', sample_queries real[] DEFAULT NULL)"
         " RETURNS jsonb LANGUAGE sql PARALLEL SAFE AS $$"
@@ -172,7 +181,7 @@ SETUP_STEPS = [
         "CREATE OR REPLACE FUNCTION extensions.ruvector_record_trajectory("
         " table_name text, query_vector real[], result_ids bigint[], latency_us bigint,"
         " ef_search integer, probes integer) RETURNS text LANGUAGE c PARALLEL SAFE"
-        f" AS '{RUVECTOR_LIBRARY}', 'ruvector_record_trajectory_wrapper'"
+        f" AS '{SQL_LIBRARY}', 'ruvector_record_trajectory_wrapper'"
     )),
     ("placement", (
         "DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_extension x JOIN pg_namespace n"

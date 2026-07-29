@@ -744,6 +744,7 @@ fn terminal_spawn(
                     "focus-pane-id",
                     &pane_id,
                 ])
+                .env("ZELLIJ_SESSION_NAME", &focus_session_name)
                 .status()
                 .is_ok_and(|status| status.success());
             if focused {

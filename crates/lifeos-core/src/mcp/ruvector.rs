@@ -171,11 +171,18 @@ impl RuvectorMcpClient {
                 "RuVector MCP binary must not be empty".into(),
             ));
         }
-        let mut child = Command::new(binary)
+        let mut command = Command::new(binary);
+        command
             .args(args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
+            .stderr(Stdio::inherit());
+        if let Ok(cwd) = std::env::var("LIFEOS_RUVECTOR_MCP_CWD") {
+            if !cwd.trim().is_empty() {
+                command.current_dir(cwd);
+            }
+        }
+        let mut child = command
             .spawn()
             .map_err(|error| McpError::NotConnected(format!("spawn RuVector MCP: {error}")))?;
         let stdin = child
@@ -269,7 +276,7 @@ impl RuvectorMcpClient {
             // Notifications have no id and may be interleaved with a response
             // while the server is working. They are not the result of this
             // request and must not desynchronise the single outstanding call.
-            if response.get("id").is_none() {
+            if response.get("id").and_then(Value::as_u64).is_none() {
                 continue;
             }
             break response;
@@ -451,6 +458,7 @@ IFS= read -r line || exit 1
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05"}}'
 IFS= read -r line || exit 1
 IFS= read -r line || exit 1
+printf '%s\n' '{"jsonrpc":"2.0","id":null,"error":{"code":-32601,"message":"Method not found"}}'
 printf '%s\n' '{"jsonrpc":"2.0","method":"notifications/progress","params":{"progress":1}}'
 printf '%s\n' '{"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"image","data":"ignored"},{"type":"text","text":"{\"count\":42}"}]}}'
 IFS= read -r line || exit 1

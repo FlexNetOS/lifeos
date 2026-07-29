@@ -1,0 +1,117 @@
+{
+  "schema_version": "lifeos.evidence.cow-native-roundtrip-live.v1",
+  "authority": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "status": "passed",
+  "receipt_id": "51a7e8f9-4bba-486e-adda-9f76fd8a6ac2",
+  "idempotency_key": "lifeos:cow-native-roundtrip:7ae310908a1b61a4fa85ca0e77b09d3f",
+  "evidence": {
+    "schema": "lifeos.native-rvf-postgres-roundtrip.v1",
+    "status": "passed",
+    "suite_version": "lifeos.native-rvf-postgres-roundtrip.v1",
+    "database_semantics": {
+      "suite_version": "lifeos.cow-db-semantic-suite.v1",
+      "receipt_digest": "047d63e1e32891bf02f7d6b9e4ccf9b64e86f209fedeeec314c6e7d7c65debb2",
+      "artifact_sha256": "f3eecadaf1b5d333d0449b775d47c81ca76195e18d0a6ed3fade50e089ee0ba9"
+    },
+    "installed_extension": {
+      "version": "0.3.1",
+      "catalog_version": "0.3.1"
+    },
+    "installed_libraries": [
+      {
+        "catalog_binding": "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector",
+        "path": "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector.so",
+        "sha256": "3ea6fcf6699aecd915afea76f3a2e741a3cb2cf2f8a5fb570f547cf409ddfdf8"
+      },
+      {
+        "catalog_binding": "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector.so",
+        "path": "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector.so",
+        "sha256": "3ea6fcf6699aecd915afea76f3a2e741a3cb2cf2f8a5fb570f547cf409ddfdf8"
+      }
+    ],
+    "native_binary": {
+      "path": "/home/flexnetos/meta/var/cargo-target/debug/ruvector-postgres-inv011-roundtrip",
+      "sha256": "909b0a57a86446b48c8e94b99eeeb496f175df87b5b2f6294611191c324f2f51",
+      "rvf_runtime_source_sha256": "605dc19550c258532227d87bfe7abf1df85c9386acd5e98488ff455cb2bf9908",
+      "ruvector_postgres_source_sha256": "bb7108e88c9e6a6d71d5df321ad2808daea6c7d89f576203849b0243ba92003b"
+    },
+    "verification": {
+      "adversarial_suite": "passed",
+      "native_close_reopen": "passed",
+      "postgres_roundtrip": "passed",
+      "fresh_bootstrap": "passed",
+      "upgrade_migration": "passed",
+      "least_privilege_rls": "passed",
+      "witness_chain": "passed",
+      "generation_u32_overflow": "passed",
+      "replacement_tombstone_identity": "passed"
+    },
+    "native_roundtrip": {
+      "child_file_id": "063b04d90cae52ba417548e13ab9a9d6",
+      "child_path": "/tmp/lifeos-cow-native-roundtrip/output/agentdb-child.rvf",
+      "cow_map": {
+        "generation_id": 2,
+        "payload_path": "/tmp/lifeos-cow-native-roundtrip/output/cow-map.payload",
+        "segment_count": 1
+      },
+      "generation_id": 2,
+      "lineage_depth": 1,
+      "membership": {
+        "generation_id": 2,
+        "member_count": 1,
+        "payload_path": "/tmp/lifeos-cow-native-roundtrip/output/membership.payload",
+        "rows": [
+          {
+            "logical_key_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "operation": "insert",
+            "relation_name": "lifeos_runtime.canonical_projection",
+            "tombstone": false,
+            "vector_id": 0,
+            "visible": true
+          }
+        ],
+        "segment_count": 1
+      },
+      "parent_generation_id": 1,
+      "parent_membership": {
+        "generation_id": 1,
+        "member_count": 1,
+        "payload_path": "/tmp/lifeos-cow-native-roundtrip/output/parent-membership.payload"
+      },
+      "parent_path": "/tmp/lifeos-cow-native-roundtrip/output/agentdb-parent.rvf",
+      "row_count": 1,
+      "schema": "lifeos.native-rvf-postgres-output.v1",
+      "status": "passed",
+      "visible_count": 1
+    }
+  },
+  "capability": {
+    "ready": true,
+    "rollback": "active-pointer-recursive-promotion-ancestry",
+    "promotion": "baseline-gated-database-materialized",
+    "implemented": true,
+    "table_count": 18,
+    "rvf_roundtrip": true,
+    "function_count": 21,
+    "schema_version": 2,
+    "forced_rls_count": 17,
+    "witness_algorithm": "SHAKE256-256",
+    "overlay_resolution": "overlay-nearest-ancestor-canonical-projection",
+    "database_receipt_id": "c21d508c-bea9-4685-b715-b111dbd2b7cb",
+    "legacy_witness_count": 0,
+    "required_table_count": 18,
+    "invalid_witness_count": 0,
+    "native_evidence_valid": true,
+    "native_rvf_receipt_id": "51a7e8f9-4bba-486e-adda-9f76fd8a6ac2",
+    "runtime_digest_binding": true,
+    "required_function_count": 21,
+    "witness_preimage_schema": "lifeos.cow-preimage.v1",
+    "database_semantics_receipt": true,
+    "invalid_witness_chain_count": 0,
+    "legacy_envctl_execute_count": 0,
+    "public_security_definer_count": 0,
+    "compatibility_forced_rls_count": 8,
+    "acceptance_receipt_schema_version": 1,
+    "compatibility_required_forced_rls_count": 8
+  }
+}

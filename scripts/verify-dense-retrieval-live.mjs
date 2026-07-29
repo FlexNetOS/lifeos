@@ -20,12 +20,23 @@ SELECT lifeos_security.bootstrap_envctl_context(
   '00000000-0000-4000-8000-000000000003',
   convert_to('{"probe":true}', 'UTF8')
 );
-SELECT lifeos_semantic.append_embedding_projection(
-  'LIFEOS_DENSE_PROBE', 'dense-probe', 384,
-  decode(repeat('00000000', 384), 'hex'),
-  ${query}, jsonb_build_object('probe', true),
-  extract(epoch FROM clock_timestamp())::bigint, false
-);
+CREATE TEMP TABLE dense_probe (embedding_id uuid) ON COMMIT DROP;
+INSERT INTO dense_probe
+  SELECT lifeos_semantic.append_embedding_projection(
+    'LIFEOS_DENSE_PROBE', 'dense-probe', 384,
+    decode(repeat('00000000', 384), 'hex'),
+    ${query}, jsonb_build_object('probe', true),
+    extract(epoch FROM clock_timestamp())::bigint, false
+  );
+WITH results AS (
+  SELECT result.*
+  FROM lifeos_semantic.search_embedding(
+    (${query})::extensions.ruvector,
+    '00000000-0000-4000-8000-000000000005', 10
+  ) AS result
+  CROSS JOIN dense_probe
+  WHERE result.embedding_id = dense_probe.embedding_id
+)
 SELECT jsonb_build_object(
   'matched', count(*) = 1,
   'source_object_id', (array_agg(source_object_id))[1],
@@ -34,10 +45,7 @@ SELECT jsonb_build_object(
   'generation', min(generation),
   'rank_positive', min(rank) > 0
 )
-FROM lifeos_semantic.search_embedding(
-  (${query})::extensions.ruvector,
-  '00000000-0000-4000-8000-000000000005', 10
-);
+FROM results;
 ROLLBACK;`;
 
 const child = Bun.spawn(

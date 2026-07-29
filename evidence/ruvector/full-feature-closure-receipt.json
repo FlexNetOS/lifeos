@@ -1,0 +1,44 @@
+{
+  "schema_version": "lifeos.evidence.ruvector-full-feature-closure.v1",
+  "authority": "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
+  "features": [
+    "pg17",
+    "all-features-v3"
+  ],
+  "ruvector": {
+    "repository": "/home/flexnetos/meta/src/meta-ruvector",
+    "commit": "4dec9ce6eb444f6d601513244379a839dbfec954",
+    "dependency_manifest": "crates/ruvector-postgres/Cargo.toml",
+    "lockfile": "crates/ruvector-postgres/Cargo.lock"
+  },
+  "envctl": {
+    "repository": "/home/flexnetos/meta/src/envctl",
+    "commit": "6a6159ad788cdc0a004e1a529d26290bda05a3ef",
+    "vendored_manifest": "third_party/ruvector-postgres-2.0.5/Cargo.toml"
+  },
+  "dependency_policy": {
+    "fastembed_features": [
+      "hf-hub-rustls-tls",
+      "image-models",
+      "ort-load-dynamic"
+    ],
+    "openssl_sys_present": false,
+    "native_tls_present": false,
+    "rustls_present": true
+  },
+  "approved_artifact": {
+    "sql": {
+      "path": "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector--0.3.1.sql",
+      "bytes": 136977,
+      "sha256": "b5047cdcaeca67eaee806ec744201d0e838fd2aa8796f4f8f794dc847ab5604c"
+    },
+    "library": {
+      "path": "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector.so",
+      "bytes": 17804423,
+      "sha256": "7790f1f54035695eb9d3b1d8fa49b69cffe76326674fe55f21c25e745e4e2fcb"
+    },
+    "sql_function_count": 314,
+    "invalid_default_tokens": []
+  },
+  "cargo_tree_lines": 2445
+}

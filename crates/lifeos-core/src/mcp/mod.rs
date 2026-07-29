@@ -53,6 +53,14 @@ impl std::error::Error for McpError {}
 /// tests use an in-memory fake keyed by path.
 pub trait Transport {
     fn get(&self, path: &str) -> Result<String, McpError>;
+
+    /// Raw GET response bytes for byte-complete ingress callers. The default
+    /// preserves compatibility for string-backed test transports; production
+    /// transports override it before any text decoding occurs.
+    fn get_bytes(&self, path: &str) -> Result<Vec<u8>, McpError> {
+        self.get(path).map(String::into_bytes)
+    }
+
     fn post(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError>;
     fn put(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError>;
 }
@@ -112,6 +120,24 @@ mod reqwest_transport {
                 )));
             }
             resp.text().map_err(|e| McpError::Protocol(e.to_string()))
+        }
+
+        fn get_bytes(&self, path: &str) -> Result<Vec<u8>, McpError> {
+            let url = format!("{}{}", self.base_url, path);
+            let resp = self
+                .client
+                .get(&url)
+                .send()
+                .map_err(|e| McpError::NotConnected(e.to_string()))?;
+            if !resp.status().is_success() {
+                return Err(McpError::Protocol(format!(
+                    "GET {url} returned {}",
+                    resp.status()
+                )));
+            }
+            resp.bytes()
+                .map(|bytes| bytes.to_vec())
+                .map_err(|e| McpError::Protocol(e.to_string()))
         }
 
         fn post(&self, path: &str, body: &serde_json::Value) -> Result<String, McpError> {

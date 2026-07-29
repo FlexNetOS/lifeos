@@ -4,15 +4,17 @@ Headless LifeOS node. Runs on a Raspberry Pi Zero 2 W or Pi 3 (Pi OS 64-bit / Ub
 
 ## Status
 
-The daemon is an active Cognitum-Seed → MQTT bridge. On startup it performs a
-status handshake, connects to the configured broker, publishes retained online
-status, and publishes retained sensor snapshots until stopped. MQTT's
-last-will record publishes retained offline status when the process disappears.
+The daemon is an envctl-authorized Cognitum-Seed → PostgreSQL/RuVector → MQTT
+bridge. It refuses to start without a database-issued execution context. Every
+sensor response is captured as its exact wire bytes through
+`lifeos_runtime.append_log_frame` before the derived MQTT payload is published;
+read failures are captured on the stderr stream. MQTT's last-will record
+publishes retained offline status when the process disappears.
 
 ## Purpose
 
 - Live on small SBCs (Pi Zero 2 W, Pi 3, anything `aarch64-unknown-linux-gnu`) that can't host the full Tauri app.
-- Poll `lifeos_core::mcp::cognitum::CognitumClient::sensor_snapshot()` and forward frames over MQTT (subject TBD — likely `lifeos/sensor/<device-id>`).
+- Poll `lifeos_core::mcp::cognitum::CognitumClient::sensor_snapshot()`, capture the exact response through the database runtime, and forward the derived frame over MQTT.
 - Stay headless: no GUI deps, no `gtk`, no `webkit2gtk`, no `librsvg`.
 - Stay pure-Rust at the dependency graph level. **No `openssl-sys`.** Rustls only when TLS is needed.
 
@@ -53,11 +55,11 @@ cross build -p lifeos-daemon --target aarch64-unknown-linux-gnu --release
 
 ## Acceptance commands
 
-These are the four commands that proved the scaffold:
+These commands cover the production binary and its cross-target dependency closure:
 
 ```bash
 cargo check --workspace                                             # native, full workspace
-cargo run -p lifeos-daemon                                          # bridge loop
+cargo run -p lifeos-daemon                                          # requires envctl runtime context + live Cognitum/MQTT
 rustup target add aarch64-unknown-linux-gnu                         # additive, idempotent
 cargo check -p lifeos-daemon --target aarch64-unknown-linux-gnu     # cross check (no link)
 ```
@@ -76,6 +78,12 @@ Environment variables are the database/envctl-generated projection boundary:
 | `LIFEOS_DEVICE_ID` | `$HOSTNAME` or `lifeos-node` |
 | `LIFEOS_MQTT_TOPIC_PREFIX` | `lifeos/sensor` |
 | `LIFEOS_SENSOR_POLL_SECONDS` | `5` |
+| `LIFEOS_DATABASE_URL` | envctl-issued PostgreSQL/RuVector URL (required) |
+| `LIFEOS_RUNTIME_EXECUTION_ID` | database-issued running execution UUID (required) |
+| `LIFEOS_RUNTIME_TENANT_ID` | envctl runtime context (required) |
+| `LIFEOS_RUNTIME_IDENTITY_ID` | envctl runtime context (required) |
+| `LIFEOS_RUNTIME_GRANT_ID` | envctl runtime context (required) |
+| `LIFEOS_RUNTIME_BINDING_JSON` | envctl runtime context (required) |
 
 The bridge publishes `<prefix>/<device-id>/status` and
 `<prefix>/<device-id>/snapshot` with QoS 1 and retained payloads. `mqtts://`

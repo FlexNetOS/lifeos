@@ -93,6 +93,8 @@ impl CogsListResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SensorSnapshot {
     raw: Value,
+    #[serde(skip)]
+    wire_bytes: Vec<u8>,
 }
 
 impl SensorSnapshot {
@@ -113,6 +115,12 @@ impl SensorSnapshot {
 
     pub fn raw(&self) -> &Value {
         &self.raw
+    }
+
+    /// Exact response bytes returned by the Cognitum transport. `raw()` is a
+    /// derived parsed view; capture callers persist these bytes for fidelity.
+    pub fn wire_bytes(&self) -> &[u8] {
+        &self.wire_bytes
     }
 }
 
@@ -193,9 +201,15 @@ impl<T: Transport> CognitumClient<T> {
     /// `GET /api/v1/sensor/stream` — most recent sensor frame. Mirrors the
     /// `seed.sensor.snapshot` MCP tool.
     pub fn sensor_snapshot(&self) -> Result<SensorSnapshot, McpError> {
-        let body = self.transport.get("/api/v1/sensor/stream")?;
+        let wire_bytes = self.transport.get_bytes("/api/v1/sensor/stream")?;
+        let body = String::from_utf8(wire_bytes.clone()).map_err(|error| {
+            McpError::Protocol(format!("sensor_snapshot: response is not UTF-8: {error}"))
+        })?;
         let raw = parse_sensor_event(&body)?;
-        Ok(SensorSnapshot { raw })
+        Ok(SensorSnapshot {
+            raw,
+            wire_bytes,
+        })
     }
 
     /// Coherence profile from `/api/v1/coherence/profile`.
@@ -285,6 +299,10 @@ mod tests {
         assert_eq!(
             client.sensor_snapshot().unwrap().timestamp().as_deref(),
             Some("2026-05-25T12:00:00Z")
+        );
+        assert_eq!(
+            client.sensor_snapshot().unwrap().wire_bytes(),
+            b"event: sensor\ndata: {\"ts\":1748131200000}\n\nevent: sensor\ndata: {\"timestamp\":\"2026-05-25T12:00:00Z\"}\n"
         );
     }
 

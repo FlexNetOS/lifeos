@@ -4,10 +4,8 @@
 # reqwest uses rustls and rumqttc is built without native TLS or OpenSSL.
 #
 # Dependency posture: pure-Rust only. No `openssl-sys`. We pull `lifeos-core`
-# with `default-features = false` so the daemon scaffold doesn't drag
-# `reqwest` (and its rustls transport) into the cross-compile path until a
-# future stage opts back into `mcp-http`. This keeps `cargo check --target
-# aarch64-unknown-linux-gnu` resolving against a minimal dependency graph.
+# with `default-features = false` and opts into the production HTTP and
+# envctl-bound PostgreSQL runtime surfaces explicitly.
 
 [package]
 name = "lifeos-daemon"
@@ -22,12 +20,10 @@ name = "lifeos-daemon"
 path = "src/main.rs"
 
 [dependencies]
-# Workspace sibling. `default-features = false` strips the `mcp-http` feature
-# (and the `reqwest` dep behind it) — the scaffold's `main()` only needs the
-# `VERSION` constant + the `CognitumClient` type signatures, both available
-# without the HTTP transport. A future wave that wires real sensor reads will
-# either flip `default-features` back on or add a `mcp-http` feature here that
-# forwards to `lifeos-core/mcp-http`.
-lifeos-core = { path = "../lifeos-core", default-features = false, features = ["mcp-http"] }
+# The daemon must capture exact device bytes through the canonical database
+# procedure before publishing any derived MQTT payload.
+lifeos-core = { path = "../lifeos-core", default-features = false, features = ["mcp-http", "storage"] }
 rumqttc = { version = "0.25.1", default-features = false, features = ["use-rustls"] }
 serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+uuid = { version = "1", features = ["v4"] }

@@ -2,11 +2,14 @@
 
 use lifeos_core::mcp::cognitum::CognitumClient;
 use lifeos_core::mcp::ReqwestTransport;
+use lifeos_core::storage::{logs, Storage};
 use rumqttc::{Client, LastWill, MqttOptions, QoS};
 use serde_json::json;
 use std::env;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use tokio::runtime::Runtime;
+use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 struct Config {
@@ -17,6 +20,7 @@ struct Config {
     device_id: String,
     topic_prefix: String,
     poll_interval: Duration,
+    execution_id: Uuid,
 }
 
 impl Config {
@@ -34,6 +38,10 @@ impl Config {
         if poll_seconds == 0 {
             return Err("LIFEOS_SENSOR_POLL_SECONDS must be greater than zero".into());
         }
+        let execution_id = env::var("LIFEOS_RUNTIME_EXECUTION_ID")
+            .map_err(|_| "LIFEOS_RUNTIME_EXECUTION_ID is required".to_string())?
+            .parse::<Uuid>()
+            .map_err(|e| format!("LIFEOS_RUNTIME_EXECUTION_ID: {e}"))?;
         Ok(Self {
             cognitum_url: env::var("LIFEOS_COGNITUM_URL")
                 .unwrap_or_else(|_| "http://169.254.42.1/mcp".to_string()),
@@ -47,6 +55,7 @@ impl Config {
                 .trim_end_matches('/')
                 .to_string(),
             poll_interval: Duration::from_secs(poll_seconds),
+            execution_id,
         })
     }
 }
@@ -82,8 +91,42 @@ fn now_unix_ms() -> u128 {
         .as_millis()
 }
 
+fn capture(
+    runtime: &Runtime,
+    storage: &Storage,
+    execution_id: Uuid,
+    stream: &str,
+    frame_no: &mut i64,
+    byte_offset: &mut i64,
+    bytes: &[u8],
+    context: serde_json::Value,
+) -> Result<(), String> {
+    runtime
+        .block_on(logs::append_frame(
+            storage.pool(),
+            execution_id,
+            stream,
+            *frame_no,
+            *byte_offset,
+            bytes,
+            context,
+        ))
+        .map_err(|e| format!("capture {stream} frame {}: {e}", *frame_no))?;
+    *frame_no += 1;
+    *byte_offset +=
+        i64::try_from(bytes.len()).map_err(|_| "captured frame is too large".to_string())?;
+    Ok(())
+}
+
 fn main() -> Result<(), String> {
     let config = Config::from_env()?;
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .map_err(|e| format!("create storage runtime: {e}"))?;
+    let storage = runtime
+        .block_on(Storage::from_runtime_env())
+        .map_err(|e| format!("open envctl-bound PostgreSQL runtime: {e}"))?;
     let cognitum_url = config.cognitum_url.clone();
     let cognitum = CognitumClient::<ReqwestTransport>::from_env().map_err(|e| {
         format!(
@@ -101,7 +144,7 @@ fn main() -> Result<(), String> {
         QoS::AtLeastOnce,
         true,
     ));
-    let (mut mqtt, mut connection) = Client::new(mqtt_options, 32);
+    let (mqtt, mut connection) = Client::new(mqtt_options, 32);
     thread::spawn(move || {
         for event in connection.iter() {
             if let Err(error) = event {
@@ -121,12 +164,33 @@ fn main() -> Result<(), String> {
     .map_err(|e| format!("publish online status: {e}"))?;
 
     let sensor_topic = format!("{}/{}/snapshot", config.topic_prefix, config.device_id);
+    let mut stdout_frame_no = 0_i64;
+    let mut stdout_offset = 0_i64;
+    let mut stderr_frame_no = 0_i64;
+    let mut stderr_offset = 0_i64;
     loop {
         match cognitum.sensor_snapshot() {
             Ok(snapshot) => {
+                let captured_at_ms = now_unix_ms();
+                capture(
+                    &runtime,
+                    &storage,
+                    config.execution_id,
+                    "stdout",
+                    &mut stdout_frame_no,
+                    &mut stdout_offset,
+                    snapshot.wire_bytes(),
+                    json!({
+                        "schema_version": "lifeos.daemon.sensor-frame.v1",
+                        "device_id": config.device_id,
+                        "source": "cognitum.sensor_snapshot",
+                        "captured_at_ms": captured_at_ms,
+                        "content_type": "application/json-or-sse",
+                    }),
+                )?;
                 let payload = json!({
                     "device_id": config.device_id,
-                    "captured_at_ms": now_unix_ms(),
+                    "captured_at_ms": captured_at_ms,
                     "snapshot": snapshot.raw(),
                 });
                 if let Err(error) =
@@ -135,7 +199,25 @@ fn main() -> Result<(), String> {
                     eprintln!("lifeos-daemon sensor publish: {error}");
                 }
             }
-            Err(error) => eprintln!("lifeos-daemon sensor read: {error}"),
+            Err(error) => {
+                let error_bytes = error.to_string().into_bytes();
+                capture(
+                    &runtime,
+                    &storage,
+                    config.execution_id,
+                    "stderr",
+                    &mut stderr_frame_no,
+                    &mut stderr_offset,
+                    &error_bytes,
+                    json!({
+                        "schema_version": "lifeos.daemon.sensor-error.v1",
+                        "device_id": config.device_id,
+                        "source": "cognitum.sensor_snapshot",
+                        "captured_at_ms": now_unix_ms(),
+                    }),
+                )?;
+                eprintln!("lifeos-daemon sensor read: {error}");
+            }
         }
         thread::sleep(config.poll_interval);
     }

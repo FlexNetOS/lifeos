@@ -22,6 +22,11 @@ const engine = engineCandidates.find(({ path }) => {
 if (!engine) throw new Error("yzx-envelope engine not found");
 
 const python = execFileSync("bash", ["-c", 'readlink -f "$(command -v python3)"'], { encoding: "utf8" }).trim();
+// The profile may rotate its moving symlink during a generation switch. Resolve
+// Nushell through the active profile-owned PATH instead of assuming a fixed
+// ~/.nix-profile/bin/nu link exists.
+const nuBinary = process.env.LIFEOS_NU_BIN
+  ?? execFileSync("bash", ["-c", "command -v nu"], { encoding: "utf8" }).trim();
 // Two identical timed passes make scheduler noise a smaller fraction of the
 // sample while keeping the comparison inside the same process and namespace.
 const WORKLOAD = "import time; t=time.perf_counter(); [sum(i*i for i in range(20_000_000)) for _ in range(2)]; print(time.perf_counter()-t)";
@@ -39,7 +44,7 @@ function bareRun() {
 function envelopeRun(i) {
   const wall0 = process.hrtime.bigint();
   const launcher = engine.kind === "nu"
-    ? ["/home/flexnetos/.nix-profile/bin/nu", engine.path]
+    ? [nuBinary, engine.path]
     : ["bash", engine.path];
   const out = execFileSync(
     launcher[0],

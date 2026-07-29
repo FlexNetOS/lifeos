@@ -1,0 +1,228 @@
+{
+  "schema_version": "lifeos.evidence.network-coordination-authority-live.v1",
+  "generated_at": "2026-07-29T07:55:28.662Z",
+  "components": {
+    "network_control": {
+      "path": "/home/flexnetos/meta/src/network-control",
+      "revision": "cad70349968d2a6f501fb304a77d5cd6dac340b5",
+      "clean": true,
+      "workspace_packages": 3
+    },
+    "weave": {
+      "path": "/home/flexnetos/meta/src/weave",
+      "revision": "1f0801f5cc9ff772b87497584d5650a9ddca15d5",
+      "clean": true,
+      "workspace_packages": 4
+    },
+    "rusty_idd": {
+      "path": "/home/flexnetos/meta/src/rusty-idd",
+      "revision": "fd95efdd3d461874ceab28a4ad82c435e162b751",
+      "clean": true,
+      "workspace_packages": 28
+    },
+    "flexnetos_runner": {
+      "path": "/home/flexnetos/meta/src/flexnetos_runner",
+      "revision": "3e67b2e75973619efb3892820298da1eda2cbf7c",
+      "clean": true,
+      "workspace_packages": 3
+    }
+  },
+  "database": {
+    "server_version": "17.10",
+    "migration_count": 88,
+    "latest_migration": 99,
+    "active_tenant": null,
+    "task_count": 0,
+    "lease_count": 0,
+    "coordination_rows": 0,
+    "procedure_count": 9
+  },
+  "network": {
+    "netctl": "/home/flexnetos/meta/var/cargo-target/debug/netctl",
+    "status": {
+      "interfaces": [
+        {
+          "index": 1,
+          "name": "lo",
+          "mac": "00:00:00:00:00:00",
+          "mtu": 65536,
+          "is_up": true,
+          "is_loopback": true,
+          "ipv4": [
+            {
+              "addr": "127.0.0.1",
+              "prefix": 8
+            }
+          ],
+          "ipv6": [
+            {
+              "addr": "::1",
+              "prefix": 128
+            }
+          ],
+          "gateways": []
+        },
+        {
+          "index": 2,
+          "name": "eno1",
+          "mac": "10:ff:e0:b3:9e:55",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [
+            {
+              "addr": "10.0.1.172",
+              "prefix": 24
+            }
+          ],
+          "ipv6": [
+            {
+              "addr": "fe80::12ff:e0ff:feb3:9e55",
+              "prefix": 64
+            }
+          ],
+          "gateways": [
+            "10.0.1.1"
+          ]
+        },
+        {
+          "index": 3,
+          "name": "enp73s0",
+          "mac": "10:ff:e0:b3:9e:56",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [],
+          "ipv6": [],
+          "gateways": []
+        },
+        {
+          "index": 6,
+          "name": "wlp71s0",
+          "mac": "04:68:74:aa:a0:65",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [
+            {
+              "addr": "10.0.1.161",
+              "prefix": 24
+            }
+          ],
+          "ipv6": [
+            {
+              "addr": "fe80::45ad:5107:3e96:1f46",
+              "prefix": 64
+            }
+          ],
+          "gateways": [
+            "10.0.1.1"
+          ]
+        },
+        {
+          "index": 7,
+          "name": "virbr0",
+          "mac": "52:54:00:a2:9b:31",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [
+            {
+              "addr": "192.168.122.1",
+              "prefix": 24
+            }
+          ],
+          "ipv6": [],
+          "gateways": []
+        },
+        {
+          "index": 8,
+          "name": "docker0",
+          "mac": "12:21:ba:7e:a7:04",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [
+            {
+              "addr": "172.17.0.1",
+              "prefix": 16
+            }
+          ],
+          "ipv6": [],
+          "gateways": []
+        },
+        {
+          "index": 9,
+          "name": "br-6fff958fc08d",
+          "mac": "f2:76:d1:42:b6:e1",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [
+            {
+              "addr": "172.18.0.1",
+              "prefix": 16
+            }
+          ],
+          "ipv6": [],
+          "gateways": []
+        },
+        {
+          "index": 18,
+          "name": "enxb6c23dc46927",
+          "mac": "b6:c2:3d:c4:69:27",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [],
+          "ipv6": [
+            {
+              "addr": "fe80::76e4:96f1:cf01:38f6",
+              "prefix": 64
+            }
+          ],
+          "gateways": []
+        },
+        {
+          "index": 19,
+          "name": "enxde98079bf2db",
+          "mac": "de:98:07:9b:f2:db",
+          "mtu": 1500,
+          "is_up": true,
+          "is_loopback": false,
+          "ipv4": [],
+          "ipv6": [
+            {
+              "addr": "fe80::a0a4:7d05:479c:1811",
+              "prefix": 64
+            }
+          ],
+          "gateways": []
+        }
+      ],
+      "default_interface": "eno1",
+      "default_gateway": "10.0.1.1",
+      "dns_servers": [
+        "127.0.0.53"
+      ]
+    },
+    "dry_run": {
+      "result": "planned",
+      "plan": {
+        "op": {
+          "op": "set_state",
+          "iface": "lo",
+          "up": true
+        },
+        "ip_equivalent": "ip link set lo up",
+        "disruptive": false,
+        "notes": [
+          "live kernel change (not persisted) — needs root; re-add to netplan to survive reboot"
+        ]
+      }
+    },
+    "unauthorized_submission_rejected": true
+  },
+  "verdict": "pass-with-authorized-apply-release-gate",
+  "release_gate": "An active database-issued task, lease, grant, and bound executor context are required before a controlled network mutation or Weave/runner job can be executed; none was present in the live database during this run."
+}

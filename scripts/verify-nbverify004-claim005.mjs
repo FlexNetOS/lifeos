@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 
 const root = process.cwd();
 const outputArgument = process.argv.find((argument) =>
@@ -19,12 +20,15 @@ const sourceFiles = [
   "planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md",
 ];
 
-function run(command, args) {
+function run(command, args, env = {}) {
   try {
     return {
       command: [command, ...args].join(" "),
       exit_status: 0,
-      output: execFileSync(command, args, { encoding: "utf8" }),
+      output: execFileSync(command, args, {
+        encoding: "utf8",
+        env: { ...process.env, ...env },
+      }),
     };
   } catch (error) {
     return {
@@ -60,11 +64,24 @@ const agentProcesses = processSnapshot.output
       /ruvnet|agentdb|ruvllm|ruvector|rvf|swarm/i.test(line) &&
       !/rustc|kache|envctl_engine/i.test(line),
   );
-const runtime = run("bun", ["scripts/lifeos-agent-runtime.mjs", "--once"]);
-const runtimeStatusPath = "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/status.json";
+const proofRvfRoot = mkdtempSync(join(tmpdir(), "nbverify005-agent-rvf-"));
+const runtimeStatusPath = join(proofRvfRoot, "status.json");
+const proofRuntimeEnv = {
+  LIFEOS_AGENT_RVF_ROOT: proofRvfRoot,
+  LIFEOS_AGENT_STATUS: runtimeStatusPath,
+};
+const runtime = run(
+  "bun",
+  ["scripts/lifeos-agent-runtime.mjs", "--once"],
+  proofRuntimeEnv,
+);
 let runtimeStatus = null;
 try { runtimeStatus = JSON.parse(readFileSync(runtimeStatusPath, "utf8")); } catch {}
-const restart = run("bun", ["scripts/lifeos-agent-runtime.mjs", "--once"]);
+const restart = run(
+  "bun",
+  ["scripts/lifeos-agent-runtime.mjs", "--once"],
+  proofRuntimeEnv,
+);
 const orchestrationSource = run("rg", ["-n", "governed-ruvnet-agents|AgentRuntimeSupervisor|startAgentRuntime|AgentRvfRegistry", "scripts/boot-reattach.mjs", "scripts/lifeos-agent-runtime.mjs", "src-tauri/src/lib.rs"]);
 const live = runtime.exit_status === 0 && restart.exit_status === 0 && runtimeStatus?.native_loaded === true && runtimeStatus?.identity_bound === true;
 let previous = {};

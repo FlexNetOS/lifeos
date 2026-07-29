@@ -17,6 +17,16 @@ license = "MIT OR Apache-2.0"
 name = "lifeos_core"
 path = "src/lib.rs"
 
+[[bin]]
+name = "lifeos-network-control-executor"
+path = "src/bin/lifeos-network-control-executor.rs"
+required-features = ["storage"]
+
+[[bin]]
+name = "lifeos-coordination-executor"
+path = "src/bin/lifeos-coordination-executor.rs"
+required-features = ["storage"]
+
 [dependencies]
 # Stage 1b: derive Serialize/Deserialize on portable types so the Tauri shell
 # can still return them through `#[tauri::command]` without re-defining shapes.

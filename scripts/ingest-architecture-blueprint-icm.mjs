@@ -13,9 +13,9 @@ export const SOURCE_PATH = path.join(
 
 export const SOURCE_ID = "ARCHANCHOR-001";
 export const SOURCE_SHA256 =
-  "9218e362bc8f273943307b628cdd4a25dd5005e3469a967b360078477c5203e8";
-export const SOURCE_BYTES = 1_016_885;
-export const SOURCE_LINES = 6_446;
+  "5e7cb1ec58368d33dc6025169aeea76eac5af26f637ae4d103a763db848d28ac";
+export const SOURCE_BYTES = 1_017_794;
+export const SOURCE_LINES = 6_448;
 export const MEMOIR_NAME = "architecture-data-pipeline-ruvector";
 export const TOPIC_PREFIX = MEMOIR_NAME;
 export const MAX_RAW_CHUNK_BYTES = 8_192;

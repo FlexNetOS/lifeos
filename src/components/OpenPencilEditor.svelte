@@ -137,7 +137,11 @@
 
   let loadedPath = $state(null);
   let loadedContent = $state("");
+  let loadedSha256 = $state(null);
+  let editedContent = $state("");
   let loadError = $state("");
+  let applyStatus = $state("");
+  let applyError = $state("");
 
   $effect(() => {
     const path = activePath;
@@ -145,18 +149,28 @@
     if (!path || !invoke) {
       loadedPath = null;
       loadedContent = "";
+      loadedSha256 = null;
+      editedContent = "";
       loadError = "";
+      applyStatus = "";
+      applyError = "";
       return;
     }
     let current = true;
     loadedPath = path;
     loadedContent = "";
+    loadedSha256 = null;
+    editedContent = "";
     loadError = "";
+    applyStatus = "";
+    applyError = "";
     invoke("open_pencil_read_file", { path }).then(
-      (content) => {
+      (source) => {
         if (!current) return;
         loadedPath = path;
-        loadedContent = String(content ?? "");
+        loadedContent = String(source?.content ?? "");
+        editedContent = loadedContent;
+        loadedSha256 = String(source?.sha256 ?? "");
       },
       (error) => {
         if (!current) return;
@@ -183,11 +197,30 @@
     if (tauriInvoke()) {
       if (loadedPath !== p) return "Loading source…";
       if (loadError) return `Unable to load ${p}: ${loadError}`;
-      return loadedContent;
+      return editedContent;
     }
     if (FILE_SAMPLES[p]) return FILE_SAMPLES[p];
     return `# ${p}\n\n# (Preview) — the actual contents live on disk under ui_kits/lifeos_vue/${p}.\n# In the production Tauri build this view loads the file via @tauri-apps/plugin-fs,\n# inside the allowlist scoped to $APPDATA/lifeos/vault and the project root.\n\n# AI chat (right) has this file in its working context. Use the Preview tab\n# to see the rendered output for HTML / Markdown / Vue / SVG.`;
   });
+
+  const applyFile = async () => {
+    const invoke = tauriInvoke();
+    if (!invoke || !activePath || loadedPath !== activePath || loadError) return;
+    applyStatus = "Applying…";
+    applyError = "";
+    try {
+      await invoke("open_pencil_apply", {
+        path: activePath,
+        content: editedContent,
+        expectedSha256: loadedSha256,
+      });
+      loadedContent = editedContent;
+      applyStatus = "Applied to PostgreSQL/RuVector";
+    } catch (error) {
+      applyStatus = "";
+      applyError = String(error ?? "OpenPencil Apply failed");
+    }
+  };
 
   let fileExt = $derived.by(() => {
     const p = activePath || "";
@@ -696,6 +729,12 @@ claude mcp add --scope user open-pencil -- openpencil-mcp
                     {/each}
                   </span>
                   <span class="op-files-lang">{langLabel}</span>
+                  {#if applyStatus}<span class="op-files-apply-status">{applyStatus}</span>{/if}
+                  {#if applyError}<span class="op-files-apply-error" title={applyError}>Apply failed</span>{/if}
+                  <button class="op-files-apply" disabled={!tauriInvoke() || !loadedPath || loadedPath !== activePath || !!loadError || editedContent === loadedContent}
+                          onclick={applyFile} title="Apply exact source bytes through CodeDB and envctl">
+                    <Icon name="save" size={11} /> Apply
+                  </button>
                   <div class="op-files-view-switch" role="tablist" aria-label="View">
                     <button role="tab" aria-selected={filesView === "editor"} class:active={filesView === "editor"} onclick={() => filesView = "editor"} title="Editor only">
                       <Icon name="code" size={11} /> Editor
@@ -723,7 +762,8 @@ claude mcp add --scope user open-pencil -- openpencil-mcp
                           <li>{i + 1}</li>
                         {/each}
                       </ol>
-                      <pre class="op-files-code">{fileContent}</pre>
+                      <textarea class="op-files-code" aria-label="Editable source" value={fileContent}
+                                spellcheck="false" oninput={(event) => { editedContent = event.currentTarget.value; applyStatus = ""; applyError = ""; }}></textarea>
                     </div>
                   {/if}
                   {#if filesView !== "editor"}

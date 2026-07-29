@@ -9,6 +9,8 @@ const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/v
 const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root, "evidence/glass/live-launch-receipt.json"));
 const failureReceiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_FAILURE_RECEIPT ?? join(root, "evidence/glass/live-launch-failure-receipt.json"));
 // The native binary embeds tauri.conf.json's localhost:1420 dev URL.
+const { glassLiveEnv } = await import(new URL("./glass-live-env.mjs", import.meta.url).href);
+
 const port = "1420";
 const reuseDevServer = process.env.LIFEOS_GLASS_REUSE_DEV_SERVER === "1";
 const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
@@ -83,7 +85,12 @@ function terminateTree(rootPid) {
 }
 
 const startedAt = Date.now();
-const childEnv = { ...process.env, ...runtime };
+// GTK loads its fallback icon through glycin, which sandboxes its loader with
+// `bwrap --unshare-all`. Where network-namespace creation is denied that fails and
+// GTK aborts before the window exists — the cause of the historical
+// live-launch-*-failure receipts. glassLiveEnv() supplies a bwrap shim that keeps
+// every namespace except the unavailable netns.
+const childEnv = { ...glassLiveEnv(process.env).env, ...runtime };
 const launchCommand = reuseDevServer
   ? ["/home/flexnetos/.nix-profile/bin/cargo", ["run", "--manifest-path", "src-tauri/Cargo.toml", "--no-default-features", "--color", "always", "--"]]
   : ["/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev"]];

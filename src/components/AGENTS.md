@@ -4,23 +4,23 @@
 # components
 
 ## Purpose
-22 Vue 3 SFCs — the LifeOS shell, every workspace view pane, overlay layers, and primitives. `App.vue` orchestrates which view pane mounts via `v-else-if` on `lifeos.activeId` and `lifeos.activeSub.item?.view`. Add the same `view` discriminator to `data.js` (and `../data/types.ts`) when adding a new view pane.
+24 Svelte 5 components — the LifeOS shell, every workspace view pane, overlay layer, and primitive. `App.svelte` orchestrates which view pane mounts from `lifeos.activeId` and `lifeos.activeSub.item?.view`. Add the same `view` discriminator to `data.js` (and `../data/types.ts`) when adding a new view pane.
 
 ## Key Files
 
-### Shell (always mounted by `App.vue`)
+### Shell (always mounted by `App.svelte`)
 | File | Description |
 |------|-------------|
-| `Sidebar.vue` | Primary rail — brand toggle, workspace switcher, persistent footer icons (Settings · Favorites · Notifications · Calendar · To-Do · Knowledge · Contacts). |
-| `Workspace.vue` | Secondary panel — section selector + draggable menu rows for the active workspace. |
-| `Dashboard.vue` | Default canvas — greeting, stat strip, agent team cards. Renders when `!lifeos.activeSub`. |
+| `Sidebar.svelte` | Primary rail — brand toggle, workspace switcher, persistent footer icons (Settings · Favorites · Notifications · Calendar · To-Do · Knowledge · Contacts). |
+| `Workspace.svelte` | Secondary panel — section selector + draggable menu rows for the active workspace. |
+| `Dashboard.svelte` | Default canvas — greeting, stat strip, agent team cards. Renders when `!lifeos.activeSub`. |
 
 ### View panes (rendered in `<main>` based on `activeId` / `activeSub.item.view`)
 | File | Discriminator | Description |
 |------|---------------|-------------|
-| `SubsectionView.vue` | *(default fallback)* | Detail view for any sub without a specialised pane. |
-| `N8nFlowView.vue` | `view: "n8n-flow"` | SVG visualisation of agent-team workflows (consumes `LIFEOS_FLOWS[flowId]`). |
-| `OpenPencilEditor.vue` | `view: "open-pencil"` | AI-mediated SFC editor surface. **Mounting gate** in `App.vue` must remain `v-else-if="lifeos.activeSub.item?.view === 'open-pencil'"`. |
+| `SubsectionView.svelte` | *(default fallback)* | Detail view for any sub without a specialised pane. |
+| `N8nFlowView.svelte` | `view: "n8n-flow"` | SVG visualisation of agent-team workflows (consumes `LIFEOS_FLOWS[flowId]`). |
+| `OpenPencilEditor.svelte` | `view: "open-pencil"` | AI-mediated SFC editor with an in-memory buffer. Apply sends exact source bytes through CodeDB and envctl to `lifeos_blob` plus the maintained projection; it never writes app-data files. **Mounting gate** in `App.svelte` must remain the `activeSub.item?.view === 'open-pencil'` branch. |
 | `LightsView.vue` | `view: "lights"` | Home → Lights subsection. Persists scene/room state via `lights_state_read`/`lights_state_write`. |
 | `CalendarView.vue` | `view: "calendar"` | Aggregator-backed Calendar view. |
 | `FilesView.vue` | `view: "files"` | Files browser (Work / Personal). |

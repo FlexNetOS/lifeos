@@ -38,8 +38,8 @@ fn redb_root() -> PathBuf {
 #[cfg(test)]
 mod terminal_tests {
     use super::{
-        apply_glass_vt_profile, engine_room_argv, engine_room_shell_argv, scoped_prompt,
-        resolve_open_pencil_path, validate_redb_event_stream, GLASS_VT_PROFILE,
+        apply_glass_vt_profile, engine_room_argv, engine_room_shell_argv, resolve_open_pencil_path,
+        scoped_prompt, validate_redb_event_stream, GLASS_VT_PROFILE,
     };
     use flexnetos_redb_owner::CommitEvent;
     use portable_pty::CommandBuilder;
@@ -331,7 +331,10 @@ fn resolve_open_pencil_path(relative_path: &str) -> Result<PathBuf, String> {
         .canonicalize()
         .map_err(|error| format!("canonicalize LifeOS source root: {error}"))?;
     let resolved = root.join(relative).canonicalize().map_err(|error| {
-        format!("canonicalize OpenPencil source {}: {error}", relative.display())
+        format!(
+            "canonicalize OpenPencil source {}: {error}",
+            relative.display()
+        )
     })?;
     if !resolved.starts_with(&root) {
         return Err("OpenPencil file path resolves outside the source root".into());
@@ -342,13 +345,28 @@ fn resolve_open_pencil_path(relative_path: &str) -> Result<PathBuf, String> {
 /// Read the selected OpenPencil source from the repository projection.
 /// This command is deliberately read-only: Apply remains a separate durable
 /// CodeDB/envctl workflow and cannot be replaced with a filesystem write.
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct OpenPencilSource {
+    content: String,
+    sha256: String,
+}
+
 #[tauri::command]
-fn open_pencil_read_file(path: String) -> Result<String, String> {
+fn open_pencil_read_file(path: String) -> Result<OpenPencilSource, String> {
     let resolved = resolve_open_pencil_path(&path)?;
     let bytes = std::fs::read(&resolved)
         .map_err(|error| format!("read OpenPencil source {}: {error}", resolved.display()))?;
-    String::from_utf8(bytes)
-        .map_err(|error| format!("OpenPencil source is not UTF-8 ({}): {error}", resolved.display()))
+    let content = String::from_utf8(bytes.clone()).map_err(|error| {
+        format!(
+            "OpenPencil source is not UTF-8 ({}): {error}",
+            resolved.display()
+        )
+    })?;
+    Ok(OpenPencilSource {
+        content,
+        sha256: format!("{:x}", Sha256::digest(bytes)),
+    })
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -360,6 +378,152 @@ struct CodeDbIngestReceipt {
     local_seq: u64,
     raw_sha256: String,
     typed_sha256: String,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct OpenPencilApplyReceipt {
+    status: &'static str,
+    relative_path: String,
+    source_sha256: String,
+    idempotency_key: String,
+    code_db_ingest: serde_json::Value,
+    code_db_enqueue: serde_json::Value,
+    envctl: envctl_commit_worker::DrainReceipt,
+    return_projection: Vec<(String, String)>,
+}
+
+fn run_codedb_json(
+    binary: &std::ffi::OsStr,
+    args: &[&str],
+    input_path: &std::path::Path,
+    store: &std::path::Path,
+) -> Result<serde_json::Value, String> {
+    let output = Command::new(binary)
+        .args(args)
+        .arg("--input")
+        .arg(input_path)
+        .args(["--format", "json", "--store"])
+        .arg(store)
+        .output()
+        .map_err(|error| format!("launching CodeDB: {error}"))?;
+    if !output.status.success() {
+        return Err(format!(
+            "CodeDB {} failed: {}",
+            args.first().copied().unwrap_or("command"),
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+    serde_json::from_slice(&output.stdout)
+        .map_err(|error| format!("CodeDB returned invalid JSON: {error}"))
+}
+
+/// Apply an edited OpenPencil source through CodeDB redb → PostgreSQL export
+/// → envctl. No filesystem write is performed: the exact UTF-8 bytes and the
+/// audit/projection record become durable only after envctl acknowledges them.
+#[tauri::command]
+fn open_pencil_apply(
+    path: String,
+    content: String,
+    expected_sha256: Option<String>,
+) -> Result<OpenPencilApplyReceipt, String> {
+    let resolved = resolve_open_pencil_path(&path)?;
+    let current = std::fs::read(&resolved)
+        .map_err(|error| format!("read OpenPencil source {}: {error}", resolved.display()))?;
+    let current_sha = format!("{:x}", Sha256::digest(&current));
+    if let Some(expected) = expected_sha256 {
+        if expected != current_sha {
+            return Err(format!(
+                "OpenPencil source changed on disk; expected {expected}, found {current_sha}"
+            ));
+        }
+    }
+
+    let source_bytes = content.into_bytes();
+    let source_sha256 = format!("{:x}", Sha256::digest(&source_bytes));
+    let idempotency_key = format!(
+        "open-pencil:{:x}",
+        Sha256::digest(format!("{path}\n{source_sha256}").as_bytes())
+    );
+    let store = std::env::var_os("LIFEOS_CODEDB_REDB_STORE")
+        .ok_or_else(|| "LIFEOS_CODEDB_REDB_STORE is required for OpenPencil Apply".to_string())?;
+    let binary = std::env::var_os("LIFEOS_CODEDB_BIN")
+        .or_else(|| std::env::var_os("CODEDB_BIN"))
+        .unwrap_or_else(|| "codedb".into());
+    let temp_dir = std::env::temp_dir().join(format!("lifeos-open-pencil-{}", Uuid::new_v4()));
+    std::fs::create_dir_all(&temp_dir)
+        .map_err(|error| format!("create OpenPencil Apply temp directory: {error}"))?;
+
+    let result = (|| {
+        let encoded = BASE64.encode(&source_bytes);
+        let envelope = serde_json::json!({
+            "schema_version": "codedb.ingest-envelope.v0",
+            "files": [{
+                "path": path,
+                "module_path": "open-pencil",
+                "unix_mode": "0644",
+                "content_base64": encoded,
+                "sha256": source_sha256,
+                "ast": []
+            }]
+        });
+        let envelope_path = temp_dir.join("envelope.json");
+        std::fs::write(&envelope_path, serde_json::to_vec(&envelope).unwrap())
+            .map_err(|error| format!("write OpenPencil CodeDB envelope: {error}"))?;
+        let ingest = run_codedb_json(
+            &binary,
+            &["ingest-envelope"],
+            &envelope_path,
+            std::path::Path::new(&store),
+        )?;
+
+        let job = serde_json::json!({
+            "schema_version": "codedb.embedding-job.v0",
+            "blob_sha256": source_sha256,
+            "relative_path": envelope["files"][0]["path"],
+            "model_name": "open-pencil-source",
+            "model_revision": "lifeos-open-pencil-v1",
+            "payload_digest": source_sha256,
+            "open_pencil_apply": {
+                "idempotency_key": idempotency_key,
+                "relative_path": envelope["files"][0]["path"],
+                "source_sha256": source_sha256,
+                "raw_bytes_base64": envelope["files"][0]["content_base64"],
+                "media_type": "text/plain; charset=utf-8"
+            }
+        });
+        let job_path = temp_dir.join("job.json");
+        std::fs::write(&job_path, serde_json::to_vec(&job).unwrap())
+            .map_err(|error| format!("write OpenPencil CodeDB job: {error}"))?;
+        let enqueue = run_codedb_json(
+            &binary,
+            &["outbox-enqueue"],
+            &job_path,
+            std::path::Path::new(&store),
+        )?;
+
+        codedb_outbox_sync()?;
+        let envctl = envctl_commit_worker::drain_and_commit(&envctl_commit_conn()?, 500, false)
+            .map_err(|error| error.to_string())?;
+        let return_projection =
+            envctl_commit_worker::return_projection(&envctl_commit_conn()?, &redb_root())
+                .map_err(|error| error.to_string())?;
+        Ok(OpenPencilApplyReceipt {
+            status: "applied",
+            relative_path: envelope["files"][0]["path"]
+                .as_str()
+                .unwrap_or_default()
+                .to_string(),
+            source_sha256: source_sha256.to_string(),
+            idempotency_key: idempotency_key.to_string(),
+            code_db_ingest: ingest,
+            code_db_enqueue: enqueue,
+            envctl,
+            return_projection,
+        })
+    })();
+    let _ = std::fs::remove_dir_all(&temp_dir);
+    result
 }
 
 /// Validate and place a complete CodeDB envelope in the authenticated redb
@@ -1929,6 +2093,7 @@ pub fn run() {
             redb_swarm_heartbeat,
             redb_ui_ready,
             open_pencil_read_file,
+            open_pencil_apply,
             codedb_ingest_envelope,
             envctl_drain,
             envctl_return_projection,

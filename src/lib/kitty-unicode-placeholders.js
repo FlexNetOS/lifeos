@@ -57,6 +57,18 @@ const normalizeVirtualPlacement = (sequence) => {
  */
 export class KittyUnicodePlaceholderStream {
   #pending = new Uint8Array();
+  #sawPlacement = false;
+
+  /**
+   * True when at least one virtual placement was converted since the last call,
+   * and clears the flag. Scanning the buffer for placeholder cells is only
+   * worthwhile after a placement actually passed through.
+   */
+  takePlacementSeen() {
+    const seen = this.#sawPlacement;
+    this.#sawPlacement = false;
+    return seen;
+  }
 
   feed(frame) {
     const input = frame instanceof Uint8Array ? frame : new Uint8Array(frame);
@@ -89,7 +101,12 @@ export class KittyUnicodePlaceholderStream {
       }
       if (end < 0) break;
 
-      output.push(normalizeVirtualPlacement(data.slice(cursor, end + 2)));
+      const sequence = data.slice(cursor, end + 2);
+      const normalized = normalizeVirtualPlacement(sequence);
+      // `normalizeVirtualPlacement` returns its argument unchanged when the
+      // sequence is not a virtual placement, so identity marks a real conversion.
+      if (normalized !== sequence) this.#sawPlacement = true;
+      output.push(normalized);
       cursor = end + 2;
     }
 
@@ -130,14 +147,35 @@ export class KittyUnicodePlaceholderStream {
 export class KittyUnicodePlaceholderAddon {
   #terminal;
   #disposables = [];
+  #armed = false;
 
   activate(terminal) {
     this.#terminal = terminal;
-    const scan = () => this.#clearPlaceholderCells();
-    this.#disposables.push(terminal.onWriteParsed(scan));
-    this.#disposables.push(terminal.onScroll(scan));
-    this.#disposables.push(terminal.onResize(scan));
+    // Scanning is O(rows x cols) in `getCell`, so it must not run on every write.
+    // `markPlacement()` arms it, and only an armed scan walks the buffer.
+    const scan = () => {
+      if (!this.#armed) return;
+      this.#armed = false;
+      this.#clearPlaceholderCells();
+    };
+    // `onWriteParsed` and the `_core` buffer reach into xterm.js internals on a
+    // beta pin. Bind only what this build actually exposes so a version bump
+    // degrades to "placeholder cells stay visible" instead of throwing during
+    // addon activation and taking the whole terminal down with it.
+    for (const hook of ["onWriteParsed", "onScroll", "onResize"]) {
+      if (typeof terminal[hook] !== "function") continue;
+      try {
+        this.#disposables.push(terminal[hook](scan));
+      } catch {
+        // A hook that refuses to bind is not fatal; skip it.
+      }
+    }
     return undefined;
+  }
+
+  /** Arms a single buffer scan; call when a virtual placement was converted. */
+  markPlacement() {
+    this.#armed = true;
   }
 
   dispose() {

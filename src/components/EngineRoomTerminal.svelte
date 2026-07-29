@@ -127,6 +127,11 @@
         const frame = new Uint8Array(bytes);
         const text = probeDecoder.decode(frame, { stream: true });
         const rendererFrame = kittyPlaceholderStream?.feed(frame) || frame;
+        // Only arm the placeholder-cell scan when a placement actually converted;
+        // an unconditional scan walks rows x cols on every PTY chunk.
+        if (kittyPlaceholderStream?.takePlacementSeen()) {
+          kittyPlaceholderAddon?.markPlacement();
+        }
         terminal?.write(rendererFrame);
         if (probe && !probeClosed) {
           probeOutput = `${probeOutput}${text}`.slice(-16_384);
@@ -340,6 +345,11 @@
       await invoke()("terminal_close", { sessionId }).catch(() => {});
     }
     outputChannel = null;
+    // A partial APC held back waiting for its terminator would otherwise be
+    // dropped. Release it to the renderer before teardown so no captured byte is
+    // silently discarded.
+    const trailing = kittyPlaceholderStream?.flush();
+    if (trailing?.length) terminal?.write(trailing);
     kittyPlaceholderStream = null;
     kittyPlaceholderAddon = null;
     terminal?.dispose();

@@ -3,6 +3,10 @@ const APC = 0x5f;
 const KITTY_GRAPHICS = 0x47;
 const ST = 0x5c;
 
+// Slightly above the pinned image addon's 20 MB `kittySizeLimit`, so the guard
+// only ever releases bytes the addon would have rejected anyway.
+const MAX_PENDING_BYTES = 24 * 1024 * 1024;
+
 const concatBytes = (left, right) => {
   const result = new Uint8Array(left.length + right.length);
   result.set(left);
@@ -10,12 +14,21 @@ const concatBytes = (left, right) => {
   return result;
 };
 
-const normalizeVirtualPlacement = (sequence) => {
-  const semicolon = sequence.indexOf(0x3b, 3);
-  if (semicolon < 0) return sequence;
+// Kitty creates a virtual placement with `a=p` (place an already-transmitted
+// image) or `a=T` (transmit and display). Yazi emits both, and a placement that
+// references an existing image carries no payload — so the control section ends
+// at the ST terminator rather than at a `;`.
+const VIRTUAL_PLACEMENT_ACTION = /(?:^|,)a=[Tp](?=,|$)/;
+const VIRTUAL_PLACEMENT_FLAG = /(?:^|,)U=1(?=,|$)/;
 
-  const control = String.fromCharCode(...sequence.subarray(3, semicolon));
-  if (!/(?:^|,)a=p(?:,|$)/.test(control) || !/(?:^|,)U=1(?:,|$)/.test(control)) {
+const normalizeVirtualPlacement = (sequence) => {
+  const terminator = sequence.length - 2;
+  const semicolon = sequence.indexOf(0x3b, 3);
+  const controlEnd = semicolon < 0 || semicolon > terminator ? terminator : semicolon;
+  if (controlEnd <= 3) return sequence;
+
+  const control = String.fromCharCode(...sequence.subarray(3, controlEnd));
+  if (!VIRTUAL_PLACEMENT_ACTION.test(control) || !VIRTUAL_PLACEMENT_FLAG.test(control)) {
     return sequence;
   }
 
@@ -29,7 +42,9 @@ const normalizeVirtualPlacement = (sequence) => {
     ? directControl.replace(/(?:^|,)C=\d+(?=,|$)/, (value) => value.replace(/\d+$/, "1"))
     : `${directControl},C=1`;
   const prefix = sequence.subarray(0, 3);
-  const payload = sequence.subarray(semicolon);
+  // `controlEnd` is the `;` when a payload follows, otherwise the ST terminator,
+  // so this keeps payload-less placements intact.
+  const payload = sequence.subarray(controlEnd);
   const normalized = new TextEncoder().encode(normalizedControl);
   return concatBytes(concatBytes(prefix, normalized), payload);
 };
@@ -79,6 +94,13 @@ export class KittyUnicodePlaceholderStream {
     }
 
     this.#pending = data.slice(cursor);
+    // A malformed or oversized APC that never terminates must not stall the
+    // terminal. Past the addon's own kitty size limit the bytes cannot be a
+    // placement it would accept, so release them unmodified.
+    if (this.#pending.length > MAX_PENDING_BYTES) {
+      output.push(this.#pending);
+      this.#pending = new Uint8Array();
+    }
     const length = output.reduce(
       (total, part) => total + (typeof part === "number" ? 1 : part.length),
       0,

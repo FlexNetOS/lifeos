@@ -301,6 +301,49 @@ fn redb_swarm_heartbeat() -> Result<u64, String> {
     publish_swarm_runtime_status()
 }
 
+fn resolve_open_pencil_path(relative_path: &str) -> Result<PathBuf, String> {
+    let relative = std::path::Path::new(relative_path);
+    if relative_path.is_empty() || relative.is_absolute() {
+        return Err("OpenPencil file path must be a non-empty relative path".into());
+    }
+    if relative.components().any(|component| {
+        matches!(
+            component,
+            std::path::Component::ParentDir
+                | std::path::Component::RootDir
+                | std::path::Component::Prefix(_)
+        )
+    }) {
+        return Err("OpenPencil file path may not escape the source root".into());
+    }
+    let root = std::env::var_os("LIFEOS_SOURCE_ROOT")
+        .map(PathBuf::from)
+        .or_else(|| std::env::current_dir().ok())
+        .ok_or_else(|| "LifeOS source root is unavailable".to_string())?;
+    let root = root
+        .canonicalize()
+        .map_err(|error| format!("canonicalize LifeOS source root: {error}"))?;
+    let resolved = root.join(relative).canonicalize().map_err(|error| {
+        format!("canonicalize OpenPencil source {}: {error}", relative.display())
+    })?;
+    if !resolved.starts_with(&root) {
+        return Err("OpenPencil file path resolves outside the source root".into());
+    }
+    Ok(resolved)
+}
+
+/// Read the selected OpenPencil source from the repository projection.
+/// This command is deliberately read-only: Apply remains a separate durable
+/// CodeDB/envctl workflow and cannot be replaced with a filesystem write.
+#[tauri::command]
+fn open_pencil_read_file(path: String) -> Result<String, String> {
+    let resolved = resolve_open_pencil_path(&path)?;
+    let bytes = std::fs::read(&resolved)
+        .map_err(|error| format!("read OpenPencil source {}: {error}", resolved.display()))?;
+    String::from_utf8(bytes)
+        .map_err(|error| format!("OpenPencil source is not UTF-8 ({}): {error}", resolved.display()))
+}
+
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct CodeDbIngestReceipt {
@@ -1878,6 +1921,7 @@ pub fn run() {
             redb_state_write,
             redb_swarm_heartbeat,
             redb_ui_ready,
+            open_pencil_read_file,
             codedb_ingest_envelope,
             envctl_drain,
             envctl_return_projection,

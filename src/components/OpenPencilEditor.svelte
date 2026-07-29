@@ -1,9 +1,9 @@
 <script>
   // LifeOS — OpenPencilEditor SFC (Svelte port of OpenPencilEditor.vue)
   // In-app surface for github.com/FlexNetOS/open-pencil/tree/develop.
-  // Renders the editor's UI vocabulary as a mock — tool palette · canvas · inspector ·
-  // AI chat strip. The real Skia/CanvasKit runtime is embedded via iframe when available;
-  // when not, falls back to a static placeholder so the rest of the prototype keeps working.
+  // Renders the editor's UI vocabulary — tool palette · canvas · inspector · AI chat strip.
+  // Native Glass reads the selected source through the read-only Tauri boundary; browser
+  // preview retains local fixtures because it has no repository filesystem authority.
   import { untrack } from "svelte";
   import { useLifeos } from "@/stores/lifeos-native";
   import { createNav } from "@/lib/svelte-nav.js";
@@ -133,8 +133,41 @@
     nav.pickSub({ icon: "folder-open", label: path.split("/").pop() || "/", view: "open-pencil", pane: "files", folder: path }, "Files");
   };
 
-  // Synthetic file content — keyed by path. Real load wired in production via Tauri fs scope.
-  // Includes a handful of pre-baked snippets so the file viewer reads like a real IDE preview.
+  const tauriInvoke = () => globalThis.__TAURI__?.core?.invoke || null;
+
+  let loadedPath = $state(null);
+  let loadedContent = $state("");
+  let loadError = $state("");
+
+  $effect(() => {
+    const path = activePath;
+    const invoke = tauriInvoke();
+    if (!path || !invoke) {
+      loadedPath = null;
+      loadedContent = "";
+      loadError = "";
+      return;
+    }
+    let current = true;
+    loadedPath = path;
+    loadedContent = "";
+    loadError = "";
+    invoke("open_pencil_read_file", { path }).then(
+      (content) => {
+        if (!current) return;
+        loadedPath = path;
+        loadedContent = String(content ?? "");
+      },
+      (error) => {
+        if (!current) return;
+        loadedPath = path;
+        loadError = String(error ?? "Unable to read source file");
+      },
+    );
+    return () => { current = false; };
+  });
+
+  // Browser-only fallback content — native Glass never hides a source read error behind it.
   const FILE_SAMPLES = {
     "README.md": "# LifeOS — Vue + Tauri kit\n\nSibling implementation of `ui_kits/lifeos_app/` (React canon), rebuilt as production-ready Vue 3 + Vite + Pinia + vue-router + Tauri.\n\n## Two ways to view this\n\n- **In-browser preview** — open `index.html` directly. Uses `vue3-sfc-loader` to compile `.vue` at runtime.\n- **Production build** — `npm install && npm run tauri:dev`.",
     "package.json": "{\n  \"name\": \"lifeos-vue\",\n  \"version\": \"0.1.0\",\n  \"scripts\": {\n    \"dev\":  \"vite\",\n    \"build\":\"vite build\",\n    \"test\": \"vitest\",\n    \"tauri:dev\":   \"tauri dev\",\n    \"tauri:build\": \"tauri build\"\n  }\n}",
@@ -147,6 +180,11 @@
   let fileContent = $derived.by(() => {
     const p = activePath;
     if (!p) return "";
+    if (tauriInvoke()) {
+      if (loadedPath !== p) return "Loading source…";
+      if (loadError) return `Unable to load ${p}: ${loadError}`;
+      return loadedContent;
+    }
     if (FILE_SAMPLES[p]) return FILE_SAMPLES[p];
     return `# ${p}\n\n# (Preview) — the actual contents live on disk under ui_kits/lifeos_vue/${p}.\n# In the production Tauri build this view loads the file via @tauri-apps/plugin-fs,\n# inside the allowlist scoped to $APPDATA/lifeos/vault and the project root.\n\n# AI chat (right) has this file in its working context. Use the Preview tab\n# to see the rendered output for HTML / Markdown / Vue / SVG.`;
   });

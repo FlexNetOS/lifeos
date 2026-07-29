@@ -12,7 +12,7 @@ const failureReceiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_FAILURE_RECEI
 const { glassLiveEnv } = await import(new URL("./glass-live-env.mjs", import.meta.url).href);
 
 const port = "1420";
-const reuseDevServer = process.env.LIFEOS_GLASS_REUSE_DEV_SERVER === "1";
+const useTauriCli = process.env.LIFEOS_GLASS_TAURI_CLI === "1";
 const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
 const runtime = {
   LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql",
@@ -91,9 +91,13 @@ const startedAt = Date.now();
 // live-launch-*-failure receipts. glassLiveEnv() supplies a bwrap shim that keeps
 // every namespace except the unavailable netns.
 const childEnv = { ...glassLiveEnv(process.env).env, ...runtime };
-const launchCommand = reuseDevServer
-  ? ["/home/flexnetos/.nix-profile/bin/cargo", ["run", "--manifest-path", "src-tauri/Cargo.toml", "--no-default-features", "--color", "always", "--"]]
-  : ["/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev"]];
+// The direct cargo path launches the same Tauri binary while avoiding the
+// tauri-cli Rust watcher, which fails with EMFILE on this host before the
+// application starts. Set LIFEOS_GLASS_TAURI_CLI=1 when the CLI path itself
+// is the subject under test.
+const launchCommand = useTauriCli
+  ? ["/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev", "--no-watch"]]
+  : ["/home/flexnetos/.nix-profile/bin/cargo", ["run", "--manifest-path", "src-tauri/Cargo.toml", "--no-default-features", "--color", "always", "--"]];
 const child = spawn(launchCommand[0], launchCommand[1], {
   cwd: root,
   env: childEnv,

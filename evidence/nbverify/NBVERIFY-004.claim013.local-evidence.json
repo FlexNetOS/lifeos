@@ -1,0 +1,68 @@
+{
+  "schema_version": "lifeos.notebooklm.nbverify-004.local-evidence.v1",
+  "task_id": "NBVERIFY-004",
+  "observed_at": "2026-07-29T06:41:19.095Z",
+  "repository": {
+    "root": "/home/flexnetos/meta/src/lifeos",
+    "package_json_sha256": "4701467d442a5e20b765982684d96b29829df06d8d898c6d24a9b612f9b03dc2"
+  },
+  "claims": [
+    {
+      "claim_id": "SWARM-CLAIM-013",
+      "verification_status": "verified",
+      "status": "verified",
+      "conclusion": "ATAS temporal forecasting executes a bounded echo-state reservoir, emits calibrated uncertainty intervals, records measured runtime evidence, and keeps promotion database-gated.",
+      "evidence": [
+        {
+          "relationship": "forecasting-implementation-search",
+          "proven": true,
+          "command": "rg -n -i Temporal Strange Attractor|strange attractor|Echo.State Network|\\bESN\\b|timeline prediction|forecasting src src-tauri crates scripts --glob !**/AGENTS.md",
+          "exit_status": 0,
+          "matches": [
+            "scripts/atas-forecast-lifecycle.mjs:1:// ARCHBP-015 — bounded ATAS temporal forecasting lifecycle.",
+            "scripts/verify-nbverify004-claim013.mjs:26:  \"Temporal Strange Attractor|strange attractor|Echo.State Network|\\\\bESN\\\\b|timeline prediction|forecasting\",",
+            "scripts/verify-nbverify004-claim013.mjs:53:      ? \"ATAS temporal forecasting executes a bounded echo-state reservoir, emits calibrated uncertainty intervals, records measured runtime evidence, and keeps promotion database-gated.\"",
+            "scripts/verify-nbverify004-claim013.mjs:54:      : \"ATAS temporal forecasting runtime did not execute successfully; the claim remains unverified.\",",
+            "scripts/verify-nbverify004-claim013.mjs:57:      relationship: \"forecasting-implementation-search\",",
+            "scripts/verify-nbverify004-claim013.mjs:94:    mode: \"live-forecasting-runtime-trace\","
+          ],
+          "note": "The source search locates the executable ATAS runtime and its lifecycle test."
+        },
+        {
+          "relationship": "forecast-model-boundary",
+          "proven": true,
+          "implementation": "scripts/atas-forecast-lifecycle.mjs",
+          "algorithm": "echo-state-reservoir",
+          "output_schema": "lifeos.atas.forecast.v1",
+          "uncertainty": {
+            "method": "holdout-residual-95-percent-interval",
+            "calibrated": true
+          }
+        },
+        {
+          "relationship": "evaluation-runtime",
+          "proven": true,
+          "calibration": {
+            "trainCount": 35,
+            "holdoutCount": 12,
+            "holdoutRmse": 0.11246029281148218,
+            "residualStd": 0.11246029281148218
+          },
+          "runtime_ms": 3.664385,
+          "promotion": {
+            "status": "database-gated",
+            "selfPromoted": false
+          }
+        }
+      ]
+    }
+  ],
+  "collector": {
+    "claim_id": "SWARM-CLAIM-013",
+    "mode": "live-forecasting-runtime-trace",
+    "writes_only": "/home/flexnetos/meta/src/lifeos/evidence/nbverify/NBVERIFY-004.claim013.local-evidence.json",
+    "does_not_launch": false,
+    "does_not_install": true,
+    "does_not_mutate_generated_runtime": true
+  }
+}

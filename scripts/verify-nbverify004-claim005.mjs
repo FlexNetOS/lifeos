@@ -17,7 +17,6 @@ const sourceFiles = [
   "crates/lifeos-core/src/mcp/ruvector.rs",
   "crates/lifeos-daemon/src/main.rs",
   "crates/lifeos-daemon/README.md",
-  "planning-spine-v0/1.0_VISION/LifeOS Master Plan — Consolidated v1 (2026-07-07).md",
 ];
 
 function run(command, args, env = {}) {

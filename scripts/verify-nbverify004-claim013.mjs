@@ -11,7 +11,7 @@ const outputPath = outputArgument
   ? resolve(root, outputArgument.slice("--output=".length))
   : join(
       root,
-      "planning-spine-v0/generated/notebooklm_claim_verification/NBVERIFY-004.local-evidence.json",
+      "evidence/nbverify/NBVERIFY-004.claim013.local-evidence.json",
     );
 function run(command, args) {
   try {

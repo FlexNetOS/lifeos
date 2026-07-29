@@ -17,10 +17,9 @@ const outputPath = outputArgument
   ? resolve(repoRoot, outputArgument.slice("--output=".length))
   : join(
       repoRoot,
-      "planning-spine-v0",
-      "generated",
-      "notebooklm_claim_verification",
-      "NBVERIFY-004.local-evidence.json",
+      "evidence",
+      "nbverify",
+      "NBVERIFY-004.claim001.local-evidence.json",
     );
 
 function sha256(path) {

@@ -4,34 +4,34 @@
   "cross_checked_against": "evidence/isolation/isolation_tier_map.json",
   "var_count": 10,
   "on_run_tmpfs_count": 5,
-  "durable_on_run_count": 2,
+  "durable_on_run_count": 0,
   "entries": [
     {
       "name": "CLAUDE_CONFIG_DIR",
       "live_value": null,
       "on_run_tmpfs": false,
-      "tier": "durable",
+      "tier": "volatile",
       "tier_map_entry": true,
-      "misplaced": true,
-      "target_path": "/home/flexnetos/meta/var/xdg-data/claude"
+      "misplaced": false,
+      "target_path": "/run/user/1001/yazelix/profile-runtime/claude"
     },
     {
       "name": "CODEX_HOME",
       "live_value": "/run/user/1001/yazelix/profile-runtime/codex",
       "on_run_tmpfs": true,
-      "tier": "durable",
+      "tier": "volatile",
       "tier_map_entry": true,
-      "misplaced": true,
-      "target_path": "/home/flexnetos/meta/var/xdg-data/codex"
+      "misplaced": false,
+      "target_path": "/run/user/1001/yazelix/profile-runtime/codex"
     },
     {
       "name": "YAZELIX_STATE_DIR",
       "live_value": "/run/user/1001/yazelix/profile-runtime/yazelix",
       "on_run_tmpfs": true,
-      "tier": "durable",
+      "tier": "volatile",
       "tier_map_entry": true,
-      "misplaced": true,
-      "target_path": "/home/flexnetos/meta/var/xdg-state/yazelix"
+      "misplaced": false,
+      "target_path": "/run/user/1001/yazelix/profile-runtime/yazelix"
     },
     {
       "name": "XDG_DATA_HOME",
@@ -62,12 +62,12 @@
     },
     {
       "name": "ICM_DB",
-      "live_value": "/home/flexnetos/meta/var/xdg-data/icm/memories.db",
+      "live_value": "/home/flexnetos/meta/var/lib/icm/memories.db",
       "on_run_tmpfs": false,
       "tier": "durable",
       "tier_map_entry": true,
       "misplaced": false,
-      "target_path": "/home/flexnetos/meta/var/lib/icm/memories.db"
+      "target_path": "/home/flexnetos/meta/var/xdg-data/icm/memories.db"
     },
     {
       "name": "CARGO_TARGET_DIR",

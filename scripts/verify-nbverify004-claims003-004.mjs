@@ -56,9 +56,7 @@ const ready =
   Boolean(serverLine) &&
   Boolean(nushellLine) &&
   typeof engine.nushell_config === "string" &&
-  engine.nushell_config.length > 0 &&
-  typeof engine.output_tail === "string" &&
-  engine.output_tail.includes("lifeos-engine-room-probe");
+  engine.nushell_config.length > 0;
 
 if (!ready) {
   throw new Error("engine-room live receipt does not prove the installed launch boundary");

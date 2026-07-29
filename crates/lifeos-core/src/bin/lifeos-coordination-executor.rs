@@ -83,14 +83,23 @@ async fn main() -> Result<(), String> {
             let (value, status) = match run(&attempt.request) {
                 Ok(output) => (
                     result(&output),
-                    if output.status.success() { "succeeded" } else { "failed" },
+                    if output.status.success() {
+                        "succeeded"
+                    } else {
+                        "failed"
+                    },
                 ),
                 Err(error) => (spawn_error(error), "failed"),
             };
             let key = format!("{job_id}:{}:result", attempt.attempt_id);
             (
                 coordination::record_weave_attempt(
-                    storage.pool(), job_id, attempt.attempt_id, status, value, &key,
+                    storage.pool(),
+                    job_id,
+                    attempt.attempt_id,
+                    status,
+                    value,
+                    &key,
                 )
                 .await
                 .map_err(|error| error.to_string())?,
@@ -104,7 +113,11 @@ async fn main() -> Result<(), String> {
             let (value, status) = match run(&job.request) {
                 Ok(output) => (
                     result(&output),
-                    if output.status.success() { "succeeded" } else { "failed" },
+                    if output.status.success() {
+                        "succeeded"
+                    } else {
+                        "failed"
+                    },
                 ),
                 Err(error) => (spawn_error(error), "failed"),
             };

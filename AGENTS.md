@@ -267,15 +267,15 @@ renderer reads it through the `terminal_capabilities` command, and
 | The PTY exports `TERM=xterm-256color` | Truthful baseline for the embedded renderer. |
 | `TERM_PROGRAM` / `TERM_PROGRAM_VERSION` are stripped | `CommandBuilder` seeds from `std::env::vars_os()`, so the host identity would otherwise leak. |
 | **Never** set `TERM` to a host terminal type | `xterm-ghostty`/`xterm-kitty` makes Yazi emit graphics the renderer cannot draw; Yazi documents this as breaking adapter detection. |
-| `YAZI_IMAGE_PROTOCOL=KgpOld` is set explicitly | Yazi's `Kgp` default uses `U+10EEEE` Unicode placeholders, which the pinned image addon does not implement. |
+| `YAZI_IMAGE_PROTOCOL=Kgp` is set explicitly | The renderer-side compatibility addon adapts Yazi's `U+10EEEE` Unicode placeholders for the pinned image addon; raw PTY capture remains unchanged. |
 | `convertEol` stays `false` | Zellij emits its own CRLF and absolute cursor positioning; rewriting LF corrupts the stream. |
 | `onBinary` must stay wired | It carries 8-bit input; UTF-8 encoding it corrupts any byte ≥ `0x80`. |
 | PTY pixel geometry is reported every resize | SIXEL, IIP, and Kitty graphics size their output from it. |
 
 Changing any renderer pin means re-checking the envelope against what the new packages
-actually implement, then re-running `bun run verify:terminal-capability`. The Kitty
-Unicode-placeholder gap is declared and release-gated — do not describe it in
-silent-downgrade language.
+actually implement, then re-running `bun run verify:terminal-capability`. The Kgp
+compatibility adapter is part of the renderer contract and must remain covered by
+protocol tests; do not describe its adaptation as a host-terminal capability.
 
 ## UI state persistence
 

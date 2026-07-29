@@ -15,13 +15,19 @@ const normalizeVirtualPlacement = (sequence) => {
   if (semicolon < 0) return sequence;
 
   const control = String.fromCharCode(...sequence.subarray(3, semicolon));
-  if (!/(?:^|,)a=[pT](?:,|$)/.test(control) || !/(?:^|,)U=1(?:,|$)/.test(control)) {
+  if (!/(?:^|,)a=p(?:,|$)/.test(control) || !/(?:^|,)U=1(?:,|$)/.test(control)) {
     return sequence;
   }
 
-  const normalizedControl = /(?:^|,)C=\d+(?:,|$)/.test(control)
-    ? control.replace(/(?:^|,)C=\d+(?=,|$)/, (value) => value.replace(/\d+$/, "1"))
-    : `${control},C=1`;
+  // The pinned addon understands direct placement but not Kgp's U=1 virtual
+  // placement flag. Remove only that display-layer flag; the original PTY
+  // frame remains captured unchanged by the Tauri channel and CodeDB path.
+  const directControl = control
+    .replace(/(?:^|,)U=1(?=,|$)/, "")
+    .replace(/^,|,$/g, "");
+  const normalizedControl = /(?:^|,)C=\d+(?:,|$)/.test(directControl)
+    ? directControl.replace(/(?:^|,)C=\d+(?=,|$)/, (value) => value.replace(/\d+$/, "1"))
+    : `${directControl},C=1`;
   const prefix = sequence.subarray(0, 3);
   const payload = sequence.subarray(semicolon);
   const normalized = new TextEncoder().encode(normalizedControl);

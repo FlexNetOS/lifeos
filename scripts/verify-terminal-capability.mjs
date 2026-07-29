@@ -78,9 +78,15 @@ if (profile.kittyGraphics && !imageTypings.includes("kittySupport?: boolean")) {
 }
 
 // Yazi's `Kgp` uses U+10EEEE Unicode placeholders. The pinned addon implements
-// direct placement only, so `KgpOld` is the only correct Kitty selection.
+// direct placement; LifeOS supplies the renderer-side compatibility adapter.
 const imageBundle = read("node_modules/@xterm/addon-image/lib/addon-image.js");
-const placeholdersImplemented = imageBundle.includes("10EEEE") || imageBundle.includes("1114110");
+const placeholderAdapter = read("src/lib/kitty-unicode-placeholders.js");
+const placeholdersImplemented =
+  imageBundle.includes("10EEEE") ||
+  imageBundle.includes("1114110") ||
+  (placeholderAdapter.includes("0x10eeee") &&
+    placeholderAdapter.includes("KittyUnicodePlaceholderStream") &&
+    placeholderAdapter.includes("KittyUnicodePlaceholderAddon"));
 if (placeholdersImplemented !== profile.kittyUnicodePlaceholders) {
   throw new Error(
     `profile declares kittyUnicodePlaceholders=${profile.kittyUnicodePlaceholders} but the pinned addon ${placeholdersImplemented ? "implements" : "does not implement"} them`,
@@ -98,6 +104,8 @@ const rendererContract = [
   ["allowProposedApi: true", "the renderer does not opt into the API the image addon requires"],
   ["terminal.onBinary(", "8-bit onBinary input is dropped instead of forwarded"],
   ["new ImageAddon(", "the image addon is not loaded"],
+  ["KittyUnicodePlaceholderStream", "the Kgp renderer compatibility adapter is not loaded"],
+  ["KittyUnicodePlaceholderAddon", "the Kgp placeholder-cell adapter is not loaded"],
   ["screenPixels()", "PTY pixel geometry is not reported, so images have no scale reference"],
 ];
 for (const [needle, failure] of rendererContract) {
@@ -122,9 +130,9 @@ const receipt = {
   capability_envelope: profile,
   pins: { ...pins, "@xterm/addon-fit": packageJson.dependencies?.["@xterm/addon-fit"], "@xterm/addon-webgl": packageJson.dependencies?.["@xterm/addon-webgl"] },
   host_terminal_identity_stripped: ["TERM_PROGRAM", "TERM_PROGRAM_VERSION"],
-  declared_gap: {
-    kitty_unicode_placeholders: false,
-    consequence: "resolved by the renderer-side Kgp compatibility addon; Kgp virtual placements are adapted before xterm.js parsing.",
+  resolved_compatibility: {
+    kitty_unicode_placeholders: true,
+    implementation: "renderer-side Kgp compatibility addon adapts virtual placements before xterm.js parsing; raw PTY capture remains unchanged.",
   },
   byte_fidelity: {
     convert_eol: false,

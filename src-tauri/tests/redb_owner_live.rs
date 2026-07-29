@@ -1,8 +1,6 @@
 //! Live ARCHBP redb-owner boundary checks through the LifeOS Tauri dependency.
 
-use flexnetos_redb_owner::{
-    OwnerClient, OwnerError, OwnerService, ProjectionReader, read_events,
-};
+use flexnetos_redb_owner::{read_events, OwnerClient, OwnerError, OwnerService, ProjectionReader};
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -33,16 +31,27 @@ fn authenticated_owner_publishes_checksummed_projection_and_ordered_events() {
 
     let projection = ProjectionReader::read(&root).expect("read projection");
     assert_eq!(projection.local_seq, 2);
-    assert_eq!(projection.entries.get("session"), Some(&"active".to_string()));
+    assert_eq!(
+        projection.entries.get("session"),
+        Some(&"active".to_string())
+    );
     assert!(!projection.checksum.is_empty());
 
     let events = read_events(&root, 0).expect("read ordered events");
-    assert_eq!(events.iter().map(|event| event.seq).collect::<Vec<_>>(), [1, 2]);
-    assert!(events.iter().all(|event| event.slot == "a" || event.slot == "b"));
+    assert_eq!(
+        events.iter().map(|event| event.seq).collect::<Vec<_>>(),
+        [1, 2]
+    );
+    assert!(events
+        .iter()
+        .all(|event| event.slot == "a" || event.slot == "b"));
 
     let mut bad = OwnerClient::connect(&root).expect("bad client connects");
     bad.override_token("invalid-token");
-    assert!(matches!(bad.put("denied", "write"), Err(OwnerError::Rejected(_))));
+    assert!(matches!(
+        bad.put("denied", "write"),
+        Err(OwnerError::Rejected(_))
+    ));
 
     drop(owner);
     cleanup(&root);
@@ -57,7 +66,12 @@ fn owner_republishes_a_commit_after_projection_publish_failure() {
         assert_eq!(client.put("stable", "1").expect("stable put"), 1);
         owner.inject_publish_crash();
         assert!(client.put("replayed", "2").is_err());
-        assert_eq!(ProjectionReader::read(&root).expect("read stale projection").local_seq, 1);
+        assert_eq!(
+            ProjectionReader::read(&root)
+                .expect("read stale projection")
+                .local_seq,
+            1
+        );
     }
 
     let _owner = OwnerService::start(&root).expect("owner restarts and replays");

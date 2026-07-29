@@ -19,6 +19,7 @@ const expectedMigrations = (await readdir(resolve("crates/lifeos-core/migrations
   .filter((entry) => /^\d+_.+\.sql$/.test(entry))
   .length;
 const supportedRuVectorVersions = new Set(["0.3.0", "0.3.1"]);
+const approvedRuVectorLibrary = "/home/flexnetos/meta/var/lib/ruvector/ext/ruvector";
 
 const sql = `
 WITH ruvector_extension AS (
@@ -87,7 +88,7 @@ SELECT jsonb_build_object(
           AND language_row.lanname = 'c'
       ),
     'learning_library_paths', (
-      SELECT COUNT(*) = 7 AND bool_and(function_row.probin = '$libdir/ruvector')
+      SELECT COUNT(*) = 7 AND bool_and(function_row.probin = '${approvedRuVectorLibrary}')
       FROM pg_proc function_row
       JOIN pg_namespace namespace_row ON namespace_row.oid = function_row.pronamespace
       WHERE namespace_row.nspname = 'extensions'
@@ -161,7 +162,7 @@ if (receipt.compatibility?.trajectory_writer !== true) {
   failures.push("RuVector trajectory writer binding is not active");
 }
 if (receipt.compatibility?.learning_library_paths !== true) {
-  failures.push("RuVector learning bindings are not normalized to $libdir/ruvector");
+  failures.push(`RuVector learning bindings are not normalized to ${approvedRuVectorLibrary}`);
 }
 
 if (failures.length) {

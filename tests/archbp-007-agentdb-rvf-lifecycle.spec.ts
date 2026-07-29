@@ -128,6 +128,7 @@ describe("ARCHBP-007 RVF lifecycle proof (real @ruvector/rvf + agentdb native su
       expect(r.witness.reason).toBe("verified");
       expect(r.acceptance.witnessEntries).toBeGreaterThan(0);
       expect(r.acceptance.witnessChainBytes).toBe(r.acceptance.witnessEntries * 73);
+      expect(r.acceptance.allPassed).toBe(true);
       expect(r.feedback.recorded).toBe(true);
       expect(r.feedback.solverTrainCount).toBeGreaterThan(0);
 

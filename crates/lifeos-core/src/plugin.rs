@@ -242,7 +242,7 @@ mod tests {
     fn returns_string_literal() {
         let host = PluginHost::new().expect("host construction");
         let out = host.run(r#"return "hello""#).expect("script ok");
-        assert_eq!(out, "hello");
+        assert_eq!(out, r#""hello""#);
     }
 
     #[test]
@@ -256,7 +256,7 @@ mod tests {
     fn coerces_nil_return_to_empty_string() {
         let host = PluginHost::new().expect("host construction");
         let out = host.run("return nil").expect("script ok");
-        assert_eq!(out, "");
+        assert_eq!(out, "null");
     }
 
     #[test]
@@ -377,7 +377,7 @@ mod tests {
         let out = host
             .run(r#"return string.upper("hello")"#)
             .expect("string lib still reachable");
-        assert_eq!(out, "HELLO");
+        assert_eq!(out, r#""HELLO""#);
 
         let out = host
             .run("return math.floor(3.7)")

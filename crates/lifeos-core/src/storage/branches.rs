@@ -58,17 +58,17 @@ pub async fn create(
     sqlx::query_scalar(
         "SELECT lifeos_runtime.cow_frontdoor_create_v2($1, $2, $3, $4, $5, $6, $7, $8)",
     )
-        .bind(parent_branch)
-        .bind(kind)
-        .bind(purpose)
-        .bind(policy)
-        .bind(creator)
-        .bind(execution)
-        .bind(effect)
-        .bind(idempotency_key)
-        .fetch_one(pool)
-        .await
-        .map_err(StorageError::from)
+    .bind(parent_branch)
+    .bind(kind)
+    .bind(purpose)
+    .bind(policy)
+    .bind(creator)
+    .bind(execution)
+    .bind(effect)
+    .bind(idempotency_key)
+    .fetch_one(pool)
+    .await
+    .map_err(StorageError::from)
 }
 
 /// Append a witnessed merge gate between two tenant-scoped branches.
@@ -81,9 +81,7 @@ pub async fn merge(
     let execution = Uuid::new_v4();
     let effect = Uuid::new_v4();
     let idempotency_key = format!("lifeos:cow:merge:{}", Uuid::new_v4());
-    sqlx::query_scalar(
-        "SELECT lifeos_runtime.cow_frontdoor_merge_v2($1, $2, $3, $4, $5, $6)",
-    )
+    sqlx::query_scalar("SELECT lifeos_runtime.cow_frontdoor_merge_v2($1, $2, $3, $4, $5, $6)")
         .bind(source_branch)
         .bind(target_branch)
         .bind(merge_record)
@@ -119,9 +117,7 @@ pub async fn promote(
     let execution = Uuid::new_v4();
     let effect = Uuid::new_v4();
     let idempotency_key = format!("lifeos:cow:promote:{}", Uuid::new_v4());
-    sqlx::query_scalar(
-        "SELECT lifeos_runtime.cow_frontdoor_promote_v2($1, $2, $3, $4, $5, $6)",
-    )
+    sqlx::query_scalar("SELECT lifeos_runtime.cow_frontdoor_promote_v2($1, $2, $3, $4, $5, $6)")
         .bind(source_branch)
         .bind(target_branch)
         .bind(promotion_record)

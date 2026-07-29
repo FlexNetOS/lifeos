@@ -23,16 +23,14 @@ pub async fn append_decision(
         return Err(StorageError::InvalidRouteDecision);
     }
 
-    sqlx::query_scalar(
-        "SELECT lifeos_agent.append_route_decision($1, $2, $3, $4, $5, $6)",
-    )
-    .bind(route)
-    .bind(reason)
-    .bind(signals)
-    .bind(policy)
-    .bind(source)
-    .bind(format!("lifeos:ai-route:{}", Uuid::new_v4()))
-    .fetch_one(pool)
-    .await
-    .map_err(StorageError::from)
+    sqlx::query_scalar("SELECT lifeos_agent.append_route_decision($1, $2, $3, $4, $5, $6)")
+        .bind(route)
+        .bind(reason)
+        .bind(signals)
+        .bind(policy)
+        .bind(source)
+        .bind(format!("lifeos:ai-route:{}", Uuid::new_v4()))
+        .fetch_one(pool)
+        .await
+        .map_err(StorageError::from)
 }

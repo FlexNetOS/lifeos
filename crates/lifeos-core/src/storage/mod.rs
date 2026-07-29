@@ -3,10 +3,10 @@ pub mod branches;
 pub mod error;
 #[cfg(feature = "legacy-sqlite-import")]
 pub mod legacy_sqlite;
-pub mod mempalace;
 pub mod logs;
-pub mod ruvector;
+pub mod mempalace;
 pub mod routing;
+pub mod ruvector;
 pub mod security;
 pub mod seed_vault;
 pub mod state;
@@ -230,10 +230,9 @@ async fn migrate_pool(pool: PgPool) -> Result<MigrateReport, StorageError> {
         connection = retry_connection;
     }
 
-    let (applied,): (i64,) =
-        sqlx::query_as("SELECT COUNT(*) FROM lifeos_runtime._sqlx_migrations")
-            .fetch_one(&mut *connection)
-            .await?;
+    let (applied,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM lifeos_runtime._sqlx_migrations")
+        .fetch_one(&mut *connection)
+        .await?;
     let total = sqlx::migrate!("./migrations").migrations.len() as u32;
 
     Ok(MigrateReport {

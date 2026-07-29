@@ -10,6 +10,7 @@ const receiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_RECEIPT ?? join(root
 const failureReceiptPath = resolve(process.env.LIFEOS_GLASS_LAUNCH_FAILURE_RECEIPT ?? join(root, "evidence/glass/live-launch-failure-receipt.json"));
 // The native binary embeds tauri.conf.json's localhost:1420 dev URL.
 const port = "1420";
+const reuseDevServer = process.env.LIFEOS_GLASS_REUSE_DEV_SERVER === "1";
 const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
 const runtime = {
   LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql",
@@ -83,7 +84,10 @@ function terminateTree(rootPid) {
 
 const startedAt = Date.now();
 const childEnv = { ...process.env, ...runtime };
-const child = spawn("/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev"], {
+const launchCommand = reuseDevServer
+  ? ["/home/flexnetos/.nix-profile/bin/cargo", ["run", "--manifest-path", "src-tauri/Cargo.toml", "--no-default-features", "--color", "always", "--"]]
+  : ["/home/flexnetos/.nix-profile/bin/bun", ["run", "tauri", "--", "dev"]];
+const child = spawn(launchCommand[0], launchCommand[1], {
   cwd: root,
   env: childEnv,
   detached: true,
@@ -151,7 +155,7 @@ const result = {
   authority: "Tauri process and authenticated redb owner projection",
   started_at: new Date(startedAt).toISOString(),
   launch: {
-    command: "bun run tauri -- dev",
+    command: launchCommand.join(" "),
     pid: child.pid,
     process_tree: tree,
     launch_error: launchError?.message ?? null,

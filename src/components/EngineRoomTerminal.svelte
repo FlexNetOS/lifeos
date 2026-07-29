@@ -3,6 +3,11 @@
   import { Terminal } from "@xterm/xterm";
   import { FitAddon } from "@xterm/addon-fit";
   import { WebglAddon } from "@xterm/addon-webgl";
+  import { ImageAddon } from "@xterm/addon-image";
+  import {
+    KittyUnicodePlaceholderAddon,
+    KittyUnicodePlaceholderStream,
+  } from "../lib/kitty-unicode-placeholders.js";
   import { Channel, invoke as tauriCoreInvoke } from "@tauri-apps/api/core";
   import "@xterm/xterm/css/xterm.css";
   import Icon from "./Icon.svelte";
@@ -25,9 +30,40 @@
   let probeClosed = false;
   let probeAttempts = 0;
   let resizeFrame = null;
+  let kittyPlaceholderStream = null;
+  let kittyPlaceholderAddon = null;
 
   const tauri = () => (typeof window === "undefined" ? null : window.__TAURI__);
   const invoke = () => tauri()?.core?.invoke || tauriCoreInvoke;
+
+  // Mirrors GLASS_VT_PROFILE in src-tauri/src/lib.rs. The backend is the source
+  // of truth; this is only the browser-preview fallback, and
+  // scripts/verify-terminal-capability.mjs asserts the two stay identical.
+  const GLASS_VT_FALLBACK = {
+    kittyKeyboard: true,
+    kittyGraphics: true,
+    kittyUnicodePlaceholders: true,
+    sixel: true,
+    iip: true,
+  };
+
+  const fetchCapabilities = async () => {
+    const call = invoke();
+    if (!call) return GLASS_VT_FALLBACK;
+    return (await call("terminal_capabilities").catch(() => null)) || GLASS_VT_FALLBACK;
+  };
+
+  // Image protocols size their output from the PTY's pixel geometry, so the
+  // rendered screen box has to travel with every cols/rows update.
+  const screenPixels = () => {
+    const screen = terminalEl?.querySelector(".xterm-screen");
+    if (!screen) return { pixelWidth: 0, pixelHeight: 0 };
+    const ratio = typeof devicePixelRatio === "number" ? devicePixelRatio : 1;
+    return {
+      pixelWidth: Math.round(screen.clientWidth * ratio),
+      pixelHeight: Math.round(screen.clientHeight * ratio),
+    };
+  };
 
   const recordProbeError = (error) => {
     if (!probe) return;
@@ -38,6 +74,7 @@
         schemaVersion: "lifeos.engine-room-error.v1",
         observedAt: Date.now(),
         error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
       }),
     });
   };
@@ -51,6 +88,7 @@
       sessionId,
       cols: terminal.cols,
       rows: terminal.rows,
+      ...screenPixels(),
     }).catch(() => {});
   };
 
@@ -81,9 +119,15 @@
         });
       }
       outputChannel = new Channel();
+      // One streaming decoder for the whole session: a multi-byte UTF-8 sequence
+      // split across two channel frames would otherwise decode to replacement
+      // characters. The terminal itself is fed raw bytes and is unaffected.
+      const probeDecoder = new TextDecoder("utf-8");
       outputChannel.onmessage = (bytes) => {
-        const text = new TextDecoder().decode(new Uint8Array(bytes));
-        terminal?.write(new Uint8Array(bytes));
+        const frame = new Uint8Array(bytes);
+        const text = probeDecoder.decode(frame, { stream: true });
+        const rendererFrame = kittyPlaceholderStream?.feed(frame) || frame;
+        terminal?.write(rendererFrame);
         if (probe && !probeClosed) {
           probeOutput = `${probeOutput}${text}`.slice(-16_384);
           if (probeOutput.includes("LIFEOS_ENGINE_PROBE_DONE")) {
@@ -116,6 +160,7 @@
       const spawnedSessionId = await call("terminal_spawn", {
         cols: terminal?.cols || 100,
         rows: terminal?.rows || 30,
+        ...screenPixels(),
         onOutput: outputChannel,
       });
       sessionId = spawnedSessionId;
@@ -162,8 +207,9 @@
           });
       }
       await resizeTerminal();
-    } catch {
+    } catch (error) {
       reconcileMessage = "Engine Room unavailable";
+      recordProbeError(error);
     }
   };
 
@@ -191,11 +237,17 @@
 
   onMount(async () => {
     try {
+      const caps = await fetchCapabilities();
       terminal = new Terminal({
       cols: 100,
       rows: 30,
       cursorBlink: true,
-      convertEol: true,
+      // The PTY carries a real terminal stream: Zellij emits its own CRLF and
+      // absolute cursor positioning. Rewriting LF would corrupt that surface.
+      convertEol: false,
+      // Required by the image addon.
+      allowProposedApi: true,
+      kittyKeyboard: caps.kittyKeyboard !== false,
       fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
       fontSize: 12,
       theme: {
@@ -207,6 +259,23 @@
     });
     fitAddon = new FitAddon();
     terminal.loadAddon(fitAddon);
+    try {
+      terminal.loadAddon(
+        new ImageAddon({
+          sixelSupport: caps.sixel !== false,
+          iipSupport: caps.iip !== false,
+          kittySupport: caps.kittyGraphics !== false,
+        }),
+      );
+    } catch {
+      // Images are an enhancement; a failed addon must not take the pane down.
+      // Yazi falls back to Chafa ASCII when no protocol renders.
+    }
+    if (caps.kittyUnicodePlaceholders) {
+      kittyPlaceholderStream = new KittyUnicodePlaceholderStream();
+      kittyPlaceholderAddon = new KittyUnicodePlaceholderAddon();
+      terminal.loadAddon(kittyPlaceholderAddon);
+    }
     let webgl2 = false;
     try {
       const canvas = document.createElement("canvas");
@@ -224,6 +293,11 @@
     }
     terminal.open(terminalEl);
     terminal.onData((data) => sendBytes(new TextEncoder().encode(data)));
+    // `onBinary` carries 8-bit payloads (mouse reports and similar) as a string
+    // of raw char codes. Encoding it as UTF-8 would corrupt any byte >= 0x80.
+    terminal.onBinary((data) =>
+      sendBytes(Uint8Array.from(data, (char) => char.charCodeAt(0) & 0xff)),
+    );
     await resizeTerminal();
     if (typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(scheduleResize);
@@ -248,8 +322,9 @@
         const projection = await invoke()("redb_projection_read").catch(() => null);
         redbSeq = projection?.localSeq ?? null;
       }
-    } catch {
+    } catch (error) {
       reconcileMessage = "Engine Room unavailable";
+      recordProbeError(error);
     }
   });
 
@@ -265,6 +340,8 @@
       await invoke()("terminal_close", { sessionId }).catch(() => {});
     }
     outputChannel = null;
+    kittyPlaceholderStream = null;
+    kittyPlaceholderAddon = null;
     terminal?.dispose();
   });
 </script>

@@ -159,6 +159,23 @@ Lose that condition and OpenPencil-tagged subs fall through to `<SubsectionView>
 
 `/workspace/:id/:section?/:sub?` is the canonical pattern. `?view=flow` switches `main` from `SubsectionView` to `N8nFlowView`. `/settings/:section?` is **not** a workspace — it lives outside the workspace tree. The native menu's Cmd-, emits `lifeos:navigate` → `/settings` (handled in `main.ts`).
 
+### "xterm" means xterm.js — the renderer, not a terminal choice
+
+The blueprint's `@xterm/xterm` pin (§3.1) is **xterm.js**, the renderer embedded in the
+Svelte pane. It is not XTerm the X11 application, and it is not a host terminal choice.
+Kitty, Ghostty, WezTerm, and Yazelix Nova's bundled Mars (Rio-derived) sit one layer out
+at the *native* front door hosting `yzx enter`. Two parallel front doors, and neither
+substitutes for the other — a GPU host emulator cannot mount in a webview, and xterm.js
+cannot replace the native host.
+
+The consequence that bites: because the embedded renderer is weaker than a native host,
+its capabilities must be **declared, not inherited**. `GLASS_VT_PROFILE` in
+`src-tauri/src/lib.rs` is that declaration, published to the renderer via
+`terminal_capabilities` and gated by `bun run verify:terminal-capability`. The PTY
+exports `TERM=xterm-256color` and strips `TERM_PROGRAM` — inheriting the host's
+`xterm-ghostty` made Yazi emit Kitty Unicode-placeholder graphics the renderer cannot
+draw. Full contract: §3.1.1 of the blueprint and the Engine Room section of `AGENTS.md`.
+
 ### Storage layer (Rust-side only)
 
 Added in `database-storage-foundation`. Owned entirely by `lifeos-core` + the Tauri shell — the Svelte layer never touches the DB directly.

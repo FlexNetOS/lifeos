@@ -9,7 +9,7 @@ const codeDbRoot = resolve(repoRoot, process.env.LIFEOS_CODEDB_ROOT ?? "../nu_pl
 // The external nu_plugin checkout is the immutable integration target. This
 // pin follows its owner-socket redb landing implementation; LifeOS never
 // mutates that checkout.
-const expectedCodeDbRevision = "5cc8c97b1b05a47949af455c951570fbee9701e4";
+const expectedCodeDbRevision = "5ec4242c656d019ea9dd583c1c78f1d5d48b4e7f";
 
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });

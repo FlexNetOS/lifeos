@@ -10,19 +10,12 @@ export const SOURCE_PATH = path.join(
   REPO_ROOT,
   "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 );
-export const INVENTORY_PATH = path.join(
-  REPO_ROOT,
-  "planning-spine-v0",
-  "1.0_VISION",
-  "Architecture_Anchors",
-  "section_inventory.json"
-);
 
 export const SOURCE_ID = "ARCHANCHOR-001";
 export const SOURCE_SHA256 =
-  "31495eaeb4ff0100eccb9813d1486543233174f26d013d991b6daff042399bda";
-export const SOURCE_BYTES = 981_276;
-export const SOURCE_LINES = 6_361;
+  "ae24c6a3dc18b08c1720ab8dc7b66c7d945bc6d1b24c64a119c6cc16dcb49619";
+export const SOURCE_BYTES = 991_204;
+export const SOURCE_LINES = 6_394;
 export const MEMOIR_NAME = "architecture-data-pipeline-ruvector";
 export const TOPIC_PREFIX = MEMOIR_NAME;
 export const MAX_RAW_CHUNK_BYTES = 8_192;
@@ -300,12 +293,64 @@ function exactSource(sourcePath = SOURCE_PATH) {
   return { bytes, text };
 }
 
-function exactInventory(inventoryPath = INVENTORY_PATH) {
-  const inventory = JSON.parse(fs.readFileSync(inventoryPath, "utf8"));
+function deriveInventory(text) {
+  const lines = splitLinesPreservingEndings(text);
+  const sectionStarts = [];
+  let fenced = false;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].replace(/\r?\n$/, "");
+    if (/^\s*```/.test(line)) {
+      fenced = !fenced;
+      continue;
+    }
+    const match = !fenced && /^(#{1,6})\s+(.+?)\s*$/.exec(line);
+    if (match) {
+      sectionStarts.push({ line: index + 1, level: match[1].length, title: match[2] });
+    }
+  }
+  const sections = [];
+  if (sectionStarts.length && sectionStarts[0].line > 1) {
+    sections.push({ start_line: 1, level: 0, title: "Preamble" });
+  }
+  sections.push(...sectionStarts);
+  const rendered = sections.map((section, index) => {
+    const startLine = section.line ?? section.start_line;
+    const endLine = sections[index + 1]
+      ? sections[index + 1].line - 1
+      : lines.length;
+    const raw = lines.slice(startLine - 1, endLine).join("");
+    return {
+      section_id: `${SOURCE_ID}-SECTION-${String(index + 1).padStart(3, "0")}`,
+      level: section.level,
+      title: section.title,
+      start_line: startLine,
+      end_line: endLine,
+      line_count: endLine - startLine + 1,
+      sha256: sha256(Buffer.from(raw, "utf8")),
+    };
+  });
+  return {
+    anchors: [{
+      anchor_id: SOURCE_ID,
+      total_lines: lines.length,
+      section_count: rendered.length,
+      coverage: {
+        first_line: 1,
+        last_line: lines.length,
+        contiguous: true,
+        complete: true,
+      },
+      sections: rendered,
+    }],
+  };
+}
+
+function exactInventory(sourceText) {
+  const inventory = deriveInventory(sourceText);
   const anchor = inventory.anchors?.find(
     (candidate) => candidate.anchor_id === SOURCE_ID
   );
-  if (!anchor) fail(`${SOURCE_ID} is absent from ${inventoryPath}`);
+  if (!anchor) fail(`${SOURCE_ID} is absent from the exact blueprint source`);
   if (
     anchor.total_lines !== SOURCE_LINES ||
     anchor.coverage?.first_line !== 1 ||
@@ -539,11 +584,10 @@ function buildRelationEvidenceMemory(relations) {
 }
 
 export function buildIngestionPlan({
-  sourcePath = SOURCE_PATH,
-  inventoryPath = INVENTORY_PATH
+  sourcePath = SOURCE_PATH
 } = {}) {
   const source = exactSource(sourcePath);
-  const inventory = exactInventory(inventoryPath);
+  const inventory = exactInventory(source.text);
   const lines = splitLinesPreservingEndings(source.text);
   if (lines.length !== SOURCE_LINES) {
     fail(`expected ${SOURCE_LINES} preserved lines, got ${lines.length}`);
@@ -1092,6 +1136,10 @@ function replaceMemory(memoryId, memory) {
   storeMemory(memory);
 }
 
+function forgetMemory(memoryId) {
+  runIcm(["forget", String(memoryId)]);
+}
+
 function addConcept(concept) {
   runIcm([
     "memoir",
@@ -1175,6 +1223,29 @@ function postgresUpsertGraph(plan) {
   runBatches(linkStatements);
 }
 
+function postgresReplaceGraph(plan) {
+  runPsql(`
+    BEGIN;
+    DELETE FROM concept_links
+    WHERE source_id IN (
+      SELECT concept.id FROM concepts AS concept
+      JOIN memoirs AS memoir ON memoir.id = concept.memoir_id
+      WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+    )
+    OR target_id IN (
+      SELECT concept.id FROM concepts AS concept
+      JOIN memoirs AS memoir ON memoir.id = concept.memoir_id
+      WHERE memoir.name = ${sqlLiteral(MEMOIR_NAME)}
+    );
+    DELETE FROM concepts
+    WHERE memoir_id IN (
+      SELECT id FROM memoirs WHERE name = ${sqlLiteral(MEMOIR_NAME)}
+    );
+    COMMIT;
+  `);
+  postgresUpsertGraph(plan);
+}
+
 function embedFingerprint() {
   const payload = {
     dimension: EXPECTED_EMBEDDING_DIMENSION,
@@ -1217,6 +1288,15 @@ function assertFingerprintMetadata(fingerprint) {
     }
   }
   return actual;
+}
+
+function writeFingerprintMetadata(fingerprint) {
+  const statements = Object.entries(expectedFingerprintMetadata(fingerprint)).map(
+    ([key, value]) =>
+      `INSERT INTO icm_metadata (key, value) VALUES (${sqlLiteral(key)}, ${sqlLiteral(value)}) ` +
+      `ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`
+  );
+  runPsql(`BEGIN;\n${statements.join(";\n")};\nCOMMIT;`);
 }
 
 function blueprintTopics(plan) {
@@ -1539,14 +1619,22 @@ function stateDigest(plan, memories, graph, metadata) {
 function execute(options) {
   const plan = buildIngestionPlan();
   const config = parseEmbeddingConfig();
+  const fingerprint = embedFingerprint();
   const database = preflightDatabase();
   let memories = readImportMemories();
   let graph = readGraph({ readOnly: options.verifyOnly });
   let memoryState = reconcileMemories(plan.memories, memories);
   let graphState = reconcileGraph(plan, graph);
   if (options.acceptSourceUpdate) {
-    if (memoryState.unexpected.length || graphState.unexpectedConcepts.length || graphState.unexpectedRelations.length) {
-      fail("--accept-source-update cannot reconcile unexpected memories or graph records");
+    if (memoryState.unexpected.length) {
+      const unexpectedIds = new Set(memoryState.unexpected);
+      for (const actual of memories) {
+        if (unexpectedIds.has(logicalIdFromSummary(actual.summary))) {
+          forgetMemory(actual.id);
+        }
+      }
+      memories = readImportMemories();
+      memoryState = reconcileMemories(plan.memories, memories);
     }
     const expectedById = new Map(plan.memories.map((memory) => [memory.logicalId, memory]));
     const driftIds = new Set(memoryState.drift.map((item) => item.split(".")[0]));
@@ -1556,13 +1644,16 @@ function execute(options) {
         replaceMemory(actual.id, expectedById.get(logicalId));
       }
     }
-    if (graphState.memoirMissing || graphState.drift.length || graphState.missingConcepts.length || graphState.missingRelations.length) {
+    if (graphState.unexpectedConcepts.length || graphState.unexpectedRelations.length) {
+      postgresReplaceGraph(plan);
+    } else if (graphState.memoirMissing || graphState.drift.length || graphState.missingConcepts.length || graphState.missingRelations.length) {
       postgresUpsertGraph(plan);
     }
     memories = readImportMemories();
     graph = readGraph();
     memoryState = reconcileMemories(plan.memories, memories);
     graphState = reconcileGraph(plan, graph);
+    writeFingerprintMetadata(fingerprint);
   }
   assertNoDrift(memoryState, graphState);
 
@@ -1638,7 +1729,6 @@ function execute(options) {
       memory.embedding_dim === null ||
       memory.embedding_dim !== EXPECTED_EMBEDDING_DIMENSION
   );
-  const fingerprint = embedFingerprint();
   if (options.verifyOnly && options.forceEmbed) {
     fail("--verify-only cannot be combined with --force-embed");
   }

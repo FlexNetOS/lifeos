@@ -9,7 +9,8 @@ static ROOT_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 fn temp_root() -> PathBuf {
     let id = ROOT_COUNTER.fetch_add(1, Ordering::SeqCst);
-    let root = std::env::temp_dir().join(format!("lifeos-redb-latency-{}-{id}", std::process::id()));
+    let root =
+        std::env::temp_dir().join(format!("lifeos-redb-latency-{}-{id}", std::process::id()));
     std::fs::create_dir_all(&root).expect("create latency root");
     root
 }

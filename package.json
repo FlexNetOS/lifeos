@@ -16,6 +16,9 @@
     "blueprint:diagrams": "bun scripts/verify-blueprint-diagrams.mjs",
     "storage:verify": "bun scripts/verify-postgres-ruvector.mjs",
     "verify:postgres-ruvector-live": "bun scripts/verify-postgres-ruvector-live.mjs",
+    "verify:lexical-retrieval-live": "bun scripts/verify-lexical-retrieval-live.mjs",
+    "verify:dense-retrieval-live": "bun scripts/verify-dense-retrieval-live.mjs",
+    "verify:rvf-solver-artifact": "bun scripts/verify-rvf-solver-artifact.mjs",
     "verify:ruvector-learning-live": "bun scripts/verify-ruvector-learning-live.mjs",
     "verify:pitr-drill": "python3 verification/pitr-drill/run_drill.py",
     "verify:ruvector-feature-matrix": "python3 verification/ruvector-feature-matrix/run_matrix.py",
@@ -80,12 +83,16 @@
     "vue": "^3.5.34",
     "vue-router": "^5.0.7"
   },
+  "overrides": {
+    "@ruvector/rvf-solver": "file:vendor/rvf-solver"
+  },
   "devDependencies": {
     "@google/design.md": "0.1.1",
     "@noble/hashes": "2.2.0",
     "@ruvector/postgres-cli": "^0.2.9",
     "@ruvector/ruvllm": "2.6.0",
     "@ruvector/rvf": "0.3.0",
+    "@ruvector/rvf-solver": "file:vendor/rvf-solver",
     "@ruvector/sona": "0.1.8",
     "@ruvector/tiny-dancer": "0.1.22",
     "@sveltejs/vite-plugin-svelte": "^7.2.0",

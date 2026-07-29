@@ -20,8 +20,8 @@ use std::path::PathBuf;
 use std::process::{Child as ProcessChild, Command, Stdio};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
-use std::time::{SystemTime, UNIX_EPOCH};
 use std::thread::JoinHandle;
+use std::time::{SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
 // `tauri::menu::*` is only used inside the `#[cfg(desktop)]` block in `run()`,
 // so the imports moved inline there. Mobile builds (iOS/Android) don't compile
@@ -38,9 +38,11 @@ fn redb_root() -> PathBuf {
 #[cfg(test)]
 mod terminal_tests {
     use super::{
-        engine_room_argv, engine_room_shell_argv, scoped_prompt, validate_redb_event_stream,
+        apply_glass_vt_profile, engine_room_argv, engine_room_shell_argv, scoped_prompt,
+        resolve_open_pencil_path, validate_redb_event_stream, GLASS_VT_PROFILE,
     };
     use flexnetos_redb_owner::CommitEvent;
+    use portable_pty::CommandBuilder;
 
     #[test]
     fn engine_room_argv_matches_the_reattach_contract() {
@@ -61,6 +63,51 @@ mod terminal_tests {
         assert!(!argv.join(" ").contains("ghostty"));
         assert!(!argv.join(" ").contains("kitty"));
         assert!(!argv.join(" ").contains("wezterm"));
+    }
+
+    #[test]
+    fn glass_vt_profile_never_advertises_a_host_terminal() {
+        // The Glass renderer is xterm.js. Claiming a host emulator's TERM would
+        // tell Yazi/Helix/Zellij to emit sequences it cannot draw.
+        assert_eq!(GLASS_VT_PROFILE.term, "xterm-256color");
+        for forbidden in ["ghostty", "kitty", "wezterm", "mars", "rio", "alacritty"] {
+            assert!(!GLASS_VT_PROFILE.term.contains(forbidden));
+        }
+    }
+
+    #[test]
+    fn glass_vt_profile_strips_inherited_host_terminal_identity() {
+        // `CommandBuilder` seeds from the parent environment, so a host running
+        // under Ghostty would otherwise leak `xterm-ghostty` into the Engine Room.
+        let mut command = CommandBuilder::new("/bin/true");
+        command.env("TERM", "xterm-ghostty");
+        command.env("TERM_PROGRAM", "ghostty");
+        command.env("TERM_PROGRAM_VERSION", "1.2.3");
+
+        apply_glass_vt_profile(&mut command);
+
+        assert_eq!(
+            command.get_env("TERM").unwrap(),
+            std::ffi::OsStr::new("xterm-256color")
+        );
+        assert!(command.get_env("TERM_PROGRAM").is_none());
+        assert!(command.get_env("TERM_PROGRAM_VERSION").is_none());
+    }
+
+    #[test]
+    fn glass_image_protocol_is_the_kitty_variant_the_renderer_implements() {
+        // The renderer-side compatibility addon adapts Kgp virtual placements
+        // while the pinned image addon performs the direct image placement.
+        assert!(GLASS_VT_PROFILE.kitty_graphics);
+        assert!(GLASS_VT_PROFILE.kitty_unicode_placeholders);
+        assert_eq!(GLASS_VT_PROFILE.image_protocol, "Kgp");
+
+        let mut command = CommandBuilder::new("/bin/true");
+        apply_glass_vt_profile(&mut command);
+        assert_eq!(
+            command.get_env("YAZI_IMAGE_PROTOCOL").unwrap(),
+            std::ffi::OsStr::new("Kgp")
+        );
     }
 
     #[test]
@@ -94,6 +141,13 @@ mod terminal_tests {
             scoped_prompt("untrusted-surface", "hello"),
             "[LifeOS surface: chat]\nhello"
         );
+    }
+
+    #[test]
+    fn open_pencil_path_rejects_escape_attempts() {
+        assert!(resolve_open_pencil_path("").is_err());
+        assert!(resolve_open_pencil_path("../outside.txt").is_err());
+        assert!(resolve_open_pencil_path("/etc/passwd").is_err());
     }
 }
 
@@ -189,10 +243,16 @@ fn validate_redb_event_stream(
             ));
         }
         if event.slot != "a" && event.slot != "b" {
-            return Err(format!("redb event has invalid projection slot: {}", event.slot));
+            return Err(format!(
+                "redb event has invalid projection slot: {}",
+                event.slot
+            ));
         }
         if event.checksum.is_empty() {
-            return Err(format!("redb event {} has an empty projection checksum", event.seq));
+            return Err(format!(
+                "redb event {} has an empty projection checksum",
+                event.seq
+            ));
         }
         expected = expected
             .checked_add(1)
@@ -246,6 +306,49 @@ fn redb_ui_ready() -> Result<u64, String> {
 #[tauri::command]
 fn redb_swarm_heartbeat() -> Result<u64, String> {
     publish_swarm_runtime_status()
+}
+
+fn resolve_open_pencil_path(relative_path: &str) -> Result<PathBuf, String> {
+    let relative = std::path::Path::new(relative_path);
+    if relative_path.is_empty() || relative.is_absolute() {
+        return Err("OpenPencil file path must be a non-empty relative path".into());
+    }
+    if relative.components().any(|component| {
+        matches!(
+            component,
+            std::path::Component::ParentDir
+                | std::path::Component::RootDir
+                | std::path::Component::Prefix(_)
+        )
+    }) {
+        return Err("OpenPencil file path may not escape the source root".into());
+    }
+    let root = std::env::var_os("LIFEOS_SOURCE_ROOT")
+        .map(PathBuf::from)
+        .or_else(|| std::env::current_dir().ok())
+        .ok_or_else(|| "LifeOS source root is unavailable".to_string())?;
+    let root = root
+        .canonicalize()
+        .map_err(|error| format!("canonicalize LifeOS source root: {error}"))?;
+    let resolved = root.join(relative).canonicalize().map_err(|error| {
+        format!("canonicalize OpenPencil source {}: {error}", relative.display())
+    })?;
+    if !resolved.starts_with(&root) {
+        return Err("OpenPencil file path resolves outside the source root".into());
+    }
+    Ok(resolved)
+}
+
+/// Read the selected OpenPencil source from the repository projection.
+/// This command is deliberately read-only: Apply remains a separate durable
+/// CodeDB/envctl workflow and cannot be replaced with a filesystem write.
+#[tauri::command]
+fn open_pencil_read_file(path: String) -> Result<String, String> {
+    let resolved = resolve_open_pencil_path(&path)?;
+    let bytes = std::fs::read(&resolved)
+        .map_err(|error| format!("read OpenPencil source {}: {error}", resolved.display()))?;
+    String::from_utf8(bytes)
+        .map_err(|error| format!("OpenPencil source is not UTF-8 ({}): {error}", resolved.display()))
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -438,21 +541,33 @@ impl AgentRuntimeSupervisor {
             .join("..")
             .join("scripts/lifeos-agent-runtime.mjs");
         if !script.exists() {
-            return Err(format!("agent runtime script is missing: {}", script.display()));
+            return Err(format!(
+                "agent runtime script is missing: {}",
+                script.display()
+            ));
         }
         let bun = std::env::var_os("LIFEOS_BUN_BIN")
             .map(PathBuf::from)
             .unwrap_or_else(|| PathBuf::from("/home/flexnetos/.nix-profile/bin/bun"));
         let child = Command::new(&bun)
             .arg(&script)
-            .current_dir(script.parent().and_then(|path| path.parent()).unwrap_or_else(|| std::path::Path::new(".")))
+            .current_dir(
+                script
+                    .parent()
+                    .and_then(|path| path.parent())
+                    .unwrap_or_else(|| std::path::Path::new(".")),
+            )
             .env("LIFEOS_REDB_ROOT", redb_root())
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
-            .map_err(|error| format!("start LifeOS agent runtime with {}: {error}", bun.display()))?;
-        Ok(Self { child: Arc::new(Mutex::new(child)) })
+            .map_err(|error| {
+                format!("start LifeOS agent runtime with {}: {error}", bun.display())
+            })?;
+        Ok(Self {
+            child: Arc::new(Mutex::new(child)),
+        })
     }
 }
 
@@ -485,10 +600,8 @@ impl EnvctlReconciler {
                                 if !receipt.committed.is_empty()
                                     || !receipt.skipped_existing.is_empty()
                                 {
-                                    let _ = envctl_commit_worker::return_projection(
-                                        &conn,
-                                        &owner_root,
-                                    );
+                                    let _ =
+                                        envctl_commit_worker::return_projection(&conn, &owner_root);
                                 }
                             }
                         }
@@ -523,9 +636,11 @@ struct TerminalSession {
 }
 
 fn engine_room_pane_target(session_name: &str) -> Option<(PathBuf, String)> {
-    let zellij = std::env::var_os("YZX_ZELLIJ").map(PathBuf::from).unwrap_or_else(|| {
-        PathBuf::from("/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij")
-    });
+    let zellij = std::env::var_os("YZX_ZELLIJ")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from("/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij")
+        });
     let server_root = std::env::var_os("XDG_RUNTIME_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
@@ -533,7 +648,12 @@ fn engine_room_pane_target(session_name: &str) -> Option<(PathBuf, String)> {
         .join("zellij/contract_version_1")
         .join(session_name);
     let output = Command::new(&zellij)
-        .args(["--server", server.to_string_lossy().as_ref(), "action", "list-panes"])
+        .args([
+            "--server",
+            server.to_string_lossy().as_ref(),
+            "action",
+            "list-panes",
+        ])
         .output()
         .ok()?;
     String::from_utf8_lossy(&output.stdout)
@@ -565,7 +685,9 @@ fn write_engine_room_pane(session_name: &str, bytes: &[u8]) -> Result<bool, Stri
         .status()
         .map_err(|error| format!("write Engine Room Nushell pane: {error}"))?;
     if !status.success() {
-        return Err(format!("write Engine Room Nushell pane exited with {status}"));
+        return Err(format!(
+            "write Engine Room Nushell pane exited with {status}"
+        ));
     }
     let _ = pane;
     Ok(true)
@@ -728,6 +850,63 @@ fn engine_room_session_name() -> Result<String, String> {
     Ok(name)
 }
 
+/// The Glass VT capability envelope.
+///
+/// The Glass renderer is xterm.js — an embedded renderer, not a host terminal
+/// emulator. Kitty, Ghostty, and Mars live one layer out, at the native front
+/// door, and are never substitutable here. Every field below states what the
+/// pinned renderer actually implements, so no process in the Engine Room is ever
+/// told Glass can draw something it cannot.
+///
+/// `term` stays a truthful terminfo baseline. Kitty keyboard support is
+/// negotiated at runtime through `CSI ? u` queries rather than advertised
+/// through `TERM`. The renderer-side compatibility addon adapts Kgp's Unicode
+/// placeholders (`U+10EEEE`) while the pinned image addon performs placement.
+#[derive(Debug, Clone, Copy, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct GlassVtProfile {
+    term: &'static str,
+    kitty_keyboard: bool,
+    kitty_graphics: bool,
+    kitty_unicode_placeholders: bool,
+    sixel: bool,
+    iip: bool,
+    image_protocol: &'static str,
+    core_pin: &'static str,
+    image_addon_pin: &'static str,
+}
+
+const GLASS_VT_PROFILE: GlassVtProfile = GlassVtProfile {
+    term: "xterm-256color",
+    kitty_keyboard: true,
+    kitty_graphics: true,
+    kitty_unicode_placeholders: true,
+    sixel: true,
+    iip: true,
+    image_protocol: "Kgp",
+    core_pin: "6.1.0-beta.292",
+    image_addon_pin: "0.10.0-beta.292",
+};
+
+/// Publishes the capability envelope so the Svelte renderer and the verification
+/// script read the same constant instead of duplicating it.
+#[tauri::command]
+fn terminal_capabilities() -> GlassVtProfile {
+    GLASS_VT_PROFILE
+}
+
+/// Applies the capability envelope to a PTY command.
+///
+/// `CommandBuilder` seeds itself from `std::env::vars_os()`, so the host's
+/// `TERM`/`TERM_PROGRAM` would otherwise leak into the Engine Room and advertise
+/// the *host* terminal's capabilities to processes rendering into Glass.
+fn apply_glass_vt_profile(command: &mut CommandBuilder) {
+    command.env("TERM", GLASS_VT_PROFILE.term);
+    command.env_remove("TERM_PROGRAM");
+    command.env_remove("TERM_PROGRAM_VERSION");
+    command.env("YAZI_IMAGE_PROTOCOL", GLASS_VT_PROFILE.image_protocol);
+}
+
 fn engine_room_argv(session_name: &str) -> Vec<String> {
     vec![
         "yzx".into(),
@@ -738,8 +917,8 @@ fn engine_room_argv(session_name: &str) -> Vec<String> {
 }
 
 fn engine_room_shell_argv(session_name: &str) -> Vec<String> {
-    let yzx = std::env::var("YZX_BIN")
-        .unwrap_or_else(|_| "/home/flexnetos/.nix-profile/bin/yzx".into());
+    let yzx =
+        std::env::var("YZX_BIN").unwrap_or_else(|_| "/home/flexnetos/.nix-profile/bin/yzx".into());
     let inner = format!("^{yzx} enter --session {session_name}");
     vec![
         std::env::var("LIFEOS_NUSHELL_PATH").unwrap_or_else(|_| {
@@ -758,9 +937,10 @@ fn yazelix_runtime_dir() -> Result<PathBuf, String> {
     let state_dir = std::env::var_os("YAZELIX_STATE_DIR").ok_or_else(|| {
         "YAZELIX_RUNTIME_DIR or YAZELIX_STATE_DIR is required for Engine Room".to_string()
     })?;
-    PathBuf::from(state_dir).parent().map(PathBuf::from).ok_or_else(|| {
-        "YAZELIX_STATE_DIR has no profile-runtime parent".to_string()
-    })
+    PathBuf::from(state_dir)
+        .parent()
+        .map(PathBuf::from)
+        .ok_or_else(|| "YAZELIX_STATE_DIR has no profile-runtime parent".to_string())
 }
 
 #[tauri::command]
@@ -769,13 +949,17 @@ fn terminal_spawn(
     state: tauri::State<'_, TerminalState>,
     cols: Option<u16>,
     rows: Option<u16>,
+    pixel_width: Option<u16>,
+    pixel_height: Option<u16>,
     on_output: Channel<Vec<u8>>,
 ) -> Result<String, String> {
+    // Pixel geometry is what SIXEL, IIP, and Kitty graphics use to size images.
+    // Reporting zeros leaves every image protocol without a scale reference.
     let size = PtySize {
         rows: rows.unwrap_or(24).max(1),
         cols: cols.unwrap_or(80).max(1),
-        pixel_width: 0,
-        pixel_height: 0,
+        pixel_width: pixel_width.unwrap_or(0),
+        pixel_height: pixel_height.unwrap_or(0),
     };
     let pair = native_pty_system()
         .openpty(size)
@@ -791,10 +975,7 @@ fn terminal_spawn(
     command.args(&shell_argv[1..]);
     command.env("YAZELIX_RUNTIME_DIR", &runtime_dir);
     command.env("YAZELIX_STATE_DIR", state_dir);
-    command.env(
-        "TERM",
-        std::env::var("TERM").unwrap_or_else(|_| "xterm-256color".into()),
-    );
+    apply_glass_vt_profile(&mut command);
     command.env(
         "YAZELIX_SESSION_TERMINAL",
         std::env::var("YAZELIX_SESSION_TERMINAL")
@@ -917,7 +1098,12 @@ fn terminal_spawn(
         let pane_name = "lifeos-engine-shell";
         let find_pane = || {
             Command::new(&zellij)
-                .args(["--server", server.to_string_lossy().as_ref(), "action", "list-panes"])
+                .args([
+                    "--server",
+                    server.to_string_lossy().as_ref(),
+                    "action",
+                    "list-panes",
+                ])
                 .output()
                 .ok()
                 .and_then(|output| {
@@ -1060,6 +1246,8 @@ fn terminal_resize(
     session_id: String,
     cols: u16,
     rows: u16,
+    pixel_width: Option<u16>,
+    pixel_height: Option<u16>,
 ) -> Result<(), String> {
     let sessions = state
         .sessions
@@ -1072,15 +1260,20 @@ fn terminal_resize(
         &session_id,
         "resize",
         &[],
-        serde_json::json!({"cols": cols, "rows": rows}),
+        serde_json::json!({
+            "cols": cols,
+            "rows": rows,
+            "pixelWidth": pixel_width.unwrap_or(0),
+            "pixelHeight": pixel_height.unwrap_or(0),
+        }),
     )?;
     session
         .master
         .resize(PtySize {
             rows: rows.max(1),
             cols: cols.max(1),
-            pixel_width: 0,
-            pixel_height: 0,
+            pixel_width: pixel_width.unwrap_or(0),
+            pixel_height: pixel_height.unwrap_or(0),
         })
         .map_err(|error| format!("resize terminal: {error}"))
 }
@@ -1735,10 +1928,12 @@ pub fn run() {
             redb_state_write,
             redb_swarm_heartbeat,
             redb_ui_ready,
+            open_pencil_read_file,
             codedb_ingest_envelope,
             envctl_drain,
             envctl_return_projection,
             terminal_spawn,
+            terminal_capabilities,
             terminal_write,
             terminal_probe,
             terminal_resize,

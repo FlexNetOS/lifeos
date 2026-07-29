@@ -80,6 +80,35 @@ describe("EngineRoomTerminal capability envelope", () => {
     expect(captured.options.kittyKeyboard).toBe(true);
   });
 
+  // Yazi queries cell size (CSI 16 t) before it will draw an image. xterm.js
+  // defaults `windowOptions` to `{}` and silently ignores it, which makes Yazi
+  // report "Terminal response timeout" and leaves images without a scale
+  // reference. Only the read-side reports are enabled — nothing may move or
+  // resize the window.
+  it("answers the pixel-geometry queries images are sized against", async () => {
+    await mount();
+    expect(captured.options.windowOptions?.getCellSizePixels).toBe(true);
+    expect(captured.options.windowOptions?.getWinSizePixels).toBe(true);
+  });
+
+  it("never lets a PTY process move or resize the Glass window", async () => {
+    await mount();
+    for (const writeSideOption of [
+      "setWinSizePixels",
+      "setWinSizeChars",
+      "setWinPosition",
+      "fullscreenWin",
+      "maximizeWin",
+      "minimizeWin",
+      "raiseWin",
+      "lowerWin",
+      "refreshWin",
+      "restoreWin",
+    ]) {
+      expect(captured.options.windowOptions?.[writeSideOption]).toBeFalsy();
+    }
+  });
+
   it("loads the image addon with kitty graphics, sixel and iip enabled", async () => {
     await mount();
     const image = captured.addons.find((addon) => addon.imageOptions);

@@ -101,7 +101,7 @@ fn ensure_redb_owner() -> Result<(), String> {
 mod terminal_tests {
     use super::{
         apply_glass_vt_profile, engine_room_argv, engine_room_shell_argv, resolve_open_pencil_path,
-        scoped_prompt, validate_redb_event_stream, GLASS_VT_PROFILE,
+        scoped_prompt, validate_redb_event_stream, GLASS_VT_PROFILE, HOST_TERMINAL_IDENTITY_VARS,
     };
     use flexnetos_redb_owner::CommitEvent;
     use portable_pty::CommandBuilder;
@@ -154,6 +154,48 @@ mod terminal_tests {
         );
         assert!(command.get_env("TERM_PROGRAM").is_none());
         assert!(command.get_env("TERM_PROGRAM_VERSION").is_none());
+    }
+
+    /// Yazi resolves its image adapter from the whole host-identity set, not just
+    /// `TERM_PROGRAM`. A single surviving marker — `GHOSTTY_RESOURCES_DIR` is the
+    /// one this host actually exports — makes it identify the host emulator, skip
+    /// negotiating with the Glass renderer, and select an adapter for a terminal
+    /// that is not drawing the pixels.
+    #[test]
+    fn glass_vt_profile_strips_every_host_emulator_marker() {
+        let mut command = CommandBuilder::new("/bin/true");
+        for variable in HOST_TERMINAL_IDENTITY_VARS {
+            command.env(variable, "leaked");
+        }
+
+        apply_glass_vt_profile(&mut command);
+
+        for variable in HOST_TERMINAL_IDENTITY_VARS {
+            assert!(
+                command.get_env(variable).is_none(),
+                "{variable} leaked the host terminal identity into the Engine Room"
+            );
+        }
+    }
+
+    #[test]
+    fn host_terminal_identity_covers_yazi_brand_detection() {
+        // The markers `yazi-emulator`'s brand detection reads. Losing one of these
+        // silently reintroduces host-dependent image behaviour inside Glass.
+        for required in [
+            "GHOSTTY_RESOURCES_DIR",
+            "KITTY_WINDOW_ID",
+            "KONSOLE_VERSION",
+            "ITERM_SESSION_ID",
+            "WEZTERM_EXECUTABLE",
+            "WARP_HONOR_PS",
+            "TERM_PROGRAM",
+        ] {
+            assert!(
+                HOST_TERMINAL_IDENTITY_VARS.contains(&required),
+                "{required} is a Yazi brand-detection marker but is not stripped"
+            );
+        }
     }
 
     #[test]
@@ -853,6 +895,7 @@ impl Drop for EnvctlReconciler {
 }
 
 struct TerminalSession {
+    engine_session_name: String,
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send>,
@@ -1039,15 +1082,52 @@ fn terminal_capabilities() -> GlassVtProfile {
     GLASS_VT_PROFILE
 }
 
+/// Every environment variable that identifies a *host* terminal emulator.
+///
+/// `TERM_PROGRAM` is only the best-known one. Yazi resolves its image adapter from
+/// this whole set (`yazi-emulator`'s brand detection), and other TUIs use them too,
+/// so stripping just two leaves the host's identity in force inside Glass.
+const HOST_TERMINAL_IDENTITY_VARS: &[&str] = &[
+    "TERM_PROGRAM",
+    "TERM_PROGRAM_VERSION",
+    "GHOSTTY_RESOURCES_DIR",
+    "GHOSTTY_BIN_DIR",
+    "GHOSTTY_SHELL_FEATURES",
+    "KITTY_WINDOW_ID",
+    "KITTY_PID",
+    "KITTY_INSTALLATION_DIR",
+    "KONSOLE_VERSION",
+    "ITERM_SESSION_ID",
+    "WEZTERM_EXECUTABLE",
+    "WEZTERM_PANE",
+    "WEZTERM_UNIX_SOCKET",
+    "WARP_HONOR_PS",
+    "VTE_VERSION",
+    "WT_SESSION",
+    "ALACRITTY_WINDOW_ID",
+    "ALACRITTY_SOCKET",
+    "LC_TERMINAL",
+    "LC_TERMINAL_VERSION",
+];
+
 /// Applies the capability envelope to a PTY command.
 ///
-/// `CommandBuilder` seeds itself from `std::env::vars_os()`, so the host's
-/// `TERM`/`TERM_PROGRAM` would otherwise leak into the Engine Room and advertise
-/// the *host* terminal's capabilities to processes rendering into Glass.
+/// `CommandBuilder` seeds itself from `std::env::vars_os()`, so the host's terminal
+/// identity would otherwise leak into the Engine Room and advertise the *host*
+/// terminal's capabilities to processes rendering into Glass.
+///
+/// Leaving even one marker behind is not cosmetic. With `GHOSTTY_RESOURCES_DIR`
+/// still set, Yazi resolves the emulator as Ghostty, skips the capability
+/// negotiation it would otherwise perform against this renderer, and selects an
+/// adapter for a terminal that is not the one drawing the pixels — on this host
+/// that lands on `chafa`, which is absent, so no image renders at all. With the
+/// full set stripped, Yazi negotiates from the renderer's own query responses (the
+/// image addon answers DA1 with `CSI ?62;4;9;22c`) and renders for real.
 fn apply_glass_vt_profile(command: &mut CommandBuilder) {
     command.env("TERM", GLASS_VT_PROFILE.term);
-    command.env_remove("TERM_PROGRAM");
-    command.env_remove("TERM_PROGRAM_VERSION");
+    for variable in HOST_TERMINAL_IDENTITY_VARS {
+        command.env_remove(variable);
+    }
     command.env("YAZI_IMAGE_PROTOCOL", GLASS_VT_PROFILE.image_protocol);
 }
 
@@ -1072,6 +1152,47 @@ fn engine_room_shell_argv(session_name: &str) -> Vec<String> {
         "-c".into(),
         inner,
     ]
+}
+
+fn engine_room_pane_snapshot(session_name: &str) -> Option<String> {
+    let zellij = std::env::var_os("YZX_ZELLIJ").unwrap_or_else(|| {
+        "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij".into()
+    });
+    let server_root = std::env::var_os("XDG_RUNTIME_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+    let server = server_root
+        .join("zellij/contract_version_1")
+        .join(session_name);
+    let pane = Command::new(&zellij)
+        .args([
+            "--server",
+            server.to_string_lossy().as_ref(),
+            "action",
+            "list-panes",
+        ])
+        .output()
+        .ok()
+        .and_then(|output| {
+            String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .find(|line| line.contains("lifeos-engine-shell"))
+                .and_then(|line| line.split_whitespace().next())
+                .map(str::to_string)
+        })?;
+    Command::new(zellij)
+        .args([
+            "--server",
+            server.to_string_lossy().as_ref(),
+            "action",
+            "dump-screen",
+            "-p",
+            &pane,
+        ])
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+        .map(|output| String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
 fn yazelix_runtime_dir() -> Result<PathBuf, String> {
@@ -1119,6 +1240,7 @@ fn terminal_spawn(
     command.args(&shell_argv[1..]);
     command.env("YAZELIX_RUNTIME_DIR", &runtime_dir);
     command.env("YAZELIX_STATE_DIR", state_dir);
+    command.env("YAZELIX_STARTUP_PROFILE_SKIP_WELCOME", "1");
     apply_glass_vt_profile(&mut command);
     command.env(
         "YAZELIX_SESSION_TERMINAL",
@@ -1225,6 +1347,7 @@ fn terminal_spawn(
         .insert(
             session_id.clone(),
             TerminalSession {
+                engine_session_name: session_name.clone(),
                 master: pair.master,
                 writer,
                 child,
@@ -1350,48 +1473,57 @@ fn terminal_probe(
     session_id: String,
 ) -> Result<bool, String> {
     let probe = b"echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r";
-    std::thread::sleep(Duration::from_millis(250));
     let recent_output = {
-        let mut sessions = state
+        let sessions = state
             .sessions
             .lock()
             .map_err(|error| format!("terminal state lock: {error}"))?;
-        let session = sessions
-            .get_mut(&session_id)
-            .ok_or_else(|| "terminal session is not active".to_string())?;
-        let offset = session
-            .input_offset
-            .fetch_add(probe.len() as u64, Ordering::Relaxed);
-        capture_terminal_frame(
-            &session_id,
-            "input",
-            probe,
-            serde_json::json!({"stream": "pty", "offset": offset, "source": "native-probe"}),
-        )?;
-        session
-            .writer
-            .write_all(probe)
-            .and_then(|_| session.writer.flush())
-            .map_err(|error| format!("write terminal probe: {error}"))?;
-        Arc::clone(&session.probe_output)
+        Arc::clone(
+            &sessions
+                .get(&session_id)
+                .ok_or_else(|| "terminal session is not active".to_string())?
+                .probe_output,
+        )
     };
+    let mut probe_sent = false;
     for attempt in 0..40 {
-        if recent_output
+        let pty_ready = recent_output
             .lock()
             .map(|bytes| {
                 bytes
                     .windows(b"LIFEOS_ENGINE_PROBE_DONE".len())
                     .any(|window| window == b"LIFEOS_ENGINE_PROBE_DONE")
             })
-            .unwrap_or(false)
-        {
+            .unwrap_or(false);
+        let pane_output = engine_room_pane_snapshot(
+            &state
+                .sessions
+                .lock()
+                .map_err(|error| format!("terminal state lock: {error}"))?
+                .get(&session_id)
+                .ok_or_else(|| "terminal session is not active".to_string())?
+                .engine_session_name,
+        )
+        .unwrap_or_default();
+        if !pane_output.is_empty() {
+            capture_terminal_frame(
+                &session_id,
+                "output",
+                pane_output.as_bytes(),
+                serde_json::json!({
+                    "stream": "zellij-pane",
+                    "source": "nushell-read-only-observation",
+                    "pane": "lifeos-engine-shell"
+                }),
+            )?;
+        }
+        if pty_ready || pane_output.contains("LIFEOS_ENGINE_PROBE_DONE") {
             return Ok(true);
         }
-        std::thread::sleep(Duration::from_millis(250));
-        // yzx-welcome may consume the first input while it hands the PTY to
-        // the Zellij session. Retry through the same PTY master until Nushell
-        // has actually echoed the completion marker; every retry is captured.
-        if attempt < 39 {
+        // yzx-welcome consumes input while it hands the PTY to Zellij. Wait
+        // for a real pane snapshot before sending the marker, then retry on
+        // the same PTY until Nushell has echoed it.
+        if !pane_output.is_empty() && (!probe_sent || attempt % 4 == 0) {
             let mut sessions = state
                 .sessions
                 .lock()
@@ -1409,8 +1541,8 @@ fn terminal_probe(
                 serde_json::json!({
                     "stream": "pty",
                     "offset": offset,
-                    "source": "native-probe-retry",
-                    "attempt": attempt + 1,
+                    "source": if probe_sent { "native-probe-retry" } else { "native-probe" },
+                    "attempt": attempt,
                 }),
             )?;
             session
@@ -1418,7 +1550,32 @@ fn terminal_probe(
                 .write_all(probe)
                 .and_then(|_| session.writer.flush())
                 .map_err(|error| format!("write terminal probe retry: {error}"))?;
+            // `yzx enter` hands the managed Zellij client the inherited PTY
+            // after startup. Write through the focused Engine Room pane as
+            // well so the probe reaches Nushell across that handoff; the PTY
+            // write above remains the captured input authority.
+            let zellij = std::env::var_os("YZX_ZELLIJ").unwrap_or_else(|| {
+                "/nix/store/0b7a9y9kk3kag3xjhhai30phj5j56nij-zellij-0.44.3/bin/zellij"
+                    .into()
+            });
+            let server_root = std::env::var_os("XDG_RUNTIME_DIR")
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+            let server = server_root
+                .join("zellij/contract_version_1")
+                .join(&session.engine_session_name);
+            let _ = Command::new(zellij)
+                .args([
+                    "--server",
+                    server.to_string_lossy().as_ref(),
+                    "action",
+                    "write-chars",
+                    std::str::from_utf8(probe).unwrap_or_default(),
+                ])
+                .status();
+            probe_sent = true;
         }
+        std::thread::sleep(Duration::from_millis(250));
     }
     Ok(false)
 }
@@ -2269,7 +2426,7 @@ pub fn run() {
             if std::env::var_os("VITE_LIFEOS_ENGINE_PROBE").as_deref() == Some(std::ffi::OsStr::new("1")) {
                 if let Some(window) = app.get_webview_window("main") {
                     window
-                        .eval("window.location.replace(window.location.origin + '/?probe=engine-room')")
+                        .eval("window.location.replace(window.location.origin + '/?probe=engine-room&probeNonce=' + Date.now())")
                         .map_err(|error| std::io::Error::other(format!("redirect Engine Room probe: {error}")))?;
                 }
             }

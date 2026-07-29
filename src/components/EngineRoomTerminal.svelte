@@ -191,8 +191,25 @@
             sessionId: spawnedSessionId,
           }),
         });
+        void call("redb_state_write", {
+          key: "lifeos.engine-room.probe-dispatch",
+          value: JSON.stringify({
+            schemaVersion: "lifeos.engine-room-probe-dispatch.v1",
+            observedAt: Date.now(),
+            sessionId: spawnedSessionId,
+          }),
+        });
         void call("terminal_probe", { sessionId: spawnedSessionId })
           .then((verified) => {
+            void call("redb_state_write", {
+              key: "lifeos.engine-room.probe-result",
+              value: JSON.stringify({
+                schemaVersion: "lifeos.engine-room-probe-result.v1",
+                observedAt: Date.now(),
+                sessionId: spawnedSessionId,
+                verified,
+              }),
+            });
             if (!verified) return;
             void call("redb_state_write", {
               key: "lifeos.engine-room.ready",
@@ -241,6 +258,16 @@
   };
 
   onMount(async () => {
+    if (probe) {
+      void invoke()?.("redb_state_write", {
+        key: "lifeos.engine-room.component-mounted",
+        value: JSON.stringify({
+          schemaVersion: "lifeos.engine-room-component-mounted.v1",
+          observedAt: Date.now(),
+          probe,
+        }),
+      });
+    }
     try {
       const caps = await fetchCapabilities();
       terminal = new Terminal({
@@ -253,6 +280,16 @@
       // Required by the image addon.
       allowProposedApi: true,
       kittyKeyboard: caps.kittyKeyboard !== false,
+      // xterm.js defaults `windowOptions` to `{}`, so it silently ignores the
+      // cell/window pixel-geometry queries. Yazi asks for cell size (CSI 16 t)
+      // before it will draw an image; unanswered it reports "Terminal response
+      // timeout" and has no scale reference. These three are reports only — the
+      // set-side window ops stay off, so no process can move or resize the window.
+      windowOptions: {
+        getCellSizePixels: true,
+        getWinSizePixels: true,
+        getWinSizeChars: true,
+      },
       fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
       fontSize: 12,
       theme: {
@@ -311,15 +348,15 @@
 
     const events = tauri()?.event;
     if (events) {
-      stopExit = await events.listen("lifeos:terminal-exit", (event) => {
+      void events.listen("lifeos:terminal-exit", (event) => {
         if (event.payload?.sessionId === sessionId) connected = false;
-      });
-      stopCaptureError = await events.listen("lifeos:terminal-capture-error", (event) => {
+      }).then((stop) => { stopExit = stop; }).catch(recordProbeError);
+      void events.listen("lifeos:terminal-capture-error", (event) => {
         if (event.payload?.sessionId === sessionId) {
           reconcileMessage = "Terminal capture unavailable — output paused";
           connected = false;
         }
-      });
+      }).then((stop) => { stopCaptureError = stop; }).catch(recordProbeError);
     }
     await start();
       if (invoke()) {

@@ -46,11 +46,30 @@ for (const hostTerminal of ["ghostty", "kitty", "wezterm", "mars", "rio", "alacr
     throw new Error(`Glass TERM claims host terminal "${hostTerminal}": ${profile.term}`);
   }
 }
-if (!lib.includes('command.env_remove("TERM_PROGRAM")')) {
-  throw new Error("inherited TERM_PROGRAM is not stripped from the Engine Room PTY");
+// Stripping TERM_PROGRAM alone is not enough. Yazi resolves its image adapter from
+// the whole host-identity set; with GHOSTTY_RESOURCES_DIR still set it identifies the
+// *host* emulator, skips negotiating with this renderer, and picks an adapter for a
+// terminal that is not drawing the pixels. Verified against yazi 26.5.6.
+const identityBlock = lib.match(/const HOST_TERMINAL_IDENTITY_VARS[^=]*=\s*&\[([\s\S]*?)\];/);
+if (!identityBlock) {
+  throw new Error("HOST_TERMINAL_IDENTITY_VARS is not declared in src-tauri/src/lib.rs");
 }
-if (!lib.includes('command.env_remove("TERM_PROGRAM_VERSION")')) {
-  throw new Error("inherited TERM_PROGRAM_VERSION is not stripped from the Engine Room PTY");
+const strippedIdentityVars = [...identityBlock[1].matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+for (const required of [
+  "TERM_PROGRAM",
+  "TERM_PROGRAM_VERSION",
+  "GHOSTTY_RESOURCES_DIR",
+  "KITTY_WINDOW_ID",
+  "WEZTERM_EXECUTABLE",
+  "KONSOLE_VERSION",
+  "ITERM_SESSION_ID",
+]) {
+  if (!strippedIdentityVars.includes(required)) {
+    throw new Error(`inherited ${required} is not stripped from the Engine Room PTY`);
+  }
+}
+if (!/for variable in HOST_TERMINAL_IDENTITY_VARS[\s\S]{0,120}env_remove\(variable\)/.test(lib)) {
+  throw new Error("HOST_TERMINAL_IDENTITY_VARS is declared but never applied to the PTY command");
 }
 if (!lib.includes('command.env("YAZI_IMAGE_PROTOCOL"')) {
   throw new Error("the image protocol is not selected explicitly for the Engine Room PTY");
@@ -157,6 +176,10 @@ const rendererContract = [
   ["KittyUnicodePlaceholderStream", "the Kgp renderer compatibility adapter is not loaded"],
   ["KittyUnicodePlaceholderAddon", "the Kgp placeholder-cell adapter is not loaded"],
   ["screenPixels()", "PTY pixel geometry is not reported, so images have no scale reference"],
+  // Yazi asks for cell size (CSI 16 t) before drawing; xterm.js ignores it unless
+  // the report is enabled, and then reports "Terminal response timeout".
+  ["getCellSizePixels: true", "the renderer ignores the cell-size query images size against"],
+  ["getWinSizePixels: true", "the renderer ignores the window pixel-geometry query"],
 ];
 for (const [needle, failure] of rendererContract) {
   if (!component.includes(needle)) throw new Error(failure);
@@ -179,7 +202,15 @@ const receipt = {
   renderer: "xterm.js (embedded); host terminal emulator choice stays open at the native front door",
   capability_envelope: profile,
   pins: { ...pins, "@xterm/addon-fit": packageJson.dependencies?.["@xterm/addon-fit"], "@xterm/addon-webgl": packageJson.dependencies?.["@xterm/addon-webgl"] },
-  host_terminal_identity_stripped: ["TERM_PROGRAM", "TERM_PROGRAM_VERSION"],
+  host_terminal_identity_stripped: strippedIdentityVars,
+  image_protocol_negotiation: {
+    mechanism:
+      "Yazi resolves its adapter from host-identity environment variables first and from terminal query responses only when none are present. Stripping the full identity set is therefore what makes the Engine Room negotiate against this renderer instead of against the host emulator.",
+    renderer_advertises_sixel_via: "@xterm/addon-image DA1 reply CSI ?62;4;9;22c",
+    cell_geometry_reported_via: "windowOptions.getCellSizePixels (CSI 16 t)",
+    yazi_image_protocol_env:
+      "set for image-protocol-aware consumers; yazi 26.5.6 does not read it, so it is not the authority for adapter selection",
+  },
   resolved_compatibility: {
     kitty_unicode_placeholders: true,
     implementation: "renderer-side Kgp compatibility addon adapts virtual placements before xterm.js parsing; raw PTY capture remains unchanged.",

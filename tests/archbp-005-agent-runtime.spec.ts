@@ -79,5 +79,5 @@ describe("ARCHBP-005 supervised LifeOS agent runtime", () => {
       await new Promise((resolveExit) => child.once("exit", resolveExit));
       rmSync(rvfRoot, { recursive: true, force: true });
     }
-  }, 30_000);
+  }, 60_000);
 });

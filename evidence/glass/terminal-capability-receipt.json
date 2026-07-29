@@ -21,8 +21,32 @@
   },
   "host_terminal_identity_stripped": [
     "TERM_PROGRAM",
-    "TERM_PROGRAM_VERSION"
+    "TERM_PROGRAM_VERSION",
+    "GHOSTTY_RESOURCES_DIR",
+    "GHOSTTY_BIN_DIR",
+    "GHOSTTY_SHELL_FEATURES",
+    "KITTY_WINDOW_ID",
+    "KITTY_PID",
+    "KITTY_INSTALLATION_DIR",
+    "KONSOLE_VERSION",
+    "ITERM_SESSION_ID",
+    "WEZTERM_EXECUTABLE",
+    "WEZTERM_PANE",
+    "WEZTERM_UNIX_SOCKET",
+    "WARP_HONOR_PS",
+    "VTE_VERSION",
+    "WT_SESSION",
+    "ALACRITTY_WINDOW_ID",
+    "ALACRITTY_SOCKET",
+    "LC_TERMINAL",
+    "LC_TERMINAL_VERSION"
   ],
+  "image_protocol_negotiation": {
+    "mechanism": "Yazi resolves its adapter from host-identity environment variables first and from terminal query responses only when none are present. Stripping the full identity set is therefore what makes the Engine Room negotiate against this renderer instead of against the host emulator.",
+    "renderer_advertises_sixel_via": "@xterm/addon-image DA1 reply CSI ?62;4;9;22c",
+    "cell_geometry_reported_via": "windowOptions.getCellSizePixels (CSI 16 t)",
+    "yazi_image_protocol_env": "set for image-protocol-aware consumers; yazi 26.5.6 does not read it, so it is not the authority for adapter selection"
+  },
   "resolved_compatibility": {
     "kitty_unicode_placeholders": true,
     "implementation": "renderer-side Kgp compatibility addon adapts virtual placements before xterm.js parsing; raw PTY capture remains unchanged."
@@ -33,8 +57,8 @@
     "pty_pixel_geometry_reported": true
   },
   "source_sha256": {
-    "lib": "c692f8d300427d75391ec103805b102c16ab655fb5b363ef255c4fe2a2390bca",
-    "component": "a6c55ec5923a6a155e936c5f6fd9625749432b7298fe150e3130cebe241f9707"
+    "lib": "1793f145b2eef8060121128eb54b4193f94f93f1c0452aaa99bc622d72811601",
+    "component": "615ebcfa2205b7afdd7e1d9391ccfd5ad91ee694d5a308b78a0a19d41ee5f6cb"
   },
   "ok": true
 }

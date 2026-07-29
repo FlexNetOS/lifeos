@@ -1,0 +1,48 @@
+{
+  "schema_version": "lifeos.evidence.engine-room-image-render.v1",
+  "authority": "Live yazi 26.5.6 driven on a real PTY reproducing the Glass VT capability envelope (TIOCSWINSZ with pixel geometry, raw line discipline, xterm.js-shaped query replies).",
+  "reproduce": [
+    "python3 scripts/probe-yazi-image-adapter.py --json",
+    "python3 scripts/probe-yazi-image-adapter.py --leak-host-identity --json",
+    "python3 scripts/probe-yazi-image-adapter.py --debug-report --json"
+  ],
+  "probe": "scripts/probe-yazi-image-adapter.py",
+  "yazi_binary": "/nix/store/382wqsqc7ylr19xzq384qsq6lwj7jdd0-yazi-26.5.6/bin/yazi",
+  "repository_commit": "3439ca33e5669d5e8118bda7326fdd194171e701",
+  "finding": "The Engine Room rendered no image at all. CommandBuilder seeds the PTY from the parent environment and apply_glass_vt_profile stripped only TERM_PROGRAM/TERM_PROGRAM_VERSION, so GHOSTTY_RESOURCES_DIR survived. Yazi resolved the host emulator from that marker, skipped negotiating with the Glass renderer, and selected an adapter for a terminal that was not drawing the pixels — chafa, which is not installed on this host.",
+  "fix": "HOST_TERMINAL_IDENTITY_VARS in src-tauri/src/lib.rs now strips the full host-identity set, and the renderer answers the pixel-geometry queries via windowOptions.",
+  "before_fix": {
+    "host_identity": "leaked (GHOSTTY_RESOURCES_DIR present)",
+    "brand_from_env": "Some(Ghostty)",
+    "emulator_detect": "Emulator { kind: Left(Ghostty), version: \"xterm(6.1.0)\", light: false, csi_16t: (10, 20), force_16t: false }",
+    "adapter_matches": "Chafa",
+    "captured_bytes": 5033,
+    "sixel_payloads": 0,
+    "chafa_fallback": true,
+    "image_rendered": false
+  },
+  "after_fix": {
+    "host_identity": "stripped",
+    "brand_from_env": "None",
+    "emulator_detect": "Emulator { kind: Right(Unknown { kgp: false, sixel: true }), version: \"xterm(6.1.0)\", light: false, csi_16t: (10, 20), force_16t: false }",
+    "adapter_matches": "Sixel",
+    "captured_bytes": 35597,
+    "sixel_payloads": 1,
+    "kitty_capability_probe_sent": true,
+    "chafa_fallback": false,
+    "image_rendered": true
+  },
+  "geometry": {
+    "cols": 100,
+    "rows": 30,
+    "pixel_width": 1000,
+    "pixel_height": 600
+  },
+  "notes": [
+    "sixel:true is negotiated from the renderer's own DA1 reply — @xterm/addon-image answers CSI ?62;4;9;22c when sixelSupport is enabled. No host impersonation is involved.",
+    "csi_16t:(10,20) is only populated because windowOptions.getCellSizePixels answers CSI 16 t. Unanswered, Yazi prints 'Terminal response timeout' and images have no scale reference.",
+    "YAZI_IMAGE_PROTOCOL is still exported for image-protocol-aware consumers, but yazi 26.5.6 does not read it — the only YAZI_* variables it reads are YAZI_CONFIG_HOME, YAZI_FILE_ONE, YAZI_ID, YAZI_LEVEL, YAZI_LOG, YAZI_PID and YAZI_ZOXIDE_OPTS. It is not the authority for adapter selection.",
+    "Kitty graphics support is retained end to end (addon kittySupport plus the U+10EEEE placeholder adapter). Yazi 26.5.6 sets kgp:true only from a known emulator brand; it emits the a=q capability probe but answering it with i=31;OK did not flip kgp in testing, so Kgp-by-negotiation is NOT claimed here."
+  ],
+  "ok": true
+}

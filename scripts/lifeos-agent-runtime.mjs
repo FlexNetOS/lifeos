@@ -12,6 +12,10 @@ import { AgentRvfRegistry } from "./agentdb-rvf-lifecycle.mjs";
 
 const agentId = process.env.LIFEOS_AGENT_ID ?? "lifeos-coordinator";
 const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/var/lib/redb");
+// This variable routes owner UDS writes only. Do not leak it into the native
+// AgentDB/RuVector active-plane initialization: native consumers may interpret
+// it as their own storage root and block on the durable owner database.
+delete process.env.LIFEOS_REDB_ROOT;
 const rvfRoot = resolve(process.env.LIFEOS_AGENT_RVF_ROOT ?? "/home/flexnetos/meta/var/lib/agentdb/rvf");
 const intervalMs = Number(process.env.LIFEOS_AGENT_HEARTBEAT_MS ?? 5_000);
 const statusPath = resolve(process.env.LIFEOS_AGENT_STATUS ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/status.json");
@@ -72,7 +76,7 @@ if (import.meta.main) {
   let runtime;
   try {
     runtime = await startAgentRuntime();
-    console.log(JSON.stringify({ schemaVersion: "lifeos.agent-runtime.v1", status: "ready", ...runtime }));
+    process.stdout.write(`${JSON.stringify({ schemaVersion: "lifeos.agent-runtime.v1", status: "ready", ...runtime })}\n`);
     if (once) {
       await runtime.shutdown();
       process.exit(0);

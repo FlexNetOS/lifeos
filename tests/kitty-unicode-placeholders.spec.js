@@ -74,6 +74,47 @@ describe("Kitty Unicode placeholder stream", () => {
     expect(new KittyUnicodePlaceholderStream().feed(alreadyDirect)).toEqual(alreadyDirect);
   });
 
+  // Captured from yazi 26.5.6 rendering a real preview through the Kgp adapter
+  // (evidence/glass/kgp-placement-position-receipt.json). Yazi emits `C=1` itself
+  // and chunks the payload with `m=1`, neither of which the synthetic fixtures
+  // above exercised.
+  const YAZI_PLACEMENT = "q=2,a=T,C=1,U=1,f=32,s=256,v=256,i=3726565,m=1";
+
+  it("converts the placement yazi actually emits, changing only the virtual flag", () => {
+    const stream = new KittyUnicodePlaceholderStream();
+    const frame = bytes(`${APC}${YAZI_PLACEMENT};QUJD${ST}`);
+
+    const result = text(stream.feed(frame));
+    // Exactly `U=1,` is removed — the cursor policy yazi already set is kept as-is
+    // rather than appended a second time, and every other key is byte-identical.
+    expect(result).toBe(`${APC}q=2,a=T,C=1,f=32,s=256,v=256,i=3726565,m=1;QUJD${ST}`);
+    expect(result.length).toBe(text(frame).length - "U=1,".length);
+  });
+
+  it("leaves chunked payload continuations untouched", () => {
+    const stream = new KittyUnicodePlaceholderStream();
+    // After the first chunk, yazi sends payload-only APCs with no control keys.
+    // Rewriting or reordering these would corrupt the transmitted image.
+    const continuation = bytes(`${APC}m=1;QUJDRA==${ST}${APC}m=0;RUZH${ST}`);
+
+    expect(stream.feed(continuation)).toEqual(continuation);
+  });
+
+  it("never rewrites the cursor positioning the image is placed against", () => {
+    const stream = new KittyUnicodePlaceholderStream();
+    // Kgp positions an image at its placeholder-cell region, and yazi parks the
+    // cursor at that region's origin before emitting the placement. The direct
+    // placement therefore lands correctly only while the adapter leaves every
+    // positioning sequence exactly where it was.
+    const frame = bytes(
+      `[2;64H${APC}${YAZI_PLACEMENT};QUJD${ST}󾻮[3;64H󾻮`,
+    );
+
+    const result = text(stream.feed(frame));
+    expect(result.match(/\[[0-9;]*H/g)).toEqual(["[2;64H", "[3;64H"]);
+    expect((result.match(/󾻮/g) || []).length).toBe(2);
+  });
+
   it("releases an unterminated APC rather than buffering the terminal to a halt", () => {
     const stream = new KittyUnicodePlaceholderStream();
     // No string terminator ever arrives; the size guard must emit instead of stalling.

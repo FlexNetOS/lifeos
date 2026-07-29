@@ -1,0 +1,258 @@
+{
+  "schema_version": "lifeos.evidence.learning-ruflo-atas-live.v1",
+  "generated_at": "2026-07-29T07:42:58.602Z",
+  "authority": "installed LifeOS runtime and pinned release-source identities",
+  "tasks": [
+    "ARCHBP-009",
+    "ARCHBP-013",
+    "ARCHBP-014",
+    "ARCHBP-015"
+  ],
+  "runtime": {
+    "ruflo_installed_version": "3.32.9",
+    "ruflo_source_snapshot_version": "3.32.8",
+    "ruflo_source_revision": "12ede21767a6dd669df1b79392a5d27d9154f237",
+    "ruvector_source_revision": "6a6c39e662a4c3184dcb913db91a09401c84b2ae"
+  },
+  "verdict": "pass",
+  "proofs": {
+    "learning": {
+      "task": "ARCHBP-009",
+      "generatedAt": "2026-07-29T07:42:56.489Z",
+      "provenance": {
+        "sona": {
+          "component": "sona",
+          "packageVersion": "0.1.8",
+          "nativeVersion": "0.1.8",
+          "model": "sona-h8-mlr2",
+          "agentId": "agent-a",
+          "digest": "33c429aa2408e51ef8a07798c63efdf0fd037c759a30d2cebbf9daa453439c07"
+        },
+        "fastgrnn": {
+          "component": "fastgrnn",
+          "packageVersion": "0.1.22",
+          "nativeVersion": "2.2.3",
+          "model": "fastgrnn-router",
+          "agentId": "agent-a",
+          "digest": "66fe8add32fdef76959178a19c128d6bf3dd3c4139325f7aa0779db664d08480"
+        }
+      },
+      "isolation": {
+        "agentASandboxPatterns": 1,
+        "agentBSandboxPatterns": 0,
+        "isolated": true
+      },
+      "promotion": {
+        "promoted": true,
+        "reason": "promoted",
+        "executionBeforePromotionUsesBaseline": true,
+        "executionAfterPromotionUsesSandbox": true
+      },
+      "rollback": {
+        "deterministic": true,
+        "executionAfterRollbackMatchesBaseline": true
+      },
+      "resources": {
+        "withinBudget": true,
+        "dropped": 0
+      },
+      "fastgrnn": {
+        "score": 0.3857934772968292,
+        "provenance": {
+          "component": "fastgrnn",
+          "packageVersion": "0.1.22",
+          "nativeVersion": "2.2.3",
+          "model": "fastgrnn-router",
+          "agentId": "agent-a",
+          "digest": "66fe8add32fdef76959178a19c128d6bf3dd3c4139325f7aa0779db664d08480"
+        }
+      },
+      "componentGuard": {
+        "rejectedUnsupported": true,
+        "supported": [
+          "microlora",
+          "sona",
+          "fastgrnn"
+        ]
+      },
+      "stabilityClaim": "measured-workload-only; no absolute-stability claim"
+    },
+    "routing": {
+      "task": "ARCHBP-013",
+      "generatedAt": "2026-07-29T07:42:56.517Z",
+      "defaultRoute": "local",
+      "liveRoutingEnabled": false,
+      "classifier": {
+        "trainedFastGrnn": true,
+        "sampleComplexity": 0.6193907260894775
+      },
+      "gates": {
+        "privacyDenial": true,
+        "costCeiling": true,
+        "classifierUncertainty": true,
+        "outageFallback": true,
+        "resourceExhaustionFailsClosed": true
+      },
+      "replay": {
+        "accuracy": 1,
+        "baselineAccuracy": 0,
+        "beatsBaseline": true,
+        "liveRoutesTaken": 0
+      },
+      "auditable": true,
+      "policy": {
+        "costCeiling": 1,
+        "minConfidence": 0.5,
+        "complexityThreshold": 0.5,
+        "liveRoutingEnabled": false
+      }
+    },
+    "coordination": {
+      "task": "ARCHBP-014",
+      "generatedAt": "2026-07-29T07:42:58.561Z",
+      "primarySource": {
+        "rufloInstalled": true,
+        "version": "3.32.9",
+        "publisher": "ruvnet (npm ~ruvnet)"
+      },
+      "authority": {
+        "readyAuthorized": true,
+        "inventedRejected": true,
+        "nonReadyRejected": true
+      },
+      "binding": {
+        "agentIdentityBound": true,
+        "agentFileId": "64aee956e31be477c63c7718a5d8c0ff",
+        "routeIsLocalDefault": true,
+        "cartridgeBound": true,
+        "agentMemoryBound": true
+      },
+      "routingRuntime": {
+        "nativeLoaded": true,
+        "model": "B1_2",
+        "confidence": 0.43473124504089355,
+        "complexity": 0.5062288641929626,
+        "fastGrnnMeasured": true
+      },
+      "cancellation": {
+        "stopped": true
+      },
+      "timeout": {
+        "timedOut": true
+      },
+      "retry": {
+        "bounded": true
+      },
+      "budget": {
+        "failsClosed": true
+      },
+      "completion": {
+        "coordinatorCannotComplete": true
+      },
+      "proof": {
+        "appendOnly": true,
+        "candidatesNotAccepted": true
+      },
+      "forecast": {
+        "schemaVersion": "lifeos.atas.forecast.v1",
+        "candidateId": "29bd28be-71d8-4edd-a0c9-fb09d44158a2",
+        "calibrated": true,
+        "points": 4,
+        "selfPromoted": false
+      }
+    },
+    "forecast": {
+      "schemaVersion": "lifeos.atas.forecast.v1",
+      "candidateId": "aac884b9-d02a-4cf0-b07c-b3150a82ec07",
+      "branchKind": "forecast-local-candidate",
+      "model": {
+        "kind": "echo-state-reservoir",
+        "reservoirSize": 32,
+        "spectralRadius": 0.85,
+        "leakRate": 0.35
+      },
+      "input": {
+        "count": 48,
+        "lastObserved": -0.023664975827170087,
+        "digest": "834609c9e772eeacb275a2cda196b889eb1d166ea631cdb27be137eefae6a9fe"
+      },
+      "metrics": {
+        "meanDelta": -0.0005035101239823423,
+        "deltaVariance": 0.029513026553202124,
+        "divergence": 0.3024560167582324,
+        "regime": "stable"
+      },
+      "calibration": {
+        "trainCount": 35,
+        "holdoutCount": 12,
+        "holdoutRmse": 0.11246029281148218,
+        "residualStd": 0.11246029281148218
+      },
+      "forecast": [
+        {
+          "step": 1,
+          "value": 0.23968752202478213,
+          "lower": 0.019265348114277075,
+          "upper": 0.46010969593528717
+        },
+        {
+          "step": 2,
+          "value": 0.4763882684471792,
+          "lower": 0.16466424065518193,
+          "upper": 0.7881122962391764
+        },
+        {
+          "step": 3,
+          "value": 0.6709221413999191,
+          "lower": 0.28913973707214136,
+          "upper": 1.052704545727697
+        },
+        {
+          "step": 4,
+          "value": 0.8122128982461048,
+          "lower": 0.37136855042509465,
+          "upper": 1.2530572460671148
+        },
+        {
+          "step": 5,
+          "value": 0.894376612599069,
+          "lower": 0.40149764798689896,
+          "upper": 1.387255577211239
+        },
+        {
+          "step": 6,
+          "value": 0.9157555509592062,
+          "lower": 0.37583369688345436,
+          "upper": 1.4556774050349581
+        },
+        {
+          "step": 7,
+          "value": 0.8783928211495049,
+          "lower": 0.2952105655380789,
+          "upper": 1.4615750767609308
+        },
+        {
+          "step": 8,
+          "value": 0.7878574038500054,
+          "lower": 0.16440934826601084,
+          "upper": 1.4113054594339998
+        }
+      ],
+      "uncertainty": {
+        "method": "holdout-residual-95-percent-interval",
+        "calibrated": true
+      },
+      "promotion": {
+        "status": "database-gated",
+        "selfPromoted": false
+      },
+      "runtimeMs": 3.597232
+    }
+  },
+  "proof_sha256": {
+    "learning": "b01ba287f778e9912b6b8dc6f7c9348770965fdeef4d82bcb6417bf7b18f2afd",
+    "routing": "184c8531b2a9a60dabcae6d60929282b1e3de8eb67fd16a366c8b9459b970a26",
+    "coordination": "b1a32a6305464dff75814cf1cb99967120911eee15928f5f48dfd9fcbc76a6ad",
+    "forecast": "ec10f0ab572c390c373cf9e32277b624eae6d7bde5aabb2fb660e55b15d84222"
+  }
+}

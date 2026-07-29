@@ -134,6 +134,53 @@ function startMqttCapture() {
   });
 }
 
+async function startMqttSubscriber(rawUrl, topicFilter) {
+  const url = new URL(rawUrl);
+  const lines = [];
+  const subscriber = spawn(
+    "/home/flexnetos/.nix-profile/bin/nix",
+    [
+      "shell",
+      "github:NixOS/nixpkgs/nixos-unstable#mosquitto",
+      "--command",
+      "mosquitto_sub",
+      "-V",
+      "mqttv311",
+      "-h",
+      url.hostname,
+      "-p",
+      String(url.port || 1883),
+      "-t",
+      topicFilter,
+      "-v",
+      "-q",
+      "1",
+    ],
+    { stdio: ["ignore", "pipe", "pipe"] },
+  );
+  subscriber.stdout.on("data", (chunk) => lines.push(chunk.toString()));
+  let stderr = "";
+  subscriber.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+  await new Promise((resolveReady) => setTimeout(resolveReady, 1500));
+  if (subscriber.exitCode !== null) {
+    throw new Error(`mosquitto_sub exited before daemon start: ${stderr}`);
+  }
+  return {
+    port: Number(url.port || 1883),
+    get publications() {
+      return lines.join("").split(/\r?\n/).filter(Boolean).flatMap((line) => {
+        const separator = line.indexOf(" ");
+        if (separator < 0) return [];
+        return [{ topic: line.slice(0, separator), payload: Buffer.from(line.slice(separator + 1)) }];
+      });
+    },
+    close: () => new Promise((resolveClose) => {
+      subscriber.once("exit", resolveClose);
+      subscriber.kill("SIGTERM");
+    }),
+  };
+}
+
 const setupSql = String.raw`
 \set ON_ERROR_STOP on
 BEGIN;
@@ -197,7 +244,10 @@ SELECT json_build_object('lease_id',:'lease_id','binding_object_id',:'binding_ob
 `;
 
 const setup = JSON.parse(runPsql(setupSql).trim().split("\n").at(-1));
-const mqtt = await startMqttCapture();
+const mqttUrl = process.env.LIFEOS_MQTT_URL ?? "";
+const mqtt = mqttUrl
+  ? await startMqttSubscriber(mqttUrl, "lifeos/sensor/+/+")
+  : await startMqttCapture();
 const seedToken = readFileSync("/home/flexnetos/meta/var/lib/env-ctl/seed-token", "utf8").trim();
 const daemonEnv = {
   ...process.env,
@@ -212,7 +262,7 @@ const daemonEnv = {
   LIFEOS_RUNTIME_TASK_BINDING_OBJECT_ID: setup.binding_object_id,
   LIFEOS_COGNITUM_URL: "https://169.254.42.1:8443/mcp",
   LIFEOS_COGNITUM_BEARER_TOKEN: seedToken,
-  LIFEOS_MQTT_URL: `mqtt://127.0.0.1:${mqtt.port}`,
+  LIFEOS_MQTT_URL: mqttUrl || `mqtt://127.0.0.1:${mqtt.port}`,
   LIFEOS_DEVICE_ID: "archbp-cognitum",
   LIFEOS_SENSOR_POLL_SECONDS: "1",
 };
@@ -271,7 +321,8 @@ const receipt = {
   authority: "Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md",
   execution_id: execution,
   device_url: "https://169.254.42.1:8443/mcp",
-  mqtt_listener: "127.0.0.1:ephemeral",
+  mqtt_listener: mqttUrl || "127.0.0.1:ephemeral",
+  mqtt_mode: mqttUrl ? "persistent-external-broker" : "ephemeral-protocol-capture",
   durable: final,
   mqtt_publication_count: mqtt.publications.length,
   sensor_publication_count: snapshotPublications.length,

@@ -24,8 +24,50 @@ export const FAST_EMBEDDING_MODEL = "Xenova/all-MiniLM-L12-v2";
 export const PRIMARY_EMBEDDING_MODEL =
   "jinaai/jina-embeddings-v2-base-code";
 
-const RTK_BIN = "/home/flexnetos/.nix-profile/bin/rtk";
-const ICM_BIN = "/home/flexnetos/.nix-profile/bin/icm";
+const profileToolCache = new Map();
+
+/// Resolves a profile-owned tool by name.
+///
+/// Pinning the profile path as a constant makes ingestion fail outright during a
+/// profile generation flip: the link is momentarily absent and the run dies with
+/// `ENOENT ... posix_spawn '/home/flexnetos/.nix-profile/bin/rtk'`, leaving the
+/// memoir anchor unverifiable for reasons that have nothing to do with the source.
+/// Recover the same way `resolveProfilePsql` does — through the exact
+/// profile-owned derivation, never through bare PATH.
+function resolveProfileTool(name) {
+  const cached = profileToolCache.get(name);
+  if (cached) return cached;
+
+  const profileBin = `/home/flexnetos/.nix-profile/bin/${name}`;
+  const candidates = [profileBin, `/home/flexnetos/.nix-profile/toolbin/${name}`];
+  for (const candidate of candidates) {
+    try {
+      const resolved = fs.realpathSync(candidate);
+      if (fs.existsSync(resolved)) {
+        profileToolCache.set(name, resolved);
+        return resolved;
+      }
+    } catch {
+      // The profile symlink may be between generations; use the immutable
+      // derivation scan below instead of spawning through a moving link.
+    }
+  }
+
+  const derivations = fs.readdirSync("/nix/store")
+    .filter((entry) => entry.includes("flexnetos-foundation-tools") && !entry.endsWith(".drv"))
+    .map((entry) => path.join("/nix/store", entry, "bin", name))
+    .filter((candidate) => fs.existsSync(candidate));
+  if (derivations.length) {
+    const resolved = derivations.sort().at(-1);
+    profileToolCache.set(name, resolved);
+    return resolved;
+  }
+  fail(
+    `profile front door is unavailable: expected ${profileBin} or one exact ` +
+      `FlexNetOS foundation-tools derivation providing ${name}`
+  );
+}
+
 function resolveProfilePsql() {
   const profileClient = "/home/flexnetos/.nix-profile/toolbin/psql";
   if (fs.existsSync(profileClient)) return profileClient;
@@ -864,7 +906,7 @@ function parseArgs(argv) {
 }
 
 function runRtk(command, args, { timeout = PROCESS_TIMEOUT_MS } = {}) {
-  const result = spawnSync(RTK_BIN, ["proxy", command, ...args], {
+  const result = spawnSync(resolveProfileTool("rtk"), ["proxy", command, ...args], {
     cwd: REPO_ROOT,
     encoding: "utf8",
     env: {
@@ -893,7 +935,7 @@ function runIcm(args, options = {}) {
   if (options.readOnly && !finalArgs.includes("--read-only")) {
     finalArgs.push("--read-only");
   }
-  return runRtk(ICM_BIN, finalArgs, {
+  return runRtk(resolveProfileTool("icm"), finalArgs, {
     timeout: options.timeout
   });
 }

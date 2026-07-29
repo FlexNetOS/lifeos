@@ -1351,30 +1351,31 @@ fn terminal_probe(
 ) -> Result<bool, String> {
     let probe = b"echo LIFEOS_NUSHELL_PROBE; echo LIFEOS_ENGINE_PROBE_DONE\r";
     std::thread::sleep(Duration::from_millis(250));
-    let mut sessions = state
-        .sessions
-        .lock()
-        .map_err(|error| format!("terminal state lock: {error}"))?;
-    let session = sessions
-        .get_mut(&session_id)
-        .ok_or_else(|| "terminal session is not active".to_string())?;
-    let offset = session
-        .input_offset
-        .fetch_add(probe.len() as u64, Ordering::Relaxed);
-    capture_terminal_frame(
-        &session_id,
-        "input",
-        probe,
-        serde_json::json!({"stream": "pty", "offset": offset, "source": "native-probe"}),
-    )?;
-    session
-        .writer
-        .write_all(probe)
-        .and_then(|_| session.writer.flush())
-        .map_err(|error| format!("write terminal probe: {error}"))?;
-    let recent_output = Arc::clone(&session.probe_output);
-    drop(sessions);
-    for _ in 0..40 {
+    let recent_output = {
+        let mut sessions = state
+            .sessions
+            .lock()
+            .map_err(|error| format!("terminal state lock: {error}"))?;
+        let session = sessions
+            .get_mut(&session_id)
+            .ok_or_else(|| "terminal session is not active".to_string())?;
+        let offset = session
+            .input_offset
+            .fetch_add(probe.len() as u64, Ordering::Relaxed);
+        capture_terminal_frame(
+            &session_id,
+            "input",
+            probe,
+            serde_json::json!({"stream": "pty", "offset": offset, "source": "native-probe"}),
+        )?;
+        session
+            .writer
+            .write_all(probe)
+            .and_then(|_| session.writer.flush())
+            .map_err(|error| format!("write terminal probe: {error}"))?;
+        Arc::clone(&session.probe_output)
+    };
+    for attempt in 0..40 {
         if recent_output
             .lock()
             .map(|bytes| {
@@ -1387,6 +1388,37 @@ fn terminal_probe(
             return Ok(true);
         }
         std::thread::sleep(Duration::from_millis(250));
+        // yzx-welcome may consume the first input while it hands the PTY to
+        // the Zellij session. Retry through the same PTY master until Nushell
+        // has actually echoed the completion marker; every retry is captured.
+        if attempt < 39 {
+            let mut sessions = state
+                .sessions
+                .lock()
+                .map_err(|error| format!("terminal state lock: {error}"))?;
+            let session = sessions
+                .get_mut(&session_id)
+                .ok_or_else(|| "terminal session is not active".to_string())?;
+            let offset = session
+                .input_offset
+                .fetch_add(probe.len() as u64, Ordering::Relaxed);
+            capture_terminal_frame(
+                &session_id,
+                "input",
+                probe,
+                serde_json::json!({
+                    "stream": "pty",
+                    "offset": offset,
+                    "source": "native-probe-retry",
+                    "attempt": attempt + 1,
+                }),
+            )?;
+            session
+                .writer
+                .write_all(probe)
+                .and_then(|_| session.writer.flush())
+                .map_err(|error| format!("write terminal probe retry: {error}"))?;
+        }
     }
     Ok(false)
 }

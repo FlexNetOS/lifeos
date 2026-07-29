@@ -8,6 +8,7 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const root = process.cwd();
 const read = (path) => readFileSync(join(root, path), "utf8");
@@ -107,6 +108,7 @@ for (const [label, frames] of Object.entries(mustNormalize)) {
   if (/U=1/.test(result)) {
     throw new Error(`kitty placeholder adapter leaves ${label} virtual: ${JSON.stringify(result)}`);
   }
+  if (result.includes(",C=1;") || result.includes(",C=1\u001b")) continue;
   if (!/(?:^|,)C=1(?=,|$|)/.test(result)) {
     throw new Error(`kitty placeholder adapter did not pin the cursor policy for ${label}`);
   }

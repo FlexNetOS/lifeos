@@ -715,7 +715,7 @@ The architecture builds from these exact 2026-07-19 revisions:
 | `https://github.com/ruvnet/ruflo` | `main` | `12ede21767a6dd669df1b79392a5d27d9154f237` | `claude-flow`/Ruflo `3.32.8`, ruvnet swarm orchestration |
 | `https://github.com/FlexNetOS/lifeos` | `main` | `9efffd7c40c00045f7248c6427c4c21e003a5586` | LifeOS `0.1.0`, Svelte/Tauri Glass, embedded Yazelix PTY, redb-owner projection reader, envctl bridge |
 | `https://github.com/FlexNetOS/envctl` | `master` | `e9112b2243f690445a70ed96c8bc237bc6d4497f` | envctl `0.1.0`, PostgreSQL 17.10 lifecycle, RuVector client and commit-worker integration |
-| `https://github.com/FlexNetOS/weave` | `master` | `9805ab9b7473ca662dd24f81a564f0e29ebb7e49` | weave `0.2.0` session mesh and fenced jobs |
+| `https://github.com/FlexNetOS/weave` | `master` | `1f0801f5cc9ff772b87497584d5650a9ddca15d5` | weave `0.2.0` session mesh and fenced jobs |
 | `https://github.com/FlexNetOS/network-control` | `main` | `cad70349968d2a6f501fb304a77d5cd6dac340b5` | network-control `0.2.0` |
 | `https://github.com/FlexNetOS/flexnetos_runner` | `main` | `3e67b2e75973619efb3892820298da1eda2cbf7c` | runner `0.1.0` |
 | `https://github.com/FlexNetOS/rusty-idd` | `main` | `fd95efdd3d461874ceab28a4ad82c435e162b751` | rusty-idd `0.1.0`, handoff/ledger/proof runtime |
@@ -6350,6 +6350,8 @@ LifeOS R01 currency is reconciled at current revision `10865e60`: `src/main.ts` 
 **ARCHBP-010 recovery activation correction 2026-07-29:** The real worker-thread scale harness now measures three raw baseline runs and compares recovery against their median, preventing one host scheduler outlier from making a recovered process fail its own gate. The full live frontend gate passes 124 test files and 538 tests, plus 35 accessibility cases, 26 parsed diagrams, design lint, terminal capability, `rtk_nu`, and CodeDB envelope checks. The refreshed swarm-render and terminal-capability receipts are retained with the current run.
 
 **flexnetos_runner activation reconciliation 2026-07-29:** The previously absent local dependent is now materialized at `/home/flexnetos/meta/src/flexnetos_runner` from `3e67b2e75973619efb3892820298da1eda2cbf7c`, with a clean detached checkout. Its workspace compiles offline; the full suite passes 159 `fxrun`, 190 `runner-core`, 49 `fxrun-dispatch`, 5 end-to-end UDS dispatch tests, and the no-system-depths gate. Real `fxrun doctor` confirms signed JobSpec verification, UDS dispatch, bounded kernel execution, secret redaction/injection, recovery, single-flight, and workspace teardown. LifeOS migration 0099 remains the canonical database lease/receipt boundary for runner jobs; this checkout is the physical signed-dispatch consumer.
+
+**Weave activation reconciliation 2026-07-29:** The active Weave checkout is now `1f0801f5cc9ff772b87497584d5650a9ddca15d5`. Its Codex-tools doctor recognizes the repository’s archived `.codex.tar.xz` asset bundle without extracting it or treating the archive as an executable config path; the full workspace passes 74 unit tests, 365 integration tests, 64 injector tests, 32 MCP tests, and the trusted-resolution test. The native Weave projection remains a consumer of LifeOS migration 0099’s lease-bound dispatch/attempt/receipt authority.
 
 | ID | Blueprint Location | Reviewed Claim | Repository/File Evidence | Finding | Conflict or Gap | Correction Applied | Verification |
 |---|---|---|---|---|---|---|---|

@@ -30,6 +30,20 @@ The attached `Architecture_Data_Pipeline_Graph_ANCHORED_VERIFIED(3).md`, with SH
 20. The exact linked file is read back after the final edit before its link is provided.
 21. The attached anchored projection is absolute for architecture topology and flow. Current implementation gaps become required work and release gates; they never become permission to narrow the anchor.
 
+### Published-artifact source authority
+
+For every rUv/RuVector published artifact, source order is absolute:
+
+1. Source of truth: `https://www.npmjs.com/~ruvnet`
+2. Fallback: `https://crates.io/users/ruvnet`
+3. Last resort: `https://github.com/ruvnet`
+
+The npmjs registry is authoritative for Node/NAPI, CLI, PostgreSQL CLI, and
+published extension artifacts. Check npmjs before crates.io, and check both
+before using a GitHub source snapshot. Record the selected release and keep it
+in the Yazelix packaging graph; no out-of-band installer or competing binary,
+runtime, database, agent configuration, or durable-state owner is permitted.
+
 ## 1. Two-phase architecture
 
 ### 1.1 Bootstrap phase
@@ -704,15 +718,17 @@ The central database owns bytes, relational records, vectors, graphs, policies, 
 
 ### 2. Complete repository, crate, package, extension, binding, and runtime inventory
 
-#### 2.1 Pinned repository revisions and distribution versions
+#### 2.1 Historical source snapshots and current distribution versions
 
-The architecture builds from these exact 2026-07-19 revisions:
+These repository revisions are retained as historical/last-resort source
+snapshots. They are not release authority when npmjs publishes the artifact.
+Current published versions are selected from the npmjs registry first:
 
 | Repository | Branch | Revision | Distribution mapping |
 |---|---|---|---|
-| `https://github.com/ruvnet/RuVector` | `main` | `6a6c39e662a4c3184dcb913db91a09401c84b2ae` | Rust workspace 2.3.0 family; PostgreSQL, NAPI, WASM, model, RVF, graph, index, cognition, and device crates |
-| `https://github.com/ruvnet/agentdb` | `main` | `04968e3fba3bf01ef4e9978d0446485452365a86` | AgentDB `3.0.0-alpha.18` and `.rvf` cognition |
-| `https://github.com/ruvnet/ruflo` | `main` | `12ede21767a6dd669df1b79392a5d27d9154f237` | source snapshot `claude-flow` 3.32.8; installed Ruflo runtime 3.32.9, ruvnet swarm orchestration |
+| `https://github.com/ruvnet/RuVector` | `main` | `6a6c39e662a4c3184dcb913db91a09401c84b2ae` | Last-resort source snapshot; npmjs `ruvector 0.2.40`, `@ruvector/core 0.1.31`, and `@ruvector/postgres-cli 0.2.9` |
+| `https://github.com/ruvnet/agentdb` | `main` | `04968e3fba3bf01ef4e9978d0446485452365a86` | Last-resort source snapshot; npmjs AgentDB `3.0.0-alpha.20` |
+| `https://github.com/ruvnet/ruflo` | `main` | `12ede21767a6dd669df1b79392a5d27d9154f237` | Last-resort source snapshot; npmjs Ruflo `3.34.0` |
 | `https://github.com/FlexNetOS/lifeos` | `main` | `9efffd7c40c00045f7248c6427c4c21e003a5586` | LifeOS `0.1.0`, Svelte/Tauri Glass, embedded Yazelix PTY, redb-owner projection reader, envctl bridge |
 | `https://github.com/FlexNetOS/envctl` | `master` | `e9112b2243f690445a70ed96c8bc237bc6d4497f` | envctl `0.1.0`, PostgreSQL 17.10 lifecycle, RuVector client and commit-worker integration |
 | `https://github.com/FlexNetOS/weave` | `master` | `1f0801f5cc9ff772b87497584d5650a9ddca15d5` | weave `0.2.0` session mesh and fenced jobs |
@@ -1213,7 +1229,7 @@ Claim verification resolves every endpoint to stored source bytes, checks object
 
 ### 11. Complete Ruflo, RuvLTRA, and ATAS forecasting architecture
 
-The pinned Ruflo source snapshot is `claude-flow` 3.32.8, while the active installed `ruflo` runtime is 3.32.9; the live receipt records both identities and the runtime package is the authority for execution. Its distributed packages include `@claude-flow/neural` 3.0.0-alpha.9, `@claude-flow/memory` 3.0.0-alpha.21, `@claude-flow/mcp` 3.0.0-alpha.9, and `@claude-flow/shared` 3.0.0-alpha.8. Together they form the global swarm orchestration, memory, neural, MCP, routing, and forecast surface. Ruflo binds AgentDB, SONA, RuVector, ruvllm, RuvLTRA, task swarms, model providers, and tool execution to database tasks and leases. Local ruvllm reflex routing handles low-latency work; proportional-intelligence routing escalates complex or high-risk contexts to larger local RuvLTRA profiles or database-authorized cloud models.
+The historical Ruflo source snapshot is retained only as a last-resort fallback; the active installed npmjs-authoritative `ruflo` runtime is 3.34.0. The live receipt records the selected registry release and the runtime package is the authority for execution. Its distributed packages include `@claude-flow/neural` 3.0.0-alpha.9, `@claude-flow/memory` 3.0.0-alpha.21, `@claude-flow/mcp` 3.0.0-alpha.9, and `@claude-flow/shared` 3.0.0-alpha.8. Together they form the global swarm orchestration, memory, neural, MCP, routing, and forecast surface. Ruflo binds AgentDB, SONA, RuVector, ruvllm, RuvLTRA, task swarms, model providers, and tool execution to database tasks and leases. Local ruvllm reflex routing handles low-latency work; proportional-intelligence routing escalates complex or high-risk contexts to larger local RuvLTRA profiles or database-authorized cloud models.
 
 ATAS retains its full name, Agentic Temporal Attractor Studio. Its distributed runtime combines:
 

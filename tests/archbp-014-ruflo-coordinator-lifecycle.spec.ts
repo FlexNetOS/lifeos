@@ -18,6 +18,9 @@ import {
 
 const repoRoot = resolve(import.meta.dirname, "..");
 const adapterPath = resolve(repoRoot, "scripts/ruflo-coordinator-lifecycle.mjs");
+const rufloVersion = JSON.parse(
+  readFileSync(resolve(repoRoot, "package.json"), "utf8"),
+).devDependencies.ruflo;
 
 const graph = {
   "ARCHBP-100": { status: "Ready" },
@@ -26,7 +29,7 @@ const graph = {
 };
 
 function coordinator() {
-  return new RufloCoordinator(graph, { maxRetries: 2, budget: 10, primarySourceVersion: "3.32.9" });
+  return new RufloCoordinator(graph, { maxRetries: 2, budget: 10, primarySourceVersion: rufloVersion });
 }
 
 const binding = { agentIdentity: "agent-fileid-abc", cartridgeId: "cart-1", route: "local", cost: 1 };
@@ -150,7 +153,7 @@ describe("ARCHBP-014 coordinator proof (real ruflo primary source + real binding
 
       const r = JSON.parse(readFileSync(outputPath, "utf8"));
       expect(r.primarySource.rufloInstalled).toBe(true);
-      expect(r.primarySource.version).toBe("3.32.9");
+      expect(r.primarySource.version).toBe(rufloVersion);
       expect(r.authority.readyAuthorized).toBe(true);
       expect(r.authority.inventedRejected).toBe(true);
       expect(r.authority.nonReadyRejected).toBe(true);

@@ -11,6 +11,8 @@ import { spawnSync } from "node:child_process";
 const root = resolve(import.meta.dirname, "..");
 const receiptPath = resolve(root, "evidence/learning/live-lifecycle-receipt.json");
 const runDir = resolve(tmpdir(), `lifeos-learning-live-${process.pid}`);
+const packageJson = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
+const rufloVersion = packageJson.devDependencies.ruflo;
 
 function run(script, name) {
   const output = join(runDir, `${name}.json`);
@@ -43,7 +45,7 @@ function assertProofs(proofs) {
       !routing.auditable) {
     throw new Error("ARCHBP-013 routing proof is incomplete");
   }
-  if (!coordination.primarySource.rufloInstalled || coordination.primarySource.version !== "3.32.9" ||
+  if (!coordination.primarySource.rufloInstalled || coordination.primarySource.version !== rufloVersion ||
       !coordination.authority.readyAuthorized || !coordination.authority.inventedRejected ||
       !coordination.authority.nonReadyRejected || !coordination.binding.agentIdentityBound ||
       !coordination.routingRuntime.nativeLoaded || !coordination.routingRuntime.fastGrnnMeasured ||
@@ -79,7 +81,7 @@ try {
     tasks: ["ARCHBP-009", "ARCHBP-013", "ARCHBP-014", "ARCHBP-015"],
     runtime: {
       ruflo_installed_version: proofs.coordination.primarySource.version,
-      ruflo_source_snapshot_version: "3.32.8",
+      ruflo_source_snapshot_version: rufloVersion,
       ruflo_source_revision: "12ede21767a6dd669df1b79392a5d27d9154f237",
       ruvector_source_revision: "6a6c39e662a4c3184dcb913db91a09401c84b2ae",
     },

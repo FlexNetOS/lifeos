@@ -5,12 +5,10 @@
 // Subcommands:
 //   reattach [--services PATH] [--json]   full idempotent re-attach sequence
 //   sessions [--root PATH] [--json]       list resumable sessions (durable only)
-//   unit                                  print the declarative user unit
-// The engine touches NO host system service: it is triggered by a systemd
-// USER unit (evidence/isolation/lifeos-reattach.service) or invoked directly — the single
-// deliberate command of G7. Runs under Bun/Node.
+// Yazelix is the only runtime owner. This command invokes the profile-owned
+// stack bootstrap and then verifies durable state and service readiness.
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from "node:fs";
-import { execFileSync, spawn } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { connect } from "node:net";
 import { resolve, dirname } from "node:path";
 
@@ -23,61 +21,16 @@ const DURABLE_ROOTS = [
   { name: "xdg-data", path: "/home/flexnetos/meta/var/xdg-data", need: "writable" },
 ];
 
-// Production service order (postgres -> redb -> front door -> governed agents). Health gates are
-// real; postgres actually STARTS from the intact durable datadir with a
-// user-owned socket dir — the canonical macro-state comes back up at
-// re-attach, exactly what the 2026-07-21 incident lacked.
-function pgBin() {
-  // Path law: the profile frontdoor is the sole sanctioned launcher — it wraps
-  // the postgresql-and-plugins build whose share dir carries ruvector. A bare
-  // postgresql-17.10 store path starts a server that cannot load the canonical
-  // extension ($libdir/ruvector missing) while TCP health still passes — the
-  // defect that ran the cluster extension-less after the 2026-07-21 incident.
-  const candidates = [
-    "test -x /home/flexnetos/.nix-profile/bin/pg_ctl && echo /home/flexnetos/.nix-profile/bin/pg_ctl",
-    "ls -d /nix/store/*-flexnetos-foundation-postgresql-frontdoors-*-ruvector-*/bin/pg_ctl 2>/dev/null | head -1",
-    "ls -d /nix/store/*-postgresql-and-plugins-17.10/bin/pg_ctl 2>/dev/null | head -1",
-  ];
-  for (const probe of candidates) {
-    try {
-      const hit = execFileSync("bash", ["-c", probe], { encoding: "utf8" }).trim();
-      if (hit) return hit;
-    } catch { /* next candidate */ }
-  }
-  return null;
-}
-
-const PG_DATA = "/home/flexnetos/meta/var/lib/postgresql/17";
-const PG_SOCKET_DIR = "/home/flexnetos/meta/var/run/postgresql";
-const AGENT_STATUS = process.env.LIFEOS_AGENT_STATUS ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/status.json";
-const AGENT_ROOT = process.env.LIFEOS_AGENT_RVF_ROOT ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/rvf";
+const YAZELIX_STACK_BOOTSTRAP = process.env.YAZELIX_STACK_BOOTSTRAP
+  ?? "/home/flexnetos/.nix-profile/bin/yazelix-stack-bootstrap";
 
 export function productionServices() {
-  const pgCtl = pgBin();
-  mkdirSync(PG_SOCKET_DIR, { recursive: true });
   return [
-    {
-      name: "postgresql-ruvector",
-      order: 1,
-      healthTcp: 5432,
-      timeoutMs: 20000,
-      start: pgCtl
-        ? [pgCtl, "-D", PG_DATA, "-l", `${PG_DATA}/logfile`, "-o",
-           `-c unix_socket_directories='${PG_SOCKET_DIR}' -c listen_addresses='127.0.0.1'`, "start"]
-        : undefined,
-    },
-    // The transient plane's declared home (tier map redb-plane entry); the
-    // first re-attach initializes it, later runs find it — idempotent.
-    { name: "redb-plane", order: 2, health: ["test", "-d", "/home/flexnetos/meta/var/lib/redb"], start: ["mkdir", "-p", "/home/flexnetos/meta/var/lib/redb"], timeoutMs: 5000 },
-    { name: "glass-engine-frontdoor", order: 3, health: ["test", "-x", "/home/flexnetos/.nix-profile/bin/yzx"] },
-    {
-      name: "governed-ruvnet-agents",
-      order: 4,
-      health: ["test", "-s", AGENT_STATUS],
-      start: ["/home/flexnetos/.nix-profile/toolbin/bun", `${repoRoot}/scripts/lifeos-agent-runtime.mjs`],
-      timeoutMs: 15000,
-      environment: { LIFEOS_REDB_ROOT: "/home/flexnetos/meta/var/lib/redb", LIFEOS_AGENT_STATUS: AGENT_STATUS, LIFEOS_AGENT_RVF_ROOT: AGENT_ROOT },
-    },
+    { name: "sqld", order: 1, healthTcp: 8080 },
+    { name: "postgresql-ruvector", order: 2, healthTcp: 5432 },
+    { name: "icm-web", order: 3, healthTcp: 8420 },
+    { name: "lifeos-mqtt", order: 4, healthTcp: 1883 },
+    { name: "glass-engine-frontdoor", order: 5, health: ["test", "-x", "/home/flexnetos/.nix-profile/bin/yzx"] },
   ];
 }
 
@@ -129,9 +82,7 @@ export function reattachDurablePlane() {
   return { ok: results.every((r) => r.ok), roots: results };
 }
 
-// (3) Ordered, health-gated service startup. Each service: if health passes,
-// it is already up (idempotent); otherwise run start (if given) and poll
-// health until timeout. A failure is surfaced, never swallowed.
+// (3) Ordered health verification. Only Yazelix may start or repair services.
 export async function startServicesOrdered(services) {
   const report = [];
   for (const svc of [...services].sort((a, b) => a.order - b.order)) {
@@ -147,32 +98,7 @@ export async function startServicesOrdered(services) {
       catch { return Promise.resolve(false); }
     };
     let up = await healthy();
-    let started = false;
-    if (!up && svc.start) {
-      const deadline = Date.now() + (svc.timeoutMs ?? 10000);
-      // Under load a spawn can fail transiently (EAGAIN); retry within the
-      // health window rather than crashing — the failure still surfaces if
-      // health never passes.
-      while (!started && Date.now() < deadline) {
-        try {
-          const child = spawn(svc.start[0], svc.start.slice(1), {
-            detached: true,
-            stdio: "ignore",
-            env: svc.environment ? { ...process.env, ...svc.environment } : process.env,
-          });
-          child.on("error", () => {});
-          child.unref();
-          started = true;
-        } catch {
-          await new Promise((r) => setTimeout(r, 200));
-        }
-      }
-      while (!up && Date.now() < deadline) {
-        await new Promise((r) => setTimeout(r, 100));
-        up = await healthy();
-      }
-    }
-    report.push({ name: svc.name, order: svc.order, healthy: up, started });
+    report.push({ name: svc.name, order: svc.order, healthy: up, started: false });
     if (!up) {
       // Health-gated: a failed dependency stops the chain and surfaces.
       return { ok: false, failed: svc.name, report };
@@ -183,7 +109,7 @@ export async function startServicesOrdered(services) {
 
 // (4) Re-expose resumable sessions from the DURABLE transcript store — the
 // store that survived the 2026-07-21 reboot. No /run tmpfs dependency.
-export function listSessions(root = "/home/flexnetos/.claude/projects") {
+export function listSessions(root = resolve(process.env.CLAUDE_CONFIG_DIR ?? "/home/flexnetos/meta/var/lib/claude", "projects")) {
   if (root.startsWith("/run/")) throw new Error("session store must be durable, never /run tmpfs");
   if (!existsSync(root)) return { root, sessions: [] };
   const sessions = [];
@@ -198,6 +124,7 @@ export function listSessions(root = "/home/flexnetos/.claude/projects") {
 
 export async function reattach({ services, sessionRoot } = {}) {
   if (!services) services = productionServices();
+  execFileSync(YAZELIX_STACK_BOOTSTRAP, [], { timeout: 90000, stdio: "pipe" });
   const envelope = rematerializeEnvelope();
   const durable = reattachDurablePlane();
   const svc = await startServicesOrdered(services);
@@ -214,31 +141,10 @@ export async function reattach({ services, sessionRoot } = {}) {
   };
 }
 
-const UNIT = `# lifeos-reattach.service — systemd USER unit (login-triggered, idempotent).
-# Installs under ~/.config/systemd/user/ (or the profile-owned equivalent):
-#   systemctl --user enable lifeos-reattach.service
-# It couples to NO host system service: WantedBy=default.target fires at user
-# login/boot session start, After= orders only against the user session bus.
-[Unit]
-Description=LifeOS envelope + durable-state re-attach (yzx-iso T7)
-# No Requires=/BindsTo= on any host system unit: the host boots freely (G1).
-
-[Service]
-Type=oneshot
-# The single deliberate command (ARCHBP-098); safe to re-run any time.
-ExecStart=/home/flexnetos/.nix-profile/toolbin/bun ${repoRoot}/scripts/boot-reattach.mjs reattach --json
-RemainAfterExit=yes
-
-[Install]
-WantedBy=default.target
-`;
-
 async function main() {
   const [cmd, ...args] = process.argv.slice(2);
   const json = args.includes("--json");
-  if (cmd === "unit") {
-    process.stdout.write(UNIT);
-  } else if (cmd === "sessions") {
+  if (cmd === "sessions") {
     const rootArg = args.find((a) => a.startsWith("--root="));
     const r = listSessions(rootArg ? rootArg.slice("--root=".length) : undefined);
     process.stdout.write(`${JSON.stringify(r, null, json ? 2 : 0)}\n`);
@@ -258,7 +164,7 @@ async function main() {
     process.stdout.write(body);
     process.exit(r.ok ? 0 : 1);
   } else {
-    console.error("usage: boot-reattach.mjs {reattach|sessions|unit}");
+    console.error("usage: boot-reattach.mjs {reattach|sessions}");
     process.exit(2);
   }
 }

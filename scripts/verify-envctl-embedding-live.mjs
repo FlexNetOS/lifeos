@@ -7,7 +7,7 @@ import { join } from "node:path";
 const root = process.cwd();
 const rtk = "/home/flexnetos/.nix-profile/bin/rtk";
 const bun = "/home/flexnetos/.nix-profile/bin/bun";
-const conn = process.env.ENVCTL_PG_CONN ?? "host=/home/flexnetos/meta/var/run/postgresql dbname=envctl_commit_test user=flexnetos";
+const conn = process.env.ENVCTL_PG_CONN ?? "host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql dbname=envctl_commit_test user=flexnetos";
 const port = Number(process.env.LIFEOS_RUVLLM_EMBEDDER_PORT ?? 19765);
 const seq = Date.now();
 const service = spawn(bun, [join(root, "scripts/ruvllm-embedder.mjs")], {

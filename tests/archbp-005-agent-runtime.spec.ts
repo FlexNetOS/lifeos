@@ -50,7 +50,7 @@ async function activeOwnerRoot() {
   const roots = [
     process.env.LIFEOS_REDB_ROOT,
     "/home/flexnetos/meta/var/lib/redb",
-    "/run/user/1001/bpredb",
+    "/run/user/4242/bpredb",
   ].filter((root): root is string => Boolean(root));
   for (const root of [...new Set(roots)]) {
     if (await canConnect(root)) return root;

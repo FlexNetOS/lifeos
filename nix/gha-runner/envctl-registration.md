@@ -49,7 +49,7 @@ gh secret set OPENAI_API_KEY     --repo FlexNetOS/lifeos --body (envctl secret s
 |---|---|---|---|
 | `GHA_RUNNER_ORG` | `FlexNetOS` | agent-env | target org for `config.sh --url` |
 | `GHA_RUNNER_LABELS` | `self-hosted,flexnetos,nix` | agent-env | labels the workflow's `runs-on` matches |
-| `GHA_RUNNER_WORKDIR` | `/run/user/1001/yazelix/profile-runtime/gha-runner` | agent-env | volatile runner state (profile-runtime) |
+| `GHA_RUNNER_WORKDIR` | `/home/flexnetos/meta/var/lib/yazelix/runtime/runner` | Yazelix | persistent Yazelix runtime state |
 
 The registration token itself is **minted on demand** (not stored) because it expires in
 ~1h; `register.nu` mints immediately before `config.sh`.

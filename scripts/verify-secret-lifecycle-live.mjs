@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const rtk = "/home/flexnetos/.nix-profile/bin/rtk";
-const socket = process.env.LIFEOS_PG_SOCKET ?? "/home/flexnetos/meta/var/run/postgresql";
+const socket = process.env.LIFEOS_PG_SOCKET ?? "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const database = process.env.LIFEOS_SECRET_DATABASE ?? "lifeos";
 const sql = String.raw`BEGIN;
 DO $$

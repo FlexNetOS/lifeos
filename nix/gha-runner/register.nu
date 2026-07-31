@@ -5,7 +5,7 @@
 # B1 OWNER-FENCE: the runner registration token is envctl-minted. `envctl` is the
 # sole authoritative committer and is NOT reachable from an in-session agent shell,
 # so this script is run by the owner on the profile-owned host (or with an explicit
-# --token). Volatile runner state lives under profile-runtime; nothing touches the OS.
+# --token). Runner state lives under the persistent Yazelix runtime; nothing touches the OS.
 #
 # Usage:
 #   nix run .#register -- --installation-id <ID>   # mint via envctl GitHub App (B1)
@@ -18,7 +18,7 @@ def main [
   --labels: string = "self-hosted,flexnetos,nix"
   --installation-id: string = ""                                   # GitHub App installation id for `envctl secret mint-github`
   --token: string = ""                                             # empty => mint via envctl (B1)
-  --runtime: string = "/run/user/1001/yazelix/profile-runtime/gha-runner"
+  --runtime: string = "/home/flexnetos/meta/var/lib/yazelix/runtime/runner"
 ] {
   let url = $"https://github.com/($org)/($repo)"
 
@@ -43,7 +43,7 @@ def main [
     error make { msg: "No registration token. Pass --token, or run where envctl + gh are reachable (B1)." }
   }
 
-  # 2. Materialize a writable runner dir under profile-runtime (volatile state, SPEC §2).
+  # 2. Materialize a writable runner dir under the Yazelix runtime (SPEC §2).
   mkdir $runtime
   let substrate = (^nix build --no-link --print-out-paths ".#gha-runner-substrate" | str trim)
   # github-runner ships config.sh / run.sh; discover their dir rather than hardcode.
@@ -59,5 +59,5 @@ def main [
   ^./config.sh --url $url --token $tok --labels $labels --name $name --work $"($runtime)/_work" --unattended --replace
 
   print $"Registered ($name) -> ($url) with labels [($labels)]."
-  print "Next: `nix run .#runner`  (or a systemd --user unit — NEVER a system unit)."
+  print "Next: launch through `yzx enter` or `yzx launch`; never install a local unit."
 }

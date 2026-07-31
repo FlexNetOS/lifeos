@@ -68,7 +68,7 @@ These are **mandatory must-use**, not optional. In this environment "optional" r
 - any `.local` ownership, runtime, or launcher path;
 - any home-root `~/.codex` or `~/.claude` ownership or compatibility path.
 
-Profile-managed volatile agent state targets `/run/user/1001/yazelix/profile-runtime`. This governs ownership and runtime paths; it does not touch the in-repo `CLAUDE.md` / `AGENTS.md` contracts.
+Profile-managed agent homes are durable at `/home/flexnetos/meta/var/lib/codex` and `/home/flexnetos/meta/var/lib/claude`; live process state targets `/home/flexnetos/meta/var/lib/yazelix/runtime`. This governs ownership and runtime paths; it does not touch the in-repo `CLAUDE.md` / `AGENTS.md` contracts.
 
 ## Read first
 
@@ -334,7 +334,7 @@ toolchain is bound to:
    table): `XDG_DATA_HOME` → `/home/flexnetos/meta/var/xdg-data`, `XDG_STATE_HOME` →
    `/home/flexnetos/meta/var/xdg-state`; add
    `ICM_DB=/home/flexnetos/meta/var/xdg-data/icm/memories.db`; leave `YAZELIX_STATE_DIR`
-   unset (yzx baked default `/run/user/1001/yazelix/profile-runtime/yazelix`).
+   unset (yzx baked default `/home/flexnetos/meta/var/lib/yazelix/runtime/state`).
 3. **Restart the yazelix session** so the agent env adopts the new roots.
 4. `migrate-tool-state-off-dotlocal.sh verify` → `finalize` (removes
    `~/.local/share/{tools}` + `~/.local/state/env-ctl`; `finalize` refuses unless

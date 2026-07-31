@@ -8,7 +8,7 @@ const root = resolve(import.meta.dirname, "..");
 const rtk = "/home/flexnetos/.nix-profile/bin/rtk";
 const cargo = "/home/flexnetos/.nix-profile/bin/cargo";
 const psql = "/home/flexnetos/.nix-profile/bin/psql";
-const socket = process.env.LIFEOS_PG_SOCKET ?? "/home/flexnetos/meta/var/run/postgresql";
+const socket = process.env.LIFEOS_PG_SOCKET ?? "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const database = process.env.LIFEOS_DATABASE ?? "lifeos";
 const databaseUrl =
   process.env.LIFEOS_DATABASE_URL ??

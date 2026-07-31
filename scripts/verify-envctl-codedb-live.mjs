@@ -8,7 +8,7 @@ const rtk = "/home/flexnetos/.nix-profile/bin/rtk";
 const envctlRoot = join(root, "../envctl");
 const codeDbRoot = join(root, "../nu_plugin");
 const pgConn = process.env.ENVCTL_PG_CONN ??
-  "host=/home/flexnetos/meta/var/run/postgresql dbname=envctl_commit_test user=flexnetos";
+  "host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql dbname=envctl_commit_test user=flexnetos";
 
 function run(args, env = process.env) {
   return execFileSync(rtk, args, {

@@ -1,7 +1,7 @@
 # G2 gate — plan preconditions for the full-ocean blueprint build. Exit 0 = all hold.
 # --canary deliberately breaks one assertion and MUST exit 1 (falsifiability proof).
 const PGBIN = "/nix/store/8zm2sma9jgvq101yy4x45za4y28yd164-postgresql-17.10/bin"
-const PGSOCK = "/home/flexnetos/meta/var/run/postgresql"
+const PGSOCK = "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql"
 const BLUEPRINT = "/home/flexnetos/meta/src/lifeos/Architecture_Data_Pipeline_Blueprint_RUVECTOR_FULLY_EXPANDED_VERIFIED.md"
 const BLUEPRINT_SHA = "78d8584d73957e795320d0ca9eb8e5593f1ab6286463e77b4537757dfef220ee"
 const MANIFEST = "/home/flexnetos/meta/src/lifeos/.ruvnet-brain/ingest-manifest.json"

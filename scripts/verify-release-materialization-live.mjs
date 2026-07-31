@@ -13,8 +13,8 @@ const cargo = process.env.LIFEOS_CARGO ?? "/home/flexnetos/.nix-profile/bin/carg
 const psql = process.env.LIFEOS_PSQL ?? "/home/flexnetos/.nix-profile/bin/psql";
 const envctlRoot = process.env.LIFEOS_ENVCTL_ROOT ?? "/home/flexnetos/meta/src/envctl";
 const databaseUrl = process.env.LIFEOS_DATABASE_URL ??
-  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql";
-const conn = "host=/home/flexnetos/meta/var/run/postgresql dbname=lifeos user=flexnetos";
+  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
+const conn = "host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql dbname=lifeos user=flexnetos";
 const protectedPlugin = "/home/flexnetos/meta/src/nu_plugin";
 const receiptPath = resolve(root, "evidence/release/live-materialization-receipt.json");
 const tempRoot = mkdtempSync(join(tmpdir(), "lifeos-release-materialization-"));

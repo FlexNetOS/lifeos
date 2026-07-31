@@ -33,7 +33,7 @@ RUVECTOR_LIBRARY = os.environ.get(
     "RUVECTOR_LIBRARY",
     str(Path(PGBIN).parent / "lib" / "ruvector"),
 )
-PGHOST = os.environ.get("RUVECTOR_PGHOST", "/home/flexnetos/meta/var/run/postgresql")
+PGHOST = os.environ.get("RUVECTOR_PGHOST", "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql")
 PGPORT = os.environ.get("RUVECTOR_PGPORT", "5432")
 DBNAME = os.environ.get("RUVECTOR_DB", "ruvector_matrix")
 SQL_LIBRARY = RUVECTOR_LIBRARY if DBNAME == "lifeos" else "$libdir/ruvector"

@@ -18,7 +18,7 @@ const redbRoot = resolve(process.env.LIFEOS_REDB_ROOT ?? "/home/flexnetos/meta/v
 delete process.env.LIFEOS_REDB_ROOT;
 const rvfRoot = resolve(process.env.LIFEOS_AGENT_RVF_ROOT ?? "/home/flexnetos/meta/var/lib/agentdb/rvf");
 const intervalMs = Number(process.env.LIFEOS_AGENT_HEARTBEAT_MS ?? 5_000);
-const statusPath = resolve(process.env.LIFEOS_AGENT_STATUS ?? "/run/user/1001/yazelix/profile-runtime/lifeos-agent-runtime/status.json");
+const statusPath = resolve(process.env.LIFEOS_AGENT_STATUS ?? "/home/flexnetos/meta/var/lib/yazelix/runtime/lifeos-agent/status.json");
 
 function ownerPutMany(entries) {
   return new Promise((resolvePromise, reject) => {

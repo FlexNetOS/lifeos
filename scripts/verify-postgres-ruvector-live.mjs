@@ -6,7 +6,7 @@ import { join } from "node:path";
 const root = process.cwd();
 const rtk = "/home/flexnetos/.nix-profile/bin/rtk";
 const psql = process.env.LIFEOS_PSQL ?? "/home/flexnetos/.nix-profile/bin/psql";
-const defaultSocket = "/home/flexnetos/meta/var/run/postgresql";
+const defaultSocket = "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const databaseUrl = process.env.LIFEOS_DATABASE_URL ??
   (existsSync(join(defaultSocket, ".s.PGSQL.5432"))
     ? `postgresql://${process.env.USER ?? "flexnetos"}@localhost/lifeos?host=${encodeURIComponent(defaultSocket)}`

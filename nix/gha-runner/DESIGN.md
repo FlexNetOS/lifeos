@@ -61,14 +61,14 @@ deps and break hermeticity. Removing them IS the hermetic rewrite.
 ```
 register.nu:
   token = envctl mint gha-runner-registration --org FlexNetOS   # B1 fence (owner runs)
-  RUNNER_DIR = $PROFILE_RUNTIME/gha-runner            # /run/user/1001/yazelix/profile-runtime/gha-runner
+  RUNNER_DIR = /home/flexnetos/meta/var/lib/yazelix/runtime/runner
   cp -r ${substrate}/share/github-runner/* $RUNNER_DIR   # config.sh + run.sh live here
   $RUNNER_DIR/config.sh --url https://github.com/FlexNetOS/lifeos \
      --token $token --labels self-hosted,flexnetos,nix --name flexnetos-nix-01 \
      --work $RUNNER_DIR/_work --unattended --replace
 runner.nu:
   exec $RUNNER_DIR/run.sh          # foreground; yzx/Zellij pane keeps it alive, OR
-  # systemd --user unit (user scope only) for restart-on-boot — NEVER a system unit
+  # activation is owned by `yzx enter` / `yzx launch`; no local unit
 ```
 
 Volatile state (`_work`, `_diag`, `HARNESS_MEMORY_PATH`) → profile-runtime (SPEC §2).

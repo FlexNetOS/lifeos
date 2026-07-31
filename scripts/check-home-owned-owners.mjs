@@ -11,12 +11,13 @@ const repoRoot = resolve(new URL(".", import.meta.url).pathname, "..");
 const args = process.argv.slice(2);
 const strict = args.includes("--strict");
 const bArg = args.indexOf("--baseline");
+const hArg = args.indexOf("--home-root");
 const baselinePath =
   bArg >= 0
     ? resolve(process.cwd(), args[bArg + 1])
     : resolve(repoRoot, "evidence/isolation/home_residual_baseline.json");
 
-const HOME = "/home/flexnetos";
+const HOME = hArg >= 0 ? resolve(args[hArg + 1]) : "/home/flexnetos";
 // The residual surface under path law: home-owned dirs that may act as
 // active owners. Kept in sync with the T1 failure-mode catalog (FM-04).
 const SCAN_ROOTS = [

@@ -32,7 +32,7 @@ function runCargoTree() {
 
 function runPsql(sql) {
   return execFileSync(rtk, [
-    "proxy", "psql", "-X", "-q", "-h", "/home/flexnetos/meta/var/run/postgresql",
+    "proxy", "psql", "-X", "-q", "-h", "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql",
     "-d", "lifeos", "-At", "-c", sql,
   ], { cwd: lifeosRoot, encoding: "utf8" }).trim();
 }

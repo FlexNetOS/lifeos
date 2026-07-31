@@ -9,7 +9,7 @@ import { execFileSync } from "node:child_process";
 const root = process.cwd();
 const psql = process.env.LIFEOS_PSQL ?? "/home/flexnetos/.nix-profile/bin/psql";
 const databaseUrl = process.env.LIFEOS_DATABASE_URL ??
-  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql";
+  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const tenant = "00000000-0000-4000-8000-000000000001";
 const identity = "00000000-0000-4000-8000-000000000002";
 const grant = "00000000-0000-4000-8000-000000000003";

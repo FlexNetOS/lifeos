@@ -13,8 +13,8 @@ export const SOURCE_PATH = path.join(
 
 export const SOURCE_ID = "ARCHANCHOR-001";
 export const SOURCE_SHA256 =
-  "f500fe591bd19b8f429280a25afd7c4a29f7ae58934b96875793f4faf5c6471a";
-export const SOURCE_BYTES = 1_041_476;
+  "123f68d83fb6502b581cded175a32c5013c509ce988c89a7d51e0635b64e1b40";
+export const SOURCE_BYTES = 1_041_446;
 export const SOURCE_LINES = 6_512;
 export const MEMOIR_NAME = "architecture-data-pipeline-ruvector";
 export const TOPIC_PREFIX = MEMOIR_NAME;
@@ -89,8 +89,7 @@ function resolveProfilePsql() {
   );
 }
 
-const ICM_CONFIG_PATH = "/home/flexnetos/.config/icm/config.toml";
-const PG_SOCKET = "/home/flexnetos/meta/var/run/postgresql";
+const PG_SOCKET = "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const PG_DATABASE = "icm";
 const ICM_POSTGRES_URL = process.env.ICM_POSTGRES_URL ??
   `postgresql://${encodeURIComponent(process.env.USER ?? "flexnetos")}@/${PG_DATABASE}` +
@@ -967,34 +966,25 @@ function sqlLiteral(value) {
 }
 
 function parseEmbeddingConfig() {
-  const realPath = fs.realpathSync(ICM_CONFIG_PATH);
-  if (
-    !realPath.startsWith("/home/flexnetos/meta/src/envctl/") &&
-    !realPath.startsWith("/nix/store/")
-  ) {
-    fail(`ICM config is not profile/envctl-owned: ${realPath}`);
+  const text = runIcm(["config"]).stdout;
+  const configPath = /^Config:\s+(.+)$/m.exec(text)?.[1]?.trim() ?? null;
+  if (!configPath || !configPath.startsWith("/nix/store/")) {
+    fail(`ICM config is not owned by the Yazelix profile: ${configPath ?? "missing"}`);
   }
-  const text = fs.readFileSync(ICM_CONFIG_PATH, "utf8");
   const lines = text.split("\n");
   const sectionStart = lines.findIndex(
     (line) => line.trim() === "[embeddings]"
   );
-  if (sectionStart === -1) {
-    fail(`${ICM_CONFIG_PATH} has no [embeddings] section`);
-  }
+  if (sectionStart === -1) fail("profile ICM config has no [embeddings] section");
   const tail = lines.slice(sectionStart + 1);
-  const nextSection = tail.findIndex((line) =>
-    line.trim().startsWith("[")
-  );
-  const section = (nextSection === -1 ? tail : tail.slice(0, nextSection)).join(
-    "\n"
-  );
+  const nextSection = tail.findIndex((line) => line.trim().startsWith("["));
+  const section = (nextSection === -1 ? tail : tail.slice(0, nextSection)).join("\n");
   const value = (key) => {
-    const match = new RegExp(`^${key}\\s*=\\s*"([^"]+)"`, "m").exec(section);
+    const match = new RegExp(`^\\s*${key}\\s*=\\s*(\\S+)`, "m").exec(section);
     return match?.[1] ?? null;
   };
   const config = {
-    path: realPath,
+    path: configPath,
     primaryModel: value("model"),
     fastModel: value("fast_model")
   };

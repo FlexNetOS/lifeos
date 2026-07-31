@@ -1198,7 +1198,7 @@ fn engine_room_pane_snapshot(session_name: &str) -> Option<String> {
     });
     let server_root = std::env::var_os("XDG_RUNTIME_DIR")
         .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+        .unwrap_or_else(|| PathBuf::from("/home/flexnetos/meta/var/lib/yazelix/runtime/xdg"));
     let server = server_root
         .join("zellij/contract_version_1")
         .join(session_name);
@@ -1404,7 +1404,7 @@ fn terminal_spawn(
         });
         let server_root = std::env::var_os("XDG_RUNTIME_DIR")
             .map(PathBuf::from)
-            .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+            .unwrap_or_else(|| PathBuf::from("/home/flexnetos/meta/var/lib/yazelix/runtime/xdg"));
         let server = server_root
             .join("zellij/contract_version_1")
             .join(&focus_session_name);
@@ -1597,7 +1597,9 @@ fn terminal_probe(
             });
             let server_root = std::env::var_os("XDG_RUNTIME_DIR")
                 .map(PathBuf::from)
-                .unwrap_or_else(|| PathBuf::from("/run/user/1001"));
+                .unwrap_or_else(|| {
+                    PathBuf::from("/home/flexnetos/meta/var/lib/yazelix/runtime/xdg")
+                });
             let server = server_root
                 .join("zellij/contract_version_1")
                 .join(&session.engine_session_name);

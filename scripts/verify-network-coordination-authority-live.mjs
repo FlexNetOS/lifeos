@@ -11,7 +11,7 @@ const root = resolve(import.meta.dirname, "..");
 const psql = "/home/flexnetos/.nix-profile/bin/psql";
 const rtk = "/home/flexnetos/.nix-profile/bin/rtk";
 const netctl = process.env.LIFEOS_NETCTL_BIN ?? "/home/flexnetos/meta/var/cargo-target/debug/netctl";
-const dbArgs = ["-X", "--no-psqlrc", "-v", "ON_ERROR_STOP=1", "-h", "/home/flexnetos/meta/var/run/postgresql", "-d", "lifeos", "-qAt"];
+const dbArgs = ["-X", "--no-psqlrc", "-v", "ON_ERROR_STOP=1", "-h", "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql", "-d", "lifeos", "-qAt"];
 
 const components = {
   network_control: {

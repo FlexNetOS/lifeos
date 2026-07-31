@@ -29,7 +29,7 @@ vitest suite) going green on `runs-on: [self-hosted, flexnetos, nix]`.
 1. **MUST NOT TOUCH SYSTEM DEPTHS** — no root, no `/etc`, no system `systemd` units,
    no second profile. The runner is a **user-level** service.
 2. **SINGLE NIX_PROFILE** — `/home/flexnetos/.nix-profile` is the sole owner.
-   Volatile runner/agent state under `/run/user/1001/yazelix/profile-runtime`.
+   Runner/agent state under `/home/flexnetos/meta/var/lib/yazelix/runtime/runner`.
 3. **LATEST TOOLCHAIN** — nixpkgs pinned to `nixos-unstable` (locked in `flake.lock`);
    npm layer re-verified against live registry (done: host-github-actions 0.1.2,
    kernel 0.1.2, agentic-flow 2.1.0).

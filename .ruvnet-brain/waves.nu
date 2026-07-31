@@ -10,12 +10,12 @@ const LEDGER = "/home/flexnetos/meta/var/lib/codedb/ledgers"
 # external to the repository"), so that a tree cannot supply its own capture
 # authority. The ledger dir is itself under a capture root, so policies are
 # written to volatile runtime storage outside /home/flexnetos instead.
-const POLICY_DIR = "/run/user/1001/yazelix/volatile/tmp/codedb-policies"
+const POLICY_DIR = "/home/flexnetos/meta/var/lib/yazelix/runtime/volatile/tmp/codedb-policies"
 # NOTE: rust-postgres rejects an `options` URL param, and the live postmaster's parallel
 # workers fail at startup (dangling profile binaries). Mitigation lives DB-side instead:
 # ALTER DATABASE lifeos SET max_parallel_{workers_per_gather,maintenance_workers}=0
 # (reset after the owner-gated frontdoor heal).
-const DSN = "postgresql:///lifeos?host=/home/flexnetos/meta/var/run/postgresql&port=5432"
+const DSN = "postgresql:///lifeos?host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql&port=5432"
 const PLACEHOLDER = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
 
 def wave-roots [] {

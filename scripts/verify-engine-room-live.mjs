@@ -81,7 +81,7 @@ const result = {
   argv: ["yzx", "enter", "--session", session],
   session,
   process_tree: processTree,
-  nushell_config: "/run/user/1001/yazelix/profile-runtime/yazelix/nu/env.nu",
+  nushell_config: "/home/flexnetos/meta/var/lib/yazelix/runtime/state/nu/env.nu",
   output_tail: output.slice(-4096),
   ready,
   shutdown,

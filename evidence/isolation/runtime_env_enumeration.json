@@ -2,36 +2,37 @@
   "schema_version": "lifeos.evidence.runtime-env-enumeration.v1",
   "generated_by": "scripts/enumerate-runtime-env.mjs",
   "cross_checked_against": "evidence/isolation/isolation_tier_map.json",
+  "capture_mode": "declared-yazelix-targets",
   "var_count": 10,
-  "on_run_tmpfs_count": 5,
+  "on_run_tmpfs_count": 0,
   "durable_on_run_count": 0,
   "entries": [
     {
       "name": "CLAUDE_CONFIG_DIR",
-      "live_value": null,
+      "live_value": "/home/flexnetos/meta/var/lib/claude",
       "on_run_tmpfs": false,
-      "tier": "volatile",
+      "tier": "durable",
       "tier_map_entry": true,
       "misplaced": false,
-      "target_path": "/run/user/1001/yazelix/profile-runtime/claude"
+      "target_path": "/home/flexnetos/meta/var/lib/claude"
     },
     {
       "name": "CODEX_HOME",
-      "live_value": "/run/user/1001/yazelix/profile-runtime/codex",
-      "on_run_tmpfs": true,
-      "tier": "volatile",
+      "live_value": "/home/flexnetos/meta/var/lib/codex",
+      "on_run_tmpfs": false,
+      "tier": "durable",
       "tier_map_entry": true,
       "misplaced": false,
-      "target_path": "/run/user/1001/yazelix/profile-runtime/codex"
+      "target_path": "/home/flexnetos/meta/var/lib/codex"
     },
     {
       "name": "YAZELIX_STATE_DIR",
-      "live_value": "/run/user/1001/yazelix/profile-runtime/yazelix",
-      "on_run_tmpfs": true,
-      "tier": "volatile",
+      "live_value": "/home/flexnetos/meta/var/lib/yazelix/runtime/state",
+      "on_run_tmpfs": false,
+      "tier": "runtime",
       "tier_map_entry": true,
       "misplaced": false,
-      "target_path": "/run/user/1001/yazelix/profile-runtime/yazelix"
+      "target_path": "/home/flexnetos/meta/var/lib/yazelix/runtime/state"
     },
     {
       "name": "XDG_DATA_HOME",
@@ -53,16 +54,16 @@
     },
     {
       "name": "XDG_RUNTIME_DIR",
-      "live_value": "/run/user/1001",
-      "on_run_tmpfs": true,
-      "tier": "volatile",
+      "live_value": "/home/flexnetos/meta/var/lib/yazelix/runtime/xdg",
+      "on_run_tmpfs": false,
+      "tier": "runtime",
       "tier_map_entry": true,
       "misplaced": false,
-      "target_path": "/run/user/1001"
+      "target_path": "/home/flexnetos/meta/var/lib/yazelix/runtime/xdg"
     },
     {
       "name": "ICM_DB",
-      "live_value": "/home/flexnetos/meta/var/lib/icm/memories.db",
+      "live_value": "/home/flexnetos/meta/var/xdg-data/icm/memories.db",
       "on_run_tmpfs": false,
       "tier": "durable",
       "tier_map_entry": true,
@@ -70,31 +71,31 @@
       "target_path": "/home/flexnetos/meta/var/xdg-data/icm/memories.db"
     },
     {
+      "name": "CARGO_HOME",
+      "live_value": "/home/flexnetos/meta/var/cache/cargo-home",
+      "on_run_tmpfs": false,
+      "tier": "durable",
+      "tier_map_entry": true,
+      "misplaced": false,
+      "target_path": "/home/flexnetos/meta/var/cache/cargo-home"
+    },
+    {
       "name": "CARGO_TARGET_DIR",
       "live_value": "/home/flexnetos/meta/var/cargo-target",
       "on_run_tmpfs": false,
-      "tier": "volatile",
+      "tier": "durable",
       "tier_map_entry": true,
       "misplaced": false,
       "target_path": "/home/flexnetos/meta/var/cargo-target"
     },
     {
-      "name": "RUSTUP_HOME",
-      "live_value": "/run/user/1001/yazelix/volatile/rustup-home",
-      "on_run_tmpfs": true,
-      "tier": "volatile",
-      "tier_map_entry": true,
-      "misplaced": false,
-      "target_path": "/run/user/1001/yazelix/volatile/rustup-home"
-    },
-    {
       "name": "TMPDIR",
-      "live_value": "/run/user/1001/yazelix/volatile/tmp",
-      "on_run_tmpfs": true,
+      "live_value": "/home/flexnetos/meta/var/lib/yazelix/runtime/volatile/tmp",
+      "on_run_tmpfs": false,
       "tier": "volatile",
       "tier_map_entry": true,
       "misplaced": false,
-      "target_path": "/run/user/1001/yazelix/volatile/tmp"
+      "target_path": "/home/flexnetos/meta/var/lib/yazelix/runtime/volatile/tmp"
     }
   ]
 }

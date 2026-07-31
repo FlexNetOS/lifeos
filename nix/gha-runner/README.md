@@ -10,7 +10,7 @@ layered on top. Everything runs from one Nix flake closure with **zero OS depend
   action, ADR-033) · `agentic-flow@2.1.0` · `@metaharness/kernel@0.1.2`, pinned by exact
   version + SRI and materialized by `buildNpmPackage`.
 - **Foundation:** one flake, `yzx`-launched, Nushell scripts, envctl-minted token,
-  volatile state under `/run/user/1001/yazelix/profile-runtime`.
+  state under `/home/flexnetos/meta/var/lib/yazelix/runtime/runner`.
 
 Grounded in `metaharness/docs/adrs/ADR-033-host-github-actions.md` (Status: IMPLEMENTED).
 See [SPEC.md](./SPEC.md) and [DESIGN.md](./DESIGN.md).

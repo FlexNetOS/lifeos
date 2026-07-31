@@ -78,7 +78,7 @@ if (process.platform === "linux") {
   // profile-owned cached plugin; the primary deployment already copied the
   // required libraries, so the recursive pass is unnecessary.
   const gtkPlugin = join(
-    env.XDG_CACHE_HOME ?? "/run/user/1001/yazelix/volatile/cache",
+    env.XDG_CACHE_HOME ?? "/home/flexnetos/meta/var/lib/yazelix/runtime/volatile/cache",
     "tauri/linuxdeploy-plugin-gtk.sh",
   );
   if (existsSync(gtkPlugin)) {

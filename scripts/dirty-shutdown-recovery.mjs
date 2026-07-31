@@ -18,7 +18,7 @@ import { productionServices, startServicesOrdered, reattachDurablePlane } from "
 
 const PG_DATA = "/home/flexnetos/meta/var/lib/postgresql/17";
 const PG_LOG = `${PG_DATA}/logfile`;
-const PG_SOCKET_DIR = "/home/flexnetos/meta/var/run/postgresql";
+const PG_SOCKET_DIR = "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const RECEIPT = "/home/flexnetos/meta/var/xdg-data/lifeos/crash-drill/receipt.json";
 const REDB_DIR = "/home/flexnetos/meta/var/lib/redb";
 const DRILL_DB = "archbp133_drill";

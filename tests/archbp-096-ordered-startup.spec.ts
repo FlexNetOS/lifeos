@@ -3,37 +3,21 @@ import { createServer } from "node:net";
 // @ts-expect-error mjs module
 import { startServicesOrdered } from "../scripts/boot-reattach.mjs";
 
-// ARCHBP-096 — Start postgres, then redb, then the Glass/Engine front door
-// in dependency order. (yzx-iso t7, G7.)
+// ARCHBP-096 — Verify postgres, redb, and the Glass/Engine front door in
+// dependency order after Yazelix starts the owned stack. (yzx-iso t7, G7.)
 
 // Real-process fixtures are timing-sensitive under full-suite parallel load
 // (proven passing 3/3 solo); retries absorb host contention, not product bugs.
 describe("ARCHBP-096 ordered health-gated startup", { retry: 2 }, () => {
-  test("ordered startup is implemented with health-gated transitions (real processes)", async () => {
-    // Real fixture: two TCP services started by the engine itself, ordered.
-    // Ports are unique per run (pid-derived) and the fixtures live only a few
-    // seconds, so back-to-back runs never find a leaked listener already up.
-    const freePort = () => new Promise<number>((resolvePort, reject) => {
-      const server = createServer();
-      server.once("error", reject);
-      server.listen(0, "127.0.0.1", () => {
-        const address = server.address();
-        const port = typeof address === "object" && address ? address.port : 0;
-        server.close((error) => error ? reject(error) : resolvePort(port));
-      });
-    });
-    const p1 = await freePort();
-    const p2 = await freePort();
-    const fixture = (port: number) =>
-      ["bun", "-e", `Bun.listen({hostname:'127.0.0.1',port:${port},socket:{data(){}}}); setTimeout(()=>{}, 5000)`];
+  test("readiness is verified in dependency order without starting a competing process", async () => {
     const services = [
-      { name: "first", order: 1, healthTcp: p1, timeoutMs: 20000, start: fixture(p1) },
-      { name: "second", order: 2, healthTcp: p2, timeoutMs: 20000, start: fixture(p2) },
+      { name: "second", order: 2, health: ["test", "-d", "/"] },
+      { name: "first", order: 1, health: ["test", "-d", "/"] },
     ];
     const r = await startServicesOrdered(services);
     expect(r.ok, JSON.stringify(r)).toBe(true);
     expect(r.report.map((s: { name: string }) => s.name)).toEqual(["first", "second"]);
-    expect(r.report.every((s: { healthy: boolean; started: boolean }) => s.healthy && s.started)).toBe(true);
+    expect(r.report.every((s: { healthy: boolean; started: boolean }) => s.healthy && !s.started)).toBe(true);
   }, 60000);
 
   test("a failed dependency stops the chain and the failure is surfaced", async () => {

@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
-// ARCHBP-059 — Exhaustively classify every runtime path into volatile (tmpfs),
-// durable (persistent), or portable (release) tiers so classification cannot
+// ARCHBP-059 — Exhaustively classify every path into Yazelix runtime,
+// volatile scratch, durable data, or portable release tiers so classification cannot
 // drift. (yzx-iso t1-2-tier-map, G1/G4.)
 
 const repoRoot = resolve(import.meta.dirname, "..");
@@ -12,7 +12,7 @@ const tierMapPath = resolve(
   "evidence/isolation/isolation_tier_map.json",
 );
 
-const TIERS = new Set(["volatile", "durable", "portable"]);
+const TIERS = new Set(["runtime", "volatile", "durable", "portable"]);
 
 // The known agent/runtime surface that a tier map claiming exhaustiveness must
 // at minimum classify (env vars and state paths from the 2026-07-21 incident
@@ -23,16 +23,17 @@ const REQUIRED_ENV_VARS = [
   "YAZELIX_STATE_DIR",
   "XDG_DATA_HOME",
   "XDG_STATE_HOME",
+  "XDG_RUNTIME_DIR",
   "ICM_DB",
+  "CARGO_HOME",
+  "CARGO_TARGET_DIR",
 ];
 const REQUIRED_PATH_NAMES = [
   "postgres-datadir",
   "redb-plane",
   "claude-session-transcripts",
   "cargo-target",
-  "rustup-toolchains",
   "build-tmp",
-  "profile-runtime",
   "runner-work-root",
 ];
 
@@ -45,7 +46,7 @@ describe("ARCHBP-059 runtime path tier map", () => {
     expect(existsSync(tierMapPath)).toBe(true);
   });
 
-  test("every entry is classified into exactly volatile, durable, or portable", () => {
+  test("every entry is classified into exactly one declared tier", () => {
     const map = loadTierMap();
     expect(Array.isArray(map.entries)).toBe(true);
     expect(map.entries.length).toBeGreaterThan(0);
@@ -77,18 +78,12 @@ describe("ARCHBP-059 runtime path tier map", () => {
     expect(offenders).toEqual([]);
   });
 
-  test("profile-owned /run state is explicitly classified as volatile", () => {
+  test("agent and process runtime paths have no host-runtime owner", () => {
     const map = loadTierMap();
-    const onRun = map.entries.filter(
-      (e: { current_path?: string; tier: string }) =>
-        (e.current_path ?? "").startsWith("/run/") &&
-        ["CLAUDE_CONFIG_DIR", "CODEX_HOME", "YAZELIX_STATE_DIR"].includes(e.name),
-    );
-    expect(onRun.length).toBe(3);
-    for (const entry of onRun) {
-      expect(entry.tier, entry.name).toBe("volatile");
-      expect(entry.misplaced, `${entry.name} must not be marked misplaced`).toBe(false);
-      expect(entry.target_path.startsWith("/run/"), entry.name).toBe(true);
+    const names = ["CLAUDE_CONFIG_DIR", "CODEX_HOME", "YAZELIX_STATE_DIR", "XDG_RUNTIME_DIR"];
+    for (const entry of map.entries.filter((e: { name: string }) => names.includes(e.name))) {
+      expect(entry.current_path.startsWith("/run/"), entry.name).toBe(false);
+      expect(entry.target_path.startsWith("/run/"), entry.name).toBe(false);
     }
   });
 

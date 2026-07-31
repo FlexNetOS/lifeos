@@ -12,7 +12,7 @@ const psql = "/home/flexnetos/.nix-profile/bin/psql";
 const executor = process.env.LIFEOS_NETWORK_EXECUTOR ??
   "/home/flexnetos/meta/var/cargo-target/debug/lifeos-network-control-executor";
 const netctl = process.env.LIFEOS_NETCTL_BIN ?? "/home/flexnetos/meta/var/cargo-target/debug/netctl";
-const socket = process.env.LIFEOS_PG_SOCKET ?? "/home/flexnetos/meta/var/run/postgresql";
+const socket = process.env.LIFEOS_PG_SOCKET ?? "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const database = process.env.LIFEOS_DATABASE ?? "lifeos";
 const databaseUrl = process.env.LIFEOS_DATABASE_URL ??
   `postgresql://flexnetos@localhost/lifeos?host=${socket}`;

@@ -27,18 +27,12 @@ function makeSessionRoot(dir: string) {
   return dir;
 }
 
-// Fixture services in the boot-reattach schema, TCP-health-gated on ports
-// unique to this run (pid-derived, same discipline as the 096 spec).
-const p1 = 23700 + (process.pid % 97);
-function fixtureServices(port: number) {
+// Fixture services in the boot-reattach schema. Activation is deliberately
+// absent: the harness verifies what Yazelix restored and never starts an
+// independent fixture process of its own.
+function fixtureServices() {
   return [
-    {
-      name: "fixture-db",
-      order: 1,
-      healthTcp: port,
-      timeoutMs: 20000,
-      start: ["bun", "-e", `Bun.listen({hostname:'127.0.0.1',port:${port},socket:{data(){}}}); setTimeout(()=>{}, 8000)`],
-    },
+    { name: "fixture-db", order: 1, health: ["test", "-d", "/"] },
     { name: "fixture-plane", order: 2, health: ["test", "-d", "/"], timeoutMs: 5000 },
   ];
 }
@@ -57,7 +51,7 @@ function armed(name: string, services: unknown) {
 describe("ARCHBP-099 cold-reboot re-attach harness", () => {
   test("harness built: arm captures a durable expectation manifest", () => {
     expect(existsSync(harness)).toBe(true);
-    const { statePath } = armed("arm", fixtureServices(p1));
+    const { statePath } = armed("arm", fixtureServices());
     const m = JSON.parse(readFileSync(statePath, "utf8"));
     expect(m.schema_version).toBe("lifeos-planning-spine.cold-reboot-expectation.v0");
     expect(m.boot_id).toBe(bootId()); // armed on THIS boot — verify demands the next one
@@ -67,7 +61,7 @@ describe("ARCHBP-099 cold-reboot re-attach harness", () => {
   });
 
   test("verify runs unattended and asserts service + session restore", async () => {
-    const { statePath, dir } = armed("green", fixtureServices(p1 + 1));
+    const { statePath, dir } = armed("green", fixtureServices());
     const receiptPath = `${dir}/verdict.json`;
     // Unattended: no TTY, stdin ignored — exactly how the post-boot unit runs it.
     const { stdout } = await execFileAsync(
@@ -97,7 +91,7 @@ describe("ARCHBP-099 cold-reboot re-attach harness", () => {
   }, 120000);
 
   test("verify refuses a same-boot run unless explicitly allowed", async () => {
-    const { statePath, dir } = armed("sameboot", fixtureServices(p1 + 2));
+    const { statePath, dir } = armed("sameboot", fixtureServices());
     const receiptPath = `${dir}/verdict.json`;
     // The gauntlet contract: without the override the harness demands that a
     // real cold reboot happened since arm — same boot_id is an early failure.
@@ -109,12 +103,10 @@ describe("ARCHBP-099 cold-reboot re-attach harness", () => {
     expect(receipt.cold_reboot).toBe(false);
   }, 60000);
 
-  test("the unit runs verify non-interactively at login with no host-unit coupling", () => {
-    const out = execFileSync("bun", [harness, "unit"], { encoding: "utf8" });
-    expect(out).toContain("Type=oneshot");
-    expect(out).toContain("cold-reboot-harness.mjs verify");
-    expect(out).toContain("WantedBy=default.target");
-    expect(out).not.toMatch(/^Requires=/m); // host boots freely (G1)
-    expect(out).not.toMatch(/StandardInput=tty|TTYPath/); // unattended
+  test("the harness leaves activation to Yazelix", () => {
+    const src = readFileSync(harness, "utf8");
+    expect(src).not.toContain("systemctl");
+    expect(src).not.toContain("WantedBy=");
+    expect(src).toContain('from "./boot-reattach.mjs"');
   });
 });

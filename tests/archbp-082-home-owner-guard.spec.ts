@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -15,26 +15,27 @@ const run = (args: string[]) =>
 describe("ARCHBP-082 home-owned-owner guard", () => {
   test("the scanner enumerates the live residual surface each CI run (session start)", () => {
     const r = run([]);
-    expect(r.status, r.stderr).toBe(0); // no NEW residuals today
+    expect(r.status, r.stderr).toBe(0);
     expect(r.stdout).toMatch(/\d+ roots scanned/);
     expect(r.stdout).toContain("PASS");
-    // Honesty: the known pre-T5 residuals are enumerated, not hidden.
-    expect(r.stderr).toContain("known residual");
-    expect(r.stderr).toContain("/home/flexnetos/.claude");
+    expect(r.stdout).toContain("0 present");
+    expect(r.stderr).toBe("");
   });
 
   test("CI fails on a NEW residual (regression) — proven with a shrunken baseline", () => {
     const dir = mkdtempSync(join(tmpdir(), "archbp082-"));
     try {
-      // A baseline that omits ~/.claude makes the real, live ~/.claude a
-      // "new" residual — the guard must fail.
+      const fixtureHome = join(dir, "home");
+      const residual = join(fixtureHome, ".codex");
+      mkdirSync(residual, { recursive: true });
+      writeFileSync(join(residual, "config.toml"), "fixture\n");
       const shrunken = {
         schema_version: "lifeos-planning-spine.home-residual-baseline.v0",
-        known_residuals: [{ path: "/home/flexnetos/FlexNetOS", why: "fixture" }],
+        known_residuals: [],
       };
       const p = join(dir, "baseline.json");
       writeFileSync(p, JSON.stringify(shrunken));
-      const r = run(["--baseline", p]);
+      const r = run(["--home-root", fixtureHome, "--baseline", p]);
       expect(r.status).toBe(1);
       expect(r.stderr).toContain("NEW RESIDUAL");
       expect(r.stdout).toContain("FAIL");
@@ -43,9 +44,9 @@ describe("ARCHBP-082 home-owned-owner guard", () => {
     }
   });
 
-  test("strict mode fails while any residual remains (the post-T5 target)", () => {
+  test("strict mode passes only after every residual is gone", () => {
     const r = run(["--strict"]);
-    expect(r.status).toBe(1);
-    expect(r.stdout).toContain("FAIL");
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stdout).toContain("PASS");
   });
 });

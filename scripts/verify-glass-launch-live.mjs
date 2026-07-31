@@ -15,7 +15,7 @@ const port = "1420";
 const useTauriCli = process.env.LIFEOS_GLASS_TAURI_CLI === "1";
 const engineSession = process.env.LIFEOS_ENGINE_SESSION_NAME ?? `lifeos-probe-${Date.now()}`;
 const runtime = {
-  LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql",
+  LIFEOS_DATABASE_URL: process.env.LIFEOS_DATABASE_URL ?? "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql",
   LIFEOS_RUNTIME_TENANT_ID: process.env.LIFEOS_RUNTIME_TENANT_ID ?? "00000000-0000-4000-8000-000000000001",
   LIFEOS_RUNTIME_IDENTITY_ID: process.env.LIFEOS_RUNTIME_IDENTITY_ID ?? "00000000-0000-4000-8000-000000000002",
   LIFEOS_RUNTIME_GRANT_ID: process.env.LIFEOS_RUNTIME_GRANT_ID ?? "00000000-0000-4000-8000-000000000003",

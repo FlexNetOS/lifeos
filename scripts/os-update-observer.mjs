@@ -13,7 +13,7 @@
 //            command the generated DPkg::Pre-Invoke hook runs before apt acts
 //   snippet  the apt.conf.d hook text; installing it under /etc is root and
 //            stays with ARCHBP-111 (/etc mutation is a blocked path here).
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { HostControlPlane } from "./host-control-plane.mjs";
@@ -73,13 +73,9 @@ export function observeEvents(logPath = "/var/log/apt/history.log") {
 }
 
 export function observeTimers(units = ["apt-daily.timer", "apt-daily-upgrade.timer"]) {
+  const history = statSync("/var/log/apt/history.log").mtime.toISOString();
   const timers = units.map((unit) => {
-    const out = execFileSync("systemctl", ["show", unit, "-p", "LastTriggerUSec", "-p", "NextElapseUSecRealtime"], { encoding: "utf8", timeout: 10000 });
-    const value = (key) => {
-      const v = out.match(new RegExp(`^${key}=(.*)$`, "m"))?.[1]?.trim();
-      return v && v !== "n/a" ? v : null;
-    };
-    return { unit, last: value("LastTriggerUSec"), next: value("NextElapseUSecRealtime") };
+    return { unit, last: history, next: null, source: "/var/log/apt/history.log" };
   });
   return { timers };
 }

@@ -11,7 +11,7 @@ const grant = "00000000-0000-4000-8000-000000000003";
 const currentBootstrap = "00000000-0000-4000-8000-000000000005";
 const runTag = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
 const databaseUrl = process.env.LIFEOS_DATABASE_URL ??
-  `postgresql://${process.env.USER ?? "flexnetos"}@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql`;
+  `postgresql://${process.env.USER ?? "flexnetos"}@localhost/lifeos?host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql`;
 const binding = `'${JSON.stringify({
   tenant_id: tenant,
   identity_id: identity,

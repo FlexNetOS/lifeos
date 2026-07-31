@@ -18,7 +18,7 @@ environment failure, not a finding about the change.
 
 ```bash
 D=/home/flexnetos/meta/var/lib/postgresql/17      # the datadir IS 17/, not 17/data
-S=/home/flexnetos/meta/var/run/postgresql
+S=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql
 mkdir -p $S
 rtk proxy -- pg_ctl -D $D -l $D/logfile -o "-k $S" start
 rtk proxy -- pg_isready -h $S

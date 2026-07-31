@@ -2,7 +2,7 @@ import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
 const databaseUrl = process.env.LIFEOS_DATABASE_URL ??
-  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql";
+  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const psql = process.env.LIFEOS_PSQL ?? Bun.which("psql");
 const receiptPath = resolve("evidence/postgres-ruvector/learning-live-receipt.json");
 

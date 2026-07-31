@@ -4,7 +4,7 @@
 # --canary injects a fabricated fs entry and MUST exit 1.
 # Declared: manifest exclusions, denied-class CSV ledger rows, loose-mapping staging.
 const PGBIN = "/nix/store/8zm2sma9jgvq101yy4x45za4y28yd164-postgresql-17.10/bin"
-const PGSOCK = "/home/flexnetos/meta/var/run/postgresql"
+const PGSOCK = "/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql"
 const MANIFEST = "/home/flexnetos/meta/src/lifeos/.ruvnet-brain/ingest-manifest.json"
 const LEDGER = "/home/flexnetos/meta/var/lib/codedb/ledgers"
 

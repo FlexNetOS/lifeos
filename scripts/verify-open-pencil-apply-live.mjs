@@ -4,12 +4,12 @@ import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
 const databaseUrl = process.env.LIFEOS_DATABASE_URL ??
-  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/run/postgresql";
+  "postgresql://flexnetos@localhost/lifeos?host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql";
 const psql = process.env.LIFEOS_PSQL ?? Bun.which("psql");
 const receiptPath = resolve("evidence/postgres-ruvector/open-pencil-apply-live-receipt.json");
 const rtk = process.env.LIFEOS_RTK_BIN ?? "/home/flexnetos/.nix-profile/bin/rtk";
 const commitConn = process.env.ENVCTL_PG_CONN ??
-  "host=/home/flexnetos/meta/var/run/postgresql dbname=lifeos user=flexnetos";
+  "host=/home/flexnetos/meta/var/lib/yazelix/runtime/services/postgresql dbname=lifeos user=flexnetos";
 const source = "<script>lifeos</script>\n";
 const sourceBytes = Buffer.from(source, "utf8");
 const sourceBase64 = sourceBytes.toString("base64");

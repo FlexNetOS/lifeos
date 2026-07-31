@@ -1,12 +1,11 @@
 #!/usr/bin/env nu
-# Launch the registered hermetic Nix github-runner, user-level, under profile-runtime.
-# NEVER a system systemd unit (SPEC §1). Keep this alive in a yzx/Zellij pane, or wrap
-# in a `systemd --user` unit for restart-on-login.
+# Legacy LifeOS runner diagnostic. The canonical listener is composed and supervised
+# by Yazelix from FlexNetOS/flexnetos_runner; never install a local service unit.
 #
 # Usage:  nix run .#runner
 
 def main [
-  --runtime: string = "/run/user/1001/yazelix/profile-runtime/gha-runner"
+  --runtime: string = "/home/flexnetos/meta/var/lib/yazelix/runtime/runner"
 ] {
   if not ($"($runtime)/run.sh" | path exists) {
     error make { msg: $"No runner at ($runtime). Run `nix run .#register` first (B1)." }

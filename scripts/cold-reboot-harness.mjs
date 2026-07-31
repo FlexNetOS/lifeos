@@ -8,7 +8,6 @@
 //           the in-session test override), run the full boot re-attach, and
 //           assert every expected service is healthy and every durable
 //           session survived. Verdict receipt on disk + stdout; exit 0/1.
-//   unit    print the systemd USER unit that runs verify at login.
 //
 // The harness itself never reboots the host — executing the physical reboot
 // gauntlet is ARCHBP-100 (owner-gated). Runs unattended: all inputs come from
@@ -17,7 +16,6 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { listSessions, productionServices, reattach } from "./boot-reattach.mjs";
 
-const repoRoot = resolve(new URL(".", import.meta.url).pathname, "..");
 const STATE_DEFAULT = "/home/flexnetos/meta/var/xdg-data/lifeos/cold-reboot/expectation.json";
 const VERDICT_DEFAULT = "/home/flexnetos/meta/var/xdg-data/lifeos/cold-reboot/verdict.json";
 
@@ -86,24 +84,6 @@ export async function verify({ statePath = STATE_DEFAULT, outputPath = VERDICT_D
   return verdict;
 }
 
-const UNIT = `# lifeos-cold-reboot-verify.service — systemd USER unit (yzx-iso T7.8).
-# Post-reboot half of the cold-reboot gauntlet: after 'arm' and a real
-# reboot, this asserts full re-attach at first login and records the verdict.
-#   systemctl --user enable lifeos-cold-reboot-verify.service
-[Unit]
-Description=LifeOS cold-reboot re-attach verification (yzx-iso T7.8)
-# No Requires= on any host system unit: the host boots freely (G1).
-After=lifeos-reattach.service
-
-[Service]
-Type=oneshot
-ExecStart=/home/flexnetos/.nix-profile/toolbin/bun ${repoRoot}/scripts/cold-reboot-harness.mjs verify
-RemainAfterExit=yes
-
-[Install]
-WantedBy=default.target
-`;
-
 async function main() {
   const [cmd, ...args] = process.argv.slice(2);
   if (cmd === "arm") {
@@ -122,10 +102,8 @@ async function main() {
     });
     process.stdout.write(`${JSON.stringify(verdict)}\n`);
     process.exit(verdict.ok ? 0 : 1);
-  } else if (cmd === "unit") {
-    process.stdout.write(UNIT);
   } else {
-    console.error("usage: cold-reboot-harness.mjs {arm|verify|unit}");
+    console.error("usage: cold-reboot-harness.mjs {arm|verify}");
     process.exit(2);
   }
 }
